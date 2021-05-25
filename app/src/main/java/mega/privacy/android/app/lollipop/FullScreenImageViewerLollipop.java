@@ -1029,7 +1029,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			// TODO: use constants
 			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE), savedInstanceState);
 		} else if (adapterType == PHOTO_SYNC_ADAPTER) {
-			getImageHandles(new MegaNodeRepo(megaApi, dbH).getCuChildren(orderGetChildren), savedInstanceState);
+			getImageHandles(new MegaNodeRepo(megaApi, dbH).getCuChildren(orderGetChildren), savedInstanceState, true);
 		} else {
 			if (parentNodeHandle == INVALID_HANDLE){
 				switch(adapterType){
@@ -1092,11 +1092,33 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		}
 	}
 
+	/**
+	 * Gets all the image handles to preview.
+	 *
+	 * @param nodes				 List of all nodes where search.
+	 * @param savedInstanceState Saved instance state if exists, null otherwise.
+	 */
 	private void getImageHandles(List<MegaNode> nodes, Bundle savedInstanceState) {
+		getImageHandles(nodes, savedInstanceState, false);
+	}
+
+	/**
+	 * Gets all the handles to preview.
+	 *
+	 * @param nodes				 List of all nodes where search.
+	 * @param savedInstanceState Saved instance state if exists, null otherwise.
+	 * @param getVideosToo		 True if should get video and image handles, false otherwise.
+	 */
+	private void getImageHandles(List<MegaNode> nodes, Bundle savedInstanceState, boolean getVideosToo) {
 		int imageNumber = 0;
 		for (int i = 0; i < nodes.size(); i++) {
 			MegaNode n = nodes.get(i);
-			if (MimeTypeList.typeForName(n.getName()).isImage()) {
+			MimeTypeList mime = MimeTypeList.typeForName(n.getName());
+			boolean isImageHandle = getVideosToo
+					? mime.isImage() || mime.isVideoReproducible()
+					: mime.isImage();
+
+			if (isImageHandle) {
 				imageHandles.add(n.getHandle());
 				if (i == positionG && savedInstanceState == null) {
 					positionG = imageNumber;

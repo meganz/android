@@ -62,7 +62,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
 
     @Override public long getItemId(int position) {
         switch (getItemViewType(position)) {
-            case CuNode.TYPE_TITLE:
+            case CuNode.TYPE_HEADER:
                 return mNodes.get(position).getModifyDate().hashCode();
             case CuNode.TYPE_IMAGE:
             case CuNode.TYPE_VIDEO:
@@ -79,7 +79,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     public CuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case CuNode.TYPE_TITLE:
+            case CuNode.TYPE_HEADER:
                 return new CuTitleViewHolder(
                         ItemCameraUploadsTitleBinding.inflate(inflater, parent, false));
             case CuNode.TYPE_VIDEO:
@@ -113,7 +113,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
             return 1;
         }
         switch (mNodes.get(position).getType()) {
-            case CuNode.TYPE_TITLE:
+            case CuNode.TYPE_HEADER:
                 return mSpanCount;
             case CuNode.TYPE_IMAGE:
             case CuNode.TYPE_VIDEO:
