@@ -79,7 +79,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
-import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.CONTACTS_TAB;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -522,8 +521,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 				inviteShown = false;
 			}
 		});
-
-		((ManagerActivityLollipop) context).deleteInviteContactHandle();
 	}
 
 	public void showAlertDialog (int title, int text, final boolean success) {
@@ -684,7 +681,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.contact_fragment_action, menu);
-			((ManagerActivityLollipop) context).hideTabs(true, CONTACTS_TAB);
 			((ManagerActivityLollipop)context).hideFabButton();
 			checkScroll();
 			return true;
@@ -695,7 +691,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 			logDebug("onDestroyActionMode");
 			clearSelections();
 			adapter.setMultipleSelect(false);
-			((ManagerActivityLollipop) context).hideTabs(false, CONTACTS_TAB);
 			((ManagerActivityLollipop)context).showFabButton();
 			checkScroll();
 		}
