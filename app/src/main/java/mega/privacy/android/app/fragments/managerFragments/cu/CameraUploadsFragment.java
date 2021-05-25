@@ -39,14 +39,11 @@ import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION;
@@ -56,7 +53,6 @@ import static mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME;
 import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
-import static mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CUMU;
 import static mega.privacy.android.app.utils.FileUtil.findVideoLocalPath;
@@ -103,12 +99,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         return mAdapter == null ? 0 : mAdapter.getItemCount();
     }
 
-    public void setOrderBy(int orderBy) {
-        reloadNodes(orderBy);
-    }
-
-    public void reloadNodes(int orderBy) {
-        mViewModel.loadCuNodes(orderBy);
+    public void reloadNodes() {
+        mViewModel.loadCuNodes();
     }
 
     public void checkScroll() {
@@ -131,7 +123,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             skipCUSetup();
             return 1;
         } else {
-            reloadNodes(sortOrderManagement.getOrderCamera());
+            reloadNodes();
             mManagerActivity.invalidateOptionsMenu();
             mManagerActivity.setToolbarTitle();
             return 1;
@@ -200,7 +192,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         CuViewModelFactory viewModelFactory =
                 new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
-                        new MegaNodeRepo(context, megaApi, dbH), context);
+                        new MegaNodeRepo(context, megaApi, dbH), context, sortOrderManagement);
         mViewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
         initAdsLoader(AD_SLOT, true);
@@ -413,7 +405,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     @Override public void onResume() {
         super.onResume();
 
-        reloadNodes(sortOrderManagement.getOrderCamera());
+        reloadNodes();
     }
 
     private void openNode(int position, CuNode cuNode) {

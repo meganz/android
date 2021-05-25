@@ -9239,9 +9239,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		refreshSearch();
 	}
 
-	public void refreshCameraOrder(int orderCamera) {
+	public void refreshCUNodes() {
 		if (getCameraUploadFragment() != null) {
-			cuFragment.setOrderBy(orderCamera);
+			cuFragment.reloadNodes();
 		}
 	}
 
@@ -12445,9 +12445,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		checkCameraUploadFolder(false,updatedNodes);
 
-		if (getCameraUploadFragment() != null) {
-			cuFragment.reloadNodes(sortOrderManagement.getOrderCamera());
-		}
+		refreshCUNodes();
 
 		LiveEventBus.get(EVENT_NODES_CHANGE).post(true);
 

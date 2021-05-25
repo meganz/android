@@ -30,6 +30,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.arch.BaseRxViewModel;
 import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.BaseListener;
 import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.Constants;
@@ -55,6 +56,7 @@ class CuViewModel extends BaseRxViewModel {
     private final DatabaseHandler mDbHandler;
     private final MegaNodeRepo mRepo;
     private final Context mAppContext;
+    private final SortOrderManagement mSortOrderManagement;
 
     private final MutableLiveData<List<CuNode>> mCuNodes = new MutableLiveData<>();
     private final MutableLiveData<Pair<Integer, CuNode>> mNodeToOpen = new MutableLiveData<>();
@@ -81,11 +83,12 @@ class CuViewModel extends BaseRxViewModel {
 
     @Inject
     public CuViewModel(@MegaApi MegaApiAndroid megaApi, DatabaseHandler dbHandler,
-                       MegaNodeRepo repo, Context context) {
+                       MegaNodeRepo repo, Context context, SortOrderManagement sortOrderManagement) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;
         mAppContext = context.getApplicationContext();
+        mSortOrderManagement = sortOrderManagement;
         mCreateThumbnailRequest = new BaseListener(mAppContext) {
             @Override
             public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
@@ -125,12 +128,8 @@ class CuViewModel extends BaseRxViewModel {
         return mActionMode;
     }
 
-    public void loadCuNodes(int orderBy) {
-        loadCuNodes(Single.defer(() -> Single.just(getCuNodes(orderBy))));
-    }
-
-    public void setSearchDate(long[] searchDate, int orderBy) {
-        loadCuNodes(orderBy);
+    public void loadCuNodes() {
+        loadNodes(Single.defer(() -> Single.just(getCuNodes())));
     }
 
     public long[] getSearchResultNodeHandles() {
@@ -333,34 +332,20 @@ class CuViewModel extends BaseRxViewModel {
         return camSyncEnabled;
     }
 
-    private void loadCuNodes() {
-        loadCuNodes(Single.defer(() -> {
-            int orderBy = MegaApiJava.ORDER_MODIFICATION_DESC;
-            MegaPreferences pref = mDbHandler.getPreferences();
-            if (pref != null) {
-                try {
-                    orderBy = Integer.parseInt(pref.getPreferredSortCameraUpload());
-                } catch (NumberFormatException ignored) {
-                }
-            }
-            return Single.just(orderBy);
-        }).map(this::getCuNodes));
-    }
-
-    private void loadCuNodes(Single<List<CuNode>> source) {
+    private void loadNodes(Single<List<CuNode>> source) {
         add(source.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(nodes -> {
-                    mCuNodes.setValue(nodes);
-                }, logErr("loadCuNodes")));
+                .subscribe(mCuNodes::setValue, logErr("loadCuNodes")));
     }
 
-    private List<CuNode> getCuNodes(int orderBy) {
+    private List<CuNode> getCuNodes() {
         List<CuNode> nodes = new ArrayList<>();
         List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
 
         LocalDate lastModifyDate = null;
-        List<Pair<Integer, MegaNode>> realNodes = mRepo.getCuChildren(orderBy, null);
+        List<Pair<Integer, MegaNode>> realNodes =
+                mRepo.getCuChildren(mSortOrderManagement.getOrderCamera(), null);
+
         for (Pair<Integer, MegaNode> pair : realNodes) {
             MegaNode node = pair.second;
             File thumbnail =
