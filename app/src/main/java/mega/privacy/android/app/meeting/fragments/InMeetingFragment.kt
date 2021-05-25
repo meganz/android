@@ -179,12 +179,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         inMeetingViewModel.updateParticipantsVisibility(it)
     }
 
-    private val privilegesChangeObserver = Observer<MegaChatListItem> {
-        if (inMeetingViewModel.isSameChatRoom(it.chatId)) {
-            inMeetingViewModel.getCall()?.let {
-                if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+    private val privilegesChangeObserver = Observer<MegaChatListItem> {item ->
+        if (inMeetingViewModel.isSameChatRoom(item.chatId)) {
+            inMeetingViewModel.getCall()?.let { call ->
+                if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     when {
-                        it.hasChanged(CHANGE_TYPE_OWN_PRIV) -> {
+                        item.hasChanged(CHANGE_TYPE_OWN_PRIV) -> {
                             logDebug("Change in my privileges")
                             if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
                                 showFixedBanner(
@@ -194,7 +194,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             }
                             bottomFloatingPanelViewHolder.updatePrivilege(inMeetingViewModel.getOwnPrivileges())
                         }
-                        it.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS) -> {
+                        item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS) -> {
                             logDebug("Change in the privileges of a participant")
                             updateRemotePrivileges(inMeetingViewModel.updateParticipantsPrivileges())
                             bottomFloatingPanelViewHolder.updateRemotePrivileges(
@@ -1615,7 +1615,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun updateLowOrHiResolution(isHiRes: Boolean, session: MegaChatSession) {
         logDebug("The resolution of a participant needs to be updated")
         inMeetingViewModel.getParticipant(session.peerid, session.clientid)?.let {
-            inMeetingViewModel.onActivateVideo(it, false)
+            val speakerParticipant = inMeetingViewModel.speakerParticipant.value
+            if (speakerParticipant != null && speakerParticipant.peerId == it.peerId && speakerParticipant.clientId == it.clientId) {
+                inMeetingViewModel.onActivateVideo(it, true)
+            } else {
+                inMeetingViewModel.onActivateVideo(it, false)
+            }
         }
 
         speakerViewCallFragment?.let {

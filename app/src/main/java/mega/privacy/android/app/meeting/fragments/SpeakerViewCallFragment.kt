@@ -197,7 +197,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
             logDebug("Update new speaker selected with clientId ${it.clientId}")
             speakerUser = it
-            updateSpeakerUser(it)
+            speakerUser?.let { speaker ->
+                updateSpeakerUser(speaker)
+            }
         }
 
         sharedModel.cameraLiveData.observe(viewLifecycleOwner) { isOn ->

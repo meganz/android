@@ -204,7 +204,7 @@ class VideoMeetingViewHolder(
                 it.addListener(listenerRenderer)
             }
 
-            inMeetingViewModel.onActivateVideo(participant, false)
+            inMeetingViewModel.onActivateVideo(participant, !isGrid)
         } else {
             logDebug("Active video when listener is not null")
             if (binding.parentTextureView.childCount > 0) {

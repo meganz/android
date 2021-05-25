@@ -917,12 +917,11 @@ class InMeetingViewModel @ViewModelInject constructor(
                         }
 
                         val position = participants.value?.indexOf(it)
-                        logDebug("Removed participant")
                         if (it.isVideoOn) {
                             removeVideoOfParticipantRemoved(chat.chatId, it)
                         }
-
                         list.remove()
+                        logDebug("Removed participant")
                         participants.value = participants.value
                         logDebug("Num of participants:" + participants.value?.size)
                         return position
