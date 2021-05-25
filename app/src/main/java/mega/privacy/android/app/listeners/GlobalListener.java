@@ -130,6 +130,9 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
         notifyNotificationCountChange(api);
 
+        Intent intent = new Intent(BROADCAST_ACTION_REQUEST_UPDATE);
+        MegaApplication.getInstance().sendBroadcast(intent);
+
         for (int i = 0; i < requests.size(); i++) {
             MegaContactRequest cr = requests.get(i);
             if (cr != null) {

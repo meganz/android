@@ -27,16 +27,21 @@ class ContactRequestsViewModel @ViewModelInject constructor(
     private val contactRequests: MutableLiveData<List<ContactRequestItem>> = MutableLiveData()
 
     init {
-        getContactRequests()
+        updateRequests()
     }
 
-    private fun getContactRequests() {
+    fun updateRequests() {
+        composite.clear()
         getContactRequestsUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { items -> contactRequests.value = items },
-                onError = { error -> Log.e(TAG, error.stackTraceToString()) }
+                onNext = { items ->
+                    contactRequests.value = items
+                },
+                onError = { error ->
+                    Log.e(TAG, error.stackTraceToString())
+                }
             )
             .addTo(composite)
     }
@@ -74,7 +79,7 @@ class ContactRequestsViewModel @ViewModelInject constructor(
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onComplete = { getContactRequests() },
+                onComplete = { updateRequests() },
                 onError = { Log.e(TAG, it.stackTraceToString()) }
             )
             .addTo(composite)

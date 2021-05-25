@@ -5523,7 +5523,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     		}
     		case CONTACTS:{
 				showHideBottomNavigationView(true);
-				startActivity(new Intent(this, ContactsActivity.class));
+				startActivity(ContactsActivity.getListIntent(this));
     			break;
     		}
 			case NOTIFICATIONS:{
@@ -9397,7 +9397,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			case R.id.contacts_section: {
 				sectionClicked = true;
 				drawerItem = DrawerItem.CONTACTS;
-				startActivity(new Intent(this, ContactsActivity.class));
+//				startActivity(ContactsActivity.getListIntent(this));
 				break;
 			}
 			case R.id.notifications_section: {

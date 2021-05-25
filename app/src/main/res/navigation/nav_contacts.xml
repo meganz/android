@@ -24,7 +24,13 @@
         android:id="@+id/contact_requests"
         android:name="mega.privacy.android.app.contacts.requests.ContactRequestsFragment"
         android:label="@string/section_requests"
-        tools:layout="@layout/fragment_contact_requests" />
+        tools:layout="@layout/fragment_contact_requests">
+
+        <argument
+            android:name="isOutgoing"
+            android:defaultValue="false"
+            app:argType="boolean" />
+    </fragment>
 
     <fragment
         android:id="@+id/contact_groups"
