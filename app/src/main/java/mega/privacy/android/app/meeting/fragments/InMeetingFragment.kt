@@ -1840,7 +1840,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun finishActivity() {
         logDebug("Finishing the activity")
-        MegaApplication.setCreatingMeeting(inMeetingViewModel.getChatId(), false)
+        if(inMeetingViewModel.getChatId() != MEGACHAT_INVALID_HANDLE){
+            MegaApplication.setCreatingMeeting(inMeetingViewModel.getChatId(), false)
+        }
         meetingActivity.finish()
     }
 
@@ -1972,6 +1974,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 -1
             )
         }
+
         MegaApplication.setOpeningMeetingLink(args.chatId, false)
         finishActivity()
     }
@@ -2010,7 +2013,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         MegaApplication.setOpeningMeetingLink(args.chatId, false)
         finishActivity()
     }
-
 
     fun updatePanelParticipantList(list: MutableList<Participant> = mutableListOf()) {
         bottomFloatingPanelViewHolder
