@@ -6,6 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.listeners.ChatConnectionListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.*
@@ -485,6 +486,9 @@ class InMeetingRepository @Inject constructor(
 
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
         megaChatApi.autojoinPublicChat(chatId, listener)
+
+    fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =
+        megaChatApi.addChatListener(ChatConnectionListener(chatId, callback))
 
     fun getMyInfo(moderator: Boolean, audio: Boolean, video: Boolean): Participant {
         return Participant(

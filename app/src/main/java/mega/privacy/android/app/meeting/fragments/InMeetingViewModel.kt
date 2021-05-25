@@ -1779,6 +1779,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
         inMeetingRepository.joinPublicChat(chatId, listener)
 
+    fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =
+        inMeetingRepository.registerConnectionUpdateListener(chatId, callback)
+
     // // For join as guest end
 
     /**

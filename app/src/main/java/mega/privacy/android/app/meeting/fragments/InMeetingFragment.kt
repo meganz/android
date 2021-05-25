@@ -507,16 +507,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                                 }"
                                             )
 
-                                            // Delay 5s then join.
-                                            RunOnUIThreadUtils.runDelay(5000) {
-                                                inMeetingViewModel.joinPublicChat(
-                                                    args.chatId,
-                                                    AutoJoinPublicChatListener(
-                                                        context,
-                                                        this@InMeetingFragment
-                                                    )
+                                            inMeetingViewModel.joinPublicChat(
+                                                args.chatId,
+                                                AutoJoinPublicChatListener(
+                                                    context,
+                                                    this@InMeetingFragment
                                                 )
-                                            }
+                                            )
                                         })
                                     )
                                 }))
@@ -1983,6 +1980,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         inMeetingViewModel.checkAnotherCallsInProgress(chatId)
 
+        if (args.action == MEETING_ACTION_GUEST) {
+            inMeetingViewModel.registerConnectionUpdateListener(args.chatId) {
+                answerCallAfterJoin()
+            }
+        } else {
+            answerCallAfterJoin()
+        }
+    }
+
+    private fun answerCallAfterJoin() {
         inMeetingViewModel.getCall()?.let {
             logDebug("Joined to chat, answer call")
             inMeetingViewModel.answerChatCall(
