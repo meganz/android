@@ -179,7 +179,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         inMeetingViewModel.updateParticipantsVisibility(it)
     }
 
-    private val privilegesChangeObserver = Observer<MegaChatListItem> {item ->
+    private val privilegesChangeObserver = Observer<MegaChatListItem> { item ->
         if (inMeetingViewModel.isSameChatRoom(item.chatId)) {
             inMeetingViewModel.getCall()?.let { call ->
                 if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
@@ -769,7 +769,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        sharedModel.snackBarLiveData.observe(viewLifecycleOwner){
+        sharedModel.snackBarLiveData.observe(viewLifecycleOwner) {
             (requireActivity() as MeetingActivity).showSnackbar(it)
         }
     }
@@ -1022,16 +1022,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Control the UI of the call, whether one-to-one or meeting
      */
     private fun checkChildFragments() {
+        val call: MegaChatCall = inMeetingViewModel.getCall() ?: return
+
         logDebug("Check child fragments")
-        when {
-            inMeetingViewModel.isOneToOneCall() -> {
-                logDebug("One to one call")
-                updateOneToOneUI()
+
+        if (call.status >= MegaChatCall.CALL_STATUS_JOINING) {
+            when {
+                inMeetingViewModel.isOneToOneCall() -> {
+                    logDebug("One to one call")
+                    updateOneToOneUI()
+                }
+                else -> {
+                    logDebug("Group call")
+                    updateGroupUI()
+                }
             }
-            else -> {
-                logDebug("Group call")
-                updateGroupUI()
-            }
+        } else {
+            logDebug("Waiting For Connection")
+            waitingForConnection(call.chatid)
         }
     }
 
@@ -1202,11 +1210,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     initSpeakerViewMode()
                 }
             }
-        } else{
-            if(status == TYPE_IN_SPEAKER_VIEW){
+        } else {
+            if (status == TYPE_IN_SPEAKER_VIEW) {
                 logDebug("Manual mode - Speaker view")
                 initSpeakerViewMode()
-            }else{
+            } else {
                 logDebug("Manual mode - Grid view")
                 initGridViewMode()
             }
@@ -1840,7 +1848,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun finishActivity() {
         logDebug("Finishing the activity")
-        if(inMeetingViewModel.getChatId() != MEGACHAT_INVALID_HANDLE){
+        if (inMeetingViewModel.getChatId() != MEGACHAT_INVALID_HANDLE) {
             MegaApplication.setCreatingMeeting(inMeetingViewModel.getChatId(), false)
         }
         meetingActivity.finish()
