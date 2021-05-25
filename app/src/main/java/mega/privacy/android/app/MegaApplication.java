@@ -583,7 +583,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				break;
 
 			case MegaChatCall.CALL_STATUS_DESTROYED:
-				logDebug("the call has ended");
+				logDebug("Call has ended");
+				MegaApplication.setOpeningMeetingLink(chatId, false);
 				int termCode = call.getTermCode();
 				boolean isIgnored = call.isIgnored();
 				checkCallDestroyed(chatId, callId, termCode, isIgnored);
@@ -628,9 +629,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (!megaApi.isChatNotifiable(chatId))
 			return;
 
-		logDebug("Incoming call");
-		createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-		controlNumberOfCalls(listAllCalls, chatId, callStatus, true);
+		if(!isOpeningMeetingLink(chatId)){
+			logDebug("Incoming call");
+			createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
+			controlNumberOfCalls(listAllCalls, chatId, callStatus, true);
+		}
 	}
 
 	/**
@@ -1355,6 +1358,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	 * @param chatId The chat ID of the chat with call.
 	 */
 	private void showGroupCallNotification(long chatId) {
+		logDebug("Show group call notification");
 		notificationShown.add(chatId);
 		stopService(new Intent(this, IncomingCallService.class));
 		ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
@@ -1534,9 +1538,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
 		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup()) {
-			if(!isOpeningMeetingLink(chatId)){
-				showGroupCallNotification(chatId);
-			}
+			showGroupCallNotification(chatId);
 			return;
 		}
 
@@ -1551,10 +1553,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 			toIncomingCall(this, callToLaunch, megaChatApi);
 		} else {
-			if (!isOpeningMeetingLink(chatId)) {
-				logDebug("The call screen should be displayed");
-				launchCallActivity(callToLaunch);
-			}
+			logDebug("The call screen should be displayed");
+			launchCallActivity(callToLaunch);
 		}
 	}
 
@@ -1901,7 +1901,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashCreatingMeeting.put(chatId, isCreatingMeeting);
 	}
 
-	public static boolean isOpeningMeetingLink(long chatId) {
+	private static boolean isOpeningMeetingLink(long chatId) {
 		boolean entryExists = hashOpeningMeetingLink.containsKey(chatId);
 		if (entryExists) {
 			return hashOpeningMeetingLink.get(chatId);

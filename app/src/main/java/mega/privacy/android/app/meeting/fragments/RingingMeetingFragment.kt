@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_ringing_fragment.*
 import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnSwipeTouchListener
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -216,6 +217,8 @@ class RingingMeetingFragment : MeetingBaseFragment() {
                 } else {
                     showSnackBar(StringResourcesUtils.getString(R.string.call_error),)
                 }
+
+                MegaApplication.getInstance().removeRTCAudioManager()
             }
         })
 
