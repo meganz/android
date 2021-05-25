@@ -4,11 +4,10 @@ import android.Manifest
 import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.MaterialToolbar
 import kotlinx.android.synthetic.main.activity_meeting.*
@@ -53,6 +52,31 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     // Views
     lateinit var toolbar: MaterialToolbar
 
+    var mRootViewHeight: Int = 0
+    // Soft keyboard open and close listener
+    private var keyboardLayoutListener: OnGlobalLayoutListener? = OnGlobalLayoutListener {
+        val r = Rect()
+        val decorView: View = requireActivity().window.decorView
+        decorView.getWindowVisibleDisplayFrame(r)
+        val visibleHeight = r.height()
+        if (mRootViewHeight == 0) {
+            // save height of root view
+            mRootViewHeight = visibleHeight
+            return@OnGlobalLayoutListener
+        }
+        if (mRootViewHeight == visibleHeight) {
+            // set bottom margin to 40dp
+            setMarginBottomOfMeetingButton(40f)
+            return@OnGlobalLayoutListener
+        }
+        if (mRootViewHeight - visibleHeight > 200) {
+            // layout changing (keyboard popup), set bottom margin to 10dp
+            setMarginBottomOfMeetingButton(10f)
+            return@OnGlobalLayoutListener
+        }
+    }
+
+    //-----------------------------
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // Do not share the instance with other permission check process, because the callback functions are different.
@@ -101,10 +125,29 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        logDebug("addOnGlobalLayoutListener: keyboardLayoutListener")
+        binding.root.viewTreeObserver.addOnGlobalLayoutListener(keyboardLayoutListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        logDebug("removeOnGlobalLayoutListener: keyboardLayoutListener")
+        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(keyboardLayoutListener)
+    }
+
     private fun setMarginTopOfMeetingName(marginTop: Int) {
         val menuLayoutParams = type_meeting_edit_text.layoutParams as ViewGroup.MarginLayoutParams
         menuLayoutParams.setMargins(0, marginTop, 0, 0)
         type_meeting_edit_text.layoutParams = menuLayoutParams
+    }
+
+    protected fun setMarginBottomOfMeetingButton(marginBottom: Float) {
+        logDebug("setMarginBottomOfMeetingButton: $marginBottom")
+        val layoutParams = btn_start_join_meeting.layoutParams as ConstraintLayout.LayoutParams
+        layoutParams.bottomMargin =  Util.dp2px(marginBottom)
+        btn_start_join_meeting.layoutParams = layoutParams
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

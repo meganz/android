@@ -171,7 +171,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginRight="16dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="40dp"
             android:backgroundTint="@color/drawer_upgrade_button_background_selector"
             android:gravity="center"
             android:paddingTop="16dp"
