@@ -1954,7 +1954,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onCallAnswered(chatId: Long, flag: Boolean) {
         if (chatId == inMeetingViewModel.getChatId()) {
             logDebug("Call answered")
-            MegaApplication.setOpeningMeetingLink(args.chatId, false)
+            MegaApplication.setSpeakerStatus(chatId, true)
+            MegaApplication.setOpeningMeetingLink(chatId, false)
             checkCallStarted(chatId)
         }
     }
