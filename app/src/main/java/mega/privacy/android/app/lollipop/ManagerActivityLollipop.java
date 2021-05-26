@@ -7482,9 +7482,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		switch (menuItem.getItemId()){
 			case R.id.bottom_navigation_item_cloud_drive: {
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
-                    long rootHandle = megaApi.getRootNode().getHandle();
-                    if (parentHandleBrowser != -1 && parentHandleBrowser != rootHandle) {
-                        parentHandleBrowser = rootHandle;
+					MegaNode rootNode = megaApi.getRootNode();
+					if (rootNode == null) {
+						logError("Root node is null");
+					}
+
+                    if (parentHandleBrowser != INVALID_HANDLE
+							&& rootNode != null && parentHandleBrowser != rootNode.getHandle()) {
+                        parentHandleBrowser = rootNode.getHandle();
                         refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());
                         if (isCloudAdded()) {
                             fbFLol.scrollToFirstPosition();
@@ -13418,6 +13423,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void setSearchQuery(String searchQuery) {
 		this.searchQuery = searchQuery;
+		this.searchView.setQuery(searchQuery, false);
 	}
 
 	public long getParentHandleIncoming() {
