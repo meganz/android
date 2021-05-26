@@ -1489,7 +1489,7 @@
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]正在输入&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]和其他人正在输入&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">更多</string>
@@ -2454,7 +2454,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">您在下次登录账户时，系统会要求您输入验证程序中提供的6位验证码。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can’t help you gain access to it again.\n &lt;b&gt;备份您的恢复密钥&lt;/b&gt;</string>
+    <string name="recommendation_2fa_enabled">请导出您的<b>恢复密钥</b>，以便在您忘记密码时或禁用双重验证时使用。</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">该码无效</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -3835,4 +3835,24 @@
     <string name="file_update_failed">文件更新失败。请重试。</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">文件太大，无法打开或预览。</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">文件缺少扩展名（.%1$s）</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">请输入一个文件扩展名</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">更改文件扩展名</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">如果将扩展名由“.%1$s”更改为“.%2$s”，则可能无法访问此文件</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">添加扩展名“.%1$s”后，您可能无法访问此文件</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">删除扩展名“.%1$s”后，您可能无法访问此文件</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">删除扩展名</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">使用.%1$s</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">无扩展名</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">保留.%1$s</string>
 </resources>

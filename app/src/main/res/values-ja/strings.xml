@@ -39,7 +39,7 @@
     <!-- button -->
     <string name="general_share">共有</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="general_leave">残す</string>
+    <string name="general_leave">解除</string>
     <!-- button -->
     <string name="general_decryp">復号化</string>
     <!-- button -->
@@ -401,9 +401,9 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_get_link_menu">リンクを取得</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_leave_menu">残す</string>
+    <string name="context_leave_menu">解除</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">共有を残す</string>
+    <string name="alert_leave_share">共有を解除</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">共有を削除</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -1489,7 +1489,7 @@
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]さんが入力しています&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]さんたちが入力しています[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">詳細</string>
@@ -3835,4 +3835,24 @@
     <string name="file_update_failed">ファイルの更新に失敗しました。もう一度お試しください。</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">ファイルのサイズが大きすぎて、開くこともプレビューすることもできません。</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">拡張子のないファイル (%1$s)。</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">続行するには、ファイルの拡張子を入力する必要があります。</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">ファイル拡張子の変更</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">「.%1$s」から「.%2$s」に変更すると、このファイルにアクセスできなくなる可能性があります。</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">空から「.%1$s」に変更すると、このファイルにアクセスできなくなる可能性があります。</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">「.%1$s」から空に変更すると、このファイルにアクセスできなくなる可能性があります。</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">空を使う</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">.%1$sを使う</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">空にしておく</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">.%1$sにしておく</string>
 </resources>

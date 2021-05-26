@@ -1511,7 +1511,7 @@
         <item quantity="one">%1$s [A] is aan het schrijven&#8230;.[/A]</item>
         <item quantity="other">%1$s [A]zijn aan het schrijven&#8230;..[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A] en meer zijn aan het schrijven&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Meer</string>
@@ -3922,4 +3922,24 @@
     <string name="file_update_failed">Bestandsupdate is mislukt. Probeer het opnieuw.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Het bestand is te groot en kan niet geopend of weergegeven worden.</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">Bestand zonder extensie (.%1$s)</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">Om door te gaan moet u een bestand extensie typen</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">Bestand extensie wijziging</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">U heeft waarschijnlijk geen toegang tot dit bestand als u de extensie wijzigt van “.%1$s” naar “.%2$s”</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">U heeft waarschijnlijk geen toegang tot dit bestand als u de “.%1$s” extensie toevoegt</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">U heeft waarschijnlijk geen toegang tot dit bestand als u de “.%1$s” extensie verwijderd</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">Extensie verwijderen</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">Gebruik .%1$s</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">Geen extensie</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">Bewaar .%1$s</string>
 </resources>
