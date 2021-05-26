@@ -199,8 +199,6 @@ import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialog
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.ReceivedRequestBottomSheetDialogFragment;
-import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
@@ -8872,25 +8870,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		selectedUser = user;
 		bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-	}
-
-	public void showSentRequestOptionsPanel(MegaContactRequest request){
-		logDebug("showSentRequestOptionsPanel");
-		if (request == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
-		selectedRequest = request;
-		bottomSheetDialogFragment = new SentRequestBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
-	}
-
-	public void showReceivedRequestOptionsPanel(MegaContactRequest request){
-		logDebug("showReceivedRequestOptionsPanel");
-
-		if (request == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
-		selectedRequest = request;
-		bottomSheetDialogFragment = new ReceivedRequestBottomSheetDialogFragment();
 		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 

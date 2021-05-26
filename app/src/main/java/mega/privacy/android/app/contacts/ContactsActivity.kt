@@ -7,6 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.navigateUp
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -59,10 +60,19 @@ class ContactsActivity : PasscodeActivity() {
             }
     }
 
+    private lateinit var binding: ActivityContactsBinding
     private val showGroups by extraNotNull(EXTRA_SHOW_GROUPS, false)
     private val showSentRequests by extraNotNull(EXTRA_SHOW_SENT_REQUESTS, false)
     private val showReceivedRequests by extraNotNull(EXTRA_SHOW_RECEIVED_REQUESTS, false)
-    private lateinit var binding: ActivityContactsBinding
+    private val appBarConfiguration by lazy {
+        AppBarConfiguration(
+            topLevelDestinationIds = setOf(),
+            fallbackOnNavigateUpListener = {
+                onBackPressed()
+                true
+            }
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +81,10 @@ class ContactsActivity : PasscodeActivity() {
         setSupportActionBar(binding.toolbar)
         setupNavigation(savedInstanceState == null)
     }
+
+    override fun onSupportNavigateUp(): Boolean =
+        getNavController().navigateUp(appBarConfiguration)
+                || super.onSupportNavigateUp()
 
     private fun setupNavigation(overrideNavGraph: Boolean) {
         val navController = getNavController()
@@ -87,17 +101,7 @@ class ContactsActivity : PasscodeActivity() {
             )
         }
 
-        NavigationUI.setupActionBarWithNavController(
-            this,
-            navController,
-            AppBarConfiguration(
-                topLevelDestinationIds = setOf(),
-                fallbackOnNavigateUpListener = {
-                    onBackPressed()
-                    true
-                }
-            )
-        )
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
     }
 
     private fun getNavController(): NavController =
