@@ -58,6 +58,39 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <LinearLayout
+        android:id="@+id/view_type_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/years_button"
+            style="@style/CuViewTypeButton"
+            android:text="@string/years_view_button" />
+
+        <Button
+            android:id="@+id/months_button"
+            style="@style/CuViewTypeButton"
+            android:text="@string/months_view_button" />
+
+        <Button
+            android:id="@+id/days_button"
+            style="@style/CuViewTypeButton"
+            android:text="@string/days_view_button" />
+
+        <Button
+            android:id="@+id/all_button"
+            style="@style/CuViewTypeButton"
+            android:text="@string/all_view_button" />
+
+    </LinearLayout>
+
     <mega.privacy.android.app.components.scrollBar.FastScroller
         android:id="@+id/scroller"
         android:layout_width="wrap_content"

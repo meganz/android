@@ -2036,6 +2036,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		enableCULayout = findViewById(R.id.enable_cu_layout);
 		findViewById(R.id.enable_cu_button).setOnClickListener(v -> {
 			if (getCameraUploadFragment() != null) {
+				updateEnableCuButton(View.GONE);
 				cuFragment.enableCUClick();
 			}
 		});
