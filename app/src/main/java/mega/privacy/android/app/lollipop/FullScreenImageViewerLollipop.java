@@ -92,16 +92,18 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FullScreenImageViewerLollipop extends PasscodeActivity
 		implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface,
-		SnackbarShower {
+		SnackbarShower, MegaFullScreenImageAdapterLollipop.FullScreenCallback {
 
 	int placeholderCount;
 
@@ -915,7 +917,8 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 					logDebug("Handle: " + hash);
 					imageHandles.add(hash);
 
-					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
+					adapterMega = new MegaFullScreenImageAdapterLollipop(this,
+							fullScreenImageViewer, imageHandles, megaApi, this);
 					viewPager.setAdapter(adapterMega);
 					viewPager.setCurrentItem(positionG);
 					viewPager.addOnPageChangeListener(this);
@@ -1022,7 +1025,8 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			}
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,
+					imageHandles, megaApi, this);
 		} else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
@@ -1133,7 +1137,8 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 
 		fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
-		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
+		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,
+				imageHandles, megaApi, this);
 	}
 
 	private BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
@@ -1536,12 +1541,59 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
 
-	public void touchImage() {
-		logDebug("touchImage");
-		if(aB.isShowing()){
+	@Override
+	public void onTouchImage() {
+		if (aB.isShowing()) {
 			hideActionBar();
-		}else{
+		} else {
 			showActionBar();
+		}
+	}
+
+	@Override
+	public void onPlayVideo() {
+		MegaNode video = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
+		Intent mediaIntent;
+		if (MimeTypeList.typeForName(video.getName()).isVideoNotSupported()) {
+			mediaIntent = new Intent(Intent.ACTION_VIEW);
+		} else {
+			mediaIntent = getMediaIntent(this, node.getName());
+		}
+
+		mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, video.getHandle())
+				.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER)
+				.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
+
+		mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
+
+		boolean paramsSetSuccessfully;
+		String localPath = null;
+
+		try {
+			localPath = findVideoLocalPath(this, node);
+		} catch (Exception e) {
+			logWarning(e.getMessage());
+		}
+
+		if (localPath != null && checkFingerprint(megaApi, node, localPath)) {
+			paramsSetSuccessfully = setLocalIntentParams(this, node, mediaIntent, localPath,
+					false, this);
+		} else {
+			paramsSetSuccessfully = setStreamingIntentParams(this, node, megaApi,
+					mediaIntent, this);
+		}
+
+		if (!isIntentAvailable(this, mediaIntent)) {
+			showSnackbar(SNACKBAR_TYPE,
+					StringResourcesUtils.getString(R.string.intent_not_available), MEGACHAT_INVALID_HANDLE);
+
+			paramsSetSuccessfully = false;
+		}
+
+		if (paramsSetSuccessfully) {
+			startActivity(mediaIntent);
+			overridePendingTransition(0, 0);
 		}
 	}
 

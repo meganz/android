@@ -418,52 +418,9 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             return;
         }
 
-        MimeTypeThumbnail mime = MimeTypeThumbnail.typeForName(node.getName());
-        if (mime.isImage()) {
-            Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
-            putExtras(intent, cuNode.getIndexForViewer(), position, node);
-            launchNodeViewer(intent);
-        } else if (mime.isVideoReproducible()) {
-            Intent mediaIntent;
-            if (mime.isVideoNotSupported()) {
-                mediaIntent = new Intent(Intent.ACTION_VIEW);
-            } else {
-                mediaIntent = getMediaIntent(context, node.getName());
-            }
-
-            putExtras(mediaIntent, cuNode.getIndexForViewer(), position, node);
-
-            mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
-
-            boolean paramsSetSuccessfully;
-            String localPath = null;
-            try {
-                localPath = findVideoLocalPath(context, node);
-            } catch (Exception e) {
-                logWarning(e.getMessage());
-            }
-            if (localPath != null && checkFingerprint(megaApi, node, localPath)) {
-                paramsSetSuccessfully = setLocalIntentParams(context, node, mediaIntent, localPath,
-                        false, mManagerActivity);
-            } else {
-                paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi,
-                        mediaIntent, mManagerActivity);
-            }
-            if (!isIntentAvailable(context, mediaIntent)) {
-                mManagerActivity.showSnackbar(SNACKBAR_TYPE,
-                        getString(R.string.intent_not_available), MEGACHAT_INVALID_HANDLE);
-                paramsSetSuccessfully = false;
-            }
-            if (paramsSetSuccessfully) {
-                launchNodeViewer(mediaIntent);
-            }
-        }
-    }
-
-    private void putExtras(Intent intent, int indexForViewer, int position, MegaNode node) {
         MegaNode parentNode = megaApi.getParentNode(node);
-
-        intent.putExtra(INTENT_EXTRA_KEY_POSITION, indexForViewer)
+        Intent intent = new Intent(context, FullScreenImageViewerLollipop.class)
+                .putExtra(INTENT_EXTRA_KEY_POSITION, cuNode.getIndexForViewer())
                 .putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderManagement.getOrderCamera())
                 .putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle())
                 .putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
@@ -473,9 +430,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER);
 
         putThumbnailLocation(intent, mBinding.cuList, position, VIEWER_FROM_CUMU, mAdapter);
-    }
-
-    private void launchNodeViewer(Intent intent) {
         startActivity(intent);
         requireActivity().overridePendingTransition(0, 0);
     }

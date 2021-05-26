@@ -160,7 +160,7 @@ public class MegaOfflineFullScreenImageAdapterLollipop extends PagerAdapter impl
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_gif:
 			case R.id.full_screen_image_viewer_image:{
-                ((FullScreenImageViewerLollipop) context).touchImage();
+                ((FullScreenImageViewerLollipop) context).onTouchImage();
 
                 RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
 				activityLayout.invalidate();

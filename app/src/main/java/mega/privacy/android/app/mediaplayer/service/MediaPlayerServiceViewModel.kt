@@ -20,7 +20,6 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
-import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB
 import mega.privacy.android.app.utils.FileUtil.*
@@ -254,17 +253,6 @@ class MediaPlayerServiceViewModel(
                                 _playlistTitle.postValue(getString(R.string.sortby_type_video_first))
 
                                 buildPlaylistForVideos(intent, firstPlayHandle)
-                            }
-                            PHOTO_SYNC_ADAPTER -> {
-                                val nodes = MegaNodeRepo(megaApi, dbHandler)
-                                    .getCuChildren(
-                                        intent.getIntExtra(
-                                            INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                                            ORDER_DEFAULT_ASC
-                                        )
-                                    )
-                                
-                                buildPlaylistFromNodes(megaApi, nodes, firstPlayHandle)
                             }
                             FILE_BROWSER_ADAPTER,
                             RUBBISH_BIN_ADAPTER,
