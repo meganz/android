@@ -66,7 +66,9 @@ class MeetingVideoListener(
                         holderWidth = holderHeight * viewWidth / viewHeight
                     }
                     bitmap = renderer.createBitmap(width, height)
-                    holder.setFixedSize(holderWidth, holderHeight)
+                   if(!isLocal){
+                       holder.setFixedSize(holderWidth, holderHeight)
+                   }
                 } else {
                     this.width = -1
                     this.height = -1
@@ -86,7 +88,7 @@ class MeetingVideoListener(
         isLocal = clientId == MEGACHAT_INVALID_HANDLE
 
         if (isFloatingWindow && isLocal) {
-            this.surfaceView.setZOrderMediaOverlay(true)
+            this.surfaceView.setZOrderOnTop(true)
         } else if (!isFloatingWindow) {
             if (!isLocal) {
                 this.surfaceView.setZOrderOnTop(false)
@@ -98,7 +100,7 @@ class MeetingVideoListener(
         }
 
         surfaceHolder = surfaceView.holder
-        surfaceHolder.setFormat(PixelFormat.TRANSPARENT)
+        surfaceHolder.setFormat(PixelFormat.TRANSLUCENT)
         renderer = MegaSurfaceRenderer(
             surfaceView,
             isFloatingWindow,
