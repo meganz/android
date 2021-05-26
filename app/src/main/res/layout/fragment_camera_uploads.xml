@@ -65,14 +65,4 @@
         android:layout_gravity="end"
         android:orientation="vertical" />
 
-    <Button
-        android:id="@+id/turn_on_cu_button"
-        style="?attr/materialButtonStyle"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/white"
-        android:text="@string/settings_camera_upload_turn_on"
-        android:textColor="@color/teal_300_dark_grey"
-        android:visibility="gone"
-        tools:visibility="visible" />
 </FrameLayout>

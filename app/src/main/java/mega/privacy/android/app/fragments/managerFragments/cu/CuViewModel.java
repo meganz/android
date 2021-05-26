@@ -2,7 +2,6 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.content.Context;
 import android.os.Environment;
-import android.text.TextUtils;
 import android.util.Pair;
 
 import androidx.collection.LongSparseArray;
@@ -59,6 +58,7 @@ class CuViewModel extends BaseRxViewModel {
     private final Context mAppContext;
     private final SortOrderManagement mSortOrderManagement;
 
+    private final MutableLiveData<Boolean> camSyncEnabled = new MutableLiveData<>();
     private final MutableLiveData<List<CuNode>> mCuNodes = new MutableLiveData<>();
     private final MutableLiveData<Pair<Integer, CuNode>> mNodeToOpen = new MutableLiveData<>();
     private final MutableLiveData<Pair<Integer, CuNode>> mNodeToAnimate = new MutableLiveData<>();
@@ -107,6 +107,10 @@ class CuViewModel extends BaseRxViewModel {
 
         add(mCreatingThumbnailFinished.throttleLatest(1, TimeUnit.SECONDS, true)
                 .subscribe(ignored -> loadCuNodes(), logErr("creatingThumbnailFinished")));
+    }
+
+    public boolean isCUEnabled() {
+        return camSyncEnabled != null && camSyncEnabled.getValue();
     }
 
     public LiveData<List<CuNode>> cuNodes() {
@@ -318,12 +322,10 @@ class CuViewModel extends BaseRxViewModel {
                     return true;
                 })
                 .subscribeOn(Schedulers.io())
-                .subscribe(IGNORE, logErr("enableCuForBusinessFirstTime")));
+                .subscribe(IGNORE, logErr("enableCu")));
     }
 
     public LiveData<Boolean> camSyncEnabled() {
-        MutableLiveData<Boolean> camSyncEnabled = new MutableLiveData<>();
-
         add(Single.fromCallable(
                 () -> Boolean.parseBoolean(mDbHandler.getPreferences().getCamSyncEnabled()))
                 .subscribeOn(Schedulers.io())

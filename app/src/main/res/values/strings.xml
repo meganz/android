@@ -3946,6 +3946,14 @@
     <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Automatically back up your photos and videos to your Cloud Drive.</string>
-    <!-- Text to show as a date on Camera Uploads section. The first placeholder is for the month and second one is for the year. The [B][/B] placeholders are for set the month with bold format. E.g.: July 2021, in which "July" will be shown with bold format. -->
-    <string name="bold_month_year_date">[B]%1$s[/B] %2$s</string>
+    <!-- Text to show as a date on Camera Uploads section. The first placeholder is for the highlighted part, it can be only the year, only the month or the day and month.The second one is for the non highlighted part, it can be the year or empty. The [B][/B] placeholders are for set the month highlighted format programmatically. E.g.: July 2021, in which "July" will be shown with highlighted format. -->
+    <string name="highlighted_date">[B]%1$s[/B] %2$s</string>
+    <!-- Text of a button on Camera Uploads section to show all the content of the section-->
+    <string name="all_view_button">All</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
+    <string name="days_view_button">Days</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
+    <string name="months_view_button">Months</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
+    <string name="years_view_button">Years</string>
 </resources>

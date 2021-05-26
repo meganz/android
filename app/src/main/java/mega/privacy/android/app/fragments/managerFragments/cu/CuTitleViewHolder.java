@@ -23,7 +23,7 @@ class CuTitleViewHolder extends CuViewHolder {
     @Override
     protected void bind(CuNode node) {
         Pair<String, String> date = node.getHeaderDate();
-        String dateText = getString(R.string.bold_month_year_date, date.first, date.second);
+        String dateText = getString(R.string.highlighted_date, date.first, date.second);
 
         try {
             dateText = dateText.replace("[B]", "<font face=\"sans-serif-medium\">")

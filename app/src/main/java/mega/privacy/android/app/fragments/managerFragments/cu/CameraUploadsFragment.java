@@ -72,20 +72,20 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class CameraUploadsFragment extends BaseFragment implements CameraUploadsAdapter.Listener {
-    public static final int TYPE_CAMERA = MegaNodeRepo.CU_TYPE_CAMERA;
-    public static final int TYPE_MEDIA = MegaNodeRepo.CU_TYPE_MEDIA;
 
-    private static final String ARG_TYPE = "type";
-
-    @Inject
-    SortOrderManagement sortOrderManagement;
+    public static final int ALL_VIEW = 0;
+    public static final int DAYS_VIEW = 1;
+    public static final int MONTHS_VIEW = 2;
+    public static final int YEARS_VIEW = 3;
 
     // in large grid view, we have 3 thumbnails each row, while in small grid view, we have 5.
     private static final int SPAN_LARGE_GRID = 3;
     private static final int SPAN_SMALL_GRID = 5;
 
-    private ManagerActivityLollipop mManagerActivity;
+    @Inject
+    SortOrderManagement sortOrderManagement;
 
+    private ManagerActivityLollipop mManagerActivity;
     private FragmentCameraUploadsFirstLoginBinding mFirstLoginBinding;
     private FragmentCameraUploadsBinding mBinding;
     private CameraUploadsAdapter mAdapter;
@@ -172,17 +172,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             logDebug("Starting CU");
             startCameraUploadService(context);
         }, 1000);
-    }
-
-    public void resetSwitchButtonLabel() {
-        if (mBinding == null) {
-            return;
-        }
-
-        mBinding.turnOnCuButton.setVisibility(View.VISIBLE);
-        mBinding.turnOnCuButton.setText(
-                getString(R.string.settings_camera_upload_turn_on).toUpperCase(
-                        Locale.getDefault()));
     }
 
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -301,11 +290,10 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void setupOtherViews() {
-        mBinding.turnOnCuButton.setOnClickListener(v -> enableCUClick());
         mBinding.emptyEnableCuButton.setOnClickListener(v -> enableCUClick());
     }
 
-    private void enableCUClick() {
+    public void enableCUClick() {
         ((MegaApplication) ((Activity) context).getApplication()).sendSignalPresenceActivity();
         String[] permissions = { android.Manifest.permission.READ_EXTERNAL_STORAGE };
 
@@ -327,6 +315,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                     ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
             mBinding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
             mAdapter.setNodes(nodes);
+            updateEnableCUButtons(mViewModel.isCUEnabled());
             mManagerActivity.updateCuFragmentOptionsMenu();
 
             mBinding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
@@ -375,15 +364,14 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             }
         });
 
-        mViewModel.camSyncEnabled()
-                .observe(getViewLifecycleOwner(), enabled -> {
-                            boolean empty = mAdapter.getItemCount() <= 0;
-                            mBinding.turnOnCuButton.setVisibility(!enabled && !empty ? View.VISIBLE : View.GONE);
-                            mBinding.emptyEnableCuButton.setVisibility(!enabled && empty ? View.VISIBLE : View.GONE);
-                        }
-                );
-
+        mViewModel.camSyncEnabled().observe(getViewLifecycleOwner(), this::updateEnableCUButtons);
         observeDragSupportEvents(getViewLifecycleOwner(), mBinding.cuList, VIEWER_FROM_CUMU);
+    }
+
+    private void updateEnableCUButtons(boolean cuEnabled) {
+        boolean emptyAdapter = mAdapter.getItemCount() <= 0;
+        mManagerActivity.updateEnableCuButton(!cuEnabled && !emptyAdapter ? View.VISIBLE : View.GONE);
+        mBinding.emptyEnableCuButton.setVisibility(!cuEnabled && emptyAdapter ? View.VISIBLE : View.GONE);
     }
 
     @Override

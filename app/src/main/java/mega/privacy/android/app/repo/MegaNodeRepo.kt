@@ -219,9 +219,4 @@ class MegaNodeRepo @Inject constructor(
             offline.path + File.separator + offline.name + File.separator
         }
     }
-
-    companion object {
-        const val CU_TYPE_CAMERA = 0
-        const val CU_TYPE_MEDIA = 1
-    }
 }

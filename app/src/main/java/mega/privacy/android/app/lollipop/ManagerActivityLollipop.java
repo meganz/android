@@ -554,7 +554,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private MiniAudioPlayerController miniAudioPlayerController;
 
-    //Tabs in Shares
+	private LinearLayout enableCULayout;
+
+	//Tabs in Shares
 	private TabLayout tabLayoutShares;
 	private SharesPageAdapter sharesPageAdapter;
 	private CustomViewPager viewPagerShares;
@@ -2030,6 +2032,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else {
 			tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
 		}
+
+		enableCULayout = findViewById(R.id.enable_cu_layout);
+		findViewById(R.id.enable_cu_button).setOnClickListener(v -> {
+			if (getCameraUploadFragment() != null) {
+				cuFragment.enableCUClick();
+			}
+		});
 
 		//TABS section Shared Items
 		tabLayoutShares =  findViewById(R.id.sliding_tabs_shares);
@@ -3519,16 +3528,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     builder.setMessage(text);
 
                     builder.setPositiveButton(getString(R.string.general_yes),
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int whichButton) {
-                                    stopRunningCameraUploadService(ManagerActivityLollipop.this);
-                                    dbH.setCamSyncEnabled(false);
-                                    sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
-									if (cuFragment != null && cuFragment.isResumed()) {
-										cuFragment.resetSwitchButtonLabel();
-									}
-                                }
-                            });
+							(dialog, whichButton) -> {
+								stopRunningCameraUploadService(ManagerActivityLollipop.this);
+								dbH.setCamSyncEnabled(false);
+								sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
+								enableCULayout.setVisibility(View.VISIBLE);
+							});
+
                     builder.setNegativeButton(getString(R.string.general_no), null);
                     final AlertDialog dialog = builder.create();
                     try {
@@ -5446,6 +5452,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (item != DrawerItem.CHAT) {
 			//remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
 			removeFragment(getChatsFragment());
+		}
+
+		if (item != DrawerItem.CAMERA_UPLOADS) {
+			enableCULayout.setVisibility(View.GONE);
 		}
 
 		if (item != DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
@@ -8928,6 +8938,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 		setToolbarTitle();
 		refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+	}
+
+	public void updateEnableCuButton(int visibility) {
+		enableCULayout.setVisibility(visibility);
 	}
 
 	/**
@@ -13206,17 +13220,22 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		// elevation in this case, a crack would appear between toolbar and ChatRecentFragment's Appbarlayout, for example.
 		float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
 		int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
+		int transparentColor = ContextCompat.getColor(this, android.R.color.transparent);
 		boolean onlySetToolbar = Util.isDarkMode(this) && !mShowAnyTabLayout;
+		boolean enableCUVisible = enableCULayout.getVisibility() == View.VISIBLE;
 
 		if (mElevationCause > 0) {
 			if (onlySetToolbar) {
 				toolbar.setBackgroundColor(toolbarElevationColor);
+				if (enableCUVisible) enableCULayout.setBackgroundColor(toolbarElevationColor);
 			} else {
-				toolbar.setBackgroundColor(android.R.color.transparent);
+				toolbar.setBackgroundColor(transparentColor);
+				if (enableCUVisible) enableCULayout.setBackground(null);
 				abL.setElevation(elevation);
 			}
 		} else {
-			toolbar.setBackgroundColor(android.R.color.transparent);
+			toolbar.setBackgroundColor(transparentColor);
+			if (enableCUVisible) enableCULayout.setBackground(null);
 			abL.setElevation(0);
 		}
 
