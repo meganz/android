@@ -270,7 +270,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                             MegaContactRequest c = contacts.get(i);
                             if(c.getSourceEmail().equals(notif.getEmail())){
                                 logDebug("Go to Received requests");
-                                ((ManagerActivityLollipop)context).navigateToContacts();
+                                ((ManagerActivityLollipop)context).navigateToContactRequests();
                                 break;
                             }
                         }

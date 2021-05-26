@@ -2522,8 +2522,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					else if(getIntent().getAction().equals(ACTION_IPC)){
 						logDebug("IPC link - go to received request in Contacts");
 						markNotificationsSeen(true);
-						drawerItem=DrawerItem.CONTACTS;
-						selectDrawerItemLollipop(drawerItem);
+						startActivity(ContactsActivity.getReceivedRequestsIntent(this));
 						selectDrawerItemPending=false;
 					}
 					else if(getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
@@ -2648,7 +2647,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_CONTACTS_SECTION)){
 						markNotificationsSeen(true);
-						navigateToContacts();
+						openContactLink(getIntent().getLongExtra(CONTACT_HANDLE, -1));
 					}
 					else if (getIntent().getAction().equals(ACTION_REFRESH_STAGING)){
 						update2FASetting();
@@ -3551,8 +3550,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				else if(getIntent().getAction().equals(ACTION_IPC)){
 					logDebug("IPC - go to received request in Contacts");
 					markNotificationsSeen(true);
-					drawerItem=DrawerItem.CONTACTS;
-					selectDrawerItemLollipop(drawerItem);
+					startActivity(ContactsActivity.getReceivedRequestsIntent(this));
 				}
 				else if(getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
 					logDebug("ACTION_CHAT_NOTIFICATION_MESSAGE");
@@ -6595,7 +6593,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	return true;
 	        }
 	        case R.id.action_add_contact:{
-	        	if (drawerItem == DrawerItem.CONTACTS||drawerItem == DrawerItem.CHAT){
+	        	if (drawerItem == DrawerItem.CHAT){
 					chooseAddContactDialog(false);
 	        	}
 	        	return true;
@@ -6628,9 +6626,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	}
 	        	else if(drawerItem == DrawerItem.SHARED_ITEMS){
 	        		showNewFolderDialog();
-	        	}
-	        	else if (drawerItem == DrawerItem.CONTACTS){
-					chooseAddContactDialog(false);
 	        	}
 	        	return true;
 	        }
@@ -9238,6 +9233,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void navigateToContacts(){
 		showHideBottomNavigationView(true);
 		startActivity(ContactsActivity.getListIntent(this));
+	}
+
+	public void navigateToContactRequests(){
+		startActivity(ContactsActivity.getReceivedRequestsIntent(this));
 	}
 
 	public void navigateToMyAccount(){
