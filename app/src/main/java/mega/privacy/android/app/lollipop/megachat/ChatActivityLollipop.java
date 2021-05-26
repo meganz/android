@@ -88,10 +88,13 @@ import mega.privacy.android.app.BuildConfig;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
+import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
@@ -151,10 +154,12 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMes
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1466,6 +1471,15 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
         setStatusIcon();
     }
 
+    private void openChatPreview(String link) {
+        megaChatApi.openChatPreview(link, this);
+
+        if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
+            openingAndJoining = true;
+            setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
+        }
+    }
+
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
 
         if (newIntent != null){
@@ -1475,12 +1489,53 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
 
                 if (intentAction.equals(ACTION_OPEN_CHAT_LINK) || intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)){
                     String link = newIntent.getDataString();
-                    megaChatApi.openChatPreview(link, this);
 
-                    if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
-                        openingAndJoining = true;
-                        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
-                    }
+                    megaChatApi.checkChatLink(link, new ChatBaseListener(this) {
+
+                        @Override
+                        public void onRequestFinish(@NotNull MegaChatApiJava api, @NotNull MegaChatRequest request, @NotNull MegaChatError e) {
+                            int errorCode = e.getErrorCode();
+                            boolean codeError = errorCode != MegaChatError.ERROR_OK && errorCode != MegaChatError.ERROR_EXIST;
+                            boolean linkInvalid = TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE;
+                            logDebug("Chat id: " + request.getChatHandle() + ", type: " + request.getParamType() + ", flag: " + request.getFlag());
+
+                            if (codeError || linkInvalid) {
+                                return;
+                            }
+
+                            if (request.getParamType() == LINK_IS_FOR_MEETING) {
+                                logDebug("It's a meeting");
+
+                                if (request.getFlag()) {
+                                    MegaHandleList list = request.getMegaHandleList();
+
+                                    if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
+                                        logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
+                                        CallUtil.openMeetingToJoin(
+                                                ChatActivityLollipop.this, request.getChatHandle(), request.getText(), link);
+                                    } else {
+                                        logDebug("It's a meeting, open dialog: Meeting has ended");
+                                        new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+                                            @Override
+                                            public void onViewMeetingChat() {
+                                                openChatPreview(link);
+                                            }
+
+                                            @Override
+                                            public void onLeave() { }
+                                        }).show(getSupportFragmentManager(),
+                                                MeetingHasEndedDialogFragment.TAG);
+                                    }
+                                } else {
+                                    logDebug("It's a meeting, open chat preview");
+                                    api.openChatPreview(link, this);
+                                }
+                            } else {
+                                // Normal Chat Link
+                                openChatPreview(link);
+                            }
+                        }
+                    });
                 } else {
                     long newIdChat = newIntent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 
