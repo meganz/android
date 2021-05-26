@@ -1,5 +1,7 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import android.util.Pair;
+
 import java.io.File;
 import nz.mega.sdk.MegaNode;
 
@@ -15,6 +17,7 @@ public class CuNode {
     private final File mThumbnail;
     private final int mType;
     private final String mModifyDate;
+    private final Pair<String, String> mHeaderDate;
 
     private boolean mSelected;
 
@@ -26,15 +29,17 @@ public class CuNode {
         mType = type;
         mModifyDate = modifyDate;
         mSelected = selected;
+        mHeaderDate = null;
     }
 
-    public CuNode(String modifyDate) {
+    public CuNode(String modifyDate, Pair<String, String> headerDate) {
         mNode = null;
         mIndexForViewer = INVALID_VALUE;
         mThumbnail = null;
         mType = TYPE_HEADER;
         mModifyDate = modifyDate;
         mSelected = false;
+        mHeaderDate = headerDate;
     }
 
     public MegaNode getNode() {
@@ -55,6 +60,10 @@ public class CuNode {
 
     public String getModifyDate() {
         return mModifyDate;
+    }
+
+    public Pair<String, String> getHeaderDate() {
+        return mHeaderDate;
     }
 
     public boolean isSelected() {

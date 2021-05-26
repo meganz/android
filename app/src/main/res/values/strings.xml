@@ -3922,8 +3922,30 @@
     <string name="file_update_failed">File update failed. Try again.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">File without extension (.%1$s)</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">To proceed you need to type a file extension</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">File extension change</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">You may not be able to access this file if you change the extension from “.%1$s” to “.%2$s”</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">You may not be able to access this file if you add the “.%1$s” extension</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">You may not be able to access this file if you remove the “.%1$s” extension</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">Remove extension</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">Use .%1$s</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">No extension</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">Keep .%1$s</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
     <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Automatically backup your photos and videos to your Cloud Drive.</string>
+    <string name="enable_cu_subtitle">Automatically back up your photos and videos to your Cloud Drive.</string>
+    <!-- Text to show as a date on Camera Uploads section. The first placeholder is for the month and second one is for the year. The [B][/B] placeholders are for set the month with bold format. E.g.: July 2021, in which "July" will be shown with bold format. -->
+    <string name="bold_month_year_date">[B]%1$s[/B] %2$s</string>
 </resources>

@@ -41,6 +41,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
@@ -351,12 +352,15 @@ class CuViewModel extends BaseRxViewModel {
             File thumbnail =
                     new File(getThumbFolder(mAppContext), node.getBase64Handle() + ".jpg");
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
-            String dateString = DateTimeFormatter.ofPattern("MMMM uuuu").format(modifyDate);
+            String dateString = ofPattern("MMMM uuuu").format(modifyDate);
 
             if (lastModifyDate == null
                     || !YearMonth.from(lastModifyDate).equals(YearMonth.from(modifyDate))) {
                 lastModifyDate = modifyDate;
-                nodes.add(new CuNode(dateString));
+                String month = ofPattern("MMMM").format(modifyDate);
+                String year = ofPattern("yyyy").format(modifyDate);
+                String currentYear = ofPattern("yyyy").format(LocalDate.now());
+                nodes.add(new CuNode(dateString, new Pair<>(month, currentYear.equals(year) ? "" : year)));
             }
 
             nodes.add(new CuNode(node, pair.first, thumbnail.exists() ? thumbnail : null,
@@ -389,17 +393,17 @@ class CuViewModel extends BaseRxViewModel {
         }
 
         if (filter[0] == 1) {
-            return DateTimeFormatter.ofPattern("d MMM").format(fromEpoch(filter[1] / 1000));
+            return ofPattern("d MMM").format(fromEpoch(filter[1] / 1000));
         } else if (filter[0] == 2) {
             if (filter[2] == 1) {
-                return DateTimeFormatter.ofPattern("MMMM").format(YearMonth.now().minusMonths(1));
+                return ofPattern("MMMM").format(YearMonth.now().minusMonths(1));
             } else if (filter[2] == 2) {
                 return String.valueOf(YearMonth.now().getYear() - 1);
             } else {
                 return "";
             }
         } else if (filter[0] == 3) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM");
+            DateTimeFormatter formatter = ofPattern("d MMM");
             LocalDate from = fromEpoch(filter[3] / 1000);
             LocalDate to = fromEpoch(filter[4] / 1000);
             return formatter.format(from) + " - " + formatter.format(to);

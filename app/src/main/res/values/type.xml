@@ -230,6 +230,10 @@
         <item name="android:textColor">@color/grey_054_white_060</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Grey87White87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Normal.Grey54White60.15sp">
         <item name="android:textSize">15sp</item>
     </style>
