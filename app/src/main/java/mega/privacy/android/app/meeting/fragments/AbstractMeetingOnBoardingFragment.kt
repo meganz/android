@@ -53,6 +53,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     lateinit var toolbar: MaterialToolbar
 
     var mRootViewHeight: Int = 0
+
     // Soft keyboard open and close listener
     private var keyboardLayoutListener: OnGlobalLayoutListener? = OnGlobalLayoutListener {
         val r = Rect()
@@ -76,7 +77,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
     }
 
-    //-----------------------------
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // Do not share the instance with other permission check process, because the callback functions are different.
@@ -146,7 +146,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     protected fun setMarginBottomOfMeetingButton(marginBottom: Float) {
         logDebug("setMarginBottomOfMeetingButton: $marginBottom")
         val layoutParams = btn_start_join_meeting.layoutParams as ConstraintLayout.LayoutParams
-        layoutParams.bottomMargin =  Util.dp2px(marginBottom)
+        layoutParams.bottomMargin = Util.dp2px(marginBottom)
         btn_start_join_meeting.layoutParams = layoutParams
     }
 

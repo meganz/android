@@ -735,7 +735,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem scanQRcodeMenuItem;
 	private MenuItem returnCallMenuItem;
 	private MenuItem openMeetingMenuItem;
-	private MenuItem startMeetingMenuItem;
 	private Chronometer chronometerMenuItem;
 	private LinearLayout layoutCallMenuItem;
 
@@ -6322,7 +6321,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		inviteMenuItem = menu.findItem(R.id.action_menu_invite);
 		returnCallMenuItem = menu.findItem(R.id.action_return_call);
 		openMeetingMenuItem = menu.findItem(R.id.action_menu_open_meeting);
-		startMeetingMenuItem = menu.findItem(R.id.action_menu_start_join_meeting);
 		RelativeLayout rootView = (RelativeLayout) returnCallMenuItem.getActionView();
 		layoutCallMenuItem = rootView.findViewById(R.id.layout_menu_call);
 		chronometerMenuItem = rootView.findViewById(R.id.chrono_menu);
@@ -6531,7 +6529,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 						importLinkMenuItem.setVisible(true);
 						importLinkMenuItem.setTitle(getString(R.string.action_open_chat_link));
-						startMeetingMenuItem.setVisible(true);
 					}
 					break;
 
@@ -7218,10 +7215,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				// Click to enter "create meeting"
 				onCreateMeeting();
 				return true;
-			case R.id.action_menu_start_join_meeting:
-				// Display bottom meeting dialog
-				showMeetingOptionsPanel();
-				return true;
 			default:{
 	            return super.onOptionsItemSelected(item);
             }
@@ -7259,7 +7252,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             killAllSessions.setVisible(false);
             exportMK.setVisible(false);
             openMeetingMenuItem.setVisible(false);
-            startMeetingMenuItem.setVisible(false);
         }
     }
 
