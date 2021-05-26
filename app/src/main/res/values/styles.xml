@@ -563,7 +563,7 @@
         <item name="fabCustomSize">@dimen/meeting_bottom_floating_panel_fab_size</item>
         <item name="off_background_tint">@color/white</item>
         <item name="off_icon_tint">@color/red_600</item>
-        <item name="on_background_tint">@color/grey_alpha_032</item>
+        <item name="on_background_tint">@color/grey_alpha_032_white_alpha_054</item>
         <item name="on_icon_tint">@color/white</item>
     </style>
 

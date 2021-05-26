@@ -39,9 +39,7 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
-import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.OnDragTouchListener
-import mega.privacy.android.app.meeting.activity.AssignModeratorBottomFragment
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
@@ -51,6 +49,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
+import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ChatUtil.*
@@ -184,7 +183,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.getCall()?.let { call ->
                 if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     when {
-                        item.hasChanged(CHANGE_TYPE_OWN_PRIV) -> {
+                        item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) -> {
                             logDebug("Change in my privileges")
                             if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
                                 showFixedBanner(

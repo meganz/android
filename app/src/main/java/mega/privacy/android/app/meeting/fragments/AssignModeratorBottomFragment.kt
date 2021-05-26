@@ -1,4 +1,4 @@
-package mega.privacy.android.app.meeting.activity
+package mega.privacy.android.app.meeting.fragments
 
 import android.annotation.SuppressLint
 import android.app.Dialog
@@ -24,8 +24,6 @@ class AssignModeratorBottomFragment : BaseBottomSheetDialogFragment() {
     private lateinit var binding: ActivityAssignModeratorBinding
 
     private var selectedParticipants: MutableList<Participant> = mutableListOf()
-//    private var participants: MutableList<Participant> = mutableListOf()
-
     private var participants: MutableList<Participant> = mutableListOf()
 
     private lateinit var participantsAdapter: AssignParticipantsAdapter
@@ -46,6 +44,7 @@ class AssignModeratorBottomFragment : BaseBottomSheetDialogFragment() {
             update(newData.filter { inMeetingViewModel.isNormalUser(it.peerId) }.toMutableList())
         }
 
+
         dialog.setContentView(binding.root)
     }
 
@@ -63,10 +62,11 @@ class AssignModeratorBottomFragment : BaseBottomSheetDialogFragment() {
                 isHideable = true
                 addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                     override fun onStateChanged(bottomSheet: View, newState: Int) {
-                        if (newState == BottomSheetBehavior.STATE_DRAGGING){
+                        if (newState == BottomSheetBehavior.STATE_DRAGGING) {
                             state = BottomSheetBehavior.STATE_EXPANDED
                         }
                     }
+
                     override fun onSlide(bottomSheet: View, slideOffset: Float) {}
                 })
 
@@ -77,7 +77,8 @@ class AssignModeratorBottomFragment : BaseBottomSheetDialogFragment() {
 
     private fun initRecyclerview() {
         participantsAdapter = AssignParticipantsAdapter(inMeetingViewModel, selectCallback)
-        selectedParticipantsAdapter = SelectedParticipantsAdapter(inMeetingViewModel, deleteCallback)
+        selectedParticipantsAdapter =
+            SelectedParticipantsAdapter(inMeetingViewModel, deleteCallback)
 
         binding.participantList.apply {
             layoutManager = LinearLayoutManager(context)

@@ -3,12 +3,14 @@ package mega.privacy.android.app.meeting.fragments
 import android.animation.ArgbEvaluator
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.InsetDrawable
+import android.graphics.drawable.LayerDrawable
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -90,7 +92,7 @@ class BottomFloatingPanelViewHolder(
     /**
      * Dismiss the tips window
      */
-    fun dismissPopWindow(){
+    fun dismissPopWindow() {
         popWindow?.dismiss()
         inMeetingViewModel.updateShowTips()
     }
@@ -143,6 +145,22 @@ class BottomFloatingPanelViewHolder(
 
         floatingPanelView.indicator.isVisible = isGroup
         updateShareAndInviteButton()
+    }
+
+
+    fun genCheckedDrawable(background: Int): Drawable? {
+        val roundRect = GradientDrawable()
+        roundRect.shape = GradientDrawable.RECTANGLE
+        roundRect.cornerRadius = context.resources.getDimension(R.dimen.elevation_upgrade_low)
+        roundRect.setColor(background)
+
+        val round2 = GradientDrawable()
+        round2.shape = GradientDrawable.RECTANGLE
+        round2.setColor(ContextCompat.getColor(context, R.color.white_alpha_007))
+        round2.cornerRadius = context.resources.getDimension(R.dimen.elevation_upgrade_low)
+        val insetLayer2 = InsetDrawable(round2, 0, 0, 0, 0)
+
+        return LayerDrawable(arrayOf(roundRect, insetLayer2))
     }
 
     /**
@@ -216,7 +234,7 @@ class BottomFloatingPanelViewHolder(
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 Log.d("bottomSheetBehavior", "onSlide")
                 onBottomFloatingPanelSlide(slideOffset)
-                if (slideOffset > 0.1f){
+                if (slideOffset > 0.1f) {
                     popWindow?.dismiss()
                 }
             }
@@ -351,14 +369,22 @@ class BottomFloatingPanelViewHolder(
                     val argbEvaluator = ArgbEvaluator()
                     val background = argbEvaluator.evaluate(
                         value,
-                        ContextCompat.getColor(context, R.color.grey_alpha_070),
-                        ContextCompat.getColor(context, R.color.white_grey_900)
+                        ContextCompat.getColor(
+                            context, R.color.grey_alpha_070_dark_grey_alpha_066
+                        ), ContextCompat.getColor(
+                            context, R.color.white_dark_grey
+                        )
                     ) as Int
 
-                    val grad: GradientDrawable = view.background as GradientDrawable
-                    grad.setColor(background)
+                    view.background =
+                        if (Util.isDarkMode(context)) {
+                            genCheckedDrawable(background)
+                        } else {
+                            val grad: GradientDrawable = view.background as GradientDrawable
+                            grad.setColor(background)
+                            grad
+                        }
 
-                    view.background = grad
                 }
             })
 
@@ -411,8 +437,8 @@ class BottomFloatingPanelViewHolder(
                         val argbEvaluator = ArgbEvaluator()
                         val background = argbEvaluator.evaluate(
                             value,
-                            ContextCompat.getColor(context, R.color.grey_alpha_032),
-                            ContextCompat.getColor(context, R.color.grey_alpha_060)
+                            ContextCompat.getColor(context, R.color.grey_alpha_032_white_alpha_054),
+                            ContextCompat.getColor(context, R.color.grey_alpha_060_white_alpha_054)
                         ) as Int
 
                         view.backgroundTintList = ColorStateList.valueOf(background)
