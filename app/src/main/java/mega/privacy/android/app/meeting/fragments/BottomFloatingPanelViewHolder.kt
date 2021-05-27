@@ -235,7 +235,7 @@ class BottomFloatingPanelViewHolder(
                 Log.d("bottomSheetBehavior", "onSlide")
                 onBottomFloatingPanelSlide(slideOffset)
                 if (slideOffset > 0.1f) {
-                    popWindow?.dismiss()
+                    dismissPopWindow()
                 }
             }
         })
