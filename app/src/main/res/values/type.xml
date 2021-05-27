@@ -145,6 +145,10 @@
         <item name="android:textSize">18sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant2.White">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
     <!-- Medium, normal, 20sp, 0px, white - black 87% -->
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant3">
         <item name="android:textSize">20sp</item>
@@ -164,6 +168,10 @@
     <!-- Medium, normal, 20sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6">
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6.White">
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant7">

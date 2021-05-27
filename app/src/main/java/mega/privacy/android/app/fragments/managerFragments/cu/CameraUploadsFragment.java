@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -61,7 +65,7 @@ import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class CameraUploadsFragment extends BaseFragment implements CameraUploadsAdapter.Listener {
+public class CameraUploadsFragment extends BaseFragment implements CUGridViewAdapter.Listener {
 
     public static final int ALL_VIEW = 0;
     public static final int DAYS_VIEW = 1;
@@ -78,7 +82,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private ManagerActivityLollipop mManagerActivity;
     private FragmentCameraUploadsFirstLoginBinding mFirstLoginBinding;
     private FragmentCameraUploadsBinding mBinding;
-    private CameraUploadsAdapter mAdapter;
+    private CUGridViewAdapter gridAdapter;
+    private CUCardViewAdapter cardAdapter;
     private ActionMode mActionMode;
 
     private CuViewModel mViewModel;
@@ -88,7 +93,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private static final String AD_SLOT = "and3";
 
     public int getItemCount() {
-        return mAdapter == null ? 0 : mAdapter.getItemCount();
+        return gridAdapter == null ? 0 : gridAdapter.getItemCount();
     }
 
     public void reloadNodes() {
@@ -242,8 +247,6 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
         int spanCount = smallGrid ? SPAN_SMALL_GRID : SPAN_LARGE_GRID;
 
         mBinding.cuList.setHasFixedSize(true);
-        GridLayoutManager layoutManager = new GridLayoutManager(context, spanCount);
-        mBinding.cuList.setLayoutManager(layoutManager);
         mBinding.cuList.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -269,19 +272,28 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 getResources().getDimensionPixelSize(
                         R.dimen.cu_fragment_selected_round_corner_radius));
 
-        mAdapter = new CameraUploadsAdapter(this, spanCount, itemSizeConfig);
-        mAdapter.setHasStableIds(true);
-        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-            @Override public int getSpanSize(int position) {
-                return mAdapter.getSpanSize(position);
-            }
-        });
-
-        mBinding.cuList.setAdapter(mAdapter);
-        mBinding.scroller.setRecyclerView(mBinding.cuList);
+        if (selectedView == ALL_VIEW) {
+            GridLayoutManager layoutManager = new GridLayoutManager(context, spanCount);
+            mBinding.cuList.setLayoutManager(layoutManager);
+            gridAdapter = new CUGridViewAdapter(this, spanCount, itemSizeConfig);
+            gridAdapter.setHasStableIds(true);
+            layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override public int getSpanSize(int position) {
+                    return gridAdapter.getSpanSize(position);
+                }
+            });
+            mBinding.cuList.setAdapter(gridAdapter);
+        } else {
+            LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+            mBinding.cuList.setLayoutManager(layoutManager);
+            cardAdapter = new CUCardViewAdapter(selectedView);
+            cardAdapter.setHasStableIds(true);
+            mBinding.cuList.setAdapter(cardAdapter);
+        }
     }
 
     private void setupOtherViews() {
+        mBinding.scroller.setRecyclerView(mBinding.cuList);
         mBinding.emptyEnableCuButton.setOnClickListener(v -> enableCUClick());
         mBinding.emptyHintText.setText(HtmlCompat.fromHtml(
                 formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.photos_empty)),
@@ -324,7 +336,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             boolean showScroller = nodes.size() >= (mManagerActivity.isSmallGridCameraUploads
                     ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
             mBinding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
-            mAdapter.setNodes(nodes);
+            gridAdapter.setNodes(nodes);
             updateEnableCUButtons(mViewModel.isCUEnabled());
             mManagerActivity.updateCuFragmentOptionsMenu();
 
@@ -338,11 +350,11 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                 .observe(getViewLifecycleOwner(), pair -> openNode(pair.first, pair.second));
 
         mViewModel.nodeToAnimate().observe(getViewLifecycleOwner(), pair -> {
-            if (pair.first < 0 || pair.first >= mAdapter.getItemCount()) {
+            if (pair.first < 0 || pair.first >= gridAdapter.getItemCount()) {
                 return;
             }
 
-            mAdapter.showSelectionAnimation(pair.first, pair.second,
+            gridAdapter.showSelectionAnimation(pair.first, pair.second,
                     mBinding.cuList.findViewHolderForLayoutPosition(pair.first));
         });
 
@@ -372,12 +384,34 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
         mViewModel.camSyncEnabled().observe(getViewLifecycleOwner(), this::updateEnableCUButtons);
         observeDragSupportEvents(getViewLifecycleOwner(), mBinding.cuList, VIEWER_FROM_CUMU);
+
+        mViewModel.getDayCards().observe(getViewLifecycleOwner(), this::showDayCards);
+        mViewModel.getMonthCards().observe(getViewLifecycleOwner(), this::showMonthCards);
+        mViewModel.getYearCards().observe(getViewLifecycleOwner(), this::showYearCards);
     }
 
     private void updateEnableCUButtons(boolean cuEnabled) {
-        boolean emptyAdapter = mAdapter.getItemCount() <= 0;
+        boolean emptyAdapter = gridAdapter.getItemCount() <= 0;
         mManagerActivity.updateEnableCuButton(!cuEnabled && !emptyAdapter ? View.VISIBLE : View.GONE);
         mBinding.emptyEnableCuButton.setVisibility(!cuEnabled && emptyAdapter ? View.VISIBLE : View.GONE);
+    }
+
+    private void showDayCards(List<Pair<CUCard, MegaNode>> dayCards) {
+        if (selectedView != DAYS_VIEW) {
+            return;
+        }
+    }
+
+    private void showMonthCards(List<Pair<CUCard, MegaNode>> monthCards) {
+        if (selectedView != MONTHS_VIEW) {
+            return;
+        }
+    }
+
+    private void showYearCards(List<Pair<CUCard, MegaNode>> yearCards) {
+        if (selectedView != YEARS_VIEW) {
+            return;
+        }
     }
 
     @Override
@@ -403,7 +437,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     }
 
     private void openNode(int position, CuNode cuNode) {
-        if (position < 0 || position >= mAdapter.getItemCount()) {
+        if (position < 0 || position >= gridAdapter.getItemCount()) {
             return;
         }
 
@@ -423,7 +457,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
                                 : parentNode.getHandle())
                 .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER);
 
-        putThumbnailLocation(intent, mBinding.cuList, position, VIEWER_FROM_CUMU, mAdapter);
+        putThumbnailLocation(intent, mBinding.cuList, position, VIEWER_FROM_CUMU, gridAdapter);
         startActivity(intent);
         requireActivity().overridePendingTransition(0, 0);
     }

@@ -6,7 +6,7 @@ import mega.privacy.android.app.databinding.ItemCameraUploadsVideoBinding;
 
 import static mega.privacy.android.app.utils.TimeUtils.getVideoDuration;
 
-class CuVideoViewHolder extends CuViewHolder {
+class CuVideoViewHolder extends CuGridViewHolder {
 
     private final ItemCameraUploadsVideoBinding mBinding;
     private final CuItemSizeConfig mItemSizeConfig;

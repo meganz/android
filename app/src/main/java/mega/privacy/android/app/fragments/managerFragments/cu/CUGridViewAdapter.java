@@ -22,7 +22,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 
-public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
+public class CUGridViewAdapter extends RecyclerView.Adapter<CuGridViewHolder>
         implements SectionTitleProvider, DragThumbnailGetter {
 
     private final Listener mListener;
@@ -30,7 +30,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     private final int mSpanCount;
     private final CuItemSizeConfig mItemSizeConfig;
 
-    public CameraUploadsAdapter(Listener listener, int spanCount, CuItemSizeConfig itemSizeConfig) {
+    public CUGridViewAdapter(Listener listener, int spanCount, CuItemSizeConfig itemSizeConfig) {
         mListener = listener;
         mSpanCount = spanCount;
         mItemSizeConfig = itemSizeConfig;
@@ -76,7 +76,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     }
 
     @NonNull @Override
-    public CuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CuGridViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
             case CuNode.TYPE_HEADER:
@@ -94,7 +94,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
         }
     }
 
-    @Override public void onBindViewHolder(@NonNull CuViewHolder holder, int position) {
+    @Override public void onBindViewHolder(@NonNull CuGridViewHolder holder, int position) {
         holder.bind(position, mNodes.get(position), mListener);
     }
 

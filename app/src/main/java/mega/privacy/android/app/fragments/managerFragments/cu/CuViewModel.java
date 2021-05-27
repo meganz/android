@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -59,6 +60,9 @@ class CuViewModel extends BaseRxViewModel {
     private final SortOrderManagement mSortOrderManagement;
 
     private final MutableLiveData<Boolean> camSyncEnabled = new MutableLiveData<>();
+    private final MutableLiveData<List<Pair<CUCard, MegaNode>>> dayCards = new MutableLiveData<>();
+    private final MutableLiveData<List<Pair<CUCard, MegaNode>>> monthCards = new MutableLiveData<>();
+    private final MutableLiveData<List<Pair<CUCard, MegaNode>>> yearCards = new MutableLiveData<>();
     private final MutableLiveData<List<CuNode>> mCuNodes = new MutableLiveData<>();
     private final MutableLiveData<Pair<Integer, CuNode>> mNodeToOpen = new MutableLiveData<>();
     private final MutableLiveData<Pair<Integer, CuNode>> mNodeToAnimate = new MutableLiveData<>();
@@ -107,6 +111,18 @@ class CuViewModel extends BaseRxViewModel {
 
         add(mCreatingThumbnailFinished.throttleLatest(1, TimeUnit.SECONDS, true)
                 .subscribe(ignored -> loadCuNodes(), logErr("creatingThumbnailFinished")));
+    }
+
+    public LiveData<List<Pair<CUCard, MegaNode>>> getDayCards() {
+        return dayCards;
+    }
+
+    public LiveData<List<Pair<CUCard, MegaNode>>> getMonthCards() {
+        return monthCards;
+    }
+
+    public LiveData<List<Pair<CUCard, MegaNode>>> getYearCards() {
+        return yearCards;
     }
 
     public boolean isCUEnabled() {
@@ -342,10 +358,15 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     private List<CuNode> getCuNodes() {
+        List<Pair<CUCard, MegaNode>> days = new ArrayList<>();
+        List<Pair<CUCard, MegaNode>> months = new ArrayList<>();
+        List<Pair<CUCard, MegaNode>> years = new ArrayList<>();
         List<CuNode> nodes = new ArrayList<>();
         List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
-
-        LocalDate lastModifyDate = null;
+        long itemsCount = 0;
+        LocalDate lastDayDate = null;
+        LocalDate lastMonthDate = null;
+        LocalDate lastYearDate = null;
         List<Pair<Integer, MegaNode>> realNodes =
                 mRepo.getCuChildren(mSortOrderManagement.getOrderCamera(), null);
 
@@ -354,15 +375,33 @@ class CuViewModel extends BaseRxViewModel {
             File thumbnail =
                     new File(getThumbFolder(mAppContext), node.getBase64Handle() + ".jpg");
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
-            String dateString = ofPattern("MMMM uuuu").format(modifyDate);
+            String day = ofPattern("dd").format(modifyDate);
+            String month = ofPattern("MMM").format(modifyDate);
+            String year = ofPattern("yyyy").format(modifyDate);
+            String dateString = ofPattern("MMM yyyy").format(modifyDate);
 
-            if (lastModifyDate == null
-                    || !YearMonth.from(lastModifyDate).equals(YearMonth.from(modifyDate))) {
-                lastModifyDate = modifyDate;
-                String month = ofPattern("MMMM").format(modifyDate);
-                String year = ofPattern("yyyy").format(modifyDate);
-                String currentYear = ofPattern("yyyy").format(LocalDate.now());
-                nodes.add(new CuNode(dateString, new Pair<>(month, currentYear.equals(year) ? "" : year)));
+            if (lastDayDate == null) {
+                lastDayDate = modifyDate;
+            }
+
+            if (lastDayDate.equals(modifyDate)) {
+                itemsCount++;
+            } else {
+                days.add(new Pair<>(new CUCard(day, month, year, ofPattern("dd MMM yyyy").format(modifyDate), itemsCount), node));
+                itemsCount = 0;
+            }
+
+            if (lastMonthDate == null
+                    || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
+                lastMonthDate = modifyDate;
+                nodes.add(new CuNode(dateString, new Pair<>(month,
+                        Year.from(LocalDate.now()).equals(Year.from(modifyDate)) ? "" : year)));
+                months.add(new Pair<>(new CUCard(null, month, year, ofPattern("MMM yyyy").format(modifyDate), null), node));
+            }
+
+            if (lastYearDate == null || !Year.from(lastYearDate).equals(Year.from(modifyDate))) {
+                lastYearDate = modifyDate;
+                years.add(new Pair<>(new CUCard(null, null, year, ofPattern("yyyy").format(modifyDate), null), node));
             }
 
             nodes.add(new CuNode(node, pair.first, thumbnail.exists() ? thumbnail : null,
@@ -385,6 +424,10 @@ class CuViewModel extends BaseRxViewModel {
                             new File(getThumbFolder(mAppContext), node.getBase64Handle() + ".jpg");
                     mMegaApi.getThumbnail(node, thumbnail.getAbsolutePath(), mCreateThumbnailRequest);
                 }, logErr("CuViewModel getThumbnail")));
+
+        dayCards.postValue(days);
+        monthCards.postValue(months);
+        yearCards.postValue(years);
 
         return nodes;
     }

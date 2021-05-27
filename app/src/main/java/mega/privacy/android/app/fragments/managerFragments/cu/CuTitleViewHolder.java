@@ -10,7 +10,7 @@ import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
-class CuTitleViewHolder extends CuViewHolder {
+class CuTitleViewHolder extends CuGridViewHolder {
 
     private final ItemCameraUploadsTitleBinding mBinding;
 
