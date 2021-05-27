@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA zapewnia kontrolowane przez użytkownika szyfrowane przechowywanie w chmurze i czat za pośrednictwem standardowych przeglądarek internetowych, wraz z dedykowanymi aplikacjami na urządzenia mobilne. W przeciwieństwie do innych dostawców usług w chmurze, Twoje dane są szyfrowane i odszyfrowywane tylko przez urządzenia klienckie, a nigdy przez nas.\n\nPrześlij swoje pliki ze smartfona lub tabletu, a następnie wyszukuj, przechowuj, pobieraj, przesyłaj strumieniowo, przeglądaj, udostępniaj, zmieniaj nazwę lub usuwaj swoje pliki w dowolnym momencie, z dowolnego urządzenia, w dowolnym miejscu. Udostępniaj foldery swoim kontaktom i przeglądaj ich aktualizacje w czasie rzeczywistym. Proces szyfrowania oznacza, że ​​nie możemy uzyskać dostępu do Twojego hasła ani zresetować go, więc MUSISZ je zapamiętać (chyba że masz kopię zapasową klucza odzyskiwania), w przeciwnym razie utracisz dostęp do przechowywanych plików.\n\nMEGA zaszyfrowana przez użytkownika końcowego. Czat wideo zapewnia całkowitą prywatność i jest dostępny przez przeglądarkę od 2016 roku. Został rozszerzony na naszą aplikację mobilną, a historia czatów jest dostępna na wielu urządzeniach. Użytkownicy mogą również łatwo dodawać pliki do czatu ze swojego MEGA Cloud Drive.\n\nMEGA oferuje hojne 50 GB bezpłatnej przestrzeni dyskowej dla wszystkich zarejestrowanych użytkowników z dodatkowymi osiągnięciami i oferuje płatne plany ze znacznie wyższymi limitami:\n\n\nSubskrypcja Pro Lite: 4,99 EUR miesięcznie lub 49,99 EUR rocznie zapewnia 400 GB miejsca na dane i 1 TB limitu transferu miesięcznie.\nSubskrypcja Pro I: 9,99 EUR miesięcznie lub 99,99 EUR rocznie zapewnia 2 TB przestrzeni dyskowej i 2 TB limitu transferu miesięcznie.\nSubskrypcja Pro II: 19,99 EUR miesięcznie lub 199,99 EUR rocznie zapewnia 8 TB przestrzeni dyskowej i 8 TB limitu transferu miesięcznie. \nSubskrypcja Pro III: 29,99 € miesięcznie lub 299,99 € rocznie daje 16 TB przestrzeni dyskowej i 16 TB limitu transferu miesięcznie.\n\nSubskrypcje są odnawiane automatycznie na kolejne okresy subskrypcji o tej samej długości io taka sama cena jak w wybranym początkowym okresie. Aby zarządzać swoimi subskrypcjami, po prostu kliknij ikonę Sklepu Play na swoim urządzeniu mobilnym, zaloguj się za pomocą swojego identyfikatora Google (jeśli jeszcze tego nie zrobiłeś), a następnie kliknij aplikację MEGA. Będziesz mógł tam zarządzać swoją subskrypcją.\n\nUprawnienia aplikacji:\nWRITE_EXTERNAL_STORAGE -&gt; Pobierz swoje pliki z MEGA na swoje urządzenie i prześlij pliki z urządzenia do MEGA\nCAMERA -&gt; Weź zrób zdjęcie i prześlij swoje zdjęcia do MEGA\nREAD_CONTACTS -&gt; Z łatwością dodawaj kontakty z urządzenia jako kontakty MEGA\nRECORD_AUDIO i CAPTURE_VIDEO_OUTPUT (mikrofon i kamera) -&gt; MEGA zapewnia kompleksowe szyfrowane połączenia audio / wideo\n\n\nAby zwiększyć zaufanie użytkowników do systemu MEGA, publikowany jest cały kod po stronie klienta, aby zainteresowani badacze bezpieczeństwa mogli ocenić proces szyfrowania. Kod naszej aplikacji mobilnej znajduje się pod adresem: https://github.com/meganz/android\n\nAby uzyskać więcej informacji, odwiedź naszą witrynę:\nZobacz https://mega.nz/terms \n \n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA jest Cloud Storage z potężną, pełną prywatnością.</string>
     <!-- PRO Lite account -->
@@ -75,7 +75,7 @@
     <!-- when any file or folder is selected -->
     <string name="error_no_selection">Nie wybrano żadnego pliku lub katalogu</string>
     <!-- when trying to download a file that is already downloaded in the device -->
-    <string name="general_already_downloaded">Plik został już pobrany</string>
+    <string name="general_already_downloaded">Plik został już&#160;pobrany</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
     <string name="general_already_uploaded">zostały już wgrane</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the file -->
@@ -153,16 +153,16 @@
     <!-- General label for files -->
     <plurals name="general_num_files">
         <item quantity="one">Plik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Plików</item>
+        <item quantity="many">Plików</item>
         <item quantity="other">Pliki</item>
     </plurals>
     <!-- Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts -->
     <plurals name="general_num_shared_with">
         <item quantity="one">Współdzielone z %1$s</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Shared with %1$d contacts</item>
+        <item quantity="few">Udostępniony z %1$d</item>
+        <item quantity="many">Udostępniony z %1$d</item>
+        <item quantity="other">Udostępniony z %1$dkontaktami</item>
     </plurals>
     <!-- Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
     <string name="alert_larger_file">%s zostanie pobrane.</string>
@@ -257,7 +257,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Hasła do siebie nie pasują</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Podany adres e-mail został już użyty podczas rejestracji.</string>
+    <string name="error_email_registered">Podany adres e-mail został&#160;już użyty podczas rejestracji.</string>
     <!--  -->
     <string name="create_account_creating_account">Łączenie z serwerem: tworzenie konta</string>
     <!--  -->
@@ -269,8 +269,8 @@
     <!-- Warning to confirm remove selected transfers. Plural more than 1 transfer -->
     <plurals name="cancel_selected_transfers">
         <item quantity="one">Wybrany transfer zostanie anulowany.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wybrane transfery zostaną anulowane.</item>
+        <item quantity="many">Wybrane transfery zostaną anulowane.</item>
         <item quantity="other">Wybrane transfery zostaną anulowane.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
@@ -301,9 +301,9 @@
     <string name="sent_requests_empty">[B]Brak [/B][A]zgłoszeń[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[B]Brak [/B][A]zgłoszeń[/A]</string>
-    <!-- Title for the file transfer screen (with the up &amp; download) -->
+    <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">Ruch</string>
-    <!-- Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this. -->
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Moje konto</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">Wgrywanie zdjęć</string>
@@ -313,7 +313,7 @@
     <string name="tab_outgoing_shares">Wychodzące</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Linki</string>
-    <!-- Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible). -->
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">Udostępnienia</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Udostępnione z</string>
@@ -372,36 +372,36 @@
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_began">
         <item quantity="one">Pobieranie rozpoczęte</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Rozpoczęto pobieranie %1$d</item>
+        <item quantity="many">Rozpoczęto pobieranie %1$d</item>
         <item quantity="other">Rozpoczęto pobieranie %1$d</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_finish">
         <item quantity="one">Pobieranie zostało zakończone</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Pobieranie %1$d zostało zakończone</item>
+        <item quantity="many">Pobieranie %1$d zostało zakończone</item>
         <item quantity="other">Pobieranie %1$d zostało zakończone</item>
     </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="one">Wgrywanie rozpoczęte</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Rozpoczęło się przesyłanie %1$d</item>
+        <item quantity="many">Rozpoczęło się przesyłanie %1$d</item>
         <item quantity="other">Rozpoczęło się przesyłanie %1$d</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_finish">
         <item quantity="one">Przesyłanie zostało zakończone</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Przesyłanie %1$d zostało zakończone</item>
+        <item quantity="many">Przesyłanie %1$d zostało zakończone</item>
         <item quantity="other">Przesyłanie %1$d zostało zakończone</item>
     </plurals>
     <!-- Warning shown when it tries to download some empty folders. Plural -->
     <plurals name="empty_folders">
         <item quantity="one">Folder jest pusty.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Foldery są puste.</item>
+        <item quantity="many">Foldery są puste.</item>
         <item quantity="other">Foldery są puste.</item>
     </plurals>
     <!-- Hint how to cancel the download -->
@@ -431,14 +431,14 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Usuń udostępnienie</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_remove_link_menu">Usuń link</string>
+    <string name="context_remove_link_menu">Usuń&#160;link</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
-    <string name="context_remove_link_warning_text">Ten link nie będzie już dostępny publicznie.</string>
+    <string name="context_remove_link_warning_text">Ten link nie będzie już&#160;dostępny publicznie.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
-        <item quantity="one">Ten link nie będzie już dostępny publicznie.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="one">Ten link nie będzie już dostępny publicznie.</item>
+        <item quantity="few">Te linki nie będą już publicznie dostępne.</item>
+        <item quantity="many">Te linki nie będą już publicznie dostępne.</item>
         <item quantity="other">Te linki nie będą już publicznie dostępne.</item>
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -524,7 +524,7 @@
     <!-- message when trying to send a file without full access -->
     <string name="context_send_no_permission">Nie masz uprawnień do wysłania tego pliku</string>
     <!-- success message when creating a folder -->
-    <string name="context_folder_created">Katalog został utworzony</string>
+    <string name="context_folder_created">Katalog został&#160;utworzony</string>
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Błąd. Katalog nie został utworzony</string>
     <!-- success message when renaming a node -->
@@ -602,7 +602,7 @@
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">%d kontaktów nie zostało usunięte</string>
     <!-- success message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_shared_correctly">Katalog został udostępniony z %d kontaktami</string>
+    <string name="number_contact_file_shared_correctly">Katalog został&#160;udostępniony z %d kontaktami</string>
     <!-- error message when sharing a file with multiple contacts -->
     <string name="number_contact_file_not_shared_">Plik nie może być udostępniony %d kontaktom.</string>
     <!-- success message when sharing multiple files -->
@@ -622,13 +622,13 @@
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">Błąd. Kosz nie został opróżniony</string>
     <!-- dialog cancel subscriptions -->
-    <string name="dialog_cancel_subscriptions">Mass zamiar anulować swoją subskrypcję MEGA. Prosimy o poinformowanie nas, czy możemy jakoś pomóc i wpłynąć na zmianę Twojej decyzji.</string>
+    <string name="dialog_cancel_subscriptions">Mass zamiar anulować swoją subskrypcję&#160;MEGA. Prosimy o poinformowanie nas, czy możemy jakoś pomóc i wpłynąć na zmianę Twojej decyzji.</string>
     <!-- hint cancel subscriptions dialog -->
     <string name="hint_cancel_subscriptions">Wpisz swoją opinię</string>
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Wyślij</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Dziękujemy za opinię! Czy na pewno chcesz anulować swoja subskrypcję MEGA?</string>
+    <string name="confirmation_cancel_subscriptions">Dziękujemy za opinię! Czy na pewno chcesz anulować swoja subskrypcję&#160;MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Twoja subskrypcja nie została anulowane. Prosimy o podane powodu anulowania</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -687,7 +687,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problem z systemem plików</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Wystąpił błąd podczas wykonywania operacji</string>
+    <string name="general_error">Wystąpił&#160;błąd podczas wykonywania operacji</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Podgląd zdjęcia</string>
     <!-- Headline for the amount of storage space is used -->
@@ -715,13 +715,13 @@
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Płatność miesięczna lub roczna</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">Na chwilę obecną, brak form płatności dla tego planu</string>
+    <string name="no_available_payment_method">Na chwilę&#160;obecną, brak form płatności dla tego planu</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Miesięcznie*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
     <string name="upgrade_per_year">Rocznie*</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Link został skopiowany do schowka</string>
+    <string name="file_properties_get_link">Link został&#160;skopiowany do schowka</string>
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">Podgląd nie został jeszcze pobrany. Prosimy czekać</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
@@ -910,7 +910,7 @@
     <!-- Settings of the Passcode -->
     <string name="settings_passcode_lock_switch">Blokada PIN</string>
     <!-- Settings option to change Passcode. -->
-    <string name="settings_change_passcode">Zmień kod</string>
+    <string name="settings_change_passcode">Zmień&#160;kod</string>
     <!-- Settings option screen to change Passcode. -->
     <string name="title_change_passcode">Zmiana blokady kodem dostępu</string>
     <!-- Settings option to set the timer to ask for passcode. -->
@@ -922,8 +922,8 @@
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="one">1 nieudana próba podania hasła</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d nieudanych prób wprowadzenia kodu</item>
+        <item quantity="many">%1$d nieudanych prób wprowadzenia kodu</item>
         <item quantity="other">%1$d nieudanych prób wprowadzenia kodu</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
@@ -933,8 +933,8 @@
     <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
     <plurals name="pin_lock_incorrect_alert">
         <item quantity="one">Błędny kod dostępu, spróbuj ponownie. Pozostała Ci 1 próba</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Błędny kod dostępu, spróbuj ponownie. Pozostało Ci %2dprób</item>
+        <item quantity="many">Błędny kod dostępu, spróbuj ponownie. Pozostało Ci %2dprób</item>
         <item quantity="other">Błędny kod dostępu, spróbuj ponownie. Pozostało Ci %2d prób</item>
     </plurals>
     <!-- Error message when not typing the Passcode correctly (two times) -->
@@ -998,7 +998,7 @@
     <!--  -->
     <string name="free_account">Darmowe</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
-    <string name="camera_uploads_created">Folder dla zdjęć został utworzony</string>
+    <string name="camera_uploads_created">Folder dla zdjęć został&#160;utworzony</string>
     <!-- category in sort by action -->
     <string name="sortby_name">Nazwa</string>
     <!-- sort files alphabetically ascending -->
@@ -1096,7 +1096,7 @@
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Zapomniałeś hasła?</string>
     <!-- First paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_first_paragraph">Jeżeli posiadasz kopię klucza, możesz zresetować swojego hasło klikając TAK. Dane nie zostaną utracone.</string>
+    <string name="forgot_pass_first_paragraph">Jeżeli posiadasz kopię klucza, możesz zresetować swojego hasło klikając TAK. Dane nie zostaną&#160;utracone.</string>
     <!-- Second paragraph of the screen when the password has been forgotten -->
     <string name="forgot_pass_second_paragraph">Wciąż możesz zapisać swój klucz, jeżeli posiadasz aktywną sesję MEGA w innej przeglądarce na tym lub innym komputerze. Jeżeli nie masz aktywnej sesji, nie możesz odszyfrować aktualnego konta i zalecamy utworzenie nowego konta z tym samym adresem email poprzez wybranie NIE.</string>
     <!-- Sentence to ask to the user if he has the master key in the screen when the password has been forgotten -->
@@ -1152,7 +1152,7 @@
     <!-- Text of the dialog message to ask for the link to park the account -->
     <string name="dialog_park_account">Wprowadź adres email poniżej. Otrzymasz link, który umożliwi zachowanie Twojego konta.</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">To jest ostatni krok przed zawieszeniem konta, wprowadź noweg hasło. Twoje dane będą przechowywanie przez conajmniej 60 dni. Jeżeli chcesz odwiesić swoje konto, skontaktuj się z support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">To jest ostatni krok przed zawieszeniem konta, wprowadź noweg hasło. Twoje dane będą&#160;przechowywanie przez conajmniej 60 dni. Jeżeli chcesz odwiesić swoje konto, skontaktuj się z support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Wprowadź nowe hasło</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1214,7 +1214,7 @@
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Ustaw hasło</string>
     <!-- Hint of the dialog to get link with password -->
-    <string name="hint_set_password_protection_dialog">Wprowadź hasło</string>
+    <string name="hint_set_password_protection_dialog">Wprowadź&#160;hasło</string>
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="hint_confirm_password_protection_dialog">Potwierdź hasło</string>
     <!-- Status text at the beginning of getting a link -->
@@ -1240,15 +1240,15 @@
     <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
     <plurals name="general_num_request">
         <item quantity="one">1 zgłoszenie</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d zgłoszenia</item>
+        <item quantity="many">%1$d zgłoszenia</item>
         <item quantity="other">%1$d zgłoszenia</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Katalog jest udostępniony z %1$d. Usunąć udostępnienie?</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Katalog jest udostępniony z %1$d. Usunąć wszystkie udostępnienia?</item>
+        <item quantity="many">Katalog jest udostępniony z %1$d. Usunąć wszystkie udostępnienia?</item>
         <item quantity="other">Katalog jest udostępniony z %1$d. Usunąć wszystkie udostępnienia?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
@@ -1276,8 +1276,8 @@
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 element</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d elementów</item>
+        <item quantity="many">%1$d elementów</item>
         <item quantity="other">%1$d elementów</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
@@ -1353,15 +1353,15 @@
     <!-- Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15 -->
     <plurals name="success_muting_chat_until_specific_time">
         <item quantity="one">Powiadomienia czatu będą wyciszone do czasu %1$s</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Powiadomienia czatu będą wyciszone do czasu %1$s</item>
+        <item quantity="many">Powiadomienia czatu będą wyciszone do czasu %1$s</item>
         <item quantity="other">Powiadomienia czatu będą wyciszone do czasu %1$s</item>
     </plurals>
     <!-- Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00 -->
     <plurals name="success_muting_chat_until_specific_date_and_time">
         <item quantity="one">Powiadomienia czatu będą wyciszone do %1$s o %2$s.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Powiadomienia czatu będą wyciszone do %1$s o %2$s.</item>
+        <item quantity="many">Powiadomienia czatu będą wyciszone do %1$s o %2$s.</item>
         <item quantity="other">Powiadomienia czatu będą wyciszone do %1$s o %2$s.</item>
     </plurals>
     <!-- Message when select the option Do not disturb but the notifications are already muted -->
@@ -1371,8 +1371,8 @@
     <!-- String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15 -->
     <plurals name="chat_notifications_muted_until_specific_time">
         <item quantity="one">Wyciszone do %1$s</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wyciszone do %1$s</item>
+        <item quantity="many">Wyciszone do %1$s</item>
         <item quantity="other">Wyciszone do %1$s</item>
     </plurals>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -1402,7 +1402,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">System zapewnia weryfikację, że przesyłane dane pochodzą od zweyfikowanej osoby i że zawartość nie została zmieniona poczas transferu danych.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_confidentiality_empty_screen">Tylko nadawca i odbiorca wiadomości mogą rozszyfrować jej treść.</string>
+    <string name="mega_confidentiality_empty_screen">Tylko nadawca i odbiorca wiadomości mogą&#160;rozszyfrować jej treść.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_info_empty_screen">MEGA</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1456,7 +1456,7 @@
     <!-- Text appended to a edited message. -->
     <string name="edited_message_text">(edytowany)</string>
     <!-- Option in menu to change title of a chat group. -->
-    <string name="change_title_option">Zmień tytuł</string>
+    <string name="change_title_option">Zmień&#160;tytuł</string>
     <!-- confirmation message before leaving a group chat -->
     <string name="confirmation_leave_group_chat">Jeżeli opuścisz czat, nie będziesz miał możliwości czytania oraz wysyłania w ramach czatu.</string>
     <!-- title confirmation message before leaving a group chat -->
@@ -1520,8 +1520,8 @@
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d kontakt</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d kontakty</item>
+        <item quantity="many">%1$d kontakty</item>
         <item quantity="other">%1$d kontakty</item>
     </plurals>
     <!-- Message shown when the folder sharing process fails -->
@@ -1529,15 +1529,15 @@
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
         <item quantity="one">Wszystkie dane powiązane w wybranym kontaktem zostaną usunięte.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wszystkie dane powiązane w wybranymi kontaktami zostaną usunięte.</item>
+        <item quantity="many">Wszystkie dane powiązane w wybranymi kontaktami zostaną usunięte.</item>
         <item quantity="other">Wszystkie dane powiązane w wybranymi kontaktami zostaną usunięte.</item>
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
         <item quantity="one">Usuń kontakt?</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Usuąć kontakty?</item>
+        <item quantity="many">Usuąć kontakty?</item>
         <item quantity="other">Usuąć kontakty?</item>
     </plurals>
     <!-- option shown when a message could not be sent -->
@@ -1551,8 +1551,8 @@
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]pisze&#8230;[/A]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$s [A]piszą&#8230;[/A]</item>
+        <item quantity="many">%1$s [A]piszą&#8230;[/A]</item>
         <item quantity="other">%1$s [A]piszą&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
@@ -1643,8 +1643,8 @@
     <!-- Label to show the number of transfers in progress, Plural -->
     <plurals name="text_number_transfers">
         <item quantity="one">%1$d z %2$d plik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d of %2$d plików</item>
+        <item quantity="many">%1$d of %2$d plików</item>
         <item quantity="other">%1$d of %2$d plików</item>
     </plurals>
     <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
@@ -1690,108 +1690,108 @@
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_notification">
         <item quantity="one">Wgrywanie %1$d z %2$d pliku</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wgrywanie %1$d z %2$d plików</item>
+        <item quantity="many">Wgrywanie %1$d z %2$d plików</item>
         <item quantity="other">Wgrywanie %1$d z %2$d plików</item>
     </plurals>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_paused_notification">
         <item quantity="one">Wgrywanie %1$d z %2$d pliku (wstrzymane)</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wgrywanie %1$d z %2$d plików (wstrzymane)</item>
+        <item quantity="many">Wgrywanie %1$d z %2$d plików (wstrzymane)</item>
         <item quantity="other">Wgrywanie %1$d z %2$d plików (wstrzymane)</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_notification">
         <item quantity="one">Przesyłanie %1$d do folderu %2$d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wgrywanie %1$d z %2$d katalogów</item>
+        <item quantity="many">Wgrywanie %1$d z %2$d katalogów</item>
         <item quantity="other">Wgrywanie %1$d z %2$d katalogów</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_paused_notification">
         <item quantity="one">Wgrywanie %1$d z %2$d katalogu (wstrzymane)</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wgrywanie %1$d z %2$d katalogów (wstrzymane)</item>
+        <item quantity="many">Wgrywanie %1$d z %2$d katalogów (wstrzymane)</item>
         <item quantity="other">Wgrywanie %1$d z %2$d katalogów (wstrzymane)</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">Wgrano %1$d plik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wgrano %1$d plików</item>
+        <item quantity="many">Wgrano %1$d plików</item>
         <item quantity="other">Wgrano %1$d plików</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="one">1 plik już wgrany</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d plików już wgranych</item>
+        <item quantity="many">%1$d plików już wgranych</item>
         <item quantity="other">%1$d plików już wgranych</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
     <plurals name="folder_upload_service_final_notification">
         <item quantity="one">Wgrano %1$d katalog</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wgrano %1$d katalogów</item>
+        <item quantity="many">Wgrano %1$d katalogów</item>
         <item quantity="other">Wgrano %1$d katalogów</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Rozmiar: %1$s</string>
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
-        <item quantity="one">%1$d plik nie został wgrany</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="one">%1$d plik nie został&#160;wgrany</item>
+        <item quantity="few">%1$d plików nie zostało wgranych</item>
+        <item quantity="many">%1$d plików nie zostało wgranych</item>
         <item quantity="other">%1$d plików nie zostało wgranych</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
     <plurals name="copied_service_upload">
         <item quantity="one">%1$d pliku skopiowane</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d plików skopiowanych</item>
+        <item quantity="many">%1$d plików skopiowanych</item>
         <item quantity="other">%1$d plików skopiowanych</item>
     </plurals>
     <!-- Text of the notification shown when the download service do not download because the file is already on the device, Plural -->
     <plurals name="already_downloaded_service">
         <item quantity="one">%1$d plik pobranych poprzednio</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d plików pobranych poprzednio</item>
+        <item quantity="many">%1$d plików pobranych poprzednio</item>
         <item quantity="other">%1$d plików pobranych poprzednio</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished, Plural -->
     <plurals name="download_service_final_notification">
         <item quantity="one">Pobieranie %1$d plik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Pobieranie %1$d plików</item>
+        <item quantity="many">Pobieranie %1$d plików</item>
         <item quantity="other">Pobieranie %1$d plików</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
         <item quantity="one">Pobrano %1$d %2$d plik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Pobrano %1$d %2$d plików</item>
+        <item quantity="many">Pobrano %1$d %2$d plików</item>
         <item quantity="other">Pobrano %1$d %2$d plików</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
         <item quantity="one">%1$d nie został pobrany</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d nie zostało pobranych</item>
+        <item quantity="many">%1$d nie zostało pobranych</item>
         <item quantity="other">%1$d nie zostało pobranych</item>
     </plurals>
     <!-- Text of the notification shown when the download service is running, Plural -->
     <plurals name="download_service_notification">
         <item quantity="one">Pobieranie %1$d z %2$d plik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Pobieranie %1$d z %2$d plików</item>
+        <item quantity="many">Pobieranie %1$d z %2$d plików</item>
         <item quantity="other">Pobieranie %1$d z %2$d plików</item>
     </plurals>
     <!-- Text of the notification shown when the download service is paused, Plural -->
     <plurals name="download_service_paused_notification">
         <item quantity="one">Pobieranie %1$d z %2$d pliku (wstrzymane)</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Pobieranie %1$d z %2$d plików (wstrzymane)</item>
+        <item quantity="many">Pobieranie %1$d z %2$d plików (wstrzymane)</item>
         <item quantity="other">Pobieranie %1$d z %2$d plików (wstrzymane)</item>
     </plurals>
     <!-- Title of the alert when the transfer quota is exceeded. -->
@@ -1807,8 +1807,8 @@
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
     <plurals name="new_general_num_files">
         <item quantity="one">%1$d plik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d pliki</item>
+        <item quantity="many">%1$d pliki</item>
         <item quantity="other">%1$d pliki</item>
     </plurals>
     <!-- Menu option -->
@@ -1850,22 +1850,22 @@
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
         <item quantity="one">Usunięcie linku nie powiodło się. Spróbuj ponownie później.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Nie udało się usunąć niektórych linków. Spróbuj ponownie później.</item>
+        <item quantity="many">Nie udało się usunąć niektórych linków. Spróbuj ponownie później.</item>
         <item quantity="other">Nie udało się usunąć niektórych linków. Spróbuj ponownie później.</item>
     </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="one">Utworzenie łącza nie powiodło się. Spróbuj ponownie później.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Nie udało się utworzyć niektórych linków. Spróbuj ponownie później.</item>
+        <item quantity="many">Nie udało się utworzyć niektórych linków. Spróbuj ponownie później.</item>
         <item quantity="other">Nie udało się utworzyć niektórych linków. Spróbuj ponownie później.</item>
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
         <item quantity="one">Link usunięty pomyślnie.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Linki zostały usunięte pomyślnie.</item>
+        <item quantity="many">Linki zostały usunięte pomyślnie.</item>
         <item quantity="other">Linki zostały usunięte pomyślnie.</item>
     </plurals>
     <!-- error message -->
@@ -1930,7 +1930,7 @@
     <string name="file_properties_shared_folder_full_access">Pełen dostęp</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">Tylko odczyt</string>
-    <!-- Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;) -->
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Oczyt i zapis</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Transfery zatrzymane!</string>
@@ -1955,7 +1955,7 @@
     <!-- Success message when the attachment has been sent to a many chats -->
     <string name="success_attaching_node_from_cloud_chats">Plik wysłany do %1$d czatów</string>
     <!-- Error message when the attachment cannot be sent -->
-    <string name="error_attaching_node_from_cloud">Błąd. Plik nie został wysłany</string>
+    <string name="error_attaching_node_from_cloud">Błąd. Plik nie został&#160;wysłany</string>
     <!-- Error message when the attachment cannot be sent to any of the selected chats -->
     <string name="error_attaching_node_from_cloud_chats">Błąd. Plik nie został wysłany do wybranych czatów.</string>
     <!-- Error message when the attachment cannot be revoked -->
@@ -1973,7 +1973,7 @@
     <!-- title of the notification for a new incoming contact request -->
     <string name="title_contact_request_notification">Nowy kontakt</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
-    <string name="title_properties_chat_clear">Wyczyść historię czatu</string>
+    <string name="title_properties_chat_clear">Wyczyść&#160;historię&#160;czatu</string>
     <!-- Title of the section to remove contact in the Contact Properties screen -->
     <string name="title_properties_remove_contact">Usuń kontakt</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
@@ -2015,7 +2015,7 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Bonusy</string>
     <!-- title of the section for install a mobile app in achivements section (maximum 24 chars) -->
-    <string name="title_install_app">Zainstaluj aplikację mobilną</string>
+    <string name="title_install_app">Zainstaluj aplikację&#160;mobilną</string>
     <!-- Title of the section for add phone number in achivements section (maximum 24 chars) -->
     <string name="title_add_phone">Dodaj telefon komórkowy</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
@@ -2069,15 +2069,15 @@
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Udostępnij katalog</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Udostępnione katalogi</item>
+        <item quantity="many">Udostępnione katalogi</item>
         <item quantity="other">Udostępnione katalogi</item>
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
         <item quantity="one">Jeśli opuścisz folder, nie będziesz go więcej widzieć.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Jeśli opuścisz te foldery, nie będziesz mógł ich ponownie zobaczyć.</item>
+        <item quantity="many">Jeśli opuścisz te foldery, nie będziesz mógł ich ponownie zobaczyć.</item>
         <item quantity="other">Jeśli opuścisz te foldery, nie będziesz mógł ich ponownie zobaczyć.</item>
     </plurals>
     <!-- Info of a contact if there is no folders shared with him -->
@@ -2145,8 +2145,8 @@
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Proszę nazwać swój plik przed kontynuowaniem</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Proszę nazwać swoje pliki przed kontynuowaniem</item>
+        <item quantity="many">Proszę nazwać swoje pliki przed kontynuowaniem</item>
         <item quantity="other">Proszę nazwać swoje pliki przed kontynuowaniem</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
@@ -2220,7 +2220,7 @@
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">Użytkownik został zaproszony i po zaakceptowaniu pojawi się na Twojej liście kontaktów.</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
-    <string name="invite_sent_text_multi">Użytkownik został zaproszony i pojawi się na liście Twoich kontaktów po akceptacji zaproszenia.</string>
+    <string name="invite_sent_text_multi">Użytkownik został zaproszony i pojawi się&#160;na liście Twoich kontaktów po akceptacji zaproszenia.</string>
     <!-- Text shown when it tries to share the QR and occurs an error to process the action -->
     <string name="error_share_qr">Wystąpił błąd podczas próby udostępnienia pliku QR. Być może plik nie istnieje. Spróbuj ponownie później.</string>
     <!-- Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action -->
@@ -2234,7 +2234,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent_text">Kod QR lub link do kontaktu jest nieprawidłowy. Spróbuj zeskanować prawidłowy kod lub otworzyć prawidłowy link.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
-    <string name="invite_not_sent_text_already_contact">Zaproszenie nie zostało wysłane. %s jest już na liście Twoich kontaktów.</string>
+    <string name="invite_not_sent_text_already_contact">Zaproszenie nie zostało wysłane. %s jest już&#160;na liście Twoich kontaktów.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">Zaproszenie nie zostało wysłane. Wystąpił błąd podczas przetwarzania.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
@@ -2358,8 +2358,8 @@
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
     <plurals name="number_of_versions">
         <item quantity="one">%1$d wersja</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d wersji</item>
+        <item quantity="many">%1$d wersji</item>
         <item quantity="other">%1$d wersji</item>
     </plurals>
     <!-- Title of the section Versions for files -->
@@ -2369,8 +2369,8 @@
     <!--  -->
     <plurals name="header_previous_section_item">
         <item quantity="one">Poprzednia wersja</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Poprzednie wersje</item>
+        <item quantity="many">Poprzednie wersje</item>
         <item quantity="other">Poprzednie wersje</item>
     </plurals>
     <!-- option menu to revert a file version -->
@@ -2380,8 +2380,8 @@
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
         <item quantity="one">Usunąć wersję?</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Usunąć wersje?</item>
+        <item quantity="many">Usunąć wersje?</item>
         <item quantity="other">Usunąć wersje?</item>
     </plurals>
     <!-- Content of the dialog to confirm that a version is going to be deleted -->
@@ -2412,8 +2412,8 @@
     <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
     <plurals name="number_of_versions_inside_folder">
         <item quantity="one">%1$d wersja pliku</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d wersja plików</item>
+        <item quantity="many">%1$d wersja plików</item>
         <item quantity="other">%1$d wersja plików</item>
     </plurals>
     <!-- Confirmation message after forwarding one or several messages, version items -->
@@ -2423,15 +2423,15 @@
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
         <item quantity="one">Błąd. %1$d wiadomość nie została pomyślnie przekazana</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Błąd. %1$d wiadomości nie zostały pomyślnie przekazane</item>
+        <item quantity="many">Błąd. %1$d wiadomości nie zostały pomyślnie przekazane</item>
         <item quantity="other">Błąd. %1$d wiadomości nie zostały pomyślnie przekazane</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
         <item quantity="one">Błąd. Zasób nie jest już dostępny</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Błąd. Zasoby nie są już dostępne</item>
+        <item quantity="many">Błąd. Zasoby nie są już dostępne</item>
         <item quantity="other">Błąd. Zasoby nie są już dostępne</item>
     </plurals>
     <!-- The title of fragment Turn on Notifications -->
@@ -2451,8 +2451,8 @@
     <!-- Alert message after sending to chat one or several messages to several chats, version items -->
     <plurals name="files_send_to_chat_success">
         <item quantity="one">Plik wysłany poprawnie</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Pliki wysłane</item>
+        <item quantity="many">Pliki wysłane</item>
         <item quantity="other">Pliki wysłane</item>
     </plurals>
     <!-- Error message after sending to chat one or several messages to several chats -->
@@ -2502,15 +2502,15 @@
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s nieprzeczytana wiadomość</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$s nieprzeczytanych wiadomości</item>
+        <item quantity="many">%1$s nieprzeczytanych wiadomości</item>
         <item quantity="other">%1$s nieprzeczytanych wiadomości</item>
     </plurals>
     <!-- Notification title to show the number of unread chats, unread messages -->
     <plurals name="plural_number_messages_chat_notification">
         <item quantity="one">%1$d nieprzeczytany czat</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d nieprzeczytanych rozmów</item>
+        <item quantity="many">%1$d nieprzeczytanych rozmów</item>
         <item quantity="other">%1$d nieprzeczytanych rozmów</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
@@ -2572,8 +2572,8 @@
     <!-- Notification title to show the number of incoming contact request, contact requests -->
     <plurals name="plural_number_contact_request_notification">
         <item quantity="one">%1$d oczekujące żądanie kontaktu</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d oczekujących żądań kontaktu</item>
+        <item quantity="many">%1$d oczekujących żądań kontaktu</item>
         <item quantity="other">%1$d oczekujących żądań kontaktu</item>
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
@@ -2619,7 +2619,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Gdy następnym razem zalogujesz się na swoje konto, zostaniesz poproszony o podanie 6-cyfrowego kodu podanego przez aplikację Authenticator.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your &lt;b&gt;Recovery Key&lt;/b&gt; in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Rozważ wyeksportowanie klucza <b>odzyskiwania</b> na wypadek utraty dostępu do aplikacji lub wyłączenia uwierzytelniania dwuczynnikowego w przyszłości.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Nieprawidłowy kod</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2633,7 +2633,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">Usuń konto</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
-    <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
+    <string name="verify_2fa_subtitle_diable_2fa">Zablokuj</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Zgubiłeś swoje urządzenie?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2653,9 +2653,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Wyeksportuj klucz odzyskiwania, aby zakończyć</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
+    <string name="no_authentication_apps_title">Aplikacja do uwierzytelniania dwuskładnikowego</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
+    <string name="open_play_store_2fa">Czy chcesz otworzyć Google Play, aby zainstalować aplikację Authenticator App?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2677,14 +2677,14 @@
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="one">Wiadomość nie została przesłana dalej</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wiadomości nie zostały przesłane</item>
+        <item quantity="many">Wiadomości nie zostały przesłane</item>
         <item quantity="other">Wiadomości nie zostały przesłane</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">Zaawansowane podglądy adresów URL</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Podgląd linków zostanie zablokowany. Możesz to zmienić później w ustawieniach. Czy chcesz kontynuować?</string>
+    <string name="text_confirmation_disable_rich_links">Podgląd linków zostanie zablokowany. Możesz to zmienić&#160;później w ustawieniach. Czy chcesz kontynuować?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Nieodebrane połączenie[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2716,8 +2716,8 @@
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
     <plurals name="plural_contact_sent_to_chats">
         <item quantity="one">Kontakt wysłany na czaty z powodzeniem</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Kontakty wysłane z powodzeniem na czaty</item>
+        <item quantity="many">Kontakty wysłane z powodzeniem na czaty</item>
         <item quantity="other">Kontakty wysłane z powodzeniem na czaty</item>
     </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
@@ -2857,8 +2857,8 @@
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
         <item quantity="one">Wybierz plik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Wybierz pliki</item>
+        <item quantity="many">Wybierz pliki</item>
         <item quantity="other">Wybierz pliki</item>
     </plurals>
     <!-- Title of confirmation dialog of sending invitation to a contact -->
@@ -3024,8 +3024,8 @@
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
         <item quantity="one">Plik %d nie został pobrany z powodu naruszenia ToS / AUP.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Pliki %d nie zostały pobrane z powodu naruszenia zasad ToS / AUP.</item>
+        <item quantity="many">Pliki %d nie zostały pobrane z powodu naruszenia zasad ToS / AUP.</item>
         <item quantity="other">Pliki %d nie zostały pobrane z powodu naruszenia zasad ToS / AUP.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
@@ -3109,22 +3109,22 @@
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d plik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%d plików</item>
+        <item quantity="many">%d plików</item>
         <item quantity="other">%d plików</item>
     </plurals>
     <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
     <plurals name="num_folders_with_parameter">
         <item quantity="one">%d katalog</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%d katalogów</item>
+        <item quantity="many">%d katalogów</item>
         <item quantity="other">%d katalogów</item>
     </plurals>
     <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
     <plurals name="num_folders_num_files">
         <item quantity="one">%1$d folderów · 1 plik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d folderów · %2$d plików</item>
+        <item quantity="many">%1$d folderów · %2$d plików</item>
         <item quantity="other">%1$d folderów · %2$d plików</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
@@ -3132,29 +3132,29 @@
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->
     <plurals name="subtitle_notification_added_files">
         <item quantity="one">[A]%1$s [/A][B]dodał %2$d plik.[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">[A]%1$s [/A][B]dodał %2$d pliki.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]dodał %2$d pliki.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]dodał %2$d pliki.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items -->
     <plurals name="subtitle_notification_deleted_items">
         <item quantity="one">[A]%1$s [/A][B]usunął %2$d element.[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">[A]%1$s [/A][B]usunął %2$d elementy.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]usunął %2$d elementy.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]usunął %2$d elementy.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of folder. 2 folders -->
     <plurals name="subtitle_notification_added_folders">
         <item quantity="one">[A]%1$s [/A][B]dodał %2$d katalog.[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">[A]%1$s [/A][B]dodał %2$d katalogi.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]dodał %2$d katalogi.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]dodał %2$d katalogi.[/B]</item>
     </plurals>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <plurals name="subtitle_of_group_chat">
         <item quantity="one">%d uczestnik</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%d uczestników</item>
+        <item quantity="many">%d uczestników</item>
         <item quantity="other">%d uczestników</item>
     </plurals>
     <!--  -->
@@ -3210,22 +3210,22 @@
     <!-- Message that shows the hours of a call when it ends, more hours -->
     <plurals name="plural_call_ended_messages_hours">
         <item quantity="one">[B]%1$s godzinę[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">[B]%1$s godziny[/B]</item>
+        <item quantity="many">[B]%1$s godziny[/B]</item>
         <item quantity="other">[B]%1$s godziny[/B]</item>
     </plurals>
     <!-- Message that shows the minutes of a call when it ends, more minutes -->
     <plurals name="plural_call_ended_messages_minutes">
         <item quantity="one">[B]%1$s minutę[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">[B]%1$s minut[/B]</item>
+        <item quantity="many">[B]%1$s minut[/B]</item>
         <item quantity="other">[B]%1$s minut[/B]</item>
     </plurals>
     <!-- Message that shows the seconds of a call when it ends, more seconds -->
     <plurals name="plural_call_ended_messages_seconds">
         <item quantity="one">[B]%1$d sekund[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">[B]%1$d sekundy[/B]</item>
+        <item quantity="many">[B]%1$d sekundy[/B]</item>
         <item quantity="other">[B]%1$d sekundy[/B]</item>
     </plurals>
     <!-- Message to indicate a call has ended without indicate the call duration. -->
@@ -3295,8 +3295,8 @@
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="one">Wiadomość przesłana dalej</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Przekierowane wiadomości</item>
+        <item quantity="many">Przekierowane wiadomości</item>
         <item quantity="other">Przekierowane wiadomości</item>
     </plurals>
     <!-- Title of a chat message that contains geolocation info -->
@@ -3306,29 +3306,29 @@
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">Plik %d nie został wysłany do czatów %d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%d plików nie zostało wysłanych do czatów %d</item>
+        <item quantity="many">%d plików nie zostało wysłanych do czatów %d</item>
         <item quantity="other">%d plików nie zostało wysłanych do czatów %d</item>
     </plurals>
     <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_contacts_not_send">
         <item quantity="one">Kontakt %d nie został wysłany do czatów %d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%d kontaktów nie zostało wysłanych do czatów %d</item>
+        <item quantity="many">%d kontaktów nie zostało wysłanych do czatów %d</item>
         <item quantity="other">%d kontaktów nie zostało wysłanych do czatów %d</item>
     </plurals>
     <!-- Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_messages_not_send">
         <item quantity="one">Wiadomość %d nie została wysłana do czatów %d</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%d wiadomości nie zostało wysłanych do %d czatów</item>
+        <item quantity="many">%d wiadomości nie zostało wysłanych do %d czatów</item>
         <item quantity="other">%d wiadomości nie zostało wysłanych do %d czatów</item>
     </plurals>
     <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
     <plurals name="quantity_of_local_contact">
         <item quantity="one">Znaleziono kontakt %d na MEGA</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Znaleziono %d kontaktów na MEGA</item>
+        <item quantity="many">Znaleziono %d kontaktów na MEGA</item>
         <item quantity="other">Znaleziono %d kontaktów na MEGA</item>
     </plurals>
     <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
@@ -3362,15 +3362,15 @@
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
         <item quantity="one">%d wersja usunięta pomyślnie</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%d wersje zostały usunięte pomyślnie</item>
+        <item quantity="many">%d wersje zostały usunięte pomyślnie</item>
         <item quantity="other">%d wersje zostały usunięte pomyślnie</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
         <item quantity="one">Wersja %d nie została usunięta</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Nie usunięto wersji %d</item>
+        <item quantity="many">Nie usunięto wersji %d</item>
         <item quantity="other">Nie usunięto wersji %d</item>
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
@@ -3518,15 +3518,15 @@
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files -->
     <plurals name="file_already_downloaded">
         <item quantity="one">%d plik już pobrany.&#160;</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%d plików już pobranych.&#160;</item>
+        <item quantity="many">%d plików już pobranych.&#160;</item>
         <item quantity="other">%d plików już pobranych.&#160;</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
     <plurals name="file_pending_download">
         <item quantity="one">%d plik oczekuje.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%d plików oczekuje.</item>
+        <item quantity="many">%d plików oczekuje.</item>
         <item quantity="other">%d plików oczekuje.</item>
     </plurals>
     <!-- Title of the login screen -->
@@ -3605,7 +3605,7 @@
     <string name="overall_usage_label">Ogólne wykorzystanie</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Przesyłanie</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz -->
+    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Nie możesz usunąć %1$s jako kontaktu, ponieważ są one częścią twojego konta firmowego.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Wystąpił problem z ostatnią płatnością. Proszę uzyskać dostęp do MEGA za pomocą przeglądarki na pulpicie, aby uzyskać więcej informacji.</string>
@@ -3730,8 +3730,8 @@
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
         <item quantity="one">Skontaktowaliśmy się z Tobą przez e-mail do %1$s na %2$s, ale nadal masz %3$s plików zajmujących %4$s na swoim koncie MEGA, co wymaga posiadania %5$s.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Skontaktowaliśmy się z Tobą przez e-mail do %1$s na %2$s i %3$s, ale nadal masz %4$s plików zajmujących %5$s na koncie MEGA, co wymaga posiadania %6$s.</item>
+        <item quantity="many">Skontaktowaliśmy się z Tobą przez e-mail do %1$s na %2$s i %3$s, ale nadal masz %4$s plików zajmujących %5$s na koncie MEGA, co wymaga posiadania %6$s.</item>
         <item quantity="other">Skontaktowaliśmy się z Tobą przez e-mail do %1$s na %2$s i %3$s, ale nadal masz %4$s plików zajmujących %5$s na koncie MEGA, co wymaga posiadania %6$s.</item>
     </plurals>
     <!-- Text of the Over Disk Quota Paywall warning with no email notification info. Placeholders: 1 user email, 2 number of files, 3 files size (including units) and 4 required PRO plan -->
@@ -3745,8 +3745,8 @@
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
         <item quantity="one">1 dzień</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%d dni</item>
+        <item quantity="many">%d dni</item>
         <item quantity="other">%d dni</item>
     </plurals>
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
@@ -3848,7 +3848,7 @@
     <!-- System message displayed to all chat participants when one of them enables retention history -->
     <string name="retention_history_changed_by">[A]%1$s[/A][B] zmienił czas usuwania komunikatu na[/B][A] %2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
-    <string name="title_properties_clear_chat_history">Wyczyść historię czatu</string>
+    <string name="title_properties_clear_chat_history">Wyczyść&#160;historię&#160;czatu</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
     <string name="retention_history_disabled">[A]%1$s[/A][B] wyłączone usuwanie komunikatów[/B]</string>
     <!-- Subtitle of the section to clear the chat content in the Manage chat history screen -->
@@ -3878,29 +3878,29 @@
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
     <plurals name="retention_time_picker_hours">
         <item quantity="one">godzina</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">godziny</item>
+        <item quantity="many">godzin</item>
         <item quantity="other">godzin</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <plurals name="retention_time_picker_days">
         <item quantity="one">dzień</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">dni</item>
+        <item quantity="many">dni</item>
         <item quantity="other">dni</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several weeks -->
     <plurals name="retention_time_picker_weeks">
         <item quantity="one">tygodniu</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">tygodni</item>
+        <item quantity="many">tygodni</item>
         <item quantity="other">tygodniach</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several months -->
     <plurals name="retention_time_picker_months">
         <item quantity="one">miesiąc</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">miesiący</item>
+        <item quantity="many">miesiący</item>
         <item quantity="other">miesiące</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates a year -->
@@ -3908,22 +3908,22 @@
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
         <item quantity="one">1 godzina</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d godzin</item>
+        <item quantity="many">%1$d godzin</item>
         <item quantity="other">%1$d godzin</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
         <item quantity="one">1 tydzień</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d tygodni</item>
+        <item quantity="many">%1$d tygodni</item>
         <item quantity="other">%1$d tygodni</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
         <item quantity="one">1 miesiąc</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">%1$d miesiące</item>
+        <item quantity="many">%1$d miesiące</item>
         <item quantity="other">%1$d miesiące</item>
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
@@ -4095,5 +4095,5 @@
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">Aktualizacja pliku nie powiodła się. Spróbuj ponownie.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
-    <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
+    <string name="error_opening_file">Plik jest zbyt duży i nie można go otworzyć ani wyświetlić jego podglądu.</string>
 </resources>
