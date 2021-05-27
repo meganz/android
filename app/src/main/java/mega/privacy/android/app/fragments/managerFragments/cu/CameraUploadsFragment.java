@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,6 +55,7 @@ import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CUMU;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -80,6 +82,8 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
     private ActionMode mActionMode;
 
     private CuViewModel mViewModel;
+
+    private int selectedView = ALL_VIEW;
 
     private static final String AD_SLOT = "and3";
 
@@ -279,6 +283,24 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     private void setupOtherViews() {
         mBinding.emptyEnableCuButton.setOnClickListener(v -> enableCUClick());
+        mBinding.emptyHintText.setText(HtmlCompat.fromHtml(
+                formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.photos_empty)),
+                HtmlCompat.FROM_HTML_MODE_LEGACY));
+
+        mBinding.allButton.setOnClickListener(v -> newViewClicked(ALL_VIEW));
+        mBinding.daysButton.setOnClickListener(v -> newViewClicked(DAYS_VIEW));
+        mBinding.monthsButton.setOnClickListener(v -> newViewClicked(MONTHS_VIEW));
+        mBinding.yearsButton.setOnClickListener(v -> newViewClicked(YEARS_VIEW));
+        updateViewSelected();
+    }
+
+    private void newViewClicked(int selectedView) {
+        if (this.selectedView == selectedView) {
+            return;
+        }
+
+        this.selectedView = selectedView;
+        updateViewSelected();
     }
 
     public void enableCUClick() {
@@ -309,11 +331,7 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
             mBinding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
             mBinding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
             mBinding.scroller.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
-            if (nodes.isEmpty()) {
-                String textToShow = StringResourcesUtils.getString(R.string.photos_empty);
-                mBinding.emptyHintText.setText(HtmlCompat.fromHtml(
-                        formatEmptyScreenText(context, textToShow), HtmlCompat.FROM_HTML_MODE_LEGACY));
-            }
+            mBinding.viewTypeLayout.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
         });
 
         mViewModel.nodeToOpen()
@@ -426,5 +444,40 @@ public class CameraUploadsFragment extends BaseFragment implements CameraUploads
 
     public boolean isEnableCUFragmentShown() {
         return mViewModel.isEnableCUShown();
+    }
+
+    private void updateViewSelected() {
+        setViewTypeButtonStyle(mBinding.allButton, false);
+        setViewTypeButtonStyle(mBinding.daysButton, false);
+        setViewTypeButtonStyle(mBinding.monthsButton, false);
+        setViewTypeButtonStyle(mBinding.yearsButton, false);
+
+        switch (selectedView) {
+            case DAYS_VIEW:
+                setViewTypeButtonStyle(mBinding.daysButton, true);
+                break;
+
+            case MONTHS_VIEW:
+                setViewTypeButtonStyle(mBinding.monthsButton, true);
+                break;
+
+            case YEARS_VIEW:
+                setViewTypeButtonStyle(mBinding.yearsButton, true);
+                break;
+
+            default:
+                setViewTypeButtonStyle(mBinding.allButton, true);
+        }
+    }
+
+    private void setViewTypeButtonStyle(TextView textView, boolean enabled) {
+        textView.setBackgroundResource(enabled
+                ? R.drawable.background_18dp_rounded_selected_button
+                : R.drawable.background_18dp_rounded_unselected_button);
+
+        setTextStyle(context, textView, enabled
+                        ? R.style.TextAppearance_Mega_Subtitle2_Medium_WhiteGrey87
+                        : R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White87,
+                enabled ? R.color.white_grey_087 : R.color.grey_087_white_087, false);
     }
 }

@@ -261,6 +261,15 @@
         <item name="android:textColor">@color/grey_087_white</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Medium">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Medium.WhiteGrey87">
+        <item name="android:textColor">@color/white_grey_087</item>
+    </style>
+
     <!-- ================== Body1 ====================== -->
 
     <!-- In material design, for the CheckedTextView -->

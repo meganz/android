@@ -69,25 +69,27 @@
         android:layout_marginBottom="8dp"
         android:orientation="horizontal">
 
-        <Button
+        <TextView
             android:id="@+id/years_button"
             style="@style/CuViewTypeButton"
             android:text="@string/years_view_button" />
 
-        <Button
+        <TextView
             android:id="@+id/months_button"
             style="@style/CuViewTypeButton"
             android:text="@string/months_view_button" />
 
-        <Button
+        <TextView
             android:id="@+id/days_button"
             style="@style/CuViewTypeButton"
             android:text="@string/days_view_button" />
 
-        <Button
+        <TextView
             android:id="@+id/all_button"
             style="@style/CuViewTypeButton"
-            android:text="@string/all_view_button" />
+            android:text="@string/all_view_button"
+            tools:background="@drawable/background_18dp_rounded_selected_button"
+            tools:textAppearance="@style/TextAppearance.Mega.Subtitle2.Medium.WhiteGrey87"/>
 
     </LinearLayout>
 
