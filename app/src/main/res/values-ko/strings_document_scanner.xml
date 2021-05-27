@@ -47,5 +47,5 @@
   <!-- Dialog message showing file progress -->
   <string name="scan_dialog_progress">%1$s 준비중. 잠시 기다리세요&#x2026;</string>
   <!-- Error shown when the user writes a character not allowed -->
-  <string name="scan_snackbar_invalid_characters">다음의 글자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
+  <string name="scan_snackbar_invalid_characters">다음의 문자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
 </resources>

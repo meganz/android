@@ -7,49 +7,49 @@
   <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
   <string name="api_eargs">引数無効</string>
   <!-- Label to show that a request error occurs during a SDK operation. -->
-  <string name="api_eagain">リクエスト失敗、再度トライ中</string>
+  <string name="api_eagain">リクエストが失敗し、再試行しています</string>
   <!-- Label to show that the rate limit has been reached during a SDK operation. -->
   <string name="api_eratelimit">レート上限超過</string>
   <!-- Label to show that a SDK operation has failed permanently. -->
-  <string name="api_efailed">転送できませんでした。</string>
+  <string name="api_efailed">完全に失敗しました</string>
   <!-- Error shown when terms of service are breached during download. -->
   <string name="api_etoomany_ec_download">ご利用規約違反</string>
   <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
-  <string name="api_etoomay">同時接続又は転送が多すぎます。</string>
+  <string name="api_etoomay">同時接続または転送が多すぎます。</string>
   <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
-  <string name="api_erange">領域外</string>
+  <string name="api_erange">範囲外</string>
   <!-- State to indicate something has expired (achivements of business status account for instance) -->
-  <string name="api_eexpired">失効済み</string>
+  <string name="api_eexpired">期限切れ</string>
   <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
-  <string name="api_enoent">見つかりません。</string>
+  <string name="api_enoent">見つかりません</string>
   <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
-  <string name="api_ecircular">環状連鎖あり</string>
+  <string name="api_ecircular">循環リンクを検出しました</string>
   <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-  <string name="api_eaccess">アクセスは拒否されました。</string>
+  <string name="api_eaccess">アクセスが拒否されました</string>
   <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
-  <string name="api_eexist">既に存在します。</string>
+  <string name="api_eexist">既に存在します</string>
   <!-- Label to show that an error related with an Incomplete SDK operation. -->
-  <string name="api_eincomplete">不完全です。</string>
+  <string name="api_eincomplete">不完全です</string>
   <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-  <string name="api_ekey">鍵が無効／複合化エラー</string>
+  <string name="api_ekey">キーが無効／複合化エラー</string>
   <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
-  <string name="api_esid">セッションID不良</string>
+  <string name="api_esid">セッションIDが正しくありません</string>
   <!-- Error shown when download a file that has violated ToS/AUP. -->
-  <string name="api_eblocked_ec_import_ec_download">ToS/AUP違反のためアクセスできません</string>
+  <string name="api_eblocked_ec_import_ec_download">ToS（ご利用規約）/AUP（ご利用規定）違反のためアクセスできません</string>
   <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
-  <string name="api_eblocked">妨害されています</string>
+  <string name="api_eblocked">ブロックされています</string>
   <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
-  <string name="api_eoverquota">クォータ超過</string>
+  <string name="api_eoverquota">容量超過</string>
   <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
-  <string name="api_etempunavail">今は使えません。</string>
+  <string name="api_etempunavail">一時的に利用できません</string>
   <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
   <string name="api_etoomanyconnections">接続過多</string>
   <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
-  <string name="api_ewrite">エラーを書き込む</string>
+  <string name="api_ewrite">書き込みエラー</string>
   <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
-  <string name="api_eread">エラーを読み取る</string>
+  <string name="api_eread">読み取りエラー</string>
   <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
-  <string name="api_eappkey">アプリ鍵無効</string>
+  <string name="api_eappkey">アプリケーションキーが無効です</string>
   <!-- Error shown when SSL check has failed -->
   <string name="api_essl">SSL検証に失敗しました</string>
   <!-- Label shown when current account does not have enough quota to complete the operation -->
@@ -71,7 +71,7 @@
   <!-- Label to show that an error of Balance occurs during a SDK operation. -->
   <string name="payment_ebalance">残高エラー</string>
   <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-  <string name="payment_egeneric_api_error_unknown">未知のエラー</string>
+  <string name="payment_egeneric_api_error_unknown">不明なエラー</string>
   <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
   <string name="api_error_http">HTTPエラー</string>
   <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->

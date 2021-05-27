@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">O MEGA proporciona armazenamento em nuvem criptografado controlado pelo usuário e chat através de navegadores padrão e aplicativos para dispositivos móveis. Ao contrário de outros provedores de armazenamento em nuvem, os seus dados são codificados e decodificados apenas pelos seus dispositivos clientes e nunca por nós. \n \nFaça o upload de arquivos do seu smartphone ou tablet, depois pesquise, armazene, baixe, transmita, visualize, compartilhe, renomeie ou exclua os seus arquivos a qualquer momento, usando qualquer dispositivo, em qualquer lugar. Compartilhe pastas com os seus contatos e veja as atualizações deles em tempo real. O processo de criptografia significa que não podemos acessar ou redefinir a sua senha, então você PRECISA lembrá-la (a menos que você tenha a sua chave de recuperação guardada) ou você perderá o acesso aos seus arquivos armazenados. \n \nO chat de vídeo criptografado de ponta a ponta pelo usuário garante uma privacidade total, e está disponível no navegador desde 2016. Atualmente, foi ampliado para o nosso aplicativo móvel, e o histórico do chat é acessível em vários dispositivos. Os usuários também podem facilmente adicionar arquivos da sua Nuvem de arquivos no MEGA em um chat. \n\nO MEGA oferece um generoso espaço de armazenamento gratuito de 50 GB para todos os usuários registrados com bônus de Conquistas, e oferece planos pagos com limites muito maiores: \n\n\nAssinatura Pro Lite: 4,99€ por mês ou 49,99€ por ano - oferece 400 GB de espaço de armazenamento e 1 TB de cota de transferência por mês. \nAssinatura Pro I: 9,99€ por mês ou 99,99€ por ano - oferece 2 TB de espaço de armazenamento e 2 TB de cota de transferência por mês. \nAssinatura Pro II: 19,99€ por mês ou 199,99€ por ano - oferece 8 TB de espaço de armazenamento e 8 TB de cota de transferência por mês. \nAssinatura Pro III: 29,99€ por mês ou 299,99€ por ano - oferece 16 TB de espaço de armazenamento e 16 TB de cota de transferência por mês. \n \nAs assinaturas são renovadas automaticamente por períodos com a mesma duração e o mesmo preço que o período inicial escolhido. Para gerenciar as suas assinaturas, basta clicar no ícone da Play Store no seu dispositivo móvel, entrar com o seu usuário do Google (se você ainda não o fez) e depois clicar em MEGA. Você poderá gerenciar a sua assinatura lá. \n \nPermissões da aplicação: \nWRITE_EXTERNAL_STORAGE -&gt; Baixar os seus arquivos do MEGA para o seu dispositivo e fazer o upload dos arquivos do seu dispositivo para o MEGA \nCAMERA -&gt; Tirar fotos e fazer o upload delas para o MEGA \nREAD_CONTACTS -&gt; Adicionar facilmente contatos do seu dispositivo como contatos no MEGA \nRECORD_AUDIO e CAPTURE_VIDEO_OUTPUT (microfone e câmera) -&gt; O MEGA oferece chamadas de áudio e vídeo criptografadas de ponta a ponta \n\n\n Para aumentar a confiança dos usuários no sistema do MEGA, todos os códigos do lado do cliente são publicados, para que pesquisadores de segurança que estiverem interessados ​​possam avaliar o processo de criptografia. O código do nosso aplicativo móvel está localizado em: https://github.com/meganz/android\n\nPara obter mais informações, consulte o nosso site: \nAcesse https://mega.nz/terms \n \n \n Desktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">O MEGA proporciona armazenamento em nuvem com privacidade total.</string>
     <!-- PRO Lite account -->
@@ -105,7 +105,7 @@
     <!-- Menu item -->
     <string name="action_create_folder">Criar nova pasta</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Create new text file</string>
+    <string name="action_create_txt">Criar um arquivo de texto novo</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">Abrir link</string>
     <!-- Menu item -->
@@ -1142,7 +1142,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Upgrade</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Aumente a sua capacidade de nuvem![A]Obtenha mais espaço e mais cota de transferência com uma conta PRO!</string>
+    <string name="get_pro_account">Aumente a capacidade da sua Nuvem![A]Obtenha mais espaço e mais cota de transferência com uma conta Pro!</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">A chave de recuperação foi salva em: %1s. [A]Enquanto o arquivo permanecer neste caminho, você poderá encontrá-lo na seção Salvo para Offline.[A]Aviso: o arquivo será deletado se você fizer logout. Por favor, salve a chave de recuperação em um lugar seguro.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -2009,7 +2009,7 @@
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Versão de Android</string>
     <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">New text file</string>
+    <string name="dialog_title_new_text_file">Novo arquivo de texto</string>
     <!-- Title of the dialog to create a new file by inserting the name -->
     <string name="dialog_title_new_file">Novo arquivo</string>
     <!-- Input field description in the create file dialog. -->
@@ -2509,7 +2509,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Na próxima vez que você fizer login na sua conta, você deverá inserir um código de seis dígitos proporcionado pelo seu aplicativo de autenticação.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Exporte a sua <b>chave de recuperação</b> para evitar problemas caso você perca o acesso ao seu aplicativo e queira desativar a autenticação de dois fatores no futuro.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Código inválido</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2523,7 +2523,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">Deletar conta</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
-    <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
+    <string name="verify_2fa_subtitle_diable_2fa">Desativar</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Você perdeu o seu dispositivo de autenticação?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2543,9 +2543,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Para concluir, exporte a sua chave de recuperação</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
+    <string name="no_authentication_apps_title">Aplicativo para autenticação de dois fatores</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
+    <string name="open_play_store_2fa">Você quer acessar a Google Play Store para instalar um aplicativo de autenticação?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -3903,23 +3903,23 @@
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
     <string name="cloud_drive_select_destination">Selecione o destino</string>
     <!-- Warning which alerts the user before discard changes -->
-    <string name="discard_changes_warning">Discard changes and close the editor?</string>
+    <string name="discard_changes_warning">Descartar as alterações e fechar o editor?</string>
     <!-- Action discard -->
-    <string name="discard_close_action">Discard and close</string>
+    <string name="discard_close_action">Descartar e fechar</string>
     <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">Saving file&#8230;</string>
+    <string name="saving_file">Salvando o arquivo&#8230;</string>
     <!-- Label indicating a file was created successfully -->
-    <string name="file_created">File created</string>
+    <string name="file_created">Arquivo criado</string>
     <!-- Warning indicating a file was not created successfully -->
-    <string name="file_creation_failed">File creation failed. Try again.</string>
+    <string name="file_creation_failed">Não foi possível criar o arquivo, tente novamente.</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
-    <string name="file_saved_to">File saved to %1$s</string>
+    <string name="file_saved_to">Arquivo salvo em %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">File not saved to %1$s. Try again.</string>
+    <string name="file_saved_to_failed">Não foi possível salvar o arquivo em %1$s, tente novamente.</string>
     <!-- Label indicating a file was updated successfully -->
-    <string name="file_updated">File updated</string>
+    <string name="file_updated">Arquivo atualizado</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">File update failed. Try again.</string>
+    <string name="file_update_failed">Não foi possível atualizar o arquivo, tente novamente.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
-    <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
+    <string name="error_opening_file">O arquivo é muito grande e não pode ser aberto ou visualizado.</string>
 </resources>

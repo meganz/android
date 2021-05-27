@@ -53,8 +53,8 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
