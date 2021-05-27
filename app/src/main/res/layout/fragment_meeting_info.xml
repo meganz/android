@@ -49,6 +49,7 @@
         style="@style/BottomSheetInfoItem"
         android:text="meeting"
         android:visibility="gone"
+        android:singleLine="true"
         app:drawableStartCompat="@drawable/ic_copy"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

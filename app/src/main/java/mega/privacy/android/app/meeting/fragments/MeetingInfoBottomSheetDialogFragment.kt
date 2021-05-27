@@ -41,8 +41,7 @@ import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
 
-class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
-    MegaChatRequestListenerInterface {
+class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var binding: FragmentMeetingInfoBinding
     private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
     private val shareViewModel: MeetingActivityViewModel by activityViewModels()
@@ -208,7 +207,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
             input.requestFocus()
         } else {
             LogUtil.logDebug("Positive button pressed - change title")
-            inMeetingViewModel.changeMeetingRoom(title, this)
+            inMeetingViewModel.setTitleChat(title)
             changeTitleDialog?.dismiss()
         }
     }
@@ -218,25 +217,5 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
         fun newInstance(): MeetingInfoBottomSheetDialogFragment {
             return MeetingInfoBottomSheetDialogFragment()
         }
-    }
-
-    override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
-    }
-
-    override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {
-    }
-
-    override fun onRequestFinish(
-        api: MegaChatApiJava?,
-        request: MegaChatRequest?,
-        e: MegaChatError?
-    ) {
-    }
-
-    override fun onRequestTemporaryError(
-        api: MegaChatApiJava?,
-        request: MegaChatRequest?,
-        e: MegaChatError?
-    ) {
     }
 }

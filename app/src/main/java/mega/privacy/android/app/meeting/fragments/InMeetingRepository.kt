@@ -535,8 +535,4 @@ class InMeetingRepository @Inject constructor(
 
         return bitmap
     }
-
-    fun changeMeetingRoom(chatId: Long, title: String, listener: MegaChatRequestListenerInterface) {
-        megaChatApi.setChatTitle(chatId, title, listener)
-    }
 }
