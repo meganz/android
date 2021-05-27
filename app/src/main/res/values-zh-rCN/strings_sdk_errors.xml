@@ -75,5 +75,5 @@
   <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
   <string name="api_error_http">HTTP错误</string>
   <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
-  <string name="api_ecircular_ec_upload">Transfer failed due to a recursive directory structure</string>
+  <string name="api_ecircular_ec_upload">传输失败，递归目录结构错误。</string>
 </resources>
