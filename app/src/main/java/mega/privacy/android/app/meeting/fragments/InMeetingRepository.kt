@@ -525,7 +525,7 @@ class InMeetingRepository @Inject constructor(
                 mail
             )
         }
-        
+
         if (bitmap == null){
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
@@ -534,5 +534,9 @@ class InMeetingRepository @Inject constructor(
         }
 
         return bitmap
+    }
+
+    fun changeMeetingRoom(chatId: Long, title: String, listener: MegaChatRequestListenerInterface) {
+        megaChatApi.setChatTitle(chatId, title, listener)
     }
 }

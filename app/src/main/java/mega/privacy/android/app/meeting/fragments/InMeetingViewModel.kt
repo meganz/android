@@ -1910,6 +1910,10 @@ class InMeetingViewModel @ViewModelInject constructor(
         editor.putBoolean(IS_SHOWED_TIPS, true).commit()
     }
 
+    fun changeMeetingRoom(title: String, listener: MegaChatRequestListenerInterface) {
+        inMeetingRepository.changeMeetingRoom(currentChatId, title, listener)
+    }
+
     companion object {
         const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"
     }

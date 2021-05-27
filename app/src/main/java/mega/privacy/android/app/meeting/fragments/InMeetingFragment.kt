@@ -627,6 +627,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         toolbar = meetingActivity.toolbar
         toolbarTitle = meetingActivity.title_toolbar
         toolbarSubtitle = meetingActivity.subtitle_toolbar
+        toolbar.setOnClickListener { if (!inMeetingViewModel.isOneToOneCall()) showMeetingInfoFragment() }
         bannerAnotherCallLayout = meetingActivity.banner_another_call
         bannerAnotherCallTitle = meetingActivity.banner_another_call_title
         bannerAnotherCallSubtitle = meetingActivity.banner_another_call_subtitle
@@ -646,6 +647,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bannerAnotherCallLayout.setOnClickListener {
             returnToAnotherCall()
         }
+    }
+
+    private fun showMeetingInfoFragment(){
+        MeetingInfoBottomSheetDialogFragment.newInstance()
+            .run {
+                show(
+                    this@InMeetingFragment.childFragmentManager,
+                    tag
+                )
+            }
     }
 
     /**
