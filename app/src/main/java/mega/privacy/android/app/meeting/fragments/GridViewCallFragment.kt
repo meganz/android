@@ -13,8 +13,7 @@ import mega.privacy.android.app.meeting.adapter.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatSession
 
-class GridViewCallFragment : MeetingBaseFragment(),
-    MegaSurfaceRenderer.MegaSurfaceRendererListener {
+class GridViewCallFragment : MeetingBaseFragment(){
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
 
@@ -34,9 +33,9 @@ class GridViewCallFragment : MeetingBaseFragment(),
         if (isFirsTime) {
             logDebug("Participants changed")
             isFirsTime = false
-            adapterPager.let {
-                it.setNewData(newData)
-                it.notifyDataSetChanged()
+            adapterPager.apply {
+                setNewData(newData)
+                notifyDataSetChanged()
             }
             viewPagerData = newData
         }
@@ -66,7 +65,6 @@ class GridViewCallFragment : MeetingBaseFragment(),
             parentFragment,
             maxWidth,
             maxHeight,
-            this
         )
 
         viewDataBinding.gridViewPager.offscreenPageLimit = 1
@@ -258,27 +256,6 @@ class GridViewCallFragment : MeetingBaseFragment(),
     }
 
     /**
-     * Method for resizing the listener
-     *
-     * @param peerId
-     * @param clientId
-     */
-    override fun resetSize(peerId: Long, clientId: Long) {
-        (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
-            peerId,
-            clientId
-        )?.let {
-            if (it.isVideoOn) {
-                it.videoListener?.let {
-                    logDebug("Resize participant listener")
-                    it.height = 0
-                    it.width = 0
-                }
-            }
-        }
-    }
-
-    /**
      * Method to delete the videos and texture views of participants
      */
     private fun removeTextureView() {
@@ -292,12 +269,8 @@ class GridViewCallFragment : MeetingBaseFragment(),
 
     override fun onResume() {
         val iterator = participants.iterator()
-        iterator.forEach { participant ->
-            participant.videoListener?.let {
-                logDebug("Resize speaker listener")
-                it.height = 0
-                it.width = 0
-            }
+        iterator.forEach {
+            (parentFragment as InMeetingFragment).inMeetingViewModel.resetSizeListener(it)
         }
         super.onResume()
     }

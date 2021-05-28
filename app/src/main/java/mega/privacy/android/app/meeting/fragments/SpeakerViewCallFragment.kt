@@ -84,9 +84,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             isFirsTime = false
             adapter.submitList(null)
             adapter.submitList(participants)
+            updateVisibleParticipantsSpeakerView(participants)
         }
-
-        updateVisibleParticipantsSpeakerView(participants)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -736,8 +735,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
     override fun onResume() {
         val iterator = participants.iterator()
-        iterator.forEach { participant ->
-            resetSizeListener(participant)
+        iterator.forEach {
+            inMeetingViewModel.resetSizeListener(it)
         }
 
         super.onResume()
@@ -754,7 +753,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             peerId,
             clientId
         )?.let {
-            resetSizeListener(it)
+            inMeetingViewModel.resetSizeListener(it)
         }
     }
 

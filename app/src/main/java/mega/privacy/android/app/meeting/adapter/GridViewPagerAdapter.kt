@@ -22,7 +22,6 @@ class GridViewPagerAdapter(
     private val fragment: Fragment?,
     private var maxWidth: Int,
     private var maxHeight: Int,
-    private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?
 ) : RecyclerView.Adapter<GridViewPagerAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -72,7 +71,6 @@ class GridViewPagerAdapter(
                 maxHeight,
                 position,
                 orientation,
-                listenerRenderer
             )
 
             adapter.submitList(null)

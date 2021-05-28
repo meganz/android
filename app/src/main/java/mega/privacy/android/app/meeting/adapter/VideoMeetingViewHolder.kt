@@ -119,6 +119,9 @@ class VideoMeetingViewHolder(
             logDebug("Remove the video initially")
             inMeetingViewModel.onCloseVideo(participant)
             removeTextureView(participant)
+        }else{
+            logDebug("Add as participantVisible in the speaker view list")
+            inMeetingViewModel.addParticipantVisible(participant)
         }
     }
 
@@ -155,7 +158,7 @@ class VideoMeetingViewHolder(
 
         logDebug("UI video on")
         hideAvatar(participant)
-        activateVideo(participant)
+        activateVideo(participant, !isGrid)
     }
 
     /**
@@ -177,7 +180,7 @@ class VideoMeetingViewHolder(
      *
      * @param participant
      */
-    private fun activateVideo(participant: Participant) {
+    private fun activateVideo(participant: Participant, isSpeaker:Boolean) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
         /*Video*/
@@ -204,7 +207,7 @@ class VideoMeetingViewHolder(
                 it.addListener(listenerRenderer)
             }
 
-            inMeetingViewModel.onActivateVideo(participant, !isGrid)
+            inMeetingViewModel.onActivateVideo(participant, isSpeaker)
         } else {
             logDebug("Active video when listener is not null")
             if (binding.parentTextureView.childCount > 0) {
@@ -603,6 +606,7 @@ class VideoMeetingViewHolder(
         inMeetingViewModel.getParticipant(peerId!!, clientId!!)?.let {
             if (it.isVideoOn) {
                 logDebug("Remove the video when participant is not visible")
+                inMeetingViewModel.removeParticipantVisible(it)
                 inMeetingViewModel.onCloseVideo(it)
                 removeTextureView(it)
             }

@@ -1583,10 +1583,14 @@ class InMeetingViewModel @ViewModelInject constructor(
             getSession(participant.clientId)?.let {
                 if (participant.hasHiRes) {
                     removeLowRes(participant.videoListener!!, it, chat.chatId)
-                    participant.videoListener = null
+                    if(it.canRecvVideoLowRes()){
+                        participant.videoListener = null
+                    }
                 } else {
                     removeHiRes(participant.videoListener!!, it, chat.chatId)
-                    participant.videoListener = null
+                    if(it.canRecvVideoHiRes()){
+                        participant.videoListener = null
+                    }
                 }
             }
         }
@@ -1597,7 +1601,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param participant
      */
-    private fun addParticipantVisible(participant: Participant) {
+    fun addParticipantVisible(participant: Participant) {
         if (visibleParticipants.size == 0) {
             visibleParticipants.add(participant)
             return
@@ -1611,6 +1615,22 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Removing visible participant
+     *
+     * @param participant
+     */
+    fun removeParticipantVisible(participant: Participant) {
+        if (visibleParticipants.size == 0) {
+            return
+        }
+        val checkParticipant = visibleParticipants.filter {
+            it.peerId == participant.peerId && it.clientId == participant.clientId
+        }
+        if (checkParticipant.isNotEmpty()) {
+            visibleParticipants.remove(participant)
+        }
+    }
 
     /**
      * Check if a participant is visible
@@ -1691,6 +1711,21 @@ class InMeetingViewModel @ViewModelInject constructor(
                     onActivateVideo(participant, false)
                 }
             }
+        }
+    }
+
+    /**
+     * Method for resizing the listener of a participant
+     *
+     * @param participant
+     */
+    fun resetSizeListener(participant: Participant) {
+        if (!participant.isVideoOn || participant.videoListener == null)
+            return
+        participant.videoListener?.let {
+            logDebug("Reset Size participant listener")
+            it.height = 0
+            it.width = 0
         }
     }
 
