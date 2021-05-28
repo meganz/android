@@ -3836,7 +3836,7 @@
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">ファイルのサイズが大きすぎて、開くこともプレビューすることもできません。</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
-    <string name="file_without_extension">拡張子のないファイル (%1$s)。</string>
+    <string name="file_without_extension">ファイルに拡張子（%1$s）がありません</string>
     <!-- Error shown when the user writes a file name without extension -->
     <string name="file_without_extension_warning">続行するには、ファイルの拡張子を入力する必要があります。</string>
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
@@ -3844,15 +3844,15 @@
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
     <string name="file_extension_change_warning">「.%1$s」から「.%2$s」に変更すると、このファイルにアクセスできなくなる可能性があります。</string>
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
-    <string name="file_extension_change_warning_old_empty">空から「.%1$s」に変更すると、このファイルにアクセスできなくなる可能性があります。</string>
+    <string name="file_extension_change_warning_old_empty">拡張子「.%1$s」を追加すると、このファイルにアクセスできなくなることがあります。</string>
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
-    <string name="file_extension_change_warning_new_empty">「.%1$s」から空に変更すると、このファイルにアクセスできなくなる可能性があります。</string>
+    <string name="file_extension_change_warning_new_empty">拡張子「.%1$s」を削除すると、このファイルにアクセスできなくなることがあります。</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
-    <string name="action_use_empty_new_extension">空を使う</string>
+    <string name="action_use_empty_new_extension">拡張子を削除</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
     <string name="action_use_new_extension">.%1$sを使う</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
-    <string name="action_keep_empty_old_extension">空にしておく</string>
+    <string name="action_keep_empty_old_extension">拡張子なし</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">.%1$sにしておく</string>
 </resources>

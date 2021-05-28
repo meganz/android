@@ -481,7 +481,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Thư mời đã được gửi lại lần nữa</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Lời mời đã được gửi tới %s thành công. Theo dõi tình trạng của lời mời trong phần Yêu Cầu Gửi Đi.</string>
+    <string name="context_contact_request_sent">Lời mời đã được gửi tới %s thành công. Theo dõi tình trạng của lời mời trong tab Yêu Cầu Gửi Đi.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Đã xóa tên liên lạc</string>
     <!-- error message -->
@@ -1274,7 +1274,7 @@
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Đang tải danh bạ từ điện thoại&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
-    <string name="number_existing_invite_contact_request">%d yêu cầu đã được gửi đi.</string>
+    <string name="number_existing_invite_contact_request">%d yêu cầu đã được gửi đi rồi.</string>
     <!-- success message when reinviting multiple contacts -->
     <string name="number_correctly_invite_contact_request">%d lời mời đã được gửi đi thành công.</string>
     <!-- error message when reinviting multiple contacts -->
@@ -2790,7 +2790,7 @@
     <!-- Menu item -->
     <string name="action_open_chat_link">Mở đường liên kết vào cuộc chát</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
-    <string name="invite_not_sent_already_sent">Lời mời đã được gửi tới %s trước đây rồi. Theo dõi tình trạng của lời mời trong phần Yêu Cầu Gửi Đi.</string>
+    <string name="invite_not_sent_already_sent">Lời mời đã được gửi tới tên liên lạc %s trước đây rồi. Theo dõi tình trạng của lời mời trong tab Yêu Cầu Gửi Đi.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
     <string name="save_qr_cloud_drive">Đang lưu %s vào Ổ Mây&#8230;</string>
     <!-- General label for folders -->

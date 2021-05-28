@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA透過標準網頁瀏覽器以及行動裝置專屬應用程式提供用戶可控制的加密雲端儲存及對話功能。與其他雲端儲存服務供應商不同，您的資料僅可由您的客戶端裝置加密與解密，並非由我們加密。\n\n從智慧型手機或平板電腦上傳檔案，然後從任何裝置搜尋、儲存、下載、串流播放、查看、分享，重新命名或刪除您的檔案。可與您的聯絡人共享資料夾，並即時查看檔案更新狀況。加密功能表示我們無法訪問或重置您的密碼，因此您必須記住它（除非您有備份還原金鑰；忘記密碼時可透過金鑰重設帳號密碼），否則您將無法存取您所儲存的檔案。\n\n點對點用戶加密的MEGA視訊對話能確保完全的隱私，此功能從2016年起可透過瀏覽器使用，而且現在已支援我們的行動應用程式，可透過多個裝置檢視對話記錄。用戶還可透過MEGA雲端硬碟輕鬆地將檔案加到對話室中。\n \n MEGA為所有註冊用戶大方的提供50 GB的免費儲存空間以及成就獎勵，並提供更高空間上限的付費方案：\n\n\nPRO Lite 訂閱：每月4.99歐元或每年49.99歐元，每月為您提供400GB的儲存空間和1TB的傳輸配額。\nPRO I 訂閱：每月9.99歐元或每年99.99歐元，每月為您提供2TB的儲存空間和2TB的傳輸配額。\nPRO II 訂閱：每月19.99歐元或每年199.99歐元，為您提供8TB的儲存空間和每月8TB的傳輸配額。\nPRO III 訂閱：每月29.99歐元或每年299.99歐元，為您提供16TB的儲存空間和每月16TB的傳輸配額。\n\n訂閱將自動續訂，且續期與第一次訂閱的相同，價格也相同。欲管理您的訂閱，只需點擊行動裝置上的Play商店圖示，使用您的Google ID登錄（若您尚未登入的話），然後點擊MEGA應用程式，您就能夠管理您的訂閱。\n\n應用程式存取權限：\n外部儲存裝置資料寫入 - &gt;將您的檔案從MEGA下載到您的裝置並將檔案從您的裝置上傳到MEGA \n 相機 - &gt;拍照並將其上傳到MEGA \n 讀取聯絡人 - &gt; 輕鬆將裝置中的聯絡人匯入以作為MEGA聯絡人 \n錄音與影像截取輸出（存取麥克風與相機） - &gt; MEGA提供點對點加密音訊/視訊通話\n\n\n為了增加用戶”對MEGA系統的信心，所有客戶端程式碼均已發布，有興趣的安全開發人員可以評估我們的加密過程。我們的行動應用程式代碼可於https://github.com/meganz/android 查詢。\n\n相關詳細資訊，請查詢我們的網站：\n請查詢：https://mega.nz/terms \n\n\n桌上型電腦系統 - https://mega.nz/</string>
+    <string name="full_description_text">MEGA透過標準網頁瀏覽器以及行動裝置專屬應用程式提供用戶可控制的加密雲端儲存及對話功能。與其他雲端儲存服務供應商不同，您的資料僅可由您的客戶端裝置加密與解密，並非由我們加密。\n\n從智慧型手機或平板電腦上傳檔案，然後從任何裝置搜尋、儲存、下載、串流播放、查看、分享，重新命名或刪除您的檔案。可與您的聯絡人共享資料夾，並即時查看檔案更新狀況。加密功能表示我們無法訪問或重置您的密碼，因此您必須記住它（除非您有備份還原金鑰；忘記密碼時可透過金鑰重設帳號密碼），否則您將無法存取您所儲存的檔案。\n\n點對點用戶加密的MEGA視訊對話能確保完全的隱私，此功能從2016年起可透過瀏覽器使用，而且現在已支援我們的行動應用程式，可透過多個裝置檢視對話記錄。用戶還可透過MEGA雲端硬碟輕鬆地將檔案加到對話室中。\n \n MEGA為所有註冊用戶大方的提供50 GB的免費儲存空間以及成就獎勵，並提供更高空間上限的付費方案：\n\n\nPRO Lite 訂閱：每月4.99歐元或每年49.99歐元，每月為您提供400GB的儲存空間和1TB的傳輸配額。\nPRO I 訂閱：每月9.99歐元或每年99.99歐元，每月為您提供2TB的儲存空間和2TB的傳輸配額。\nPRO II 訂閱：每月19.99歐元或每年199.99歐元，為您提供8TB的儲存空間和每月8TB的傳輸配額。\nPRO III 訂閱：每月29.99歐元或每年299.99歐元，為您提供16TB的儲存空間和每月16TB的傳輸配額。\n\n訂閱將自動續訂，且續期與第一次訂閱的相同，價格也相同。欲管理您的訂閱，只需點擊行動裝置上的Play商店圖示，使用您的Google ID登錄（若您尚未登入的話），然後點擊MEGA應用程式，您就能夠管理您的訂閱。\n\n應用程式存取權限：\n外部儲存裝置資料寫入 - &gt;將您的檔案從MEGA下載到您的裝置並將檔案從您的裝置上傳到MEGA \n 相機 - &gt;拍照並將其上傳到MEGA \n 讀取聯絡人 - &gt; 輕鬆將裝置中的聯絡人匯入以作為MEGA聯絡人 \n錄音與影像截取輸出（存取麥克風與相機） - &gt; MEGA提供點對點加密音訊/視訊通話\n\n\n為了增加用戶對MEGA系統的信心，所有客戶端程式碼均已發布，有興趣的安全開發人員可以評估我們的加密過程。我們的行動應用程式代碼可於https://github.com/meganz/android 查詢。\n\n相關詳細資訊，請查詢我們的網站：\n請查詢：https://mega.nz/terms \n\n\n桌上型電腦系統 - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA雲端空間功能強大，永遠保護您的隱私。</string>
     <!-- PRO Lite account -->
@@ -143,7 +143,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">此筆訂閱已經成功取消</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">我們無法取消您的訂閱。請聯絡 support&#64;mega.nz 以獲得協助。</string>
+    <string name="cancel_subscription_error">我們無法取消您的訂閱。請聯絡 support&#64;mega.nz 以取得協助。</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">關閉其他登入帳戶</string>
     <!-- Message after kill all opened sessions -->
@@ -1130,7 +1130,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">現在就升級</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">提升雲端容量！[A]升級至專業版帳戶，以獲得更多空間 &amp; 傳輸配額！</string>
+    <string name="get_pro_account">提升雲端容量！[A]升級至專業版帳戶，以取得更多空間 &amp; 傳輸配額！</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">還原金鑰已備份至：%1s。[A]當檔案仍在此路徑中時，您可在儲存為可離線存取區裡找到它。[A]請注意：在您登出後，離線存取裡的還原金鑰將會被刪除，請將它儲存在一個安全的地方。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -2654,7 +2654,7 @@
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">雲端硬碟已滿。立即升級為專業版帳戶並獲得高達%1$s的儲存空間和%2$s的傳輸配額。</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">雲端硬碟已滿。立即升級並獲得高達%1$s的儲存空間和%2$s的傳輸配額。</string>
+    <string name="text_storage_full_warning_pro_account">雲端硬碟已滿。立即升級並取得高達%1$s的儲存空間和%2$s的傳輸配額。</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
     <string name="text_storage_full_warning_pro3_account">雲端硬碟已滿。如果您需要更多儲存空間，請聯絡MEGA客服部門，讓我們為您設計客製方案。</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
@@ -2762,7 +2762,7 @@
     <!-- Title of the dialog to confirm after closing all other sessions -->
     <string name="confirmation_close_sessions_title">您要關閉所有其它工作階段嗎？</string>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
-    <string name="number_of_participants">%d位與會者</string>
+    <string name="number_of_participants">%d位參與者</string>
     <!-- Label of the button to join a chat by a chat link -->
     <string name="action_join">加入</string>
     <!-- Label for observers of a group chat -->
@@ -2931,7 +2931,7 @@
     <string name="one_folder_several_files">1個資料夾 · %1$d個檔案</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
-        <item quantity="other">%d 個檔案</item>
+        <item quantity="other">%d個檔案</item>
     </plurals>
     <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
     <plurals name="num_folders_with_parameter">
@@ -2957,7 +2957,7 @@
     </plurals>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <plurals name="subtitle_of_group_chat">
-        <item quantity="other">%d位與會者</item>
+        <item quantity="other">%d位參與者</item>
     </plurals>
     <!--  -->
     <string name="custom_subtitle_of_group_chat">還有%1$s和%2$d</string>
@@ -3168,13 +3168,13 @@
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">請輸入您的密碼</string>
     <!-- Text of the dialog shown when a pdf required password -->
-    <string name="text_pdf_password">%s是受密碼保護的PDF檔。請輸入密碼以打開此PDF。</string>
+    <string name="text_pdf_password">%s是受密碼保護的PDF檔。請輸入密碼以開啟此PDF。</string>
     <!-- Error of the dialog shown wen a pdf required password and the user types a wrong password -->
-    <string name="error_pdf_password">您輸入了錯誤的密碼，請重試。</string>
+    <string name="error_pdf_password">您輸入錯誤密碼，請重試。</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
     <string name="error_max_pdf_password">您輸入的密碼無效。</string>
     <!-- Alert shown when a user tries to open a file from a zip and the file is unknown or has not been possible to unzip correctly -->
-    <string name="unknownn_file">無法打開檔案。可能因為它是未知的檔案類型，或者無法成功解壓縮檔案。</string>
+    <string name="unknownn_file">無法開啟檔案。可能因為它是未知的檔案類型，或者無法成功解壓縮檔案。</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">正在通話時無法播放影音檔案。</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -3186,15 +3186,15 @@
     <!-- message displayed when you try to start a call but it is not possible because you are already on a call -->
     <string name="not_allowed_to_start_call">您目前正在通話</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
-    <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B]已加入群聊。[/B]</string>
+    <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B]已加入群組對話。[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">一旦它被刪除，將無法再透過此連結存取對話內容。</string>
     <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">加密金鑰輪替功能不允許您在未建立新群聊的情況下獲取對話連結。</string>
+    <string name="context_create_chat_link_warning_text">加密金鑰輪替功能不允許您在未建立新群組對話的情況下獲取對話連結。</string>
     <!-- Question of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_question_text">您想建立一個新的群組並獲取對話連結嗎？</string>
+    <string name="context_create_chat_link_question_text">您想建立一個新的群組對話並產出對話連結嗎？</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="context_make_private_chat_warning_text">加密密鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入者將看不到舊的訊息。</string>
+    <string name="context_make_private_chat_warning_text">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新參與者將看不到舊的訊息。</string>
     <!-- Message shown when a user has joined to a public chat successfully -->
     <string name="message_joined_successfully">您已成功加入對話。</string>
     <!-- Label that indicates the steps of a wizard -->
@@ -3202,7 +3202,7 @@
     <!-- Hint of the Search view -->
     <string name="hint_action_search">搜尋&#8230;</string>
     <!-- Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason. -->
-    <string name="answer_call_incoming">應答</string>
+    <string name="answer_call_incoming">答覆</string>
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">忽略</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
@@ -3286,7 +3286,7 @@
     <!-- Title of popup when user click ‘Share’ button on invite contact page -->
     <string name="invite_contact_chooser_title">邀請朋友</string>
     <!-- Action button label -->
-    <string name="invite_contact_action_button">邀請朋友&#8230;</string>
+    <string name="invite_contact_action_button">透過&#8230;邀請朋友</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files -->
     <plurals name="file_already_downloaded">
         <item quantity="other">已下載%d個檔案。&#160;</item>
@@ -3302,23 +3302,23 @@
     <!-- Label to reference a recents section -->
     <string name="recents_label">近期的</string>
     <!-- Label to reference a chats section -->
-    <string name="chats_label">交談</string>
+    <string name="chats_label">對話</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[B]沒有檔案在您的[/B][A]近期存取[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">還有%1$s和%2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
-    <string name="title_media_bucket_only_images">%d張圖像</string>
+    <string name="title_media_bucket_only_images">%d張圖片</string>
     <!-- Title of a media recents bucket that only contains some videos -->
     <string name="title_media_bucket_only_videos">%d個影片</string>
     <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">%1$d張圖像與%2$d個影片</string>
+    <string name="title_media_bucket_images_and_videos">%1$d張圖片與%2$d個影片</string>
     <!-- Title of a media recents bucket that contains some images and a video -->
-    <string name="title_media_bucket_images_and_video">%d張圖像與1個影片</string>
+    <string name="title_media_bucket_images_and_video">%d張圖片與1個影片</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">1張圖像與%d個影片</string>
+    <string name="title_media_bucket_image_and_videos">1張圖片與%d個影片</string>
     <!-- Title of a media recents bucket that contains an image and a video -->
-    <string name="title_media_bucket_image_and_video">1張圖像與1個影片</string>
+    <string name="title_media_bucket_image_and_video">1張圖片與1個影片</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">由%s[A]建立[/A]</string>
     <!-- Label that indicates who updated a file into a recents bucket -->
@@ -3344,7 +3344,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_title">讀取中</string>
     <!-- The message of progress dialog when loading web content -->
-    <string name="embed_web_browser_loading_message">請等待&#8230;&#8230;</string>
+    <string name="embed_web_browser_loading_message">請等待&#8230;</string>
     <!-- Head label to show the business account type -->
     <string name="account_label">帳戶類型</string>
     <!-- Label in My Account section to show user account type -->
@@ -3366,13 +3366,13 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">用量</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">空間使用細節</string>
+    <string name="usage_storage_details_label">空間使用狀態</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">總使用量</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">傳輸</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
-    <string name="error_remove_business_contact">您無法以刪除聯絡人方式刪除%1$s，因為他們是您商業帳戶的成員之一。</string>
+    <string name="error_remove_business_contact">您無法以刪除聯絡人的方式刪除%1$s，因為他們是您商業帳戶的成員之一。</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">您最近一次付款有問題。請使用電腦版瀏覽器登入MEGA以取得更多訊息。</string>
     <!-- A dialog title shown to users when their business account is expired. -->
@@ -3400,7 +3400,7 @@
     <!-- Alert shown to the user when they is trying to create an empty group for attach a file -->
     <string name="error_creating_group_and_attaching_file">請選擇一個或多個聯絡人。</string>
     <!-- Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts -->
-    <string name="contacts_sent">已傳給 %s 位聯絡人。</string>
+    <string name="contacts_sent">已傳給%s位聯絡人。</string>
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
     <string name="my_chat_files_folder">我的對話檔案</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
@@ -3458,7 +3458,7 @@
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <string name="alert_remove_several_shares">您確定要終止這%1$d個資料夾的共享嗎？</string>
     <!-- Download location label -->
-    <string name="download_location">下載地址</string>
+    <string name="download_location">下載位址</string>
     <!-- Text asking confirmation for download location -->
     <string name="confirmation_download_location">總是儲存在此位置？</string>
     <!-- Action to show any file in its location -->
@@ -3468,7 +3468,7 @@
     <!-- Title of the File Provider activity -->
     <string name="file_provider_title">附加自⋯</string>
     <!-- Title of an inactive chat which was recently created (today or yesterday). Placeholder is to show the specific creation day. e.g. Chat created today -->
-    <string name="inactive_chat_title_2">對話建立於%s</string>
+    <string name="inactive_chat_title_2">對話已建立%s</string>
     <!-- Title of an inactive chat. Placeholder is to show the creation date and time -->
     <string name="inactive_chat_title">對話建立於%s</string>
     <!-- Title of the chat when multi-selection is activated -->
@@ -3482,13 +3482,13 @@
     <!-- Label indicating transfer over quota -->
     <string name="label_transfer_over_quota">超出傳輸配額</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">超出空間配額的儲存</string>
+    <string name="label_storage_over_quota">儲存空間超出配額</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">獲取更多傳輸配額</string>
     <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">該資料夾不存在</string>
+    <string name="warning_folder_not_exists">資料夾不存在</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">該檔案在雲端硬碟中不存在。</string>
+    <string name="warning_node_not_exists_in_cloud">檔案在雲端硬碟中不存在。</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">空間已滿</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3548,9 +3548,9 @@
     <!-- Error message when trying to login and the account is blocked -->
     <string name="error_account_blocked">您的帳戶已被鎖定。請連繫 support&#64;mega.nz</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">您的帳戶已被您的管理員停用。相關詳細資訊，請與您的商業帳戶管理員聯絡。</string>
+    <string name="error_business_disabled">您的帳戶已被您的管理員停用。相關詳細資訊請與您的商業帳戶管理員聯繫。</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
-    <string name="error_business_removed">您的帳戶已被管理員刪除。有關更多資訊，請與您的商業帳戶管理員聯繫。</string>
+    <string name="error_business_removed">您的帳戶已被管理員刪除。有關更多資訊請與您的商業帳戶管理員聯繫。</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
     <string name="option_modify_phone_number">修改</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -3596,7 +3596,7 @@
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">取消暫停傳輸即可繼續上傳。</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
-    <string name="progress_size_indicator">%1$d%%之%2$s</string>
+    <string name="progress_size_indicator">%2$s之%1$d%%</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">啟用對話訊息的特別資訊</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -3606,17 +3606,17 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">此訊息已達到%d個回應的最大限制。</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B]將訊息刪除時間改為[/B][A]%2$s[/A][B]。[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B]將訊息清除時間改為[/B][A]%2$s[/A][B]。[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
-    <string name="title_properties_clear_chat_history">清空對話紀錄</string>
+    <string name="title_properties_clear_chat_history">清除對話紀錄</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
-    <string name="retention_history_disabled">[A]%1$s[/A][B]停用訊息刪除功能。[/B]</string>
+    <string name="retention_history_disabled">[A]%1$s[/A][B]停用訊息清除功能。[/B]</string>
     <!-- Subtitle of the section to clear the chat content in the Manage chat history screen -->
     <string name="subtitle_properties_chat_clear">刪除此對話中所有訊息和分享的檔案。此動作是無法復原的。</string>
     <!-- Title of the history retention option -->
     <string name="title_properties_history_retention">歷史記錄清除</string>
     <!-- Subtitle of the history retention option when history retention is disabled -->
-    <string name="subtitle_properties_history_retention">自動刪除超過一定時間的訊息。</string>
+    <string name="subtitle_properties_history_retention">自動刪除超過一段時間的訊息。</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled -->
     <string name="history_retention_option_disabled">停用</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day -->
@@ -3630,7 +3630,7 @@
     <!-- Title of the Manage chat history screen -->
     <string name="title_properties_manage_chat">管理對話記錄</string>
     <!-- Subtitle of the dialogue to select a retention time -->
-    <string name="subtitle_properties_manage_chat">自動刪除超過此時間的訊息：</string>
+    <string name="subtitle_properties_manage_chat">自動清除超過此時間的訊息：</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
     <string name="confirmation_clear_chat_history">清除此對話的全部訊息記錄？</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
@@ -3668,31 +3668,31 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">選擇傳輸</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">傳輸 ”%1$s” 的優先變更失敗。</string>
+    <string name="change_of_transfer_priority_failed">傳輸 “%1$s” 的優先變更失敗。</string>
     <!-- Title option to send separated the link and decryption key -->
-    <string name="option_send_decryption_key_separately">各別發送解密密鑰</string>
+    <string name="option_send_decryption_key_separately">各別發送解密金鑰</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">各別匯出連結與解密密鑰</string>
+    <string name="explanation_send_decryption_key_separately">各別匯出連結與解密金鑰</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">瞭解更多</string>
     <!-- Label key referring to a link decryption key -->
-    <string name="key_label">密鑰</string>
+    <string name="key_label">金鑰</string>
     <!-- Button which action is share the decryption key of a link -->
-    <string name="button_share_key">分享密鑰</string>
+    <string name="button_share_key">分享金鑰</string>
     <!-- Button which action is copy the decryption key of a link -->
-    <string name="button_copy_key">複製密鑰</string>
+    <string name="button_copy_key">複製金鑰</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">複製密碼</string>
     <!-- Confirmation shown informing a link it’s copied to the clipboard -->
     <string name="link_copied_clipboard">連結已複製到剪貼簿</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">密鑰已複製到剪貼簿</string>
+    <string name="key_copied_clipboard">金鑰已複製到剪貼簿</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">密碼已複製到剪貼簿</string>
     <!-- Confirmation shown informing a link it’s copied to the clipboard -->
     <string name="link_sent">連結已成功發送。</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">連結和密鑰已成功發送。</string>
+    <string name="link_and_key_sent">連結和金鑰已成功發送。</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_password_sent">連結和密碼已成功發送。</string>
     <!-- Title of a warning recommending upgrade to Pro -->
@@ -3700,17 +3700,17 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA專業版用戶可以獨享額外的連結安全功能，讓您的帳戶更加安全。</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">我們的點對點加密系統需要有為此檔案自動生成的唯一密鑰才能開啟。預設情況下會自動產生帶有此密鑰的連結，但為了更加安全考量，您可以將解密密鑰單獨匯出。</string>
+    <string name="decryption_key_explanation">我們的點對點加密系統需要有為此檔案自動生成的唯一金鑰才能開啟。預設情況下會自動產生帶有此金鑰的連結，但為了更加安全考量，您可以將解密金鑰單獨匯出。</string>
     <!-- Reset password label -->
     <string name="reset_password_label">重設密碼</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
-    <string name="share_key_warning">分享此連結的密鑰？</string>
+    <string name="share_key_warning">分享此連結的金鑰？</string>
     <!-- Warning show to the user when has set a password protection of a link and tries to share the link -->
     <string name="share_password_warning">分享此連結的密碼？</string>
     <!-- Button which action is share the password of a link -->
     <string name="button_share_password">分享密碼</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
-    <string name="share_link_with_key">連結: %1$s\n\n密鑰: %2$s</string>
+    <string name="share_link_with_key">連結: %1$s\n\n金鑰: %2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">連結: %1$s\n\n密碼: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
@@ -3718,7 +3718,7 @@
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">喜歡</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
-    <string name="file_properties_unfavourite">移除最愛</string>
+    <string name="file_properties_unfavourite">移除喜歡</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
     <string name="file_properties_label">標籤&#8230;</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
@@ -3746,7 +3746,7 @@
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">正在播放</string>
     <!-- Text that indicates the song is now playing, but paused -->
-    <string name="audio_player_now_playing_paused">正在播放(暫停)</string>
+    <string name="audio_player_now_playing_paused">正在播放（暫停）</string>
     <!-- Title of the song info screen -->
     <string name="audio_track_info">歌曲資訊</string>
     <!-- Action to get more information -->
@@ -3770,7 +3770,7 @@
     <!-- Cookie dialog third party second subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle2">類別：廣告Cookies</string>
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Google用來：\n• 根據您的位置和您以前訪問過的其他網站，自定義Google在我們的服務以及其他服務和網站上顯示的廣告；\n• 監測您多久看到某些廣告；\n• 提供防止欺騙的廣告功能；和\n• 確定您何時點擊廣告，然後追蹤您針對該廣告接下來所採取的動作。\n https://policies.google.com/technologies/partner-sites</string>
+    <string name="dialog_cookie_thirdparty_message">Google用來：\n• 根據您的位置和您以前訪問過的其他網站自定義Google在我們的服務以及其他服務和網站上顯示的廣告；\n• 監測您多久看到某些廣告；\n• 提供防止欺騙的廣告功能；和\n• 確定您何時點擊廣告，然後追蹤您針對該廣告接下來所採取的動作。\n https://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">接受Cookies</string>
     <!-- Preference screen item title -->
@@ -3784,17 +3784,17 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">性能與分析Cookies</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_performance_summary">協助我們了解您如何使用我們的服務，並提供我們可用來改進的資訊。不接受這些Cookies將意味著我們將缺少可用來幫助我們改進設計的資訊。</string>
+    <string name="preference_cookies_performance_summary">協助我們了解您如何使用我們的服務，並提供我們可用來改進的資訊。不接受這些Cookies意味著我們將缺少可用來幫助我們改進設計的資訊。</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_advertising_title">廣告Cookies</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_advertising_summary">我們和我們所認可的廣告合作夥伴所使用，根據您的瀏覽記錄以客製化您在我們服務及其它網站上看到的廣告。不接受這些Cookies意味我們可能會顯示不相關的廣告。</string>
+    <string name="preference_cookies_advertising_summary">我們和我們所認可的廣告合作夥伴用來根據您的瀏覽記錄以客製化您在我們服務及其它網站上看到的廣告。不接受這些Cookies意味我們可能會顯示不相關的廣告。</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_thirdparty_title">第三方Cookies</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
     <string name="preference_cookies_thirdparty_summary">這些Cookies不是我們控制的；我們使用這些Cookies來提供上述功能類型。根據每個第三方Cookie的類型，不接受這些Cookies將會產生不同的含義。點擊下面 “更多資訊” 來了解我們使用的所有第三方Cookies資訊。</string>
     <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_privacy">私隱條款</string>
+    <string name="preference_cookies_policies_privacy">隱私權政策</string>
     <!-- Preference screen item action button -->
     <string name="preference_cookies_policies_cookie">Cookie政策</string>
     <!-- Preference screen item state description -->
@@ -3804,7 +3804,7 @@
     <!-- Message displayed when clicking on a contact attached to the chat that is not my contact -->
     <string name="user_is_not_contact">%s不在您的聯絡人列表</string>
     <!-- Option of color theme, light mode. -->
-    <string name="theme_light">輕度</string>
+    <string name="theme_light">淺色</string>
     <!-- Option of color theme, dark mode. -->
     <string name="theme_dark">深色</string>
     <!-- Option of color theme, follow the system setting. -->
@@ -3826,9 +3826,9 @@
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">檔案建立失敗。再試一次。</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
-    <string name="file_saved_to">檔案已儲存到 %1$s</string>
+    <string name="file_saved_to">檔案已儲存到%1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">檔案未儲存到 %1$s。再試一次。</string>
+    <string name="file_saved_to_failed">檔案未儲存到%1$s。再試一次。</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">檔案已更新</string>
     <!-- Warning indicating a file was not updated successfully -->
@@ -3854,5 +3854,5 @@
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
     <string name="action_keep_empty_old_extension">沒有副檔名</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
-    <string name="action_keep_old_extension">保持 .%1$s</string>
+    <string name="action_keep_old_extension">保留 .%1$s</string>
 </resources>

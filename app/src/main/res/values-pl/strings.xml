@@ -4109,11 +4109,11 @@
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
     <string name="file_extension_change_warning_new_empty">Możesz nie być w stanie uzyskać dostępu do tego pliku. jeśli zmienisz go z “.%1$s” na pusty</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
-    <string name="action_use_empty_new_extension">Użyj pustego</string>
+    <string name="action_use_empty_new_extension">Usuń rozszerzenie</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
     <string name="action_use_new_extension">Użyj .%1$s</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
-    <string name="action_keep_empty_old_extension">Zachowaj puste</string>
+    <string name="action_keep_empty_old_extension">Brak rozszerzenia</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Zachowaj .%1$s</string>
 </resources>
