@@ -400,7 +400,7 @@ class CuViewModel extends BaseRxViewModel {
         List<CuNode> nodes = new ArrayList<>();
         List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
         List<MegaNode> nodesWithoutPreview = new ArrayList<>();
-        long itemsCount = 0;
+        long dayItemsCount = 0;
         LocalDate lastDayDate = null;
         LocalDate lastMonthDate = null;
         LocalDate lastYearDate = null;
@@ -425,21 +425,19 @@ class CuViewModel extends BaseRxViewModel {
                     dateString,
                     mSelectedNodes.containsKey(node.getHandle()));
 
-            if (lastDayDate == null) {
-                lastDayDate = modifyDate;
-            }
+            dayItemsCount++;
 
-            if (lastDayDate.equals(modifyDate)) {
-                itemsCount++;
-            } else {
+            if (lastDayDate == null || lastDayDate.getDayOfYear() != modifyDate.getDayOfYear()) {
                 lastDayDate = modifyDate;
-                itemsCount++;
-                String date = sameYear
-                        ? ofPattern("dd MMM").format(lastDayDate)
-                        : ofPattern("dd MMM yyyy").format(lastDayDate);
+                String date = ofPattern(sameYear ? "dd MMM" : "dd MMM yyyy").format(lastDayDate);
+                days.add(new Pair<>(new CUCard(day, month, year, date, null), cuNode));
 
-                days.add(new Pair<>(new CUCard(day, month, year, date, itemsCount), cuNode));
-                itemsCount = 0;
+                int daysSize = days.size();
+                if (daysSize > 1) {
+                    days.get(daysSize - 2).first.setNumItems(dayItemsCount);
+                }
+
+                dayItemsCount = 0;
                 shouldGetPreview = true;
             }
 

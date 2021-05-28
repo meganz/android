@@ -1587,6 +1587,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putBoolean(CONNECTED, connected);
 		outState.putBoolean(SMALL_GRID, isSmallGridCameraUploads);
 
+		if (getCameraUploadFragment() != null) {
+			getSupportFragmentManager().putFragment(outState, FragmentTag.CAMERA_UPLOADS.getTag(), cuFragment);
+		}
+
 		checkNewTextFileDialogState(newTextFileDialog, outState);
 
 		nodeAttacher.saveState(outState);
@@ -6553,10 +6557,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (drawerItem == DrawerItem.CAMERA_UPLOADS
 				&& getCameraUploadFragment() != null
 				&& cuFragment.getItemCount() > 0) {
-			sortByMenuItem.setVisible(true);
-
+			sortByMenuItem.setVisible(!cuFragment.isEnableCUFragmentShown());
 			setCuThumbnailTypeIcon();
-			gridSmallLargeMenuItem.setVisible(true);
+			gridSmallLargeMenuItem.setVisible(cuFragment.shouldShowGridOption());
 		}
 	}
 

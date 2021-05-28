@@ -24,6 +24,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -68,6 +70,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 @AndroidEntryPoint
 public class CameraUploadsFragment extends BaseFragment implements CUGridViewAdapter.Listener {
 
+    private static final String SELECTED_VIEW = "SELECTED_VIEW";
     public static final int ALL_VIEW = 0;
     public static final int DAYS_VIEW = 1;
     public static final int MONTHS_VIEW = 2;
@@ -180,6 +183,10 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null) {
+            selectedView = savedInstanceState.getInt(SELECTED_VIEW, ALL_VIEW);
+        }
+
         mManagerActivity = (ManagerActivityLollipop) context;
 
         CuViewModelFactory viewModelFactory =
@@ -196,12 +203,19 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
         if (mManagerActivity.getFirstLogin() || viewModel.isEnableCUShown()) {
             viewModel.setEnableCUShown(true);
+            mManagerActivity.updateCuFragmentOptionsMenu();
             return createCameraUploadsViewForFirstLogin(inflater, container);
         } else {
             binding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
             setupGoogleAds();
             return binding.getRoot();
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+        outState.putInt(SELECTED_VIEW, selectedView);
+        super.onSaveInstanceState(outState);
     }
 
     private View createCameraUploadsViewForFirstLogin(@NonNull LayoutInflater inflater,
@@ -338,6 +352,12 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.monthsButton.setOnClickListener(v -> newViewClicked(MONTHS_VIEW));
         binding.yearsButton.setOnClickListener(v -> newViewClicked(YEARS_VIEW));
         updateViewSelected();
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) binding.viewTypeLayout.getLayoutParams();
+            params.width = outMetrics.heightPixels;
+            binding.viewTypeLayout.setLayoutParams(params);
+        }
     }
 
     private void newViewClicked(int selectedView) {
@@ -382,14 +402,14 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private void observeLiveData() {
         viewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
-            if (!isResumed()) {
-                return;
-            }
-
             boolean showScroller = nodes.size() >= (mManagerActivity.isSmallGridCameraUploads
                     ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
             binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
-            gridAdapter.setNodes(nodes);
+
+            if (gridAdapter != null) {
+                gridAdapter.setNodes(nodes);
+            }
+
             updateEnableCUButtons(viewModel.isCUEnabled());
             mManagerActivity.updateCuFragmentOptionsMenu();
 
@@ -444,7 +464,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void updateEnableCUButtons(boolean cuEnabled) {
-        boolean emptyAdapter = gridAdapter.getItemCount() <= 0;
+        boolean emptyAdapter = gridAdapter == null || gridAdapter.getItemCount() <= 0;
         mManagerActivity.updateEnableCuButton(!cuEnabled && !emptyAdapter ? View.VISIBLE : View.GONE);
         binding.emptyEnableCuButton.setVisibility(!cuEnabled && emptyAdapter ? View.VISIBLE : View.GONE);
     }
@@ -481,12 +501,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 break;
             }
         }
-    }
-
-    @Override public void onResume() {
-        super.onResume();
-
-        reloadNodes();
     }
 
     private void openNode(int position, CuNode cuNode) {
@@ -533,6 +547,10 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         return viewModel.isEnableCUShown();
     }
 
+    public boolean shouldShowGridOption() {
+        return !isEnableCUFragmentShown() && selectedView == ALL_VIEW;
+    }
+
     private void updateViewSelected() {
         setViewTypeButtonStyle(binding.allButton, false);
         setViewTypeButtonStyle(binding.daysButton, false);
@@ -555,6 +573,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             default:
                 setViewTypeButtonStyle(binding.allButton, true);
         }
+
+        mManagerActivity.updateCuFragmentOptionsMenu();
     }
 
     private void setViewTypeButtonStyle(TextView textView, boolean enabled) {
