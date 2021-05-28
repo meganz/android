@@ -1257,6 +1257,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun loadChildFragment(containerId: Int, fragment: Fragment, tag: String) {
+        if (requireActivity().isFinishing) return
+
         childFragmentManager.beginTransaction().replace(
             containerId,
             fragment,
