@@ -58,7 +58,6 @@ import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_OWN_PRIV
 
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
@@ -626,7 +625,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         toolbarTitle = meetingActivity.title_toolbar
         toolbarSubtitle = meetingActivity.subtitle_toolbar
         toolbarSubtitle?.let {
-            it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
+            it.text = StringResourcesUtils.getString(R.string.chat_connecting)
         }
 
         toolbar.setOnClickListener { if (!inMeetingViewModel.isOneToOneCall()) showMeetingInfoFragment() }
@@ -1284,7 +1283,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                 CallUtil.activateChrono(false, meetingChrono, null)
                 toolbarSubtitle?.let {
-                    it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
+                    it.text = StringResourcesUtils.getString(R.string.chat_connecting)
                 }
             }
             MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
