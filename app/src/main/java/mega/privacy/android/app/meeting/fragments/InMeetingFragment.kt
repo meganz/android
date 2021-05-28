@@ -207,16 +207,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private val callStatusObserver = Observer<MegaChatCall> {
-        when {
-            it.status != INVALID_CALL_STATUS -> {
-                if (inMeetingViewModel.isSameCall(it.callId)) {
-                    updateToolbarSubtitle(it)
-                    when (it.status) {
-                        MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> finishActivity()
-                    }
-                } else {
-                    checkAnotherCall()
+        if(it.status != INVALID_CALL_STATUS) {
+            if (inMeetingViewModel.isSameCall(it.callId)) {
+                updateToolbarSubtitle(it)
+                when (it.status) {
+                    MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> finishActivity()
                 }
+            } else {
+                checkAnotherCall()
             }
         }
     }
@@ -627,6 +625,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         toolbar = meetingActivity.toolbar
         toolbarTitle = meetingActivity.title_toolbar
         toolbarSubtitle = meetingActivity.subtitle_toolbar
+        toolbarSubtitle?.let {
+            it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
+        }
+
         toolbar.setOnClickListener { if (!inMeetingViewModel.isOneToOneCall()) showMeetingInfoFragment() }
         bannerAnotherCallLayout = meetingActivity.banner_another_call
         bannerAnotherCallTitle = meetingActivity.banner_another_call_title
@@ -1282,29 +1284,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                 CallUtil.activateChrono(false, meetingChrono, null)
                 toolbarSubtitle?.let {
-                    toolbarSubtitle?.text =
-                        StringResourcesUtils.getString(R.string.chat_connecting)
+                    it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
                 }
             }
             MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
-                when {
-                    inMeetingViewModel.isRequestSent() && !MegaApplication.isCreatingMeeting(
-                        inMeetingViewModel.getChatId()
-                    ) -> {
-                        CallUtil.activateChrono(false, meetingChrono, null)
-                        toolbarSubtitle?.let {
-                            toolbarSubtitle?.text =
-                                StringResourcesUtils.getString(R.string.outgoing_call_starting)
-                        }
-
+                if(inMeetingViewModel.isRequestSent() && !MegaApplication.isCreatingMeeting(inMeetingViewModel.getChatId())) {
+                    CallUtil.activateChrono(false, meetingChrono, null)
+                    toolbarSubtitle?.let {
+                        it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
                     }
-                    else -> {
-                        toolbarSubtitle?.let {
-                            toolbarSubtitle?.text =
-                                StringResourcesUtils.getString(R.string.duration_meeting)
-                        }
-                        CallUtil.activateChrono(true, meetingChrono, call)
+                } else {
+                    toolbarSubtitle?.let {
+                        it.text = StringResourcesUtils.getString(R.string.duration_meeting)
                     }
+                    CallUtil.activateChrono(true, meetingChrono, call)
                 }
             }
         }
