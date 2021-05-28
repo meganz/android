@@ -6,17 +6,21 @@ import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemCuCardBinding
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment.*
-import nz.mega.sdk.MegaNode
 
-class CUCardViewAdapter(private val cardViewType: Int) :
-    RecyclerView.Adapter<CUCardViewHolder>(), SectionTitleProvider {
+class CUCardViewAdapter(
+    private val cardViewType: Int,
+    private val cardWidth: Int,
+    private val cardMargin: Int
+) : RecyclerView.Adapter<CUCardViewHolder>(), SectionTitleProvider {
 
-    private var cards: List<Pair<CUCard, MegaNode>> = emptyList()
+    private var cards: ArrayList<android.util.Pair<CUCard, CuNode>> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CUCardViewHolder {
         return CUCardViewHolder(
             cardViewType,
-            ItemCuCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemCuCardBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            cardWidth,
+            cardMargin
         )
     }
 
@@ -40,5 +44,11 @@ class CUCardViewAdapter(private val cardViewType: Int) :
                 else -> ""
             }
         }
+    }
+
+    fun setCards(cards: List<android.util.Pair<CUCard, CuNode>>) {
+        this.cards.clear()
+        this.cards.addAll(cards)
+        notifyDataSetChanged()
     }
 }

@@ -122,4 +122,7 @@
     <dimen name="btn_21_padding_horizontal">21dp</dimen>
 
     <dimen name="btn_transparent_padding_vertical">8dp</dimen>
+
+    <dimen name="card_margin_portrait">8dp</dimen>
+    <dimen name="card_margin_landscape">3dp</dimen>
 </resources>

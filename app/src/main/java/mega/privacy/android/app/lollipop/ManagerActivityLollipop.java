@@ -330,6 +330,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public static final String LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK";
     public static final String CONNECTED = "CONNECTED";
 
+    private static final String SMALL_GRID = "SMALL_GRID";
+
 	public static final int ERROR_TAB = -1;
 	public static final int INCOMING_TAB = 0;
 	public static final int OUTGOING_TAB = 1;
@@ -1583,6 +1585,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink);
 		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
 		outState.putBoolean(CONNECTED, connected);
+		outState.putBoolean(SMALL_GRID, isSmallGridCameraUploads);
 
 		checkNewTextFileDialogState(newTextFileDialog, outState);
 
@@ -1683,6 +1686,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false);
 			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
 			connected = savedInstanceState.getBoolean(CONNECTED, false);
+			isSmallGridCameraUploads = savedInstanceState.getBoolean(SMALL_GRID, false);
 
 			nodeAttacher.restoreState(savedInstanceState);
 			nodeSaver.restoreState(savedInstanceState);
@@ -1836,7 +1840,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (prefs == null){
 			firstTimeAfterInstallation = true;
 			isList=true;
-			isSmallGridCameraUploads = false;
+
+			if (savedInstanceState == null) {
+				isSmallGridCameraUploads = false;
+			}
 		}
 		else{
 			if (prefs.getFirstTime() == null){
@@ -1851,7 +1858,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				isList = Boolean.parseBoolean(prefs.getPreferredViewList());
 			}
 
-			isSmallGridCameraUploads = dbH.isSmallGridCamera();
+			if (savedInstanceState == null) {
+				isSmallGridCameraUploads = dbH.isSmallGridCamera();
+			}
 		}
 		logDebug("Preferred View List: " + isList);
 
