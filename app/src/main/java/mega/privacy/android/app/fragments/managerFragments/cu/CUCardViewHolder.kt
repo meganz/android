@@ -33,10 +33,10 @@ class CUCardViewHolder(
         binding.numberItemsText.isVisible = viewType == DAYS_VIEW
         binding.numberItemsText.text = "+${cuCard.numItems}"
 
-        if (cuNode.thumbnail != null) {
-            binding.thumbnail.setImageURI(Uri.fromFile(cuNode.thumbnail))
+        if (cuNode.preview != null) {
+            binding.preview.setImageURI(Uri.fromFile(cuNode.preview))
         } else {
-            binding.thumbnail.setActualImageResource(R.drawable.ic_image_thumbnail)
+            binding.preview.setActualImageResource(R.drawable.ic_image_thumbnail)
         }
     }
 }

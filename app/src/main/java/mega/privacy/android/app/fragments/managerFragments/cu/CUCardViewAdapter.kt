@@ -32,6 +32,10 @@ class CUCardViewAdapter(
         return cards.size
     }
 
+    override fun getItemId(position: Int): Long {
+        return cards[position].second.node.handle
+    }
+
     override fun getSectionTitle(position: Int): String {
         return if (position < 0 || position >= cards.size) ""
         else {

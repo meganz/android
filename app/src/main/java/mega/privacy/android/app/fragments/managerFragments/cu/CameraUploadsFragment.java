@@ -267,6 +267,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         int spanCount = getSpanCount(isPortrait, smallGrid);
         GridLayoutManager layoutManager = new GridLayoutManager(context, spanCount);
         binding.cuList.setLayoutManager(layoutManager);
+        binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) binding.cuList.getLayoutParams();
 
         if (selectedView == ALL_VIEW) {

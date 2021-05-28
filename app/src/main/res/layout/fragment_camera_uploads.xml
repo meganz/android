@@ -56,7 +56,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/cu_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:clipToPadding="false"/>
 
     <LinearLayout
         android:id="@+id/view_type_layout"

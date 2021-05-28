@@ -125,4 +125,5 @@
 
     <dimen name="card_margin_portrait">8dp</dimen>
     <dimen name="card_margin_landscape">3dp</dimen>
+    <dimen name="cu_margin_bottom">50dp</dimen>
 </resources>
