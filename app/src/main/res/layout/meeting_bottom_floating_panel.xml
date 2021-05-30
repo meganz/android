@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center_horizontal"
+    android:paddingBottom="36dp"
     app:behavior_expandedOffset="36dp"
     app:behavior_fitToContents="false"
     app:behavior_hideable="false"
@@ -131,13 +132,13 @@
         android:id="@+id/fab_end"
         android:layout_width="@dimen/meeting_bottom_floating_panel_fab_size"
         android:layout_height="@dimen/meeting_bottom_floating_panel_fab_size"
+        android:layout_marginEnd="20dp"
         android:background="@null"
+        android:src="@drawable/ic_meeting_end"
+        app:backgroundTint="@color/red_600"
         app:borderWidth="0dp"
         app:elevation="0dp"
         app:fabCustomSize="@dimen/meeting_bottom_floating_panel_fab_size"
-        android:layout_marginEnd="20dp"
-        android:src="@drawable/ic_meeting_end"
-        app:backgroundTint="@color/red_600"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/fab_mic"
         app:pressedTranslationZ="12dp"
@@ -175,10 +176,10 @@
         android:backgroundTint="@color/grey_020_grey_alpha_040"
         android:drawableTop="@drawable/ic_social_share_white"
         android:stateListAnimator="@null"
-        android:visibility="gone"
         android:text="@string/context_get_link"
         android:textAllCaps="false"
         android:textColor="@color/grey_600_white"
+        android:visibility="gone"
         app:drawableTint="@color/teal_300_teal_200"
         app:layout_constraintEnd_toStartOf="@id/invite"
         app:layout_constraintHorizontal_chainStyle="spread"
@@ -192,12 +193,12 @@
         android:layout_marginStart="6dp"
         android:layout_marginEnd="15dp"
         android:backgroundTint="@color/grey_020_grey_alpha_040"
-        android:visibility="gone"
         android:drawableTop="@drawable/ic_invite_contact"
         android:stateListAnimator="@null"
         android:text="@string/invite_participants"
         android:textAllCaps="false"
         android:textColor="@color/grey_600_white"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/share_link"
@@ -229,30 +230,31 @@
         app:layout_constraintTop_toTopOf="@id/participants_num" />
 
 
-    <!--    <androidx.recyclerview.widget.RecyclerView-->
-    <!--        android:id="@+id/participants"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="0dp"-->
-    <!--        android:layout_marginTop="21dp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/participants_num" />-->
-
-
-    <RelativeLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/participants"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="21dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/participants_num">
+        app:layout_constraintTop_toBottomOf="@id/participants_num" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/participants"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </RelativeLayout>
+
+    <!--    <RelativeLayout-->
+    <!--        android:descendantFocusability="blocksDescendants"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:layout_marginTop="21dp"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/participants_num">-->
+
+    <!--        <androidx.recyclerview.widget.RecyclerView-->
+    <!--            android:id="@+id/participants"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="match_parent" />-->
+    <!--    </RelativeLayout>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

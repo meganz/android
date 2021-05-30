@@ -115,7 +115,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         participants.filter { it.isModerator }
             .map { it.name }.forEach {
                 if (it.isNotEmpty())
-                    nameList = "$nameList, $it"
+                    nameList = if (nameList.isNotEmpty()) "$nameList, $it" else "$it"
             }
 
         return nameList

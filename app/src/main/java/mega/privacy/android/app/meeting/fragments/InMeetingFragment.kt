@@ -1862,7 +1862,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Send share link
      */
     override fun onShareLink() {
-        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isLinkVisible()) {
+        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isChatRoomPublic()) {
             logError("Error getting the link, it is a private chat")
             return
         }

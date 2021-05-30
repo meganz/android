@@ -1774,7 +1774,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun shouldAssignModerator(): Boolean {
         val hasOneModerator = participants.value?.toList()?.filter { it.isModerator }?.size?.let {
             when {
-                it > 1 -> true
+                it > 1 -> false
                 it == 1 -> getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR
                 else -> getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
             }
