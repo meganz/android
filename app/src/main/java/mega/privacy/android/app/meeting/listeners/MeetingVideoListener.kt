@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
+import mega.privacy.android.app.utils.Constants.INVALID_DIMENSION
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -74,8 +75,8 @@ class MeetingVideoListener(
                        holder.setFixedSize(holderWidth, holderHeight)
                    }
                 } else {
-                    this.width = -1
-                    this.height = -1
+                    this.width = INVALID_DIMENSION
+                    this.height = INVALID_DIMENSION
                 }
             }
         }

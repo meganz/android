@@ -570,9 +570,6 @@ public class Constants {
     public static final int CHAT_LINK = 202;
     public static final int CONTACT_LINK = 203;
     public static final int ERROR_LINK = -1;
-    public static final int INVALID_CALL_STATUS = -1;
-    public static final int MAX_PARTICIPANTS_GRID = 6;
-    public static final int INVALID_CALL = -1;
 
     public static final int BACK_PRESS_NOT_HANDLED = 0;
     public static final int BACK_PRESS_HANDLED = 1;
@@ -623,6 +620,8 @@ public class Constants {
     public static final int INVALID_VOLUME = -1;
     public static final int INVALID_DIMENSION = -1;
     public static final int INVALID_VIEW_TYPE = -1;
+    public static final int INVALID_CALL_STATUS = -1;
+    public static final int INVALID_CALL = -1;
 
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 

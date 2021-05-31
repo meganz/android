@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting.listeners
 import android.graphics.Bitmap
 import android.view.TextureView
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
+import mega.privacy.android.app.utils.Constants.INVALID_DIMENSION
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatVideoListenerInterface
@@ -42,8 +43,8 @@ class GroupVideoListener(
             if (viewWidth != 0 && viewHeight != 0) {
                 bitmap = localRenderer!!.createBitmap(width, height)
             } else {
-                this.width = -1
-                this.height = -1
+                this.width = INVALID_DIMENSION
+                this.height = INVALID_DIMENSION
             }
         }
 
