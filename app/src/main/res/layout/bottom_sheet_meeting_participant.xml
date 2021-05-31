@@ -115,7 +115,7 @@
                 android:id="@+id/ping_to_speaker"
                 style="@style/BottomSheetItem"
                 android:show="@{viewModel.showPinItem()}"
-                android:text="@string/ping_to_speaker"
+                android:text="@string/pin_to_speaker"
                 app:drawableStartCompat="@drawable/ic_speaker_view" />
 
             <View

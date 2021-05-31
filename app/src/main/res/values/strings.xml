@@ -2306,7 +2306,6 @@
     <string name="error_chat_link" context="Message on the title of the chat screen if there were any error loading the chat link">Error loading the chat link.</string>
 
     <string name="error_chat_link_init_error" context="Message on the title of the chat screen if there were any error loading the chat link without logging">Error initialising chat when loading the chat link.</string>
-    <string name="error_meeting_link_init_error" context="Message on the paste link dialog if there were any error loading the meeting link without logging">Error initialising meeting when loading the meeting link.</string>
 
     <string name="alert_already_participant_chat_link" context="Message on the alert to preview a chat link if the user is already a participant">You are already participating in this chat.</string>
 
@@ -2612,8 +2611,6 @@
     <string name="content_tour_three" cotext="Content of third tour screen">Add contacts, create a network, collaborate, and make voice and video calls without ever leaving MEGA</string>
     <string name="title_tour_four" cotext="Title of fourth tour screen">Your Photos in the Cloud</string>
     <string name="content_tour_four" cotext="Content of fourth tour screen">Camera Uploads is an essential feature for any mobile device and we have got you covered. Create your account now.</string>
-    <string name="title_tour_five" cotext="Title of fifth tour screen">MEGA encrypted meeting</string>
-    <string name="content_tour_five" cotext="Content of fourth tour screen">End-to-End Encrypted conference at MEGA</string>
 
     <string name="title_pdf_password" context="Title of the dialog shown when a pdf required password">Enter your password</string>
     <string name="text_pdf_password" context="Text of the dialog shown when a pdf required password">%s is a password protected PDF document. Please enter the password to open the PDF.</string>
@@ -2627,7 +2624,6 @@
     <string name="join_call_layout_in_group_call" context="Title of the layout to join a group call from the chat screen. The placeholder indicates the user who initiated the call">%s started a group call. Tap to join.</string>
     <string name="call_in_progress_layout" context="Title of the layout to return to a call">Tap to return to call</string>
     <string name="not_allowed_to_start_call" context="message displayed when you try to start a call but it is not possible because you are already on a call">You are currently on a call</string>
-    <string name="join_meeting_layout_in_group_call" context="Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting">%s started a meeting. Tap to join.</string>
 
     <string name="message_joined_public_chat_autoinvitation" context="chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime." formatted="false">[A]%1$s[/A][B] joined the group chat.[/B]</string>
 
@@ -2665,12 +2661,9 @@
     <string name="invalid_file_folder_link" context="Error shown when it tries to open an invalid file or folder link">Invalid file or folder link</string>
     <string name="invalid_file_folder_link_empty" context="Error shown when it tries to open an invalid file or folder link and the text view is empty">Please enter a valid file or folder link</string>
     <string name="invalid_chat_link_empty" context="Error shown when it tries to open an invalid chat link and the text view is empty">Please enter a valid chat link</string>
-    <string name="invalid_meeting_link_empty" context="Error shown when it tries to open an invalid meeting link and the text view is empty">Please enter a valid meeting link</string>
     <string name="valid_chat_link" context="Error shown when it tries to open a chat link from the Cloud Drive section">You have pasted a chat link.</string>
-    <string name="valid_meeting_link" context="Error shown when it tries to open a meeting link from the Cloud Drive section">You have pasted a meeting link.</string>
     <string name="valid_contact_link" context="Error shown when it tries to open a contact link from the Cloud Drive section">You have pasted a contact link.</string>
     <string name="action_open_contact_link" context="Menu item">Open contact link</string>
-    <string name="action_open_meeting_link" context="Menu item">Open meeting link</string>
 
     <string name="copy_link_explanation" context="Explanation of the dialog shown to share a chat link">People can join your group by using this link.</string>
     <string name="new_chat_link_label" context="Label that indicates the creation of a chat link">New chat link</string>
@@ -3065,7 +3058,6 @@
     <!-- Meeting -->
     <string name="context_meeting" context="Item menu option upon right click on meeting.">Meeting</string>
     <string name="start_join_meeting" context="Menu option that allows the user to start/join meeting.">Start/Join meeting</string>
-    <string name="new_meeting_link_label" context="Label that indicates the creation of a meeting">New meeting</string>
     <string name="new_meeting" context="Label that create a meeting">New meeting</string>
     <string name="join_meeting" context="Label that join a meeting">Join meeting</string>
     <string name="btn_start_meeting" context="Button that create a meeting">Start meeting</string>
@@ -3086,7 +3078,7 @@
     <string name="meeting_end" context="Label for end meeting">End</string>
     <string name="invite_participants" context="Invite contacts as participants of the meeting">Invite Participants</string>
     <string name="participants_number" context="The number of participants in the meeting">In the meeting (%d)</string>
-    <string name="ping_to_speaker" context="Ping the participant to speaker view in the meeting">Pin to Speaker View</string>
+    <string name="pin_to_speaker" context="Pin the participant to speaker view in the meeting">Pin to Speaker View</string>
     <string name="make_moderator" context="Make the participant as moderator in the meeting">Make moderator</string>
     <string name="remove_participant" context="Remove the participant from meeting">Remove participant</string>
     <string name="title_end_meeting" context="The title of dialog for end meeting confirmation">Leave meeting now?</string>
@@ -3137,5 +3129,11 @@
     <string name="tip_invite_more_participants" context="the content of tips when the user uses the meeting first time">Invite more participants to the \nmeeting. Swipe up to invite.</string>
     <string name="invitation_send" context="the content of snack bar when the user send the invitation to others">Invitation sent.\nSee status on Sent Requests Tab.</string>
     <string name="be_new_moderator" context="the content of snack bar when the user be the new moderator">You are the new meeting moderator now!</string>
+
+    <string name="error_meeting_link_init_error" context="Message on the paste link dialog if there were any error loading the meeting link without logging">Error initialising meeting when loading the meeting link.</string>
+    <string name="join_meeting_layout_in_group_call" context="Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting">%s started a meeting. Tap to join.</string>
+    <string name="title_tour_five" cotext="Title of fifth tour screen">MEGA encrypted meeting</string>
+    <string name="content_tour_five" cotext="Content of fourth tour screen">End-to-End Encrypted conference at MEGA</string>
+    <string name="invalid_meeting_link_empty" context="Error shown when it tries to open an invalid meeting link and the text view is empty">Please enter a valid meeting link</string>
 </resources>
 
