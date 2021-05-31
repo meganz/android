@@ -270,4 +270,13 @@
     <color name="grey_060_white_054">@color/white_alpha_054</color>
     <!--  background of bottom menu button when collapse-->
     <color name="grey_032_white_054">@color/white_alpha_054</color>
+
+    <!--  SnackBar background  -->
+    <color name="grey_alpha_087_white">@color/white</color>
+
+    <!--  SnackBar text  -->
+    <color name="white_alpha_087_grey_alpha_087">@color/grey_alpha_087</color>
+
+    <!--  SnackBar Button text  -->
+    <color name="teal_200_teal_300">@color/teal_300</color>
 </resources>

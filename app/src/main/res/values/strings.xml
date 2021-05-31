@@ -4093,5 +4093,4 @@
     <string name="content_tour_five">End-to-End Encrypted conference at MEGA</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Please enter a valid meeting link</string>
-
 </resources>

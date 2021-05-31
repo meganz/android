@@ -171,7 +171,7 @@
     </style>
 
     <style name="Widget.Mega.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
-        <item name="android:textColor">?attr/colorSecondary</item>
+        <item name="android:textColor">@color/teal_200_teal_300</item>
     </style>
 
     <!--- SeekBar white, chat room own voice clip -->

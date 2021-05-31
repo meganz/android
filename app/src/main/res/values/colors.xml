@@ -434,6 +434,7 @@
 
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/white_alpha_090</color>
+
     <!--  Background of panel when expand-->
     <color name="grey_070_dark_grey_066">@color/grey_alpha_070</color>
     <!--  Background of share link and invite button-->
@@ -444,4 +445,13 @@
     <color name="grey_060_white_054">@color/grey_600</color>
     <!--  background of bottom menu button when collapse-->
     <color name="grey_032_white_054">@color/grey_alpha_032</color>
+
+    <!--  SnackBar background  -->
+    <color name="grey_alpha_087_white">@color/grey_alpha_087</color>
+
+    <!--  SnackBar text  -->
+    <color name="white_alpha_087_grey_alpha_087">@color/white_alpha_087</color>
+
+    <!--  SnackBar Button text  -->
+    <color name="teal_200_teal_300">@color/teal_200</color>
 </resources>
