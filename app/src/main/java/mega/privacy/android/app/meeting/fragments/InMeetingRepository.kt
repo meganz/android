@@ -161,15 +161,14 @@ class InMeetingRepository @Inject constructor(
      * @param meetingName the name of the meeting
      * @param listener MegaChatRequestListenerInterface
      */
-    fun createMeeting(meetingName: String, listener: MegaChatRequestListenerInterface) {
+    fun createMeeting(meetingName: String, listener: MegaChatRequestListenerInterface) =
         megaChatApi.createMeeting(meetingName, listener)
-    }
 
     /**
      * Method to switch a call on hold
      *
      * @param chatId chat ID
-     * @param isHold True, if I am going to put it on hold. False, otherwise
+     * @param isOn True, if I am going to put it on hold. False, otherwise
      */
     fun setCallOnHold(chatId: Long, isOn: Boolean) {
         if (chatId != MEGACHAT_INVALID_HANDLE) {
@@ -194,26 +193,13 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method for leave a meeting
      *
-     * @param chatId chat ID
+     * @param callId call ID
      */
     fun leaveMeeting(callId: Long) {
         if (callId == MEGACHAT_INVALID_HANDLE)
             return
 
         megaChatApi.hangChatCall(callId, HangChatCallListener(context))
-    }
-
-    fun getMyAvatar(chat: MegaChatRoom): Bitmap? {
-        var avatar = CallUtil.getImageAvatarCall(chat, megaChatApi.myUserHandle)
-        when (avatar) {
-            null -> {
-                avatar = CallUtil.getDefaultAvatarCall(
-                    MegaApplication.getInstance().applicationContext,
-                    megaChatApi.myUserHandle
-                )
-            }
-        }
-        return avatar
     }
 
     /**

@@ -144,10 +144,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         LiveEventBus.get(Constants.EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
             .observeSticky(this, callOnHoldObserver)
-
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(Constants.EVENT_REMOTE_AVFLAGS_CHANGE)
             .observeSticky(this, remoteAVFlagsObserver as Observer<Any>)
-
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(Constants.EVENT_SESSION_ON_HOLD_CHANGE)
             .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
     }
