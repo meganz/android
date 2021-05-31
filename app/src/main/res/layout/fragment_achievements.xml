@@ -21,9 +21,9 @@
             android:id="@+id/unlocked_rewards_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:background="?android:attr/colorBackground"
             android:layout_marginTop="6dp"
+            android:background="?android:attr/colorBackground"
+            android:gravity="center_horizontal"
             android:paddingTop="18dp"
             android:paddingBottom="18dp">
 
@@ -37,116 +37,53 @@
                 android:text="@string/unlocked_rewards_title"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" />
 
-            <TableLayout
-                android:id="@+id/unlocked_rewards_content_table"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:layout_below="@+id/unlocked_rewards_title"
                 android:layout_centerInParent="true"
                 android:layout_marginTop="24dp"
-                android:layout_marginBottom="12dp"
-                android:stretchColumns="*">
+                android:layout_marginBottom="12dp">
 
-                <TableRow
-                    android:id="@+id/tableRow1"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:divider="@color/grey_012_white_012"
-                    android:showDividers="middle"
-                    android:weightSum="1">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:orientation="vertical">
 
                     <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content">
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal">
 
-                        <LinearLayout
+                        <TextView
+                            android:id="@+id/unlocked_storage_text"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:orientation="vertical">
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/dark_blue_500_200"
+                            android:textSize="28sp" />
 
-                            <RelativeLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal">
-
-                                <TextView
-                                    android:id="@+id/unlocked_storage_text"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:textColor="@color/dark_blue_500_200"
-                                    android:textSize="28sp" />
-
-                                <TextView
-                                    android:id="@+id/unlocked_storage_unit"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignBaseline="@+id/unlocked_storage_text"
-                                    android:layout_marginLeft="2dp"
-                                    android:layout_toRightOf="@+id/unlocked_storage_text"
-                                    android:textColor="@color/dark_blue_500_200"
-                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant"/>
-                            </RelativeLayout>
-
-                            <TextView
-                                android:id="@+id/unlocked_storage_title"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_column="0"
-                                android:text="@string/unlocked_storage_title"
-                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Medium"/>
-                        </LinearLayout>
-
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
+                        <TextView
+                            android:id="@+id/unlocked_storage_unit"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_centerHorizontal="true"
-                            android:orientation="vertical">
-
-                            <RelativeLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center_horizontal">
-
-                                <TextView
-                                    android:id="@+id/unlocked_transfer_text"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:textColor="@color/green_500_green_400"
-                                    android:textSize="28sp" />
-
-                                <TextView
-                                    android:id="@+id/unlocked_transfer_unit"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_alignBaseline="@+id/unlocked_transfer_text"
-                                    android:layout_marginLeft="2dp"
-                                    android:layout_toRightOf="@+id/unlocked_transfer_text"
-                                    android:textColor="@color/green_500_green_400"
-                                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant" /> />
-                            </RelativeLayout>
-
-                            <TextView
-                                android:id="@+id/unlocked_transfer_title"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_column="0"
-                                android:text="@string/label_transfer_quota_achievements"
-                                android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Medium"/>
-                        </LinearLayout>
-
+                            android:layout_alignBaseline="@+id/unlocked_storage_text"
+                            android:layout_marginLeft="2dp"
+                            android:layout_toRightOf="@+id/unlocked_storage_text"
+                            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant"
+                            android:textColor="@color/dark_blue_500_200" />
                     </RelativeLayout>
 
-                </TableRow>
-            </TableLayout>
+                    <TextView
+                        android:id="@+id/unlocked_storage_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_column="0"
+                        android:text="@string/unlocked_storage_title"
+                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Medium" />
+                </LinearLayout>
+            </RelativeLayout>
         </RelativeLayout>
 
         <RelativeLayout
@@ -154,8 +91,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="?android:attr/colorBackground"
-            android:layout_marginTop="6dp">
+            android:layout_marginTop="6dp"
+            android:background="?android:attr/colorBackground">
 
             <RelativeLayout
                 android:id="@+id/card_view_relative_layout"
@@ -200,65 +137,33 @@
                                 android:layout_marginRight="2dp"
                                 android:maxWidth="200dp" />
 
-                            <LinearLayout
+                            <RelativeLayout
                                 android:id="@+id/figures_referral_bonuses_layout"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_below="@+id/title_referral_bonuses"
                                 android:orientation="horizontal">
 
-                                <RelativeLayout
+                                <TextView
+                                    android:id="@+id/figure_unlocked_storage_text_referral"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginRight="24dp">
+                                    android:layout_column="0"
+                                    android:layout_gravity="left"
+                                    android:text="1 GB"
+                                    android:textColor="@color/dark_blue_500_200"
+                                    android:textSize="14dp" />
 
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_storage_text_referral"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="1 GB"
-                                        android:textColor="@color/dark_blue_500_200"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_storage_title_referral"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_storage_text_referral"
-                                        android:text="@string/unlocked_storage_title"
-                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
-
-                                </RelativeLayout>
-
-                                <RelativeLayout
+                                <TextView
+                                    android:id="@+id/unlocked_storage_title_referral"
                                     android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content">
+                                    android:layout_height="wrap_content"
+                                    android:layout_column="0"
+                                    android:layout_below="@id/figure_unlocked_storage_text_referral"
+                                    android:text="@string/unlocked_storage_title"
+                                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_transfer_text_referral"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="0 GB"
-                                        android:textColor="@color/green_500_green_400"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_transfer_title_referral"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_transfer_text_referral"
-                                        android:text="@string/label_transfer_quota_achievements"
-                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
-
-                                </RelativeLayout>
-                            </LinearLayout>
-
+                            </RelativeLayout>
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -302,7 +207,6 @@
                             android:layout_height="wrap_content"
                             android:src="@drawable/google_wallet_ic" />
 
-
                         <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -319,69 +223,33 @@
                                 android:textColor="?android:attr/textColorPrimary"
                                 android:textSize="16dp" />
 
-                            <LinearLayout
+                            <RelativeLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_below="@+id/title_base_quota"
-                                android:orientation="horizontal">
+                                android:layout_below="@+id/title_base_quota">
 
-                                <RelativeLayout
+                                <TextView
+                                    android:id="@+id/figure_unlocked_storage_text_base_quota"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginRight="24dp">
+                                    android:layout_column="0"
+                                    android:layout_gravity="left"
+                                    android:text="1 GB"
+                                    android:textColor="@color/dark_blue_500_200"
+                                    android:textSize="14dp" />
 
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_storage_text_base_quota"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="1 GB"
-                                        android:textColor="@color/dark_blue_500_200"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_storage_title_base_quota"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_storage_text_base_quota"
-                                        android:text="@string/unlocked_storage_title"
-                                        android:textAllCaps="false"
-                                        android:textColor="?android:attr/textColorSecondary"
-                                        android:textSize="11dp" />
-
-                                </RelativeLayout>
-
-                                <RelativeLayout
+                                <TextView
+                                    android:id="@+id/unlocked_storage_title_base_quota"
                                     android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content">
+                                    android:layout_height="wrap_content"
+                                    android:layout_column="0"
+                                    android:layout_below="@id/figure_unlocked_storage_text_base_quota"
+                                    android:text="@string/unlocked_storage_title"
+                                    android:textAllCaps="false"
+                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:textSize="11dp" />
 
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_transfer_text_base_quota"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="0 GB"
-                                        android:textColor="@color/green_500_green_400"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_transfer_title_base_quota"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_transfer_text_base_quota"
-                                        android:text="@string/label_transfer_quota_achievements"
-                                        android:textColor="?android:attr/textColorSecondary"
-                                        android:textSize="11dp" />
-
-                                </RelativeLayout>
-
-
-                            </LinearLayout>
-
+                            </RelativeLayout>
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -396,10 +264,7 @@
                                 android:layout_marginRight="13dp"
                                 android:src="@drawable/ic_chevron_right_grey" />
                         </RelativeLayout>
-
                     </LinearLayout>
-
-
                 </RelativeLayout>
 
                 <LinearLayout
@@ -448,90 +313,53 @@
                                 style="@style/figures_text_style"
                                 android:layout_below="@+id/title_install_app" />
 
-                            <LinearLayout
+                            <RelativeLayout
                                 android:id="@+id/figures_install_app_layout"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_below="@+id/title_install_app"
-                                android:orientation="horizontal">
-
-                                <RelativeLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="24dp">
-
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_storage_text_install_app"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="1 GB"
-                                        android:textColor="@color/dark_blue_500_200"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_storage_title_install_app"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_storage_text_install_app"
-                                        android:text="@string/unlocked_storage_title"
-                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
-
-                                </RelativeLayout>
-
-                                <RelativeLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content">
-
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_transfer_text_install_app"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="0 GB"
-                                        android:textColor="@color/green_500_green_400"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_transfer_title_install_app"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_transfer_text_install_app"
-                                        android:text="@string/label_transfer_quota_achievements"
-                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
-
-                                </RelativeLayout>
-                            </LinearLayout>
-
-                            <RelativeLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content">
+                                android:layout_below="@+id/title_install_app">
 
                                 <TextView
-                                    android:id="@+id/days_left_text_install_app"
+                                    android:id="@+id/figure_unlocked_storage_text_install_app"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_column="0"
-                                    android:layout_alignParentRight="true"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginRight="12dp"
-                                    android:ellipsize="end"
-                                    android:gravity="right"
-                                    android:singleLine="true"
-                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:layout_gravity="left"
+                                    android:text="1 GB"
+                                    android:textColor="@color/dark_blue_500_200"
                                     android:textSize="14dp" />
-                            </RelativeLayout>
 
+                                <TextView
+                                    android:id="@+id/unlocked_storage_title_install_app"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_column="0"
+                                    android:layout_below="@id/figure_unlocked_storage_text_install_app"
+                                    android:text="@string/unlocked_storage_title"
+                                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
+
+                            </RelativeLayout>
                         </RelativeLayout>
 
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
 
+                            <TextView
+                                android:id="@+id/days_left_text_install_app"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_column="0"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginRight="12dp"
+                                android:ellipsize="end"
+                                android:gravity="right"
+                                android:singleLine="true"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:textSize="14dp" />
+                        </RelativeLayout>
                     </LinearLayout>
-
-
                 </RelativeLayout>
 
                 <LinearLayout
@@ -579,65 +407,34 @@
                                 style="@style/figures_text_style"
                                 android:layout_below="@+id/title_add_phone" />
 
-                            <LinearLayout
+                            <RelativeLayout
                                 android:id="@+id/figures_add_phone_layout"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_below="@+id/title_add_phone"
-                                android:orientation="horizontal">
+                                android:layout_below="@+id/title_add_phone">
 
-                                <RelativeLayout
+                                <TextView
+                                    android:id="@+id/figure_unlocked_storage_text_add_phone"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginRight="24dp">
+                                    android:layout_column="0"
+                                    android:layout_gravity="left"
+                                    android:text="1 GB"
+                                    android:textColor="@color/dark_blue_500_200"
+                                    android:textSize="14dp" />
 
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_storage_text_add_phone"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="1 GB"
-                                        android:textColor="@color/dark_blue_500_200"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_storage_title_add_phone"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_storage_text_add_phone"
-                                        android:text="@string/unlocked_storage_title"
-                                        android:textAllCaps="false"
-                                        android:textColor="?android:attr/textColorSecondary"
-                                        android:textSize="11dp" />
-                                </RelativeLayout>
-
-                                <RelativeLayout
+                                <TextView
+                                    android:id="@+id/unlocked_storage_title_add_phone"
                                     android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content">
+                                    android:layout_height="wrap_content"
+                                    android:layout_column="0"
+                                    android:layout_below="@id/figure_unlocked_storage_text_add_phone"
+                                    android:text="@string/unlocked_storage_title"
+                                    android:textAllCaps="false"
+                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:textSize="11dp" />
 
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_transfer_text_add_phone"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="0 GB"
-                                        android:textColor="@color/green_500_green_400"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_transfer_title_add_phone"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_transfer_text_add_phone"
-                                        android:text="@string/transfer_quota"
-                                        android:textColor="?android:attr/textColorSecondary"
-                                        android:textSize="11dp" />
-                                </RelativeLayout>
-                            </LinearLayout>
+                            </RelativeLayout>
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -670,6 +467,7 @@
                     android:id="@+id/registration_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="visible"
                     android:layout_below="@+id/separator_add_phone">
 
                     <LinearLayout
@@ -698,91 +496,53 @@
                                 style="@style/achievements_subtitle"
                                 android:text="@string/title_regitration" />
 
-                            <LinearLayout
+                            <RelativeLayout
                                 android:id="@+id/figures_registration_layout"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_below="@+id/title_registration"
-                                android:orientation="horizontal">
-
-                                <RelativeLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="24dp">
-
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_storage_text_registration"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="1 GB"
-                                        android:textColor="@color/dark_blue_500_200"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_storage_title_registration"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_storage_text_registration"
-                                        android:text="@string/unlocked_storage_title"
-                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
-
-                                </RelativeLayout>
-
-                                <RelativeLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content">
-
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_transfer_text_registration"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="0 GB"
-                                        android:textColor="@color/green_500_green_400"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_transfer_title_registration"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_transfer_text_registration"
-                                        android:text="@string/label_transfer_quota_achievements"
-                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
-
-                                </RelativeLayout>
-
-                            </LinearLayout>
-
-                            <RelativeLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content">
+                                android:layout_below="@+id/title_registration">
 
                                 <TextView
-                                    android:id="@+id/days_left_text_registration"
+                                    android:id="@+id/figure_unlocked_storage_text_registration"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_column="0"
-                                    android:layout_alignParentRight="true"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginRight="12dp"
-                                    android:ellipsize="end"
-                                    android:gravity="right"
-                                    android:singleLine="true"
-                                    android:textColor="@color/grey_alpha_054"
+                                    android:layout_gravity="left"
+                                    android:text="1 GB"
+                                    android:textColor="@color/dark_blue_500_200"
                                     android:textSize="14dp" />
-                            </RelativeLayout>
 
+                                <TextView
+                                    android:id="@+id/unlocked_storage_title_registration"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_column="0"
+                                    android:layout_below="@id/figure_unlocked_storage_text_registration"
+                                    android:text="@string/unlocked_storage_title"
+                                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
+
+                            </RelativeLayout>
                         </RelativeLayout>
 
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
 
+                            <TextView
+                                android:id="@+id/days_left_text_registration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_column="0"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginRight="12dp"
+                                android:ellipsize="end"
+                                android:gravity="right"
+                                android:singleLine="true"
+                                android:textColor="@color/grey_alpha_054"
+                                android:textSize="14dp" />
+                        </RelativeLayout>
                     </LinearLayout>
-
-
                 </RelativeLayout>
 
                 <LinearLayout
@@ -830,94 +590,54 @@
                                 style="@style/figures_text_style"
                                 android:layout_below="@+id/title_install_desktop" />
 
-                            <LinearLayout
+                            <RelativeLayout
                                 android:id="@+id/figures_install_desktop_layout"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_below="@+id/title_install_desktop"
-                                android:orientation="horizontal">
-
-                                <RelativeLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginRight="24dp">
-
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_storage_text_install_desktop"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="1 GB"
-                                        android:textColor="@color/dark_blue_500_200"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_storage_title_install_desktop"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_storage_text_install_desktop"
-                                        android:text="@string/unlocked_storage_title"
-                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
-
-                                </RelativeLayout>
-
-                                <RelativeLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content">
-
-                                    <TextView
-                                        android:id="@+id/figure_unlocked_transfer_text_install_desktop"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_gravity="left"
-                                        android:text="0 GB"
-                                        android:textColor="@color/green_500_green_400"
-                                        android:textSize="14dp" />
-
-                                    <TextView
-                                        android:id="@+id/unlocked_transfer_title_install_desktop"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_column="0"
-                                        android:layout_below="@id/figure_unlocked_transfer_text_install_desktop"
-                                        android:text="@string/label_transfer_quota_achievements"
-                                        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
-
-                                </RelativeLayout>
-
-                            </LinearLayout>
-
-                            <RelativeLayout
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content">
+                                android:layout_below="@+id/title_install_desktop">
 
                                 <TextView
-                                    android:id="@+id/days_left_text_install_desktop"
+                                    android:id="@+id/figure_unlocked_storage_text_install_desktop"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_column="0"
-                                    android:layout_alignParentRight="true"
-                                    android:layout_marginTop="5dp"
-                                    android:layout_marginRight="12dp"
-                                    android:ellipsize="end"
-                                    android:gravity="right"
-                                    android:singleLine="true"
-                                    android:textColor="?android:attr/textColorSecondary"
+                                    android:layout_gravity="left"
+                                    android:text="1 GB"
+                                    android:textColor="@color/dark_blue_500_200"
                                     android:textSize="14dp" />
-                            </RelativeLayout>
 
+                                <TextView
+                                    android:id="@+id/unlocked_storage_title_install_desktop"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_column="0"
+                                    android:layout_below="@id/figure_unlocked_storage_text_install_desktop"
+                                    android:text="@string/unlocked_storage_title"
+                                    android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
+                            </RelativeLayout>
                         </RelativeLayout>
 
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/days_left_text_install_desktop"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_column="0"
+                                android:layout_alignParentRight="true"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginRight="12dp"
+                                android:ellipsize="end"
+                                android:gravity="right"
+                                android:singleLine="true"
+                                android:textColor="?android:attr/textColorSecondary"
+                                android:textSize="14dp" />
+                        </RelativeLayout>
                     </LinearLayout>
-
-
                 </RelativeLayout>
-
             </RelativeLayout>
         </RelativeLayout>
-
     </LinearLayout>
 </ScrollView>

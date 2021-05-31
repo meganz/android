@@ -63,6 +63,7 @@
 
             <TextView
                 android:id="@+id/how_works_title"
+                android:visibility="gone"
                 style="@style/how_it_works" />
 
             <TextView

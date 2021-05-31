@@ -33,6 +33,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 	ImageView icon;
 	ImageView checkIcon;
 	TextView title;
+	TextView sectionTitle;
 	TextView firstParagraph;
 	TextView secondParagraph;
 
@@ -51,6 +52,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 		icon = v.findViewById(R.id.icon_info_achievements);
 		checkIcon = v.findViewById(R.id.icon_achievement_completed);
 		title = v.findViewById(R.id.title_info_achievements);
+		sectionTitle = v.findViewById(R.id.how_works_title);
 		firstParagraph = v.findViewById(R.id.info_achievements_how_works_first_p);
 		secondParagraph = v.findViewById(R.id.info_achievements_how_works_second_p);
 
@@ -150,8 +152,9 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 			if(awardId==-1){
 				logWarning("No award for this achievement");
 				checkIcon.setVisibility(View.GONE);
-				title.setText(getString(R.string.figures_achievements_text, getSizeString(installAppStorageValue), getSizeString(installAppTransferValue)));
+				title.setText(getString(R.string.figures_achievements_text, getSizeString(installAppStorageValue)));
 				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+				sectionTitle.setVisibility(View.VISIBLE);
 				firstParagraph.setText(getString(R.string.paragraph_info_achievement_install_mobile_app, getSizeString(installAppStorageValue), getSizeString(installAppTransferValue)));
 				secondParagraph.setVisibility(View.GONE);
 			}
@@ -173,7 +176,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 
 				long storageAppInstall = details.getRewardStorageByAwardId(awardId);
 				long transferAppInstall = details.getRewardTransferByAwardId(awardId);
-				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_install_mobile_app, getSizeString(storageAppInstall), getSizeString(transferAppInstall)));
+				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_install_mobile_app, getSizeString(storageAppInstall)));
 				secondParagraph.setVisibility(View.GONE);
 			}
 		}else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
@@ -184,8 +187,9 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 			if(awardId==-1){
 				logDebug("No award for this achievement");
 				checkIcon.setVisibility(View.GONE);
-				title.setText(getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue), getSizeString(addPhoneTransferValue)));
+				title.setText(getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue)));
 				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+				sectionTitle.setVisibility(View.VISIBLE);
 				firstParagraph.setText(getString(R.string.paragraph_info_achievement_add_phone, getSizeString(addPhoneStorageValue), getSizeString(addPhoneTransferValue)));
 				secondParagraph.setVisibility(View.GONE);
 			}
@@ -219,8 +223,9 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 			if(awardId==-1) {
 				logWarning("No award for this achievement");
 				checkIcon.setVisibility(View.GONE);
-				title.setText(getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue), getSizeString(installDesktopTransferValue)));
+				title.setText(getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue)));
 				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+				sectionTitle.setVisibility(View.VISIBLE);
 				firstParagraph.setText(getString(R.string.paragraph_info_achievement_install_desktop, getSizeString(installDesktopStorageValue), getSizeString(installDesktopTransferValue)));
 				secondParagraph.setVisibility(View.GONE);
 			}
@@ -242,7 +247,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 
 				long storageDesktopInstall = details.getRewardStorageByAwardId(awardId);
 				long transferDesktopInstall = details.getRewardTransferByAwardId(awardId);
-				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_install_desktop, getSizeString(storageDesktopInstall), getSizeString(transferDesktopInstall)));
+				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_install_desktop, getSizeString(storageDesktopInstall)));
 				secondParagraph.setVisibility(View.GONE);
 
 			}
