@@ -44,7 +44,7 @@ class MeetingVideoListener(
         byteBuffer: ByteArray
     ) {
 
-        if (width == 0 || height == 0 || byteBuffer == null) {
+        if (width == 0 || height == 0) {
             return
         }
 
