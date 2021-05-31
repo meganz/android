@@ -95,6 +95,21 @@ public class CallUtil {
     }
 
     /**
+     * Method for starting the Meeting Activity when the meeting is in progress call.
+     *
+     * @param context     Context
+     * @param chatId      chat ID
+     */
+    public static void openMeetingToStart(Context context, long chatId) {
+        logDebug("Open join a meeting screen");
+        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        Intent meetingIntent = new Intent(context, MeetingActivity.class);
+        meetingIntent.setAction(MEETING_ACTION_START);
+        meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
+        context.startActivity(meetingIntent);
+    }
+
+    /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
      *
      * @param context Context
