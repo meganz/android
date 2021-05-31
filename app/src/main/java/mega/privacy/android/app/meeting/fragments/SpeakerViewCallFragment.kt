@@ -143,6 +143,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     private fun initLiveEventBus() {
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(Constants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
             .observeSticky(this, remoteAudioLevelObserver as Observer<Any>)
 
@@ -711,17 +712,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 logDebug("Update participant privileges")
                 adapter.updateParticipantPrivileges(it)
             }
-        }
-    }
-
-    private fun resetSizeListener(participant: Participant) {
-        if (!participant.isVideoOn)
-            return
-
-        participant.videoListener?.let {
-            logDebug("Reset Size participant listener")
-            it.height = 0
-            it.width = 0
         }
     }
 

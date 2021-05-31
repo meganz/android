@@ -207,7 +207,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private val callStatusObserver = Observer<MegaChatCall> {
-        if(it.status != INVALID_CALL_STATUS) {
+        if (it.status != INVALID_CALL_STATUS) {
             if (inMeetingViewModel.isSameCall(it.callId)) {
                 updateToolbarSubtitle(it)
                 when (it.status) {
@@ -561,18 +561,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             it.layoutParams = menuLayoutParams
         }
 
-        floatingWindowFragment?.let {
-            it.updateOrientation(
-                newConfig.orientation,
-            )
-        }
-        gridViewCallFragment?.let {
-            it.updateLayout(
-                newConfig.orientation,
-                outMetrics.widthPixels,
-                outMetrics.heightPixels
-            )
-        }
+        floatingWindowFragment?.updateOrientation(
+            newConfig.orientation,
+        )
+
+        gridViewCallFragment?.updateLayout(
+            newConfig.orientation,
+            outMetrics.widthPixels,
+            outMetrics.heightPixels
+        )
     }
 
     private fun initLiveEventBus() {
@@ -608,18 +605,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .observeSticky(this, localNetworkQualityObserver)
 
         //Sessions Level
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_STATUS_CHANGE)
             .observeSticky(this, sessionStatusObserver as Observer<Any>)
-
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
             .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
-
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE)
             .observeSticky(this, remoteAVFlagsObserver as Observer<Any>)
-
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_HIRES_CHANGE)
             .observeSticky(this, sessionHiResObserver as Observer<Any>)
-
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_LOWRES_CHANGE)
             .observeSticky(this, sessionLowResObserver as Observer<Any>)
     }
@@ -654,7 +652,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private fun showMeetingInfoFragment(){
+    private fun showMeetingInfoFragment() {
         MeetingInfoBottomSheetDialogFragment.newInstance()
             .run {
                 show(
@@ -943,9 +941,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             return
         }
 
-        bottomFloatingPanelViewHolder.let {
-            it.changeOnHoldIconDrawable(false)
-        }
+        bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(false)
 
         logDebug("No other calls in progress or on hold")
         bannerAnotherCallLayout.isVisible = false
@@ -957,11 +953,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param anotherCall Another call on hold or in progress
      */
     private fun updateOnHoldFabButton(anotherCall: MegaChatCall) {
-        bottomFloatingPanelViewHolder.let {
-            it.changeOnHoldIcon(
-                anotherCall.isOnHold
-            )
-        }
+        bottomFloatingPanelViewHolder.changeOnHoldIcon(
+            anotherCall.isOnHold
+        )
     }
 
     /**
@@ -1067,14 +1061,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         status = TYPE_IN_ONE_TO_ONE
         logDebug("One to One call")
         val call: MegaChatCall? = inMeetingViewModel.getCall()
-        call?.let { call ->
-            val session = inMeetingViewModel.getSessionOneToOneCall(call)
-            session?.let { session ->
+        call?.let { currentCall ->
+            val session = inMeetingViewModel.getSessionOneToOneCall(currentCall)
+            session?.let { userSession ->
                 logDebug("Create fragment")
                 individualCallFragment = IndividualCallFragment.newInstance(
-                    call.chatid,
-                    session.peerid,
-                    session.clientid
+                    currentCall.chatid,
+                    userSession.peerid,
+                    userSession.clientid
                 )
 
                 individualCallFragment?.let { it ->
@@ -1086,7 +1080,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
 
-            initLocal(call.chatid)
+            initLocal(currentCall.chatid)
         }
     }
 
@@ -1291,7 +1285,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
             MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
-                if(inMeetingViewModel.isRequestSent() && !MegaApplication.isCreatingMeeting(inMeetingViewModel.getChatId())) {
+                if (inMeetingViewModel.isRequestSent() && !MegaApplication.isCreatingMeeting(
+                        inMeetingViewModel.getChatId()
+                    )
+                ) {
                     CallUtil.activateChrono(false, meetingChrono, null)
                     toolbarSubtitle?.let {
                         it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
@@ -1388,7 +1385,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun showRequestPermissionSnackBar() {
         val warningText =
             StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
-        showSnackbar(Constants.PERMISSIONS_TYPE, warningText, MEGACHAT_INVALID_HANDLE)
+        showSnackbar(PERMISSIONS_TYPE, warningText, MEGACHAT_INVALID_HANDLE)
     }
 
     /**
@@ -1514,12 +1511,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Check if a call is outgoing, on hold button must be disabled
      */
     private fun enableOnHoldFab(callIsOnHold: Boolean) {
-        bottomFloatingPanelViewHolder.let {
-            it.enableHoldIcon(
-                !inMeetingViewModel.isRequestSent(),
-                callIsOnHold
-            )
-        }
+        bottomFloatingPanelViewHolder.enableHoldIcon(
+            !inMeetingViewModel.isRequestSent(),
+            callIsOnHold
+        )
     }
 
     /**
@@ -1673,9 +1668,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        bottomFloatingPanelViewHolder.let {
-            it.updateRemoteAudioVideo(session)
-        }
+        bottomFloatingPanelViewHolder.updateRemoteAudioVideo(session)
     }
 
     /**
@@ -1812,7 +1805,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    val showAssignModeratorFragment = fun() {
+    private val showAssignModeratorFragment = fun() {
         val callback = fun() {
             leaveMeeting()
         }
@@ -1904,13 +1897,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         val inviteParticipantIntent =
             Intent(meetingActivity, AddContactActivityLollipop::class.java).apply {
-                putExtra("contactType", Constants.CONTACT_TYPE_MEGA)
+                putExtra("contactType", CONTACT_TYPE_MEGA)
                 putExtra("chat", true)
                 putExtra("chatId", 123L)
                 putExtra("aBtitle", getString(R.string.invite_participants))
             }
         meetingActivity.startActivityForResult(
-            inviteParticipantIntent, Constants.REQUEST_ADD_PARTICIPANTS
+            inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
         )
     }
 
@@ -2034,7 +2027,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         finishActivity()
     }
 
-    fun updatePanelParticipantList(list: MutableList<Participant> = mutableListOf()) {
+    private fun updatePanelParticipantList(list: MutableList<Participant> = mutableListOf()) {
         bottomFloatingPanelViewHolder
             .setParticipants(
                 list,

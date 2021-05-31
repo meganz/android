@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
-import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -90,21 +89,19 @@ class GridViewPagerAdapter(
     }
 
     fun setNewData(newData: List<List<Participant>>) {
-        if (data != null && data.isNotEmpty()) {
+        if (data.isNotEmpty()) {
             data = newData
         } else {
             data = newData
             notifyDataSetChanged()
         }
 
-        if (data != null && data.isNotEmpty() && adapterList.isNotEmpty()) {
+        if (data.isNotEmpty() && adapterList.isNotEmpty()) {
             for (i in 0 until adapterList.size) {
                 if (data.size > i) {
                     val participantsForPage = data[i]
-                    if (participantsForPage != null && participantsForPage.isNotEmpty()) {
-                        adapterList[i]?.let {
-                            it.submitList(participantsForPage)
-                        }
+                    if (participantsForPage.isNotEmpty()) {
+                        adapterList[i]?.submitList(participantsForPage)
                     }
                 }
             }
@@ -198,9 +195,7 @@ class GridViewPagerAdapter(
         if (removePage) {
             logDebug("This page should be deleted $pageWithChange")
             if (adapterList.isNotEmpty() && adapterList.size > lastPageNum) {
-                adapterList[lastPageNum]?.let {
-                    it.submitList(null)
-                }
+                adapterList[lastPageNum]?.submitList(null)
 
                 notifyItemRemoved(lastPageNum)
             }
@@ -232,7 +227,7 @@ class GridViewPagerAdapter(
                 logDebug("Update the page with the participant removed")
                 updatePageWithChange(numPage, position)
             } else {
-                if (data != null && data.isNotEmpty() && data.size > i) {
+                if (data.isNotEmpty() && data.size > i) {
                     val participantsForPage = data[i]
                     if (adapterList.isNotEmpty() && adapterList.size > i) {
                         adapterList[i]?.let {
@@ -318,9 +313,7 @@ class GridViewPagerAdapter(
                     return
 
                 for (i in 0 until adapterList.size) {
-                    adapterList[i]?.let {
-                        it.updateParticipantPrivileges(participant)
-                    }
+                    adapterList[i]?.updateParticipantPrivileges(participant)
                 }
 
             }
@@ -338,9 +331,7 @@ class GridViewPagerAdapter(
                     return
 
                 for (i in 0 until adapterList.size) {
-                    adapterList[i]?.let {
-                        it.updateParticipantName(participant)
-                    }
+                    adapterList[i]?.updateParticipantName(participant)
                 }
 
             }
@@ -363,9 +354,7 @@ class GridViewPagerAdapter(
                     return
 
                 for (i in 0 until adapterList.size) {
-                    adapterList[i]?.let {
-                        it.updateCallOnHold(participant, isOnHold)
-                    }
+                    adapterList[i]?.updateCallOnHold(participant, isOnHold)
                 }
 
             }
@@ -388,9 +377,7 @@ class GridViewPagerAdapter(
                     return
 
                 for (i in 0 until adapterList.size) {
-                    adapterList[i]?.let {
-                        it.updateSessionOnHold(participant, isOnHold)
-                    }
+                    adapterList[i]?.updateSessionOnHold(participant, isOnHold)
                 }
 
             }
@@ -413,9 +400,7 @@ class GridViewPagerAdapter(
                     return
 
                 for (i in 0 until adapterList.size) {
-                    adapterList[i]?.let {
-                        it.updateParticipantAudioVideo(typeChange, participant)
-                    }
+                    adapterList[i]?.updateParticipantAudioVideo(typeChange, participant)
                 }
 
             }
@@ -436,9 +421,7 @@ class GridViewPagerAdapter(
                     return
 
                 for (i in 0 until adapterList.size) {
-                    adapterList[i]?.let {
-                        it.removeTextureView(participant)
-                    }
+                    adapterList[i]?.removeTextureView(participant)
                 }
 
             }

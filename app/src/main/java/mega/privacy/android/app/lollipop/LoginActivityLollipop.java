@@ -739,6 +739,13 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                     } else {
                         cancelConfirmationAccount();
                     }
+                } // In case getParamType == 3 (creating ephemeral account ++) we don't need to trigger a fetch nodes (sdk performs internal)
+
+                if (request.getParamType() == 4) {
+                    if (e.getErrorCode() == MegaError.API_OK && megaApi != null) {
+                        //Resuming ephemeral account ++, we need to trigger a fetch nodes
+                        megaApi.fetchNodes();
+                    }
                 }
             } catch (Exception exc) {
                 logError("Exception", exc);

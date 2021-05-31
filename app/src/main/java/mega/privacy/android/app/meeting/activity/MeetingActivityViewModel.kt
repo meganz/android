@@ -3,7 +3,6 @@ package mega.privacy.android.app.meeting.activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -12,7 +11,6 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
@@ -156,6 +154,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .observeForever(meetingCreatedObserver)
 
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_LINK_RECOVERED)
             .observeForever(linkRecoveredObserver as Observer<Any>)
 
@@ -505,8 +504,8 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .removeObserver(meetingCreatedObserver)
 
-        LiveEventBus.get(EVENT_LINK_RECOVERED)
-            .removeObserver(linkRecoveredObserver as Observer<Any>)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_LINK_RECOVERED).removeObserver(linkRecoveredObserver as Observer<Any>)
     }
 
     fun inviteToChat(context: Context, requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -515,7 +514,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             LogUtil.logWarning("Intent is null")
             return
         }
-        if (requestCode == Constants.REQUEST_ADD_PARTICIPANTS && resultCode == BaseActivity.RESULT_OK) {
+        if (requestCode == REQUEST_ADD_PARTICIPANTS && resultCode == BaseActivity.RESULT_OK) {
             logDebug("Participants successfully added")
             val contactsData: List<String>? =
                 intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)

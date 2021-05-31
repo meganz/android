@@ -144,10 +144,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         LiveEventBus.get(Constants.EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
             .observeSticky(this, callOnHoldObserver)
-
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(Constants.EVENT_REMOTE_AVFLAGS_CHANGE)
             .observeSticky(this, remoteAVFlagsObserver as Observer<Any>)
-
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(Constants.EVENT_SESSION_ON_HOLD_CHANGE)
             .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
     }
@@ -313,11 +313,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         if (inMeetingViewModel.isMe(this.peerId)) {
             logDebug("Remove local video listener")
-            sharedModel.removeLocalVideo(chatId!!, videoListener!!)
+            sharedModel.removeLocalVideo(chatId, videoListener!!)
         } else {
             inMeetingViewModel.getSession(clientId)?.let {
                 logDebug("Remove remove video listener")
-                inMeetingViewModel.removeHiResOneToOneCall(videoListener!!, it, chatId!!)
+                inMeetingViewModel.removeHiResOneToOneCall(videoListener!!, it, chatId)
             }
         }
 
@@ -435,7 +435,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 )
 
                 inMeetingViewModel.getSession(clientId)?.let {
-                    inMeetingViewModel.addHiResOneToOneCall(videoListener!!, it, chatId)
+                    inMeetingViewModel.addHiResOneToOneCall(videoListener!!, it, this.chatId)
                 }
             }
         }
