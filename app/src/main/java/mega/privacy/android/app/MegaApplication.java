@@ -778,13 +778,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		//Logout check resumed pending transfers
 		TransfersManagement.checkResumedPendingTransfers();
 
-		boolean staging = true;
-//		if (dbH != null) {
-//			MegaAttributes attrs = dbH.getAttributes();
-//			if (attrs != null && attrs.getStaging() != null) {
-//				staging = Boolean.parseBoolean(attrs.getStaging());
-//			}
-//		}
+		boolean staging = false;
+		if (dbH != null) {
+			MegaAttributes attrs = dbH.getAttributes();
+			if (attrs != null && attrs.getStaging() != null) {
+				staging = Boolean.parseBoolean(attrs.getStaging());
+			}
+		}
 
 		if (staging) {
 			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
@@ -998,7 +998,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			megaChatApi.addChatListener(globalChatListener);
 			//megaChatApi.addChatCallListener(callListener);
 			megaChatApi.addChatCallListener(meetingListener);
-			megaChatApi.setPublicKeyPinning(false);
 			registeredChatListeners = true;
 		}
 	}
