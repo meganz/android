@@ -1809,7 +1809,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     val showAssignModeratorFragment = fun() {
-        AssignModeratorBottomFragment.newInstance().let {
+        val callback = fun() {
+            leaveMeeting()
+        }
+        AssignModeratorBottomFragment.newInstance(callback).let {
             it.show(childFragmentManager, it.tag)
         }
     }

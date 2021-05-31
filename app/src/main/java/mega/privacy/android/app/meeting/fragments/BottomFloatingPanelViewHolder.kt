@@ -73,13 +73,27 @@ class BottomFloatingPanelViewHolder(
         listenButtons()
         setupRecyclerView()
         updateShareAndInviteButton()
-
         updatePanel()
+        initTipsAndRatio()
+    }
 
+    /**
+     * Init the tips window & Calculate the ratio for bottom sheet behavior
+     */
+    private fun initTipsAndRatio() {
         floatingPanelView.backgroundMask.post {
             if (inMeetingViewModel.shouldShowTips()) {
                 initPopWindow(floatingPanelView.backgroundMask)
             }
+
+            val peekHeight =
+                context.resources.getDimensionPixelSize(R.dimen.meeting_bottom_floating_panel_peek_height)
+
+            var ratio = peekHeight.toFloat() / binding.root.measuredHeight
+            if ((ratio <= 0) || (ratio >= 1)) {
+                ratio = 0.001f
+            }
+            bottomSheetBehavior.halfExpandedRatio = ratio
         }
     }
 
@@ -215,9 +229,7 @@ class BottomFloatingPanelViewHolder(
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 Log.d("bottomSheetBehavior", "newState:$newState")
                 bottomFloatingPanelExpanded = newState == BottomSheetBehavior.STATE_EXPANDED
-                if (newState == BottomSheetBehavior.STATE_DRAGGING && !isGroup
-                    || newState == BottomSheetBehavior.STATE_HALF_EXPANDED
-                ) {
+                if (newState == BottomSheetBehavior.STATE_DRAGGING && !isGroup) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
 
@@ -241,19 +253,6 @@ class BottomFloatingPanelViewHolder(
         })
 
         initUpdaters()
-
-        // Set the half expanded ratio, to set the height for the `STATE_HALF_EXPANDED`
-        // if ratio is not between 0 and 1, will set to 0.001f
-        post {
-            val peekHeight =
-                context.resources.getDimensionPixelSize(R.dimen.meeting_bottom_floating_panel_peek_height)
-
-            var ratio = peekHeight.toFloat() / binding.root.measuredHeight
-            if ((ratio <= 0) || (ratio >= 1)) {
-                ratio = 0.001f
-            }
-            bottomSheetBehavior.halfExpandedRatio = ratio
-        }
     }
 
 

@@ -13,14 +13,15 @@ import mega.privacy.android.app.databinding.ActivityAssignModeratorBinding
 import mega.privacy.android.app.meeting.adapter.AssignParticipantsAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
-import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 
 /**
  * AssignModerator page allow moderator assign other users moderator when they are leaving the meeting
  *
  */
-class AssignModeratorBottomFragment : BaseBottomSheetDialogFragment() {
+class AssignModeratorBottomFragment(
+    private val leaveMeeting: () -> Unit
+) : BaseBottomSheetDialogFragment() {
     private lateinit var binding: ActivityAssignModeratorBinding
 
     private var selectedParticipants: MutableList<Participant> = mutableListOf()
@@ -168,6 +169,7 @@ class AssignModeratorBottomFragment : BaseBottomSheetDialogFragment() {
             inMeetingViewModel.updateChatPermissions(it.peerId)
         }
 
+        leaveMeeting.invoke()
         dismiss()
     }
 
@@ -176,7 +178,7 @@ class AssignModeratorBottomFragment : BaseBottomSheetDialogFragment() {
     }
 
     companion object {
-        fun newInstance() = AssignModeratorBottomFragment()
+        fun newInstance(leaveMeeting: () -> Unit) = AssignModeratorBottomFragment(leaveMeeting)
     }
 
 }

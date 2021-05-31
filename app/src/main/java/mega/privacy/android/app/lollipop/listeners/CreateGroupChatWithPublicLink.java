@@ -71,10 +71,8 @@ public class CreateGroupChatWithPublicLink implements MegaChatRequestListenerInt
             }
         }
         else if (request.getType() == MegaChatRequest.TYPE_CHAT_LINK_HANDLE) {
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                Pair<Long, String> chatAndLink = Pair.create(request.getChatHandle(), request.getText());
-                LiveEventBus.get(EVENT_LINK_RECOVERED, Pair.class).post(chatAndLink);
-            }
+            Pair<Long, String> chatAndLink = Pair.create(request.getChatHandle(), request.getText());
+            LiveEventBus.get(EVENT_LINK_RECOVERED, Pair.class).post(chatAndLink);
 
             if (request.getFlag() == false) {
               if (request.getNumRetry() == 1) {

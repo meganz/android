@@ -125,7 +125,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     Observer<android.util.Pair<Long, String>> { chatAndLink ->
         _currentChatId.value?.let {
                 if (chatAndLink.first == it) {
-                    _meetingLinkLiveData.value = chatAndLink.second
+                    if (!chatAndLink.second.isNullOrEmpty()) {
+                        _meetingLinkLiveData.value = chatAndLink.second
+                    } else {
+                        _snackBarLiveData.value = getString(R.string.no_chat_link_available)
+                    }
                 }
             }
         }
