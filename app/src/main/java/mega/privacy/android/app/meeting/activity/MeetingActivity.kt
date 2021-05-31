@@ -35,6 +35,7 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_ACTION_RINGING = "ringing_meeting"
         const val MEETING_ACTION_RINGING_VIDEO_ON = "ringing_meeting_video_on"
         const val MEETING_ACTION_RINGING_VIDEO_OFF = "ringing_meeting_video_off"
+        const val MEETING_ACTION_START = "start_meeting"
 
         /** The names of the Extra data being passed to the initial fragment */
         const val MEETING_NAME = "meeting_name"
@@ -158,11 +159,20 @@ class MeetingActivity : PasscodeActivity() {
             )
         }
 
+        if(meetingAction == MEETING_ACTION_START) {
+            bundle.putString("action", MEETING_ACTION_START)
+
+            bundle.putLong(
+                MEETING_CHAT_ID,
+                intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+            )
+        }
+
         navGraph.startDestination = when (meetingAction) {
             MEETING_ACTION_CREATE -> R.id.createMeetingFragment
             MEETING_ACTION_JOIN -> R.id.joinMeetingFragment
             MEETING_ACTION_GUEST -> R.id.joinMeetingAsGuestFragment
-            MEETING_ACTION_IN -> R.id.inMeetingFragment
+            MEETING_ACTION_START, MEETING_ACTION_IN -> R.id.inMeetingFragment
             MEETING_ACTION_RINGING -> R.id.ringingMeetingFragment
             else -> R.id.createMeetingFragment
         }

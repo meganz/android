@@ -1514,17 +1514,25 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                                         CallUtil.openMeetingToJoin(
                                                 ChatActivityLollipop.this, request.getChatHandle(), request.getText(), link);
                                     } else {
-                                        logDebug("It's a meeting, open dialog: Meeting has ended");
-                                        new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-                                            @Override
-                                            public void onViewMeetingChat() {
-                                                openChatPreview(link);
-                                            }
+                                        boolean isAlreadyJoined = e.getErrorCode() == MegaChatError.ERROR_EXIST;
 
-                                            @Override
-                                            public void onLeave() { }
-                                        }).show(getSupportFragmentManager(),
-                                                MeetingHasEndedDialogFragment.TAG);
+                                        // Open a already joined and ended meeting's chatroom.
+                                        if (isAlreadyJoined) {
+                                            openChatPreview(link);
+                                        } else {
+                                            logDebug("It's a meeting, open dialog: Meeting has ended");
+                                            new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+                                                @Override
+                                                public void onViewMeetingChat() {
+                                                    openChatPreview(link);
+                                                }
+
+                                                @Override
+                                                public void onLeave() {
+                                                }
+                                            }).show(getSupportFragmentManager(),
+                                                    MeetingHasEndedDialogFragment.TAG);
+                                        }
                                     }
                                 } else {
                                     logDebug("It's a meeting, open chat preview");

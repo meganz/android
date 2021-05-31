@@ -11625,7 +11625,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
 			if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST){
-				if (joiningToChatLink && isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE) {
+			    long chatId = request.getChatHandle();
+
+				if (joiningToChatLink && isTextEmpty(request.getLink()) && chatId == MEGACHAT_INVALID_HANDLE) {
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), MEGACHAT_INVALID_HANDLE);
 					resetJoiningChatLink();
 					return;
@@ -11636,27 +11638,50 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (request.getParamType() == LINK_IS_FOR_MEETING) {
 					logDebug("It's a meeting");
 
-					if (request.getFlag()) {
-						MegaHandleList list = request.getMegaHandleList();
+                    // Open chat preview finished, request.getFlag() is true.
+                    if (request.getFlag()) {
+                        boolean isAlreadyJoined = e.getErrorCode() == MegaChatError.ERROR_EXIST;
 
-						if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-							logDebug("It's a meeting, open join call");
-							CallUtil.openMeetingToJoin(this, request.getChatHandle(), request.getText(), link);
-						} else {
-							logDebug("It's a meeting, open dialog: Meeting has ended");
-							new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-								@Override
-								public void onViewMeetingChat() {
-									showChatLink(link);
-								}
-								@Override
-								public void onLeave() {
-								}
-							}).show(getSupportFragmentManager(),
-									MeetingHasEndedDialogFragment.TAG);
-						}
-					} else {
-						logDebug("It's a meeting, open chat preview");
+                        MegaHandleList list = request.getMegaHandleList();
+
+                        if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
+                            logDebug("It's a meeting, open join call");
+                            if (isAlreadyJoined) {
+                                // Open the ongoing meeting.
+                                MegaChatCall call = api.getChatCall(chatId);
+
+                                // Haven't joined the call, start it.
+                                if (call == null || call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+                                    CallUtil.openMeetingToStart(this, chatId);
+                                } else {
+                                    returnCall(this, chatId);
+                                }
+                            } else {
+                                logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
+                                CallUtil.openMeetingToJoin(this, chatId, request.getText(), link);
+                            }
+                        } else {
+                            if (isAlreadyJoined) {
+                                // Meeting has ended, open the chat room.
+                                showChatLink(link);
+                            } else {
+                                logDebug("It's a meeting, open dialog: Meeting has ended");
+                                new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+                                    @Override
+                                    public void onViewMeetingChat() {
+                                        showChatLink(link);
+                                    }
+
+                                    @Override
+                                    public void onLeave() {
+                                    }
+                                }).show(getSupportFragmentManager(),
+                                        MeetingHasEndedDialogFragment.TAG);
+                            }
+                        }
+                    } else {
+                        // Check chat link finished, request.getFlag() is false.
+						logDebug("Check chat link finished and it's a meeting, open chat preview.");
 						api.openChatPreview(link, this);
 					}
 				} else {
