@@ -432,18 +432,16 @@
     <!-- QR code page background color -->
     <color name="white_grey_700">@color/white</color>
 
-
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/white_alpha_090</color>
-
     <!--  Background of panel when expand-->
-    <color name="grey_alpha_070_dark_grey_alpha_066">@color/grey_alpha_070</color>
+    <color name="grey_070_dark_grey_066">@color/grey_alpha_070</color>
     <!--  Background of share link and invite button-->
-    <color name="grey_020_grey_alpha_040">@color/grey_020</color>
+    <color name="grey_020_grey_040">@color/grey_020</color>
     <!--  title color of share link and invite button-->
     <color name="grey_600_white">@color/grey_600</color>
     <!--  background of bottom menu button when expand-->
-    <color name="grey_alpha_060_white_alpha_054">@color/grey_600</color>
+    <color name="grey_060_white_054">@color/grey_600</color>
     <!--  background of bottom menu button when collapse-->
-    <color name="grey_alpha_032_white_alpha_054">@color/grey_alpha_032</color>
+    <color name="grey_032_white_054">@color/grey_alpha_032</color>
 </resources>

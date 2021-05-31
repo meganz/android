@@ -40,6 +40,9 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
+import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.EDIT_MODE
+import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
+import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -1505,7 +1508,19 @@ object MegaNodeUtil {
      */
     @JvmStatic
     fun manageTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
-        manageTextFileIntent(context, node, adapterType, null)
+        manageTextFileIntent(context, node, adapterType, null, VIEW_MODE)
+    }
+
+    /**
+     * Launches an Intent to open TextFileEditorActivity on edit mode.
+     *
+     * @param context     Current context.
+     * @param node        Node to preview on Text Editor.
+     * @param adapterType Current adapter view.
+     */
+    @JvmStatic
+    fun manageEditTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
+        manageTextFileIntent(context, node, adapterType, null, EDIT_MODE)
     }
 
     /**
@@ -1523,16 +1538,37 @@ object MegaNodeUtil {
         adapterType: Int,
         urlFileLink: String?
     ) {
+        manageTextFileIntent(context, node, adapterType, urlFileLink, VIEW_MODE)
+    }
+
+    /**
+     * Launches an Intent to open TextFileEditorActivity.
+     *
+     * @param context     Current context.
+     * @param node        Node to preview on Text Editor.
+     * @param adapterType Current adapter view.
+     * @param urlFileLink Link of the file if the adapter is FILE_LINK_ADAPTER.
+     * @param mode        Text file editor mode.
+     */
+    @JvmStatic
+    fun manageTextFileIntent(
+        context: Context,
+        node: MegaNode,
+        adapterType: Int,
+        urlFileLink: String?,
+        mode: String
+    ) {
         val textFileIntent = Intent(context, TextFileEditorActivity::class.java)
 
         if (adapterType == FILE_LINK_ADAPTER) {
             textFileIntent.putExtra(EXTRA_SERIALIZE_STRING, node.serialize())
-            textFileIntent.putExtra(URL_FILE_LINK, urlFileLink)
+                .putExtra(URL_FILE_LINK, urlFileLink)
         } else {
             textFileIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
         }
 
         textFileIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
+            .putExtra(MODE, mode)
         context.startActivity(textFileIntent)
     }
 }

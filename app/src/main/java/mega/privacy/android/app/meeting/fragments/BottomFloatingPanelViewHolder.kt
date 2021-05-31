@@ -24,7 +24,6 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
-import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatRoom
@@ -369,7 +368,7 @@ class BottomFloatingPanelViewHolder(
                     val background = argbEvaluator.evaluate(
                         value,
                         ContextCompat.getColor(
-                            context, R.color.grey_alpha_070_dark_grey_alpha_066
+                            context, R.color.grey_070_dark_grey_066
                         ), ContextCompat.getColor(
                             context, R.color.white_dark_grey
                         )
@@ -436,8 +435,8 @@ class BottomFloatingPanelViewHolder(
                         val argbEvaluator = ArgbEvaluator()
                         val background = argbEvaluator.evaluate(
                             value,
-                            ContextCompat.getColor(context, R.color.grey_alpha_032_white_alpha_054),
-                            ContextCompat.getColor(context, R.color.grey_alpha_060_white_alpha_054)
+                            ContextCompat.getColor(context, R.color.grey_032_white_054),
+                            ContextCompat.getColor(context, R.color.grey_060_white_054)
                         ) as Int
 
                         view.backgroundTintList = ColorStateList.valueOf(background)

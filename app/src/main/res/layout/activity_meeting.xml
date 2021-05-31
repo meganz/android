@@ -62,7 +62,7 @@
         android:id="@+id/banner_another_call"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/secondaryColor"
+        android:background="?attr/colorSecondary"
         android:elevation="1dp"
         android:gravity="center"
         android:minHeight="36dp"

@@ -1,23 +1,51 @@
 <?xml version="1.0"?>
 <resources>
-    <string name="scan_title_crop" context="Screen title for cropping current scan (Document scanner)">Cortar</string>
-    <string name="scan_title_save_scan" context="Screen title for saving current scan (Document scanner)">Guardar escaneo</string>
-    <string name="scan_action_add" context="button">Añadir</string>
-    <string name="scan_action_save" context="Action of a button to save something">Guardar</string>
-    <string name="scan_action_retake" context="Action text to retake current scan picture (Document scanner)">Escanear de nuevo</string>
-    <string name="scan_file_name" context="Document scanner file name">Nombre del archivo</string>
-    <string name="scan_file_type" context="Input field description in the document save screen (Document scanner)">Tipo de archivo</string>
-    <string name="scan_quality" context="Input field description in the document save screen (Document scanner)">Calidad</string>
-    <string name="scan_destination" context="Input field description in the document save screen (Document scanner)">Destino</string>
-    <string name="scan_quality_high" context="Document scanner high quality option">Alta</string>
-    <string name="scan_quality_medium" context="Document scanner medium quality option">Media</string>
-    <string name="scan_quality_low" context="Document scanner low quality option">Baja</string>
-    <string name="scan_dialog_discard_title" context="Title text shown on document scanner dialog to discard scan">¿Descartar escaneo?</string>
-    <string name="scan_dialog_discard_body" context="Body text shown on document scanner dialog to discard scan">Este escaneo será eliminado</string>
-    <string name="scan_dialog_discard_all_title" context="Title text shown on document scanner dialog to discard scan all scans">¿Descartar todos los escaneos?</string>
-    <string name="scan_dialog_discard_all_body" context="Body text shown on document scanner dialog to discard all scans">Este documento será eliminado</string>
-    <string name="scan_dialog_discard_action" context="Action text shown on document scanner dialog to discard scans">Descartar</string>
-    <string name="scan_dialog_delete_body" context="Body text shown on document scanner dialog to delete current scan">¿Eliminar este escaneo?</string>
-    <string name="scan_requires_permission" context="Message shown when users deny camera permissions to scan documents">Se necesitan el permiso de la cámara para escanear documentos</string>
-    <string name="scan_invalid_input" context="Error text for field invalid input (Document scanner)">Entrada inválida</string>
+  <!-- Screen title for cropping current scan (Document scanner) -->
+  <string name="scan_title_crop">Cortar</string>
+  <!-- Screen title for saving current scan (Document scanner) -->
+  <string name="scan_title_save_scan">Guardar escaneo</string>
+  <!-- button -->
+  <string name="scan_action_add">Añadir</string>
+  <!-- Action of a button to save something -->
+  <string name="scan_action_save">Guardar</string>
+  <!-- Action text to retake current scan picture (Document scanner) -->
+  <string name="scan_action_retake">Escanear de nuevo</string>
+  <!-- Document scanner file name -->
+  <string name="scan_file_name">Nombre del archivo</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_file_type">Tipo de archivo</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_quality">Calidad</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_destination">Destino</string>
+  <!-- Document scanner high quality option -->
+  <string name="scan_quality_high">Alta</string>
+  <!-- Document scanner medium quality option -->
+  <string name="scan_quality_medium">Media</string>
+  <!-- Document scanner low quality option -->
+  <string name="scan_quality_low">Baja</string>
+  <!-- Title text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_title">¿Descartar escaneo?</string>
+  <!-- Body text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_body">Este escaneo será eliminado</string>
+  <!-- Title text shown on document scanner dialog to discard scan all scans -->
+  <string name="scan_dialog_discard_all_title">¿Descartar todos los escaneos?</string>
+  <!-- Body text shown on document scanner dialog to discard all scans -->
+  <string name="scan_dialog_discard_all_body">Este documento será eliminado</string>
+  <!-- Action text shown on document scanner dialog to discard scans -->
+  <string name="scan_dialog_discard_action">Descartar</string>
+  <!-- Body text shown on document scanner dialog to delete current scan -->
+  <string name="scan_dialog_delete_body">¿Eliminar este escaneo?</string>
+  <!-- Message shown when users deny camera permissions to scan documents -->
+  <string name="scan_requires_permission">Se necesita el permiso de la cámara para escanear documentos</string>
+  <!-- Error text for incorrect name -->
+  <string name="scan_incorrect_name">Nombre incorrecto</string>
+  <!-- Error text for invalid characters -->
+  <string name="scan_invalid_characters">Caracteres no permitidos</string>
+  <!-- Snackbar text for incorrect name -->
+  <string name="scan_snackbar_incorrect_name">Corrige el nombre del archivo antes de continuar</string>
+  <!-- Dialog message showing file progress -->
+  <string name="scan_dialog_progress">Preparando %1$s. Espera por favor&#8230;</string>
+  <!-- Error shown when the user writes a character not allowed -->
+  <string name="scan_snackbar_invalid_characters">Los siguientes caracteres no están permitidos: ” * / : &lt; &gt; ? \ |</string>
 </resources>

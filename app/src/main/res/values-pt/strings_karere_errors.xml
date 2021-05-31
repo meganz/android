@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Label to show that an SDK operation has been complete successfully. -->
+  <string name="error_ok">Nenhum erro</string>
+  <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
+  <string name="error_args">Argumento inválido</string>
+  <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
+  <string name="error_access">Acesso negado</string>
+  <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
+  <string name="error_noent">O recurso não existe.</string>
+  <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
+  <string name="error_exist">O recurso já existe.</string>
+  <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
+  <string name="error_unknown">Erro desconhecido</string>
+  <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
+  <string name="error_toomany">Uso excessivo deste recurso.</string>
+</resources>
