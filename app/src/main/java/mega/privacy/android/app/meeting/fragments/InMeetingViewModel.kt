@@ -44,7 +44,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         _pinItemEvent.value = Event(item)
     }
 
-    var waitingForMeetingLink: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    private var waitingForMeetingLink: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
     // Meeting
     private val _callLiveData: MutableLiveData<MegaChatCall?> = MutableLiveData<MegaChatCall?>()
@@ -442,7 +442,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Method to find out if there is a participant in the call
      *
      * @param peerId Use handle
-     * @param list of participants with this user handle
+     * @return list of participants with changes
      */
     fun updateParticipantsName(peerId: Long): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
@@ -803,14 +803,10 @@ class InMeetingViewModel @ViewModelInject constructor(
             clientId,
             name,
             avatar,
-            false,
-            false,
-            isAudioOn,
-            isVideoOn,
-            false,
-            true,
-            true,
-            null
+            isMe = false,
+            isModerator = false,
+            isAudioOn = isAudioOn,
+            isVideoOn = isVideoOn
         )
     }
 
@@ -1678,8 +1674,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun stopVideosWhenScroll() {
         participants.value?.let { iteratorParticipants ->
-            val iteratorParticipants = iteratorParticipants.iterator()
-            iteratorParticipants.forEach { participant ->
+            iteratorParticipants.iterator().forEach { participant ->
                 if (participant.isVideoOn) {
                     if (visibleParticipants.isEmpty()) {
                         logDebug("Remove the video of a non-visible participant")

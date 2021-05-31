@@ -313,11 +313,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         if (inMeetingViewModel.isMe(this.peerId)) {
             logDebug("Remove local video listener")
-            sharedModel.removeLocalVideo(chatId!!, videoListener!!)
+            sharedModel.removeLocalVideo(chatId, videoListener!!)
         } else {
             inMeetingViewModel.getSession(clientId)?.let {
                 logDebug("Remove remove video listener")
-                inMeetingViewModel.removeHiResOneToOneCall(videoListener!!, it, chatId!!)
+                inMeetingViewModel.removeHiResOneToOneCall(videoListener!!, it, chatId)
             }
         }
 
@@ -435,7 +435,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 )
 
                 inMeetingViewModel.getSession(clientId)?.let {
-                    inMeetingViewModel.addHiResOneToOneCall(videoListener!!, it, chatId)
+                    inMeetingViewModel.addHiResOneToOneCall(videoListener!!, it, this.chatId)
                 }
             }
         }

@@ -1801,7 +1801,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    val showAssignModeratorFragment = fun() {
+    private val showAssignModeratorFragment = fun() {
         val callback = fun() {
             leaveMeeting()
         }

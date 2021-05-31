@@ -715,17 +715,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         }
     }
 
-    private fun resetSizeListener(participant: Participant) {
-        if (!participant.isVideoOn)
-            return
-
-        participant.videoListener?.let {
-            logDebug("Reset Size participant listener")
-            it.height = 0
-            it.width = 0
-        }
-    }
-
     companion object {
 
         const val TAG = "SpeakerViewCallFragment"

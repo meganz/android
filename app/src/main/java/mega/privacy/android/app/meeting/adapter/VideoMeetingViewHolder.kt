@@ -47,7 +47,7 @@ class VideoMeetingViewHolder(
     private var peerId: Long? = MEGACHAT_INVALID_HANDLE
     private var clientId: Long? = MEGACHAT_INVALID_HANDLE
 
-    var isDrawing = true
+    private var isDrawing = true
 
     fun bind(
         inMeetingViewModel: InMeetingViewModel,
@@ -115,7 +115,7 @@ class VideoMeetingViewHolder(
         binding.onHoldIcon.layoutParams = paramsOnHoldIcon
 
         binding.avatar.setImageBitmap(participant.avatar)
-        if (isGrid || isDrawing) {
+        if (isGrid || this.isDrawing) {
             logDebug("Remove the video initially")
             inMeetingViewModel.onCloseVideo(participant)
             removeTextureView(participant)
@@ -203,9 +203,7 @@ class VideoMeetingViewHolder(
 
             binding.parentTextureView.addView(participant.videoListener!!.textureView)
 
-            participant.videoListener!!.localRenderer?.let {
-                it.addListener(listenerRenderer)
-            }
+            participant.videoListener!!.localRenderer?.addListener(listenerRenderer)
 
             inMeetingViewModel.onActivateVideo(participant, isSpeaker)
         } else {
@@ -269,9 +267,7 @@ class VideoMeetingViewHolder(
         inMeetingViewModel.onCloseVideo(participant)
 
         participant.videoListener?.let { listener ->
-            listener.localRenderer?.let {
-                it.addListener(null)
-            }
+            listener.localRenderer?.addListener(null)
 
             logDebug("Removing texture view of $clientId")
             if (binding.parentTextureView.childCount > 0) {
@@ -454,9 +450,7 @@ class VideoMeetingViewHolder(
         }
 
         participant.videoListener?.let { listener ->
-            listener.localRenderer?.let {
-                it.addListener(null)
-            }
+            listener.localRenderer?.addListener(null)
             listener.textureView?.let { view ->
                 view.parent?.let { surfaceParent ->
                     (surfaceParent as ViewGroup).removeView(view)

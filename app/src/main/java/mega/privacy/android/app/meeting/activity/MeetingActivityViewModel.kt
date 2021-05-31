@@ -154,8 +154,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .observeForever(meetingCreatedObserver)
 
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_LINK_RECOVERED)
-            .observeForever(linkRecoveredObserver as Observer<Pair<Long, String>>)
+            .observeForever(linkRecoveredObserver as Observer<Any>)
 
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
