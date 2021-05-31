@@ -280,6 +280,7 @@ class VideoMeetingViewHolder(
                 }
             }
 
+            logDebug("Participant ${participant.clientId} video listener null")
             participant.videoListener = null
         }
     }
@@ -457,6 +458,7 @@ class VideoMeetingViewHolder(
                 }
             }
 
+            logDebug("Participant ${participant.clientId} video listener null")
             participant.videoListener = null
         }
     }

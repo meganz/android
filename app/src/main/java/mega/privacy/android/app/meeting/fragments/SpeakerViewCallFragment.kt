@@ -205,7 +205,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         sharedModel.cameraLiveData.observe(viewLifecycleOwner) { isOn ->
             speakerUser?.let {
                 if (it.isMe) {
-                    logDebug("Changes in local video")
                     it.isVideoOn = isOn
 
                     if (isOn) {
@@ -335,7 +334,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             inMeetingViewModel.onCloseVideo(participant)
         }
 
-
         participant.videoListener?.let { listener ->
             logDebug("Removing texture view")
             if (surfaceContainer.childCount > 0) {
@@ -348,6 +346,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 }
             }
 
+            logDebug("Speaker ${participant.clientId} video listener null")
             participant.videoListener = null
         }
     }
@@ -780,6 +779,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                     textureView.isVisible = false
                 }
 
+                logDebug("Speaker ${it.clientId} video listener null")
                 it.videoListener = null
             }
         }

@@ -19,10 +19,10 @@ import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.utils.ChatUtil.*
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.*
@@ -411,8 +411,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param listener MeetingVideoListener
      */
     fun removeLocalVideo(chatId: Long, listener: MeetingVideoListener?) {
-        if (listener == null)
+        if (listener == null) {
+            logError("Listener is null")
             return
+        }
 
         logDebug("Removing local video")
         meetingActivityRepository.removeLocalVideo(chatId, listener)

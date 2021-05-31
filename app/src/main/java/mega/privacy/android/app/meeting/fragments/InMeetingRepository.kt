@@ -419,6 +419,7 @@ class InMeetingRepository @Inject constructor(
      * @param listener GroupVideoListener
      */
     fun addLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener) {
+        logDebug("Add chat local video listener")
         megaChatApi.addChatLocalVideoListener(chatId, listener)
     }
 
@@ -429,6 +430,7 @@ class InMeetingRepository @Inject constructor(
      * @param listener GroupVideoListener
      */
     fun removeLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener) {
+        logDebug("Remove chat video listener")
         megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, listener)
     }
 

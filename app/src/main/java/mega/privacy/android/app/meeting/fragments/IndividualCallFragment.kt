@@ -321,6 +321,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
         }
 
+        logDebug("Participant $clientId video listener null")
         videoListener = null
     }
 
@@ -405,11 +406,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
         if (isInvalid(peerId, clientId)) return
 
         if (videoListener != null) {
-            logDebug("Video Listener is not null ")
             videoListener!!.height = 0
             videoListener!!.width = 0
         } else {
-            logDebug("Video Listener is null ")
             if (inMeetingViewModel.isMe(peerId)) {
                 var isOneToOneChat = true
                 if (isFloatingWindow && !inMeetingViewModel.isOneToOneCall()) {

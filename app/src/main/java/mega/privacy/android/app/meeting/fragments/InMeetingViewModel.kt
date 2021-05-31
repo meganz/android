@@ -1580,11 +1580,13 @@ class InMeetingViewModel @ViewModelInject constructor(
                 if (participant.hasHiRes) {
                     removeLowRes(participant.videoListener!!, it, chat.chatId)
                     if(it.canRecvVideoLowRes()){
+                        logDebug("Participant ${participant.clientId} video listener null")
                         participant.videoListener = null
                     }
                 } else {
                     removeHiRes(participant.videoListener!!, it, chat.chatId)
                     if(it.canRecvVideoHiRes()){
+                        logDebug("Participant ${participant.clientId} video listener null")
                         participant.videoListener = null
                     }
                 }

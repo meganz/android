@@ -398,6 +398,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        MegaApplication.getInstance().unregisterProximitySensor()
         initToolbar()
         initFloatingWindowContainerDragListener(view)
         initFloatingPanel()
@@ -527,7 +528,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 sharedModel.micInitiallyOn()
             }
             MEETING_ACTION_START -> {
-                onJoinedChat(arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)!!, MEGACHAT_INVALID_HANDLE)
+                onJoinedChat(
+                    arguments?.getLong(
+                        MeetingActivity.MEETING_CHAT_ID,
+                        MEGACHAT_INVALID_HANDLE
+                    )!!, MEGACHAT_INVALID_HANDLE
+                )
             }
         }
     }
@@ -1955,12 +1961,36 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         checkCallStarted(chatId)
     }
 
+    override fun onPause() {
+        super.onPause()
+        MegaApplication.getInstance().unregisterProximitySensor()
+
+        individualCallFragment?.let {
+            removeChildFragment(it)
+        }
+        floatingWindowFragment?.let {
+            removeChildFragment(it)
+        }
+        speakerViewCallFragment?.let {
+            removeChildFragment(it)
+        }
+        gridViewCallFragment?.let {
+            removeChildFragment(it)
+        }
+    }
+
     override fun onDestroy() {
         logDebug("Fragment destroyed")
         CallUtil.activateChrono(false, meetingChrono, null)
+        MegaApplication.getInstance().unregisterProximitySensor()
         resumeAudioPlayerIfNotInCall(meetingActivity)
         RunOnUIThreadUtils.stop()
         super.onDestroy()
+    }
+
+     override fun onResume() {
+        super.onResume()
+        MegaApplication.getInstance().startProximitySensor()
     }
 
     override fun onCallAnswered(chatId: Long, flag: Boolean) {
