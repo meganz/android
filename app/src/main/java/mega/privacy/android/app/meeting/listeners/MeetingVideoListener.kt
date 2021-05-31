@@ -32,6 +32,10 @@ class MeetingVideoListener(
     private var viewWidth = 0
     private var viewHeight = 0
 
+    fun setAlpha(alpha: Int) {
+        renderer.setAlpha(alpha)
+    }
+
     override fun onChatVideoData(
         api: MegaChatApiJava,
         chatid: Long,

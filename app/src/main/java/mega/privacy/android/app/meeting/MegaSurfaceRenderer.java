@@ -62,6 +62,12 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     private TextureView myTexture = null;
     protected List<MegaSurfaceRendererListener> listeners;
 
+    private int alpha = 255;
+
+    public void setAlpha(int alpha) {
+        this.alpha = alpha;
+    }
+
     public MegaSurfaceRenderer(SurfaceView view, boolean isSmallCamera, DisplayMetrics outMetrics) {
         surfaceHolder = view.getHolder();
         if (surfaceHolder == null)
@@ -205,6 +211,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
         }
         if (isSmallCamera) {
             paint.reset();
+            paint.setAlpha(alpha);
             paint.setXfermode(modesrcover);
             canvas.drawRoundRect(dstRectf, dp2px(CORNER_RADIUS, outMetrics), dp2px(CORNER_RADIUS, outMetrics), paint);
             paint.setXfermode(modesrcin);

@@ -13,10 +13,8 @@
         android:id="@+id/self_feed_floating_window_container"
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="125dp"
-        android:elevation="1dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"/>
+        android:layout_height="wrap_content"/>
 
     <include
         android:id="@+id/bottom_floating_panel"
