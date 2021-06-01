@@ -40,7 +40,6 @@ import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
 public class AchievementsFragment extends BaseFragment implements OnClickListener
 		, GetAchievementsListener.DataCallback {
-	// TODO:Remove the 35 GB Welcome Bonus achievement for new users
 	private RelativeLayout registrationLayout;
 	private RelativeLayout figuresInstallAppLayout;
 	private TextView zeroFiguresInstallAppText;
@@ -181,6 +180,9 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		String storageQuotaString = getString(R.string.unlocked_storage_title);
 		storageQuotaString = storageQuotaString.toLowerCase(Locale.getDefault());
 
+		String storageSpaceString = getString(R.string.storage_space);
+		storageSpaceString = storageSpaceString.toLowerCase(Locale.getDefault());
+
 		figureUnlockedRewardStorage = (TextView) v.findViewById(R.id.unlocked_storage_text);
 		figureUnlockedRewardStorageUnit = v.findViewById(R.id.unlocked_storage_unit);
 
@@ -190,7 +192,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		figureReferralBonusesStorage.setText(getSizeString(0));
 
 		TextView textReferralBonusesStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_referral);
-		textReferralBonusesStorage.setText(storageQuotaString);
+		textReferralBonusesStorage.setText(storageSpaceString);
 
 		TextView figureBaseQuotaStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_base_quota);
 		figureBaseQuotaStorage.setText(getSizeString(0));
@@ -203,7 +205,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		figureInstallAppStorage.setText(getSizeString(0));
 
 		textInstallAppStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_install_app);
-		textInstallAppStorage.setText(storageQuotaString);
+		textInstallAppStorage.setText(storageSpaceString);
 		daysLeftInstallAppText = (TextView) v.findViewById(R.id.days_left_text_install_app);
 		daysLeftInstallAppText.setText(("..."));
 
@@ -212,7 +214,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         figureAddPhoneStorage.setText(getSizeString(0));
 
         textAddPhoneStorage = v.findViewById(R.id.unlocked_storage_title_add_phone);
-        textAddPhoneStorage.setText(storageQuotaString);
+        textAddPhoneStorage.setText(storageSpaceString);
 
         daysLeftAddPhoneText = v.findViewById(R.id.days_left_text_add_phone);
         daysLeftAddPhoneText.setText(("..."));
@@ -221,7 +223,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		figureRegistrationStorage.setText(getSizeString(0));
 
 		textRegistrationStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_registration);
-		textRegistrationStorage.setText(storageQuotaString);
+		textRegistrationStorage.setText(storageSpaceString);
 
 		daysLeftRegistrationText = (TextView) v.findViewById(R.id.days_left_text_registration);
 		daysLeftRegistrationText.setText(("..."));
@@ -230,7 +232,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		figureInstallDesktopStorage.setText(getSizeString(0));
 
 		textInstallDesktopStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_install_desktop);
-		textInstallDesktopStorage.setText(storageQuotaString);
+		textInstallDesktopStorage.setText(storageSpaceString);
 
 		daysLeftInstallDesktopText = (TextView) v.findViewById(R.id.days_left_text_install_desktop);
 		daysLeftInstallDesktopText.setText(("..."));

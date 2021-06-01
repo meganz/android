@@ -190,7 +190,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 				title.setText(getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue)));
 				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 				sectionTitle.setVisibility(View.VISIBLE);
-				firstParagraph.setText(getString(R.string.paragraph_info_achievement_add_phone, getSizeString(addPhoneStorageValue), getSizeString(addPhoneTransferValue)));
+				firstParagraph.setText(getString(R.string.paragraph_info_achievement_add_phone, getSizeString(addPhoneStorageValue)));
 				secondParagraph.setVisibility(View.GONE);
 			}
 			else{

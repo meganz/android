@@ -160,7 +160,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_column="0"
                                     android:layout_below="@id/figure_unlocked_storage_text_referral"
-                                    android:text="@string/unlocked_storage_title"
+                                    android:text="@string/storage_space"
                                     android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                             </RelativeLayout>
@@ -244,7 +244,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_column="0"
                                     android:layout_below="@id/figure_unlocked_storage_text_base_quota"
-                                    android:text="@string/unlocked_storage_title"
+                                    android:text="@string/storage_space"
                                     android:textAllCaps="false"
                                     android:textColor="?android:attr/textColorSecondary"
                                     android:textSize="11dp" />
@@ -335,7 +335,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_column="0"
                                     android:layout_below="@id/figure_unlocked_storage_text_install_app"
-                                    android:text="@string/unlocked_storage_title"
+                                    android:text="@string/storage_space"
                                     android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                             </RelativeLayout>
@@ -429,7 +429,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_column="0"
                                     android:layout_below="@id/figure_unlocked_storage_text_add_phone"
-                                    android:text="@string/unlocked_storage_title"
+                                    android:text="@string/storage_space"
                                     android:textAllCaps="false"
                                     android:textColor="?android:attr/textColorSecondary"
                                     android:textSize="11dp" />
@@ -467,7 +467,7 @@
                     android:id="@+id/registration_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:layout_below="@+id/separator_add_phone">
 
                     <LinearLayout
@@ -518,7 +518,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_column="0"
                                     android:layout_below="@id/figure_unlocked_storage_text_registration"
-                                    android:text="@string/unlocked_storage_title"
+                                    android:text="@string/storage_space"
                                     android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
 
                             </RelativeLayout>
@@ -612,7 +612,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_column="0"
                                     android:layout_below="@id/figure_unlocked_storage_text_install_desktop"
-                                    android:text="@string/unlocked_storage_title"
+                                    android:text="@string/storage_space"
                                     android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant2" />
                             </RelativeLayout>
                         </RelativeLayout>
