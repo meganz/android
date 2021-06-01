@@ -107,6 +107,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     public void reloadNodes() {
         viewModel.loadCuNodes();
+        viewModel.getCUCards();
     }
 
     public void checkScroll() {
@@ -252,6 +253,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         setupRecyclerView();
         setupOtherViews();
         observeLiveData();
+        viewModel.getCUCards();
     }
 
     /**
@@ -469,19 +471,19 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.emptyEnableCuButton.setVisibility(!cuEnabled && emptyAdapter ? View.VISIBLE : View.GONE);
     }
 
-    private void showDayCards(List<Pair<CUCard, CuNode>> dayCards) {
+    private void showDayCards(List<CUCard> dayCards) {
         if (selectedView == DAYS_VIEW) {
             cardAdapter.setCards(dayCards);
         }
     }
 
-    private void showMonthCards(List<Pair<CUCard, CuNode>> monthCards) {
+    private void showMonthCards(List<CUCard> monthCards) {
         if (selectedView == MONTHS_VIEW) {
              cardAdapter.setCards(monthCards);
         }
     }
 
-    private void showYearCards(List<Pair<CUCard, CuNode>> yearCards) {
+    private void showYearCards(List<CUCard> yearCards) {
         if (selectedView == YEARS_VIEW) {
             cardAdapter.setCards(yearCards);
         }

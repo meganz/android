@@ -13,7 +13,7 @@ class CUCardViewAdapter(
     private val cardMargin: Int
 ) : RecyclerView.Adapter<CUCardViewHolder>(), SectionTitleProvider {
 
-    private var cards: ArrayList<android.util.Pair<CUCard, CuNode>> = ArrayList()
+    private var cards: ArrayList<CUCard> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CUCardViewHolder {
         return CUCardViewHolder(
@@ -33,24 +33,24 @@ class CUCardViewAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return cards[position].second.node.handle
+        return cards[position].node.handle
     }
 
     override fun getSectionTitle(position: Int): String {
         return if (position < 0 || position >= cards.size) ""
         else {
-            val date = cards[position].first
+            val card = cards[position]
 
             when (cardViewType) {
-                YEARS_VIEW -> date.year
-                MONTHS_VIEW -> date.month + " " + date.year
-                DAYS_VIEW -> date.day + " " + date.month + " " + date.year
+                YEARS_VIEW -> card.year
+                MONTHS_VIEW -> card.month + " " + card.year
+                DAYS_VIEW -> card.day + " " + card.month + " " + card.year
                 else -> ""
             }
         }
     }
 
-    fun setCards(cards: List<android.util.Pair<CUCard, CuNode>>) {
+    fun setCards(cards: List<CUCard>) {
         this.cards.clear()
         this.cards.addAll(cards)
         notifyDataSetChanged()

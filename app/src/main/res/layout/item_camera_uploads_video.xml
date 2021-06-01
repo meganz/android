@@ -16,7 +16,7 @@
         android:id="@+id/video_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/grey_alpha_032">
+        tools:background="@color/grey_alpha_032">
 
         <ImageView
             android:id="@+id/play_icon"

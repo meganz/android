@@ -25,16 +25,15 @@ class CUCardViewHolder(
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(card: android.util.Pair<CUCard, CuNode>) {
-        val cuCard = card.first
-        val cuNode = card.second
-
-        binding.dateText.text = cuCard.date
+    fun bind(card: CUCard) {
+        binding.dateText.text = card.date
         binding.numberItemsText.isVisible = viewType == DAYS_VIEW
-        binding.numberItemsText.text = "+${cuCard.numItems}"
+        binding.numberItemsText.text = "+${card.numItems}"
 
-        if (cuNode.preview != null) {
-            binding.preview.setImageURI(Uri.fromFile(cuNode.preview))
+        val preview = card.preview
+
+        if (preview != null) {
+            binding.preview.setImageURI(Uri.fromFile(preview))
         } else {
             binding.preview.setActualImageResource(R.drawable.ic_image_thumbnail)
         }

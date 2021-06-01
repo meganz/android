@@ -28,6 +28,12 @@ class MegaNodeRepo @Inject constructor(
     private val dbHandler: DatabaseHandler
 ) {
 
+    /**
+     * Get children of CU/MU, with the given order.
+     *
+     * @param orderBy Order.
+     * @return List of nodes containing CU/MU children.
+     */
     fun getCuChildren(orderBy: Int): List<MegaNode> {
         var cuNode: MegaNode? = null
         var muNode: MegaNode? = null
@@ -69,21 +75,14 @@ class MegaNodeRepo @Inject constructor(
     }
 
     /**
-     * Get children of CU/MU, with the given order, and filter nodes by date (optional).
+     * Get children of CU/MU, with the given order.
      *
-     * @param orderBy order
-     * @param filter search filter
-     * filter[0] is the search type:
-     * 1 means search for nodes in one day, then filter[1] is the day in millis.
-     * 2 means search for nodes in last month (filter[2] is 1), or in last year (filter[2] is 2).
-     * 3 means search for nodes between two days, filter[3] and filter[4] are start and end day in
-     * millis.
-     * @return list of pairs, whose first value is index used for
-     * FullscreenImageViewer/AudioVideoPlayer, and second value is the node
+     * @param orderBy Order.
+     * @return List of pairs, whose first value is index used for
+     * FullscreenImageViewer/AudioVideoPlayer, and second value is the node.
      */
-    fun getCuChildren(
-        orderBy: Int,
-        filter: LongArray?
+    fun getCuChildrenPairs(
+        orderBy: Int
     ): List<Pair<Int, MegaNode>> {
         val children = getCuChildren(orderBy)
         val nodes = ArrayList<Pair<Int, MegaNode>>()
@@ -101,60 +100,7 @@ class MegaNodeRepo @Inject constructor(
             }
         }
 
-        if (filter == null) {
-            return nodes
-        }
-
-        val result = ArrayList<Pair<Int, MegaNode>>()
-        var filterFunction: Function<MegaNode, Boolean>? = null
-
-        when (filter[SEARCH_BY_DATE_FILTER_POS_TYPE]) {
-            SEARCH_BY_DATE_FILTER_TYPE_ONE_DAY -> {
-                val date = Util.fromEpoch(filter[SEARCH_BY_DATE_FILTER_POS_THE_DAY] / 1000)
-                filterFunction = Function { node: MegaNode ->
-                    date == Util.fromEpoch(node.modificationTime)
-                }
-            }
-            SEARCH_BY_DATE_FILTER_TYPE_LAST_MONTH_OR_YEAR -> {
-                when (filter[SEARCH_BY_DATE_FILTER_POS_MONTH_OR_YEAR]) {
-                    SEARCH_BY_DATE_FILTER_LAST_MONTH -> {
-                        val lastMonth = YearMonth.now().minusMonths(1)
-                        filterFunction = Function { node: MegaNode ->
-                            lastMonth == YearMonth.from(Util.fromEpoch(node.modificationTime))
-                        }
-                    }
-                    SEARCH_BY_DATE_FILTER_LAST_YEAR -> {
-                        val lastYear = YearMonth.now().year - 1
-                        filterFunction = Function { node: MegaNode ->
-                            Util.fromEpoch(node.modificationTime).year == lastYear
-                        }
-                    }
-                }
-            }
-            SEARCH_BY_DATE_FILTER_TYPE_BETWEEN_TWO_DAYS -> {
-                val from = Util.fromEpoch(filter[SEARCH_BY_DATE_FILTER_POS_START_DAY] / 1000)
-                val to = Util.fromEpoch(filter[SEARCH_BY_DATE_FILTER_POS_END_DAY] / 1000)
-                filterFunction = Function { node: MegaNode ->
-                    val modifyDate = Util.fromEpoch(node.modificationTime)
-                    !modifyDate.isBefore(from) && !modifyDate.isAfter(to)
-                }
-            }
-        }
-
-        if (filterFunction == null) {
-            return result
-        }
-
-        // when in search mode, index used by viewer is also index in all siblings,
-        // but all siblings are image/video, non image/video nodes are filtered by previous step
-        var indexInSiblings = 0
-        for (node in nodes) {
-            if (filterFunction.apply(node.second)) {
-                result.add(Pair.create(indexInSiblings, node.second))
-                indexInSiblings++
-            }
-        }
-        return result
+        return nodes
     }
 
     fun findOfflineNode(handle: String): MegaOffline? {

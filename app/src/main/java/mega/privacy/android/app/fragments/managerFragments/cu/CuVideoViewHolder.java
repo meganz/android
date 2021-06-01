@@ -35,6 +35,11 @@ class CuVideoViewHolder extends CuGridViewHolder {
             }
         }
 
+        mBinding.videoInfo.setBackgroundResource(
+                node.isSelected() ? R.drawable.grid_cam_uploads_rounded
+                        : R.color.grey_alpha_032);
+
+
         mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
 
         updateThumbnailDisplay(mBinding.thumbnail, node, mItemSizeConfig);
