@@ -3944,4 +3944,8 @@
     <string name="action_keep_old_extension">Keep .%1$s</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">There is already a file with the same name</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">There is already an item with the same name</string>
 </resources>
