@@ -3986,7 +3986,7 @@
     <!-- Invite contacts as participants of the meeting-->
     <string name="invite_participants">Invite Participants</string>
     <!-- The number of participants in the meeting-->
-    <string name="participants_number">In the meeting (%d)</string>
+    <string name="participants_number">Participants (%d)</string>
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Pin to Speaker View</string>
     <!-- Make the participant as moderator in the meeting-->
@@ -4013,6 +4013,12 @@
     <string name="leave_anyway">Leave anyway</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
     <string name="pick_new_moderator_message">Please pick one or more to be new moderator</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">Change meeting name</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">Participants : %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">Moderator : %s</string>
 
     <!-- The literal meeting link text-->
     <string name="meeting_link">Meeting link</string>

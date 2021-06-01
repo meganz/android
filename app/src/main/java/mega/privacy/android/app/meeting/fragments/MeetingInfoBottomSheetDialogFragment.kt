@@ -36,10 +36,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
-import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaChatRequestListenerInterface
 
 class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var binding: FragmentMeetingInfoBinding
@@ -68,12 +64,8 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             binding.meetingName.text = it
         }
         inMeetingViewModel.participants.observe(this) { participants ->
-            binding.participantSize.text =
-                requireContext().getString(R.string.participants_chat_label) + ": " + (participants.size + 1)
-            binding.moderatorName.text =
-                requireContext().getString(R.string.administrator_permission_label_participants_panel) + ": " + getModeratorList(
-                    participants
-                )
+            binding.participantSize.text = getString(R.string.info_participants_number, participants.size + 1)
+            binding.moderatorName.text = getString(R.string.info_moderator_name, getModeratorList(participants))
         }
 
         shareViewModel.meetingLinkLiveData.observe(this) { link ->
@@ -123,7 +115,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     fun copyLink() {
         LogUtil.logDebug("copyLink")
-        if (chatLink != null) {
+        if (chatLink.isNotEmpty()) {
             val clipboard =
                 requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Copied Text", chatLink)
@@ -156,7 +148,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         val input = EmojiEditText(requireActivity())
         layout.addView(input, params)
-        input.setOnLongClickListener { v: View? -> false }
+        input.setOnLongClickListener { false }
         input.setSingleLine()
         input.setSelectAllOnFocus(true)
         input.setTextColor(getThemeColor(requireActivity(), android.R.attr.textColorSecondary))
@@ -168,7 +160,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         input.filters = arrayOf<InputFilter>(LengthFilter(maxAllowed))
         input.setText(chatTitle)
         val builder = MaterialAlertDialogBuilder(requireContext())
-        input.setOnEditorActionListener { v: TextView?, actionId: Int, event: KeyEvent? ->
+        input.setOnEditorActionListener { _: TextView?, actionId: Int, _: KeyEvent? ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 changeTitle(input)
             } else {
@@ -176,12 +168,12 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
             false
         }
-        input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE)
-        builder.setTitle(R.string.context_rename)
-            .setPositiveButton(getString(R.string.context_rename), null)
+        input.setImeActionLabel(getString(R.string.change_meeting_name), EditorInfo.IME_ACTION_DONE)
+        builder.setTitle(R.string.change_meeting_name)
+            .setPositiveButton(getString(R.string.change_pass), null)
             .setNegativeButton(android.R.string.cancel, null)
             .setView(layout)
-            .setOnDismissListener { dialog: DialogInterface? ->
+            .setOnDismissListener {
                 Util.hideKeyboard(
                     activity,
                     InputMethodManager.HIDE_NOT_ALWAYS
