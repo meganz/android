@@ -15,7 +15,7 @@
   <!-- Error shown when terms of service are breached during download. -->
   <string name="api_etoomany_ec_download">Нарушены условия предоставления услуг</string>
   <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
-  <string name="api_etoomay">Слишком много одновременных соединений или пересылок</string>
+  <string name="api_etoomay">Слишком много одновременных соединений или передач</string>
   <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
   <string name="api_erange">Вне диапазона</string>
   <!-- State to indicate something has expired (achivements of business status account for instance) -->
@@ -39,7 +39,7 @@
   <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
   <string name="api_eblocked">Заблокировано</string>
   <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
-  <string name="api_eoverquota">Превышение квоты</string>
+  <string name="api_eoverquota">Превышена квота</string>
   <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
   <string name="api_etempunavail">Временно недоступно</string>
   <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
