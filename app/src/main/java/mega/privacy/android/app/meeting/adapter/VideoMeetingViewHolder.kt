@@ -33,7 +33,7 @@ class VideoMeetingViewHolder(
     private val screenHeight: Int,
     private val orientation: Int,
     private val isTypeGridViewHolder: Boolean,
-    private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?
+    private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     @Inject
@@ -91,6 +91,16 @@ class VideoMeetingViewHolder(
         }
 
         initAvatar(participant)
+
+        if (!isGrid) {
+            inMeetingViewModel.addParticipantVisible(participant)
+        }
+
+        if (isGrid || this.isDrawing) {
+            logDebug("Remove the video initially")
+            inMeetingViewModel.onCloseVideo(participant)
+            removeTextureView(participant)
+        }
         checkUI(participant)
     }
 
@@ -115,14 +125,6 @@ class VideoMeetingViewHolder(
         binding.onHoldIcon.layoutParams = paramsOnHoldIcon
 
         binding.avatar.setImageBitmap(participant.avatar)
-        if (isGrid || this.isDrawing) {
-            logDebug("Remove the video initially")
-            inMeetingViewModel.onCloseVideo(participant)
-            removeTextureView(participant)
-        }else{
-            logDebug("Add as participantVisible in the speaker view list")
-            inMeetingViewModel.addParticipantVisible(participant)
-        }
     }
 
     /**
@@ -261,7 +263,7 @@ class VideoMeetingViewHolder(
     private fun closeVideo(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
-        logDebug("Close video")
+        logDebug("Close video of ${participant.clientId}")
         binding.parentTextureView.isVisible = false
 
         inMeetingViewModel.onCloseVideo(participant)
@@ -269,7 +271,7 @@ class VideoMeetingViewHolder(
         participant.videoListener?.let { listener ->
             listener.localRenderer?.addListener(null)
 
-            logDebug("Removing texture view of $clientId")
+            logDebug("Removing texture view of ${participant.clientId}")
             if (binding.parentTextureView.childCount > 0) {
                 binding.parentTextureView.removeAllViews()
             }
@@ -444,7 +446,7 @@ class VideoMeetingViewHolder(
     fun removeTextureView(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
-        logDebug("Removing texture view of $clientId")
+        logDebug("Removing texture view of ${participant.clientId}")
         if (binding.parentTextureView.childCount > 0) {
             binding.parentTextureView.removeAllViews()
             binding.parentTextureView.removeAllViewsInLayout()
@@ -457,10 +459,10 @@ class VideoMeetingViewHolder(
                     (surfaceParent as ViewGroup).removeView(view)
                 }
             }
-
-            logDebug("Participant ${participant.clientId} video listener null")
-            participant.videoListener = null
         }
+
+        logDebug("Participant ${participant.clientId} video listener null")
+        participant.videoListener = null
     }
 
     private fun landscapeLayout(isFirstPage: Boolean, itemCount: Int) {
@@ -601,7 +603,7 @@ class VideoMeetingViewHolder(
         isDrawing = false
         inMeetingViewModel.getParticipant(peerId!!, clientId!!)?.let {
             if (it.isVideoOn) {
-                logDebug("Remove the video when participant is not visible")
+                logDebug("Recycle participant in the list, participant clientId is ${it.clientId}")
                 inMeetingViewModel.removeParticipantVisible(it)
                 inMeetingViewModel.onCloseVideo(it)
                 removeTextureView(it)

@@ -8,6 +8,7 @@ import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logDebug
 
 class VideoListViewAdapter(
@@ -18,15 +19,19 @@ class VideoListViewAdapter(
 
     override fun onViewRecycled(holder: VideoMeetingViewHolder) {
         super.onViewRecycled(holder)
+
+        if(holder.adapterPosition == INVALID_POSITION)
+            return
+
         holder.onRecycle()
     }
 
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
         currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
 
-    override fun onBindViewHolder(listHolder: VideoMeetingViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: VideoMeetingViewHolder, position: Int) {
         logDebug("Bind view holder position $position")
-        listHolder.bind(inMeetingViewModel, getItem(position), itemCount, true)
+        holder.bind(inMeetingViewModel, getItem(position), itemCount, true)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoMeetingViewHolder {
