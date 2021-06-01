@@ -1142,7 +1142,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Upgrade now</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Improve your cloud capacity![A]Get more space &amp; transfer quota with a PRO account!</string>
+    <string name="get_pro_account">Improve your cloud capacity![A]Get more space and transfer quota with a Pro account!</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">The Recovery Key has been backed up into: %1s.[A]While the file remains in this path, you will find it at the Saved for Offline Section.[A]Note: It will be deleted if you log out, please store it in a safe place.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->

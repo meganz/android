@@ -362,7 +362,6 @@ object MegaNodeDialogUtil {
 
                             val oldMimeType = MimeTypeList.typeForName(node.name)
                             var newExtension = MimeTypeList.typeForName(typedString).extension
-                            if (newExtension == typedString.toLowerCase(Locale.ROOT)) newExtension = ""
 
                             when (if (node.isFolder) NO_ERROR else isValidRenameDialogValue(
                                 oldMimeType,
@@ -514,18 +513,16 @@ object MegaNodeDialogUtil {
         snackbarShower: SnackbarShower?,
         actionNodeCallback: ActionNodeCallback?
     ) {
-        val keepExtension = if (oldExtension == node.name) "" else oldExtension
-
         val typedOldExt =
-            if (keepExtension.isEmpty()) typedString.substring(0, typedString.lastIndexOf("."))
+            if (oldExtension.isEmpty()) typedString.substring(0, typedString.lastIndexOf("."))
             else typedString.substring(0, typedString.lastIndexOf(".") + 1) + oldExtension
 
-        val message = if (keepExtension.isEmpty() && newExtension.isNotEmpty()) {
+        val message = if (oldExtension.isEmpty() && newExtension.isNotEmpty()) {
             getString(R.string.file_extension_change_warning_old_empty, newExtension)
-        } else if (keepExtension.isNotEmpty() && newExtension.isEmpty()) {
-            getString(R.string.file_extension_change_warning_new_empty, keepExtension)
+        } else if (oldExtension.isNotEmpty() && newExtension.isEmpty()) {
+            getString(R.string.file_extension_change_warning_new_empty, oldExtension)
         } else {
-            getString(R.string.file_extension_change_warning, keepExtension, newExtension)
+            getString(R.string.file_extension_change_warning, oldExtension, newExtension)
         }
 
         val useButton = if (newExtension.isEmpty()) {
@@ -534,10 +531,10 @@ object MegaNodeDialogUtil {
             getString(R.string.action_use_new_extension, newExtension)
         }
 
-        val keepButton = if (keepExtension.isEmpty()) {
+        val keepButton = if (oldExtension.isEmpty()) {
             getString(R.string.action_keep_empty_old_extension)
         } else {
-            getString(R.string.action_keep_old_extension, keepExtension)
+            getString(R.string.action_keep_old_extension, oldExtension)
         }
 
         MaterialAlertDialogBuilder(context)
