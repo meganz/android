@@ -3959,7 +3959,7 @@
     <!-- Button that join a meeting as guest -->
     <string name="btn_join_meeting_as_guest">Join as a guest</string>
     <!-- Hint shown to guide user on meeting name -->
-    <string name="type_meeting_name">%s\'s meeting</string>
+    <string name="type_meeting_name">%s’s meeting</string>
 
     <!-- General label for reject the call. -->
     <string name="general_reject">Hang up</string>
@@ -4023,8 +4023,8 @@
     <!-- Subtitle of the meeting screen-->
     <string name="duration_meeting">Duration</string>
 
-    <!-- The question in on-boarding screen asking if the user don't have a mega account-->
-    <string name="onboarding_no_mega_account">Don\'t have a MEGA account?</string>
+    <!-- The question in on-boarding screen asking if the user don’t have a mega account-->
+    <string name="onboarding_no_mega_account">Don’t have a MEGA account?</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Join meeting as guest?</string>
 
