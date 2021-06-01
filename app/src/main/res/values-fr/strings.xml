@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l’utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n’importe quand, de n’importe quel appareil, n’importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l’accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l’utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50&#160;Go à tous les utilisateurs inscrits, avec des primes d’objectif, et propose des abonnements payants avec des limites beaucoup plus élevées&#160;: \n\n\nAbonnement Pro Léger&#160;: 4,99&#160;€ (4,99&#160;USD) par mois ou 49,99&#160;€ (49,99&#160;USD) par an vous donne 400&#160;Go d’espace de stockage et 1&#160;To de quota de transfert par mois.\nAbonnement Pro I&#160;: 9,99&#160;€ (9,99&#160;USD) par mois ou 99,99&#160;€ (99,99&#160;USD) par an vous donne 2&#160;To d’espace de stockage et 2&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;II&#160;: 19,99&#160;€ (19,99&#160;USD) par mois ou 199,99&#160;€ (199,99&#160;USD) par an vous donne 8&#160;To d’espace de stockage et 8&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;III&#160;: 29,99&#160;€ (29,99&#160;USD) par mois ou 299,99&#160;€ (299,99&#160;USD) par an vous donne 16&#160;To d’espace de stockage et 16&#160;To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d’abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l’icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n’est pas déjà fait) et cliquez sur l’appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l’appli&#160;: \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -&gt; Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -&gt; Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -&gt; Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -&gt; MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur&#160;: https://github.com/meganz/android\n\nPour de plus amples renseignements, veuillez visiter notre site Web&#160;: \nhttps://mega.nz/terms\n\n\nOrdinateur – https://mega.nz/</string>
+    <string name="full_description_text">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l’utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n’importe quand, de n’importe quel appareil, n’importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l’accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l’utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50&#160;Go à tous les utilisateurs inscrits, avec des primes d’objectif, et propose des abonnements payants avec des limites beaucoup plus élevées&#160;: \n\n\nAbonnement Pro Léger&#160;: 4,99&#160;€ (4,99&#160;USD) par mois ou 49,99&#160;€ (49,99&#160;USD) par an vous donne 400&#160;Go d’espace de stockage et 1&#160;To de quota de transfert par mois.\nAbonnement Pro I&#160;: 9,99&#160;€ (9,99&#160;USD) par mois ou 99,99&#160;€ (99,99&#160;USD) par an vous donne 2&#160;To d’espace de stockage et 2&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;II&#160;: 19,99&#160;€ (19,99&#160;USD) par mois ou 199,99&#160;€ (199,99&#160;USD) par an vous donne 8&#160;To d’espace de stockage et 8&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;III&#160;: 29,99&#160;€ (29,99&#160;USD) par mois ou 299,99&#160;€ (299,99&#160;USD) par an vous donne 16&#160;To d’espace de stockage et 16&#160;To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d’abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l’icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n’est pas déjà fait) et cliquez sur l’appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l’appli&#160;: \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -&gt; Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -&gt; Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -&gt; Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -&gt; MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur&#160;: https://github.com/meganz/android \n\nPour de plus amples renseignements, veuillez visiter notre site Web&#160;: \nhttps://mega.nz/terms \n\n\nOrdinateur – https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA, le service de stockage nuagique qui protège vos données personnelles en tout temps.</string>
     <!-- PRO Lite account -->
@@ -97,7 +97,7 @@
     <!-- confirmation message before removing the previously downloaded MasterKey file -->
     <string name="remove_key_confirmation">Vous êtes en train de supprimer le fichier de clé de récupération exporté précédemment</string>
     <!-- confirmation message before sending an invitation to a contact -->
-    <string name="confirmation_add_contact">Souhaitez-vous envoyer une invitation à %s ?</string>
+    <string name="confirmation_add_contact">Voulez-vous envoyer une invitation à %s ?</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">Déconnexion</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -221,7 +221,7 @@
     <!--  -->
     <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 50&#160;Go* d’espace de stockage gratuits</string>
     <!--  -->
-    <string name="tour_speed_text">Les téléversements sont rapides. Partagez rapidement des fichiers avec qui vous le souhaitez</string>
+    <string name="tour_speed_text">Les téléversements sont rapides. Partagez rapidement des fichiers avec tout le monde</string>
     <!--  -->
     <string name="tour_privacy_text">Assurez la sécurité de tous vos fichiers grâce au chiffrement de bout en bout de MEGA</string>
     <!--  -->
@@ -393,7 +393,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Visualiser les transferts</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">La plupart des appareils ne peuvent pas télécharger des fichiers supérieurs à 4 Go. Votre téléchargement échouera probablement</string>
+    <string name="error_file_size_greater_than_4gb">La plupart des appareils ne peuvent pas télécharger des fichiers supérieurs à 4&#160;Go. Votre téléchargement échouera probablement</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Aucune appli installée sur votre appareil ne peut exécuter ce fichier</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -675,7 +675,7 @@
     <!-- menu item -->
     <string name="my_account_change_password">Changer le mot de passe</string>
     <!-- Dialog text overquota error -->
-    <string name="overquota_alert_text">Vous avez dépassé votre limite de stockage. Souhaitez-vous surclasser votre compte ?</string>
+    <string name="overquota_alert_text">Vous avez dépassé votre limite de stockage. Voulez-vous surclasser votre compte ?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Dernière session</string>
     <!-- header for the social connections, showing the number of contacts the user has -->
@@ -1206,9 +1206,9 @@
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_delete_contact_request">%1$d réponses ont été supprimées avec succès, mais %2$d n’ont pas été supprimées.</string>
     <!-- confirmation message before removing a contact request. -->
-    <string name="confirmation_delete_contact_request">Souhaitez-vous supprimer l’invitation à %s ?</string>
+    <string name="confirmation_delete_contact_request">Voulez-vous supprimer l’invitation à %s ?</string>
     <!-- confirmation message before removing mutiple contact request -->
-    <string name="confirmation_remove_multiple_contact_request">Souhaitez-vous supprimer ces %d invitations ?</string>
+    <string name="confirmation_remove_multiple_contact_request">Voulez-vous supprimer ces %d invitations ?</string>
     <!-- success message when replying to multiple received request -->
     <string name="number_correctly_invitation_reply_sent">%d réponses à une demande ont été envoyées</string>
     <!-- error message when replying to multiple received request -->
@@ -1511,7 +1511,7 @@
         <item quantity="one">%1$s [A]écrit&#8230;[/A]</item>
         <item quantity="other">%1$s [A]écrivent&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]et plus écrivent&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Plus</string>
@@ -2348,7 +2348,7 @@
     <string name="turn_on_notifications_fifth_step">Activez l’option et sélectionnez vos préférences</string>
     <!-- Alert message after sending to chat one or several messages to several chats, version items -->
     <plurals name="files_send_to_chat_success">
-        <item quantity="one">Fichier envoyé</item>
+        <item quantity="one">Le fichier a été envoyé</item>
         <item quantity="other">Les fichiers ont été envoyés</item>
     </plurals>
     <!-- Error message after sending to chat one or several messages to several chats -->
@@ -2509,7 +2509,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La prochaine fois que vous vous connecterez à votre compte, un code à 6 chiffres fourni par votre appli d’authentification vous sera demandé.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Envisagez d’exporter votre <b>clé de récupération</b> au cas où vous perdriez accès à votre appli ou si vous voulez désactiver l’authentification à deux facteurs dans le futur.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Le code est invalide</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2609,7 +2609,7 @@
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Les dossiers MEGAdrop ne sont pas encore pris en charge</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
-    <string name="pre_overquota_alert_text">Cette action ne peut pas être menée à bien, car elle vous ferait dépasser votre limite de stockage actuelle. Souhaitez-vous surclasser votre compte ?</string>
+    <string name="pre_overquota_alert_text">Cette action ne peut pas être menée à bien, car elle vous ferait dépasser votre limite de stockage actuelle. Voulez-vous surclasser votre compte ?</string>
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">Conversations archivées</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
@@ -2818,7 +2818,7 @@
     <!-- Text of the dialog to confirm after closing all other sessions -->
     <string name="confirmation_close_sessions_text">Ceci vous déconnectera de toute autre session active, sauf celle-ci.</string>
     <!-- Title of the dialog to confirm after closing all other sessions -->
-    <string name="confirmation_close_sessions_title">Souhaitez-vous fermer toutes les autres sessions ?</string>
+    <string name="confirmation_close_sessions_title">Voulez-vous fermer toutes les autres sessions ?</string>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <string name="number_of_participants">%d participants</string>
     <!-- Label of the button to join a chat by a chat link -->
@@ -3147,7 +3147,7 @@
     <!-- Title of the dialog shown when the location is disabled -->
     <string name="gps_disabled">Le GPS est désactivé</string>
     <!-- Text of the dialog shown when the location is disabled for open location settings -->
-    <string name="open_location_settings">Souhaitez-vous ouvrir les paramètres de position ?</string>
+    <string name="open_location_settings">Voulez-vous ouvrir les paramètres de position ?</string>
     <!-- Info shown in the subtitle of each row of the shared files to chat: sender name . date -->
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
@@ -3268,7 +3268,7 @@
     <!-- Description text of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_warning_text">La rotation de la clé chiffrée ne vous permet pas d’obtenir de lien vers une conversation sans en créer une nouvelle.</string>
     <!-- Question of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_question_text">Souhaitez-vous créer une nouvelle conversation de groupe et obtenir un lien vers celle-ci ?</string>
+    <string name="context_create_chat_link_question_text">Voulez-vous créer une nouvelle conversation de groupe et obtenir un lien vers celle-ci ?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="context_make_private_chat_warning_text">La rotation de la clé de chiffrement est un peu plus sûre, mais elle ne vous permet pas de créer un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.</string>
     <!-- Message shown when a user has joined to a public chat successfully -->
@@ -3913,13 +3913,33 @@
     <!-- Warning indicating a file was not created successfully -->
     <string name="file_creation_failed">Échec de création du fichier. Veuillez réessayer.</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
-    <string name="file_saved_to">File saved to %1$s</string>
+    <string name="file_saved_to">Le fichier a été enregistré dans le %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">File not saved to %1$s. Try again.</string>
+    <string name="file_saved_to_failed">Le fichier n’a pas été enregistré dans le %1$s. Veuillez réessayer.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Le fichier a été mis à jour</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">Échec de mise à jour du fichier. Veuillez réessayer.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Le fichier est trop gros et ne peut être ni ouvert ni prévisualisé.</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">Fichier sans extension (.%1$s)</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">Afin de poursuivre, vous devez saisir une extension de fichier</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">Changement de l’extension du fichier</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">Vous ne pourrez peut-être pas accéder à ce fichier si vous changez l’extension de «&#160;.%1$s&#160;» à «&#160;%2$s&#160;»</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">Vous ne pourrez peut-être pas accéder à ce fichier si vous ajoutez l’extension «&#160;.%1$s&#160;»</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">Vous ne pourrez peut-être pas accéder à ce fichier si vous supprimer l’extension «&#160;.%1$s&#160;»</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">Supprimer l’extension</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">Utiliser .%1$s</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">Pas d’extension</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">Conserver .%1$s</string>
 </resources>

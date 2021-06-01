@@ -2464,7 +2464,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         inviteMenuItem.setVisible(false);
                     }
 
-                    contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
+                    contactInfoMenuItem.setTitle(getString(R.string.general_info));
                     contactInfoMenuItem.setVisible(true);
                 }
                 else {
@@ -2476,7 +2476,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         videoMenuItem.setVisible(false);
                     } else {
                         clearHistoryMenuItem.setVisible(true);
-                        contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
+                        contactInfoMenuItem.setTitle(getString(R.string.general_info));
                         contactInfoMenuItem.setVisible(true);
                     }
                     leaveMenuItem.setVisible(false);
