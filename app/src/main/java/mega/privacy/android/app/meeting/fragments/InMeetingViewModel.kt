@@ -806,7 +806,11 @@ class InMeetingViewModel @ViewModelInject constructor(
             isMe = false,
             isModerator = false,
             isAudioOn = isAudioOn,
-            isVideoOn = isVideoOn
+            isVideoOn = isVideoOn,
+            isContact = false,
+            isSpeaker = true,
+            hasHiRes = true,
+            videoListener = null
         )
     }
 
@@ -1479,10 +1483,11 @@ class InMeetingViewModel @ViewModelInject constructor(
         logDebug("Activate video, the participant with clientId ${participant.clientId} is visible")
         if (participant.hasHiRes) {
             if (!isSpeaker) {
+                logDebug("Remove lowRes before request highRes of ${participant.clientId}")
                 removeLowRes(participant.videoListener!!, session, currentChatId)
             }
 
-            logDebug("Add high resolution")
+            logDebug("Add high resolution of ${participant.clientId}")
             addHiRes(
                 participant.videoListener!!,
                 session,
@@ -1490,10 +1495,11 @@ class InMeetingViewModel @ViewModelInject constructor(
             )
         } else {
             if (!isSpeaker) {
+                logDebug("Remove highRes before request lowRes of ${participant.clientId}")
                 removeHiRes(participant.videoListener!!, session, currentChatId)
             }
 
-            logDebug("Add low resolution")
+            logDebug("Add low resolution of ${participant.clientId}")
             addLowRes(
                 participant.videoListener!!,
                 session,
@@ -1512,6 +1518,7 @@ class InMeetingViewModel @ViewModelInject constructor(
 
         inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
             getSession(participant.clientId)?.let {
+                logDebug("Close video of ${participant.clientId}")
                 when {
                     participant.hasHiRes -> {
                         removeHiRes(

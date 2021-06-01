@@ -1381,7 +1381,7 @@ public final class ChatAdvancedNotificationBuilder {
             if (!(chats.isEmpty())) {
                 lastChatId = chats.get(0).getChatId();
             } else {
-                logError("ERROR:chatsEMPTY:removeAllChatNotifications");
+                logError("Chats empty, remove all chat notifications");
                 removeAllChatNotifications();
                 return;
             }

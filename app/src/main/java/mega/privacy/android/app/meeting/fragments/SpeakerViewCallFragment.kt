@@ -252,57 +252,57 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Monitor changes when updating the speaker participant
      *
-     * @param participant
+     * @param speaker
      */
-    private fun updateSpeakerUser(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun updateSpeakerUser(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
-        participant.avatar?.let {
+        speaker.avatar?.let {
             speakerAvatar.setImageBitmap(it)
         }
 
-        updateAudioIcon(participant)
+        updateAudioIcon(speaker)
 
-        if (participant.isVideoOn) {
-            checkVideoOn(participant)
+        if (speaker.isVideoOn) {
+            checkVideoOn(speaker)
         } else {
-            videoOffUI(participant)
+            videoOffUI(speaker)
         }
     }
 
     /**
      * Check if mute icon should be visible
      *
-     * @param participant
+     * @param speaker
      */
-    private fun updateAudioIcon(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun updateAudioIcon(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
-        logDebug("Update audio icon, clientId ${participant.clientId}")
-        speakerMuteIcon.isVisible = !participant.isAudioOn
+        logDebug("Update audio icon, clientId ${speaker.clientId}")
+        speakerMuteIcon.isVisible = !speaker.isAudioOn
     }
 
     /**
      * Show UI when video is off
      *
-     * @param participant
+     * @param speaker
      */
-    private fun videoOffUI(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun videoOffUI(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
-        logDebug("UI video off, speaker with clientId ${participant.clientId}")
-        showAvatar(participant)
-        closeVideo(participant)
-        checkOnHold(participant)
+        logDebug("UI video off, speaker with clientId ${speaker.clientId}")
+        showAvatar(speaker)
+        closeVideo(speaker)
+        checkOnHold(speaker)
     }
 
     /**
      * Method to show the Avatar
      *
-     * @param participant
+     * @param speaker
      */
-    private fun showAvatar(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun showAvatar(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
         logDebug("Show avatar")
         speakerAvatar.isVisible = true
@@ -319,22 +319,22 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Method to close Video
      *
-     * @param participant
+     * @param speaker
      */
-    private fun closeVideo(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun closeVideo(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
         surfaceContainer.isVisible = false
 
-        if (participant.isMe) {
+        if (speaker.isMe) {
             logDebug("Close local video")
-            closeLocalVideo(participant)
+            closeLocalVideo(speaker)
         } else {
             logDebug("Close remote video")
-            inMeetingViewModel.onCloseVideo(participant)
+            inMeetingViewModel.onCloseVideo(speaker)
         }
 
-        participant.videoListener?.let { listener ->
+        speaker.videoListener?.let { listener ->
             logDebug("Removing texture view")
             if (surfaceContainer.childCount > 0) {
                 surfaceContainer.removeAllViews()
@@ -345,38 +345,38 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                     (viewParent as ViewGroup).removeView(view)
                 }
             }
-
-            logDebug("Speaker ${participant.clientId} video listener null")
-            participant.videoListener = null
         }
+
+        logDebug("Speaker ${speaker.clientId} video listener null")
+        speaker.videoListener = null
     }
 
     /**
      * Method to close local video
      *
-     * @param participant
+     * @param speaker
      */
-    private fun closeLocalVideo(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun closeLocalVideo(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
         logDebug("Remove local video listener")
         inMeetingViewModel.removeLocalVideoSpeaker(
             inMeetingViewModel.getChatId(),
-            participant.videoListener
+            speaker.videoListener
         )
     }
 
     /**
      * Method to control the Call/Session on hold icon visibility
      *
-     * @param participant
+     * @param speaker
      */
-    private fun checkOnHold(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun checkOnHold(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
         val isCallOnHold = inMeetingViewModel.isCallOnHold()
 
-        if (participant.isMe) {
+        if (speaker.isMe) {
             if (isCallOnHold) {
                 logDebug("Call is on hold")
                 speakerOnHoldIcon.isVisible = true
@@ -389,7 +389,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             return
         }
 
-        val isSessionOnHold = inMeetingViewModel.isSessionOnHold(participant.clientId)
+        val isSessionOnHold = inMeetingViewModel.isSessionOnHold(speaker.clientId)
         if (isSessionOnHold) {
             logDebug("Session is on hold ")
             speakerOnHoldIcon.isVisible = true
@@ -405,46 +405,46 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Control when a change is received in the video flag
      *
-     * @param participant
+     * @param speaker
      */
-    private fun checkVideoOn(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun checkVideoOn(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
-        if (participant.isVideoOn && ((participant.isMe && !inMeetingViewModel.isCallOnHold()) ||
-                    (!participant.isMe && !inMeetingViewModel.isCallOrSessionOnHold(
-                        participant.clientId
+        if (speaker.isVideoOn && ((speaker.isMe && !inMeetingViewModel.isCallOnHold()) ||
+                    (!speaker.isMe && !inMeetingViewModel.isCallOrSessionOnHold(
+                        speaker.clientId
                     )))
         ) {
+
             logDebug("Video should be on")
-            logDebug("Video should be on")
-            videoOnUI(participant)
+            videoOnUI(speaker)
             return
         }
 
         logDebug("Video should be off")
-        videoOffUI(participant)
+        videoOffUI(speaker)
     }
 
     /**
      * Show UI when video is on
      *
-     * @param participant
+     * @param speaker
      */
-    private fun videoOnUI(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun videoOnUI(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
-        logDebug("UI video on, speaker with clientId ${participant.clientId}")
-        hideAvatar(participant)
-        activateVideo(participant)
+        logDebug("UI video on, speaker with clientId ${speaker.clientId}")
+        hideAvatar(speaker)
+        activateVideo(speaker)
     }
 
     /**
      * Method to hide the Avatar
      *
-     * @param participant
+     * @param speaker
      */
-    private fun hideAvatar(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun hideAvatar(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
         logDebug("Hide Avatar")
         speakerOnHoldIcon.isVisible = false
@@ -455,14 +455,14 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Method for activating the video
      *
-     * @param participant
+     * @param speaker
      */
-    private fun activateVideo(participant: Participant) {
-        if (isSpeakerInvalid(participant)) return
+    private fun activateVideo(speaker: Participant) {
+        if (isSpeakerInvalid(speaker)) return
 
         /*Video*/
-        if (participant.videoListener == null) {
-            logDebug("Active video when listener is null, clientId ${participant.clientId}")
+        if (speaker.videoListener == null) {
+            logDebug("Active video when listener is null, clientId ${speaker.clientId}")
             surfaceContainer.removeAllViews()
 
             val myTexture = TextureView(requireContext())
@@ -475,39 +475,39 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
             val vListener = GroupVideoListener(
                 myTexture,
-                participant.peerId,
-                participant.clientId,
-                participant.isMe
+                speaker.peerId,
+                speaker.clientId,
+                speaker.isMe
             )
 
-            participant.videoListener = vListener
+            speaker.videoListener = vListener
 
-            surfaceContainer.addView(participant.videoListener!!.textureView)
+            surfaceContainer.addView(speaker.videoListener!!.textureView)
 
-            if (participant.isMe) {
+            if (speaker.isMe) {
                 inMeetingViewModel.addLocalVideoSpeaker(
                     inMeetingViewModel.getChatId(),
                     vListener
                 )
             } else {
-                inMeetingViewModel.onActivateVideo(participant, true)
+                inMeetingViewModel.onActivateVideo(speaker, true)
             }
         } else {
-            logDebug("Active video when listener is not null, clientId ${participant.clientId}")
+            logDebug("Active video when listener is not null, clientId ${speaker.clientId}")
             if (surfaceContainer.childCount > 0) {
                 surfaceContainer.removeAllViews()
             }
 
-            participant.videoListener?.textureView?.let { textureView ->
+            speaker.videoListener?.textureView?.let { textureView ->
                 textureView.parent?.let { textureViewParent ->
                     (textureViewParent as ViewGroup).removeView(textureView)
                 }
             }
 
-            surfaceContainer.addView(participant.videoListener?.textureView)
+            surfaceContainer.addView(speaker.videoListener?.textureView)
 
-            participant.videoListener?.height = 0
-            participant.videoListener?.width = 0
+            speaker.videoListener?.height = 0
+            speaker.videoListener?.width = 0
         }
 
         surfaceContainer.isVisible = true
@@ -778,10 +778,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                     }
                     textureView.isVisible = false
                 }
-
-                logDebug("Speaker ${it.clientId} video listener null")
-                it.videoListener = null
             }
+
+            logDebug("Speaker ${it.clientId} video listener null")
+            it.videoListener = null
         }
 
         val iterator = participants.iterator()
