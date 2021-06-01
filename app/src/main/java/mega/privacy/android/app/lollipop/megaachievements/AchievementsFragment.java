@@ -535,6 +535,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 			}
 			else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME){
 				logDebug("MEGA_ACHIEVEMENT_WELCOME");
+				registrationLayout.setVisibility(View.VISIBLE);
 				long storageRegistration = details.getRewardStorageByAwardId(awardId);
 				if(storageRegistration >0){
 					figureRegistrationStorage.setText(getSizeString(storageRegistration));

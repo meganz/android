@@ -182,7 +182,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 		}else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
 			long addPhoneStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
 			long addPhoneTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
-			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.il_verify_phone_big));
+			icon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.il_verify_phone_drawer));
 
 			if(awardId==-1){
 				logDebug("No award for this achievement");
