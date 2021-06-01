@@ -116,7 +116,7 @@
                     android:layout_marginStart="18dp"
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"
-                    android:text="@string/contact_properties_activity"
+                    android:text="@string/general_info"
                     android:textAppearance="?attr/textAppearanceSubtitle1" />
             </LinearLayout>
 
