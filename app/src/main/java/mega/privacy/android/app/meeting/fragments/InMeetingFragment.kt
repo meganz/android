@@ -322,6 +322,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
                     else -> checkChildFragments()
                 }
+
+                showBannerInfo()
             } else {
                 checkAnotherCall()
             }
