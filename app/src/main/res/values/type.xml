@@ -470,6 +470,12 @@
         <item name="android:textSize">11sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Caption.Secondary.Variant4">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!-- Medium, Accent -->
     <style name="TextAppearance.Mega.Caption.Accent">
         <item name="android:textColor">?attr/colorSecondary</item>

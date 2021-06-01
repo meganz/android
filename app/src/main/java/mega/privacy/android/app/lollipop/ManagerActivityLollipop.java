@@ -6557,9 +6557,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (drawerItem == DrawerItem.CAMERA_UPLOADS
 				&& getCameraUploadFragment() != null
 				&& cuFragment.getItemCount() > 0) {
-			sortByMenuItem.setVisible(!cuFragment.isEnableCUFragmentShown());
+			boolean visible = cuFragment.shouldShowToolbarOptions();
+			sortByMenuItem.setVisible(visible);
 			setCuThumbnailTypeIcon();
-			gridSmallLargeMenuItem.setVisible(cuFragment.shouldShowGridOption());
+			gridSmallLargeMenuItem.setVisible(visible);
 		}
 	}
 

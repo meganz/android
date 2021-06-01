@@ -23,17 +23,17 @@ class CuVideoViewHolder extends CuGridViewHolder {
     @Override protected void bind(CuNode node) {
         if (mItemSizeConfig.isSmallGrid()) {
             mBinding.videoDuration.setVisibility(View.GONE);
+            mBinding.playIcon.setVisibility(View.VISIBLE);
         } else {
-            mBinding.videoDuration.setVisibility(View.VISIBLE);
+            mBinding.playIcon.setVisibility(View.GONE);
+
             if (node.getNode() != null) {
+                mBinding.videoDuration.setVisibility(View.VISIBLE);
                 mBinding.videoDuration.setText(getVideoDuration(node.getNode().getDuration()));
             } else {
                 mBinding.videoDuration.setVisibility(View.GONE);
             }
         }
-        mBinding.videoInfo.setBackgroundResource(
-                node.isSelected() ? R.drawable.gradient_cam_uploads_rounded
-                        : R.drawable.gradient_cam_uploads);
 
         mBinding.icSelected.setVisibility(node.isSelected() ? View.VISIBLE : View.GONE);
 

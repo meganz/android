@@ -189,26 +189,6 @@ class CuViewModel extends BaseRxViewModel {
         loadNodes(Single.defer(() -> Single.just(getCuNodes())));
     }
 
-    public long[] getSearchResultNodeHandles() {
-        List<CuNode> nodes = mCuNodes.getValue();
-        if (nodes == null || nodes.isEmpty()) {
-            return new long[0];
-        }
-
-        List<Long> handleList = new ArrayList<>();
-        for (CuNode node : nodes) {
-            if (node.getNode() != null) {
-                handleList.add(node.getNode().getHandle());
-            }
-        }
-
-        long[] handles = new long[handleList.size()];
-        for (int i = 0, n = handleList.size(); i < n; i++) {
-            handles[i] = handleList.get(i);
-        }
-        return handles;
-    }
-
     public boolean isSelecting() {
         return mSelecting;
     }

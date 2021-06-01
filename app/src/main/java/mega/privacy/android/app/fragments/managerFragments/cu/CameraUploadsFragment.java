@@ -547,7 +547,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         return viewModel.isEnableCUShown();
     }
 
-    public boolean shouldShowGridOption() {
+    public boolean shouldShowToolbarOptions() {
         return !isEnableCUFragmentShown() && selectedView == ALL_VIEW;
     }
 
