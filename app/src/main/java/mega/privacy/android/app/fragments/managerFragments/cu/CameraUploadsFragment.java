@@ -425,7 +425,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 .observe(getViewLifecycleOwner(), pair -> openNode(pair.first, pair.second));
 
         viewModel.nodeToAnimate().observe(getViewLifecycleOwner(), pair -> {
-            if (pair.first < 0 || pair.first >= gridAdapter.getItemCount()) {
+            if (gridAdapter == null || pair.first < 0 || pair.first >= gridAdapter.getItemCount()) {
                 return;
             }
 
@@ -506,7 +506,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void openNode(int position, CuNode cuNode) {
-        if (position < 0 || position >= gridAdapter.getItemCount()) {
+        if (position < 0 || gridAdapter == null || position >= gridAdapter.getItemCount()) {
             return;
         }
 

@@ -29,7 +29,7 @@ class MegaNodeRepo @Inject constructor(
 ) {
 
     /**
-     * Get children of CU/MU, with the given order.
+     * Get children of CU/MU, with the given order. All nodes, including folders.
      *
      * @param orderBy Order.
      * @return List of nodes containing CU/MU children.
@@ -75,13 +75,13 @@ class MegaNodeRepo @Inject constructor(
     }
 
     /**
-     * Get children of CU/MU, with the given order.
+     * Get children of CU/MU, with the given order. Only images and reproducible videos.
      *
      * @param orderBy Order.
      * @return List of pairs, whose first value is index used for
      * FullscreenImageViewer/AudioVideoPlayer, and second value is the node.
      */
-    fun getCuChildrenPairs(
+    fun getFilteredCuChildrenAsPairs(
         orderBy: Int
     ): List<Pair<Int, MegaNode>> {
         val children = getCuChildren(orderBy)
@@ -97,6 +97,32 @@ class MegaNodeRepo @Inject constructor(
                 // when not in search mode, index used by viewer is index in all siblings,
                 // including non image/video nodes
                 nodes.add(Pair.create(index, node))
+            }
+        }
+
+        return nodes
+    }
+
+    /**
+     * Get children of CU/MU, with the given order. Only images and reproducible videos.
+     *
+     * @param orderBy Order.
+     * @return List of nodes containing CU/MU children.
+     */
+    fun getFilteredCuChildren(
+        orderBy: Int
+    ): List<MegaNode> {
+        val children = getCuChildren(orderBy)
+        val nodes = ArrayList<MegaNode>()
+
+        for (node in children) {
+            if (node.isFolder) {
+                continue
+            }
+
+            val mime = MimeTypeThumbnail.typeForName(node.name)
+            if (mime.isImage || mime.isVideoReproducible) {
+                nodes.add(node)
             }
         }
 
