@@ -60,7 +60,7 @@ object MegaNodeDialogUtil {
      *
      * @param context            Current context.
      * @param node               A valid node.
-     * @param snackbarShower interface to show snackbar.
+     * @param snackbarShower     Interface to show snackbar.
      * @param actionNodeCallback Callback to finish the rename action if needed, null otherwise.
      * @return The rename dialog.
      */
@@ -203,23 +203,22 @@ object MegaNodeDialogUtil {
         return dialog
     }
 
-
     /**
      * Finishes the initialization of the dialog and shows it.
      *
      * @param context            Current context.
      * @param node               A valid node if needed to confirm the action, null otherwise.
      * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
-     * @param snackbarShower interface to show snackbar.
+     * @param snackbarShower     Interface to show snackbar.
      * @param data               Valid data if needed to confirm the action, null otherwise.
      * @param defaultURLName     The default URL name if the dialog is TYPE_NEW_URL_FILE.
      * @param fromHome           True if the text file will be created from Homepage, false otherwise.
      * @param builder            The AlertDialog.Builder to create and show the final dialog.
      * @param dialogType         Indicates the type of dialog. It can be:
-     *                            - TYPE_RENAME:       Rename action.
-     *                            - TYPE_NEW_FOLDER:   Create new folder action.
-     *                            - TYPE_NEW_FILE:     Create new file action.
-     *                            - TYPE_NEW_URL_FILE: Create new URL file action.
+     *                              - TYPE_RENAME:       Rename action.
+     *                              - TYPE_NEW_FOLDER:   Create new folder action.
+     *                              - TYPE_NEW_FILE:     Create new file action.
+     *                              - TYPE_NEW_URL_FILE: Create new URL file action.
      * @return The created dialog.
      */
     private fun setFinalValuesAndShowDialog(
@@ -308,20 +307,20 @@ object MegaNodeDialogUtil {
      * - If so, confirms the action.
      * - If not, shows the error in question.
      *
-     * @param context           Current context.
+     * @param context            Current context.
      * @param node               A valid node if needed to confirm the action, null otherwise.
      * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
-     * @param snackbarShower interface to show snackbar.
+     * @param snackbarShower     Interface to show snackbar.
      * @param typeText           The input text field.
      * @param data               Valid data if needed to confirm the action, null otherwise.
      * @param errorText          The text field to show the error.
      * @param fromHome           True if the text file will be created from Homepage, false otherwise.
      * @param dialog             The AlertDialog to check.
      * @param dialogType         Indicates the type of dialog. It can be:
-     *                           - TYPE_RENAME:       Rename action.
-     *                            - TYPE_NEW_FOLDER:   Create new folder action.
-     *                           - TYPE_NEW_FILE:     Create new file action.
-     *                           - TYPE_NEW_URL_FILE: Create new URL file action.
+     *                              - TYPE_RENAME:       Rename action.
+     *                              - TYPE_NEW_FOLDER:   Create new folder action.
+     *                              - TYPE_NEW_FILE:     Create new file action.
+     *                              - TYPE_NEW_URL_FILE: Create new URL file action.
      */
     private fun checkActionDialogValue(
         context: Context,
@@ -352,6 +351,16 @@ object MegaNodeDialogUtil {
                     getString(R.string.invalid_characters_defined)
                 )
             }
+            nameAlreadyExists(typedString, dialogType == TYPE_RENAME, node) -> {
+                showDialogError(
+                    typeText,
+                    errorText,
+                    getString(
+                        if (dialogType == TYPE_RENAME || dialogType == TYPE_NEW_FOLDER) R.string.same_item_name_warning
+                        else R.string.same_file_name_warning
+                    )
+                )
+            }
             else -> {
                 when (dialogType) {
                     TYPE_RENAME -> {
@@ -362,7 +371,8 @@ object MegaNodeDialogUtil {
 
                             val oldMimeType = MimeTypeList.typeForName(node.name)
                             var newExtension = MimeTypeList.typeForName(typedString).extension
-                            if (newExtension == typedString.toLowerCase(Locale.ROOT)) newExtension = ""
+                            if (newExtension == typedString.toLowerCase(Locale.ROOT)) newExtension =
+                                ""
 
                             when (if (node.isFolder) NO_ERROR else isValidRenameDialogValue(
                                 oldMimeType,
@@ -683,5 +693,37 @@ object MegaNodeDialogUtil {
                 .setNegativeButton(getString(R.string.general_cancel), null)
                 .show()
         }
+    }
+
+    /**
+     * Checks if exists a node with the typed name within the same parent folder:
+     * - If the action is rename, then gets the parent node.
+     * - If not:
+     *      * If the received node is null, then the parent node is the root.
+     *      * If not, then the received node is the parent.
+     *
+     * @param typedString    Typed text to set as the new node name.
+     * @param isRenameAction True if the action is rename, false otherwise.
+     * @param node           Node to rename or parent where new file/folder should be created.
+     */
+    @JvmStatic
+    fun nameAlreadyExists(
+        typedString: String,
+        isRenameAction: Boolean,
+        node: MegaNode?
+    ): Boolean {
+        val megaApi = MegaApplication.getInstance().megaApi
+
+        val parentNode = when {
+            isRenameAction -> megaApi.getParentNode(node)
+            node == null -> megaApi.rootNode
+            else -> node
+        } ?: return false
+
+        val existingNode = megaApi.getChildren(parentNode)?.find { childNode ->
+            childNode.name == typedString
+        }
+
+        return existingNode != null
     }
 }
