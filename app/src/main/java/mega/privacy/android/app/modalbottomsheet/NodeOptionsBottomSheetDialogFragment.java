@@ -315,6 +315,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
                 if (node.isFile() && (nodeMime.isImage() || nodeMime.isVideo())) {
                     optionGallery.setVisibility(View.VISIBLE);
+                } else {
+                    optionGallery.setVisibility(View.GONE);
                 }
 
                 //Hide
@@ -378,6 +380,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionOpenFolder.setVisibility(View.GONE);
                 counterSave--;
                 optionDownload.setVisibility(View.GONE);
+                optionGallery.setVisibility(View.GONE);
                 counterSave--;
                 optionOffline.setVisibility(View.GONE);
                 counterShares--;
@@ -717,6 +720,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionOpenFolder.setVisibility(View.GONE);
                     counterSave--;
                     optionDownload.setVisibility(View.GONE);
+                    optionGallery.setVisibility(View.GONE);
                     counterSave--;
                     optionOffline.setVisibility(View.GONE);
                     counterShares--;
