@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA biedt door de gebruiker gecontroleerde gecodeerde cloudopslag en chat via standaard webbrowsers, samen met speciale applicaites voor mobiele apparaten. In tegenstelling tot andere cloudopslagdiensten worden uw gegevens alleen gecodeerd en gedecodeerd door uw clientapparaten en nooit door ons.\n\nUpload uw bestanden vanaf uw smartphone of tablet en zoek, bewaar, download, stream, bekijk, deel en hernoem ze of verwijder uw bestanden op elk moment, vanaf elk apparaat en overal. Deel mappen met uw contacten en bekijk hun updates in realtime. Het coderingsproces betekent dat we geen toegang hebben tot uw wachtwoord of het opnieuw kunnen instellen, dus u MOET het onthouden (tenzij u een back-up van uw herstelsleutel heeft), anders verliest u de toegang tot uw opgeslagen bestanden.\n\nEnd-to-end-gebruiker versleutelde MEGA videochat zorgt voor totale privacy en is sinds 2016 beschikbaar via de browser. Het is uitgebreid naar onze mobiele applicatie, met chatgeschiedenis die toegankelijk is op meerdere apparaten. Gebruikers kunnen ook eenvoudig bestanden toevoegen aan een chat vanaf hun MEGA Cloud Drive.\n\nMEGA biedt een royale 50 GB gratis opslagruimte voor alle geregistreerde gebruikers met bonusprestaties, en biedt betaalde abonnementen met veel hogere limieten: \n\n\nPRO LITE-abonnement: 4,99 € per maand of 49,99 € per jaar geeft u 400 GB opslagruimte en 1 TB overdrachtstegoed per maand. \nPRO I-abonnement: 9,99 € per maand of 99,99 € per jaar geeft u 2 TB opslagruimte en 2 TB overdrachtstegoed per maand. \nPRO II-abonnement: 19,99 € per maand of 199,99 € per jaar geeft u 8 TB opslagruimte en 8 TB overdrachtstegoed per maand. \nPRO III-abonnement: 29,99 € per maand of 299,99 € per jaar geeft je 16 TB opslagruimte en 16 TB overdrachtstegoed per maand. \n\nAbonnementen worden automatisch verlengd voor opeenvolgende abonnementsperiodes van dezelfde duur en voor dezelfde prijs als de gekozen beginperiode. Om uw abonnementen te beheren, klikt u gewoon op het Play Store-pictogram op uw mobiele apparaat, logt u in met uw Google-ID (als u dit nog niet heeft gedaan) en klikt u vervolgens op de MEGA-applicatie. U kunt daar uw abonnement beheren. \n\nApplicatie-machtigingen: \nWRITE_EXTERNAL_STORAGE -&gt; Download uw bestanden van MEGA naar uw apparaat en upload bestanden van uw apparaat naar MEGA \nCAMERA -&gt; Neem een foto en upload je foto\’s naar MEGA \nREAD_CONTACTS -&gt; Voeg eenvoudig contacten toe vanaf je apparaat als MEGA-contacten \nRECORD_AUDIO en CAPTURE_VIDEO_OUTPUT (microfoon en camera) -&gt; MEGA zorgt voor end-to-end gecodeerde audio-/videogesprekken \n\n\nOm het vertrouwen van gebruikers in het MEGA-systeem te vergroten, wordt alle code aan de clientzijde gepubliceerd, zodat geïnteresseerde beveiligingsonderzoekers het coderingsproces kunnen evalueren. De code van onze mobiele applicatie is te vinden op:https://github.com/meganz/android\n\nVoor meer informatie, kijk op onze website: \nZie https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA is een Cloud Opslag met Krachtige geïntegreerde Privacy.</string>
     <!-- PRO Lite account -->
@@ -295,9 +295,9 @@
     <string name="sent_requests_empty">[B]Geen [/B][A]verzonden verzoeken[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[B]Geen [/B][A]ontvangen verzoeken[/A]</string>
-    <!-- Title for the file transfer screen (with the up &amp; download) -->
+    <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">Overdrachten</string>
-    <!-- Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this. -->
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Mijn Account</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">Camera Uploads</string>
@@ -307,7 +307,7 @@
     <string name="tab_outgoing_shares">Uitgaande</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Links</string>
-    <!-- Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible). -->
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">Binnenkomende Deling</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Binnenkomende deling met</string>
@@ -420,7 +420,7 @@
     <string name="context_remove_link_warning_text">Deze koppeling is niet meer publiekelijk beschikbaar.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
-        <item quantity="one">Deze koppeling is niet meer publiekelijk beschikbaar.</item>
+        <item quantity="one">Deze link is niet meer publiekelijk beschikbaar.</item>
         <item quantity="other">Deze links zijn niet meer openbaar beschikbaar.</item>
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -694,7 +694,6 @@
     <string name="upgrade_select_pricing">Selecteer abonnement</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Maandelijks of jaarlijks betalen</string>
-    <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">Op dit moment is er geen betaalmethode beschikbaar voor dit abonnement</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
@@ -1477,9 +1476,9 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Gekopieerd naar het klembord</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Chat Fout!</string>
+    <string name="chat_error_open_title">Gespreksfout!</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">De chat kon niet correct geopend worden</string>
+    <string name="chat_error_open_message">Het gesprek kon niet correct geopend worden</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_choose_contact">Kies contact</string>
     <!-- Title of the contact list -->
@@ -1600,7 +1599,7 @@
     <!-- Label to show the number of transfers in progress, Plural -->
     <plurals name="text_number_transfers">
         <item quantity="one">%1$d of %2$d bestand</item>
-        <item quantity="other">%1$d of %2$d bestanden</item>
+        <item quantity="other">%1$d van %2$d bestanden</item>
     </plurals>
     <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
     <string name="label_process_finishing">Het proces is afgelopen &#8230;</string>
@@ -1644,8 +1643,8 @@
     <string name="completed_transfers_empty">Geen voltooide overdrachten</string>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_notification">
-        <item quantity="one">Uploaden van %1$d of %2$d bestand</item>
-        <item quantity="other">Uploaden van %1$d of %2$d bestanden</item>
+        <item quantity="one">Uploaden %1$d van %2$d bestand</item>
+        <item quantity="other">Uploaden %1$d van %2$d bestanden</item>
     </plurals>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_paused_notification">
@@ -1655,7 +1654,7 @@
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_notification">
         <item quantity="one">%1$d Uploaden van %2$d map</item>
-        <item quantity="other">%1$d Uploaden van %2$d mappen</item>
+        <item quantity="other">Uploaden %1$d van %2$d mappen</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_paused_notification">
@@ -1664,8 +1663,8 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
-        <item quantity="one">Bestand %1$d geupload</item>
-        <item quantity="other">Bestanden %1$d geupload</item>
+        <item quantity="one">%1$d bestand geüpload</item>
+        <item quantity="other">%1$d bestanden geüpload</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
@@ -1682,7 +1681,7 @@
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
         <item quantity="one">Bestand %1$d niet geupload</item>
-        <item quantity="other">Bestanden %1$d niet geupload</item>
+        <item quantity="other">%1$d  bestanden niet geüpload</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
     <plurals name="copied_service_upload">
@@ -1696,8 +1695,8 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished, Plural -->
     <plurals name="download_service_final_notification">
-        <item quantity="one">Bestand %1$d gedownload</item>
-        <item quantity="other">Bestanden %1$d gedownload</item>
+        <item quantity="one">%1$d bestand gedownload</item>
+        <item quantity="other">%1$d bestanden gedownload</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
@@ -1706,13 +1705,13 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
-        <item quantity="one">Bestand %1$d niet gedownload</item>
-        <item quantity="other">Bestanden %1$d niet gedownload</item>
+        <item quantity="one">%1$d bestand niet gedownload</item>
+        <item quantity="other">%1$d bestanden niet gedownload</item>
     </plurals>
     <!-- Text of the notification shown when the download service is running, Plural -->
     <plurals name="download_service_notification">
         <item quantity="one">Downloaden van %1$d of %2$d bestand</item>
-        <item quantity="other">Downloaden van %1$d of %2$d bestanden</item>
+        <item quantity="other">Downloaden %1$d van %2$d bestanden</item>
     </plurals>
     <!-- Text of the notification shown when the download service is paused, Plural -->
     <plurals name="download_service_paused_notification">
@@ -1798,7 +1797,7 @@
     <!--  -->
     <string name="camera_uploads_cellular_connection">Gebruik mobiele verbinding</string>
     <!--  -->
-    <string name="camera_uploads_upload_videos">Video\’s Uploaden</string>
+    <string name="camera_uploads_upload_videos">Video’s Uploaden</string>
     <!-- Message when an user avatar has been changed successfully -->
     <string name="success_changing_user_avatar">Profielfoto geupdate</string>
     <!-- Message when an error ocurred when changing an user avatar -->
@@ -1847,7 +1846,7 @@
     <string name="file_properties_shared_folder_full_access">Volledige toegang</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">Alleen lezen</string>
-    <!-- Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;) -->
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Lezen en schrijven</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Overdrachten gepauzeerd</string>
@@ -2237,9 +2236,9 @@
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Telefoon contacten</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Uw account is geschorst door meerdere misbruiken van MEGA\’s Algemene Voorwaarden. Controleer uw email postbak.</string>
+    <string name="account_suspended_multiple_breaches_ToS">Uw account is geschorst door meerdere misbruiken van MEGA’s Algemene Voorwaarden. Controleer uw email postbak.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Uw account was beëindigd door een schending van MEGA\’s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
+    <string name="account_suspended_breache_ToS">Uw account was beëindigd door een schending van MEGA’s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Bestanden laden</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2278,7 +2277,7 @@
     <!--  -->
     <plurals name="header_previous_section_item">
         <item quantity="one">Vorige versie</item>
-        <item quantity="other">Vorige Versies</item>
+        <item quantity="other">Vorige versies</item>
     </plurals>
     <!-- option menu to revert a file version -->
     <string name="general_revert">Terugkeren</string>
@@ -2300,7 +2299,7 @@
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Video Kwaliteit</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Camera Uploads heeft toegang nodig tot uw foto\’s en andere media op uw apparaat. Gaar naar de instellingen pagina en geef toestemming.</string>
+    <string name="on_refuse_storage_permission">Camera Uploads heeft toegang nodig tot uw foto’s en andere media op uw apparaat. Gaar naar de instellingen pagina en geef toestemming.</string>
     <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Originele kwaliteit</item>
@@ -2340,7 +2339,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Open Android apparaat [A]Instellingen[/A]</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Open [A]Applicaties &amp; Notificaties[/A]</string>
+    <string name="turn_on_notifications_second_step">Open [A]Applicaties &amp; meldingen[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Selecteer [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -2509,22 +2508,22 @@
     <string name="title_2fa_enabled">Twee-Stap Authenticatie Ingeschakeld</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw Authenticatie Applicatie.</string>
-    <!--  -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\’t help you gain access to it again.\n &lt;b&gt;Uw Herstelsleutel opslaan&lt;/b&gt;</string>
+    <!-- Recommendation displayed after enable Two-Factor Authentication -->
+    <string name="recommendation_2fa_enabled">Overweeg om uw <b>Herstelsleutel</b> te exporteren voor het geval u de toegang tot uw applicatie verliest of Twee-Factorenauthenticatie in de toekomst wilt uitschakelen.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Ongeldige code</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">Bent u uw Authenticatie apparaat verloren?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">Login Verificatie</string>
-    <!-- Title of screen Change password verification with Two-Factor Authentication -->
-    <string name="change_password_verification">Twee-Stap Authenticatie\nWijzig wachtwoord</string>
-    <!-- Title of screen Cancel account verification with Two-Factor Authentication -->
-    <string name="cancel_account_verification">Twee-Stap Authenticatie \nAnnuleer account</string>
-    <!-- Title of screen Change mail verification with Two-Factor Authentication -->
-    <string name="change_mail_verification">Twee-Stap Authenticatie\n Wijzig email</string>
-    <!-- Title of screen Disable Two-Factor Authentication -->
-    <string name="disable_2fa_verification">Twee-Stap Authenticatie Uitschakelen</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
+    <string name="verify_2fa_subtitle_change_password">Wijzig wachtwoord</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
+    <string name="verify_2fa_subtitle_change_email">E-mailadres wijzigen</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
+    <string name="verify_2fa_subtitle_delete_account">Verwijder account</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
+    <string name="verify_2fa_subtitle_diable_2fa">Uitschakelen</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Bent u uw Authenticatie apparaat verloren?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2544,9 +2543,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Exporteer uw Herstelsleutel om te voltooien</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Authenticatie Applicatie</string>
+    <string name="no_authentication_apps_title">Twee-Factor Authenticatie Applicatie</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Wilt u Google Play openen om een Authenticatie Applicatie te installeren?</string>
+    <string name="open_play_store_2fa">Wilt u Google Play openen zodat u een Authenticatie Applicatie kunt installeren?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2789,7 +2788,7 @@
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">Laat me weten wanneer de maat groter is dan</string>
     <!-- Title of compression queue size option in settings -->
-    <string name="settings_video_compression_queue_size_title">Als video\’s die gecomprimeerd moeten worden groter zijn dan</string>
+    <string name="settings_video_compression_queue_size_title">Als video’s die gecomprimeerd moeten worden groter zijn dan</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
     <string name="settings_rb_scheduler_alert_disabling">Om het Wis Schema van de Prullenbak uit te schakelen of een langer bewaarperiode in te stellen, zal u een PRO abonnement nodig hebben.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
@@ -2976,13 +2975,13 @@
     <!-- the title of the notification that displays when compression larger than setting -->
     <string name="title_compression_size_over_limit">Videocompressie is te groot</string>
     <!-- the content message of the notification that displays when compression larger than setting, placeholder: size in MB -->
-    <string name="message_compression_size_over_limit">De totale grootte van de te comprimeren video\’s zijn groter dan %s. Geef uw apparaat op om door te gaan.</string>
+    <string name="message_compression_size_over_limit">De totale grootte van de te comprimeren video’s zijn groter dan %s. Geef uw apparaat op om door te gaan.</string>
     <!-- Message displayed when the user changes the ‘Keep file names as in the device’ setting -->
     <string name="message_keep_device_name">Deze instelling gaat van kracht wanneer Camera Uploads de volgende keer wordt uitgevoerd</string>
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s is gecomprimeerd</string>
     <!-- notification title when compressing video -->
-    <string name="title_compress_video">Video\’s comprimeren %1$d/%2$d</string>
+    <string name="title_compress_video">Video’s comprimeren %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Ongeldige map geselecteerd</string>
     <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
@@ -3047,15 +3046,15 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA Instellen</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA heeft toegang nodig tot uw foto\’s, media en bestanden, zodat u ze kunt delen met vrienden, gecodeerde berichten kunt uitwisselen en veilig kunt bellen.</string>
+    <string name="setup_mega_explanation">MEGA heeft toegang nodig tot uw foto’s, media en bestanden, zodat u ze kunt delen met vrienden, gecodeerde berichten kunt uitwisselen en veilig kunt bellen.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Toegang tot foto\’s, media en bestanden toestaan.</string>
+    <string name="allow_acces_media_title">Toegang tot foto’s, media en bestanden toestaan.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">Voor het delen van foto\’s, video\’s en bestanden heeft MEGA uw toestemming nodig.</string>
+    <string name="allow_acces_media_subtitle">Voor het delen van foto’s, video’s en bestanden heeft MEGA uw toestemming nodig.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Camera inschakelen</string>
     <!-- Subtitle of the screen asking permissions for camera -->
-    <string name="allow_acces_camera_subtitle">Bied toegang tot uw camera om documenten te scannen, foto\’s te nemen en video-oproepen te maken.</string>
+    <string name="allow_acces_camera_subtitle">Bied toegang tot uw camera om documenten te scannen, foto’s te nemen en video-oproepen te maken.</string>
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Oproepen inschakelen</string>
     <!-- Title of the screen asking permissions for contacts -->
@@ -3172,11 +3171,11 @@
     <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_contacts_not_send">
         <item quantity="one">%d contact is niet verzonden naar %d gesprekken</item>
-        <item quantity="other">%d contacten waren niet verzonen naar %d gesprekken</item>
+        <item quantity="other">%d contacten waren niet verstuurd naar %d gesprekken</item>
     </plurals>
     <!-- Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_messages_not_send">
-        <item quantity="one">%bericht was niet verzonden naar %d gesprekken</item>
+        <item quantity="one">%d bericht was niet verzonden naar %d gesprekken</item>
         <item quantity="other">%d berichten waren niet verzonden naar %d gesprekken</item>
     </plurals>
     <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
@@ -3239,7 +3238,7 @@
     <!-- Content of third tour screen -->
     <string name="content_tour_three">Contacten toevoegen, netwerk creëren, samenwerken, en spraak en video oproepen maken zonder MEGA ooit te verlaten</string>
     <!-- Title of fourth tour screen -->
-    <string name="title_tour_four">Uw Foto\’s in de Cloud</string>
+    <string name="title_tour_four">Uw Foto’s in de Cloud</string>
     <!-- Content of fourth tour screen -->
     <string name="content_tour_four">Camera uploads is een essentieel kenmerk voor elk mobiel apparaat en wij hebben u bedekt. Creëer uw account nu.</string>
     <!-- Title of the dialog shown when a pdf required password -->
@@ -3331,7 +3330,7 @@
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
     <string name="alert_enter_group_name">Om een gespreklink te creëren moet u de groep een naam geven.</string>
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
-    <string name="invite_contacts_to_start_chat">Nodig contacten uit en begin een veilig gesprek met MEGA\’s gecodeerde chat.</string>
+    <string name="invite_contacts_to_start_chat">Nodig contacten uit en begin een veilig gesprek met MEGA’s gecodeerde chat.</string>
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Begin met veilig chatten met uw contacten door gebruik van end-to-end encryptie</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
@@ -3389,13 +3388,13 @@
     <!-- Title of a media recents bucket that only contains some images -->
     <string name="title_media_bucket_only_images">%d Afbeeldingen</string>
     <!-- Title of a media recents bucket that only contains some videos -->
-    <string name="title_media_bucket_only_videos">%d Video\’s</string>
+    <string name="title_media_bucket_only_videos">%d Video’s</string>
     <!-- Title of a media recents bucket that contains some images and some videos -->
-    <string name="title_media_bucket_images_and_videos">%1$d Afbeeldingen en %2$d Video\’s</string>
+    <string name="title_media_bucket_images_and_videos">%1$d Afbeeldingen en %2$d Video’s</string>
     <!-- Title of a media recents bucket that contains some images and a video -->
     <string name="title_media_bucket_images_and_video">%d Afbeeldingen en 1 Video</string>
     <!-- Title of a media recents bucket that contains an image and some videos -->
-    <string name="title_media_bucket_image_and_videos">1 Afbeelding en %d Video\’s</string>
+    <string name="title_media_bucket_image_and_videos">1 Afbeelding en %d Video’s</string>
     <!-- Title of a media recents bucket that contains an image and a video -->
     <string name="title_media_bucket_image_and_video">1 Afbeelding en 1 Video</string>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
@@ -3450,7 +3449,7 @@
     <string name="overall_usage_label">Totaal gebruik</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Overdracht</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz -->
+    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">U kunt %1$s niet verwijderen als contact omdat deze deel uitmaakt van uw zakelijke account.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Er is een probleem opgetreden met uw laatste betaling. Ga naar MEGA via een desktopbrowser voor meer informatie.</string>
@@ -3645,7 +3644,7 @@
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Zien</string>
     <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">%s\’s inloggegevens</string>
+    <string name="label_contact_credentials">%s’s inloggegevens</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">Docs</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3653,19 +3652,19 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Nieuw gesprek</string>
     <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">Geen foto\’s gevonden</string>
+    <string name="homepage_empty_hint_photos">Geen foto’s gevonden</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Geen documenten gevonden</string>
     <!-- Text that indicates that there’s no audio to show -->
     <string name="homepage_empty_hint_audio">Geen audio bestanden gevonden</string>
     <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">Geen video\’s gevonden</string>
+    <string name="homepage_empty_hint_video">Geen video’s gevonden</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Zoek GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
     <string name="empty_search_giphy">Geen [A]GIFs[/A] gevonden</string>
     <!-- Label indicating there is not available GIFs due to down server -->
-    <string name="server_down_giphy">Geen beschikbare GIF\’s. Probeer het later opnieuw</string>
+    <string name="server_down_giphy">Geen beschikbare GIF’s. Probeer het later opnieuw</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
     <string name="end_of_results_giphy">[A]Eind van[/A] resultaten</string>
     <!-- Title of a dialog to confirm the action of resume all transfers -->
@@ -3741,7 +3740,7 @@
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
         <item quantity="one">1 uur</item>
-        <item quantity="other">%1$d uur</item>
+        <item quantity="other">%1$d uren</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
@@ -3756,7 +3755,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Selecteer overdrachten</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">De prioriteitswijziging van de overdracht ‘%1$s\’ is mislukt.</string>
+    <string name="change_of_transfer_priority_failed">De prioriteitswijziging van de overdracht ‘%1$s’ is mislukt.</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Verzend de decoderingssleutel afzonderlijk</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3846,7 +3845,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Voordat u doorgaat</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We gebruiken lokale opslag en vergelijkbare technologieën (‘cookies\’) om u onze services te bieden, uw ervaring met onze services te verbeteren en de advertenties die u ziet, aan te passen, ook via derden. Accepteer ons gebruik van cookies vanaf het begin van uw bezoek of pas cookies aan in Cookie-instellingen. Lees meer in ons [A]Cookiebeleid[/A].</string>
+    <string name="dialog_cookie_alert_message">We gebruiken lokale opslag en vergelijkbare technologieën (‘cookies’) om u onze services te bieden, uw ervaring met onze services te verbeteren en de advertenties die u ziet, aan te passen, ook via derden. Accepteer ons gebruik van cookies vanaf het begin van uw bezoek of pas cookies aan in Cookie-instellingen. Lees meer in ons [A]Cookiebeleid[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie-Instellingen niet opgeslagen</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -3916,9 +3915,11 @@
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">Bestand opgeslagen in %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">Bestand niet opgeslagen in %1$s. Probeer het opnieuw.</string>
+    <string name="file_saved_to_failed">Bestand niet opgeslagen in %1$s. Probeer het nogmaals.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Bestand bijgewerkt</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">Bestandsupdate is mislukt. Probeer het opnieuw.</string>
+    <!-- Warning which alerts the user a file cannot be opened -->
+    <string name="error_opening_file">Het bestand is te groot en kan niet geopend of weergegeven worden.</string>
 </resources>

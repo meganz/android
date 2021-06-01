@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA는 휴대 기기를 위한 전용 앱과 함께 이용자 제어 암호화 클라우드 저장소와 대화를 표준 웹 브라우저를 통해 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 당신의 클라이언트 기기에서만 암호화되고 해독됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로그하고 언제, 어느 기기에서든, 어디서나 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제하세요. 당신의 지인들과 폴더를 공유하고 그들의 변경 사항을 실시간으로 보세요. 암호화 과정은 당신의 비밀번호를 재설정하거나 접근할 수 없다는 것을 의미하며 당신은 반드시 비밀번호를 기억해야하며 (복구 키를 백업하지 않았다면) 그렇지 않았다면 당신이 저장한 파일에 대한 접근을 잃게 됩니다.\n\n종단간 암호화 MEGA 영상 대화는 완전한 정보 보호를 가능하게 하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 우리의 모바일 앱으로도 확장되어, 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 그들의 MEGA 클라우드 드라이브로부터 파일을 대화에 쉽게 추가할 수 있습니다.\n\nMEGA는 보너스 도전과제와 함께 가입한 모든 이용자에게 50 GB의 넉넉한 무료 용량을 제공하며, 훨씬 높은 한도의 유료 요금제를 제공합니다:\n\n\nPro Lite 구독: 월 4.99 € 또는 연 49.99 €로 400 GB의 저장 공간과 월 1 TB의 전송 할당량을 받을 수 있습니다.\nPro I 구독: 월 9.99 € 또는 연 99.99 €로 2 TB의 저장 공간과 월 2 TB의 전송 할당량을 받을 수 있습니다.\nPro II 구독: 월 19.99 € 또는 연 199.99 €로 8 TB의 저장 공간과 월 8 TB의 전송 할당량을 받을 수 있습니다.\nPro III 구독: 월 29.99 € 또는 연 299.99 €로 16 TB의 저장 공간과 월 16 TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 같은 가격으로 자동 갱신됩니다. 구독을 관리하려면 모바일 기기에서 Play Store 아이콘을 클릭한 후, Google ID로 로그인(만약 하지 않았다면)한 후 MEGA 앱을 클릭하세요. 그곳에서 구독을 관리할 수 있을 것입니다.\n\n앱 권한:\n외부 저장소 쓰기 -&gt; MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드합니다\n카메라 -&gt; 사진을 찍고 당신의 사진을 MEGA에 업로드합니다\n연락처 읽기 -&gt; 당신의 기기의 연락처를 쉽게 MEGA 연락처로 추가합니다\n오디오 녹음과 영상 출력 캡처 (마이크와 카메라) -&gt; MEGA는 종단간 암호화 음성/영상 통화를 제공합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰 향상을 위해, 모든 클라이언트측 코드는 공개되며, 흥미있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android\n\n자세한 정보는, 우리의 웹사이트를 확인하세요: \nhttps://mega.nz/terms를 확인하세요\n\n\n데스크톱 - https://mega.nz/</string>
+    <string name="full_description_text">MEGA는 휴대 기기를 위한 전용 앱을 더불어, 표준 웹 브라우저를 통해 이용자 제어 암호화 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 우리가 아닌 당신의 클라이언트 기기에서만 암호화되고 복호화됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드하고 언제, 어디서나, 어느 기기에서든 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 폴더를 공유하고 그들이 수정하는 것을 실시간으로 보세요. 암호화 과정은 우리가 당신의 암호에 접근하거나 재설정할 수 없다는 것을 의미하므로 반드시 기억하지 않으면 (복구 키를 백업하지 않았다면) 저장한 파일들에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 임호화 MEGA 영상 통화는 완전한 개인 정보 보호를 가능하게 하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 이는 우리의 모바일 앱으로 확장되어, 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 MEGA 클라우드 드라이브에서 대화에 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 넉넉한 50GB 무료 공간을 보너스 도전과제와 함께 모든 가입자에게 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPro Lite 구독: 매달 4.99 € 또는 매년 49.99 €로 매달 400GB의 저장 공간과 1TB의 전송 할당량을 받을 수 있습니다.\nPro I 구독: 매달 9.99 € 또는 매년 99.99 €로 매달 2TB의 저장 공간과 2TB의 전송 할당량을 받을 수 있습니다.\nPro II 구독: 매달 19.99 € 또는 매년 199.99 €로 매달 8TB의 저장 공간과 8TB의 전송 할당량을 받을 수 있습니다.\nPro III 구독: 매달 29.99 € 또는 매년 299.99 €로 매달 16TB의 저장 공간과 16TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 동일한 기간과 동일한 요금으로 연속적으로 자동 갱신됩니다. 구독을 관리하려면, 휴대 기기에서 Play 스토어 아이콘을 클릭하고, Google ID로 로그인한 후 (아직 하지 않았다면) MEGA 앱을 클릭하세요. 그 곳에서 구독을 관리할 수 있습니다.\n\n앱 권한:\n외부 저장소 쓰기 -&gt; MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드 합니다\n카메라 -&gt; 사진을 찍고 MEGA로 사진을 업로드합니다\n연락처 읽기 -&gt; 당신의 기기에서 연락처를 MEGA 연락처로 쉽게 추가합니다\n오디오 녹음과 비디오 출력 캡처 (마이크와 카메라) -&gt; MEGA가 종단간 암호화 음성/영상 통화를 제공하는데에 필요합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰를 향상시키기 위해, 모든 클라이언트 사이드 코드는 공개되며, 관심 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android \n\n자세한 정보는, 우리의 웹사이트를 확인하세요:\nhttps://mega.nz/terms 를 확인하세요\n\n\n데스크톱 - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA는 강력한 상시 개인 정보 보호를 가진 클라우드 저장소입니다.</string>
     <!-- PRO Lite account -->
@@ -17,9 +17,9 @@
     <!-- dialog option cancel in alert dialog -->
     <string name="general_cancel">취소</string>
     <!-- When moving a file to a location in MEGA. This is the text of the button after selection the destination -->
-    <string name="general_move_to">이동할 곳</string>
+    <string name="general_move_to">이동</string>
     <!-- When copying a file to a location in MEGA. This is the text of the button after selection the destination -->
-    <string name="general_copy_to">복사할 곳</string>
+    <string name="general_copy_to">복사</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select">선택</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
@@ -41,13 +41,13 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="general_leave">떠나기</string>
     <!-- button -->
-    <string name="general_decryp">해독</string>
+    <string name="general_decryp">복호화</string>
     <!-- button -->
     <string name="general_export">내보내기</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_ok">OK</string>
     <!-- Skip a step of a configuration process. -->
-    <string name="general_skip">넘기기</string>
+    <string name="general_skip">건너뛰기</string>
     <!-- Label for a button to stop some process. For example stop the Camera Uploads -->
     <string name="general_stop">정지</string>
     <!-- option shown when a message could not be sent -->
@@ -55,11 +55,11 @@
     <!-- Button to open the default web browser -->
     <string name="general_open_browser">브라우저 열기</string>
     <!-- The title of progress dialog when loading web content -->
-    <string name="general_loading">불러오는중</string>
+    <string name="general_loading">불러오는 중</string>
     <!-- state while importing the file -->
     <string name="general_importing">들여오는 중</string>
     <!-- state while importing the file -->
-    <string name="general_forwarding">전달</string>
+    <string name="general_forwarding">전달중</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="general_import">들여오기</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
@@ -71,9 +71,9 @@
     <!-- It will be followed by the error message -->
     <string name="general_error_word">오류</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
-    <string name="general_not_yet_implemented">아직 실행되지 않음</string>
+    <string name="general_not_yet_implemented">아직 구현되지 않음</string>
     <!-- when any file or folder is selected -->
-    <string name="error_no_selection">파일이나 폴더가 선택되지 않았습니다</string>
+    <string name="error_no_selection">선택된 파일 또는 폴더 없음</string>
     <!-- when trying to download a file that is already downloaded in the device -->
     <string name="general_already_downloaded">이미 다운로드됨</string>
     <!-- when trying to upload a file that is already uploaded in the folder -->
@@ -91,9 +91,9 @@
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">보조 미디어 폴더가 존재하지 않습니다, 새 폴더를 선택하세요</string>
     <!-- when no external card exists -->
-    <string name="no_external_SD_card_detected">외부 저장 공간이 탐지되지 않았습니다</string>
+    <string name="no_external_SD_card_detected">외부 저장 공간이 감지되지 않았습니다</string>
     <!-- On clicking menu item upload in a incoming shared folder read only -->
-    <string name="no_permissions_upload">이 폴더는 읽기 전용입니다. 업로드할 권한이 없습니다</string>
+    <string name="no_permissions_upload">이 폴더는 읽기 전용입니다. 당신은 업로드할 권한이 없습니다</string>
     <!-- confirmation message before removing the previously downloaded MasterKey file -->
     <string name="remove_key_confirmation">이전에 내보낸 복구 키 파일을 삭제하려고 합니다</string>
     <!-- confirmation message before sending an invitation to a contact -->
@@ -105,7 +105,7 @@
     <!-- Menu item -->
     <string name="action_create_folder">새 폴더 생성</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">새 텍스트 파일 만들기</string>
+    <string name="action_create_txt">새 텍스트 파일 생성</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">링크 열기</string>
     <!-- Menu item -->
@@ -127,7 +127,7 @@
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">계정 업그레이드</string>
     <!-- Message while proceeding to upgrade the account -->
-    <string name="upgrading_account_message">계정 업그레이드중</string>
+    <string name="upgrading_account_message">계정 업그레이드 중</string>
     <!-- Menu item to select all the elements of a list -->
     <string name="action_select_all">모두 선택</string>
     <!-- Menu item to unselect all the elements of a list -->
@@ -141,31 +141,31 @@
     <!-- Menu item to let the user cancel subscriptions -->
     <string name="action_cancel_subscriptions">구독 취소</string>
     <!-- success message when the subscription has been canceled correctly -->
-    <string name="cancel_subscription_ok">구독이 올바르게 취소되었습니다</string>
+    <string name="cancel_subscription_ok">구독이 취소되었습니다</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">구독을 취소할 수 없습니다. 도움을 받으려면 support&#64;mega.nz로 연락주세요</string>
+    <string name="cancel_subscription_error">당신의 구독을 취소할 수 없었습니다. 도움을 받으려면 support&#64;mega.nz로 연락주세요</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">다른 세션 닫기</string>
     <!-- Message after kill all opened sessions -->
-    <string name="success_kill_all_sessions">남은 세션이 올바르게 닫혔습니다</string>
+    <string name="success_kill_all_sessions">남은 세션이 닫혔습니다</string>
     <!-- Message after kill all opened sessions -->
-    <string name="error_kill_all_sessions">열린 세션을 닫는 도중 오류가 발생하였습니다.</string>
+    <string name="error_kill_all_sessions">열린 세션을 닫는 중 오류 발생</string>
     <!-- General label for files -->
     <plurals name="general_num_files">
         <item quantity="other">파일</item>
     </plurals>
     <!-- Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts -->
     <plurals name="general_num_shared_with">
-        <item quantity="other">%1$d개의 연락처와 공유됨</item>
+        <item quantity="other">%1$d명의 지인과 공유됨</item>
     </plurals>
     <!-- Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file">%s(이)가 다운로드 됩니다.</string>
+    <string name="alert_larger_file">%s가 다운로드 됩니다.</string>
     <!-- Alert text before download -->
-    <string name="alert_no_app">%s 파일을 열 앱이 없습니다. 다운로드를 진행하시겠습니까?</string>
+    <string name="alert_no_app">%s 파일을 열 앱이 없습니다. 다운로드를 진행 하시겠습니까?</string>
     <!-- Dialog option that permits user do not show it again -->
     <string name="checkbox_not_show_again">다시 보여주지 마세요</string>
     <!-- Press back while login to cancel current login process. -->
-    <string name="confirm_cancel_login">현재 로그인 과정을 취소하시겠습니까?</string>
+    <string name="confirm_cancel_login">현재 로그인 과정을 취소 하시겠습니까?</string>
     <!-- Login button -->
     <string name="login_text">로그인</string>
     <!-- email label -->
@@ -175,9 +175,9 @@
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="confirm_password_text">암호 확인</string>
     <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
-    <string name="abc">가나다</string>
+    <string name="abc">ABC</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
-    <string name="new_to_mega">MEGA에 처음이신가요?</string>
+    <string name="new_to_mega">MEGA가 처음이신가요?</string>
     <!-- button that allows the user to create an account -->
     <string name="create_account">계정 생성</string>
     <!-- when the user tries to log in MEGA without typing the email -->
@@ -189,25 +189,25 @@
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">네트워크 연결 없음</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">다른 위치에서 이 기기를 로그아웃하였습니다.</string>
+    <string name="error_server_expired_session">다른 위치에서 이 기기를 로그아웃 하였습니다.</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
     <string name="login_generating_key">암호화 키 계산중</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
-    <string name="login_connecting_to_server">서버에 연결중</string>
+    <string name="login_connecting_to_server">서버에 연결 중</string>
     <!-- Status text when updating the file manager -->
-    <string name="download_updating_filelist">파일 목록 업데이트중</string>
+    <string name="download_updating_filelist">파일 목록 업데이트 중</string>
     <!-- title of the screen after creating an account when the user has to confirm the password to confirm the account -->
     <string name="login_confirm_account">계정 확인</string>
     <!-- when the user clicks on the link sent by MEGA after creating the account, this message is shown -->
-    <string name="login_querying_signup_link">인증 링크 확인중</string>
+    <string name="login_querying_signup_link">인증 링크 확인 중</string>
     <!-- Attempting to activate a MEGA account for a user. -->
-    <string name="login_confirming_account">활성중인 계정</string>
+    <string name="login_confirming_account">계정 활성화 중</string>
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
-    <string name="login_preparing_filelist">파일 목록 준비중</string>
+    <string name="login_preparing_filelist">파일 목록 준비 중</string>
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">MEGA로 공유하려면 로그인하세요</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
-    <string name="reg_link_expired">확인 링크가 더 이상 유효하지 않습니다. 당신의 계정이 이미 활성화되었거나 등록을 취소했을 수 있습니다.</string>
+    <string name="reg_link_expired">확인 링크가 더 이상 유효하지 않습니다. 계정이 이미 활성화되었거나 가입을 취소했을 수 있습니다.</string>
     <!--  -->
     <string name="tour_space_title">MEGA 공간</string>
     <!--  -->
@@ -217,13 +217,13 @@
     <!--  -->
     <string name="tour_access_title">MEGA 접근</string>
     <!--  -->
-    <string name="tour_space_text">지금 가입하고 50 GB*의 무료 공간을 받으세요</string>
+    <string name="tour_space_text">지금 가입하고 50GB*의 무료 공간을 받으세요</string>
     <!--  -->
-    <string name="tour_speed_text">업로드는 매우 빠릅니다. 빠르게 모두와 파일을 공유하세요</string>
+    <string name="tour_speed_text">업로드는 매우 빠릅니다. 모두와 빠르게 파일을 공유하세요</string>
     <!--  -->
     <string name="tour_privacy_text">MEGA의 종단간 암호화로 모든 파일을 안전하게 보관하세요</string>
     <!--  -->
-    <string name="tour_access_text">언제, 어디서든 완전히 암호화</string>
+    <string name="tour_access_text">언제, 어디서든 완전히 암호화된 접근</string>
     <!-- button that allows the user to create an account -->
     <string name="create_account_text">계정 생성</string>
     <!-- category in sort by action -->
@@ -235,17 +235,17 @@
     <!-- text placed on the checkbox of acceptation of the Terms of Service -->
     <string name="tos">MEGA의 [A]이용 약관[/A]에 동의합니다</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
-    <string name="top">[B]내가 비밀번호를 잊으면, 데이터에 대한 접근을 잃는다[/B]는 것을 이해하였습니다. [A]MEGA의 종단간 암호화[/A]에 대하여 더 알아보기</string>
+    <string name="top">[B]내가 암호를 잊으면, 데이터에 대한 접근을 잃는다[/B]는 것을 이해하였습니다. [A]MEGA의 종단간 암호화[/A]에 대하여 더 알아보기</string>
     <!-- Does the user already have a MEGA account -->
     <string name="already_account">이미 계정이 있으신가요?</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">이용 약관에 동의하여야 합니다.</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
-    <string name="create_account_no_top">비밀번호를 잊는 것에 대한 위험성을 이해하였다는데에 동의해야합니다</string>
+    <string name="create_account_no_top">암호를 잊는 것에 대한 위험성을 이해하였다는 데에 동의해야 합니다</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
     <string name="error_enter_username">이름을 입력하세요</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">이름을 입력하세요.</string>
+    <string name="error_enter_userlastname">성을 입력하세요.</string>
     <!-- when creating the account -->
     <string name="error_short_password">암호가 너무 짧습니다</string>
     <!-- when creating the account -->
@@ -253,7 +253,7 @@
     <!-- when creating the account -->
     <string name="error_email_registered">이 이메일 주소는 이미 MEGA에 가입되어 있습니다.</string>
     <!--  -->
-    <string name="create_account_creating_account">서버에 연결중: 계정 생성중</string>
+    <string name="create_account_creating_account">서버에 연결 중: 계정 생성 중</string>
     <!--  -->
     <string name="cancel_transfer_confirmation">이 전송을 취소할까요?</string>
     <!--  -->
@@ -292,9 +292,9 @@
     <string name="sent_requests_empty">[A]발송된 요청[/A][B] 없음[/B]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[A]수신된 요청[/A][B] 없음[/B]</string>
-    <!-- Title for the file transfer screen (with the up &amp; download) -->
+    <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">전송</string>
-    <!-- Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this. -->
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">내 계정</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">카메라 업로드</string>
@@ -304,18 +304,18 @@
     <string name="tab_outgoing_shares">나감</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">링크</string>
-    <!-- Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible). -->
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">들어오는 공유</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">다음과의 들어오는 공유</string>
     <!-- message when there are no files in the Cloud drive -->
     <string name="file_browser_empty_cloud_drive">당신의 클라우드 드라이브에 파일이 없습니다</string>
     <!-- Text that indicates that a folder is currently empty -->
-    <string name="file_browser_empty_folder">폴더에 파일이 없음</string>
+    <string name="file_browser_empty_folder">빈 폴더</string>
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">계정 선택</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">오프라인으로 사용 가능</string>
+    <string name="file_properties_available_offline">오프라인 사용 가능</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">크기</string>
     <!-- When the file/folder was last modified -->
@@ -357,28 +357,28 @@
     <!-- This is button text on the Get Link dialog. This lets the user get a public file/folder link without the decryption key e.g. https://mega.nz/#!Qo12lSpT. -->
     <string name="option_link_without_key">키 없는 링크</string>
     <!-- Alert Dialog to get link -->
-    <string name="option_decryption_key">해독 키</string>
+    <string name="option_decryption_key">복호화 키</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">파일 준비중</string>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_began">
-        <item quantity="other">%1$d개의 다운로드 시작됨</item>
+        <item quantity="other">다운로드 %1$d개 시작</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_finish">
-        <item quantity="other">%1$d개의 다운로드 완료됨</item>
+        <item quantity="other">다운로드 %1$d개 완료</item>
     </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
-        <item quantity="other">%1$d개의 업로드 시작됨</item>
+        <item quantity="other">업로드 %1$d개 시작</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_finish">
-        <item quantity="other">%1$d개의 업로드 완료됨</item>
+        <item quantity="other">업로드 %1$d개 완료</item>
     </plurals>
     <!-- Warning shown when it tries to download some empty folders. Plural -->
     <plurals name="empty_folders">
-        <item quantity="other">폴더들이 비어있습니다.</item>
+        <item quantity="other">폴더들이 비어 있습니다.</item>
     </plurals>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_cancel">취소하려면 터치하세요</string>
@@ -423,15 +423,15 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">열기</string>
     <!-- while renaming a file or folder -->
-    <string name="context_renaming">이름을 바꾸는중</string>
+    <string name="context_renaming">이름을 바꾸는 중</string>
     <!-- while file provider is downloading a file -->
-    <string name="context_preparing_provider">파일 준비중</string>
+    <string name="context_preparing_provider">파일 준비 중</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_download">다운로드</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_move">이동</string>
     <!-- while moving a file or folder -->
-    <string name="context_moving">이동중</string>
+    <string name="context_moving">이동 중</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_copy">복사</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -441,19 +441,19 @@
     <!-- menu item -->
     <string name="context_move_to_trash">휴지통으로 이동</string>
     <!-- menu item -->
-    <string name="context_delete_from_mega">MEGA에서 제거</string>
+    <string name="context_delete_from_mega">MEGA에서 삭제</string>
     <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">폴더명</string>
+    <string name="context_new_folder_name">폴더 이름</string>
     <!-- when adding a new contact. in the dialog -->
     <string name="context_new_contact_name">연락처 이메일</string>
     <!-- status dialog when performing the action -->
-    <string name="context_creating_folder">폴더 생성중</string>
+    <string name="context_creating_folder">폴더 생성 중</string>
     <!-- Menu item -->
-    <string name="context_download_to">다음 위치에 저장</string>
+    <string name="context_download_to">저장</string>
     <!-- Menu option title -->
     <string name="context_clear_rubbish">휴지통 비우기</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">휴지통에서 모든 항목을 영구적으로 제거하려고 합니다.</string>
+    <string name="clear_rubbish_confirmation">휴지통에서 모든 항목을 완전히 삭제하려고 합니다.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">보내기</string>
     <!-- send the file to inbox -->
@@ -471,7 +471,7 @@
     <!-- open a shared folder -->
     <string name="context_view_shared_folders">공유된 폴더 보기</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_sharing_folder">공유하기</string>
+    <string name="context_sharing_folder">공유 중</string>
     <!-- Menu option to manage a shared folder. -->
     <string name="manage_share">공유 관리</string>
     <!-- menu item -->
@@ -625,11 +625,11 @@
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact_and_share">연락처를 추가하고 공유</string>
     <!-- Title of the alert to introduce the decryption key -->
-    <string name="alert_decryption_key">해독 키</string>
+    <string name="alert_decryption_key">복호화 키</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">링크의 해독 키를 입력하세요</string>
+    <string name="message_decryption_key">링크의 복호화 키를 입력하세요</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
-    <string name="invalid_decryption_key">잘못된 해독 키</string>
+    <string name="invalid_decryption_key">잘못된 복호화 키</string>
     <!-- upload to. Then choose an Image file -->
     <string name="upload_to_image">이미지</string>
     <!-- upload to. Then choose an Audio file -->
@@ -684,7 +684,6 @@
     <string name="upgrade_select_pricing">회원권 선택</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">월간 또는 연간 재구독</string>
-    <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">지금 이 요금제를 결제할 수 있는 수단이 없습니다</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
@@ -740,9 +739,9 @@
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="settings_storage">저장소</string>
     <!-- Settings of the Passcode -->
-    <string name="settings_passcode_lock">비밀번호 잠금</string>
+    <string name="settings_passcode_lock">암호 잠금</string>
     <!-- Setting to allow the user to select the preferred passcode type -->
-    <string name="settings_passcode_option">비밀번호 옵션</string>
+    <string name="settings_passcode_option">암호 옵션</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">동영상 압축은 전력을 많이 소모합니다, MEGA는 압축하려는 동영상이 %s보다 클 경우 기기를 충전할 것을 요구할 것입니다.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
@@ -883,16 +882,16 @@
     <!-- Settings option to change Passcode. -->
     <string name="settings_change_passcode">패스코드 변경</string>
     <!-- Settings option screen to change Passcode. -->
-    <string name="title_change_passcode">비밀번호 잠금 변경</string>
+    <string name="title_change_passcode">암호 잠금 변경</string>
     <!-- Settings option to set the timer to ask for passcode. -->
-    <string name="settings_require_passcode">비밀번호 필요</string>
+    <string name="settings_require_passcode">암호 필요</string>
     <!-- Option available to choose in some context to make an action immediately. -->
     <string name="action_immediately">즉시</string>
     <!-- Button after the Passcode code input field -->
     <string name="pin_lock_enter">입력</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="other">비밀번호 %1$d회 틀림</item>
+        <item quantity="other">암호 %1$d회 틀림</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">당신은 로그아웃 되고 오프라인 파일은 10번의 실패 후에 삭제됩니다</string>
@@ -1039,11 +1038,11 @@
     <!-- Subtitle of the screen to backup the master key -->
     <string name="backup_subtitle">당신의 암호는 복구 키로 잠금 해제됩니다</string>
     <!-- First paragraph of the screen to backup the master key -->
-    <string name="backup_first_paragraph">당신의 데이터는 우리가 암호화하여 저장한 당신의 비밀번호로 만든, 마스터 암호화 키로 시작하는 해독 작업의 연속을 통해서만 읽을 수 있습니다. 이것은 당신이 비밀번호를 잊으면, 마스터 키가 해독될 수 없으며, 당신의 데이터를 해독할 수 없다는 것을 의미합니다.</string>
+    <string name="backup_first_paragraph">당신의 데이터는 우리가 암호화하여 저장한 당신의 암호로 만든, 마스터 암호화 키로 시작하는 복호화 작업의 연속을 통해서만 읽을 수 있습니다. 이것은 당신이 암호를 잊으면, 마스터 키가 복호화될 수 없으며, 당신의 데이터를 복호화할 수 없다는 것을 의미합니다.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="backup_second_paragraph">복구 키를 내보내고 안전한 장소에 보관하는 것은 데이터 손실 없이 새 비밀번호를 설정할 수 있도록 해줍니다.</string>
+    <string name="backup_second_paragraph">복구 키를 내보내고 안전한 장소에 보관하는 것은 데이터 손실 없이 새 암호를 설정할 수 있도록 해줍니다.</string>
     <!-- Third paragraph of the screen to backup the master key -->
-    <string name="backup_third_paragraph">외부 공격자가 당신의 키만으로 계정에 접근할 수는 없습니다. 비밀번호 재설정은 당신의 이메일에 대한 접근과 키 모두를 요구합니다.</string>
+    <string name="backup_third_paragraph">외부 공격자가 당신의 키만으로 계정에 접근할 수는 없습니다. 암호 재설정은 당신의 이메일에 대한 접근과 키 모두를 요구합니다.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
     <string name="backup_action">복구 키를 클립보드에 복사하거나 텍스트 파일로 저장하세요</string>
     <!-- Action of a button to save something -->
@@ -1061,9 +1060,9 @@
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">암호를 잊으셨나요?</string>
     <!-- First paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_first_paragraph">복구 키의 백업을 가지고 있다면, 예를 눌러서 비밀번호를 재설정할 수 있습니다. 데이터가 손실되지 않습니다.</string>
+    <string name="forgot_pass_first_paragraph">복구 키의 백업을 가지고 있다면, 예를 눌러서 암호를 재설정할 수 있습니다. 데이터가 손실되지 않습니다.</string>
     <!-- Second paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_second_paragraph">이 컴퓨터의 다른 브라우저 또는 다른 컴퓨터에 활성화된 MEGA 세션이 있다면 복구 키를 내보낼 수 있습니다. 만약 없다면, 당신은 더 이상 기존 계정을 해독할 수 없습니다, 그러나 아니오를 선택하여 같은 이메일 주소에 새 계정을 시작할 수 있습니다.</string>
+    <string name="forgot_pass_second_paragraph">이 컴퓨터의 다른 브라우저 또는 다른 컴퓨터에 활성화된 MEGA 세션이 있다면 복구 키를 내보낼 수 있습니다. 만약 없다면, 당신은 더 이상 기존 계정을 복호화할 수 없습니다, 그러나 아니오를 선택하여 같은 이메일 주소에 새 계정을 시작할 수 있습니다.</string>
     <!-- Sentence to ask to the user if he has the master key in the screen when the password has been forgotten -->
     <string name="forgot_pass_action">복구 키의 백업을 가지고 계신가요?</string>
     <!-- Title of the alert message to ask for the link to reset the pass with the MK -->
@@ -1071,13 +1070,13 @@
     <!-- Hint of the text where the user can write his e-mail -->
     <string name="edit_text_insert_mail">여기에 이메일 입력</string>
     <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="text_alert_reset_with_MK">아래에 이메일 주소를 입력하세요. 복구 키를 입력하고 비밀번호를 재설정할 수 있는 복구 링크를 받게 됩니다.</string>
+    <string name="text_alert_reset_with_MK">아래에 이메일 주소를 입력하세요. 복구 키를 입력하고 암호를 재설정할 수 있는 복구 링크를 받게 됩니다.</string>
     <!-- Hint of the text when the user can write his master key -->
     <string name="edit_text_insert_mk">당신의 복구 키를 여기에 입력하세요</string>
     <!-- Hint of the text where the user can write his password -->
     <string name="edit_text_insert_pass">여기에 암호 입력</string>
     <!-- Text shown in the last alert dialog to confirm delete user account -->
-    <string name="delete_account_text_last_step">계정을 삭제하는 마지막 단계입니다. 클라우드에 저장된 모든 데이터를 잃게 됩니다. 아래에 비밀번호를 입력하세요.</string>
+    <string name="delete_account_text_last_step">계정을 삭제하는 마지막 단계입니다. 클라우드에 저장된 모든 데이터를 잃게 됩니다. 아래에 암호를 입력하세요.</string>
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">이메일 인증</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
@@ -1111,19 +1110,19 @@
     <!-- Title of the screen to park an account -->
     <string name="park_account_title">이런!</string>
     <!-- First paragraph of the screen to park an account -->
-    <string name="park_account_first_paragraph">우리의 종단간 암호화 패러다임으로 인해, 당신의 비밀번호나 복구 키 없이 당신의 데이터에 접근할 수 없습니다.</string>
+    <string name="park_account_first_paragraph">우리의 종단간 암호화 패러다임으로 인해, 당신의 암호나 복구 키 없이 당신의 데이터에 접근할 수 없습니다.</string>
     <!-- Second paragraph of the screen to park an account -->
-    <string name="park_account_second_paragraph">당신은 기존 계정을 보류하고 같은 이메일 주소로 새 계정을 만들 수 있습니다. 당신의 데이터는 최소 60일간 보관됩니다. 만약 보류된 계정의 비밀번호가 생각났다면, support&#64;mega.nz로 연락주세요.</string>
+    <string name="park_account_second_paragraph">당신은 기존 계정을 보류하고 같은 이메일 주소로 새 계정을 만들 수 있습니다. 당신의 데이터는 최소 60일간 보관됩니다. 만약 보류된 계정의 암호가 생각났다면, support&#64;mega.nz로 연락주세요.</string>
     <!-- Text of the dialog message to ask for the link to park the account -->
     <string name="dialog_park_account">아래에 이메일 주소를 입력하세요. 계정을 보류할 수 있는 복구 링크를 받게 됩니다.</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">이것은 당신의 계정을 보류하는 마지막 단계입니다, 당신의 새 비밀번호를 입력하세요. 당신의 데이터는 최소 60일간 저장됩니다. 만약 보류된 계정의 비밀번호가 생각났다면, support&#64;mega.nz로 연락주세요.</string>
+    <string name="park_account_text_last_step">이것은 당신의 계정을 보류하는 마지막 단계입니다, 당신의 새 암호를 입력하세요. 당신의 데이터는 최소 60일간 저장됩니다. 만약 보류된 계정의 암호가 생각났다면, support&#64;mega.nz로 연락주세요.</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">새 암호를 입력하세요</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">이 복구 링크는 만료된 것으로 보입니다. 다시 시도하세요.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
-    <string name="text_reset_pass_logged_in">복구 키는 비밀번호를 재설정하는데에 사용됩니다. 새 비밀번호를 입력하세요.</string>
+    <string name="text_reset_pass_logged_in">복구 키는 암호를 재설정하는데에 사용됩니다. 새 암호를 입력하세요.</string>
     <!-- Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass -->
     <string name="email_verification_text_change_pass">암호를 재설정할 수 있는 복구 링크를 받게 됩니다.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
@@ -1141,7 +1140,7 @@
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
     <string name="mail_same_as_old">새 이메일과 이전 이메일이 일치하지 않아야합니다</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
-    <string name="change_mail_text_last_step">이메일을 변경하는 마지막 단계입니다. 아래에 비밀번호를 입력하세요.</string>
+    <string name="change_mail_text_last_step">이메일을 변경하는 마지막 단계입니다. 아래에 암호를 입력하세요.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">이메일 변경</string>
     <!-- Iitle of the warning when the user is running out of space -->
@@ -1239,7 +1238,7 @@
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_delete_account">관련된 이용자 계정이 여러 번의 이용 약관 위반으로 제거되었습니다.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
-    <string name="general_error_invalid_decryption_key">입력한 폴더 링크의 해독 키가 잘못 되었습니다.</string>
+    <string name="general_error_invalid_decryption_key">입력한 폴더 링크의 복호화 키가 잘못 되었습니다.</string>
     <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
     <string name="my_account_my_credentials">내 자격증명</string>
     <!-- Word to indicate the limited bandwidth of the free accounts -->
@@ -1349,7 +1348,7 @@
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">시스템이 명시된 발송자로부터 데이터를 수신하였으며, 그 내용이 전송중 조작되지 않았음을 보증합니다.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_confidentiality_empty_screen">작성자와 의도된 수신자만 내용을 해독하고 읽을 수 있습니다.</string>
+    <string name="mega_confidentiality_empty_screen">작성자와 의도된 수신자만 내용을 복호화하고 읽을 수 있습니다.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="title_mega_info_empty_screen">MEGA</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1805,7 +1804,7 @@
     <string name="file_properties_shared_folder_full_access">완전 접근</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">읽기 전용</string>
-    <!-- Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;) -->
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">읽기와 쓰기</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">전송 일시정지됨!</string>
@@ -2164,13 +2163,13 @@
     <!-- Message shown when a link is being processing -->
     <string name="processing_link">링크 처리중&#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
-    <string name="passwd_weak">당신의 비밀번호는 쉽게 추측됩니다. 비밀번호를 더 길게 만드세요. 대문자와 소문자를 조합하세요. 특수 문자를 삽입하세요. 이름이나 사전적 단어를 사용하지 마세요.</string>
+    <string name="passwd_weak">당신의 암호는 쉽게 추측됩니다. 암호를 더 길게 만드세요. 대문자와 소문자를 조합하세요. 특수 문자를 삽입하세요. 이름이나 사전적 단어를 사용하지 마세요.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
-    <string name="passwd_medium">당신의 비밀번호는 진행하기에 충분히 좋습니다, 하지만 비밀번호를 더 강력하게 만드는 것을 추천합니다.</string>
+    <string name="passwd_medium">당신의 암호는 진행하기에 충분히 좋습니다, 하지만 암호를 더 강력하게 만드는 것을 추천합니다.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a good password -->
-    <string name="passwd_good">이 비밀번호는 대부분의 보통 무한 대입 공격을 버틸 것입니다. 확실히 기억해두세요.</string>
+    <string name="passwd_good">이 암호는 대부분의 보통 무한 대입 공격을 버틸 것입니다. 확실히 기억해두세요.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a strong password -->
-    <string name="passwd_strong">이 비밀번호는 대부분의 정교한 무한 대입 공격을 버틸 것입니다. 확실히 기억해두세요.</string>
+    <string name="passwd_strong">이 암호는 대부분의 정교한 무한 대입 공격을 버틸 것입니다. 확실히 기억해두세요.</string>
     <!-- Password very weak -->
     <string name="pass_very_weak">매우 약함</string>
     <!-- Password weak -->
@@ -2307,9 +2306,9 @@
     <!-- Title of the dialog ‘Do you remember your password?’ -->
     <string name="remember_pwd_dialog_title">암호가 기억났나요?</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
-    <string name="remember_pwd_dialog_text_logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요.\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
+    <string name="remember_pwd_dialog_text_logout">당신은 로그아웃하려고 합니다. 암호를 기억하는지 확실히 하려면 암호를 시험하세요.\n암호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <!-- Text of the dialog ‘Do you remember your password?’ -->
-    <string name="remember_pwd_dialog_text">당신이 비밀번호를 기억하는지 확실하게 하기 위해 비밀번호를 시험해보세요. 만약 비밀번호를 잊으면, 당신의 MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
+    <string name="remember_pwd_dialog_text">당신이 암호를 기억하는지 확실하게 하기 위해 암호를 시험해보세요. 만약 암호를 잊으면, 당신의 MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <!-- Dialog option that permits user do not show it again -->
     <string name="general_do_not_show">다시 보여주지 마세요</string>
     <!-- Button of the dialog ‘Do you remember your password?’ that permits user test his password -->
@@ -2321,7 +2320,7 @@
     <!-- Message shown to the user when is testing her password and it is wrong -->
     <string name="test_pwd_wrong">잘못된 암호입니다.\n최대한 빨리 복구 키를 백업하세요!</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
-    <string name="recovery_key_exported_dialog_text_logout">당신은 로그아웃하려고 합니다. 비밀번호를 기억하는지 확실히 하려면 비밀번호를 시험하세요.\n비밀번호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
+    <string name="recovery_key_exported_dialog_text_logout">당신은 로그아웃하려고 합니다. 암호를 기억하는지 확실히 하려면 암호를 시험하세요.\n암호를 잊으면, MEGA 데이터에 대한 접근을 잃게 됩니다.</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">클립보드로 복사됨</string>
     <!-- Option that permits user export his recovery key -->
@@ -2363,7 +2362,7 @@
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="settings_recovery_key_title">복구 키 백업</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_summary">복구 키를 내보내고 안전한 장소에 보관하는 것은 데이터 손실 없이 새 비밀번호를 설정할 수 있도록 해줍니다.</string>
+    <string name="settings_recovery_key_summary">복구 키를 내보내고 안전한 장소에 보관하는 것은 데이터 손실 없이 새 암호를 설정할 수 있도록 해줍니다.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
     <string name="login_connectivity_issues">MEGA에 접속할 수 없습니다. 연결을 확인하거나 나중에 다시 시도하세요.</string>
     <!-- message when a temporary error on logging in is due to servers busy -->
@@ -2403,7 +2402,7 @@
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">MEGAchat 경험을 향상하세요. URL 컨텐츠가 종단간 암호화 없이 수신됩니다.</string>
     <!-- Subtitle of a MEGA rich link without the decryption key -->
-    <string name="subtitle_mega_rich_link_no_key">해독 키를 입력하려면 탭하세요</string>
+    <string name="subtitle_mega_rich_link_no_key">복호화 키를 입력하려면 탭하세요</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">더 강력한 암호를 입력하세요</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2433,7 +2432,7 @@
     <!-- Title of the screen Two-Factor Authentication -->
     <string name="title_2fa">왜 2단계 인증이 필요한가요?</string>
     <!--  -->
-    <string name="two_factor_authentication_explain">2단계 인증은 당신의 계정을 위한 보안의 두번째 층입니다. 당신만이 접근할 수 있는 6자리 코드가 없으면, 당신의 비밀번호를 알고 있을지라도 접근할 수 없습니다.</string>
+    <string name="two_factor_authentication_explain">2단계 인증은 당신의 계정을 위한 보안의 두번째 층입니다. 당신만이 접근할 수 있는 6자리 코드가 없으면, 당신의 암호를 알고 있을지라도 접근할 수 없습니다.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">설정 시작</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
@@ -2454,22 +2453,22 @@
     <string name="title_2fa_enabled">2단계 인증 활성화됨</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">다음번 로그인 때 당신의 인증기 앱에서 생성된 6자리 코드를 요구합니다.</string>
-    <!--  -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\’t help you gain access to it again.\n        &lt;b&gt;복구 키를 백업하세요&lt;/b&gt;</string>
+    <!-- Recommendation displayed after enable Two-Factor Authentication -->
+    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can’t help you gain access to it again.\n        &lt;b&gt;복구 키를 백업하세요&lt;/b&gt;</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">잘못된 코드</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">인증기 장치를 잃어버렸나요?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">로그인 인증</string>
-    <!-- Title of screen Change password verification with Two-Factor Authentication -->
-    <string name="change_password_verification">2단계 인증\n암호 변경</string>
-    <!-- Title of screen Cancel account verification with Two-Factor Authentication -->
-    <string name="cancel_account_verification">2단계 인증\n계정 취소</string>
-    <!-- Title of screen Change mail verification with Two-Factor Authentication -->
-    <string name="change_mail_verification">2단계 인증\n계정 변경</string>
-    <!-- Title of screen Disable Two-Factor Authentication -->
-    <string name="disable_2fa_verification">2단계 인증 비활성화</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
+    <string name="verify_2fa_subtitle_change_password">암호 변경</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
+    <string name="verify_2fa_subtitle_change_email">이메일 변경</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
+    <string name="verify_2fa_subtitle_delete_account">계정 삭제</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
+    <string name="verify_2fa_subtitle_diable_2fa">해제</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">인증기 장치를 잃어버렸나요?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2489,9 +2488,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">완료하려면 복구 키를 내보내세요</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">인증기 앱</string>
+    <string name="no_authentication_apps_title">2단계 인증 앱</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">인증기 앱 설치를 위해 Google Play를 여시겠습니까?</string>
+    <string name="open_play_store_2fa">인증기 앱을 설치할 수 있도록 Google Play를 여시겠습니까?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -3169,7 +3168,7 @@
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">암호를 입력하세요</string>
     <!-- Text of the dialog shown when a pdf required password -->
-    <string name="text_pdf_password">%s은/는 비밀번호로 보호된 PDF 문서입니다. PDF를 열려면 비밀번호를 입력하세요.</string>
+    <string name="text_pdf_password">%s은/는 암호로 보호된 PDF 문서입니다. PDF를 열려면 암호를 입력하세요.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user types a wrong password -->
     <string name="error_pdf_password">잘못된 암호입니다, 다시 시도하세요.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
@@ -3372,7 +3371,7 @@
     <string name="overall_usage_label">전체 사용량</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">전송</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz -->
+    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">%1$s님의 연락처는 당신의 비즈니스 계정의 일부이기 때문에 삭제할 수 없습니다.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">최근 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저로 MEGA에 접속하세요.</string>
@@ -3421,9 +3420,9 @@
     <!-- Title of a helping view about locked accounts -->
     <string name="locked_accounts_label">잠긴 계정들</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
-    <string name="locked_accounts_text_1">MEGA와 다른 서비스들에서 같은 비밀번호를 이용하고 있고, 다른 서비스들 중 한 곳에서 데이터 유출이 발생했을 가능성이 있습니다.</string>
+    <string name="locked_accounts_text_1">MEGA와 다른 서비스들에서 같은 암호를 이용하고 있고, 다른 서비스들 중 한 곳에서 데이터 유출이 발생했을 가능성이 있습니다.</string>
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
-    <string name="locked_accounts_text_2">당신의 비밀번호가 유출되어서 MEGA 계정뿐만 아니라 당신의 계정에 접속하려는 나쁜 사람들에게 이용되고 있습니다.</string>
+    <string name="locked_accounts_text_2">당신의 암호가 유출되어서 MEGA 계정뿐만 아니라 당신의 계정에 접속하려는 나쁜 사람들에게 이용되고 있습니다.</string>
     <!-- Button to add a nickname for a user -->
     <string name="add_nickname">별명 설정</string>
     <!-- Button to update a nickname for a user -->
@@ -3669,11 +3668,11 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">전송 선택</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">전송 ‘%1$s\’의 우선 순위 변경을 실패하였습니다.</string>
+    <string name="change_of_transfer_priority_failed">전송 ‘%1$s’의 우선 순위 변경을 실패하였습니다.</string>
     <!-- Title option to send separated the link and decryption key -->
-    <string name="option_send_decryption_key_separately">해독 키 따로 보내기</string>
+    <string name="option_send_decryption_key_separately">복호화 키 따로 보내기</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">링크와 해독 키를 따로 내보내기</string>
+    <string name="explanation_send_decryption_key_separately">링크와 복호화 키를 따로 내보내기</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">더 알아보기</string>
     <!-- Label key referring to a link decryption key -->
@@ -3701,7 +3700,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro 이용자는 계정을 더욱 안전하게 만드는 추가적인 링크 보안 기능에 대한 독점적 접근이 가능합니다.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">우리의 종단간 암호화 시스템은 이 파일을 위해 자동으로 생성된 고유의 키를 필요로 합니다. 이 키가 있는 링크는 자동으로 생성되지만, 추가적인 보안을 위해 해독 키를 따로 내보낼 수 있습니다.</string>
+    <string name="decryption_key_explanation">우리의 종단간 암호화 시스템은 이 파일을 위해 자동으로 생성된 고유의 키를 필요로 합니다. 이 키가 있는 링크는 자동으로 생성되지만, 추가적인 보안을 위해 복호화 키를 따로 내보낼 수 있습니다.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">암호 재설정</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3759,7 +3758,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">진행하기 전에</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">우리는 제3자를 포함하여 당신에게 서비스를 제공하고, 우리 서비스에서의 경험을 향상하고 당신이 보는 광고를 개인화하기 위하여 로컬 저장소 그리고 비슷한 기술 (‘쿠키\’)를 사용합니다. 첫 방문시 쿠키를 허용하거나 쿠키 설정에서 설정할 수 있습니다. 더 알아보려면 우리의 [A]쿠키 정책[/A]을 읽어보세요.</string>
+    <string name="dialog_cookie_alert_message">우리는 제3자를 포함하여 당신에게 서비스를 제공하고, 우리 서비스에서의 경험을 향상하고 당신이 보는 광고를 개인화하기 위하여 로컬 저장소 그리고 비슷한 기술 (‘쿠키’)를 사용합니다. 첫 방문시 쿠키를 허용하거나 쿠키 설정에서 설정할 수 있습니다. 더 알아보려면 우리의 [A]쿠키 정책[/A]을 읽어보세요.</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">쿠키 설정이 저장되지 않았습니다.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -3793,7 +3792,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_thirdparty_title">제3자 쿠키</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">이것들은 우리가 아닌 다른 이들에 의해 통제되는 쿠키입니다; 우리는 위에 설명한 기능 유형들을 제공하기 위해 이 쿠키를 사용합니다. 이 쿠키를 허용하지 않는다면 각 제3자 쿠키가 어떤 것인가에 따라 서로 다른 영향을 받게 됩니다. 우리가 사용하는 제3자 쿠키가 어떤 것인지 자세히 보려면 ‘자세한 정보\’를 클릭하세요.</string>
+    <string name="preference_cookies_thirdparty_summary">이것들은 우리가 아닌 다른 이들에 의해 통제되는 쿠키입니다; 우리는 위에 설명한 기능 유형들을 제공하기 위해 이 쿠키를 사용합니다. 이 쿠키를 허용하지 않는다면 각 제3자 쿠키가 어떤 것인가에 따라 서로 다른 영향을 받게 됩니다. 우리가 사용하는 제3자 쿠키가 어떤 것인지 자세히 보려면 ‘자세한 정보’를 클릭하세요.</string>
     <!-- Preference screen item action button -->
     <string name="preference_cookies_policies_privacy">개인정보 보호정책</string>
     <!-- Preference screen item action button -->
@@ -3821,7 +3820,7 @@
     <!-- Action discard -->
     <string name="discard_close_action">취소하고 닫기</string>
     <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">파일 저장중...</string>
+    <string name="saving_file">파일 저장중&#8230;</string>
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">파일 생성됨</string>
     <!-- Warning indicating a file was not created successfully -->
@@ -3834,4 +3833,6 @@
     <string name="file_updated">파일 업데이트됨</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">파일 업데이트 실패. 다시 시도하세요.</string>
+    <!-- Warning which alerts the user a file cannot be opened -->
+    <string name="error_opening_file">파일이 너무 커서 열거나 미리 볼 수 없습니다.</string>
 </resources>

@@ -113,6 +113,7 @@ public class Constants {
     public static final int CANCEL_ACCOUNT_2FA = 4000;
     public static final int CHANGE_MAIL_2FA = 4001;
     public static final int DISABLE_2FA = 4002;
+    public static final int CHANGE_PASSWORD_2FA = 4003;
 
     public static final int MY_ACCOUNT_FRAGMENT = 5000;
     public static final int UPGRADE_ACCOUNT_FRAGMENT = 5001;
@@ -323,6 +324,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FIRST_LEVEL = "firstLevel";
     public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
     public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
+    public static final String INTENT_EXTRA_KEY_ENABLED = "enabled";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;

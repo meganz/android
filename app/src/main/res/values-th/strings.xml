@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA ให้ที่เก็บข้อมูลบนคลาวด์แบบเข้ารหัสที่ควบคุมโดยผู้ใช้ มีระบบแชทผ่านมาตรฐานเว็บเบราว์เซอร์ รวมถึงแอปพลิเคชันเฉพาะสำหรับโทรศัพท์มือถือ ต่างจากผู้ให้บริการจัดเก็บข้อมูลบนคลาวด์รายอื่นตรงที่ข้อมูลของคุณจะถูกเข้ารหัสและถอดรหัสโดยใช้อุปกรณ์ไคลเอนต์ของคุณเท่านั้น ไม่มีการดำเนินการใด ๆ จากเราทั้งสิ้น\n\nสามารถอัปโหลดไฟล์ได้จากสมาร์ทโฟนหรือแท็บเล็ต จากนั้นค่อยค้นหา จัดเก็บ ดาวน์โหลด สตรีม ดู แชร์ เปลี่ยนชื่อหรือลบไฟล์ของคุณได้ตลอดเวลาจากอุปกรณ์ใดก็ได้ในทุก ๆ ที่ อีกทั้งยังแชร์โฟลเดอร์กับผู้ติดต่อของคุณและดูข้อมูลอัปเดตของพวกเขาในแบบเรียลไทม์ได้เช่นเดียวกัน กระบวนการเข้ารหัสหมายความว่า เราไม่สามารถเข้าถึงหรือรีเซ็ตรหัสผ่านของคุณได้ ดังนั้น คุณต้องจำรหัสผ่านไว้ให้ดี (เว้นแต่ว่าคุณได้ทำการสำรองคีย์การกู้คืนไว้แล้ว) ไม่เช่นนั้นคุณจะไม่สามารถเข้าถึงไฟล์ที่เก็บไว้ได้เลย\n\nการแชทด้วยวิดีโอ MEGA มีการเข้ารหัสลับแบบต้นทางถึงปลายทาง ปกป้องข้อมูลส่วนบุคคลของคุณได้ทั้งหมด และสามารถใช้งานได้ผ่านทางเบราว์เซอร์ตั้งแต่ปี 2016 ซึ่งได้มีการขยายบริการไปยังแอปบนอุปกรณ์เคลื่อนที่ของเรา หากต้องการแชทคุณสามารถเข้าถึงได้ผ่านอุปกรณ์หลายเครื่อง และผู้ใช้ยังสามารถเพิ่มไฟล์ลงในการแชทจาก MEGA คลาวด์ไดร์ฟได้อย่างง่ายดาย\n\nMEGA มีพื้นที่เก็บข้อมูลฟรี 50 GB สำหรับผู้ใช้ที่ลงทะเบียนทั้งหมดพร้อมกับรางวัลโบนัสและแผนการจ่ายเงินที่มีให้เลือกมากมาย:\n\n\nสมัครใช้งาน Pro LITE: 4.99 ยูโรต่อเดือนหรือ 49.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 400 GB และโควต้าการถ่ายโอน 1 TB ต่อเดือน\nสมัครใช้งาน Pro I: 9.99 ยูโรต่อเดือนหรือ 99.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 2 TB และโควต้าการถ่ายโอน 2 TB ต่อเดือน\nสมัครใช้งาน Pro II: 19.99 ยูโรต่อเดือนหรือ 199.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 8 TB และโควต้าการถ่ายโอน 8 TB ต่อเดือน\nสมัครใช้งาน Pro III: 29.99 ยูโรต่อเดือนหรือ 299.99 ยูโรต่อปีจะให้พื้นที่เก็บข้อมูล 16 TB และโควต้าการถ่ายโอน 16 TB ต่อเดือน\n\nการสมัครรับข้อมูลจะมีการต่ออายุโดยอัตโนมัติ โดยมีระยะเวลาและราคาต่อเนื่องตามการการสมัครรับข้อมูลของคุณตั้งแต่เลือกแผนในครั้งแรก ในการจัดการการสมัครรับข้อมูลของคุณเพียงแค่คลิกที่ไอคอน Play Store บนโทรศัพท์มือถือ แล้วลงชื่อเข้าใช้ด้วย Google ID ของคุณ (หากคุณยังไม่ได้ดำเนินการ) จากนั้นคลิกที่แอป MEGA คุณจะสามารถจัดการการสมัครรับข้อมูลได้ที่นี่\n\nการขอสิทธิ์ในแอปมีดังนี้:\nWRITE_EXTERNAL_STORAGE -&gt; ดาวน์โหลดไฟล์จาก MEGA ไปยังอุปกรณ์ของคุณและอัปโหลดไฟล์จากอุปกรณ์ของคุณไปที่ MEGA\nCAMERA -&gt; ถ่ายรูปและอัปโหลดรูปถ่ายของคุณไปที่ MEGA\nREAD_CONTACTS -&gt; เพิ่มรายชื่อติดต่อจากอุปกรณ์ของคุณเป็นรายชื่อติดต่อของ MEGA ได้อย่างง่ายดาย\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (ไมโครโฟนและกล้องถ่ายรูป) -&gt; MEGA จัดเตรียมการโทรออกด้วยเสียง/วิดีโอแบบเข้ารหัสลับแบบต้นทางถึงปลายทาง\n\n\nเพื่อเพิ่มความมั่นใจให้กับผู้ใช้ในระบบ MEGA จะมีการเผยแพร่โค้ดไคลเอ็นต์ทั้งหมด เพื่อให้นักวิจัยด้านความปลอดภัยที่สนใจสามารถประเมินกระบวนการเข้ารหัสได้ โค้ดของแอปบนอุปกรณ์เคลื่อนที่ของเราจะอยู่ที่: https://github.com/meganz/android\n\nสำหรับข้อมูลเพิ่มเติม กรุณาตรวจสอบได้ที่เว็บไซต์ของเรา:\nhttps://mega.nz/terms\n\n\nเดสก์ทอป - https://mega.nz/</string>
+    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA เป็นระบบจัดเก็บไฟล์ในระบบคลาวด์ พร้อมด้วยความเป็นส่วนตัวอย่างทรงพลัง</string>
     <!-- PRO Lite account -->
@@ -292,9 +292,9 @@
     <string name="sent_requests_empty">[B]ไม่มี[/B][A]การร้องขอที่ส่ง[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[B]ไม่มี[/B][A]การร้องขอที่ได้รับ[/A]</string>
-    <!-- Title for the file transfer screen (with the up &amp; download) -->
+    <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">การถ่ายโอน</string>
-    <!-- Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this. -->
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">บัญชีของฉัน</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">อัปโหลดจากกล้อง</string>
@@ -304,7 +304,7 @@
     <string name="tab_outgoing_shares">ขาออก</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">ลิงก์</string>
-    <!-- Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible). -->
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">แชร์ขาเข้า</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">แชร์ขาเข้ากับ</string>
@@ -684,7 +684,6 @@
     <string name="upgrade_select_pricing">เลือกการสมัครสมาชิก</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">ประจำรายเดือนหรือรายปี</string>
-    <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">ขณะนี้ วิธีการชำระเงินไม่สามารถใช้ได้สำหรับแผนนี้</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
@@ -1807,7 +1806,7 @@
     <string name="file_properties_shared_folder_full_access">เข้าถึงแบบเต็มที่</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">อ่านอย่างเดียว</string>
-    <!-- Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;) -->
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">อ่านและเขียน</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">หยุดการถ่ายโอนชั่วคราวแล้ว</string>
@@ -2457,22 +2456,22 @@
     <string name="title_2fa_enabled">เปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัยแล้ว</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">ครั้งต่อไปที่คุณลงชื่อเข้าใช้บัญชีของคุณ ระบบจะขอให้คุณกรอกรหัส 6 หลักที่ได้รับจากแอปตัวรับรองความถูกต้องของคุณ</string>
-    <!--  -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\’t help you gain access to it again.\n &lt;b&gt;สำรองคีย์การกู้คืนของคุณ&lt;/b&gt;</string>
+    <!-- Recommendation displayed after enable Two-Factor Authentication -->
+    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can’t help you gain access to it again.\n &lt;b&gt;สำรองคีย์การกู้คืนของคุณ&lt;/b&gt;</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">โค้ดไม่ถูกต้อง</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">อุปกรณ์ตัวรับรองความถูกต้องของคุณสูญหายหรือไม่</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">ตรวจสอบการเข้าสู่ระบบ</string>
-    <!-- Title of screen Change password verification with Two-Factor Authentication -->
-    <string name="change_password_verification">การรับรองความถูกต้องด้วยสองปัจจัย\nเปลี่ยนรหัสผ่าน</string>
-    <!-- Title of screen Cancel account verification with Two-Factor Authentication -->
-    <string name="cancel_account_verification">การรับรองความถูกต้องด้วยสองปัจจัย\nยกเลิกบัญชี</string>
-    <!-- Title of screen Change mail verification with Two-Factor Authentication -->
-    <string name="change_mail_verification">การรับรองความถูกต้องด้วยสองปัจจัย\nเปลี่ยนอีเมล</string>
-    <!-- Title of screen Disable Two-Factor Authentication -->
-    <string name="disable_2fa_verification">ปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัย</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
+    <string name="verify_2fa_subtitle_change_password">เปลี่ยนรหัสผ่าน</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
+    <string name="verify_2fa_subtitle_change_email">เปลี่ยนอีเมล</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
+    <string name="verify_2fa_subtitle_delete_account">ลบบัญชี</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
+    <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">อุปกรณ์ตัวรับรองความถูกต้องของคุณสูญหายหรือไม่</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2492,9 +2491,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">ส่งออกคีย์การกู้คืนเพื่อเสร็จสิ้น</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">แอปตัวรับรองความถูกต้อง</string>
+    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">คุณต้องการเปิด Google Play เพื่อติดตั้งแอปตัวรับรองความถูกต้องหรือไม่</string>
+    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -3375,7 +3374,7 @@
     <string name="overall_usage_label">การใช้งานโดยรวม</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">ถ่ายโอน</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz -->
+    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">คุณไม่สามารถลบ %1$s ออกจากการเป็นผู้ติดต่อได้เนื่องจากเป็นส่วนหนึ่งของบัญชีธุรกิจของคุณ</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">เกิดปัญหากับการชำระเงินครั้งล่าสุดของคุณ กรุณาเข้าถึง MEGA โดยใช้เบราว์เซอร์เดสก์ท็อปเพื่อดูข้อมูลเพิ่มเติม</string>
@@ -3762,7 +3761,7 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">ก่อนที่คุณจะดำเนินการต่อ</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">เราได้มีการใช้คุกกี้และเทคโนโลยีที่คล้ายกัน (‘คุกกี้\’) เพื่อให้บริการแก่คุณ ปรับปรุงประสบการณ์ของคุณด้วยบริการของเรา และปรับแต่งโฆษณาที่ปรากฎให้คุณเห็น รวมถึงผ่านบุคคลที่สาม ยอมรับการใช้คุกกี้ของเราตั้งแต่เริ่มเยี่ยมชมหรือปรับแต่งคุกกี้ในการตั้งค่าคุกกี้ อ่านเพิ่มเติมใน[A]นโยบายคุกกี้[/A]ของเรา</string>
+    <string name="dialog_cookie_alert_message">เราได้มีการใช้คุกกี้และเทคโนโลยีที่คล้ายกัน (‘คุกกี้’) เพื่อให้บริการแก่คุณ ปรับปรุงประสบการณ์ของคุณด้วยบริการของเรา และปรับแต่งโฆษณาที่ปรากฎให้คุณเห็น รวมถึงผ่านบุคคลที่สาม ยอมรับการใช้คุกกี้ของเราตั้งแต่เริ่มเยี่ยมชมหรือปรับแต่งคุกกี้ในการตั้งค่าคุกกี้ อ่านเพิ่มเติมใน[A]นโยบายคุกกี้[/A]ของเรา</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie Settings unsaved.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
@@ -3837,4 +3836,6 @@
     <string name="file_updated">File updated</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">File update failed. Try again.</string>
+    <!-- Warning which alerts the user a file cannot be opened -->
+    <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
 </resources>

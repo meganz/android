@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGAは、標準のウェブブラウザを通じてユーザー制御の暗号化クラウドストレージとチャットを、モバイル端末用の専用アプリとともにご提供いたします。他のクラウドストレージプロバイダとは異なり、あなたのデータはあなたのクライアント端末によってのみ暗号化され、復号されます（当社では決して行いません）。\n\nスマートフォンやタブレットからファイルをアップロードしてから、いつでも、どこでも、どんな端末からでも、ファイルの検索、保存、ダウンロード、ストリーム配信、表示、共有、名前の変更、削除を行うことができます。あなたの連絡先とフォルダを共有し、連絡先の最新情報をリアルタイムで表示します。暗号化プロセスでは、当社はあなたのパスワードにアクセスしたり、それをリセットしたりすることができないため、あなたはパスワードを必ず覚えておく必要があります（復元キーをバックアップしない限り）。そうしないと、保存されたファイルにアクセスできなくなります。\n\nエンドツーエンドのユーザー暗号化MEGAビデオチャットは完全なプライバシー保護を可能にし、2016年からブラウザを通じてご利用いただいております。これはモバイルアプリにも拡張され、複数の端末間でチャット履歴にアクセスできます。またユーザー様は、MEGAクラウドドライブからチャットに簡単にファイルも追加できます。\n\nMEGAは、ボーナスを達成された、ご登録済みの全ユーザー様に50 GBの豊富な無料ストレージをご提供しております。また、上限がはるかに高い有料プランもご用意しております：\n\n\nPro Liteサブスクリプション：月額4.99ユーロまたは年間49.99ユーロで、400GBのストレージ容量と毎月1TBの転送容量をご提供いたします。\nPro Iサブスクリプション：月額9.99ユーロまたは年間99.99ユーロで、2TBのストレージ容量と毎月2TBの転送容量をご提供いたします。\nPro II サブスクリプション：月額19.99ユーロまたは年間199.99ユーロで、8TBのストレージ容量と毎月8TBの転送容量をご提供いたします。\nPro  IIIサブスクリプション：月額29.99ユーロまたは年間299.99ユーロで、16TBのストレージ容量と毎月16TBの転送容量をご提供いたします。\n\nサブスクリプションは、選択した最初の期間と同じ期間の連続したサブスクリプション期間を対象に、および同じ価格で、自動的に更新されます。サブスクリプションを管理するには、携帯端末のPlay Storeアイコンをクリックし、Google IDでサインインしてから（まだそのように行っていない場合）、MEGAアプリをクリックします。そこでサブスクリプションを管理することができます。\n\nアプリの権限：\nWRITE_EXTERNAL_STORAGE -&gt; MEGAから端末にファイルをダウンロードし、端末からMEGAにファイルをアップロードします\nCAMERA -&gt; 写真を撮って写真をMEGAにアップロードします\nREAD_CONTACTS -&gt; MEGAの連絡先として端末からカンタンに連絡先を追加します\nRECORD_AUDIOと CAPTURE_VIDEO_OUTPUT（マイクとカメラ） -&gt; MEGAは、エンドツーエンドの暗号化された音声/ビデオ通話をご提供いたします\n\n\nMEGAシステムに対するユーザー様の信頼を高めるために、クライアントサイドのコードはすべて公開しております。そのため、ご関心をお持ちのセキュリティ研究者の方々は、この暗号化プロセスを評価することができます。当社のモバイルアプリのコードは次の場所にございます：https://github.com/meganz/android\n\n詳細については、当社のウェブサイトをご覧ください：\n https://mega.nz/terms にアクセスしてください\n\n\nデスクトップ－ https://mega.nz/</string>
+    <string name="full_description_text">MEGAは、標準のウェブブラウザを通じてユーザー制御の暗号化クラウドストレージとチャットを、モバイル端末用の専用アプリとともにご提供いたします。他のクラウドストレージプロバイダとは異なり、あなたのデータはあなたのクライアント端末によってのみ暗号化され、復号されます（当社では決して行いません）。\n\nスマートフォンやタブレットからファイルをアップロードしてから、いつでも、どこでも、どんな端末からでも、ファイルの検索、保存、ダウンロード、ストリーム配信、表示、共有、名前の変更、削除を行うことができます。あなたの連絡先とフォルダを共有し、連絡先の最新情報をリアルタイムで表示します。暗号化プロセスでは、当社はあなたのパスワードにアクセスしたり、それをリセットしたりすることができないため、あなたはパスワードを必ず覚えておく必要があります（復元キーをバックアップしない限り）。そうしないと、保存されたファイルにアクセスできなくなります。\n\nエンドツーエンドのユーザー暗号化MEGAビデオチャットは完全なプライバシー保護を可能にし、2016年からブラウザを通じてご利用いただいております。これはモバイルアプリにも拡張され、複数の端末間でチャット履歴にアクセスできます。またユーザー様は、MEGAクラウドドライブからチャットに簡単にファイルも追加できます。\n\nMEGAは、ボーナスを達成された、ご登録済みの全ユーザー様に50 GBの豊富な無料ストレージをご提供しております。また、上限がはるかに高い有料プランもご用意しております：\n\n\nPro Liteサブスクリプション：月額4.99ユーロまたは年間49.99ユーロで、400GBのストレージ容量と毎月1TBの転送容量をご提供いたします。\nPro Iサブスクリプション：月額9.99ユーロまたは年間99.99ユーロで、2TBのストレージ容量と毎月2TBの転送容量をご提供いたします。\nPro II サブスクリプション：月額19.99ユーロまたは年間199.99ユーロで、8TBのストレージ容量と毎月8TBの転送容量をご提供いたします。\nPro IIIサブスクリプション：月額29.99ユーロまたは年間299.99ユーロで、16TBのストレージ容量と毎月16TBの転送容量をご提供いたします。\n\nサブスクリプションは、選択した最初の期間と同じ期間の連続したサブスクリプション期間を対象に、および同じ価格で、自動的に更新されます。サブスクリプションを管理するには、携帯端末のPlay Storeアイコンをクリックし、Google IDでサインインしてから（まだそのように行っていない場合）、MEGAアプリをクリックします。そこでサブスクリプションを管理することができます。\n\nアプリの権限：\nWRITE_EXTERNAL_STORAGE -&gt; MEGAから端末にファイルをダウンロードし、端末からMEGAにファイルをアップロードします\nCAMERA -&gt; 写真を撮って写真をMEGAにアップロードします\nREAD_CONTACTS -&gt; MEGAの連絡先として端末からカンタンに連絡先を追加します\nRECORD_AUDIOと CAPTURE_VIDEO_OUTPUT（マイクとカメラ） -&gt; MEGAは、エンドツーエンドの暗号化された音声/ビデオ通話をご提供いたします\n\n\nMEGAシステムに対するユーザー様の信頼を高めるために、クライアントサイドのコードはすべて公開しております。そのため、ご関心をお持ちのセキュリティ研究者の方々は、この暗号化プロセスを評価することができます。当社のモバイルアプリのコードは次の場所にございます：https://github.com/meganz/android\n\n詳細については、当社のウェブサイトをご覧ください：\n https://mega.nz/terms にアクセスしてください\n\n\nデスクトップ－ https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGAは、強力な常時プライバシーを備えたクラウドストレージです。</string>
     <!-- PRO Lite account -->
@@ -15,7 +15,7 @@
     <!-- Answer for confirmation dialog. -->
     <string name="general_no">いいえ</string>
     <!-- dialog option cancel in alert dialog -->
-    <string name="general_cancel">キャンセルする</string>
+    <string name="general_cancel">キャンセル</string>
     <!-- When moving a file to a location in MEGA. This is the text of the button after selection the destination -->
     <string name="general_move_to">移動先</string>
     <!-- When copying a file to a location in MEGA. This is the text of the button after selection the destination -->
@@ -37,17 +37,17 @@
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="general_remove">削除</string>
     <!-- button -->
-    <string name="general_share">共有する</string>
+    <string name="general_share">共有</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="general_leave">出る</string>
+    <string name="general_leave">残す</string>
     <!-- button -->
     <string name="general_decryp">復号化</string>
     <!-- button -->
-    <string name="general_export">エキスポート</string>
+    <string name="general_export">エクスポート</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_ok">OK</string>
     <!-- Skip a step of a configuration process. -->
-    <string name="general_skip">省く</string>
+    <string name="general_skip">スキップ</string>
     <!-- Label for a button to stop some process. For example stop the Camera Uploads -->
     <string name="general_stop">停止</string>
     <!-- option shown when a message could not be sent -->
@@ -55,7 +55,7 @@
     <!-- Button to open the default web browser -->
     <string name="general_open_browser">ブラウザを開く</string>
     <!-- The title of progress dialog when loading web content -->
-    <string name="general_loading">ローディング</string>
+    <string name="general_loading">読み込み中</string>
     <!-- state while importing the file -->
     <string name="general_importing">インポート中</string>
     <!-- state while importing the file -->
@@ -65,13 +65,13 @@
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="general_storage">ストレージ</string>
     <!-- Text listed before the amount of bandwidth a user gets with a certain package. For example: “8TB Bandwidth”. Can also be translated as data transfer. -->
-    <string name="general_bandwidth">転送容量制限</string>
+    <string name="general_bandwidth">転送容量</string>
     <!-- Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan -->
-    <string name="general_subscribe">定期契約購入</string>
+    <string name="general_subscribe">定期契約</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">エラー</string>
     <!-- when clicking into a menu whose functionality is not yet implemented -->
-    <string name="general_not_yet_implemented">その機能はまだ準備中です。</string>
+    <string name="general_not_yet_implemented">まだ実装されていません</string>
     <!-- when any file or folder is selected -->
     <string name="error_no_selection">ファイルまたはフォルダが選択されていません</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -95,19 +95,19 @@
     <!-- On clicking menu item upload in a incoming shared folder read only -->
     <string name="no_permissions_upload">このフォルダは読み取り専用です。アップロードの権限がありません</string>
     <!-- confirmation message before removing the previously downloaded MasterKey file -->
-    <string name="remove_key_confirmation">あなたは以前にエクスポートされた回復キーファイルを削除します</string>
+    <string name="remove_key_confirmation">以前にエクスポートされた回復キーファイルを削除します</string>
     <!-- confirmation message before sending an invitation to a contact -->
-    <string name="confirmation_add_contact">%sに招待を送信しますか</string>
+    <string name="confirmation_add_contact">%sさんに招待状を送信しますか？</string>
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">ログアウト</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">アップロード</string>
     <!-- Menu item -->
-    <string name="action_create_folder">新しいフォルダを作成する</string>
+    <string name="action_create_folder">新規フォルダを作成</string>
     <!-- Option which allows create a new text file -->
     <string name="action_create_txt">新規テキストファイルを作成</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="action_open_link">リンク開設</string>
+    <string name="action_open_link">リンクを開く</string>
     <!-- Menu item -->
     <string name="action_settings">設定</string>
     <!-- Search button -->
@@ -119,37 +119,37 @@
     <!-- Search button -->
     <string name="action_pause">一時停止</string>
     <!-- Menu item -->
-    <string name="action_refresh">リフレッシュ</string>
+    <string name="action_refresh">更新</string>
     <!-- Menu item -->
-    <string name="action_sort_by">ソートする</string>
+    <string name="action_sort_by">並び替え</string>
     <!-- Menu item -->
     <string name="action_help">ヘルプ</string>
     <!-- Change from a free account to paying MEGA -->
     <string name="action_upgrade_account">アカウントをアップグレードする</string>
     <!-- Message while proceeding to upgrade the account -->
-    <string name="upgrading_account_message">アップグレード中</string>
+    <string name="upgrading_account_message">アカウントをアップグレードしています</string>
     <!-- Menu item to select all the elements of a list -->
     <string name="action_select_all">すべて選択</string>
     <!-- Menu item to unselect all the elements of a list -->
-    <string name="action_unselect_all">選択をクリアする</string>
+    <string name="action_unselect_all">選択をクリア</string>
     <!-- Menu item to change from list view to grid view -->
-    <string name="action_grid">サムネールで見る</string>
+    <string name="action_grid">サムネイル表示</string>
     <!-- Menu item to change from grid view to list view -->
-    <string name="action_list">リスト一覧</string>
+    <string name="action_list">リスト表示</string>
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="action_export_master_key">回復キーをバックアップ</string>
     <!-- Menu item to let the user cancel subscriptions -->
-    <string name="action_cancel_subscriptions">定期契約キャンセル</string>
+    <string name="action_cancel_subscriptions">定期契約を解除</string>
     <!-- success message when the subscription has been canceled correctly -->
-    <string name="cancel_subscription_ok">定期契約はキャンセルされました。</string>
+    <string name="cancel_subscription_ok">定期契約は解除されました。</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">あなたのサブスクリプションをキャンセルできませんでした。サポートについてはsupport&#64;mega.nzにお問い合わせください</string>
+    <string name="cancel_subscription_error">サブスクリプションを解除できませんでした。サポートについてはsupport&#64;mega.nzにお問い合わせください</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">他のセッションを閉じる</string>
     <!-- Message after kill all opened sessions -->
-    <string name="success_kill_all_sessions">セッションの残りは閉じられました。</string>
+    <string name="success_kill_all_sessions">残りのセッションは終了しました</string>
     <!-- Message after kill all opened sessions -->
-    <string name="error_kill_all_sessions">進行中セッションを閉じる時、エラー発生</string>
+    <string name="error_kill_all_sessions">開いているセッションの終了時にエラーが発生しました</string>
     <!-- General label for files -->
     <plurals name="general_num_files">
         <item quantity="other">ファイル</item>
@@ -185,13 +185,13 @@
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="error_invalid_email">メールアドレスが無効です。</string>
     <!-- when the user tries to log in MEGA without typing the password -->
-    <string name="error_enter_password">あなたのパスワードを入力して下さい。</string>
+    <string name="error_enter_password">パスワードを入力してください</string>
     <!-- when the user tries to log in to MEGA without a network connection -->
     <string name="error_server_connection_problem">ネットワーク接続がありません</string>
     <!-- when the user tries to log in to MEGA without a valid session -->
-    <string name="error_server_expired_session">このデバイスは別のロケーションからログアウトしています。</string>
+    <string name="error_server_expired_session">別の場所からこの端末でログアウトされました。</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">暗号鍵作成中</string>
+    <string name="login_generating_key">暗号化キーを算出中</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">サーバーに接続中</string>
     <!-- Status text when updating the file manager -->
@@ -199,11 +199,11 @@
     <!-- title of the screen after creating an account when the user has to confirm the password to confirm the account -->
     <string name="login_confirm_account">アカウントを確認</string>
     <!-- when the user clicks on the link sent by MEGA after creating the account, this message is shown -->
-    <string name="login_querying_signup_link">照合リンク確認中</string>
+    <string name="login_querying_signup_link">検証リンクを確認中</string>
     <!-- Attempting to activate a MEGA account for a user. -->
-    <string name="login_confirming_account">アカウント起動中</string>
+    <string name="login_confirming_account">アカウントを有効化中</string>
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
-    <string name="login_preparing_filelist">ファイルリスト準備中</string>
+    <string name="login_preparing_filelist">ファイルリストを準備中</string>
     <!-- when the user tries to share something to MEGA without being logged -->
     <string name="login_before_share">MEGAと共有するにはログインしてください</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
@@ -219,19 +219,19 @@
     <!--  -->
     <string name="tour_space_text">今すぐ登録し、50 GB*の空き容量を取得してください</string>
     <!--  -->
-    <string name="tour_speed_text">アップロードは早いですよ。速くみんなとファイルを共有しましょう。</string>
+    <string name="tour_speed_text">アップロードは高速です。誰とでも素早くファイルを共有できます。</string>
     <!--  -->
-    <string name="tour_privacy_text">MEGAの末端間暗号化システムでファイルを安全にキープしましょう。</string>
+    <string name="tour_privacy_text">MEGAのエンドツーエンドの暗号化により、すべてのファイルを安全に保つことができます。</string>
     <!--  -->
-    <string name="tour_access_text">完全に暗号化されたアクセスを、いつでもどこでも。</string>
+    <string name="tour_access_text">いつでも、どこでも、完全に暗号化されたアクセスが可能です</string>
     <!-- button that allows the user to create an account -->
-    <string name="create_account_text">アカウントを作成する</string>
+    <string name="create_account_text">アカウントを作成</string>
     <!-- category in sort by action -->
     <string name="name_text">名前</string>
     <!-- First Name of the user -->
     <string name="first_name_text">名前</string>
     <!-- Last name of the user -->
-    <string name="lastname_text">姓（苗字）</string>
+    <string name="lastname_text">苗字</string>
     <!-- text placed on the checkbox of acceptation of the Terms of Service -->
     <string name="tos">私はMEGAの[A]ご利用規約[/A]に同意します</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
@@ -239,13 +239,13 @@
     <!-- Does the user already have a MEGA account -->
     <string name="already_account">もうアカウントをお持ちですか？</string>
     <!-- warning dialog -->
-    <string name="create_account_no_terms">利用規約に同意して下さい。</string>
+    <string name="create_account_no_terms">当社のご利用規約に同意していただく必要がございます。</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
     <string name="create_account_no_top">パスワードを失う危険性を理解していることに同意していただく必要がございます</string>
     <!-- Warning message when the first name is a required field to submit a form. For example during the create account process. -->
-    <string name="error_enter_username">あなたの名を入力してください</string>
+    <string name="error_enter_username">お名前をご入力ください</string>
     <!-- Warning dialog -->
-    <string name="error_enter_userlastname">あなたの姓を入力してください。</string>
+    <string name="error_enter_userlastname">苗字をご入力ください。</string>
     <!-- when creating the account -->
     <string name="error_short_password">パスワードが短すぎます</string>
     <!-- when creating the account -->
@@ -253,7 +253,7 @@
     <!-- when creating the account -->
     <string name="error_email_registered">このメールアドレスはすでにMEGAでアカウントを登録しています。</string>
     <!--  -->
-    <string name="create_account_creating_account">サーバーに接続:アカウント開設中</string>
+    <string name="create_account_creating_account">サーバーに接続：アカウントを作成</string>
     <!--  -->
     <string name="cancel_transfer_confirmation">この転送をキャンセルしますか？</string>
     <!--  -->
@@ -265,13 +265,13 @@
         <item quantity="other">選択された転送はキャンセルされます。</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
-    <string name="section_cloud_drive">クラウド・ドライブ</string>
+    <string name="section_cloud_drive">クラウドドライブ</string>
     <!-- Label to reference a recents section -->
     <string name="section_recents">最近</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">メディア・アップロード</string>
+    <string name="section_secondary_media_uploads">メディアアップロード</string>
     <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
-    <string name="section_inbox">受信</string>
+    <string name="section_inbox">受信箱</string>
     <!-- title of the screen that shows the files saved for offline in the device -->
     <string name="section_saved_for_offline">オフラインで保存</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
@@ -283,35 +283,35 @@
     <!-- title of the screen that shows all the shared items -->
     <string name="section_shared_items">共有フォルダ</string>
     <!-- The title of the trash bin in the tree of the file manager. -->
-    <string name="section_rubbish_bin">ゴミ箱</string>
+    <string name="section_rubbish_bin">ごみ箱</string>
     <!-- Section name for the “Contacts” section.Preferably one word. There is little space for this word. -->
-    <string name="section_contacts">知り合い</string>
+    <string name="section_contacts">連絡先</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">連絡先 [A](%1$d)[/A]</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
     <string name="sent_requests_empty">[A]送信済みの要求[/A]は[B]ありません[/B]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[A]受信済みの要求[/A]は[B]ありません[/B]</string>
-    <!-- Title for the file transfer screen (with the up &amp; download) -->
+    <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">転送</string>
-    <!-- Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this. -->
-    <string name="section_account">アカウント設定</string>
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
+    <string name="section_account">私のアカウント</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
-    <string name="section_photo_sync">写真アップロード</string>
+    <string name="section_photo_sync">カメラアップロード</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">受信</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
     <string name="tab_outgoing_shares">送信</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">リンク</string>
-    <!-- Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible). -->
-    <string name="title_incoming_shares_explorer">共有フォルダ受信</string>
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
+    <string name="title_incoming_shares_explorer">受信共有</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">受信共有のオーナーは</string>
     <!-- message when there are no files in the Cloud drive -->
-    <string name="file_browser_empty_cloud_drive">あなたのクラウドデバイスにはファイルが存在しません。</string>
+    <string name="file_browser_empty_cloud_drive">あなたのクラウドドライブにファイルがありません</string>
     <!-- Text that indicates that a folder is currently empty -->
-    <string name="file_browser_empty_folder">フォルダにファイルなし</string>
+    <string name="file_browser_empty_folder">空のフォルダ</string>
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">アカウントを選択</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
@@ -323,15 +323,15 @@
     <!-- Label to display the date and time when a file/folder has been added (uploaded) to MEGA. -->
     <string name="file_properties_info_added">追加時刻</string>
     <!-- the label when a folder can be accesed by public users -->
-    <string name="file_properties_shared_folder_public_link">公共リンク</string>
+    <string name="file_properties_shared_folder_public_link">公開リンク</string>
     <!-- Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager. -->
-    <string name="file_properties_shared_folder_permissions">許可</string>
+    <string name="file_properties_shared_folder_permissions">権限</string>
     <!-- Title of the dialog to choose permissions when sharing. -->
-    <string name="dialog_select_permissions">共有許可</string>
+    <string name="dialog_select_permissions">権限を共有</string>
     <!-- menu item -->
-    <string name="file_properties_shared_folder_change_permissions">許可の変更</string>
+    <string name="file_properties_shared_folder_change_permissions">権限を変更</string>
     <!-- when listing all the contacts that shares a folder -->
-    <string name="file_properties_shared_folder_select_contact">と共有</string>
+    <string name="file_properties_shared_folder_select_contact">共有先</string>
     <!-- send a file to a MEGA user -->
     <string name="file_properties_send_file_select_contact">送信先</string>
     <!-- shows the owner of an incoming shared folder -->
@@ -353,13 +353,13 @@
     <!-- Add new contacts before sharing. -->
     <string name="contacts_explorer_list_empty_text">共有する新しい連絡先を追加</string>
     <!-- Error message -->
-    <string name="error_not_enough_free_space">あなたの端末に十分な空き容量がありません</string>
+    <string name="error_not_enough_free_space">端末に十分な空き容量がありません</string>
     <!-- This is button text on the Get Link dialog. This lets the user get a public file/folder link without the decryption key e.g. https://mega.nz/#!Qo12lSpT. -->
     <string name="option_link_without_key">キーなしのリンク</string>
     <!-- Alert Dialog to get link -->
-    <string name="option_decryption_key">復号化鍵</string>
+    <string name="option_decryption_key">復号キー</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
-    <string name="download_preparing_files">ファイル準備中</string>
+    <string name="download_preparing_files">ファイルを準備中</string>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_began">
         <item quantity="other">%1$d個のダウンロードが開始されました</item>
@@ -387,13 +387,13 @@
     <!-- Warning message -->
     <string name="error_file_size_greater_than_4gb">ほとんどの端末は4GBを超えるファイルをダウンロードできません。あなたのダウンロードはおそらく失敗するでしょう</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
-    <string name="intent_not_available">デバイス上にこのファイルを実行するためのアプリがありません。</string>
+    <string name="intent_not_available">端末上にこのファイルを実行できるアプリがありません。</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">お使いの端末でこの場所を開くために利用できるアプリはありません</string>
     <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
     <string name="intent_not_available_file">このファイルタイプをサポートするアプリがインストールされていない可能性があります</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
-    <string name="context_share_image">イメージ共有方法</string>
+    <string name="context_share_image">画像共有方法</string>
     <!-- create a link of a file and send it using an app from the device -->
     <string name="context_get_link">共有リンク</string>
     <!-- Delete a link label -->
@@ -401,13 +401,13 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_get_link_menu">リンクを取得</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_leave_menu">出る</string>
+    <string name="context_leave_menu">残す</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">共有を残す</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">共有を削除</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_remove_link_menu">リンクを外す</string>
+    <string name="context_remove_link_menu">リンクを削除</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">このリンクは公開されなくなりました。</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
@@ -419,13 +419,13 @@
     <!-- Title of a dialog to rename a node. The place holder is to set the current name of the node. -->
     <string name="rename_dialog_title">%1$sの名前を変更</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
-    <string name="context_open_link_title">リンク開設</string>
+    <string name="context_open_link_title">リンクを開く</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">開く</string>
     <!-- while renaming a file or folder -->
     <string name="context_renaming">名前を変更中</string>
     <!-- while file provider is downloading a file -->
-    <string name="context_preparing_provider">ファイルの準備</string>
+    <string name="context_preparing_provider">ファイルを準備中</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_download">ダウンロード</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -433,21 +433,21 @@
     <!-- while moving a file or folder -->
     <string name="context_moving">移動中</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_copy">コピー実行</string>
+    <string name="context_copy">コピー</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_upload">アップロード</string>
     <!-- while copying a file or folder -->
     <string name="context_copying">コピー中</string>
     <!-- menu item -->
-    <string name="context_move_to_trash">ゴミ箱に移す</string>
+    <string name="context_move_to_trash">ごみ箱に移す</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">MEGAから削除</string>
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">フォルダ名</string>
     <!-- when adding a new contact. in the dialog -->
-    <string name="context_new_contact_name">知り合いのメールアドレス</string>
+    <string name="context_new_contact_name">連絡先のメールアドレス</string>
     <!-- status dialog when performing the action -->
-    <string name="context_creating_folder">フォルダの作成</string>
+    <string name="context_creating_folder">フォルダを作成中</string>
     <!-- Menu item -->
     <string name="context_download_to">保存先</string>
     <!-- Menu option title -->
@@ -457,13 +457,13 @@
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">送信</string>
     <!-- send the file to inbox -->
-    <string name="context_send_file_inbox">知り合いに送る</string>
+    <string name="context_send_file_inbox">連絡先に送信</string>
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="context_remove">削除</string>
     <!-- Menu option to delete selected items of the offline state -->
-    <string name="context_delete_offline">オフラインから削除する</string>
+    <string name="context_delete_offline">オフラインから削除</string>
     <!-- menu item -->
-    <string name="context_share_folder">フォルダを共有する</string>
+    <string name="context_share_folder">フォルダを共有</string>
     <!-- menu item -->
     <string name="context_send_file">ファイルをチャットに送信</string>
     <!-- menu item -->
@@ -471,53 +471,53 @@
     <!-- open a shared folder -->
     <string name="context_view_shared_folders">共有フォルダを見る</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_sharing_folder">共有する</string>
+    <string name="context_sharing_folder">共有中</string>
     <!-- Menu option to manage a shared folder. -->
     <string name="manage_share">共有を管理</string>
     <!-- menu item -->
     <string name="context_delete">削除</string>
     <!-- success message when removing a contact request -->
-    <string name="context_contact_invitation_deleted">リクエスト削除完了</string>
+    <string name="context_contact_invitation_deleted">要求を削除しました</string>
     <!-- success message when reinvite a contact -->
-    <string name="context_contact_invitation_resent">再送完了</string>
+    <string name="context_contact_invitation_resent">要求を再送信しました</string>
     <!-- success message when sending a contact request -->
     <string name="context_contact_request_sent">要求が%sに正確に送信されました。ステータスは「送信済み要求」タブで確認できます。</string>
     <!-- success message when removing a contact -->
-    <string name="context_contact_removed">知り合いを削除しました。</string>
+    <string name="context_contact_removed">連絡先を削除しました</string>
     <!-- error message -->
-    <string name="context_contact_not_removed">エラー発生。知り合いは削除されていません。</string>
+    <string name="context_contact_not_removed">エラー。連絡先が削除されていません</string>
     <!-- success message when chaning the permissionss -->
-    <string name="context_permissions_changed">許可を変更しました。</string>
+    <string name="context_permissions_changed">権限を変更しました</string>
     <!-- error message -->
-    <string name="context_permissions_not_changed">エラー発生。許可は変更されていません。</string>
+    <string name="context_permissions_not_changed">エラー。権限は変更されていません</string>
     <!-- message when trying to create a folder that already exists -->
-    <string name="context_folder_already_exists">そのフォルダは存在しています。</string>
+    <string name="context_folder_already_exists">フォルダがすでに存在しています</string>
     <!-- message when trying to create a invite a contact already that is already added -->
     <string name="context_contact_already_exists">%sさんはすでに連絡先に入っています</string>
     <!-- message when trying to send a file without full access -->
     <string name="context_send_no_permission">このファイルを送信する権限がありません</string>
     <!-- success message when creating a folder -->
-    <string name="context_folder_created">フォルダ作成できました。</string>
+    <string name="context_folder_created">フォルダが作成されました</string>
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">エラー。フォルダが作成されていません</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">タイトル名称変更しました。</string>
+    <string name="context_correctly_renamed">名前の変更に成功しました</string>
     <!-- error message -->
-    <string name="context_no_renamed">エラー発生。改称されていません。</string>
+    <string name="context_no_renamed">エラー。名前が変更されていません</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">コピー完了です。</string>
+    <string name="context_correctly_copied">正常にコピーされました</string>
     <!-- success message when sending a node to Inbox -->
-    <string name="context_correctly_sent_node">受信トレイに送りました</string>
+    <string name="context_correctly_sent_node">受信トレイに送信しました</string>
     <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">エラー。受信トレイに送信できませんでした。</string>
+    <string name="context_no_sent_node">エラー。受信トレイに送信されませんでした</string>
     <!-- error message -->
-    <string name="context_no_copied">エラー発生。コピーできていません。</string>
+    <string name="context_no_copied">エラー。コピーされていません</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">目的のフォルダを選択してください</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">移動成功です。</string>
+    <string name="context_correctly_moved">正常に移動しました</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_moved">%d個の項目が正常に移動しました。</string>
+    <string name="number_correctly_moved">%d項目が正常に移動しました。</string>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d項目が正常に送信されませんでした。</string>
     <!-- success message when moving a node -->
@@ -527,35 +527,35 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved_to_rubbish">&#160;また、%d項目が正常に送信されませんでした</string>
     <!-- error message -->
-    <string name="context_no_moved">エラー発生。移動されていません。</string>
+    <string name="context_no_moved">エラー。移動されませんでした</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">共有成功です。</string>
+    <string name="context_correctly_shared">正常に共有されました</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">エラー。%d件の共有は完了しませんでした</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared_removed">共有が正常に削除されました</string>
     <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number_removed">エラー。共有の削除の%dプロセスが完了していません</string>
+    <string name="context_no_shared_number_removed">エラー。共有を削除する%dプロセスが完了していません</string>
     <!-- error message -->
-    <string name="context_no_shared">エラー発生。共有できていません。</string>
+    <string name="context_no_shared">エラー。共有されていません</string>
     <!-- error message -->
-    <string name="context_no_removed_shared">共有を削除にエラーがおこりました。</string>
+    <string name="context_no_removed_shared">エラー。共有を削除できませんでした</string>
     <!-- success message when removing a sharing -->
     <string name="context_remove_sharing">フォルダの共有が削除されました</string>
     <!-- error message -->
-    <string name="context_no_link">リンク取得失敗</string>
+    <string name="context_no_link">リンクの作成に失敗しました</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">MEGA から削除されました。</string>
+    <string name="context_correctly_removed">正常に削除されました</string>
     <!-- error message -->
-    <string name="context_no_removed">エラー発生。MEGA から削除されていません。</string>
+    <string name="context_no_removed">エラー。削除に失敗しました</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d個の項目がMEGAから成功に削除されました。</string>
+    <string name="number_correctly_removed">%d個の項目がMEGAから正常に削除されました</string>
     <!-- error message when moving a node -->
     <string name="number_no_removed">%d項目が正常に削除されませんでした</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">%d個のフォルダが正常に残りました。</string>
     <!-- Message shown when a share has been left -->
-    <string name="share_left">共有から出ました</string>
+    <string name="share_left">共有が残りました</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d個のフォルダはうまく残りませんでした</string>
     <!-- success message when sending multiple files -->
@@ -583,15 +583,15 @@
     <!-- error message when sharing multiple files -->
     <string name="number_no_shared">%dフォルダが共有されませんでした</string>
     <!-- success message when sending a file to a contact -->
-    <string name="context_correctly_copied_contact">この方へ送信成功:</string>
+    <string name="context_correctly_copied_contact">以下の連絡先に正常に送信されました：</string>
     <!-- success message when removing all the contacts of a shared folder -->
-    <string name="context_correctly_removed_sharing_contacts">このフォルダは今から共有されていません</string>
+    <string name="context_correctly_removed_sharing_contacts">そのフォルダは共有されなくなりました</string>
     <!-- error message when removing all the contacts of a shared folder -->
     <string name="context_no_removed_sharing_contacts">エラー。そのフォルダはまだ別の連絡先と共有されています</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">ファイルを1つだけ選択</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">ゴミ箱を空にしました</string>
+    <string name="rubbish_bin_emptied">ごみ箱が正常に空になりました</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">エラー。ごみ箱は空になっていません</string>
     <!-- dialog cancel subscriptions -->
@@ -601,7 +601,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">送信</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">フィードバック、ありがとうございます。本当に、MEGA 定期契約をキャンセルしてしまうのですか？</string>
+    <string name="confirmation_cancel_subscriptions">ご意見を頂きありがとうございます！　MEGA サブスクリプションをキャンセルしてもよろしいですか？</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">あなたのサブスクリプションはキャンセルされていません。キャンセルの理由をご入力ください</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -617,19 +617,19 @@
     <!-- success message after removing the public link of a folder -->
     <string name="context_node_private">このフォルダはプライベートになりました。</string>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">共有は解除されました。</string>
+    <string name="context_share_correctly_removed">共有は削除されました</string>
     <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">新しいフォルダ</string>
+    <string name="menu_new_folder">新規フォルダ</string>
     <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_add_contact">知り合いの追加</string>
+    <string name="menu_add_contact">連絡先を追加</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact_and_share">連絡先と共有を追加</string>
     <!-- Title of the alert to introduce the decryption key -->
-    <string name="alert_decryption_key">復号化鍵</string>
+    <string name="alert_decryption_key">復号キー</string>
     <!-- Message of the alert to introduce the decryption key -->
     <string name="message_decryption_key">リンク用の復号キーを入力してください</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
-    <string name="invalid_decryption_key">復号化鍵無効</string>
+    <string name="invalid_decryption_key">復号キーが無効です</string>
     <!-- upload to. Then choose an Image file -->
     <string name="upload_to_image">画像</string>
     <!-- upload to. Then choose an Audio file -->
@@ -637,23 +637,23 @@
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">動画</string>
     <!-- upload to. Then choose to browse the file system to choose a file -->
-    <string name="upload_to_filesystem">ファイルシステムより選択</string>
+    <string name="upload_to_filesystem">ファイルシステムから選択</string>
     <!-- upload to. Then choose to browse the file system to choose a file -->
     <string name="upload_to_filesystem_from">以下から選択：</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
-    <string name="upload_uploaded">アップロード完了</string>
+    <string name="upload_uploaded">アップロード済み</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">ファイルを処理しています</string>
+    <string name="upload_prepare">ファイルを処理中</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
-        <item quantity="other">ファイルの処理中</item>
+        <item quantity="other">ファイルを処理中</item>
     </plurals>
     <!-- error message when downloading a file -->
-    <string name="error_temporary_unavaible">容量不足です。後でもう一度トライして下さい。</string>
+    <string name="error_temporary_unavaible">リソースが一時的に利用できません。後でもう一度やり直してください。</string>
     <!-- Error message when the selected file cannot be opened -->
     <string name="upload_can_not_open">選択したファイルを開くことができません</string>
     <!-- when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file -->
-    <string name="unzipping_process">ファイル解凍中</string>
+    <string name="unzipping_process">ファイルを解凍中</string>
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">ファイルシステムの問題</string>
     <!-- error message while browsing the local filesystem -->
@@ -661,48 +661,47 @@
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">画像ビューア</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">ご利用スペース</string>
+    <string name="my_account_used_space">使用済みスペース</string>
     <!-- menu item -->
     <string name="my_account_change_password">パスワードの変更</string>
     <!-- Dialog text overquota error -->
-    <string name="overquota_alert_text">ストレージ容量の上限を超えました。アカウントをアップグレードしますか？　</string>
+    <string name="overquota_alert_text">ストレージの制限を超えました。アカウントをアップグレードしますか？</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">前回のセッション</string>
     <!-- header for the social connections, showing the number of contacts the user has -->
     <string name="my_account_connections">接続</string>
     <!-- message displayed while the app is changing the password -->
-    <string name="my_account_changing_password">パスワード変更中</string>
+    <string name="my_account_changing_password">パスワードを変更中</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
     <string name="my_account_change_password_oldPassword">現在のパスワード</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword1">新しいパスワード</string>
     <!-- when changing the password -->
-    <string name="my_account_change_password_newPassword2">新しいパスワードの確認</string>
+    <string name="my_account_change_password_newPassword2">新しいパスワードを確認</string>
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
     <string name="my_account_change_password_dont_match">パスワードが一致しません</string>
     <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">メンバーシップ選択</string>
+    <string name="upgrade_select_pricing">メンバーシップを選択</string>
     <!-- the user has to decide the way of payment -->
-    <string name="select_membership_1">月ごと又は１年ごと</string>
-    <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
+    <string name="select_membership_1">毎月または年間の自動更新</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">現在、このプランのための支払い方法がありません。</string>
+    <string name="no_available_payment_method">現在、このプラン用のお支払い方法がございません。</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
-    <string name="upgrade_per_month">月ごと*</string>
+    <string name="upgrade_per_month">毎月*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
     <string name="upgrade_per_year">年間*</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">そのリンクはクリップボードにコピーされました。</string>
+    <string name="file_properties_get_link">リンクがクリップボードにコピーされました。</string>
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">プレビューはまだダウンロードされていません。お待ちください</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">プレビューは、利用可能なメモリ不足のため読み込めません。後でもう一度お試しください。</string>
+    <string name="not_load_preview_low_memory">利用可能なメモリが不足しているため、プレビューを読み込むことができません。後でもう一度お試しください。</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">アカウントを作成する前にログアウトしてください</string>
     <!-- message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty">現在転送なし</string>
+    <string name="transfers_empty">有効な転送はありません</string>
     <!-- menu item -->
-    <string name="menu_pause_transfers">転送、一時停止</string>
+    <string name="menu_pause_transfers">転送を一時停止</string>
     <!-- menu item -->
     <string name="menu_cancel_all_transfers">すべての転送をキャンセル</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -762,11 +761,11 @@
     <!-- Calculating Size of files in offline or cache folders -->
     <string name="settings_advanced_features_calculating">計算中</string>
     <!-- title of the setting to set the default download location -->
-    <string name="settings_storage_download_location">ダウンロード位置を設定</string>
+    <string name="settings_storage_download_location">既定のダウンロード場所</string>
     <!-- Whether to always ask the user each time. -->
     <string name="settings_storage_ask_me_always">ダウンロード先を必ず尋ねる</string>
     <!-- Whether to enable the storage in advanced devices -->
-    <string name="settings_storage_advanced_devices">アドバンス・デバイス（外部SD）表示</string>
+    <string name="settings_storage_advanced_devices">高度なデバイス（外部SD）を表示</string>
     <!-- Label of button on account page that ask user to add their phone number -->
     <string name="add_phone_number_label">電話番号を追加</string>
     <!-- enter verification code page title -->
@@ -824,7 +823,7 @@
     <string name="external_storage_label">外部ストレージ</string>
     <!-- choose the way the new user’s email is inserted, import from phone option -->
     <string-array name="add_contact_array">
-        <item>メールアドレスを書く</item>
+        <item>ユーザーのメールアドレスを書く</item>
         <item>端末からインポート</item>
     </string-array>
     <!-- settings option -->
@@ -850,12 +849,12 @@
     <string name="settings_camera_upload_what_to_upload">ファイルアップロード</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string-array name="settings_camera_upload_file_upload_entries">
-        <item>フォトのみ</item>
+        <item>写真のみ</item>
         <item>動画のみ</item>
-        <item>フォトと動画</item>
+        <item>写真と動画</item>
     </string-array>
     <!-- Option to choose that the camera sync will only be enable when the device is charging -->
-    <string name="settings_camera_upload_charging">チャージ中のみ</string>
+    <string name="settings_camera_upload_charging">充電時のみ</string>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">場所タグを含める</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
@@ -867,25 +866,25 @@
     <!-- The location of where the user photos or videos are stored in MEGA. -->
     <string name="settings_mega_camera_upload_folder">MEGAカメラアップロードフォルダ</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
-    <string name="settings_local_secondary_folder">ローカル第２フォルダ</string>
+    <string name="settings_local_secondary_folder">ローカルセカンダリフォルダ</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
     <string name="settings_mega_secondary_folder">MEGAセカンダリフォルダ</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string name="settings_camera_upload_only_photos">フォトのみ</string>
+    <string name="settings_camera_upload_only_photos">写真のみ</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_only_videos">動画のみ</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
-    <string name="settings_camera_upload_photos_and_videos">フォトと動画</string>
+    <string name="settings_camera_upload_photos_and_videos">写真と動画</string>
     <!-- status text when no custom photo sync folder has been set -->
     <string name="settings_pin_lock_code_not_set">未設定</string>
     <!-- Settings of the Passcode -->
     <string name="settings_passcode_lock_switch">パスコードロック</string>
     <!-- Settings option to change Passcode. -->
-    <string name="settings_change_passcode">パスコードを変更して下さい</string>
+    <string name="settings_change_passcode">パスコードを変更</string>
     <!-- Settings option screen to change Passcode. -->
-    <string name="title_change_passcode">パスコードロックの変更</string>
+    <string name="title_change_passcode">パスコードロックを変更</string>
     <!-- Settings option to set the timer to ask for passcode. -->
-    <string name="settings_require_passcode">パスコードが必要です</string>
+    <string name="settings_require_passcode">パスコードを要求</string>
     <!-- Option available to choose in some context to make an action immediately. -->
     <string name="action_immediately">即座に</string>
     <!-- Button after the Passcode code input field -->
@@ -897,13 +896,13 @@
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">10回失敗するとログアウトされ、オフラインファイルが削除されます。</string>
     <!-- error message when not typing the Passcode code correctly -->
-    <string name="pin_lock_incorrect">コードの間違い</string>
+    <string name="pin_lock_incorrect">コードが間違っています</string>
     <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
     <plurals name="pin_lock_incorrect_alert">
         <item quantity="other">パスコードが間違っています。もう一度お試しください。残りの試行回数は%2d回です</item>
     </plurals>
     <!-- Error message when not typing the Passcode correctly (two times) -->
-    <string name="pin_lock_not_match">パスコードが一致しません。\nもう一度入力してください。</string>
+    <string name="pin_lock_not_match">パスコードが一致しませんでした。もう一度やり直してください。</string>
     <!-- Title of the screen to unlock screen with Passcode -->
     <string name="unlock_pin_title">パスコードを入力</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
@@ -913,45 +912,45 @@
     <!-- Title of the screen to unlock screen with Passcode in second round -->
     <string name="reset_pin_title_2">新しいパスコードを再入力</string>
     <!-- Text of the screen after 10 attemps with a wrong Passcode -->
-    <string name="incorrect_pin_activity">ローカルデータがすべて削除され、あなたは%1d秒後にログアウトされます</string>
+    <string name="incorrect_pin_activity">ローカルデータがすべて削除され、%1d秒後にログアウトされます</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
-    <string name="settings_about">概要</string>
+    <string name="settings_about">会社概要</string>
     <!-- Preference screen item action button -->
     <string name="settings_about_privacy_policy">プライバシーポリシー</string>
     <!--  -->
-    <string name="settings_about_terms_of_service">利用規約</string>
+    <string name="settings_about_terms_of_service">ご利用規約</string>
     <!-- App means “Application” -->
-    <string name="settings_about_app_version">アプリ用</string>
+    <string name="settings_about_app_version">アプリのバージョン</string>
     <!-- Title of the label where the SDK version is shown -->
     <string name="settings_about_sdk_version">MEGA SDKバージョン</string>
     <!-- Title of the label where the MEGAchat SDK version is shown -->
     <string name="settings_about_karere_version">MEGAchat SDKバージョン</string>
     <!-- Link to the public code of the app -->
-    <string name="settings_about_code_link_title">ソースコードを見る</string>
+    <string name="settings_about_code_link_title">ソースコードを表示</string>
     <!--  -->
-    <string name="january">１月</string>
+    <string name="january">1月</string>
     <!--  -->
-    <string name="february">２月</string>
+    <string name="february">2月</string>
     <!--  -->
-    <string name="march">３月</string>
+    <string name="march">3月</string>
     <!--  -->
-    <string name="april">４月</string>
+    <string name="april">4月</string>
     <!--  -->
-    <string name="may">５月</string>
+    <string name="may">5月</string>
     <!--  -->
-    <string name="june">６月</string>
+    <string name="june">6月</string>
     <!--  -->
-    <string name="july">７月</string>
+    <string name="july">7月</string>
     <!--  -->
-    <string name="august">８月</string>
+    <string name="august">8月</string>
     <!--  -->
-    <string name="september">９月</string>
+    <string name="september">9月</string>
     <!--  -->
-    <string name="october">１０月</string>
+    <string name="october">10月</string>
     <!--  -->
-    <string name="november">１１月</string>
+    <string name="november">11月</string>
     <!--  -->
-    <string name="december">１２月</string>
+    <string name="december">12月</string>
     <!-- title of the screen that shows the ZIP files -->
     <string name="zip_browser_activity">ZIP ブラウザ</string>
     <!-- title of the My Account screen -->
@@ -963,31 +962,31 @@
     <!--  -->
     <string name="free_account">無料</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
-    <string name="camera_uploads_created">写真アップロード用フォルダ完成です</string>
+    <string name="camera_uploads_created">カメラアップロードフォルダが作成されました</string>
     <!-- category in sort by action -->
     <string name="sortby_name">名前</string>
     <!-- sort files alphabetically ascending -->
-    <string name="sortby_name_ascending">後ろから</string>
+    <string name="sortby_name_ascending">昇順</string>
     <!-- sort files alphabetically descending -->
-    <string name="sortby_name_descending">前から</string>
+    <string name="sortby_name_descending">降順</string>
     <!-- category in sort by action -->
     <string name="sortby_date">日付</string>
     <!-- category in sort by action -->
-    <string name="sortby_creation_date">作成時刻</string>
+    <string name="sortby_creation_date">作成日</string>
     <!-- category in sort by action -->
-    <string name="sortby_modification_date">編集日付</string>
+    <string name="sortby_modification_date">変更日</string>
     <!-- category in sort by action -->
     <string name="sortby_link_creation_date">リンク作成日</string>
     <!-- sort files by date newest first -->
-    <string name="sortby_date_newest">新しいものから</string>
+    <string name="sortby_date_newest">最新</string>
     <!-- sort files by date oldest first -->
-    <string name="sortby_date_oldest">古いものから</string>
+    <string name="sortby_date_oldest">最古</string>
     <!-- category in sort by action -->
     <string name="sortby_size">サイズ</string>
     <!-- sort files by size largest first -->
-    <string name="sortby_size_largest_first">大きいものから</string>
+    <string name="sortby_size_largest_first">最大</string>
     <!-- sort files by size smallest first -->
-    <string name="sortby_size_smallest_first">小さいものから</string>
+    <string name="sortby_size_smallest_first">最小</string>
     <!-- Title of sort by media type options -->
     <string name="sortby_type">メディアタイプ</string>
     <!-- sort option, sort media files by photos first -->
@@ -1011,15 +1010,15 @@
     <!-- Passcode alphanumeric -->
     <string name="AN_pin_lock">英数字</string>
     <!-- Confirmation message when enabling logs in the app -->
-    <string name="settings_enable_logs">ロギングが有効にしました。</string>
+    <string name="settings_enable_logs">ログが有効になりました</string>
     <!-- Confirmation message when disabling logs in the app -->
-    <string name="settings_disable_logs">ロギングが無効にしました。</string>
+    <string name="settings_disable_logs">ログが無効になりました</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
     <string name="error_unable_to_setup_cloud_folder">MEGAカメラアップロードフォルダをセットアップできません</string>
     <!-- Message displayed when the user denies the required permissions during the logs activation -->
     <string name="logs_not_enabled_permissions">必要な権限を拒否したため、ログは有効になっていません</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
-    <string name="search_open_location">ファイルの場所を開く</string>
+    <string name="search_open_location">場所を開く</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="servers_busy">このプロセスに予想以上時間がかかっています。お待ちください。</string>
     <!-- Label in My Account section to show user account type -->
@@ -1035,7 +1034,7 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Pro Liteアカウント</string>
     <!--  -->
-    <string name="backup_title">あなたの回復キーをバックアップ</string>
+    <string name="backup_title">回復キーをバックアップ</string>
     <!-- Subtitle of the screen to backup the master key -->
     <string name="backup_subtitle">あなたのパスワードはあなたの回復キーのロックを解除します</string>
     <!-- First paragraph of the screen to backup the master key -->
@@ -1043,7 +1042,7 @@
     <!-- Summary of the preference Recovery key on Settings section -->
     <string name="backup_second_paragraph">回復キーをエクスポートして安全な場所に保管すると、データを失うことなく新しいパスワードを設定できます。</string>
     <!-- Third paragraph of the screen to backup the master key -->
-    <string name="backup_third_paragraph">外部攻撃者があなたの鍵を手に入れてもあなたのアカウントにはアクセスできません。パスワードをリセットするには親鍵とあなたのメールへのアクセスとの両方が必要です。</string>
+    <string name="backup_third_paragraph">外部攻撃者があなたのキーを手に入れただけではあなたのアカウントにはアクセスできません。パスワードをリセットするにはキーとあなたのメールへのアクセスの両方が必要です。</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
     <string name="backup_action">回復キーをクリップボードにコピーするかテキストファイルとして保存します</string>
     <!-- Action of a button to save something -->
@@ -1057,7 +1056,7 @@
     <!-- Negative button to perform a general action -->
     <string name="general_negative_button">いいえ</string>
     <!-- Option of the overflow menu to show the screen info to reset the password -->
-    <string name="forgot_pass_menu">パスワードをわすれました？</string>
+    <string name="forgot_pass_menu">パスワードをお忘れですか？</string>
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">パスワードをお忘れですか？</string>
     <!-- First paragraph of the screen when the password has been forgotten -->
@@ -1067,7 +1066,7 @@
     <!-- Sentence to ask to the user if he has the master key in the screen when the password has been forgotten -->
     <string name="forgot_pass_action">回復キーのバックアップはありますか？　</string>
     <!-- Title of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="title_alert_reset_with_MK">了解。では&#8230;</string>
+    <string name="title_alert_reset_with_MK">了解しました。では&#8230;</string>
     <!-- Hint of the text where the user can write his e-mail -->
     <string name="edit_text_insert_mail">メールはこちら</string>
     <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
@@ -1081,11 +1080,11 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">メール確認</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">続けるためにメールをチェックしてください。</string>
+    <string name="email_verification_text">メールを確認して続行してください。</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">エラーが発生しました。もう一度やり直してください。</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
-    <string name="alert_not_logged_in">そうなるように、ログインする必要があります。</string>
+    <string name="alert_not_logged_in">この操作を実行するには、ログインしている必要があります。</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
     <string name="change_email_not_logged_in">メールの変更を完了するには、ログインする必要があります。現在のメールアドレスで再度ログインしてから、確認リンクをもう一度クリックしてください。</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
@@ -1095,17 +1094,17 @@
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">入力が無効です</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">メールアドレスが無効です。</string>
+    <string name="invalid_email_title">メールアドレスが無効です</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">メールアドレスを確認し、やり直して下さい。</string>
+    <string name="invalid_email_text">メールアドレスをご確認の上、再度お試しください。</string>
     <!-- Title of the dialog to write MK after opening the recovery link -->
-    <string name="title_dialog_insert_MK">パスワードのリセット</string>
+    <string name="title_dialog_insert_MK">パスワードをリセット</string>
     <!-- Text of the dialog to write MK after opening the recovery link -->
     <string name="text_dialog_insert_MK">以下にあなたの回復キーを入力してください</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">パスワードを変更しました。</string>
     <!-- Title of the dialog to park an account -->
-    <string name="park_account_dialog_title">古いアカウントを放っておく</string>
+    <string name="park_account_dialog_title">アカウントを放っておく</string>
     <!-- Button to park an account -->
     <string name="park_account_button">放置</string>
     <!-- Title of the screen to park an account -->
@@ -1121,25 +1120,25 @@
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">新しいパスワードを入力</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
-    <string name="recovery_link_expired">この回収リンクは期限切れです。やり直して下さい。</string>
+    <string name="recovery_link_expired">この回復リンクの有効期限が切れています。もう一度やり直してください。</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
-    <string name="text_reset_pass_logged_in">あなたの回復キーは、パスワードのリセットに使用されます。あなたの新しいパスワードを入力してください。</string>
+    <string name="text_reset_pass_logged_in">回復キーは、パスワードのリセットに使用されます。新しいパスワードを入力してください。</string>
     <!-- Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass -->
     <string name="email_verification_text_change_pass">あなたはパスワードをリセットできる回復リンクを受信します。</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
     <string name="my_account_upgrade_pro">アップグレード</string>
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
-    <string name="my_account_upgrade_pro_panel">いまアップグレード</string>
+    <string name="my_account_upgrade_pro_panel">今すぐアップグレード</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">あなたのクラウド機能を向上させましょう！[A]PROアカウントで、より多くのスペースと転送容量を確保しましょう！　</string>
+    <string name="get_pro_account">クラウド機能を向上させましょう！[A]PROアカウントで、より多くのスペースと転送容量を確保しましょう！　</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">回復キーは以下にバックアップされています：%1s。[A]ファイルはこのパスに残っていますが、「オフライン用に保存されました」セクションで見つけることができます。[A]注意：ログアウトすると削除されますので、安全な場所に保管してください。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">エラー。入力したメールアドレスは既に使用されています。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
-    <string name="mail_changed_confirm_requested">あなたはすでにそのメールアドレス用の確認リンクを要求しています。</string>
+    <string name="mail_changed_confirm_requested">すでにそのメールアドレス用の確認リンクを要求しています。</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">新しいEメールは現在のEメールと違う必要があります</string>
+    <string name="mail_same_as_old">新旧のメールアドレスが一致してはなりません</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
     <string name="change_mail_text_last_step">これはあなたのメールアドレスを変更する最後のステップです。以下にパスワードを入力してください。</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
@@ -1147,9 +1146,9 @@
     <!-- Iitle of the warning when the user is running out of space -->
     <string name="title_new_warning_out_space">もうすぐスペースがいっぱいになります。</string>
     <!-- Text of the warning when the user is running out of space -->
-    <string name="new_warning_out_space">Proにアップグレードして、あなたのMEGAアカウントを最大限にご活用ください。</string>
+    <string name="new_warning_out_space">Proにアップグレードして、MEGAアカウントを最大限にご活用ください。</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
-    <string name="title_options_avatar_panel">アバターを編集</string>
+    <string name="title_options_avatar_panel">プロファイル画像を編集</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
     <string name="take_photo_avatar_panel">キャプチャ</string>
     <!-- Option of the sliding panel to change the avatar by choosing an existing picture -->
@@ -1171,27 +1170,27 @@
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">編集</string>
     <!-- Alert Dialog to get link -->
-    <string name="title_set_expiry_date">失効日を選ぶ</string>
+    <string name="title_set_expiry_date">有効期限を設定する</string>
     <!-- Title of the dialog to get link with password -->
-    <string name="title_set_password_protection">パスワード保護の設定</string>
+    <string name="title_set_password_protection">パスワード保護を設定</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(プロのみ)</string>
+    <string name="subtitle_set_expiry_date">（PROのみ）</string>
     <!-- Alert Dialog to get link with password -->
-    <string name="set_password_protection_dialog">パスワードの設定</string>
+    <string name="set_password_protection_dialog">パスワードを設定</string>
     <!-- Hint of the dialog to get link with password -->
     <string name="hint_set_password_protection_dialog">パスワードを入力</string>
     <!-- Hint of the confirmation dialog to get link with password -->
-    <string name="hint_confirm_password_protection_dialog">パスワードの確認</string>
+    <string name="hint_confirm_password_protection_dialog">パスワードを確認</string>
     <!-- Status text at the beginning of getting a link -->
     <string name="link_request_status">処理中&#8230;</string>
     <!-- Option of the sliding panel to edit the link of a node -->
-    <string name="edit_link_option">リンク管理</string>
+    <string name="edit_link_option">リンクを管理</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
-    <string name="old_password_provided_incorrect">入力された現在のパスワードは間違えてます。</string>
+    <string name="old_password_provided_incorrect">入力された現在のパスワードが正しくありません。</string>
     <!-- success message when reinviting multiple contacts -->
     <string name="number_correctly_reinvite_contact_request">%d件の再招待要求が正常に送信されました。</string>
     <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_delete_contact_request">%d リクエスト削除成功。</string>
+    <string name="number_correctly_delete_contact_request">%d件の要求が正常に削除されました。</string>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_delete_contact_request">%1$d件の要求は正常に削除されましたが、%2$d件の要求は削除されませんでした。</string>
     <!-- confirmation message before removing a contact request. -->
@@ -1204,11 +1203,11 @@
     <string name="number_incorrectly_invitation_reply_sent">%1$d件の要求返信は成功しましたが、%2$d件は送信されませんでした。</string>
     <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
     <plurals name="general_num_request">
-        <item quantity="other">%1$dリクエスト</item>
+        <item quantity="other">%1$d件の要求</item>
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
-        <item quantity="other">フォルダは%1$d件の連絡先と共有されています。共有をすべて削除しますか？　</item>
+        <item quantity="other">そのフォルダは%1$d件の連絡先と共有されています。共有をすべて削除しますか？　</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">メールアドレスおよび/またはパスワードが無効です。もう一度やり直してください。</string>
@@ -1217,21 +1216,21 @@
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">ログインに失敗した回数が多すぎます。1時間お待ちください</string>
     <!-- Error message when trying to login to an account not validated. -->
-    <string name="account_not_validated_login">このアカウントはまだ検証されていません。あなたのメールを確認してください。</string>
+    <string name="account_not_validated_login">このアカウントはまだ検証されていません。メールを確認してください。</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
-    <string name="general_error_folder_not_found">利用できないリンク</string>
+    <string name="general_error_folder_not_found">フォルダリンクが使用できません</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">そのリンクは利用規約/ポリシー違反のため削除されました。</string>
+    <string name="folder_link_unavaible_ToS_violation">このフォルダリンクは、ToS（ご利用規約）/AUP（ご利用規定） 違反のため、削除されました。</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
-    <string name="general_error_file_not_found">ファイルリンクがありません</string>
+    <string name="general_error_file_not_found">ファイルリンクが使用できません</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_ToS_violation">ファイルリングはToS/AUP違反により削除されました。</string>
+    <string name="file_link_unavaible_ToS_violation">このファイルリンクは、ToS（ご利用規約）/AUP（ご利用規定） 違反のため、削除されました。</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">このURLは破損しているか変形しています。アクセスしようとしているリンクは存在しません。</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">メールの確認を待っています</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">メールを確認し、そこにあるリンクをクリックすると、あなたのアカウントにアクセス出来ます。</string>
+    <string name="confirm_email_explanation">メールを確認し、リンクをクリックしてアカウントを確認してください。</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d項目</item>
@@ -1275,7 +1274,7 @@
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">携帯電話からの連絡先を読み込み中&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
-    <string name="number_existing_invite_contact_request">%d件のリクエストがすでに送信されています。</string>
+    <string name="number_existing_invite_contact_request">%d件の要求がすでに送信されています。</string>
     <!-- success message when reinviting multiple contacts -->
     <string name="number_correctly_invite_contact_request">%d件の招待要求が正常に送信されました。</string>
     <!-- error message when reinviting multiple contacts -->
@@ -1323,7 +1322,7 @@
         <item quantity="other">%1$sまでミュート</item>
     </plurals>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
-    <string name="title_properties_chat_contact_notifications">お知らせ</string>
+    <string name="title_properties_chat_contact_notifications">通知</string>
     <!-- Title of the section to choose the sound of incoming messages in the Contact Properties screen -->
     <string name="title_properties_chat_contact_message_sound">メッセージ音</string>
     <!-- Title of the section to clear the chat content in the Contact Properties screen -->
@@ -1335,7 +1334,7 @@
     <!-- Title of the screen to select the sound of the notifications -->
     <string name="notification_sound_title">通知音</string>
     <!-- Button to clear the chat history -->
-    <string name="general_clear">クリアする</string>
+    <string name="general_clear">クリア</string>
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">チャット履歴がクリアされました</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
@@ -1369,7 +1368,7 @@
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="away_status">不在</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
-    <string name="busy_status">通信中</string>
+    <string name="busy_status">取り込み中</string>
     <!-- Info label about the status of the user -->
     <string name="invalid_status">接続なし</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1395,15 +1394,15 @@
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
     <string name="confirmation_remove_chat_contact">このチャットから%sさんを削除しますか？　</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
-    <string name="observer_permission_label_participants_panel">読み込みだけ</string>
+    <string name="observer_permission_label_participants_panel">読み取り専用</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="standard_permission_label_participants_panel">標準</string>
     <!-- Label to show the participant permission in the options panel of the group info screen -->
     <string name="administrator_permission_label_participants_panel">モデレーター</string>
     <!-- Text appended to a edited message. -->
-    <string name="edited_message_text">編集された</string>
+    <string name="edited_message_text">（編集済み）</string>
     <!-- Option in menu to change title of a chat group. -->
-    <string name="change_title_option">タイトルを変更する</string>
+    <string name="change_title_option">タイトルを変更</string>
     <!-- confirmation message before leaving a group chat -->
     <string name="confirmation_leave_group_chat">退出すると、メッセージを読んだり送信したりできなくなります。</string>
     <!-- title confirmation message before leaving a group chat -->
@@ -1476,14 +1475,14 @@
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
-        <item quantity="other">知り合いを削除しますか</item>
+        <item quantity="other">連絡先を削除しますか？</item>
     </plurals>
     <!-- option shown when a message could not be sent -->
-    <string name="message_option_retry">もう一度やる</string>
+    <string name="message_option_retry">再試行</string>
     <!-- title of the menu for a non sent message -->
     <string name="title_message_not_sent_options">メッセージが送信されていません</string>
     <!-- title of the menu for an uploading message with attachment -->
-    <string name="title_message_uploading_options">添付ファイルのアップロード</string>
+    <string name="title_message_uploading_options">添付ファイルのアップロード中</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">会話履歴なし</string>
     <!-- title of confirmation alert before removing a contact, Plural -->
@@ -1493,7 +1492,7 @@
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
     <string name="more_users_typing">%1$s [A]さんたちが入力しています[/A]</string>
     <!-- More button in contact info page -->
-    <string name="label_more">もっと</string>
+    <string name="label_more">詳細</string>
     <!-- Text button -->
     <string name="label_close">閉じる</string>
     <!-- Title of the general tab in My Account Section -->
@@ -1503,21 +1502,21 @@
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="label_storage_upgrade_account">ストレージ</string>
     <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_upgrade_account">転送容量制限</string>
+    <string name="label_transfer_quota_upgrade_account">転送容量</string>
     <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="label_transfer_quota_achievements">転送容量制限</string>
+    <string name="label_transfer_quota_achievements">転送容量</string>
     <!-- Title of the section about the plan in the storage tab in My Account Section -->
     <string name="account_plan">プラン</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">ストレージ・スペース</string>
+    <string name="storage_space">ストレージスペース</string>
     <!-- Title of the section about the transfer quota in the storage tab in My Account Section -->
-    <string name="transfer_quota">転送容量制限</string>
+    <string name="transfer_quota">転送容量</string>
     <!-- Label in section the storage tab in My Account Section -->
     <string name="available_space">使用可能</string>
     <!-- Label in section the storage tab in My Account Section when no info info is received -->
     <string name="not_available">利用できません</string>
     <!-- Label in section the storage tab when the account is Free -->
-    <string name="no_bylling_cycle">請求周期なし</string>
+    <string name="no_bylling_cycle">課金サイクルなし</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="my_account_of_string">%1$s [A]/%2$s[/A]</string>
     <!-- Confirmation message before removing something from the Offline section. -->
@@ -1527,9 +1526,9 @@
     <!-- Label for the option of setting to change the colour theme -->
     <string name="set_color_theme_label">カラーテーマ</string>
     <!-- Answer for confirmation dialog. -->
-    <string name="general_dismiss">終了する</string>
+    <string name="general_dismiss">却下</string>
     <!-- Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible). -->
-    <string name="general_not_available">できません</string>
+    <string name="general_not_available">利用不可</string>
     <!-- Accepted request invitacion alert -->
     <string name="context_invitacion_reply_accepted">招待が受け入れられました</string>
     <!-- Declined request invitacion alert -->
@@ -1549,7 +1548,7 @@
     <!-- Subtitle of the settings section to configure the status persistence of chat presence -->
     <string name="settings_persistence_subtitle">接続された端末がない場合でも、選択したステータスの状態を維持します</string>
     <!-- Title of the dialog to set the value of the auto away preference -->
-    <string name="title_dialog_set_autoaway_value">時間制限を設定する</string>
+    <string name="title_dialog_set_autoaway_value">時間制限を設定</string>
     <!-- Button to set a value -->
     <string name="button_set">設定</string>
     <!-- Button to set a value -->
@@ -1558,13 +1557,13 @@
     <string-array name="settings_status_entries">
         <item>オンライン</item>
         <item>不在</item>
-        <item>通信中</item>
+        <item>取り込み中</item>
         <item>オフライン</item>
     </string-array>
     <!-- Text that indicates that a the offline section is currently empty -->
     <string name="offline_empty_folder">オフライン用に保存されたファイルはありません</string>
     <!-- Positive confirmation to enable logs -->
-    <string name="general_enable">オンにする</string>
+    <string name="general_enable">有効にする</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
     <string name="general_allow">許可</string>
     <!-- Dialog to confirm the action of enabling logs -->
@@ -1580,7 +1579,7 @@
         <item quantity="other">%1$d/%2$dファイル</item>
     </plurals>
     <!-- Progress text shown when user stop upload/download and the app is waiting for async response -->
-    <string name="label_process_finishing">プロセスは終了しています&#8230;</string>
+    <string name="label_process_finishing">プロセスが終了しています&#8230;</string>
     <!-- positive button on dialog to view a contact -->
     <string name="option_to_transfer_manager">表示</string>
     <!-- Label of the modal bottom sheet to pause all transfers -->
@@ -1621,7 +1620,7 @@
     <string name="completed_transfers_empty">完了した転送はありません</string>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_notification">
-        <item quantity="other">%1$d/%2$dファイルをアップロード</item>
+        <item quantity="other">%1$d/%2$dファイルをアップロード中</item>
     </plurals>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_paused_notification">
@@ -1675,7 +1674,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service is running, Plural -->
     <plurals name="download_service_notification">
-        <item quantity="other">%1$d/%2$dファイルをダウンロード</item>
+        <item quantity="other">%1$d/%2$dファイルをダウンロード中</item>
     </plurals>
     <!-- Text of the notification shown when the download service is paused, Plural -->
     <plurals name="download_service_paused_notification">
@@ -1708,7 +1707,7 @@
     <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
     <string name="import_success_message">クラウドドライブに正常に追加されました</string>
     <!-- Menu option -->
-    <string name="import_success_error">エラー。クラウドドライブに正常に追加されていません</string>
+    <string name="import_success_error">エラー。クラウドドライブに追加されていません</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">接続中&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1720,9 +1719,9 @@
     <!-- Text shown after the confirmation email has been sent to the new email address -->
     <string name="confirm_email_misspelled_email_sent">メールが送信されました</string>
     <!-- text_copyright_alert_title -->
-    <string name="copyright_alert_title">お客様への警告</string>
+    <string name="copyright_alert_title">すべてのユーザー様に対する著作権の警告</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">MEGAは他人の著作権を尊重し、MEGAクラウドサービスのユーザーが著作権に関する法律に従うことを義務づけています</string>
+    <string name="copyright_alert_first_paragraph">MEGAは他人の著作権を尊重し、MEGAクラウドサービスのユーザー様が著作権に関する法律に従うことを義務づけています</string>
     <!-- text_copyright_alert_second_paragraph -->
     <string name="copyright_alert_second_paragraph">MEGAクラウドサービスを使用して著作権を侵害することは厳しく禁止されています。あなたは、個人または団体の著作権またはその他の財産権を侵害するファイル、データ、またはコンテンツをアップロード、ダウンロード、保存、共有、表示、ストリーム配信、配布、メールで送信、リンク、送信、またはその他の方法で利用可能にすることはできません。</string>
     <!-- text of the Agree button -->
@@ -1746,11 +1745,11 @@
     <!-- error message -->
     <string name="context_link_action_error">リンクのアクションに失敗しました。後でもう一度お試しください。</string>
     <!-- title of the dialog shown when sending or sharing a folder -->
-    <string name="title_write_user_email">メールアドレスを書く</string>
+    <string name="title_write_user_email">ユーザーのメールアドレスを書く</string>
     <!-- title of the screen to see the details of several node attachments -->
     <string name="activity_title_files_attached">添付されたファイル</string>
     <!-- title of the screen to see the details of several contact attachments -->
-    <string name="activity_title_contacts_attached">連絡先の添付</string>
+    <string name="activity_title_contacts_attached">添付された連絡先</string>
     <!--  -->
     <string name="alert_user_is_not_contact">このユーザーは連絡先ではありません</string>
     <!--  -->
@@ -1784,17 +1783,17 @@
     <!--  -->
     <string name="attachment_upload_panel_from_cloud">クラウドドライブから</string>
     <!--  -->
-    <string name="attachment_upload_panel_contact">知り合い</string>
+    <string name="attachment_upload_panel_contact">連絡先</string>
     <!--  -->
     <string name="attachment_upload_panel_photo">端末から</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
-    <string name="delete_account">アカウントを削除する</string>
+    <string name="delete_account">アカウントを削除</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
     <string name="delete_account_text">アカウントを削除すると、アカウントデータ、MEGAの連絡先、または会話にアクセスできなくなります。\nこの操作は元に戻すことはできません。</string>
     <!-- menu item -->
     <string name="delete_button">削除</string>
     <!--  -->
-    <string name="file_properties_info_info_file">インフォ</string>
+    <string name="file_properties_info_info_file">情報</string>
     <!-- Refers to the size of a file. -->
     <string name="file_properties_info_size">合計サイズ</string>
     <!-- header of a status field for what content a user has shared to you -->
@@ -1804,13 +1803,13 @@
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">フルアクセス</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
-    <string name="file_properties_shared_folder_read_only">読み込みだけ</string>
-    <!-- Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;) -->
-    <string name="file_properties_shared_folder_read_write">読み込みと書き込み</string>
+    <string name="file_properties_shared_folder_read_only">読み取り専用</string>
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
+    <string name="file_properties_shared_folder_read_write">読み取りと書き込み</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
-    <string name="attachment_uploading_state_paused">転送停止中</string>
+    <string name="attachment_uploading_state_paused">転送一時停止</string>
     <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state_uploading">アップロードしているのは&#8230;</string>
+    <string name="attachment_uploading_state_uploading">アップロード中&#8230;</string>
     <!--  -->
     <string name="attachment_uploading_state_compressing">圧縮中&#8230;</string>
     <!--  -->
@@ -1836,21 +1835,21 @@
     <!-- Error message when the attachment cannot be revoked -->
     <string name="error_revoking_node">エラー。添付ファイルは削除されていません</string>
     <!-- settings option -->
-    <string name="settings_set_up_automatic_uploads">自動アップロードを設定する</string>
+    <string name="settings_set_up_automatic_uploads">自動アップロードを設定</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">サイレント</string>
     <!-- messages string in chat notification -->
     <string name="messages_chat_notification">メッセージ</string>
     <!-- part of the string in incoming shared folder notification -->
-    <string name="incoming_folder_notification">から</string>
+    <string name="incoming_folder_notification">送信元</string>
     <!-- title of incoming shared folder notification -->
     <string name="title_incoming_folder_notification">新しい共有フォルダ</string>
     <!-- title of the notification for a new incoming contact request -->
-    <string name="title_contact_request_notification">新しいコンタクト要求</string>
+    <string name="title_contact_request_notification">新しい連絡先要求</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_chat_clear">チャット履歴をクリア</string>
     <!-- Title of the section to remove contact in the Contact Properties screen -->
-    <string name="title_properties_remove_contact">知り合いを削除</string>
+    <string name="title_properties_remove_contact">連絡先を削除</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_chat_notifications_contact">チャット通知</string>
     <!-- Text shown when the chat history was cleared by someone -->
@@ -1862,21 +1861,21 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">共有フォルダから連絡先を削除</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">ゴミ箱に移しますか？</string>
+    <string name="confirmation_move_to_rubbish">ごみ箱に移動しますか？</string>
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">このフォルダをごみ箱に移動してもよろしいですか？　これによりカメラアップロードが無効になります。</string>
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">このフォルダをごみ箱に移動してもよろしいですか？　これによりセカンダリメディアアップロードが無効になります。</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">ゴミ箱に移しますか？</string>
+    <string name="confirmation_move_to_rubbish_plural">ごみ箱に移動しますか？</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">MEGAから削除しますか？</string>
     <!-- label to indicate the state of an upload in chat -->
-    <string name="attachment_uploading_state">アップロードしているのは&#8230;</string>
+    <string name="attachment_uploading_state">アップロード中&#8230;</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
     <string name="title_properties_contact_notifications_for_chat">チャット通知</string>
     <!-- title of the section for achievements -->
-    <string name="achievements_title">実績</string>
+    <string name="achievements_title">達成</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">友人を招待して報酬を獲得</string>
     <!-- title of the introduction for the achievements screen -->
@@ -1886,13 +1885,13 @@
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">ロック解除された報酬</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">ストレージ容量制限</string>
+    <string name="unlocked_storage_title">ストレージ容量</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">ご紹介ボーナス</string>
     <!-- title of the section for install a mobile app in achivements section (maximum 24 chars) -->
     <string name="title_install_app">モバイルアプリをインストール</string>
     <!-- Title of the section for add phone number in achivements section (maximum 24 chars) -->
-    <string name="title_add_phone">携帯電話を追加</string>
+    <string name="title_add_phone">携帯電話番号を追加</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">ご登録ボーナス</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1902,15 +1901,15 @@
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">カメラアップロードにファイルはありません</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">残り%1$d d</string>
+    <string name="general_num_days_left">残り%1$d日</string>
     <!-- State to indicate something has expired (achivements of business status account for instance) -->
-    <string name="expired_label">失効済み</string>
+    <string name="expired_label">期限切れ</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">HTTPを使用しない</string>
     <!-- subtitle of the advanced setting to choose the use of https -->
     <string name="setting_subtitle_use_https_only">転送が開始されない場合にのみ、このオプションを有効にします。通常の状況では、転送はすべてすでに暗号化されているため、HTTPで問題ありません。</string>
     <!-- title of screen to invite friends and get an achievement -->
-    <string name="title_achievement_invite_friends">こうなっています。</string>
+    <string name="title_achievement_invite_friends">仕組み</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
     <string name="first_paragraph_achievement_invite_friends">無料のMEGAアカウントを作成し、当社のモバイルアプリをインストールするようにお友だちをご招待ください。ご登録およびアプリのインストールに成功するたびに、あなたにボーナスストレージと転送容量を贈呈いたします。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
@@ -1943,7 +1942,7 @@
     <string name="expiration_date_for_achievements">ボーナスは%1$d日後に有効期限が切れます</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
-        <item quantity="other">フォルダを共有する</item>
+        <item quantity="other">フォルダを共有</item>
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
@@ -1968,7 +1967,7 @@
     <!-- Title of the dialog to create a new text file by inserting the name -->
     <string name="dialog_title_new_text_file">新規テキストファイル</string>
     <!-- Title of the dialog to create a new file by inserting the name -->
-    <string name="dialog_title_new_file">新しいファイル</string>
+    <string name="dialog_title_new_file">新規ファイル</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">ファイル名</string>
     <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -2000,7 +1999,7 @@
     <!-- title of a button to apply search by year -->
     <string name="general_search_year">去年</string>
     <!-- title of a Search by date tag -->
-    <string name="label_set_day">設定日</string>
+    <string name="label_set_day">日付を設定</string>
     <!-- the user can’t choose this date -->
     <string name="snackbar_search_by_date">要求された日付は無効です</string>
     <!-- Error shown when the user left a name empty -->
@@ -2028,7 +2027,7 @@
     <!-- before sharing a file, has to be downloaded -->
     <string name="not_download">このファイルはまだダウンロードされていません。</string>
     <!-- Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added -->
-    <string name="not_permited_add_email_to_invite">MEGA連絡先のみ追加できます</string>
+    <string name="not_permited_add_email_to_invite">MEGAの連絡先のみ追加できます</string>
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">チャットに再接続中</string>
     <!-- Message show when a call cannot be established -->
@@ -2042,7 +2041,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">詳細設定オプション</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGAはファイルをダウンロードするためのあなたの許可が必要です</string>
+    <string name="download_requires_permission">MEGAがファイルをダウンロードするにはあなたの許可が必要です</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">古いSDカードは使用できません。新しいダウンロード場所を設定してください。</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2086,7 +2085,7 @@
     <!-- Text of dialog shown when a contact request has been sent. -->
     <string name="invite_sent_text">そのユーザーさんは招待済みで、受け入れられ次第すぐにあなたの連絡先リストに表示されます。</string>
     <!-- Text of dialog shown when multiple contacts request has been sent -->
-    <string name="invite_sent_text_multi">複数のユーザーが招待されています。あなたが認めれば、知り合いのリストに載ります。</string>
+    <string name="invite_sent_text_multi">複数のユーザーが招待されています。承認されると連絡先リストに表示されます。</string>
     <!-- Text shown when it tries to share the QR and occurs an error to process the action -->
     <string name="error_share_qr">QRファイルの共有試行中にエラーが発生しました。ファイルが存在しない可能性があります。後でもう一度お試しください。</string>
     <!-- Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action -->
@@ -2104,11 +2103,11 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">招待状は送信されていません。処理中にエラーが発生しました。</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">QRコードの生成中&#8230;</string>
+    <string name="generatin_qr">QRコードを生成中&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">QRコードをスキャン</string>
     <!-- get the contact link and copy it -->
-    <string name="button_copy_link">リンクをコピーする</string>
+    <string name="button_copy_link">リンクをコピー</string>
     <!-- Create QR code -->
     <string name="button_create_qr">QRコードを作成</string>
     <!-- Text shown when it has been created the QR code successfully -->
@@ -2150,9 +2149,9 @@
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
     <string name="context_empty_links">[B][/B][A]公開リンク[/A][B]はありません[/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
-    <string name="tab_sent_requests">送信済みリクエスト</string>
+    <string name="tab_sent_requests">送信済みの要求</string>
     <!-- Title of the received requests tab. Capital letters -->
-    <string name="tab_received_requests">受信リクエスト</string>
+    <string name="tab_received_requests">受信済みの要求</string>
     <!-- Title dialog overquota error -->
     <string name="overquota_alert_title">ストレージ容量超過</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
@@ -2166,11 +2165,11 @@
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
     <string name="passwd_weak">あなたのパスワードは簡単に推測されます。パスワードを長くしてみてください。大文字と小文字を組み合わせます。特殊文字を追加してください。名前や辞書の単語を使わないでください。</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
-    <string name="passwd_medium">あなたのパスワードはそのままでも行けますが、更に強度を高めることをお勧めします。</string>
+    <string name="passwd_medium">あなたのパスワードは、続行するには十分ですが、さらにパスワードを強化することをお勧めいたします。</string>
     <!-- Message shown when it is creating an acount and it is been introduced a good password -->
-    <string name="passwd_good">このパスワードは、大抵の攻撃に対抗できるでしょう。絶対に忘れないようにして下さい。</string>
+    <string name="passwd_good">このパスワードは、最も一般的なブルートフォース攻撃に耐えます。覚えておいてください。</string>
     <!-- Message shown when it is creating an acount and it is been introduced a strong password -->
-    <string name="passwd_strong">このパスワードは大抵の攻撃に対抗できるでしょう。絶対に忘れないようにして下さい。</string>
+    <string name="passwd_strong">このパスワードは、最も高度なブルートフォース攻撃に耐えます。覚えておいてください。</string>
     <!-- Password very weak -->
     <string name="pass_very_weak">非常に弱い</string>
     <!-- Password weak -->
@@ -2188,7 +2187,7 @@
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">通話に戻る</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">MEGAに</string>
+    <string name="contacts_mega">MEGA上の</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">電話連絡先</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
@@ -2246,7 +2245,7 @@
     <!-- Content of the dialog to confirm that several versions are going to be deleted -->
     <string name="content_dialog_delete_multiple_version">これらの%dバージョンは永久に削除されます。</string>
     <!-- Title of the notification shown when a file is uploading to a chat -->
-    <string name="chat_upload_title_notification">チャットのアップロード</string>
+    <string name="chat_upload_title_notification">チャットのアップロード中</string>
     <!-- Label for the option on setting to set up the quality of multimedia files uploaded to the chat -->
     <string name="settings_chat_upload_quality">動画の品質</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
@@ -2298,7 +2297,7 @@
     <string name="turn_on_notifications_fifth_step">オンに切り替えて環境設定を選択してください</string>
     <!-- Alert message after sending to chat one or several messages to several chats, version items -->
     <plurals name="files_send_to_chat_success">
-        <item quantity="other">送信されたファイル</item>
+        <item quantity="other">ファイルが送信されました</item>
     </plurals>
     <!-- Error message after sending to chat one or several messages to several chats -->
     <string name="files_send_to_chat_error">エラー。正しく送信されませんでした</string>
@@ -2329,9 +2328,9 @@
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">ログアウトに進みます</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="recovery_key_bottom_sheet">リカバリーキー</string>
+    <string name="recovery_key_bottom_sheet">回復キー</string>
     <!-- Option that permits user save on File System -->
-    <string name="option_save_on_filesystem">ファイルシステムに保存する</string>
+    <string name="option_save_on_filesystem">ファイルシステムに保存</string>
     <!-- Message shown when something has been copied to clipboard -->
     <string name="message_copied_to_clipboard">クリップボードにコピーしました</string>
     <!-- text of the label to show that you have messages unread in the chat conversation -->
@@ -2397,7 +2396,7 @@
     <!-- Button do not allow now the rich links previews on chat -->
     <string name="button_not_now_rich_links">今はやめます</string>
     <!-- Button do not allow the rich links previews on chat -->
-    <string name="button_never_rich_links">変更なし</string>
+    <string name="button_never_rich_links">絶対不可</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">リッチURLプレビューを有効にする</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
@@ -2407,13 +2406,13 @@
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">より強力なパスワードを入力してください</string>
     <!-- title of the notification for an acceptance of a contact request -->
-    <string name="title_acceptance_contact_request_notification">新しいコンタクト</string>
+    <string name="title_acceptance_contact_request_notification">新しい連絡先</string>
     <!-- Notification title to show the number of incoming contact request, contact requests -->
     <plurals name="plural_number_contact_request_notification">
-        <item quantity="other">%1$d件の保留中のコンタクト要求</item>
+        <item quantity="other">%1$d件の保留中の連絡先要求</item>
     </plurals>
     <!-- title of the notification for a new incoming contact request -->
-    <string name="title_new_contact_request_notification">新しいコンタクト要求</string>
+    <string name="title_new_contact_request_notification">新しい連絡先要求</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
     <string name="type_message_hint_with_title">「%s」に向けてメッセージを書き込みます&#8230;</string>
     <!-- Empty state message shown in the screen when there are not any active transfer -->
@@ -2443,9 +2442,9 @@
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">オーセンティケータアプリで生成された6桁のコードをご入力ください。</string>
     <!-- Text button -->
-    <string name="general_verify">確認する</string>
+    <string name="general_verify">確認</string>
     <!-- Text button -->
-    <string name="general_next">次へ</string>
+    <string name="general_next">次</string>
     <!-- Text button -->
     <string name="general_previous">前</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
@@ -2454,28 +2453,28 @@
     <string name="title_2fa_enabled">二要素認証が有効になりました</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">次回アカウントにログインすると、オーセンティケータアプリで提供される6桁のコードを入力するよう求められます。</string>
-    <!--  -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\’t help you gain access to it again.\n        &lt;b&gt;あなたの回復キーをバックアップ&lt;/b&gt;</string>
+    <!-- Recommendation displayed after enable Two-Factor Authentication -->
+    <string name="recommendation_2fa_enabled">アプリへのアクセスを失ったり、将来二要素認証を無効にしたりする場合に備えて、<b>回復キー</b>をエクスポートすることを検討してください。</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">コードが無効です</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">オーセンティケータ端末を紛失しましたか？　</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">ログインの確認</string>
-    <!-- Title of screen Change password verification with Two-Factor Authentication -->
-    <string name="change_password_verification">二要素認証\nパスワードを変更</string>
-    <!-- Title of screen Cancel account verification with Two-Factor Authentication -->
-    <string name="cancel_account_verification">二要素認証\nアカウントをキャンセル</string>
-    <!-- Title of screen Change mail verification with Two-Factor Authentication -->
-    <string name="change_mail_verification">二要素認証\nメールアドレスを変更</string>
-    <!-- Title of screen Disable Two-Factor Authentication -->
-    <string name="disable_2fa_verification">二要素認証を無効にする</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
+    <string name="verify_2fa_subtitle_change_password">パスワードを変更する</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
+    <string name="verify_2fa_subtitle_change_email">メールアドレスを変更する</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
+    <string name="verify_2fa_subtitle_delete_account">アカウントを削除</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
+    <string name="verify_2fa_subtitle_diable_2fa">無効にする</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">オーセンティケータ端末を紛失しましたか？　</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">2要素認証を無効にしようとしてエラーが発生しました。もう一度やり直してください。</string>
+    <string name="error_disable_2fa">二要素認証を無効にしようとしてエラーが発生しました。もう一度やり直してください。</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_enable_2fa">2要素認証を有効にしようとしてエラーが発生しました。もう一度やり直してください。</string>
+    <string name="error_enable_2fa">二要素認証を有効にしようとしてエラーが発生しました。もう一度やり直してください。</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
     <string name="title_enable_2fa">二要素認証を有効にする</string>
     <!-- Label shown when it disables the Two-Factor Authentication -->
@@ -2483,15 +2482,15 @@
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">以下で開く：</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">お使いの端末で2要素認証を有効にするアプリがありません</string>
+    <string name="intent_not_available_2fa">お使いの端末で二要素認証を有効にするアプリがありません</string>
     <!-- Text button -->
     <string name="general_close">閉じる</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">あなたの回復キーをエクスポートしてから終了します</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">オーセンティケータアプリ</string>
+    <string name="no_authentication_apps_title">二要素認証アプリ</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">オーセンティケータアプリをインストールするためにGoogle Playを開きますか？　</string>
+    <string name="open_play_store_2fa">Google Playを開いて、オーセンティケータアプリをインストールしますか？</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2559,13 +2558,13 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">アーカイブされたチャット（%d）</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">チャットを圧縮</string>
+    <string name="archive_chat_option">チャットをアーカイブ</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">チャットを解凍</string>
+    <string name="unarchive_chat_option">チャットのアーカイブを解除</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">アーカイブ</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
-    <string name="general_unarchive">解凍</string>
+    <string name="general_unarchive">アーカイブを解除</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
     <string name="success_archive_chat">%sチャットがアーカイブされました。</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
@@ -2629,7 +2628,7 @@
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
     <string name="confirmation_not_invite_contact">すでにこの連絡先%sさんを追加しています。</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
-    <string name="confirmation_invite_contact_already_added">すでにこの連絡先%sさんを追加しています。</string>
+    <string name="confirmation_invite_contact_already_added">すでにそちらの連絡先%sさんを追加しています。</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
     <string name="confirmation_share_contact">%sさんと共有しますか？　</string>
     <!-- Text button for init a group chat -->
@@ -2641,9 +2640,9 @@
     <!-- Text shown to indicate user that his account has already been confirmed -->
     <string name="account_confirmed">あなたのアカウントは有効になっています。ログインしてください。</string>
     <!-- Text shown to indicate user that his account should be confirmed typing his password -->
-    <string name="confirm_account">アカウント確認のため、パスワードを入力して下さい。</string>
+    <string name="confirm_account">アカウント確認のため、パスワードを入力してください。</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
-    <string name="error_own_email_as_contact">あなたのメールアドレスを加える必要はありません。</string>
+    <string name="error_own_email_as_contact">ご自分のメールアドレスを追加する必要はありません</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">コードが無効です</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
@@ -2659,7 +2658,7 @@
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
     <string name="text_storage_full_warning_pro3_account">クラウドドライブがいっぱいです。もっとストレージがご必要な場合は、MEGAサポートにお問い合わせし、カスタムプランを入手してください。</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
-    <string name="button_plans_almost_full_warning">計画を参照</string>
+    <string name="button_plans_almost_full_warning">プランを見る</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
     <string name="button_custom_almost_full_warning">カスタムプラン</string>
     <!-- Button of the dialog shown when the storage is almost full to get bonus -->
@@ -2675,7 +2674,7 @@
     <!-- Title of the button in the contact info screen to send a message -->
     <string name="message_button">メッセージ</string>
     <!-- Title of the button in the contact info screen to start a video call -->
-    <string name="video_button">動画</string>
+    <string name="video_button">ビデオ</string>
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">リンクの送信先&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
@@ -2683,7 +2682,7 @@
     <!-- Title of cloud explorer to upload a link or file -->
     <string name="title_cloud_explorer">アップロード先&#8230;</string>
     <!-- More button in contact info page -->
-    <string name="contact_info_button_more">もっと</string>
+    <string name="contact_info_button_more">詳細</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
         <item quantity="other">ファイルを選択</item>
@@ -2697,7 +2696,7 @@
     <!-- Popup message shown if an user try to login while there is still living transfer -->
     <string name="logout_warning_abort_transfers">転送はすべてキャンセルされます。ログアウトしてもよろしいですか？　</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
-    <string name="subtitle_read_only_permissions">読み込みだけ</string>
+    <string name="subtitle_read_only_permissions">読み取り専用</string>
     <!-- Label shown the total space and the used space in an account -->
     <string name="used_space">[A]%1$s [/A][B]/ %2$s 使用[/B]</string>
     <!-- title of the alert dialog when the user is changing the API URL to staging -->
@@ -2725,7 +2724,7 @@
     <!-- Sub title of compression queue notification option in settings indicating the size limits. Please keep the placeholders because are to show the size limits including units in runtime. For example: The minimum size is 100MB and the maximum size is 1000MB. -->
     <string name="settings_compression_queue_subtitle">最小サイズは%1$sで、最大サイズは%2$sです。</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
-    <string name="settings_rb_scheduler_select_days_title">ファイル失効日は</string>
+    <string name="settings_rb_scheduler_select_days_title">以下の日数が経過したファイルを削除：</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="settings_rb_scheduler_select_days_subtitle">%d日</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
@@ -2809,17 +2808,17 @@
     <!-- Label that indicates show less items -->
     <string name="general_show_less">表示を減らす</string>
     <!-- Subtitle of the historic notification for a new contact request -->
-    <string name="notification_new_contact_request">[A]%s [/A][B]さんがあなたにコンタクト要求を送信しました。[/B]</string>
+    <string name="notification_new_contact_request">[A]%s [/A][B]さんがあなたに連絡先要求を送信しました。[/B]</string>
     <!-- Subtitle of the historic notification for a new contact -->
     <string name="notification_new_contact">[A]%s [/A][B]さんは現在連絡先です。[/B]</string>
     <!-- Subtitle of the historic notification for a new shared folder -->
     <string name="notification_new_shared_folder">[B][/B][A]%sさんからの新しい共有フォルダ。[/A]</string>
     <!-- Subtitle of the historic notification for a reminder new contact request -->
-    <string name="notification_reminder_contact_request">[A]通知：[/A][B]%s [/B][C]さんがあなたにコンタクト要求を送信しました。[/C]</string>
+    <string name="notification_reminder_contact_request">[A]通知：[/A][B]%s [/B][C]さんがあなたに連絡先要求を送信しました。[/C]</string>
     <!-- Title of the historic notification for a contact request cancelled -->
-    <string name="title_contact_request_notification_cancelled">取り消されたコンタクト要求</string>
+    <string name="title_contact_request_notification_cancelled">取り消された連絡先要求</string>
     <!-- Subtitle of the historic notification for contact request cancelled -->
-    <string name="subtitle_contact_request_notification_cancelled">[A]%s [/A][B]さんはコンタクト要求を取り消しました。[/B]</string>
+    <string name="subtitle_contact_request_notification_cancelled">[A]%s [/A][B]さんは連絡先要求を取り消しました。[/B]</string>
     <!-- Title of the historic notification when an user deletes you as contact -->
     <string name="title_contact_notification_deleted">削除された連絡先</string>
     <!-- Subtitle of the historic notification when an user deletes you as contact -->
@@ -2847,10 +2846,10 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">異議申立による削除</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">ToS/AUP違反のためアクセスできません</string>
+    <string name="error_download_takendown_node">ToS（ご利用規約）/AUP（ご利用規定）違反のためアクセスできません</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
-        <item quantity="other">ToS/AUP違反により、%d個のファイルはダウンロードされませんでした。</item>
+        <item quantity="other">ToS（ご利用規約）/AUP（ご利用規定）違反により、%d個のファイルはダウンロードされませんでした。</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]あなたの公開共有されたファイル[/A][B]%s[/B][C]は復活しました。[/C]</string>
@@ -2859,11 +2858,11 @@
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">送信済み要求</string>
     <!-- Title of the historic notification for incoming contact requests -->
-    <string name="title_incoming_contact_request">受信した要求</string>
+    <string name="title_incoming_contact_request">受信済み要求</string>
     <!-- Subtitle of the historic notification for contact request denied -->
-    <string name="subtitle_outgoing_contact_request_denied">[A]%s [/A]さんは[B]あなたのコンタクト要求を拒否しました。[/B]</string>
+    <string name="subtitle_outgoing_contact_request_denied">[A]%s [/A]さんは[B]あなたの連絡先要求を拒否しました。[/B]</string>
     <!-- Subtitle of the historic notification for contact request accepted -->
-    <string name="subtitle_outgoing_contact_request_accepted">[A]%s [/A]さんは[B]あなたのコンタクト要求を受け入れました。[/B]</string>
+    <string name="subtitle_outgoing_contact_request_accepted">[A]%s [/A]さんは[B]あなたの連絡先要求を受け入れました。[/B]</string>
     <!-- Subtitle of the historic notification for deleted shared folders (one or many) -->
     <string name="notification_deleted_shared_folder">[B][A]%s[/A]さんが共有したフォルダへのアクセス[/B]は[B]削除されました。[/B]</string>
     <!-- Subtitle of the historic notification when a contact leaves a shared folder -->
@@ -2871,17 +2870,17 @@
     <!-- Subtitle of the historic notification when a contact leaves a shared folder and the name of the folder is known -->
     <string name="notification_left_shared_folder_with_name">[A]%1$s[/A]さんは[B]共有フォルダ[A]%2$s[/A]から離れました。[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request ignored -->
-    <string name="subtitle_incoming_contact_request_ignored">[B][A]%s [/A]さんからのコンタクト要求[/B]は[B]無視されました[/B]</string>
+    <string name="subtitle_incoming_contact_request_ignored">[B][A]%s [/A]さんからの連絡先要求[/B]は[B]無視されました[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request accepted -->
-    <string name="subtitle_incoming_contact_request_accepted">[B][A]%s [/A]さんからのコンタクト要求[/B]は[B]受け入れられました[/B]</string>
+    <string name="subtitle_incoming_contact_request_accepted">[B][A]%s [/A]さんからの連絡先要求[/B]は[B]受け入れられました[/B]</string>
     <!-- Subtitle of the historic notification for incoming contact request declined -->
-    <string name="subtitle_incoming_contact_request_denied">[B][A]%s [/A]さんからのコンタクト要求[/B]は[B]拒否されました[/B]</string>
+    <string name="subtitle_incoming_contact_request_denied">[B][A]%s [/A]さんからの連絡先要求[/B]は[B]拒否されました[/B]</string>
     <!-- Subtitle of the Upgrade account section -->
     <string name="type_of_my_account">あなたの現在のアカウントは[A]%s[/A]です</string>
     <!-- Footnote to clarify the storage space is subject to the achievement program -->
     <string name="footnote_achievements">当社の達成プログラムにご参加いただくことを条件とします。</string>
     <!-- Title label for the current payment method during account upgrading -->
-    <string name="payment_method">支払方法</string>
+    <string name="payment_method">お支払い方法</string>
     <!-- title of billing period -->
     <string name="billing_period_title">お支払い請求期間</string>
     <!-- Option of one-off (month) billing. Placeholder: purchase price. -->
@@ -2893,9 +2892,9 @@
     <!-- Option of yearly billing period. Placeholder: purchase price -->
     <string name="billed_yearly_text">[A]年間[/A] %s/年</string>
     <!-- dialog option cancel in alert dialog -->
-    <string name="button_cancel">キャンセルする</string>
+    <string name="button_cancel">キャンセル</string>
     <!-- dialog option continue in alert dialog -->
-    <string name="button_continue">続ける</string>
+    <string name="button_continue">続行</string>
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A]（サブスクリプション）</string>
     <!-- one of the payment methods -->
@@ -2932,11 +2931,11 @@
     <string name="one_folder_several_files">1個のフォルダ・%1$d個のファイル</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
-        <item quantity="other">ファイル%dこ</item>
+        <item quantity="other">%d 個のファイル</item>
     </plurals>
     <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
     <plurals name="num_folders_with_parameter">
-        <item quantity="other">フォルダ%dこ</item>
+        <item quantity="other">%d個のフォルダ</item>
     </plurals>
     <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
     <plurals name="num_folders_num_files">
@@ -2961,21 +2960,21 @@
         <item quantity="other">%d人の参加者</item>
     </plurals>
     <!--  -->
-    <string name="custom_subtitle_of_group_chat">あと%1$s%2$d</string>
+    <string name="custom_subtitle_of_group_chat">%1$s と %2$d その他</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">このチャット用のリンクを作成する前に、説明を設定する必要があります。</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">チャットリンクをクリップボードにコピーしました</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
-    <string name="type_month">[A]月[/A] / %s [A]から[/A] *</string>
+    <string name="type_month">[A][/A] %sから/[A]月[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
     <string name="upgrade_comment">* 自動更新のサブスクリプションは、更新日の前にいつでもキャンセルできます</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">通話が開始しました</string>
     <!-- Title of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_title">SSL鍵エラー</string>
+    <string name="ssl_error_dialog_title">SSLキーエラー</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGAはSSL経由では安全に接続できません。あなたは追加要件を伴うWi-Fiを使っているかもしれません。</string>
+    <string name="ssl_error_dialog_text">MEGAはSSLで安全に接続することができません。公共のWi-Fiを利用している場合、追加要件があるかもしれません。</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[A]通知[/A]は[B]ありません[/B]</string>
     <!-- Permissions screen title -->
@@ -3123,7 +3122,7 @@
     <!-- Label shown when a new group chat has been created correctly -->
     <string name="new_group_chat_created">新規グループチャットが作成されました</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
-    <string name="preparing_chats">ファイル準備中</string>
+    <string name="preparing_chats">ファイルを準備中</string>
     <!-- Label indicating some content has been sent as message -->
     <string name="sent_as_message">メッセージとして送信されました。</string>
     <!-- Error message when the attachment cannot be sent to any of the selected chats -->
@@ -3189,7 +3188,7 @@
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
     <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B]さんがグループチャットに参加しました。[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
-    <string name="context_remove_chat_link_warning_text">この会話は、チャットリンクを一度削除するとそこアクセスできなくなります。</string>
+    <string name="context_remove_chat_link_warning_text">この会話は、チャットリンクを一度削除すると、そこからアクセスできなくなります。</string>
     <!-- Description text of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_warning_text">暗号化されたキーローテーションでは、新規グループチャットを作成せずにチャットリンクを取得することはできません。</string>
     <!-- Question of the dialog to generate a public chat link -->
@@ -3299,7 +3298,7 @@
     <!-- Title of the login screen -->
     <string name="login_to_mega">MEGAにログイン</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">MEGAアカウント開設</string>
+    <string name="create_account_title">MEGA アカウントを作成</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">最近</string>
     <!-- Label to reference a chats section -->
@@ -3307,7 +3306,7 @@
     <!-- Text of the empty screen when there are not elements in Recents -->
     <string name="context_empty_recents">[A]最近[/A][B]にファイルはありません[/B]</string>
     <!-- Title of a recents bucket -->
-    <string name="title_bucket">あと%1$s%2$d</string>
+    <string name="title_bucket">%1$sとさらに%2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
     <string name="title_media_bucket_only_images">%d個の画像</string>
     <!-- Title of a media recents bucket that only contains some videos -->
@@ -3325,7 +3324,7 @@
     <!-- Label that indicates who updated a file into a recents bucket -->
     <string name="update_action_bucket">[A]更新者は[/A]%sさん</string>
     <!-- Used in recents list screen to indicate an action done by me -->
-    <string name="bucket_word_me">自分</string>
+    <string name="bucket_word_me">私</string>
     <!-- Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB -->
     <string name="sms_add_phone_number_dialog_msg_achievement_user">あなたの携帯電話番号の追加時に%1$sを無料で獲得します。これにより、あなたの連絡先がMEGAであなたを見つけやすくなります。</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
@@ -3343,9 +3342,9 @@
     <!-- Title of the notification shown on the action bar when there is an individual incoming audio call -->
     <string name="title_notification_incoming_individual_audio_call">着信音声通話</string>
     <!-- The title of progress dialog when loading web content -->
-    <string name="embed_web_browser_loading_title">ローディング</string>
+    <string name="embed_web_browser_loading_title">読み込み中</string>
     <!-- The message of progress dialog when loading web content -->
-    <string name="embed_web_browser_loading_message">しばらくお待ちください&#8230;</string>
+    <string name="embed_web_browser_loading_message">お待ちください&#8230;</string>
     <!-- Head label to show the business account type -->
     <string name="account_label">アカウントタイプ</string>
     <!-- Label in My Account section to show user account type -->
@@ -3357,22 +3356,22 @@
     <!-- General label to show the status of something or someone -->
     <string name="status_label">ステータス</string>
     <!-- State to indicate something is active (business status account for instance) -->
-    <string name="active_label">ログイン有効</string>
+    <string name="active_label">有効</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
     <string name="payment_required_label">お支払いが必要です</string>
     <!-- Business expired account Overdue payment page header. -->
-    <string name="payment_overdue_label">支払い延滞</string>
+    <string name="payment_overdue_label">お支払い期日超過</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">ユーザー管理は、デスクトップウェブブラウザからのみご利用いただけます。</string>
     <!-- Title of the usage tab in My Account Section -->
-    <string name="tab_my_account_usage">ご利用内容</string>
+    <string name="tab_my_account_usage">使用状況</string>
     <!-- Title of usage storage details section in Storage -->
     <string name="usage_storage_details_label">ストレージ使用状況詳細</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">全体的な使用状況</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">転送</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz -->
+    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">%1$sさんはあなたのビジネスアカウントの一部であるため、連絡先から削除できません。</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">最後のお支払いに問題がございました。詳細については、デスクトップブラウザを使用してMEGAにアクセスしてください。</string>
@@ -3385,7 +3384,7 @@
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
     <string name="camera_uploads_business_alert">MEGAはあなたのデータにアクセスしませんが、あなたのビジネスアカウントの管理者様は、あなたのユーザーアカウントのカメラアップロードを管理し、表示することができます。</string>
     <!-- General label to alert user that somehting went wrong -->
-    <string name="general_something_went_wrong_error">ちょと、うまく行かなかったようです。</string>
+    <string name="general_something_went_wrong_error">何かがうまくいきませんでした</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text_2">あなたのビジネスアカウント管理者に連絡して問題を解決し、あなたのアカウントを有効にしてください。</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
@@ -3401,13 +3400,13 @@
     <!-- Alert shown to the user when they is trying to create an empty group for attach a file -->
     <string name="error_creating_group_and_attaching_file">1つまたは複数の連絡先を選択してください。</string>
     <!-- Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts -->
-    <string name="contacts_sent">%s人の知り合いを送信しました。</string>
+    <string name="contacts_sent">%s人の連絡先を送信しました。</string>
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
     <string name="my_chat_files_folder">私のチャットファイル</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
     <string name="error_creating_folder">エラー。フォルダ%1$sは作成されませんでした</string>
     <!-- Title of an alert screen indicating the user has to verify their email -->
-    <string name="verify_email_label">メールアドレスを確認してください</string>
+    <string name="verify_email_label">メールアドレスを検証してください</string>
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">あなたのアカウントは一時的に安全を確保するためにロックされました。</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
@@ -3419,7 +3418,7 @@
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">メールは既に送信されています。数分待ってから再試行してください。</string>
     <!-- Title of a helping view about locked accounts -->
-    <string name="locked_accounts_label">アカウントがロックされました</string>
+    <string name="locked_accounts_label">ロックされたアカウント</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
     <string name="locked_accounts_text_1">おそらく、MEGAアカウントで他のサービスと同じパスワードを使用しており、それらのサービスの少なくとも1つがデータ侵害を受けていると思われます。</string>
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
@@ -3455,11 +3454,11 @@
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">バージョンは新しいファイルとして正常に作成されました。</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
-    <string name="general_date_label">%1$s</string>
+    <string name="general_date_label">%1$sに</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
     <string name="alert_remove_several_shares">これらの%1$d個のフォルダの共有を停止してもよろしいですか？</string>
     <!-- Download location label -->
-    <string name="download_location">ダウンロード先</string>
+    <string name="download_location">ダウンロード場所</string>
     <!-- Text asking confirmation for download location -->
     <string name="confirmation_download_location">常にこの場所に保存しますか？</string>
     <!-- Action to show any file in its location -->
@@ -3523,11 +3522,11 @@
     <!-- Action indicating something was verified. -->
     <string name="label_verified">照合済み</string>
     <!-- ”Verify user” dialog title -->
-    <string name="authenticity_credentials_label">資格証明</string>
+    <string name="authenticity_credentials_label">認証資格情報</string>
     <!-- ”Verify user” dialog description -->
-    <string name="authenticity_credentials_explanation">実際に顔を合わせるのが一番いい方法です。すでに認証済みのOTRやPGRがあれば、それを使うのも良いでしょう。</string>
+    <string name="authenticity_credentials_explanation">これは、面と向かって会うことによって、実際の生活の中で行われるのが最善です。すでに検証済みの別のチャンネル（検証済みのOTRやPGPなど）がある場合は、それを使用することもできます。</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">本人確認</string>
+    <string name="label_your_credentials">あなたの資格情報</string>
     <!-- Button to reset credentials -->
     <string name="action_reset">リセット</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
@@ -3587,11 +3586,11 @@
     <!-- Label indicating there is not available GIFs due to down server -->
     <string name="server_down_giphy">利用可能なGIFはありません。後でもう一度お試しください</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
-    <string name="end_of_results_giphy">[A]結果[/A]の終わり</string>
+    <string name="end_of_results_giphy">結果の[A]終わり[/A]</string>
     <!-- Title of a dialog to confirm the action of resume all transfers -->
     <string name="warning_resume_transfers">転送を再開しますか？</string>
     <!-- Option to  resume all transfers -->
-    <string name="option_resume_transfers">転送続行</string>
+    <string name="option_resume_transfers">転送再開</string>
     <!-- Option to  cancel a transfer -->
     <string name="option_cancel_transfer">転送をキャンセル</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
@@ -3629,16 +3628,16 @@
     <!-- Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted -->
     <string name="history_retention_option_custom">カスタム</string>
     <!-- Title of the Manage chat history screen -->
-    <string name="title_properties_manage_chat">チャット履歴を管理する</string>
+    <string name="title_properties_manage_chat">チャット履歴を管理</string>
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">以下より古いメッセージを自動的に削除：</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
     <string name="confirmation_clear_chat_history">この会話の全メッセージ履歴をクリアしますか？　</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
-    <string name="subtitle_properties_manage_chat_label_year">１年</string>
+    <string name="subtitle_properties_manage_chat_label_year">1年</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
     <plurals name="retention_time_picker_hours">
-        <item quantity="other">時</item>
+        <item quantity="other">時間</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <plurals name="retention_time_picker_days">
@@ -3646,7 +3645,7 @@
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several weeks -->
     <plurals name="retention_time_picker_weeks">
-        <item quantity="other">月</item>
+        <item quantity="other">週間</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several months -->
     <plurals name="retention_time_picker_months">
@@ -3715,31 +3714,31 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">リンク：%1$s\n\nパスワード：%2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGAはファイルを共有するためにあなたの権限を必要とします。</string>
+    <string name="files_required_permissions_warning">MEGAはファイルを共有するためにあなたの許可を必要とします。</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">お気に入り</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
-    <string name="file_properties_unfavourite">お気に入りを取り除く</string>
+    <string name="file_properties_unfavourite">お気に入りを削除</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">色を選択&#8230;</string>
+    <string name="file_properties_label">ラベル&#8230;</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
     <string name="action_remove_label">ラベルを削除</string>
     <!-- Title text to show label selector. -->
     <string name="title_label">ラベル</string>
     <!-- A user can mark a folder or file with red colour. -->
-    <string name="label_red">赤い</string>
+    <string name="label_red">赤</string>
     <!-- A user can mark a folder or file with orange colour. -->
-    <string name="label_orange">オレンジ色の</string>
+    <string name="label_orange">オレンジ</string>
     <!-- A user can mark a folder or file with yellow colour. -->
-    <string name="label_yellow">黄色の</string>
+    <string name="label_yellow">黄色</string>
     <!-- A user can mark a folder or file with green colour. -->
-    <string name="label_green">緑の</string>
+    <string name="label_green">緑</string>
     <!-- A user can mark a folder or file with blue colour. -->
-    <string name="label_blue">青い</string>
+    <string name="label_blue">青</string>
     <!-- A user can mark a folder or file with purple colour. -->
-    <string name="label_purple">紫の</string>
+    <string name="label_purple">紫</string>
     <!-- A user can mark a folder or file with grey colour. -->
-    <string name="label_grey">グレーの</string>
+    <string name="label_grey">灰色</string>
     <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="background_play_hint">バックグラウンドで再生</string>
     <!-- Text that indicates the audio will not be played in background -->
@@ -3807,7 +3806,7 @@
     <!-- Option of color theme, light mode. -->
     <string name="theme_light">ライト</string>
     <!-- Option of color theme, dark mode. -->
-    <string name="theme_dark">暗い</string>
+    <string name="theme_dark">ダーク</string>
     <!-- Option of color theme, follow the system setting. -->
     <string name="theme_system_default">デフォルトシステム</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
@@ -3821,7 +3820,7 @@
     <!-- Action discard -->
     <string name="discard_close_action">廃棄して閉じる</string>
     <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">ファイルの保存中&#8230;</string>
+    <string name="saving_file">ファイルを保存中&#8230;</string>
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">ファイルが作成されました</string>
     <!-- Warning indicating a file was not created successfully -->
@@ -3834,4 +3833,6 @@
     <string name="file_updated">ファイルが更新されました</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">ファイルの更新に失敗しました。もう一度お試しください。</string>
+    <!-- Warning which alerts the user a file cannot be opened -->
+    <string name="error_opening_file">ファイルのサイズが大きすぎて、開くこともプレビューすることもできません。</string>
 </resources>

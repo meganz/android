@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA cung cấp không gian lưu trữ điện toán đám mây với công nghệ mã hoá đầu-cuối được điều hành bởi người sử dụng, cùng với dịch vụ chat thông qua trình duyệt web và các ứng dụng cho điện thoại di động. Không như các hãng khác, dữ liệu không thể bị giải mã bởi máy chủ, chỉ có thể thực hiện bởi người dùng trên chính chương trình được sử dụng.\n\nTải lên tệp tin từ smartphone hay máy tính bảng và quản lý bằng cách lưu trữ, tải về, truyền tải, chia sẻ, đổi tên, hay xóa bỏ dữ liệu vào bất cứ thời điểm, thiết bị muốn sử dụng ở bất cứ đâu. Chia sẻ thư mục với tên liên lạc và xem tương tác được cập nhật ngay tức thì. Bảo mật đầu-cuối mang nghĩa rằng mật khẩu BẮT BUỘC phải nhớ (hay cần phải có lưu lại Mã Phục Hồi) không thì sẽ mất toàn quyền truy cập vào tài khoản và mất hết dữ liệu.\n\nCông nghệ mã hóa đầu-cuối điều hành bởi người dùng cho phép thực hiện gọi video một cách bảo mật, và được hỗ trợ từ năm 2016 cho trình duyệt nay đã thực hiện cho app điện thoại, cùng với lịch sử cuộc trò chuyện có thể được xem trên nhiều thiết bị khác nhau. Nguời sử dụng còn có thể chia sẻ tệp tin từ Ổ Mây MEGA của mình vào cuộc chat.\n\nMEGA cung cấp cho mọi tài khoản không gian lưu trữ miễn phí lên đến 50 GB với các nhiệm vụ thưởng để mở rộng thêm không gian cùng các thuê bao trả phí như:\n\n\nGói Pro Lite: €4.99 (US$4.99) mỗi tháng hay €49.99 (US$49.99) mỗi năm cung cấp cho bạn 400 GB không gian lưu trữ và 1 TB cho băng thông truyền tải mỗi tháng.\nGói Pro I: €9.99 (US$9.99) mỗi tháng hay €99.99 (US$99.99) mỗi năm cung cấp cho bạn 2 TB không gian lưu trữ và 2 TB cho băng thông truyền tải mỗi tháng.\nGói Pro II: €19.99 (US$19.99) mỗi tháng hay €199.99 (US$199.99) mỗi năm cung cấp cho bạn 8 TB không gian lưu trữ và 8 TB cho băng thông truyền tải mỗi tháng.\nGói Pro III: €29.99 (US$29.99) mỗi tháng hay €299.99 (US$299.99) mỗi năm cung cấp cho bạn 16 TB không gian lưu trữ và 16 TB cho băng thông truyền tải mỗi tháng. tải mỗi tháng.\n\nGói thuê bao trả phí sẽ tự động mua chu kỳ mới vào ngày cuối hạn với cùng giá và thời hạn như thời kỳ ban đầu. Để quản lý việc mua gói cước, xin vào CH Play trên điện thoại, đăng nhập vào đia chỉ Gmail/Google ID (nếu chưa làm) và tìm đến app MEGA. Từ đó xem, quản lý, mua, hay hủy gói cước hạng thành viên.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Tải về tệp tin từ MEGA vào trong điện thoại và để lấy tệp tin trong máy tải lên MEGA\nCAMERA -&gt; Chụp ảnh và đăng tải lên MEGA\nREAD_CONTACTS -&gt; Để dễ dàng tìm các tên liên lạc có sử dụng MEGA\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic và camera) -&gt; MEGA cung cấp tính năng bảo mật đầu-cuối và cần dùng để thực hiện các cuộc gọi thoại/video\n\n\nCác lập trình viên cho ứng dụng Android muốn tương tác với mã nguồn của MEGA có thể xem qua: https://github.com/meganz/android\n\nĐể biết thêm thông tin xin vào website:\nSee https://mega.nz/terms\n\n\nTrên máy tính - https://mega.nz/</string>
+    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA - Lưu Trữ Điện Toán Đám Mây với Bảo Mật Luôn Luôn Duy Trì.</string>
     <!-- PRO Lite account -->
@@ -292,9 +292,9 @@
     <string name="sent_requests_empty">[B]Chưa có [/B][A]yêu cầu gửi đi nào[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
     <string name="received_requests_empty">[B]Chưa có [/B][A]yêu cầu được nhận nào[/A]</string>
-    <!-- Title for the file transfer screen (with the up &amp; download) -->
+    <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">Các Phiên Truyền Tải</string>
-    <!-- Section name for the &amp;ldquo;My Account&amp;rdquo; section.Preferably one or two words. There is little space for this. -->
+    <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
     <string name="section_account">Trang Tài Khoản</string>
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">Camera Uploads</string>
@@ -304,7 +304,7 @@
     <string name="tab_outgoing_shares">Mục Gửi Đi</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Liên Kết</string>
-    <!-- Label for any &amp;lsquo;Incoming shares&amp;rsquo; button, link, text, title, etc. - (String as short as possible). -->
+    <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">Mục Chia Sẻ Nhận Được</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Mục chia sẻ nhận được từ</string>
@@ -684,7 +684,6 @@
     <string name="upgrade_select_pricing">Chọn hạng tài khoản</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Chọn hằng tháng hoặc hằng năm</string>
-    <!--<string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>-->
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">Hiện tại, chưa có phương thức thanh toán cho gói này</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
@@ -1629,11 +1628,11 @@
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_notification">
-        <item quantity="other">Đang tải lên thư mục số %1$d trong tổng %2$d</item>
+        <item quantity="other">Đang tải lên thư mục %1$d trong tổng số %2$d</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_paused_notification">
-        <item quantity="other">Tải lên %1$d trong tổng %2$d thư mục (tạm dừng)</item>
+        <item quantity="other">Tải lên %1$d trong tổng số %2$d thư mục (tạm dừng)</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
@@ -1679,7 +1678,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service is paused, Plural -->
     <plurals name="download_service_paused_notification">
-        <item quantity="other">Tải xuống %1$d trong tổng %2$d tệp (tạm dừng)</item>
+        <item quantity="other">Tải xuống %1$d trong tổng số %2$d tệp tin (tạm dừng)</item>
     </plurals>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Không đủ thông truyền tải</string>
@@ -1805,7 +1804,7 @@
     <string name="file_properties_shared_folder_full_access">Toàn quyền</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">Chỉ được xem</string>
-    <!-- Refers to access rights for a file folder. (with the &amp; needed. Don’t use the symbol itself. Use &amp;) -->
+    <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
     <string name="file_properties_shared_folder_read_write">Cho xem và sửa</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Phiên truyền tải bị dừng!</string>
@@ -2276,7 +2275,7 @@
     <string name="messages_forwarded_error">Lỗi. Không chuyển được tin nhắn</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="other">Lỗi. %1$d tin nhắn chưa được chuyển tiếp thành công</item>
+        <item quantity="other">Lỗi. %1$d tin nhắn chưa được chuyển đi thành công</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -2454,22 +2453,22 @@
     <string name="title_2fa_enabled">Xác Minh 2-Bước được Bật</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Minh.</string>
-    <!--  -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can\’t help you gain access to it again.\n &lt;b&gt;Sao lưu dự phòng Mã Khóa Phục Hồi&lt;/b&gt;</string>
+    <!-- Recommendation displayed after enable Two-Factor Authentication -->
+    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can’t help you gain access to it again.\n &lt;b&gt;Sao lưu dự phòng Mã Khóa Phục Hồi&lt;/b&gt;</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Mã không phù hợp</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">Thiết bị có cài app Lập Xác Minh đã bị mất?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">Xác Thực Đăng Nhập</string>
-    <!-- Title of screen Change password verification with Two-Factor Authentication -->
-    <string name="change_password_verification">Xác Minh 2-Bước\nĐổi mật khẩu</string>
-    <!-- Title of screen Cancel account verification with Two-Factor Authentication -->
-    <string name="cancel_account_verification">Xác Minh 2-Bước\nXóa bỏ tài khoản</string>
-    <!-- Title of screen Change mail verification with Two-Factor Authentication -->
-    <string name="change_mail_verification">Xác Minh 2-Bước\nĐổi email</string>
-    <!-- Title of screen Disable Two-Factor Authentication -->
-    <string name="disable_2fa_verification">Tắt Xác Minh 2-Bước</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
+    <string name="verify_2fa_subtitle_change_password">Đổi mật khẩu</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
+    <string name="verify_2fa_subtitle_change_email">Đổi email</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
+    <string name="verify_2fa_subtitle_delete_account">Xoá tài khoản</string>
+    <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
+    <string name="verify_2fa_subtitle_diable_2fa">Tắt</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Thiết bị có cài app Lập Xác Minh đã bị mất?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2489,9 +2488,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Xuất ra Mã Phục Hồi để hoàn tất</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">App Lập Xác Minh</string>
+    <string name="no_authentication_apps_title">App Xác Thực 2-Bước</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Bạn có muốn được chuyển tới CH Play để cài đặt App Lập Xác Minh không?</string>
+    <string name="open_play_store_2fa">Bạn có muốn tới CH Google Play để tải về một App Lập Xác Thực hay không?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">CH Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2940,7 +2939,7 @@
     </plurals>
     <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
     <plurals name="num_folders_num_files">
-        <item quantity="other">%1$d thư mục · %2$d tệp</item>
+        <item quantity="other">%1$d thư mục · %2$d tệp tin</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] đã thêm vào %2$s và %3$s[/B]</string>
@@ -3096,7 +3095,7 @@
     <string name="attachment_upload_panel_from_device">Từ File System</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
-        <item quantity="other">%d tệp tin chưa được gửi tới %d cuộc chát thành công</item>
+        <item quantity="other">%d tệp tin chưa được gửi tới %d cuộc chát</item>
     </plurals>
     <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_contacts_not_send">
@@ -3144,7 +3143,7 @@
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
-        <item quantity="other">%d phiên bản chưa được xóa xong</item>
+        <item quantity="other">%d phiên bản chưa xóa được</item>
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">Bạn không có tên nào trong danh sách liên lạc. Xin mời bạn bè cùng tham gia sử dụng MEGA.</string>
@@ -3372,7 +3371,7 @@
     <string name="overall_usage_label">Tổng quan lượng dùng</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Truyền Tải</string>
-    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja&#64;mega.nz -->
+    <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Không thể xóa tên %1$s khỏi sổ liên lạc vì đây là nhân viên trong tài khoản Doanh Nghiệp này.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Đã có vấn đề xảy ra với việc thanh toán gần đây. Xin truy cập MEGA bằng trình duyệt web trên máy tính để biết thêm thông tin.</string>
@@ -3829,9 +3828,11 @@
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">Tệp đã được lưu vào %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">Tệp chưa lưu vào được %1$s. Xin thử lại.</string>
+    <string name="file_saved_to_failed">Tệp tin chưa lưu vào %1$s được. Xin thử lại.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Tệp tin đã được cập nhật</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">Tệp tin chưa được cập nhật. Xin thử lại.</string>
+    <!-- Warning which alerts the user a file cannot be opened -->
+    <string name="error_opening_file">Tệp tin quá lớn và không thể mở hoặc xem trước được.</string>
 </resources>

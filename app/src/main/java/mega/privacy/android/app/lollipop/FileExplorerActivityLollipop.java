@@ -133,6 +133,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
     public static final String EXTRA_SHARE_INFOS = "share_infos";
     public static final String EXTRA_SHARE_ACTION = "share_action";
     public static final String EXTRA_SHARE_TYPE = "share_type";
+    public static final String EXTRA_PARENT_HANDLE = "parent_handle";
 
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -692,6 +693,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				logDebug("action = SAVE to Cloud Drive");
 				mode = SAVE;
 				selectFile = false;
+				parentHandleCloud = intent.getLongExtra(EXTRA_PARENT_HANDLE, INVALID_HANDLE);
 
 				aB.setTitle(StringResourcesUtils.getString(R.string.section_cloud_drive));
 				aB.setSubtitle(StringResourcesUtils.getString(R.string.cloud_drive_select_destination));

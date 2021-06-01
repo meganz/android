@@ -12,9 +12,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp"
-            android:fontFamily="roboto"
+            style="@style/TextAppearance.Mega.Subtitle1.Medium"
             android:text="@string/no_authentication_apps_title"/>
 
         <TextView
@@ -48,7 +47,7 @@
                 android:id="@+id/cancel_button_no_app"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="?android:attr/borderlessButtonStyle"
+                style="?attr/borderlessButtonStyle"
                 android:text="@string/general_cancel"
                 android:layout_marginRight="8dp"/>
 
@@ -56,7 +55,7 @@
                 android:id="@+id/open_button_no_app"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="?android:attr/borderlessButtonStyle"
+                style="?attr/borderlessButtonStyle"
                 android:text="@string/context_open_link" />
 
         </LinearLayout>
