@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
@@ -110,6 +111,7 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFileDialo
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewURLFileDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -483,7 +485,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
             needLogin = true;
             OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
             ownFilePrepareTask.execute(getIntent());
-            createAndShowProgressDialog(false, R.string.upload_prepare);
+            createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 			return;
 		}
 		else{
@@ -727,7 +729,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					cloudDriveFrameLayout = (FrameLayout) findViewById(R.id.cloudDriveFrameLayout);
 					OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
 					ownFilePrepareTask.execute(getIntent());
-					createAndShowProgressDialog(false, R.string.upload_prepare);
+					createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 
 					cloudDriveFrameLayout.setVisibility(View.VISIBLE);
 
@@ -1476,7 +1478,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		if (getIntent() != null && mode == UPLOAD && folderSelected && filePreparedInfos == null) {
 			OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
 			ownFilePrepareTask.execute(getIntent());
-			createAndShowProgressDialog(false, R.string.upload_prepare);
+			createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 		}
 	}
 	
@@ -1766,16 +1768,21 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		finishActivity();
     }
 
-	private void createAndShowProgressDialog (boolean cancelable, int string) {
-		ProgressDialog temp = null;
-		try{
+	/**
+	 * Method to create and show a progress dialog
+	 * @param cancelable Flag to set if the progress dialog is cancelable or not
+	 * @param message Message to display into the progress dialog
+	 */
+	private void createAndShowProgressDialog(boolean cancelable, String message) {
+		ProgressDialog temp;
+		try {
 			temp = new ProgressDialog(this);
-			temp.setMessage(getString(string));
+			temp.setMessage(message);
 			temp.setCancelable(cancelable);
 			temp.setCanceledOnTouchOutside(cancelable);
 			temp.show();
-		}
-		catch(Exception e){
+		} catch (Exception e) {
+			logWarning("Error creating and showing progress dialog.", e);
 			return;
 		}
 		statusDialog = temp;
@@ -1884,7 +1891,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			if (filePreparedInfos == null){
 				OwnFilePrepareTask ownFilePrepareTask = new OwnFilePrepareTask(this);
 				ownFilePrepareTask.execute(getIntent());
-				createAndShowProgressDialog(false, R.string.upload_prepare);
+				createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 			}
 			else{
 				onIntentProcessed();
@@ -2444,7 +2451,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		ArrayList<MegaChatRoom> chats = new ArrayList<>();
 		ArrayList<MegaUser> users = new ArrayList<>();
 
-		createAndShowProgressDialog(true, R.string.preparing_chats);
+		createAndShowProgressDialog(true, getString(R.string.preparing_chats));
 
 		for (ChatExplorerListItem item : listItems) {
 			if (item.getChat() != null) {
@@ -2579,7 +2586,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				if (filePreparedInfos == null){
 					FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 					filePrepareTask.execute(getIntent());
-					createAndShowProgressDialog(false, R.string.upload_prepare);
+					createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 				}
 				else{
                     onIntentChatProcessed(filePreparedInfos);
@@ -2590,7 +2597,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			if (filePreparedInfos == null){
 				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 				filePrepareTask.execute(getIntent());
-				createAndShowProgressDialog(false, R.string.upload_prepare);
+				createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 			}
 			else{
 				onIntentChatProcessed(filePreparedInfos);

@@ -651,8 +651,6 @@
     <string name="upload_to_filesystem_from">Pick from</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">uploaded</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Processing file</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Processing file</item>
