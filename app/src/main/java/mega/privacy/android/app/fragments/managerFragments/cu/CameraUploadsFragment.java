@@ -68,7 +68,8 @@ import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class CameraUploadsFragment extends BaseFragment implements CUGridViewAdapter.Listener {
+public class CameraUploadsFragment extends BaseFragment implements CUGridViewAdapter.Listener,
+        CUCardViewAdapter.Listener {
 
     private static final String SELECTED_VIEW = "SELECTED_VIEW";
     public static final int ALL_VIEW = 0;
@@ -96,6 +97,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     private ActionMode mActionMode;
 
     private CuViewModel viewModel;
+
+    private GridLayoutManager layoutManager;
 
     private int selectedView = ALL_VIEW;
 
@@ -281,7 +284,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
         boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         int spanCount = getSpanCount(isPortrait, smallGrid);
-        GridLayoutManager layoutManager = new GridLayoutManager(context, spanCount);
+        layoutManager = new GridLayoutManager(context, spanCount);
         binding.cuList.setLayoutManager(layoutManager);
         binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) binding.cuList.getLayoutParams();
@@ -323,7 +326,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
             int cardWidth = ((outMetrics.widthPixels - cardMargin * spanCount * 2) - cardMargin * 2) / spanCount;
 
-            cardAdapter = new CUCardViewAdapter(selectedView, cardWidth, cardMargin);
+            cardAdapter = new CUCardViewAdapter(selectedView, cardWidth, cardMargin, this);
             cardAdapter.setHasStableIds(true);
             binding.cuList.setAdapter(cardAdapter);
             params.leftMargin = params.rightMargin = cardMargin;
@@ -588,5 +591,28 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                         ? R.style.TextAppearance_Mega_Subtitle2_Medium_WhiteGrey87
                         : R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White87,
                 enabled ? R.color.white_grey_087 : R.color.grey_087_white_087, false);
+    }
+
+    @Override
+    public void onCardClicked(int position, @NonNull CUCard card) {
+        switch (selectedView) {
+            case DAYS_VIEW:
+                card = viewModel.dayClicked(position, card);
+                newViewClicked(ALL_VIEW);
+                int cuNodePosition = gridAdapter.getNodePosition(card.getNode().getHandle());
+                layoutManager.scrollToPosition(cuNodePosition);
+                openNode(cuNodePosition, gridAdapter.getNodeAtPosition(cuNodePosition));
+                break;
+
+            case MONTHS_VIEW:
+                newViewClicked(DAYS_VIEW);
+                layoutManager.scrollToPosition(viewModel.monthClicked(position, card));
+                break;
+
+            case YEARS_VIEW:
+                newViewClicked(MONTHS_VIEW);
+                layoutManager.scrollToPosition(viewModel.yearClicked(position, card));
+                break;
+        }
     }
 }

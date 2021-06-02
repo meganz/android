@@ -10,7 +10,8 @@ import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragm
 class CUCardViewAdapter(
     private val cardViewType: Int,
     private val cardWidth: Int,
-    private val cardMargin: Int
+    private val cardMargin: Int,
+    private val listener: Listener
 ) : RecyclerView.Adapter<CUCardViewHolder>(), SectionTitleProvider {
 
     private var cards: ArrayList<CUCard> = ArrayList()
@@ -25,7 +26,7 @@ class CUCardViewAdapter(
     }
 
     override fun onBindViewHolder(holder: CUCardViewHolder, position: Int) {
-        holder.bind(cards[position])
+        holder.bind(position, cards[position], listener)
     }
 
     override fun getItemCount(): Int {
@@ -54,5 +55,9 @@ class CUCardViewAdapter(
         this.cards.clear()
         this.cards.addAll(cards)
         notifyDataSetChanged()
+    }
+
+    interface Listener {
+        fun onCardClicked(position: Int, card: CUCard)
     }
 }

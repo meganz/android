@@ -455,10 +455,11 @@ class CuViewModel extends BaseRxViewModel {
                     dayItemCount = 0;
                 }
 
+                shouldGetPreview = true;
                 lastDayDate = modifyDate;
                 String date = ofPattern(sameYear ? "dd MMM" : "dd MMM yyyy").format(lastDayDate);
-                days.add(new CUCard(node, preview.exists() ? preview : null, day, month, year, date, null));
-                shouldGetPreview = true;
+                days.add(new CUCard(node, preview.exists() ? preview : null, day, month, year, date,
+                        modifyDate, null));
             }
 
             if (totalItemCount == cardNodes.size()) {
@@ -467,16 +468,18 @@ class CuViewModel extends BaseRxViewModel {
 
             if (lastMonthDate == null
                     || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
+                shouldGetPreview = true;
                 lastMonthDate = modifyDate;
                 String date = sameYear ? month : ofPattern("MMM yyyy").format(modifyDate);
-                months.add(new CUCard(node, preview.exists() ? preview : null,null, month, year, date, null));
-                shouldGetPreview = true;
+                months.add(new CUCard(node, preview.exists() ? preview : null,null, month, year,
+                        date, modifyDate, null));
             }
 
             if (lastYearDate == null || !Year.from(lastYearDate).equals(Year.from(modifyDate))) {
-                lastYearDate = modifyDate;
-                years.add(new CUCard(node, preview.exists() ? preview : null,null, null, year, year, null));
                 shouldGetPreview = true;
+                lastYearDate = modifyDate;
+                years.add(new CUCard(node, preview.exists() ? preview : null,null, null,
+                        year, year, modifyDate, null));
             }
 
             if (shouldGetPreview && !preview.exists()) {
@@ -496,6 +499,76 @@ class CuViewModel extends BaseRxViewModel {
         dayCards.postValue(days);
         monthCards.postValue(months);
         yearCards.postValue(years);
+    }
 
+    private CUCard getClickedCard(int position, long handle, List<CUCard> cards) {
+        if (cards == null) {
+            return null;
+        }
+
+        CUCard card = cards.get(position);
+
+        if (handle != card.getNode().getHandle()) {
+            card = null;
+
+            for (CUCard c : cards) {
+                if (c.getNode().getHandle() == handle) {
+                    card = c;
+                    break;
+                }
+            }
+        }
+
+        return card;
+    }
+
+    public CUCard dayClicked(int position, CUCard card) {
+        return getClickedCard(position, card.getNode().getHandle(), getDayCards());
+    }
+
+    public int monthClicked(int position, CUCard card) {
+        CUCard monthCard = getClickedCard(position, card.getNode().getHandle(), getMonthCards());
+        if (monthCard == null) {
+            return 0;
+        }
+
+        List<CUCard> dayCards = getDayCards();
+        LocalDate cardLocalDate = monthCard.getLocalDate();
+        int currentDay = LocalDate.now().getDayOfYear();
+
+        for (int i = 0; i < dayCards.size(); i++) {
+            LocalDate localDate = dayCards.get(i).getLocalDate();
+
+            if (localDate.getYear() <= cardLocalDate.getYear()
+                    && localDate.getDayOfYear() <= currentDay) {
+                //Month of year clicked, current day. If not exists, the closest day behind the current.
+                return i;
+            }
+        }
+
+        return 0;
+    }
+
+    public int yearClicked(int position, CUCard card) {
+        CUCard yearCard = getClickedCard(position, card.getNode().getHandle(), getYearCards());
+        if (yearCard == null) {
+            return 0;
+        }
+
+        List<CUCard> monthCards = getMonthCards();
+        int cardYear = yearCard.getLocalDate().getYear();
+        int currentMonth = LocalDate.now().getMonthValue();
+
+        for (int i = 0; i < monthCards.size(); i++) {
+            LocalDate localDate = monthCards.get(i).getLocalDate();
+
+            if (localDate.getYear() <= cardYear
+                    && localDate.getMonthValue() <= currentMonth) {
+                //Year clicked, current month. If not exists, the closest month behind the current.
+                return i;
+            }
+        }
+
+        return 0;
     }
 }

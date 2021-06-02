@@ -48,6 +48,12 @@ public class CUGridViewAdapter extends RecyclerView.Adapter<CuGridViewHolder>
         return INVALID_POSITION;
     }
 
+    public CuNode getNodeAtPosition(int position) {
+        return position >= 0 && position < mNodes.size()
+                ? mNodes.get(position)
+                : null;
+    }
+
     @Nullable
     @Override
     public View getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {

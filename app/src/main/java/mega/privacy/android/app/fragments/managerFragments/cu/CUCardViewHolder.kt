@@ -25,7 +25,9 @@ class CUCardViewHolder(
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(card: CUCard) {
+    fun bind(position: Int, card: CUCard, listener: CUCardViewAdapter.Listener) {
+        itemView.setOnClickListener { listener.onCardClicked(position, card) }
+
         binding.dateText.text = card.date
         binding.numberItemsText.isVisible = viewType == DAYS_VIEW
         binding.numberItemsText.text = "+${card.numItems}"
