@@ -44,6 +44,7 @@ class GridViewPagerAdapter(
         position: Int,
         payloads: MutableList<Any>
     ) {
+        logDebug("Bind view holder position $position")
         recyclerView = holder.itemView.findViewById(R.id.grid_view)
 
         val participantsForPage = data[position]
@@ -88,6 +89,11 @@ class GridViewPagerAdapter(
         return data.size
     }
 
+    /**
+     * Method for updating participants per page
+     *
+     * @param newData Updated list of participants on each page
+     */
     fun setNewData(newData: List<List<Participant>>) {
         if (data.isNotEmpty()) {
             data = newData
@@ -296,7 +302,6 @@ class GridViewPagerAdapter(
         }
     }
 
-
     fun getHolder(currentPage: Int, pager: ViewPager2): ViewHolder? {
         (pager[0] as RecyclerView).findViewHolderForAdapterPosition(currentPage)?.let {
             return it as ViewHolder
@@ -305,6 +310,13 @@ class GridViewPagerAdapter(
         return null
     }
 
+    /**
+     * Update participant privileges
+     *
+     * @param participant
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
+     */
     fun updateParticipantPrivileges(participant: Participant, currentPage: Int, pager: ViewPager2) {
         val holder = getHolder(currentPage, pager)
         holder?.let {
@@ -323,6 +335,14 @@ class GridViewPagerAdapter(
         notifyItemChanged(currentPage)
     }
 
+
+    /**
+     * Update participant name
+     *
+     * @param participant
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
+     */
     fun updateParticipantName(participant: Participant, currentPage: Int, pager: ViewPager2) {
         val holder = getHolder(currentPage, pager)
         holder?.let {
@@ -341,6 +361,14 @@ class GridViewPagerAdapter(
         notifyItemChanged(currentPage)
     }
 
+    /**
+     * Update participant when call is on hold
+     *
+     * @param participant
+     * @param isOnHold True, it it's. False, otherwise.
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
+     */
     fun updateCallOnHold(
         participant: Participant,
         isOnHold: Boolean,
@@ -364,6 +392,14 @@ class GridViewPagerAdapter(
         notifyItemChanged(currentPage)
     }
 
+    /**
+     * Update participant on hold session
+     *
+     * @param participant
+     * @param isOnHold True, it it's. False, otherwise.
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
+     */
     fun updateSessionOnHold(
         participant: Participant,
         isOnHold: Boolean,
@@ -387,6 +423,45 @@ class GridViewPagerAdapter(
         notifyItemChanged(currentPage)
     }
 
+    /**
+     * Method to activate or stop a participant's video whether it is visible or not
+     *
+     * @param shouldActivate True, if video should be activated. False, otherwise.
+     * @param participant
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
+     */
+    fun updateVideoWhenScroll(
+        shouldActivate: Boolean,
+        participant: Participant,
+        currentPage: Int,
+        pager: ViewPager2
+    ) {
+        val holder = getHolder(currentPage, pager)
+        holder?.let {
+            adapterList.let {
+                if (adapterList.isEmpty())
+                    return
+
+                for (i in 0 until adapterList.size) {
+                    adapterList[i]?.updateVideoWhenScroll(shouldActivate, participant)
+                }
+
+            }
+            return
+        }
+
+        notifyItemChanged(currentPage)
+    }
+
+    /**
+     * Update participant audio or video flags
+     *
+     * @param typeChange TYPE_VIDEO or TYPE_AUDIO
+     * @param participant
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
+     */
     fun updateParticipantAudioVideo(
         typeChange: Int,
         participant: Participant,
@@ -412,6 +487,10 @@ class GridViewPagerAdapter(
 
     /**
      * Method to destroy the texture view
+     *
+     * @param participant
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
      */
     fun removeTextureView(participant: Participant, currentPage: Int, pager: ViewPager2) {
         val holder = getHolder(currentPage, pager)

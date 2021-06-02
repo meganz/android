@@ -100,10 +100,10 @@ class MeetingActivityRepository @Inject constructor(
      */
     fun switchCamera(chatId: Long, bOn: Boolean, listener: MegaChatRequestListenerInterface) {
         if (bOn) {
-            logDebug("Enable video")
+            logDebug("Enable local video")
             megaChatApi.enableVideo(chatId, listener)
         } else {
-            logDebug("Disable video")
+            logDebug("Disable local video")
             megaChatApi.disableVideo(chatId, listener)
         }
     }

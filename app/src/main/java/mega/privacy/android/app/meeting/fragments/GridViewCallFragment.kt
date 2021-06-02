@@ -12,7 +12,7 @@ import mega.privacy.android.app.meeting.adapter.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatSession
 
-class GridViewCallFragment : MeetingBaseFragment(){
+class GridViewCallFragment : MeetingBaseFragment() {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
 
@@ -37,9 +37,8 @@ class GridViewCallFragment : MeetingBaseFragment(){
                 notifyDataSetChanged()
             }
             viewPagerData = newData
+            updateVisibleParticipantsGrid(newData)
         }
-
-        updateVisibleParticipantsGrid(newData)
     }
 
     override fun onCreateView(
@@ -79,9 +78,6 @@ class GridViewCallFragment : MeetingBaseFragment(){
 
                     val data = sliceBy6(participants)
                     updateVisibleParticipantsGrid(data)
-
-                    (parentFragment as InMeetingFragment).inMeetingViewModel.requestVideosWhenScroll()
-                    (parentFragment as InMeetingFragment).inMeetingViewModel.stopVideosWhenScroll()
                 }
             }
         })
@@ -95,6 +91,7 @@ class GridViewCallFragment : MeetingBaseFragment(){
 
         viewPagerData = newData
         viewDataBinding.gridViewPager.adapter = adapterPager
+        updateVisibleParticipantsGrid(newData)
 
         (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observeForever(
             participantsObserver
@@ -117,6 +114,69 @@ class GridViewCallFragment : MeetingBaseFragment(){
             )
         } else {
             (parentFragment as InMeetingFragment).inMeetingViewModel.removeVisibleParticipants()
+        }
+
+        activateVideoWhenScroll()
+        closeVideoWhenScroll()
+    }
+
+    /**
+     * Method that asks to receive videos from participants who are visible
+     */
+    private fun activateVideoWhenScroll() {
+        val visibleParticipants =
+            (parentFragment as InMeetingFragment).inMeetingViewModel.visibleParticipants
+        if (visibleParticipants.isNotEmpty()) {
+            val iteratorParticipants = visibleParticipants.iterator()
+            iteratorParticipants.forEach {
+                if (it.isVideoOn) {
+                    logDebug("Activate video of participant visible")
+                    adapterPager.updateVideoWhenScroll(
+                        true,
+                        it,
+                        currentPage,
+                        viewDataBinding.gridViewPager
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to stop receiving videos from participants who are not visible
+     */
+    private fun closeVideoWhenScroll() {
+        val visibleParticipants =
+            (parentFragment as InMeetingFragment).inMeetingViewModel.visibleParticipants
+
+        participants.let { iteratorParticipants ->
+            iteratorParticipants.iterator().forEach { participant ->
+                if (participant.isVideoOn) {
+                    if (visibleParticipants.isEmpty()) {
+                        logDebug("Close video of participant visible")
+                        adapterPager.updateVideoWhenScroll(
+                            false,
+                            participant,
+                            currentPage,
+                            viewDataBinding.gridViewPager
+                        )
+                    } else {
+                        val participantVisible = visibleParticipants.filter {
+                            it.peerId == participant.peerId && it.clientId == participant.clientId
+                        }
+
+                        if (participantVisible.isEmpty()) {
+                            logDebug("Close video of participant visible")
+                            adapterPager.updateVideoWhenScroll(
+                                false,
+                                participant,
+                                currentPage,
+                                viewDataBinding.gridViewPager
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -142,6 +202,7 @@ class GridViewCallFragment : MeetingBaseFragment(){
             }
         }
         viewPagerData = newData
+        updateVisibleParticipantsGrid(newData)
     }
 
     /**

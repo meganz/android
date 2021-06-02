@@ -57,8 +57,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     // List of participants in the meeting
     val participants: MutableLiveData<MutableList<Participant>> = MutableLiveData(mutableListOf())
 
-    // List of participants visibles in the meeting
-    private var visibleParticipants: MutableList<Participant> = mutableListOf()
+    // List of visible participants in the meeting
+    var visibleParticipants: MutableList<Participant> = mutableListOf()
 
     private val _speakerParticipant = MutableLiveData<Participant>(null)
     val speakerParticipant: LiveData<Participant> = _speakerParticipant
@@ -1675,46 +1675,6 @@ class InMeetingViewModel @ViewModelInject constructor(
                 addParticipantVisible(participant)
             }
             logDebug("Num visible participants is " + visibleParticipants.size)
-        }
-    }
-
-    /**
-     * Method to stop receiving videos from participants who are not visible
-     */
-    fun stopVideosWhenScroll() {
-        participants.value?.let { iteratorParticipants ->
-            iteratorParticipants.iterator().forEach { participant ->
-                if (participant.isVideoOn) {
-                    if (visibleParticipants.isEmpty()) {
-                        logDebug("Remove the video of a non-visible participant")
-                        onCloseVideo(participant)
-                    } else {
-                        val participantVisible = visibleParticipants.filter {
-                            it.peerId == participant.peerId && it.clientId == participant.clientId
-                        }
-
-                        if (participantVisible.isEmpty()) {
-                            logDebug("Remove the video of a non-visible participant")
-                            onCloseVideo(participant)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Method that asks to receive videos from participants who are visible
-     */
-    fun requestVideosWhenScroll() {
-        if (visibleParticipants.isNotEmpty()) {
-            val iteratorParticipants = visibleParticipants.iterator()
-            iteratorParticipants.forEach { participant ->
-                if (participant.isVideoOn) {
-                    logDebug("Active the video of a visible participant")
-                    onActivateVideo(participant, false)
-                }
-            }
         }
     }
 

@@ -101,6 +101,7 @@ class VideoMeetingViewHolder(
             inMeetingViewModel.onCloseVideo(participant)
             removeTextureView(participant)
         }
+
         checkUI(participant)
     }
 
@@ -260,7 +261,7 @@ class VideoMeetingViewHolder(
      *
      * @param participant
      */
-    private fun closeVideo(participant: Participant) {
+    fun closeVideo(participant: Participant) {
         if (participant.peerId != this.peerId || participant.clientId != this.clientId) return
 
         logDebug("Close video of ${participant.clientId}")
@@ -282,8 +283,10 @@ class VideoMeetingViewHolder(
                 }
             }
 
-            logDebug("Participant ${participant.clientId} video listener null")
-            participant.videoListener = null
+            if(participant.videoListener != null){
+                logDebug("Participant ${participant.clientId} video listener null")
+                participant.videoListener = null
+            }
         }
     }
 
@@ -461,8 +464,10 @@ class VideoMeetingViewHolder(
             }
         }
 
-        logDebug("Participant ${participant.clientId} video listener null")
-        participant.videoListener = null
+        if(participant.videoListener != null){
+            logDebug("Participant ${participant.clientId} video listener null")
+            participant.videoListener = null
+        }
     }
 
     private fun landscapeLayout(isFirstPage: Boolean, itemCount: Int) {

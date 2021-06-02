@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
-import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -86,8 +85,36 @@ class VideoGridViewAdapter(
     }
 
     /**
+     * Method to activate or stop a participant's video whether it is visible or not
+     *
+     * @param shouldActivate True, if video should be activated. False, otherwise.
+     * @param participant
+     */
+    fun updateVideoWhenScroll(shouldActivate: Boolean, participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        if (position == INVALID_POSITION)
+            return
+
+        getHolder(position)?.let {
+            when {
+                shouldActivate -> {
+                    it.checkVideoOn(participant)
+                }
+                else -> {
+                    it.closeVideo(participant)
+                }
+            }
+
+            return
+        }
+
+        notifyItemChanged(position)
+    }
+
+    /**
      * Update participant audio or video flags
      *
+     * @param typeChange TYPE_VIDEO or TYPE_AUDIO
      * @param participant
      */
     fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {

@@ -123,7 +123,6 @@ public class CallUtil {
         meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         meetingIntent.setAction(MEETING_ACTION_RINGING);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
-        meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(meetingIntent);
     }
 

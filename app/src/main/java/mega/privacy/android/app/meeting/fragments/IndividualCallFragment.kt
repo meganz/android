@@ -321,8 +321,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
         }
 
-        logDebug("Participant $clientId video listener null")
-        videoListener = null
+        if(videoListener != null){
+            logDebug("Participant $clientId video listener null")
+            videoListener = null
+        }
     }
 
     /**
