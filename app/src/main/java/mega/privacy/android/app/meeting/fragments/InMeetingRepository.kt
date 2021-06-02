@@ -523,4 +523,9 @@ class InMeetingRepository @Inject constructor(
 
         return bitmap
     }
+
+    fun getParticipantEmail(peerId: Long): String? =
+        ChatController(context).getParticipantEmail(peerId)
+
+    fun getOwnEmail(): String? = megaChatApi.myEmail
 }

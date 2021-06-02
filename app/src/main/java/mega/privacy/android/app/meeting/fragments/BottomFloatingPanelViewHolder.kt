@@ -35,8 +35,6 @@ import nz.mega.sdk.MegaChatSession
  *
  * @property binding InMeetingFragmentBinding, get views from this binding
  * @property listener listen to the actions of all buttons
- * @property isGuest the flag for determining if the current user is guest
- * @property isModerator the flag for determining if the current user is moderator
  */
 class BottomFloatingPanelViewHolder(
     private val inMeetingViewModel: InMeetingViewModel,
@@ -161,7 +159,7 @@ class BottomFloatingPanelViewHolder(
     }
 
 
-    fun genCheckedDrawable(background: Int): Drawable? {
+    fun genCheckedDrawable(background: Int): Drawable {
         val roundRect = GradientDrawable()
         roundRect.shape = GradientDrawable.RECTANGLE
         roundRect.cornerRadius = context.resources.getDimension(R.dimen.elevation_upgrade_low)
@@ -486,7 +484,7 @@ class BottomFloatingPanelViewHolder(
     /**
      * Update the cam icon, also update the own item's cam icon
      *
-     * @param micOn
+     * @param camOn
      */
     fun updateCamIcon(camOn: Boolean) {
         savedCamState = camOn

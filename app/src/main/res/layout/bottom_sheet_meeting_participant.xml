@@ -55,7 +55,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="middle"
-                android:show="@{!viewModel.isGuest}"
+                android:show="@{!viewModel.isItemGuest}"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
                 tools:text="@{viewModel.getEmail}" />
@@ -73,7 +73,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"

@@ -1,17 +1,10 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.content.Context
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.TextUtil
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatRoom
 
 /**
  * ViewModel for [MeetingParticipantBottomSheetDialogFragment]
@@ -21,6 +14,7 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
     var isGuest = false
     var isModerator = false
     var isSpeakerMode = false
+    var isItemGuest = false
 
     var participant: Participant? = null
     var context: Context? = null
@@ -36,10 +30,11 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
         info: Participant
     ) {
         isModerator = moderator
-        isGuest = guest
         participant = info
+        isGuest = guest
         context = con
         isSpeakerMode = speakerMode
+        isItemGuest = getEmail().isEmpty()
     }
 
     fun getEmail(): String = participant?.peerId?.let {
@@ -52,15 +47,15 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
      * it will show if is not guest and is not contact and not is me
      */
     fun showAddContact(): Boolean =
-        !isGuest && participant?.isContact == false && participant?.isMe == false
+        !isGuest && !isItemGuest && participant?.isContact == false && participant?.isMe == false
 
     /**
      * Determine if show the `Contact Info` item
      *
      * it will show if is not guest and is contact and not is me
      */
-    fun showContactInfoOrEditProfile(): Boolean =
-        !isGuest && (participant?.isContact == true || participant?.isMe == true)
+    fun showContactInfoOrEditProfile(): Boolean = !isGuest &&
+        !isItemGuest && (participant?.isContact == true || participant?.isMe == true)
 
 
     fun showDividerContactInfo(): Boolean = showAddContact() || showContactInfoOrEditProfile()
@@ -69,7 +64,7 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
      * Determine if show the `Edit Profile` item
      *
      */
-    fun showEditProfile(): Boolean = !isGuest && participant?.isMe == true
+    fun showEditProfile(): Boolean = !isGuest && !isItemGuest && participant?.isMe == true
 
     /**
      * Determine if show the `Send Message` item
@@ -77,7 +72,7 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
      * it will show if is not guest and is contact and not is me
      */
     fun showSendMessage(): Boolean =
-        !isGuest && participant?.isContact == true && participant?.isMe == false
+        !isGuest && !isItemGuest && participant?.isContact == true && participant?.isMe == false
 
 
     /**
@@ -106,13 +101,12 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
      * When the current user is moderator, and not isMe && the target user is not moderator
      */
     fun showMakeModeratorItem(): Boolean =
-        isModerator && !(participant?.isMe == true || participant?.isModerator == true)
+        !isGuest && isModerator && !(participant?.isMe == true || participant?.isModerator == true || isItemGuest)
 
     /**
      * Determine if show the `Remove Participant` item
      *
      * When the current user is moderator, and not isMe
      */
-    fun showRemoveItem(): Boolean = isModerator && participant?.isMe == false
-
+    fun showRemoveItem(): Boolean = !isGuest && isModerator && participant?.isMe == false
 }

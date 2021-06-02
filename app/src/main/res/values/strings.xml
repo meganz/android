@@ -4094,6 +4094,8 @@
     <string name="invitation_send">Invitation sent.\nSee status on Sent Requests Tab.</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">You are the new meeting moderator now!</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">Copied meeting link.</string>
 
     <!-- Message on the paste link dialog if there were any error loading the meeting link without logging-->
     <string name="error_meeting_link_init_error">Error initialising meeting when loading the meeting link.</string>

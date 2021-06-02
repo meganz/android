@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingBottom="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingBottom="16dp">
 
     <TextView
         android:id="@+id/meeting_name"
@@ -15,15 +15,15 @@
 
     <ImageView
         android:id="@+id/edit"
-        android:src="@drawable/ic_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:paddingVertical="10dp"
         android:paddingRight="10dp"
         android:scaleType="center"
-        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/ic_edit"
         app:layout_constraintBottom_toTopOf="@id/moderator_name"
         app:layout_constraintLeft_toRightOf="@id/meeting_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
         app:tint="?attr/colorSecondary" />
 
     <TextView
@@ -47,49 +47,49 @@
     <TextView
         android:id="@+id/copy_link"
         style="@style/BottomSheetInfoItem"
+        android:singleLine="true"
         android:text="meeting"
         android:visibility="gone"
-        android:singleLine="true"
         app:drawableStartCompat="@drawable/ic_copy"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/participant_size" />
 
-
-    <Button
-        android:id="@+id/share_link"
-        style="?attr/materialButtonStyle"
-        android:layout_width="0dp"
-        android:layout_marginStart="15dp"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
         android:layout_marginTop="6dp"
-        android:layout_marginEnd="6dp"
-        android:backgroundTint="@color/grey_020_grey_040"
-        android:drawableTop="@drawable/ic_social_share_white"
-        android:stateListAnimator="@null"
-        android:text="@string/context_get_link"
-        android:textAllCaps="false"
-        android:textColor="@color/grey_600_white"
-        app:drawableTint="@color/teal_300_teal_200"
-        app:layout_constraintEnd_toStartOf="@id/invite"
-        app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/copy_link" />
+        app:layout_constraintTop_toBottomOf="@id/copy_link">
 
-    <Button
-        android:id="@+id/invite"
-        style="?attr/materialButtonStyle"
-        android:layout_width="0dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginEnd="15dp"
-        android:backgroundTint="@color/grey_020_grey_040"
-        android:drawableTop="@drawable/ic_invite_contact"
-        android:stateListAnimator="@null"
-        android:text="@string/invite_participants"
-        android:textAllCaps="false"
-        android:textColor="@color/grey_600_white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toEndOf="@id/share_link"
-        app:layout_constraintTop_toTopOf="@id/share_link" />
+        <Button
+            android:id="@+id/share_link"
+            style="?attr/materialButtonStyle"
+            android:layout_width="0dp"
+            android:layout_marginRight="6dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/grey_020_grey_040"
+            android:drawableTop="@drawable/ic_social_share_white"
+            android:stateListAnimator="@null"
+            android:text="@string/context_get_link"
+            android:textAllCaps="false"
+            android:textColor="@color/grey_600_white"
+            app:drawableTint="@color/teal_300_teal_200" />
+
+        <Button
+            android:id="@+id/invite"
+            style="?attr/materialButtonStyle"
+            android:layout_width="0dp"
+            android:layout_marginLeft="6dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/grey_020_grey_040"
+            android:drawableTop="@drawable/ic_invite_contact"
+            android:stateListAnimator="@null"
+            android:text="@string/invite_participants"
+            android:textAllCaps="false"
+            android:textColor="@color/grey_600_white" />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

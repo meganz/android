@@ -1784,7 +1784,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             }
         } == true
 
-        return hasOneModerator && participants.value?.isNotEmpty() == true && isModerator()
+        return hasOneModerator && isModerator() && participants.value?.none { isNormalUser(it.peerId) } == false
     }
 
 
@@ -1893,24 +1893,21 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun isModeratorOfPrivateRoom(): Boolean =
         !isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
 
-
     /**
      * Determine if I am a guest
      *
      * @return
      */
     fun isGuest(): Boolean {
-        val privilege = getOwnPrivileges()
-        if (privilege == -1) {
-            return false
-        }
-        return getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR && getOwnPrivileges() != MegaChatRoom.PRIV_STANDARD
+        // will change to  the official function provide by SDK team.
+        return inMeetingRepository.getOwnEmail().isNullOrEmpty()
     }
 
     fun isNormalUser(peerId: Long): Boolean {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             val privileges = it.getPeerPrivilegeByHandle(peerId)
-            return privileges == MegaChatRoom.PRIV_STANDARD
+            val email = inMeetingRepository.getParticipantEmail(peerId)
+            return privileges == MegaChatRoom.PRIV_STANDARD && !email.isNullOrEmpty()
         }
 
         return false

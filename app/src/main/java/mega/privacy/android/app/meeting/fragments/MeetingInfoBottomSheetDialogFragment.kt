@@ -64,8 +64,10 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             binding.meetingName.text = it
         }
         inMeetingViewModel.participants.observe(this) { participants ->
-            binding.participantSize.text = getString(R.string.info_participants_number, participants.size + 1)
-            binding.moderatorName.text = getString(R.string.info_moderator_name, getModeratorList(participants))
+            binding.participantSize.text =
+                getString(R.string.info_participants_number, participants.size + 1)
+            binding.moderatorName.text =
+                getString(R.string.info_moderator_name, getModeratorList(participants))
         }
 
         shareViewModel.meetingLinkLiveData.observe(this) { link ->
@@ -78,7 +80,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.edit.isVisible = inMeetingViewModel.isModerator()
-        binding.shareLink.isVisible = inMeetingViewModel.isLinkVisible()
+        binding.shareLink.isVisible = inMeetingViewModel.isLinkVisible() || inMeetingViewModel.isGuestLinkVisible()
         binding.invite.isVisible = inMeetingViewModel.isLinkVisible()
 
         listenAction(binding.shareLink) { (parentFragment as InMeetingFragment).onShareLink() }
@@ -98,16 +100,14 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     fun getModeratorList(participants: MutableList<Participant>): String {
-        var nameList = if (inMeetingViewModel.isModerator()) {
-            ChatController(context).myFullName
-        } else {
-            ""
-        }
+        var nameList =
+            if (inMeetingViewModel.isModerator()) ChatController(context).myFullName else ""
 
-        participants.filter { it.isModerator }
-            .map { it.name }.forEach {
-                if (it.isNotEmpty())
-                    nameList = if (nameList.isNotEmpty()) "$nameList, $it" else "$it"
+        participants
+            .filter { it.isModerator && it.name.isNotEmpty() }
+            .map { it.name }
+            .forEach {
+                nameList = if (nameList.isNotEmpty()) "$nameList, $it" else "$it"
             }
 
         return nameList
@@ -120,7 +120,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Copied Text", chatLink)
             clipboard.setPrimaryClip(clip)
-            showSnackbar(requireContext(), getString(R.string.chat_link_copied_clipboard))
+            showSnackbar(requireContext(), getString(R.string.copied_meeting_link))
         } else {
             showSnackbar(requireContext(), getString(R.string.general_text_error))
         }

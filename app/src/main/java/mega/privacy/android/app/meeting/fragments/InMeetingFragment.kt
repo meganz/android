@@ -186,10 +186,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) -> {
                             logDebug("Change in my privileges")
                             if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
-                                showFixedBanner(
-                                    megaChatApi.myUserHandle,
-                                    TYPE_OWN_PRIVILEGE
-                                )
+                                showSnackbar(SNACKBAR_TYPE, getString(R.string.be_new_moderator), MEGACHAT_INVALID_HANDLE)
                             }
                             bottomFloatingPanelViewHolder.updatePrivilege(inMeetingViewModel.getOwnPrivileges())
                         }
