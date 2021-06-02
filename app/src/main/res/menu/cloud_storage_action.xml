@@ -139,4 +139,14 @@
         android:title="@string/context_move_to_trash"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/cab_menu_save_gallery"
+        android:icon="@drawable/ic_save_gallery"
+        android:orderInCategory="240"
+        android:title="@string/general_save_to_gallery"
+        android:visible="false"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never"
+        tools:visible="true" />
 </menu>

@@ -282,6 +282,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				case R.id.cab_menu_remove_share:
 					((ManagerActivityLollipop) context).showConfirmationRemoveAllSharingContacts(documents);
 					break;
+
+				case R.id.cab_menu_save_gallery:
+					((ManagerActivityLollipop) context).saveNodesToGallery(adapter.getArrayListSelectedNodes());
+					clearSelections();
+					hideMultipleSelect();
+					break;
 			}
 			return true;
 		}
@@ -342,10 +348,15 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			boolean showShareFolder = true;
 			boolean showTrash = true;
 			boolean showRemoveShare = true;
+			boolean showSaveToGallery = false;
 
 			for (MegaNode node : selected) {
 				if (!node.isFile()) {
 					showSendToChat = false;
+					showSaveToGallery = false;
+				} else {
+					MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
+					showSaveToGallery = nodeMime.isImage() || nodeMime.isVideo();
 				}
 				if (!node.isFolder() || (MegaNodeUtil.isOutShare(node) && selected.size() > 1)) {
 					showShareFolder = false;
@@ -373,6 +384,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			if (showRemoveShare) {
 				control.removeShare().setVisible(true);
 			}
+
+			control.saveToGallery().setVisible(showSaveToGallery);
 
 			control.trash().setVisible(showTrash);
 
