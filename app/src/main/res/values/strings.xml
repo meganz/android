@@ -1109,9 +1109,9 @@
     <string name="invalid_email_title">Invalid email address</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Please check the email address and try again.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Password reset</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Please enter your Recovery Key below</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Your password has been changed.</string>
@@ -3942,10 +3942,10 @@
     <string name="action_keep_empty_old_extension">No extension</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Keep .%1$s</string>
-    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
-    <string name="general_info">Info</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">There is already a file with the same name</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
     <string name="same_item_name_warning">There is already an item with the same name</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Info</string>
 </resources>
