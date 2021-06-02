@@ -47,6 +47,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.utils.Constants.ANIMATION_DURATION;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
@@ -450,6 +451,9 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                             new CuActionModeCallback(context, this, viewModel, megaApi));
                 }
 
+                binding.viewTypeLayout.animate().translationY(220).setDuration(ANIMATION_DURATION)
+                        .withEndAction(() -> binding.viewTypeLayout.setVisibility(View.GONE)).start();
+
                 mActionMode.setTitle(String.valueOf(viewModel.getSelectedNodesCount()));
                 mActionMode.invalidate();
             } else {
@@ -457,6 +461,9 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                     mActionMode.finish();
                     mActionMode = null;
                 }
+
+                binding.viewTypeLayout.setVisibility(View.VISIBLE);
+                binding.viewTypeLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
             }
         });
 
@@ -470,8 +477,9 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private void updateEnableCUButtons(boolean cuEnabled) {
         boolean emptyAdapter = gridAdapter == null || gridAdapter.getItemCount() <= 0;
-        mManagerActivity.updateEnableCuButton(!cuEnabled && !emptyAdapter ? View.VISIBLE : View.GONE);
         binding.emptyEnableCuButton.setVisibility(!cuEnabled && emptyAdapter ? View.VISIBLE : View.GONE);
+        mManagerActivity.updateEnableCuButton(!cuEnabled && !emptyAdapter && mActionMode == null
+                ? View.VISIBLE : View.GONE);
     }
 
     private void showDayCards(List<CUCard> dayCards) {

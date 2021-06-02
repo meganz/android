@@ -842,4 +842,6 @@ public class Constants {
     public static final int ORDER_CONTACTS = 1;
     public static final int ORDER_OTHERS = 2;
     public static final int ORDER_CAMERA = 3;
+
+    public static final long ANIMATION_DURATION = 400;
 }

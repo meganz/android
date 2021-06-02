@@ -8958,6 +8958,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		enableCULayout.setVisibility(visibility);
 	}
 
+	public void animateEnableCUButton(boolean hide) {
+		boolean visible = enableCULayout.getVisibility() == View.VISIBLE;
+		if ((hide && !visible) || !hide && visible) {
+			return;
+		}
+
+		if (hide) {
+			enableCULayout.animate().translationY(-100).setDuration(ANIMATION_DURATION)
+					.withEndAction(() -> enableCULayout.setVisibility(View.GONE)).start();
+		} else {
+			enableCULayout.setVisibility(View.VISIBLE);
+			enableCULayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+		}
+	}
+
 	/**
 	 * Shows the bottom sheet to manage a completed transfer.
 	 *
@@ -13435,12 +13450,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			updateMiniAudioPlayerVisibility(false);
 			params.setMargins(0, 0, 0, 0);
 			fragmentLayout.setLayoutParams(params);
-			bNV.animate().translationY(220).setDuration(400L).withEndAction(() -> bNV.setVisibility(View.GONE)).start();
+			bNV.animate().translationY(220).setDuration(ANIMATION_DURATION).withEndAction(() -> bNV.setVisibility(View.GONE)).start();
 		} else if (!hide && bNV.getVisibility() == View.GONE) {
 			params.setMargins(0, 0, 0,
 					getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
 			bNV.setVisibility(View.VISIBLE);
-			bNV.animate().translationY(0).setDuration(400L).withEndAction(() -> {
+			bNV.animate().translationY(0).setDuration(ANIMATION_DURATION).withEndAction(() -> {
 				updateMiniAudioPlayerVisibility(true);
 				fragmentLayout.setLayoutParams(params);
 			}).start();
