@@ -31,7 +31,8 @@ import java.util.*
 
 class InMeetingViewModel @ViewModelInject constructor(
     private val inMeetingRepository: InMeetingRepository
-) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback {
+) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
+    HangChatCallListener.OnCallHungUpCallback {
 
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
 
@@ -1223,7 +1224,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param callId
      */
     private fun hangUpSpecificCall(callId: Long) {
-        inMeetingRepository.leaveMeeting(callId)
+        inMeetingRepository.leaveMeeting(callId, HangChatCallListener(MegaApplication.getInstance(), this))
     }
 
     /**
@@ -1231,7 +1232,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun leaveMeeting() {
         _callLiveData.value?.let {
-            inMeetingRepository.leaveMeeting(it.callId)
+            inMeetingRepository.leaveMeeting(it.callId, HangChatCallListener(MegaApplication.getInstance(), this))
         }
     }
 
@@ -1908,5 +1909,15 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     companion object {
         const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"
+    }
+
+    override fun onCallHungUp(callId: Long) {
+        _callLiveData.value?.let {
+            if (it.callId == callId) {
+                logDebug("Current call hung up")
+                _callLiveData.value = null
+                currentChatId = MEGACHAT_INVALID_HANDLE
+            }
+        }
     }
 }

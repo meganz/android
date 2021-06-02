@@ -121,12 +121,9 @@ public class ContactController {
             if (chatRoomTo != null) {
                 long chatId = chatRoomTo.getChatId();
                 MegaChatCall call = megaChatApi.getChatCall(chatId);
-                if (call != null) {
-                    if (context instanceof ManagerActivityLollipop) {
-                        megaChatApi.hangChatCall(call.getCallId(), new HangChatCallListener(context));
-                    } else if (context instanceof ContactInfoActivityLollipop) {
-                        megaChatApi.hangChatCall(call.getCallId(),  new HangChatCallListener(context));
-                    }
+                if (call != null && (context instanceof ManagerActivityLollipop ||
+                        context instanceof ContactInfoActivityLollipop)) {
+                    megaChatApi.hangChatCall(call.getCallId(), new HangChatCallListener(context));
                 }
             }
         }

@@ -28,6 +28,7 @@ class AnswerChatCallListener(context: Context?) : ChatBaseListener(context) {
             callback?.onCallAnswered(request.chatHandle, request.flag)
         } else {
             LogUtil.logError("Error answering the call. Error code "+e.errorCode)
+            MegaApplication.getInstance().removeRTCAudioManagerRingIn()
             callback?.onErrorAnsweredCall(e.errorCode)
         }
     }

@@ -9,9 +9,15 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.ChatConnectionListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.listeners.*
-import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.meeting.listeners.GroupVideoListener
+import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
+import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApi.INIT_WAITING_NEW_SESSION
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -195,11 +201,11 @@ class InMeetingRepository @Inject constructor(
      *
      * @param callId call ID
      */
-    fun leaveMeeting(callId: Long) {
+    fun leaveMeeting(callId: Long, listener: MegaChatRequestListenerInterface) {
         if (callId == MEGACHAT_INVALID_HANDLE)
             return
 
-        megaChatApi.hangChatCall(callId, HangChatCallListener(context))
+        megaChatApi.hangChatCall(callId, listener)
     }
 
     /**
@@ -246,10 +252,10 @@ class InMeetingRepository @Inject constructor(
             getOwnPrivileges(chat.chatId) == MegaChatRoom.PRIV_MODERATOR,
             isAudioOn,
             isVideoOn,
-            false,
-            true,
-            true,
-            null
+            isContact = false,
+            isSpeaker = true,
+            hasHiRes = true,
+            videoListener = null
         )
     }
 
