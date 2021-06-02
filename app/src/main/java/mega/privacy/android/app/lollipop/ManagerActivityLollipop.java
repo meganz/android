@@ -8910,7 +8910,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param nodes nodes to save
 	 */
 	public void saveNodesToGallery(List<MegaNode> nodes) {
-		nodeSaver.saveNodes(nodes, false, false, false, false, true);
+		nodeSaver.saveNodes(nodes, false, false, false, true, true);
 	}
 
 	/**

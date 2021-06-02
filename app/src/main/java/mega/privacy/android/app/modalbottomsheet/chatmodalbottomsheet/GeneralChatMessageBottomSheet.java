@@ -245,9 +245,13 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             optionDownload.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
 
-            MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
-            if (node.isFile() && (nodeMime.isImage() || nodeMime.isVideo())) {
-                optionGallery.setVisibility(View.VISIBLE);
+            if (node != null && node.isFile()) {
+                MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
+                if (nodeMime.isImage() || nodeMime.isVideo()) {
+                    optionGallery.setVisibility(View.VISIBLE);
+                } else {
+                    optionGallery.setVisibility(View.GONE);
+                }
             } else {
                 optionGallery.setVisibility(View.GONE);
             }
