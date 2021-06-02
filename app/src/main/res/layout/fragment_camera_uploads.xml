@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -54,20 +54,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <TextView
+        android:id="@+id/upload_progress"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87"
+        android:visibility="gone"
+        tools:text="Upload in progress, 300 files pending" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/cu_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"/>
+        android:layout_below="@+id/upload_progress"
+        android:clipToPadding="false" />
 
     <LinearLayout
         android:id="@+id/view_type_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginBottom="8dp"
         android:orientation="horizontal">
 
@@ -91,7 +105,7 @@
             style="@style/CuViewTypeButton"
             android:text="@string/all_view_button"
             tools:background="@drawable/background_18dp_rounded_selected_button"
-            tools:textAppearance="@style/TextAppearance.Mega.Subtitle2.Medium.WhiteGrey87"/>
+            tools:textAppearance="@style/TextAppearance.Mega.Subtitle2.Medium.WhiteGrey87" />
 
     </LinearLayout>
 
@@ -99,7 +113,7 @@
         android:id="@+id/scroller"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="end"
+        android:layout_alignParentEnd="true"
         android:orientation="vertical" />
 
-</FrameLayout>
+</RelativeLayout>

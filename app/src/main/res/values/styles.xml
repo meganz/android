@@ -561,4 +561,12 @@
         <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87</item>
     </style>
 
+    <style name="CUProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">4dp</item>
+        <item name="minHeight">4dp</item>
+        <item name="maxHeight">4dp</item>
+    </style>
+
 </resources>

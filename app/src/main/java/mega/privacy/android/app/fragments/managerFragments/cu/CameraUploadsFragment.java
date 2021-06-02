@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -287,7 +288,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         layoutManager = new GridLayoutManager(context, spanCount);
         binding.cuList.setLayoutManager(layoutManager);
         binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
-        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) binding.cuList.getLayoutParams();
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.cuList.getLayoutParams();
 
         if (selectedView == ALL_VIEW) {
             int imageMargin = getResources().getDimensionPixelSize(smallGrid
@@ -477,8 +478,12 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     private void updateEnableCUButtons(boolean cuEnabled) {
         boolean emptyAdapter = gridAdapter == null || gridAdapter.getItemCount() <= 0;
         binding.emptyEnableCuButton.setVisibility(!cuEnabled && emptyAdapter ? View.VISIBLE : View.GONE);
-        mManagerActivity.updateEnableCuButton(!cuEnabled && !emptyAdapter && mActionMode == null
+        mManagerActivity.updateEnableCUButton(!cuEnabled && !emptyAdapter && mActionMode == null
                 ? View.VISIBLE : View.GONE);
+
+        if (!cuEnabled) {
+            mManagerActivity.hideCUProgress();
+        }
     }
 
     private void showDayCards(List<CUCard> dayCards) {
@@ -559,7 +564,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         return viewModel.isEnableCUShown();
     }
 
-    public boolean shouldShowToolbarOptions() {
+    public boolean shouldShowFullInfoAndOptions() {
         return !isEnableCUFragmentShown() && selectedView == ALL_VIEW;
     }
 
@@ -588,6 +593,15 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
         updateFastScrollerVisibility();
         mManagerActivity.updateCuFragmentOptionsMenu();
+        mManagerActivity.updateEnableCUButton(selectedView == ALL_VIEW
+                && gridAdapter.getItemCount() > 0 && !viewModel.isCUEnabled()
+                ? View.VISIBLE
+                : View.GONE);
+
+        if (selectedView != ALL_VIEW) {
+            mManagerActivity.hideCUProgress();
+            binding.uploadProgress.setVisibility(View.GONE);
+        }
     }
 
     private void updateFastScrollerVisibility() {
@@ -632,5 +646,10 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 layoutManager.scrollToPosition(viewModel.yearClicked(position, card));
                 break;
         }
+    }
+
+    public void updateProgress(int visibility, int pending) {
+        binding.uploadProgress.setVisibility(visibility);
+        binding.uploadProgress.setText(StringResourcesUtils.getString(R.string.cu_upload_progress, pending));
     }
 }

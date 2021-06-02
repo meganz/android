@@ -556,7 +556,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private MiniAudioPlayerController miniAudioPlayerController;
 
-	private LinearLayout enableCULayout;
+	private LinearLayout cuLayout;
+	private Button enableCUButton;
+	private ProgressBar cuProgressBar;
 
 	//Tabs in Shares
 	private TabLayout tabLayoutShares;
@@ -1100,6 +1102,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					|| intent.getAction().equals(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE))) {
 				sttFLol.refreshCameraUploadsSettings();
 			}
+		}
+	};
+
+	private final BroadcastReceiver cuUpdateReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent == null || !ACTION_UPDATE_CU.equals(intent.getAction())) {
+				return;
+			}
+
+			updateCUProgress(intent.getIntExtra(PROGRESS, 0),
+					intent.getIntExtra(PENDING_TRANSFERS, 0));
 		}
 	};
 
@@ -1760,6 +1774,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
+        registerReceiver(cuUpdateReceiver, new IntentFilter(ACTION_UPDATE_CU));
+
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
 		cC = new ContactController(this);
@@ -2046,10 +2062,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
 		}
 
-		enableCULayout = findViewById(R.id.enable_cu_layout);
-		findViewById(R.id.enable_cu_button).setOnClickListener(v -> {
+		cuLayout = findViewById(R.id.cu_layout);
+		cuProgressBar = findViewById(R.id.cu_progress_bar);
+		enableCUButton = findViewById(R.id.enable_cu_button);
+		enableCUButton.setOnClickListener(v -> {
 			if (getCameraUploadFragment() != null) {
-				updateEnableCuButton(View.GONE);
+				updateCULayout(View.GONE);
 				cuFragment.enableCUClick();
 			}
 		});
@@ -3546,7 +3564,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								stopRunningCameraUploadService(ManagerActivityLollipop.this);
 								dbH.setCamSyncEnabled(false);
 								sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
-								enableCULayout.setVisibility(View.VISIBLE);
+								cuLayout.setVisibility(View.VISIBLE);
 							});
 
                     builder.setNegativeButton(getString(R.string.general_no), null);
@@ -4180,6 +4198,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(transferFinishReceiver);
         unregisterReceiver(cameraUploadLauncherReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
+		unregisterReceiver(cuUpdateReceiver);
 
 		if (mBillingManager != null) {
 			mBillingManager.destroy();
@@ -5469,7 +5488,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		if (item != DrawerItem.CAMERA_UPLOADS) {
-			enableCULayout.setVisibility(View.GONE);
+			cuLayout.setVisibility(View.GONE);
 		}
 
 		if (item != DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
@@ -6557,7 +6576,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (drawerItem == DrawerItem.CAMERA_UPLOADS
 				&& getCameraUploadFragment() != null
 				&& cuFragment.getItemCount() > 0) {
-			boolean visible = cuFragment.shouldShowToolbarOptions();
+			boolean visible = cuFragment.shouldShowFullInfoAndOptions();
 			sortByMenuItem.setVisible(visible);
 			setCuThumbnailTypeIcon();
 			gridSmallLargeMenuItem.setVisible(visible);
@@ -8954,22 +8973,57 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	}
 
-	public void updateEnableCuButton(int visibility) {
-		enableCULayout.setVisibility(visibility);
+	public void updateCULayout(int visibility) {
+		cuLayout.setVisibility(visibility);
 	}
 
-	public void animateEnableCUButton(boolean hide) {
-		boolean visible = enableCULayout.getVisibility() == View.VISIBLE;
+	public void updateEnableCUButton(int visibility) {
+		if ((visibility == View.GONE && cuProgressBar.getVisibility() == View.GONE)
+				|| (visibility == View.VISIBLE && cuLayout.getVisibility() == View.GONE)) {
+			updateCULayout(visibility);
+		}
+
+		enableCUButton.setVisibility(visibility);
+	}
+
+	public void hideCUProgress() {
+		cuProgressBar.setVisibility(View.GONE);
+	}
+
+	public void updateCUProgress(int progress, int pending) {
+		if (drawerItem != DrawerItem.CAMERA_UPLOADS || getCameraUploadFragment() == null
+				|| !cuFragment.shouldShowFullInfoAndOptions()) {
+			return;
+		}
+
+		boolean visible = pending > 0;
+		int visibility = visible ? View.VISIBLE : View.GONE;
+
+		if ((!visible && enableCUButton.getVisibility() == View.GONE)
+				|| (visible && cuLayout.getVisibility() == View.GONE)) {
+			updateCULayout(visibility);
+		}
+
+		if (getCameraUploadFragment() != null) {
+			cuFragment.updateProgress(visibility, pending);
+		}
+
+		cuProgressBar.setVisibility(visibility);
+		cuProgressBar.setProgress(progress);
+	}
+
+	public void animateCULayout(boolean hide) {
+		boolean visible = cuLayout.getVisibility() == View.VISIBLE;
 		if ((hide && !visible) || !hide && visible) {
 			return;
 		}
 
 		if (hide) {
-			enableCULayout.animate().translationY(-100).setDuration(ANIMATION_DURATION)
-					.withEndAction(() -> enableCULayout.setVisibility(View.GONE)).start();
+			cuLayout.animate().translationY(-100).setDuration(ANIMATION_DURATION)
+					.withEndAction(() -> cuLayout.setVisibility(View.GONE)).start();
 		} else {
-			enableCULayout.setVisibility(View.VISIBLE);
-			enableCULayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+			cuLayout.setVisibility(View.VISIBLE);
+			cuLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
 		}
 	}
 
@@ -13251,20 +13305,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		int toolbarElevationColor = ColorUtils.getColorForElevation(this, elevation);
 		int transparentColor = ContextCompat.getColor(this, android.R.color.transparent);
 		boolean onlySetToolbar = Util.isDarkMode(this) && !mShowAnyTabLayout;
-		boolean enableCUVisible = enableCULayout.getVisibility() == View.VISIBLE;
+		boolean enableCUVisible = cuLayout.getVisibility() == View.VISIBLE;
 
 		if (mElevationCause > 0) {
 			if (onlySetToolbar) {
 				toolbar.setBackgroundColor(toolbarElevationColor);
-				if (enableCUVisible) enableCULayout.setBackgroundColor(toolbarElevationColor);
+				if (enableCUVisible) cuLayout.setBackgroundColor(toolbarElevationColor);
 			} else {
 				toolbar.setBackgroundColor(transparentColor);
-				if (enableCUVisible) enableCULayout.setBackground(null);
+				if (enableCUVisible) cuLayout.setBackground(null);
 				abL.setElevation(elevation);
 			}
 		} else {
 			toolbar.setBackgroundColor(transparentColor);
-			if (enableCUVisible) enableCULayout.setBackground(null);
+			if (enableCUVisible) cuLayout.setBackground(null);
 			abL.setElevation(0);
 		}
 
