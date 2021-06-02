@@ -1962,6 +1962,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onPause() {
         super.onPause()
+        status = NOT_TYPE
         MegaApplication.getInstance().unregisterProximitySensor()
 
         individualCallFragment?.let {
@@ -1987,9 +1988,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onDestroy()
     }
 
-     override fun onResume() {
+    override fun onResume() {
         super.onResume()
         MegaApplication.getInstance().startProximitySensor()
+        checkChildFragments()
     }
 
     override fun onCallAnswered(chatId: Long, flag: Boolean) {
