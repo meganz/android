@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -587,7 +586,18 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 setViewTypeButtonStyle(binding.allButton, true);
         }
 
+        updateFastScrollerVisibility();
         mManagerActivity.updateCuFragmentOptionsMenu();
+    }
+
+    private void updateFastScrollerVisibility() {
+        boolean gridView = selectedView == ALL_VIEW;
+        int visibility = (gridView && gridAdapter != null && gridAdapter.getItemCount() >= MIN_ITEMS_SCROLLBAR)
+                || (!gridView && cardAdapter != null && cardAdapter.getItemCount() >= MIN_ITEMS_SCROLLBAR)
+                ? View.VISIBLE
+                : View.GONE;
+
+        binding.scroller.setVisibility(visibility);
     }
 
     private void setViewTypeButtonStyle(TextView textView, boolean enabled) {

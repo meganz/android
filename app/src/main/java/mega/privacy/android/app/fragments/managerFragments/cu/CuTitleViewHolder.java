@@ -9,6 +9,7 @@ import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding;
 
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 class CuTitleViewHolder extends CuGridViewHolder {
 
@@ -23,7 +24,9 @@ class CuTitleViewHolder extends CuGridViewHolder {
     @Override
     protected void bind(CuNode node) {
         Pair<String, String> date = node.getHeaderDate();
-        String dateText = getString(R.string.highlighted_date, date.first, date.second);
+        String dateText = isTextEmpty(date.second)
+                ? "[B]" + date.first + "[/B]"
+                : getString(R.string.cu_month_year_date, date.first, date.second);
 
         try {
             dateText = dateText.replace("[B]", "<font face=\"sans-serif-medium\">")

@@ -39,16 +39,7 @@ class CUCardViewAdapter(
 
     override fun getSectionTitle(position: Int): String {
         return if (position < 0 || position >= cards.size) ""
-        else {
-            val card = cards[position]
-
-            when (cardViewType) {
-                YEARS_VIEW -> card.year
-                MONTHS_VIEW -> card.month + " " + card.year
-                DAYS_VIEW -> card.day + " " + card.month + " " + card.year
-                else -> ""
-            }
-        }
+        else  cards[position].date
     }
 
     fun setCards(cards: List<CUCard>) {

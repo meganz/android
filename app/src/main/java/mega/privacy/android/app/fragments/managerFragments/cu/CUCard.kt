@@ -9,7 +9,7 @@ data class CUCard(
     var preview: File?,
     var day: String? = null,
     var month: String? = null,
-    val year: String,
+    val year: String?,
     val date: String,
     val localDate: LocalDate,
     var numItems: Long? = null

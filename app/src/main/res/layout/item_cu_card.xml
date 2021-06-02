@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant6.White"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.White.20sp"
             tools:text="11 July 2020" />
 
         <TextView

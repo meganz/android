@@ -104,6 +104,14 @@
         <item name="android:textColor">@color/grey_054_white_054</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.White">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.White.20sp">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <!-- Roboto regular, 16sp, 0px, textColorSecondary, AllCaps=false -->
     <style name="TextAppearance.Mega.Subtitle1.Secondary.Variant">
         <item name="android:letterSpacing">0</item>
@@ -168,10 +176,6 @@
     <!-- Medium, normal, 20sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6">
         <item name="android:textSize">20sp</item>
-    </style>
-
-    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6.White">
-        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant7">

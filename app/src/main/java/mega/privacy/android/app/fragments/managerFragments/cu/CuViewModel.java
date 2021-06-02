@@ -386,7 +386,7 @@ class CuViewModel extends BaseRxViewModel {
             MegaNode node = pair.second;
             File thumbnail = new File(getThumbFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
-            String dateString = ofPattern("MMM yyyy").format(modifyDate);
+            String dateString = ofPattern("MMMM yyyy").format(modifyDate);
             boolean sameYear = Year.from(LocalDate.now()).equals(Year.from(modifyDate));
             CuNode cuNode = new CuNode(node, pair.first,
                     thumbnail.exists() ? thumbnail : null,
@@ -398,7 +398,7 @@ class CuViewModel extends BaseRxViewModel {
             if (lastMonthDate == null
                     || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
                 lastMonthDate = modifyDate;
-                nodes.add(new CuNode(dateString, new Pair<>(ofPattern("MMM").format(modifyDate),
+                nodes.add(new CuNode(dateString, new Pair<>(ofPattern("MMMM").format(modifyDate),
                         sameYear ? "" : ofPattern("yyyy").format(modifyDate))));
             }
 
@@ -442,7 +442,7 @@ class CuViewModel extends BaseRxViewModel {
             File preview = new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
             String day = ofPattern("dd").format(modifyDate);
-            String month = ofPattern("MMM").format(modifyDate);
+            String month = ofPattern("MMMM").format(modifyDate);
             String year = ofPattern("yyyy").format(modifyDate);
             boolean sameYear = Year.from(LocalDate.now()).equals(Year.from(modifyDate));
 
@@ -457,9 +457,9 @@ class CuViewModel extends BaseRxViewModel {
 
                 shouldGetPreview = true;
                 lastDayDate = modifyDate;
-                String date = ofPattern(sameYear ? "dd MMM" : "dd MMM yyyy").format(lastDayDate);
-                days.add(new CUCard(node, preview.exists() ? preview : null, day, month, year, date,
-                        modifyDate, null));
+                String date = ofPattern(sameYear ? "dd MMMM" : "dd MMMM yyyy").format(lastDayDate);
+                days.add(new CUCard(node, preview.exists() ? preview : null, day, month,
+                        sameYear ? null : year, date, modifyDate, null));
             }
 
             if (totalItemCount == cardNodes.size()) {
@@ -470,9 +470,9 @@ class CuViewModel extends BaseRxViewModel {
                     || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
                 shouldGetPreview = true;
                 lastMonthDate = modifyDate;
-                String date = sameYear ? month : ofPattern("MMM yyyy").format(modifyDate);
-                months.add(new CUCard(node, preview.exists() ? preview : null,null, month, year,
-                        date, modifyDate, null));
+                String date = sameYear ? month : ofPattern("MMMM yyyy").format(modifyDate);
+                months.add(new CUCard(node, preview.exists() ? preview : null,null, month,
+                        sameYear ? null : year, date, modifyDate, null));
             }
 
             if (lastYearDate == null || !Year.from(lastYearDate).equals(Year.from(modifyDate))) {
