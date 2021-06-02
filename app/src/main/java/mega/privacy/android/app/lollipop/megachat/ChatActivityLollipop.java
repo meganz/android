@@ -1494,9 +1494,10 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
 
                         @Override
                         public void onRequestFinish(@NotNull MegaChatApiJava api, @NotNull MegaChatRequest request, @NotNull MegaChatError e) {
+                            long chatId = request.getChatHandle();
                             int errorCode = e.getErrorCode();
                             boolean codeError = errorCode != MegaChatError.ERROR_OK && errorCode != MegaChatError.ERROR_EXIST;
-                            boolean linkInvalid = TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE;
+                            boolean linkInvalid = TextUtil.isTextEmpty(request.getLink()) && chatId == MEGACHAT_INVALID_HANDLE;
                             logDebug("Chat id: " + request.getChatHandle() + ", type: " + request.getParamType() + ", flag: " + request.getFlag());
 
                             if (codeError || linkInvalid) {
@@ -1507,15 +1508,27 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                                 logDebug("It's a meeting");
 
                                 if (request.getFlag()) {
+                                    boolean isAlreadyJoined = e.getErrorCode() == MegaChatError.ERROR_EXIST;
                                     MegaHandleList list = request.getMegaHandleList();
 
                                     if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
                                         logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
-                                        CallUtil.openMeetingToJoin(
-                                                ChatActivityLollipop.this, request.getChatHandle(), request.getText(), link);
-                                    } else {
-                                        boolean isAlreadyJoined = e.getErrorCode() == MegaChatError.ERROR_EXIST;
 
+                                        if(isAlreadyJoined) {
+                                            // Open the ongoing meeting.
+                                            MegaChatCall call = api.getChatCall(chatId);
+
+                                            // Haven't joined the call, start it.
+                                            if (call == null || call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+                                                CallUtil.openMeetingToStart(ChatActivityLollipop.this, chatId);
+                                            } else {
+                                                returnCall(ChatActivityLollipop.this, chatId);
+                                            }
+                                        } else {
+                                            CallUtil.openMeetingToJoin(
+                                                    ChatActivityLollipop.this, request.getChatHandle(), request.getText(), link);
+                                        }
+                                    } else {
                                         // Open a already joined and ended meeting's chatroom.
                                         if (isAlreadyJoined) {
                                             openChatPreview(link);
