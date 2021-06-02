@@ -3965,22 +3965,28 @@
     <string name="general_reject">Hang up</string>
     <!-- General label for microphone -->
     <string name="general_mic">Mic</string>
-    <!-- General label for microphone unmuted/muted -->
-    <string name="general_mic_mute">Your microphone is %s</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">Your microphone is mute</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">Your microphone is unmuted</string>
     <!-- General label for camera -->
     <string name="general_camera">Camera</string>
-    <!-- General label for camera disable/enable -->
-    <string name="general_camera_disable">Your camera is %s</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">Your camera is enable</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">Your camera is disable</string>
     <!-- Label for hold meeting -->
     <string name="meeting_hold">Hold</string>
     <!-- General label for speaker -->
     <string name="general_speaker">Speaker</string>
     <!-- General label for headphone-->
     <string name="general_headphone">Headphone</string>
-    <!-- General label for switch headphone/speaker-->
-    <string name="general_speaker_headphone">%s is on</string>
-    <!-- General label for disable speaker-->
-    <string name="speaker_off">%s is off</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">Headphone is on</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">Speaker is on</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">Speaker is off</string>
     <!-- Label for end meeting-->
     <string name="meeting_end">End</string>
     <!-- Invite contacts as participants of the meeting-->

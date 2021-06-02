@@ -101,13 +101,13 @@ class MeetingActivityViewModel @ViewModelInject constructor(
                 _speakerLiveData.value = it
                 when (it) {
                     AppRTCAudioManager.AudioDevice.EARPIECE -> {
-                        tips.value = getString(R.string.speaker_off, "Speaker")
+                        tips.value = getString(R.string.general_speaker_off)
                     }
                     AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
-                        tips.value = getString(R.string.general_speaker_headphone, "Speaker")
+                        tips.value = getString(R.string.general_speaker_on)
                     }
                     else -> {
-                        tips.value = getString(R.string.general_speaker_headphone, "Headphone")
+                        tips.value = getString(R.string.general_headphone_on)
                     }
                 }
             }
@@ -312,11 +312,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
         //The chat is not yet created or the call is not yet established
         _micLiveData.value = bOn
-        logDebug("open Mic: $_micLiveData.value")
+        logDebug("open Mic: $bOn")
         tips.value = when (bOn) {
             true -> getString(
-                R.string.general_mic_mute,
-                "unmute"
+                R.string.general_mic_unmute
             )
             false -> getString(
                 R.string.general_mic_mute,
@@ -433,25 +432,16 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         }
     }
 
-    fun releaseVideoDevice() {
-        meetingActivityRepository.switchCameraBeforeStartMeeting(
-            false,
-            OpenVideoDeviceListener(MegaApplication.getInstance(), this)
-        )
-    }
-
     override fun onVideoDeviceOpened(isVideoOn: Boolean) {
         logDebug("onVideoDeviceOpened:: isEnable = $isVideoOn")
         _cameraLiveData.value = isVideoOn
         logDebug("open video: $_cameraLiveData.value")
         tips.value = when (isVideoOn) {
             true -> getString(
-                R.string.general_camera_disable,
-                "enable"
+                R.string.general_camera_enable
             )
             false -> getString(
-                R.string.general_camera_disable,
-                "disable"
+                R.string.general_camera_disable
             )
         }
     }
@@ -460,15 +450,13 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         when (typeChange) {
             MegaChatRequest.AUDIO -> {
                 _micLiveData.value = isEnable
-                logDebug("open Mic: $_micLiveData.value")
+                logDebug("open Mic: $isEnable")
                 tips.value = when (isEnable) {
                     true -> getString(
-                        R.string.general_mic_mute,
-                        "unmute"
+                        R.string.general_mic_unmute
                     )
                     false -> getString(
-                        R.string.general_mic_mute,
-                        "mute"
+                        R.string.general_mic_mute
                     )
                 }
             }
@@ -477,12 +465,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
                 logDebug("open video: $_cameraLiveData.value")
                 tips.value = when (isEnable) {
                     true -> getString(
-                        R.string.general_camera_disable,
-                        "enable"
+                        R.string.general_camera_enable
                     )
                     false -> getString(
-                        R.string.general_camera_disable,
-                        "disable"
+                        R.string.general_camera_disable
                     )
                 }
             }

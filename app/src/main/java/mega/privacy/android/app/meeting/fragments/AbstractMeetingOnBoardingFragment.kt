@@ -438,7 +438,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         if (videoListener == null) return
         logDebug("Removing remote video listener")
         sharedModel.removeLocalVideo(MEGACHAT_INVALID_HANDLE, videoListener)
-        sharedModel.releaseVideoDevice()
         videoListener = null
     }
 }
