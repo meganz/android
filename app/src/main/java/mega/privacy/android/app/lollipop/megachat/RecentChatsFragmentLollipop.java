@@ -1440,6 +1440,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if(adapter != null) {
             adapter.dismissDialog();
         }
+        if (context instanceof ManagerActivityLollipop) {
+            ((ManagerActivityLollipop) context).setSearchQuery("");
+        }
     }
 
     @Override

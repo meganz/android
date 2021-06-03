@@ -235,7 +235,7 @@
     <!-- text placed on the checkbox of acceptation of the Terms of Service -->
     <string name="tos">MEGA의 [A]이용 약관[/A]에 동의합니다</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
-    <string name="top">[B]내가 암호를 잊으면, 데이터에 대한 접근을 잃는다[/B]는 것을 이해하였습니다. [A]MEGA의 종단간 암호화[/A]에 대하여 더 알아보기</string>
+    <string name="top">[B]내가 암호를 잊으면, 내 데이터를 잃는다[/B]는 것을 이해하였습니다. [A]MEGA의 종단간 암호화[/A]에 대하여 더 알아보기</string>
     <!-- Does the user already have a MEGA account -->
     <string name="already_account">이미 계정이 있으신가요?</string>
     <!-- warning dialog -->
@@ -289,9 +289,9 @@
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">연락처 [A](%1$d)[/A]</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
-    <string name="sent_requests_empty">[A]발송된 요청[/A][B] 없음[/B]</string>
+    <string name="sent_requests_empty">[A]발송된 요청[/A] [B]없음[/B]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
-    <string name="received_requests_empty">[A]수신된 요청[/A][B] 없음[/B]</string>
+    <string name="received_requests_empty">[A]수신된 요청[/A] [B]없음[/B]</string>
     <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">전송</string>
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
@@ -309,7 +309,7 @@
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">다음과의 들어오는 공유</string>
     <!-- message when there are no files in the Cloud drive -->
-    <string name="file_browser_empty_cloud_drive">당신의 클라우드 드라이브에 파일이 없습니다</string>
+    <string name="file_browser_empty_cloud_drive">클라우드 드라이브에 파일 없음</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">빈 폴더</string>
     <!-- Title of the fragment Choose Account -->
@@ -333,7 +333,7 @@
     <!-- when listing all the contacts that shares a folder -->
     <string name="file_properties_shared_folder_select_contact">공유된 사람</string>
     <!-- send a file to a MEGA user -->
-    <string name="file_properties_send_file_select_contact">보낼 곳</string>
+    <string name="file_properties_send_file_select_contact">보내기</string>
     <!-- shows the owner of an incoming shared folder -->
     <string name="file_properties_owner">소유자</string>
     <!-- positive button on dialog to invite a contact -->
@@ -1489,7 +1489,7 @@
     <plurals name="user_typing">
         <item quantity="other">%1$s님이 [A]입력중&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s님 외 다수가 [A]입력중&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">더 보기</string>
@@ -2454,7 +2454,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">다음번 로그인 때 당신의 인증기 앱에서 생성된 6자리 코드를 요구합니다.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can’t help you gain access to it again.\n        &lt;b&gt;복구 키를 백업하세요&lt;/b&gt;</string>
+    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">잘못된 코드</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -3835,4 +3835,24 @@
     <string name="file_update_failed">파일 업데이트 실패. 다시 시도하세요.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">파일이 너무 커서 열거나 미리 볼 수 없습니다.</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">확장자가 없는 파일 (.%1$s)</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">진행하려면 파일 확장자를 입력해야 합니다</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">파일 확장자 변경</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">확장자를 “.%1$s”에서 “.%2$s”로 변경하면 이 파일에 접근하지 못할 수 있습니다</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">확장자를 공백에서 “.%1$s”로 변경하면 이 파일에 접근하지 못할 수 있습니다</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">확장자를 “.%1$s”에서 공백으로 변경하면 이 파일에 접근하지 못할 수 있습니다</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">확장자 삭제</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">.%1$s 사용</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">공백 유지</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">.%1$s 유지</string>
 </resources>
