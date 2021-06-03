@@ -73,6 +73,7 @@
     <color name="grey_alpha_070">#B3000000</color>
     <color name="grey_alpha_080">#CC000000</color>
     <color name="grey_alpha_087">#DE000000</color>
+    <color name="grey_alpha_090">#E6000000</color>
 
     <color name="teal_050">#DCF4F0</color>
     <color name="teal_100">#A9E3D8</color>

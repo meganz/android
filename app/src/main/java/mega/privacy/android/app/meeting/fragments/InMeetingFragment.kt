@@ -643,10 +643,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         meetingChrono = meetingActivity.simple_chronometer
 
         meetingActivity.setSupportActionBar(toolbar)
-        val actionBar = meetingActivity.supportActionBar ?: return
-        actionBar.setHomeButtonEnabled(true)
-        actionBar.setDisplayHomeAsUpEnabled(true)
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         setHasOptionsMenu(true)
 
         bannerAnotherCallLayout.setOnClickListener {

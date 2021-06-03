@@ -48,6 +48,8 @@ class MeetingActivity : PasscodeActivity() {
     private lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
+    private var meetingAction: String? = null
+
     // TODO: Move to a more common place
     private fun View.setMarginTop(marginTop: Int) {
         val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
@@ -62,10 +64,10 @@ class MeetingActivity : PasscodeActivity() {
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val meetingAction = intent.action
+        meetingAction = intent.action
 
-        initActionBar(meetingAction)
-        initNavigation(meetingAction)
+        initActionBar()
+        initNavigation()
         setStatusBarTranslucent(window, true)
     }
 
@@ -94,35 +96,35 @@ class MeetingActivity : PasscodeActivity() {
 
     /**
      * Initialize Action Bar and set icon according to param
-     *
-     * @param meetAction Create Meeting or Join Meeting
      */
-    private fun initActionBar(meetAction: String?) {
+    private fun initActionBar() {
         setSupportActionBar(binding.toolbar)
         val actionBar = supportActionBar ?: return
         actionBar.setHomeButtonEnabled(true)
         actionBar.setDisplayHomeAsUpEnabled(true)
         actionBar.title = ""
 
-        when (meetAction) {
+        when (meetingAction) {
             MEETING_ACTION_CREATE -> {
                 actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
                 // Toolbar should be set to TRANSPARENT in "Create Meeting"
                 actionBar.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }
-            MEETING_ACTION_JOIN, MEETING_ACTION_GUEST
+            MEETING_ACTION_JOIN
             -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_ACTION_IN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
+            MEETING_ACTION_GUEST -> {
+                actionBar.setHomeButtonEnabled(false)
+                actionBar.setDisplayHomeAsUpEnabled(false)
+            }
         }
     }
 
     /**
      * Initialize Navigation and set startDestination(initial screen)
      * according to the meeting action
-     *
-     * @param meetingAction Create Meeting or Join Meeting
      */
-    private fun initNavigation(meetingAction: String?) {
+    private fun initNavigation() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         val navController = navHostFragment.navController
@@ -213,7 +215,10 @@ class MeetingActivity : PasscodeActivity() {
     }
 
     override fun onBackPressed() {
+        if(meetingAction == MEETING_ACTION_GUEST) return
+
         super.onBackPressed()
+
         finish()
     }
 
