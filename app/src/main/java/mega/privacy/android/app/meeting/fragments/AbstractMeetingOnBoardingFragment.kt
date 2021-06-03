@@ -440,4 +440,13 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         sharedModel.removeLocalVideo(MEGACHAT_INVALID_HANDLE, videoListener)
         videoListener = null
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (sharedModel.cameraLiveData.value == true) {
+            sharedModel.releaseVideoDevice()
+        }
+
+        removeChatVideoListener()
+    }
 }

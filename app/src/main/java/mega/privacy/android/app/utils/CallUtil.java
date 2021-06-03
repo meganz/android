@@ -182,6 +182,8 @@ public class CallUtil {
      */
     public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link) {
         logDebug("Open meeting in guest mode");
+        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        MegaApplication.setOpeningMeetingLink(chatId, true);
         Intent intent = new Intent(context, MeetingActivity.class);
         intent.setAction(MEETING_ACTION_GUEST);
         if (!isTextEmpty(meetingName)) {
@@ -570,10 +572,10 @@ public class CallUtil {
         }
 
         if (call != null) {
-            chronometer.setVisibility(View.VISIBLE);
             chronometer.setBase(SystemClock.elapsedRealtime() - (call.getDuration()* 1000));
             chronometer.start();
             chronometer.setFormat(isNecessaryToShowChronoSeparator ? "· %s" : " %s");
+            chronometer.setVisibility(View.VISIBLE);
         }
     }
 

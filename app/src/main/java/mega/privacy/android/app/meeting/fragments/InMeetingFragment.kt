@@ -186,7 +186,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) -> {
                             logDebug("Change in my privileges")
                             if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
-                                showSnackbar(SNACKBAR_TYPE, getString(R.string.be_new_moderator), MEGACHAT_INVALID_HANDLE)
+                                showSnackbar(
+                                    SNACKBAR_TYPE,
+                                    getString(R.string.be_new_moderator),
+                                    MEGACHAT_INVALID_HANDLE
+                                )
                             }
                             bottomFloatingPanelViewHolder.updatePrivilege(inMeetingViewModel.getOwnPrivileges())
                         }
@@ -397,7 +401,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        MegaApplication.getInstance().unregisterProximitySensor()
+        MegaApplication.getInstance().startProximitySensor()
         initToolbar()
         initFloatingWindowContainerDragListener(view)
         initFloatingPanel()
@@ -449,7 +453,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         val currentCall: MegaChatCall? = inMeetingViewModel.getCall()
-
         if (currentCall != null && currentCall.status > MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
             when {
                 currentCall.hasLocalAudio() -> sharedModel.micInitiallyOn()
@@ -477,8 +480,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun takeActionByArgs() {
         when (args.action) {
-            MEETING_ACTION_CREATE -> initStartMeeting()
+            MEETING_ACTION_CREATE ->{
+                camIsEnable = sharedModel.cameraLiveData.value!!
+                bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
+                initStartMeeting()
+            }
             MEETING_ACTION_JOIN -> {
+                camIsEnable = sharedModel.cameraLiveData.value!!
+                bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
+
                 inMeetingViewModel.joinPublicChat(
                     args.chatId,
                     AutoJoinPublicChatListener(requireContext(), this)
@@ -501,7 +511,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                                 )
                                             }"
                                         )
-
+                                        camIsEnable = sharedModel.cameraLiveData.value!!
                                         inMeetingViewModel.joinPublicChat(
                                             args.chatId,
                                             AutoJoinPublicChatListener(
@@ -684,8 +694,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         }
                         else -> {
                             inMeetingViewModel.startMeeting(
-                                micIsEnable,
                                 camIsEnable,
+                                micIsEnable,
                                 StartChatCallListener(meetingActivity, this, this)
                             )
                         }
@@ -1245,8 +1255,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                 logDebug("Starting meeting ...")
                 inMeetingViewModel.startMeeting(
-                    micIsEnable,
                     camIsEnable,
+                    micIsEnable,
                     StartChatCallListener(requireContext(), this, this)
                 )
             }
@@ -1276,13 +1286,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Call status is " + CallUtil.callStatusToString(call.status))
         when (call.status) {
             MegaChatCall.CALL_STATUS_CONNECTING -> {
-
                 CallUtil.activateChrono(false, meetingChrono, null)
                 toolbarSubtitle?.let {
                     it.text = StringResourcesUtils.getString(R.string.chat_connecting)
                 }
             }
-            MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
+            
+            MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
                 if (inMeetingViewModel.isRequestSent() && !MegaApplication.isCreatingMeeting(
                         inMeetingViewModel.getChatId()
                     )
@@ -1295,6 +1305,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     toolbarSubtitle?.let {
                         it.text = StringResourcesUtils.getString(R.string.duration_meeting)
                     }
+
                     CallUtil.activateChrono(true, meetingChrono, call)
                 }
             }

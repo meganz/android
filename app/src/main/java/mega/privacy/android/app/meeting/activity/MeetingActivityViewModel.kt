@@ -341,6 +341,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
         _currentChatId.value?.let {
             if(it != MEGACHAT_INVALID_HANDLE){
+                logDebug("Clicked cam with chat")
                 meetingActivityRepository.switchCamera(
                     it,
                     bOn,
@@ -350,10 +351,22 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             }
         }
 
+        logDebug("Clicked cam without chat")
         //The chat is not yet created or the call is not yet established
         meetingActivityRepository.switchCameraBeforeStartMeeting(
             bOn,
             OpenVideoDeviceListener(MegaApplication.getInstance(), this)
+        )
+    }
+
+    /**
+     * Method to release the local video device
+     */
+    fun releaseVideoDevice() {
+        //The chat is not yet created or the call is not yet established
+        meetingActivityRepository.switchCameraBeforeStartMeeting(
+            false,
+            OpenVideoDeviceListener(MegaApplication.getInstance())
         )
     }
 

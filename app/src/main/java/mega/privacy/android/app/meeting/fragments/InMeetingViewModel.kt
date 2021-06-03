@@ -646,21 +646,21 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method to start a meeting from create meeting
      *
-     * @param audioEnable if the audio is enable
      * @param videoEnable if the video is enable
+     * @param audioEnable if the audio is enable
      * @param listener MegaChatRequestListenerInterface
      */
     fun startMeeting(
-        audioEnable: Boolean,
         videoEnable: Boolean,
+        audioEnable: Boolean,
         listener: MegaChatRequestListenerInterface
     ) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             logDebug("The chat exists")
             inMeetingRepository.startCall(
                 it.chatId,
-                audioEnable,
                 videoEnable,
+                audioEnable,
                 listener
             )
             return
@@ -1763,40 +1763,26 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for answer a call
      *
+     * @param videoEnable if video should be on
      * @param audioEnable if audio should be on
-     * @param audioEnable if video should be on
      * @param listener MegaChatRequestListenerInterface
      */
     fun answerChatCall(
-        audioEnable: Boolean,
         videoEnable: Boolean,
+        audioEnable: Boolean,
         listener: MegaChatRequestListenerInterface
     ) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            //The chat exists
+            logDebug("The chat exists")
             inMeetingRepository.answerCall(
                 it.chatId,
-                audioEnable,
                 videoEnable,
+                audioEnable,
                 listener
             )
             return
         }
     }
-
-    fun answerChatCall(
-        enableVideo: Boolean,
-        enableAudio: Boolean,
-        callback: AnswerChatCallListener.OnCallAnsweredCallback
-    ) = inMeetingRepository.answerCall(
-        currentChatId,
-        enableVideo,
-        enableAudio,
-        AnswerChatCallListener(
-            MegaApplication.getInstance().applicationContext,
-            callback
-        )
-    )
 
     /**
      * Get my own information

@@ -61,16 +61,17 @@ class InMeetingRepository @Inject constructor(
      * Method for starting a meeting
      *
      * @param chatId chat ID
-     * @param enableAudio if Audio is enabled
      * @param enableVideo if Video is enabled
+     * @param enableAudio if Audio is enabled
      * @param listener MegaChatRequestListenerInterface
      */
     fun startCall(
         chatId: Long,
-        enableAudio: Boolean,
         enableVideo: Boolean,
+        enableAudio: Boolean,
         listener: MegaChatRequestListenerInterface
     ) {
+        logDebug("Starting call with video enable $enableVideo and audio enable $enableAudio")
         megaChatApi.startChatCall(chatId, enableVideo, enableAudio, listener)
     }
 
@@ -84,10 +85,11 @@ class InMeetingRepository @Inject constructor(
      */
     fun answerCall(
         chatId: Long,
-        enableAudio: Boolean,
         enableVideo: Boolean,
+        enableAudio: Boolean,
         listener: MegaChatRequestListenerInterface
     ) {
+        logDebug("Answering call with video enable $enableVideo and audio enable $enableAudio")
         megaChatApi.answerChatCall(chatId, enableVideo, enableAudio, listener)
     }
 

@@ -127,7 +127,7 @@ class MeetingActivityRepository @Inject constructor(
      */
     fun removeLocalVideo(chatId: Long, listener: MeetingVideoListener) {
         logDebug("Removed Chat video listener")
-        megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, listener)
+        megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, true, listener)
     }
 
     /**

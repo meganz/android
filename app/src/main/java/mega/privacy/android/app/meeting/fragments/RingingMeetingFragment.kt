@@ -48,7 +48,7 @@ import java.util.*
 
 
 @AndroidEntryPoint
-class RingingMeetingFragment : MeetingBaseFragment() {
+class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnCallAnsweredCallback {
 
     private val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
@@ -161,7 +161,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
                     binding.answerVideoFab.hide()
                     inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
 
-                    answerCall(enableVideo = true)
+                    answerCall(true, true)
                 }
             })
         }
@@ -186,41 +186,15 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         binding.fourthArrowCall.clearAnimationAndGone()
     }
 
-    private fun answerCall(
-        enableVideo: Boolean,
-        enableAudio: Boolean = true
-    ) = inMeetingViewModel.answerChatCall(
-        enableVideo,
-        enableAudio,
-        object : AnswerChatCallListener.OnCallAnsweredCallback {
-
-            override fun onCallAnswered(chatId: Long, flag: Boolean) {
-                val actionString = if (flag) {
-                    logDebug("Call answered with video ON and audio ON")
-                    MEETING_ACTION_RINGING_VIDEO_ON
-                } else {
-                    logDebug("Call answered with video OFF and audio ON")
-                    MEETING_ACTION_RINGING_VIDEO_OFF
-                }
-
-                val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
-                    actionString,
-                    chatId
-                )
-                findNavController().navigate(action)
-            }
-
-            override fun onErrorAnsweredCall(errorCode: Int) {
-                if (errorCode == MegaChatError.ERROR_TOOMANY) {
-                    showSnackBar(StringResourcesUtils.getString(R.string.call_error_too_many_participants)
-                    )
-                } else {
-                    showSnackBar(StringResourcesUtils.getString(R.string.call_error),)
-                }
-
-                MegaApplication.getInstance().removeRTCAudioManager()
-            }
-        })
+    private fun answerCall(enableVideo: Boolean, enableAudio: Boolean) {
+        inMeetingViewModel.getCall()?.let {
+            inMeetingViewModel.answerChatCall(
+                enableVideo,
+                enableAudio,
+                AnswerChatCallListener(requireContext(), this)
+            )
+        }
+    }
 
     private fun animationAlphaArrows(arrow: ImageView) {
         logDebug("animationAlphaArrows")
@@ -362,5 +336,31 @@ class RingingMeetingFragment : MeetingBaseFragment() {
         private const val ALPHA_ANIMATION_DURATION = 1000L
         private const val ALPHA_ANIMATION_DELAY = 250L
 
+    }
+
+    override fun onCallAnswered(chatId: Long, flag: Boolean) {
+        val actionString = if (flag) {
+            logDebug("Call answered with video ON and audio ON")
+            MEETING_ACTION_RINGING_VIDEO_ON
+        } else {
+            logDebug("Call answered with video OFF and audio ON")
+            MEETING_ACTION_RINGING_VIDEO_OFF
+        }
+
+        val action = RingingMeetingFragmentDirections.actionGlobalInMeeting(
+            actionString,
+            chatId
+        )
+        findNavController().navigate(action)
+    }
+
+    override fun onErrorAnsweredCall(errorCode: Int) {
+        if (errorCode == MegaChatError.ERROR_TOOMANY) {
+            showSnackBar(
+                StringResourcesUtils.getString(R.string.call_error_too_many_participants)
+            )
+        } else {
+            showSnackBar(StringResourcesUtils.getString(R.string.call_error))
+        }
     }
 }
