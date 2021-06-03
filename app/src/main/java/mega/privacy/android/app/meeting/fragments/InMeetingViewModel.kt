@@ -550,21 +550,6 @@ class InMeetingViewModel @ViewModelInject constructor(
                     }
                 }
             }
-
-            TYPE_OWN_PRIVILEGE -> {
-                bannerText?.let {
-                    it.setBackgroundColor(
-                        ContextCompat.getColor(
-                            MegaApplication.getInstance().applicationContext,
-                            R.color.teal_300
-                        )
-                    )
-                    it.text = StringResourcesUtils.getString(
-                        R.string.your_are_moderator
-                    )
-                    return true
-                }
-            }
         }
 
         return false
