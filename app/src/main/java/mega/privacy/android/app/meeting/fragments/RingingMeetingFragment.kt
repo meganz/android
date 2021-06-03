@@ -109,7 +109,7 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
         binding.answerAudioFab.setOnClickListener {
             inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
 
-            answerCall(true, false)
+            answerCall(enableVideo = false, enableAudio = true)
         }
 
         binding.answerVideoFab.setOnTouchListener(object : OnSwipeTouchListener(meetingActivity) {
@@ -161,7 +161,7 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
                     binding.answerVideoFab.hide()
                     inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
 
-                    answerCall(true, true)
+                    answerCall(enableVideo = true, enableAudio = true)
                 }
             })
         }

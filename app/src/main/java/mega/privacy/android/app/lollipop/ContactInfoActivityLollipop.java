@@ -307,6 +307,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 	private final Observer<MegaChatCall> callStatusObserver = call -> {
 		int callStatus = call.getStatus();
 		switch (callStatus) {
+			case MegaChatCall.CALL_STATUS_CONNECTING:
 			case MegaChatCall.CALL_STATUS_IN_PROGRESS:
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
