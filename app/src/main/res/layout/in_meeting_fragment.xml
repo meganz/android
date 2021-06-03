@@ -4,6 +4,14 @@
     android:layout_height="match_parent"
     android:background="@color/grey_900">
 
+    <ImageView
+        android:id="@+id/reconnecting"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:src="@drawable/ic_call_cancelled"
+        android:layout_gravity="center"
+        android:visibility="visible" />
+
     <FrameLayout
         android:id="@+id/meeting_container"
         android:layout_width="match_parent"

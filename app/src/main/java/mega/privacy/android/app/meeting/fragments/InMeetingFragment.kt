@@ -213,10 +213,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 updateToolbarSubtitle(it)
                 when (it.status) {
                     MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> finishActivity()
+                    MegaChatCall.CALL_STATUS_CONNECTING -> {
+                        if(inMeetingViewModel.isReconnectingStatus){
+                            reconnecting()
+                        }else{
+                            binding.reconnecting.isVisible = false
+                            showFixedBanner(MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
+                        }
+                        checkMenuItemsVisibility()
+                    }
+                    MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
+                        showFixedBanner(MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
+                        checkMenuItemsVisibility()
+                        checkChildFragments()
+                    }
                 }
-            } else {
-                checkAnotherCall()
             }
+        } else {
+            checkAnotherCall()
         }
     }
 
@@ -1036,6 +1050,35 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    private fun reconnecting(){
+        removeUI()
+        binding.reconnecting.isVisible = true
+        showFixedBanner(MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
+    }
+
+    private fun removeUI(){
+        status = NOT_TYPE
+        MegaApplication.getInstance().unregisterProximitySensor()
+
+        individualCallFragment?.let {
+            removeChildFragment(it)
+        }
+        floatingWindowFragment?.let {
+            removeChildFragment(it)
+        }
+        speakerViewCallFragment?.let {
+            removeChildFragment(it)
+        }
+        gridViewCallFragment?.let {
+            removeChildFragment(it)
+        }
+    }
+
+    private fun checkMenuItemsVisibility(){
+        checkGridSpeakerViewMenuItemVisibility()
+        checkSwapCameraMenuItemVisibility()
+    }
+
     /**
      * Control the UI of the call, whether one-to-one or meeting
      */
@@ -1043,6 +1086,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         val call: MegaChatCall = inMeetingViewModel.getCall() ?: return
 
         logDebug("Check child fragments")
+        binding.reconnecting.isVisible = false
 
         if (call.status >= MegaChatCall.CALL_STATUS_JOINING) {
             when {
@@ -1319,8 +1363,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         gridViewMenuItem = menu.findItem(R.id.grid_view)
         swapCameraMenuItem = menu.findItem(R.id.swap_camera)
 
-        checkGridSpeakerViewMenuItemVisibility()
-        checkSwapCameraMenuItemVisibility()
+       checkMenuItemsVisibility()
     }
 
     /**
@@ -1336,6 +1379,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to show or hide the buttons change to grid/speaker view
      */
     private fun checkGridSpeakerViewMenuItemVisibility() {
+        inMeetingViewModel.getCall()?.let { call ->
+            if(call.status == MegaChatCall.CALL_STATUS_CONNECTING){
+                gridViewMenuItem?.let {
+                    it.isVisible = false
+                }
+                speakerViewMenuItem?.let {
+                    it.isVisible = false
+                }
+                return
+            }
+        }
+
         when (status) {
             TYPE_IN_GRID_VIEW -> {
                 gridViewMenuItem?.let {
@@ -1464,7 +1519,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.alpha = 1f
                     logDebug("Show fixed banner")
                     it.isVisible = true
-                    if (type != TYPE_NETWORK_QUALITY) {
+                    if (type != TYPE_NETWORK_QUALITY && type!= TYPE_RECONNECTING) {
                         it.animate()?.alpha(0f)?.duration = INFO_ANIMATION.toLong()
                     }
                 }
@@ -1967,21 +2022,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onPause() {
         super.onPause()
-        status = NOT_TYPE
-        MegaApplication.getInstance().unregisterProximitySensor()
-
-        individualCallFragment?.let {
-            removeChildFragment(it)
-        }
-        floatingWindowFragment?.let {
-            removeChildFragment(it)
-        }
-        speakerViewCallFragment?.let {
-            removeChildFragment(it)
-        }
-        gridViewCallFragment?.let {
-            removeChildFragment(it)
-        }
+        removeUI()
     }
 
     override fun onDestroy() {

@@ -40,6 +40,7 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     var isSpeakerSelectionAutomatic: Boolean = true
     var isFromReconnectingStatus: Boolean = false
+    var isReconnectingStatus: Boolean = false
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
@@ -87,7 +88,10 @@ class InMeetingViewModel @ViewModelInject constructor(
                         isFromReconnectingStatus = false
                     }
                 }
+
+                isReconnectingStatus = (previousState == CALL_STATUS_IN_PROGRESS || previousState == CALL_STATUS_JOINING) && it.status == CALL_STATUS_CONNECTING
                 previousState = it.status
+
             }
         }
 
@@ -521,6 +525,25 @@ class InMeetingViewModel @ViewModelInject constructor(
         type: Int
     ): Boolean {
         when (type) {
+            TYPE_RECONNECTING ->{
+                //Check local network quality
+                _callLiveData.value?.let {
+                    if (isReconnectingStatus) {
+                        bannerText?.let { textView ->
+                            textView.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    MegaApplication.getInstance().applicationContext,
+                                    R.color.amber_700_amber_300
+                                )
+                            )
+                            textView.text = StringResourcesUtils.getString(
+                                R.string.reconnecting_message
+                            )
+                            return true
+                        }
+                    }
+                }
+            }
             TYPE_JOIN -> {
                 bannerText?.let {
                     it.setBackgroundColor(
@@ -660,7 +683,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun isNecessaryToShowSwapCameraOption(): Boolean {
         _callLiveData.value?.let {
-            return it.hasLocalVideo() && !it.isOnHold
+            return it.status != CALL_STATUS_CONNECTING && it.hasLocalVideo() && !it.isOnHold
         }
 
         return false
