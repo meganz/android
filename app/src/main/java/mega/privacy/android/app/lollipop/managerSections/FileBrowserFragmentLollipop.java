@@ -348,15 +348,16 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			boolean showShareFolder = true;
 			boolean showTrash = true;
 			boolean showRemoveShare = true;
-			boolean showSaveToGallery = false;
+			int mediaCounter = 0;
 
 			for (MegaNode node : selected) {
 				if (!node.isFile()) {
 					showSendToChat = false;
-					showSaveToGallery = false;
 				} else {
 					MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
-					showSaveToGallery = nodeMime.isImage() || nodeMime.isVideo();
+					if (nodeMime.isImage() || nodeMime.isVideo()) {
+						mediaCounter++;
+					}
 				}
 				if (!node.isFolder() || (MegaNodeUtil.isOutShare(node) && selected.size() > 1)) {
 					showShareFolder = false;
@@ -385,12 +386,17 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				control.removeShare().setVisible(true);
 			}
 
-			control.saveToGallery().setVisible(showSaveToGallery);
+			if (mediaCounter == selected.size()) {
+				control.saveToGallery().setVisible(true)
+						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			} else {
+				control.saveToGallery().setVisible(false);
+			}
 
 			control.trash().setVisible(showTrash);
 
 			control.shareOut().setVisible(true)
-					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
 			control.move().setVisible(true);
 			control.copy().setVisible(true);

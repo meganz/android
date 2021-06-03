@@ -4358,20 +4358,15 @@ public class ChatActivityLollipop extends PasscodeActivity
                     break;
 
                 case R.id.chat_cab_menu_download:
+                case R.id.chat_cab_menu_download_gallery:
+                    logDebug("chat_cab_menu_download ");
                     ArrayList<MegaNodeList> list = new ArrayList<>();
                     for (int i = 0; i < messagesSelected.size(); i++) {
                         MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
                         list.add(megaNodeList);
                     }
-                    nodeSaver.saveNodeLists(list, false, false, false, true, false);
-                    break;
-                case R.id.chat_cab_menu_download_gallery:
-                    ArrayList<MegaNodeList> selectedNodes = new ArrayList<>();
-                    for (int i = 0; i < messagesSelected.size(); i++) {
-                        MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
-                        selectedNodes.add(megaNodeList);
-                    }
-                    nodeSaver.saveNodeLists(selectedNodes, false, false, false, true, true);
+                    nodeSaver.saveNodeLists(list, false, false, false, true,
+                            item.getItemId() == R.id.chat_cab_menu_download_gallery);
                     break;
 
                 case R.id.chat_cab_menu_import:
