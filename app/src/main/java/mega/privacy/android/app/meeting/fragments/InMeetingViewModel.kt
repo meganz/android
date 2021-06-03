@@ -26,6 +26,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatCall.*
 import org.jetbrains.anko.defaultSharedPreferences
 import java.util.*
 
@@ -35,8 +36,10 @@ class InMeetingViewModel @ViewModelInject constructor(
     HangChatCallListener.OnCallHungUpCallback {
 
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
+    var previousState: Int = CALL_STATUS_INITIAL
 
     var isSpeakerSelectionAutomatic: Boolean = true
+    var isFromReconnectingStatus: Boolean = false
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
@@ -71,9 +74,29 @@ class InMeetingViewModel @ViewModelInject constructor(
             }
         }
 
+    private val updateCallStatusObserver =
+        Observer<MegaChatCall> {
+            if (isSameChatRoom(it.chatid)) {
+                if ((it.status == CALL_STATUS_IN_PROGRESS || it.status == CALL_STATUS_JOINING) && previousState == CALL_STATUS_CONNECTING) {
+                    logDebug("Is from reconnecting status")
+                    isFromReconnectingStatus = true
+                } else {
+                    if (previousState == CALL_STATUS_JOINING && it.status == CALL_STATUS_IN_PROGRESS) {
+                        logDebug("No changes necessary")
+                    } else {
+                        isFromReconnectingStatus = false
+                    }
+                }
+                previousState = it.status
+            }
+        }
+
     init {
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .observeForever(updateCallObserver)
+
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+            .observeForever(updateCallStatusObserver)
     }
 
     /**
@@ -1708,6 +1731,9 @@ class InMeetingViewModel @ViewModelInject constructor(
 
         LiveEventBus.get(EVENT_UPDATE_CALL, MegaChatCall::class.java)
             .removeObserver(updateCallObserver)
+
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+            .removeObserver(updateCallStatusObserver)
     }
 
     override fun onEditedChatRoomName(chatId: Long, name: String) {

@@ -222,7 +222,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private val callCompositionObserver = Observer<MegaChatCall> {
         if (inMeetingViewModel.isSameCall(it.callId) &&
-            it.status != INVALID_CALL_STATUS &&
+            it.status != INVALID_CALL_STATUS && !inMeetingViewModel.isFromReconnectingStatus &&
             (it.callCompositionChange == 1 || it.callCompositionChange == -1)
         ) {
             logDebug("Change in call composition, review the UI")
@@ -291,40 +291,41 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val sessionStatusObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                when {
-                    !inMeetingViewModel.isOneToOneCall() -> {
-                        when (callAndSession.second.status) {
-                            MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
-                                logDebug("Session in progress")
-                                val position =
-                                    inMeetingViewModel.addParticipant(
-                                        callAndSession.second,
-                                        status
-                                    )
-                                position?.let {
-                                    if (position != INVALID_POSITION) {
-                                        checkChildFragments()
-                                        participantAddedOfLeftMeeting(true, it)
+                if(!inMeetingViewModel.isFromReconnectingStatus){
+                    when {
+                        !inMeetingViewModel.isOneToOneCall() -> {
+                            when (callAndSession.second.status) {
+                                MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
+                                    logDebug("Session in progress")
+                                    val position =
+                                        inMeetingViewModel.addParticipant(
+                                            callAndSession.second,
+                                            status
+                                        )
+                                    position?.let {
+                                        if (position != INVALID_POSITION) {
+                                            checkChildFragments()
+                                            participantAddedOfLeftMeeting(true, it)
+                                        }
                                     }
                                 }
-                            }
-                            MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                                logDebug("Session destroyed")
-                                val position =
-                                    inMeetingViewModel.removeParticipant(callAndSession.second)
-                                position?.let {
-                                    if (position != INVALID_POSITION) {
-                                        checkChildFragments()
-                                        participantAddedOfLeftMeeting(false, it)
+                                MegaChatSession.SESSION_STATUS_DESTROYED -> {
+                                    logDebug("Session destroyed")
+                                    val position =
+                                        inMeetingViewModel.removeParticipant(callAndSession.second)
+                                    position?.let {
+                                        if (position != INVALID_POSITION) {
+                                            checkChildFragments()
+                                            participantAddedOfLeftMeeting(false, it)
+                                        }
                                     }
                                 }
                             }
                         }
+                        else -> checkChildFragments()
                     }
-                    else -> checkChildFragments()
+                    showBannerInfo()
                 }
-
-                showBannerInfo()
             } else {
                 checkAnotherCall()
             }
