@@ -361,7 +361,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         updateViewSelected();
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) binding.viewTypeLayout.getLayoutParams();
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.viewTypeLayout.getLayoutParams();
             params.width = outMetrics.heightPixels;
             binding.viewTypeLayout.setLayoutParams(params);
         }

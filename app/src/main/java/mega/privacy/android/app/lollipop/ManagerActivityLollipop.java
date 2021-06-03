@@ -8967,6 +8967,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void updateEnableCUButton(int visibility) {
+		if (enableCUButton.getVisibility() == visibility) {
+			return;
+		}
+
 		if ((visibility == View.GONE && cuProgressBar.getVisibility() == View.GONE)
 				|| (visibility == View.VISIBLE && cuLayout.getVisibility() == View.GONE)) {
 			updateCULayout(visibility);
