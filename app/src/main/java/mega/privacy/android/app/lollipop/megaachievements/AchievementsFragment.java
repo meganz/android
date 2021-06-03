@@ -7,6 +7,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -41,6 +42,7 @@ import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 public class AchievementsFragment extends BaseFragment implements OnClickListener
 		, GetAchievementsListener.DataCallback {
 	private RelativeLayout registrationLayout;
+	private LinearLayout separatorRegistration;
 	private RelativeLayout figuresInstallAppLayout;
 	private TextView zeroFiguresInstallAppText;
 
@@ -129,6 +131,7 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 		zeroFiguresReferralBonusesText = (TextView) v.findViewById(R.id.zero_figures_referral_bonuses_text);
 
+		separatorRegistration = (LinearLayout) v.findViewById(R.id.separator_registration);
 		registrationLayout = (RelativeLayout) v.findViewById(R.id.registration_layout);
         registrationLayout.setOnClickListener(this);
 
@@ -535,8 +538,11 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 			}
 			else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME){
 				logDebug("MEGA_ACHIEVEMENT_WELCOME");
+
 				registrationLayout.setVisibility(View.VISIBLE);
+				separatorRegistration.setVisibility(View.VISIBLE);
 				long storageRegistration = details.getRewardStorageByAwardId(awardId);
+
 				if(storageRegistration >0){
 					figureRegistrationStorage.setText(getSizeString(storageRegistration));
 					figureRegistrationStorage.setVisibility(View.VISIBLE);
