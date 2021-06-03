@@ -1405,7 +1405,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	break;
 	        }
 
-            case REQUEST_CAMERA_UPLOAD:{
+            case REQUEST_CAMERA_UPLOAD:
+			case REQUEST_CAMERA_ON_OFF:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     checkIfShouldShowBusinessCUAlert();
                 } else {
@@ -1413,18 +1414,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 }
 
                 break;
-            }
 
-            case REQUEST_CAMERA_ON_OFF: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    checkIfShouldShowBusinessCUAlert();
-                } else {
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.on_refuse_storage_permission), INVALID_HANDLE);
-                }
-                break;
-            }
-
-            case REQUEST_CAMERA_ON_OFF_FIRST_TIME:{
+			case REQUEST_CAMERA_ON_OFF_FIRST_TIME:
                 if(permissions.length == 0) {
                     return;
                 }
@@ -1441,7 +1432,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 }
 
                 break;
-            }
 
 			case PermissionsFragment.PERMISSIONS_FRAGMENT: {
 				pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
@@ -2067,7 +2057,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		enableCUButton = findViewById(R.id.enable_cu_button);
 		enableCUButton.setOnClickListener(v -> {
 			if (getCameraUploadFragment() != null) {
-				updateCULayout(View.GONE);
 				cuFragment.enableCUClick();
 			}
 		});
@@ -3076,8 +3065,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void checkIfShouldShowBusinessCUAlert() {
 		if (megaApi.isBusinessAccount() && !megaApi.isMasterBusinessAccount()) {
 			showBusinessCUAlert();
-		} else {
-		    enableCU();
+		} else if (getCameraUploadFragment() != null){
+			if (cuFragment.isEnableCUFragmentShown()) {
+				cuFragment.enableCu();
+			} else {
+				cuFragment.enableCUClick();
+			}
 		}
 	}
 
@@ -3087,24 +3080,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         }
 
 		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(R.string.section_photo_sync)
-                .setMessage(R.string.camera_uploads_business_alert)
-                .setNegativeButton(R.string.general_cancel, (dialog, which) -> {})
-                .setPositiveButton(R.string.general_enable, (dialog, which) -> enableCU())
+		builder.setTitle(R.string.section_photo_sync)
+				.setMessage(R.string.camera_uploads_business_alert)
+				.setNegativeButton(R.string.general_cancel, (dialog, which) -> { })
+				.setPositiveButton(R.string.general_enable, (dialog, which) -> {
+					if (getCameraUploadFragment() != null) {
+						cuFragment.enableCUClick();
+					}
+				})
 				.setCancelable(false)
 				.setOnDismissListener(dialog -> setBusinessAlertShown(isBusinessCUAlertShown = false));
-        businessCUAlert = builder.create();
-        businessCUAlert.show();
-        isBusinessCUAlertShown = true;
+		businessCUAlert = builder.create();
+		businessCUAlert.show();
+		isBusinessCUAlertShown = true;
     }
-
-	private void enableCU() {
-		if (getCameraUploadFragment() == null) {
-			return;
-		}
-
-		cuFragment.enableCu();
-	}
 
 	private void openContactLink (long handle) {
     	if (handle == -1) {

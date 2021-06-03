@@ -250,7 +250,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (binding == null) {
+        if (viewModel.isEnableCUShown()) {
+            mManagerActivity.updateCULayout(View.GONE);
             return;
         }
 
@@ -501,22 +502,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     private void showYearCards(List<CUCard> yearCards) {
         if (selectedView == YEARS_VIEW) {
             cardAdapter.setCards(yearCards);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_CAMERA_ON_OFF:
-            case REQUEST_CAMERA_ON_OFF_FIRST_TIME: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mManagerActivity.checkIfShouldShowBusinessCUAlert();
-                }
-                break;
-            }
         }
     }
 
