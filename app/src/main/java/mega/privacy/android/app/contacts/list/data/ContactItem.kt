@@ -23,7 +23,11 @@ sealed class ContactItem(val id: Long) {
     ) : ContactItem(handle) {
 
         fun getTitle(): String =
-            firstName ?: email
+            when {
+                firstName.isNullOrBlank() -> email
+                lastName.isNullOrBlank() && !firstName.isNullOrBlank() -> firstName
+                else -> "$firstName $lastName"
+            }
 
         fun getFirstCharacter(): String =
             getTitle().first().toString().toUpperCase(Locale.getDefault())

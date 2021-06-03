@@ -110,6 +110,8 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
@@ -130,6 +132,7 @@ import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.contacts.ContactsActivity;
+import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -214,6 +217,7 @@ import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
+import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.LinksUtil;
@@ -359,6 +363,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	CookieDialogHandler cookieDialogHandler;
 	@Inject
 	SortOrderManagement sortOrderManagement;
+	@Inject
+	InviteContactUseCase inviteContactUseCase;
 
 	public int accountFragment;
 
@@ -453,6 +459,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private boolean userEmailChanged;
 
 	private AlertDialog reconnectDialog;
+	private AlertDialog inviteContactDialog;
 
 	private RelativeLayout navigationDrawerAddPhoneContainer;
     int orientationSaved;
@@ -2520,7 +2527,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					else if(getIntent().getAction().equals(ACTION_IPC)){
 						logDebug("IPC link - go to received request in Contacts");
 						markNotificationsSeen(true);
-						startActivity(ContactsActivity.getReceivedRequestsIntent(this));
+						navigateToContactRequests();
 						selectDrawerItemPending=false;
 					}
 					else if(getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
@@ -3068,7 +3075,79 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		dismissOpenLinkDialog();
 		logDebug("Handle to invite a contact: " + handle);
-		navigateToContacts();
+
+		inviteContactUseCase.getContactLink(handle)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					if (throwable == null) {
+						showContactInviteDialog(result.getContactLinkHandle(), result.getFullName(), result.getEmail(), result.isContact());
+					}
+				});
+	}
+
+	private void showContactInviteDialog(Long linkHandle, String fullName, String email, boolean isContact) {
+		if (inviteContactDialog != null && inviteContactDialog.isShowing()) return;
+
+		String message;
+		String buttonText;
+
+		if (isContact) {
+			message = getString(R.string.context_contact_already_exists, email);
+			buttonText = getString(R.string.contact_view);
+		} else {
+			message = getString(R.string.invite_not_sent);
+			buttonText = getString(R.string.contact_invite);
+		}
+
+		inviteContactDialog = new MaterialAlertDialogBuilder(this)
+				.setTitle(fullName)
+				.setMessage(message)
+				.setNegativeButton(R.string.general_cancel, null)
+				.setPositiveButton(buttonText, (dialog, which) -> {
+					if (isContact) {
+						ContactUtil.openContactInfoActivity(this, email);
+					} else {
+						sendContactInvitation(linkHandle, email);
+					}
+
+					dialog.dismiss();
+					inviteContactDialog = null;
+				})
+				.create();
+		inviteContactDialog.show();
+	}
+
+	private void sendContactInvitation(Long contactLinkHandle, String email) {
+		inviteContactUseCase.invite(contactLinkHandle, email)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((result, throwable) -> {
+					String snackbarMessage = getString(R.string.general_error);
+					if (throwable == null) {
+						switch (result) {
+							case SENT:
+								snackbarMessage = getString(R.string.context_contact_request_sent, email);
+								break;
+							case RESENT:
+								snackbarMessage = getString(R.string.context_contact_invitation_resent);
+								break;
+							case DELETED:
+								snackbarMessage = getString(R.string.context_contact_invitation_deleted);
+								break;
+							case ALREADY_SENT:
+								snackbarMessage = getString(R.string.invite_not_sent_already_sent, email);
+								break;
+							case ALREADY_CONTACT:
+								snackbarMessage = getString(R.string.context_contact_already_exists, email);
+								break;
+							case INVALID_EMAIL:
+								snackbarMessage = getString(R.string.error_own_email_as_contact);
+								break;
+						}
+					}
+					showSnackbar(SNACKBAR_TYPE, snackbarMessage, -1);
+				});
 	}
 
 	private void askForSMSVerification() {
@@ -3548,7 +3627,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				else if(getIntent().getAction().equals(ACTION_IPC)){
 					logDebug("IPC - go to received request in Contacts");
 					markNotificationsSeen(true);
-					startActivity(ContactsActivity.getReceivedRequestsIntent(this));
+					navigateToContactRequests();
 				}
 				else if(getIntent().getAction().equals(ACTION_CHAT_NOTIFICATION_MESSAGE)){
 					logDebug("ACTION_CHAT_NOTIFICATION_MESSAGE");
@@ -9215,11 +9294,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void navigateToContacts(){
-		showHideBottomNavigationView(true);
+		drawerLayout.closeDrawer(Gravity.LEFT);
 		startActivity(ContactsActivity.getListIntent(this));
 	}
 
 	public void navigateToContactRequests(){
+		drawerLayout.closeDrawer(Gravity.LEFT);
 		startActivity(ContactsActivity.getReceivedRequestsIntent(this));
 	}
 
