@@ -45,7 +45,7 @@
   <!-- Snackbar text for incorrect name -->
   <string name="scan_snackbar_incorrect_name">先に進む前にファイル名を修正してください</string>
   <!-- Dialog message showing file progress -->
-  <string name="scan_dialog_progress">%1$sを準備しています。お待ちください&#x2026;</string>
+  <string name="scan_dialog_progress">%1$sを準備しています。お待ちください&#8230;</string>
   <!-- Error shown when the user writes a character not allowed -->
   <string name="scan_snackbar_invalid_characters">次の文字は許可されていません： ” * / : &lt; &gt; ? \ |</string>
 </resources>
