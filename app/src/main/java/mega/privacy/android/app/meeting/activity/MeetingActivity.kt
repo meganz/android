@@ -110,13 +110,9 @@ class MeetingActivity : PasscodeActivity() {
                 // Toolbar should be set to TRANSPARENT in "Create Meeting"
                 actionBar.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }
-            MEETING_ACTION_JOIN
+            MEETING_ACTION_JOIN,  MEETING_ACTION_GUEST
             -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_ACTION_IN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
-            MEETING_ACTION_GUEST -> {
-                actionBar.setHomeButtonEnabled(false)
-                actionBar.setDisplayHomeAsUpEnabled(false)
-            }
         }
     }
 
@@ -190,7 +186,12 @@ class MeetingActivity : PasscodeActivity() {
                 if (!meetingViewModel.isChatCreated()) {
                     MegaApplication.getInstance().removeRTCAudioManager()
                 }
-                onBackPressed()
+
+                if(meetingAction == MEETING_ACTION_GUEST) {
+                    super.onBackPressed()
+                } else {
+                    onBackPressed()
+                }
             }
         }
         return super.onOptionsItemSelected(item)
