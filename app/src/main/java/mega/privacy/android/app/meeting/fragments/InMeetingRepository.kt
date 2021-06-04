@@ -113,7 +113,7 @@ class InMeetingRepository @Inject constructor(
      * @return True, if it's me. False, otherwise
      */
     fun isMe(peerId: Long?): Boolean {
-        return peerId == megaChatApi.myUserHandle
+        return peerId == megaApi.myUserHandleBinary
     }
 
 
@@ -211,6 +211,23 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
+     * Method for getting a participant's email
+     *
+     * @param peerId userHandle
+     * @param listener MegaRequestListenerInterface
+     * @return the email
+     */
+    fun getEmailParticipant(peerId: Long, listener: MegaRequestListenerInterface): String? {
+        val email = megaChatApi.getUserEmailFromCache(peerId)
+
+        if (email != null)
+            return email
+
+        megaApi.getUserEmail(peerId, listener)
+        return null
+    }
+
+    /**
      * Get the avatar
      *
      * @param chat
@@ -244,9 +261,9 @@ class InMeetingRepository @Inject constructor(
             isVideoOn = it.hasLocalVideo()
         }
 
-        val avatar = getAvatarBitmap(chat, megaChatApi.myUserHandle)
+        val avatar = getAvatarBitmap(chat, megaApi.myUserHandleBinary)
         return Participant(
-            megaChatApi.myUserHandle,
+            megaApi.myUserHandleBinary,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname,
             avatar,
@@ -257,7 +274,9 @@ class InMeetingRepository @Inject constructor(
             isContact = false,
             isSpeaker = true,
             hasHiRes = true,
-            videoListener = null
+            videoListener = null,
+            isChosenForAssign = false,
+            isGuest = false
         )
     }
 
@@ -488,7 +507,7 @@ class InMeetingRepository @Inject constructor(
 
     fun getMyInfo(moderator: Boolean, audio: Boolean, video: Boolean): Participant {
         return Participant(
-            megaChatApi.myUserHandle,
+            megaApi.myUserHandleBinary,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname ?: "",
             null, true, moderator, audio, video
@@ -512,7 +531,7 @@ class InMeetingRepository @Inject constructor(
         val mail = ChatController(context).getParticipantEmail(peerId)
 
         val userHandleString = MegaApiAndroid.userHandleToBase64(peerId)
-        val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaChatApi.myUserHandle)
+        val myUserHandleEncoded = MegaApiAndroid.userHandleToBase64(megaApi.myUserHandleBinary)
         bitmap = if (userHandleString == myUserHandleEncoded) {
             AvatarUtil.getAvatarBitmap(mail)
         } else {

@@ -1156,7 +1156,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         individualCallFragment = IndividualCallFragment.newInstance(
             chatId,
-            megaChatApi.myUserHandle,
+            megaApi.myUserHandleBinary,
             false
         )
 
@@ -1186,7 +1186,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (floatingWindowFragment == null) {
             floatingWindowFragment = IndividualCallFragment.newInstance(
                 chatId,
-                megaChatApi.myUserHandle,
+                megaApi.myUserHandleBinary,
                 true
             )
         }
@@ -1629,10 +1629,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             if (it.isAdded) {
                 when {
                     camOn -> {
-                        it.checkVideoOn(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
+                        it.checkVideoOn(megaApi.myUserHandleBinary, MEGACHAT_INVALID_HANDLE)
                     }
                     else -> {
-                        it.videoOffUI(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
+                        it.videoOffUI(megaApi.myUserHandleBinary, MEGACHAT_INVALID_HANDLE)
                     }
                 }
             }
@@ -1642,10 +1642,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             if (it.isAdded) {
                 when {
                     camOn -> {
-                        it.checkVideoOn(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
+                        it.checkVideoOn(megaApi.myUserHandleBinary, MEGACHAT_INVALID_HANDLE)
                     }
                     else -> {
-                        it.videoOffUI(megaChatApi.myUserHandle, MEGACHAT_INVALID_HANDLE)
+                        it.videoOffUI(megaApi.myUserHandleBinary, MEGACHAT_INVALID_HANDLE)
                     }
                 }
             }

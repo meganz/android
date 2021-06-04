@@ -15,6 +15,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
+import mega.privacy.android.app.listeners.GetUserEmailListener
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
@@ -33,7 +34,7 @@ import java.util.*
 class InMeetingViewModel @ViewModelInject constructor(
     private val inMeetingRepository: InMeetingRepository
 ) : ViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
-    HangChatCallListener.OnCallHungUpCallback {
+    HangChatCallListener.OnCallHungUpCallback, GetUserEmailListener.OnUserEmailUpdateCallback {
 
     var currentChatId: Long = MEGACHAT_INVALID_HANDLE
     var previousState: Int = CALL_STATUS_INITIAL
@@ -829,6 +830,8 @@ class InMeetingViewModel @ViewModelInject constructor(
         val avatar = participant.avatar
         val isAudioOn = participant.isAudioOn
         val isVideoOn = participant.isVideoOn
+        val isChosenForAssign = participant.isChosenForAssign
+        val isGuest = participant.isGuest
 
         return Participant(
             peerId,
@@ -842,7 +845,9 @@ class InMeetingViewModel @ViewModelInject constructor(
             isContact = false,
             isSpeaker = true,
             hasHiRes = true,
-            videoListener = null
+            videoListener = null,
+            isChosenForAssign,
+            isGuest
         )
     }
 
@@ -873,8 +878,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return the position of the participant
      */
     fun addParticipant(session: MegaChatSession, status: String): Int? {
-        val participantCreated = createParticipant(session, status)
-        participantCreated?.let {
+        createParticipant(session, status)?.let { participantCreated ->
             participants.value?.add(participantCreated)
             participants.value = participants.value
             logDebug("Num of participants:" + participants.value?.size)
@@ -908,6 +912,11 @@ class InMeetingViewModel @ViewModelInject constructor(
             val hasHiRes = needHiRes(status)
             val name = getParticipantName(session.peerid)
             val avatar = inMeetingRepository.getAvatarBitmap(it, session.peerid)
+            val email = inMeetingRepository.getEmailParticipant(session.peerid, GetUserEmailListener(MegaApplication.getInstance().applicationContext, this))
+            var isGuest = false
+            if (email == null) {
+                isGuest = true
+            }
 
             val newParticipant = Participant(
                 session.peerid,
@@ -921,7 +930,9 @@ class InMeetingViewModel @ViewModelInject constructor(
                 isContact,
                 false,
                 hasHiRes,
-                null
+                null,
+                false,
+                isGuest
             )
 
             logDebug("Participant created")
@@ -1937,6 +1948,22 @@ class InMeetingViewModel @ViewModelInject constructor(
                 logDebug("Current call hung up")
                 _callLiveData.value = null
                 currentChatId = MEGACHAT_INVALID_HANDLE
+            }
+        }
+    }
+
+    override fun onUserEmailUpdate(email: String?, handler: Long, position: Int) {
+        if (email == null)
+            return
+
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value?.let { listParticipants ->
+                val iterator = listParticipants.iterator()
+                iterator.forEach {
+                    if (it.peerId == handler) {
+                        it.isGuest = false
+                    }
+                }
             }
         }
     }
