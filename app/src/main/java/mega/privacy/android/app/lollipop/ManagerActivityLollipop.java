@@ -278,6 +278,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -9891,7 +9892,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				ProgressDialog temp = null;
 				try{
 					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.upload_prepare));
+					temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
 					temp.show();
 				}
 				catch(Exception e){
