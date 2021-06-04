@@ -996,6 +996,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			megaChatApi.addChatNotificationListener(this);
 			megaChatApi.addChatListener(globalChatListener);
 			megaChatApi.addChatCallListener(meetingListener);
+			megaChatApi.setPublicKeyPinning(false);
 			registeredChatListeners = true;
 		}
 	}

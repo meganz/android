@@ -236,24 +236,28 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private val callCompositionObserver = Observer<MegaChatCall> {
         if (inMeetingViewModel.isSameCall(it.callId) &&
-            it.status != INVALID_CALL_STATUS && !inMeetingViewModel.isFromReconnectingStatus &&
+            it.status != INVALID_CALL_STATUS &&
             (it.callCompositionChange == 1 || it.callCompositionChange == -1)
         ) {
-            logDebug("Change in call composition, review the UI")
-            when {
-                inMeetingViewModel.isOneToOneCall() -> {
-                    if (it.numParticipants == 1 || it.numParticipants == 2) {
+            if(inMeetingViewModel.isFromReconnectingStatus){
+                logDebug("Back from reconnecting")
+            }else{
+                logDebug("Change in call composition, review the UI")
+                when {
+                    inMeetingViewModel.isOneToOneCall() -> {
+                        if (it.numParticipants == 1 || it.numParticipants == 2) {
+                            checkChildFragments()
+                        }
+                    }
+                    else -> {
+                        if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && !inMeetingViewModel.isRequestSent()) {
+                            showFixedBanner(
+                                it.peeridCallCompositionChange,
+                                it.callCompositionChange
+                            )
+                        }
                         checkChildFragments()
                     }
-                }
-                else -> {
-                    if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && !inMeetingViewModel.isRequestSent()) {
-                        showFixedBanner(
-                            it.peeridCallCompositionChange,
-                            it.callCompositionChange
-                        )
-                    }
-                    checkChildFragments()
                 }
             }
         }
@@ -305,7 +309,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val sessionStatusObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                if(!inMeetingViewModel.isFromReconnectingStatus){
+                if(inMeetingViewModel.isFromReconnectingStatus){
+                    logDebug("Back from reconnecting")
+                }else{
                     when {
                         !inMeetingViewModel.isOneToOneCall() -> {
                             when (callAndSession.second.status) {

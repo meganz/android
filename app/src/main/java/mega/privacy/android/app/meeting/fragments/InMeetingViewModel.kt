@@ -79,18 +79,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     private val updateCallStatusObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
-                if ((it.status == CALL_STATUS_IN_PROGRESS || it.status == CALL_STATUS_JOINING) && previousState == CALL_STATUS_CONNECTING) {
-                    logDebug("Is from reconnecting status")
-                    isFromReconnectingStatus = true
-                } else {
-                    if (previousState == CALL_STATUS_JOINING && it.status == CALL_STATUS_IN_PROGRESS) {
-                        logDebug("No changes necessary")
-                    } else {
-                        isFromReconnectingStatus = false
-                    }
-                }
-
-                isReconnectingStatus = (previousState == CALL_STATUS_IN_PROGRESS || previousState == CALL_STATUS_JOINING) && it.status == CALL_STATUS_CONNECTING
+                checkPreviousReconnectingStatus(it.status)
+                checkReconnectingStatus(it.status)
                 previousState = it.status
 
             }
@@ -103,6 +93,39 @@ class InMeetingViewModel @ViewModelInject constructor(
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observeForever(updateCallStatusObserver)
     }
+
+    /**
+     * Method to check if I am in Reconnecting status
+     *
+     * @param currentStatus Status of the call
+     */
+    private fun checkReconnectingStatus(currentStatus: Int) {
+        if (currentStatus == CALL_STATUS_CONNECTING) {
+            if (previousState == CALL_STATUS_IN_PROGRESS || previousState == CALL_STATUS_JOINING) {
+                isReconnectingStatus = true
+                return
+            }
+        }
+
+        isReconnectingStatus = false
+    }
+
+    /**
+     * Method to check if I am coming back from the reconnected state
+     *
+     * @param currentStatus Status of the call
+     */
+    private fun checkPreviousReconnectingStatus(currentStatus: Int) {
+        if (currentStatus == CALL_STATUS_JOINING || currentStatus == CALL_STATUS_IN_PROGRESS) {
+            if (previousState == CALL_STATUS_CONNECTING && isReconnectingStatus) {
+                isFromReconnectingStatus = true
+            }
+            return
+        }
+
+        isFromReconnectingStatus = false
+    }
+
 
     /**
      * Method to know if this chat is public

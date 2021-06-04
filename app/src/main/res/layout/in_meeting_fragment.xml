@@ -10,7 +10,7 @@
         android:layout_height="72dp"
         android:src="@drawable/ic_call_cancelled"
         android:layout_gravity="center"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <FrameLayout
         android:id="@+id/meeting_container"
