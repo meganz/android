@@ -122,7 +122,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             iconStateChatPanel.setVisibility(View.GONE);
             addAvatarChatPanel(null, chat);
 
-            infoChatText.setText(getString(R.string.group_chat_info_label));
+            infoChatText.setText(getString(R.string.general_info));
 
             if (megaApi != null && megaApi.getRootNode() != null) {
                 optionInfoChat.setVisibility(View.VISIBLE);
@@ -142,7 +142,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
                 iconStateChatPanel.setVisibility(View.GONE);
                 addAvatarChatPanel(null, chat);
 
-                infoChatText.setText(getString(R.string.group_chat_info_label));
+                infoChatText.setText(getString(R.string.general_info));
                 optionInfoChat.setVisibility(View.VISIBLE);
 
                 if (chat.isActive()) {
@@ -177,7 +177,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
                     if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                         optionInfoChat.setVisibility(View.VISIBLE);
-                        infoChatText.setText(getString(R.string.contact_properties_activity));
+                        infoChatText.setText(getString(R.string.general_info));
                         titleMailContactChatPanel.setText(contact.getEmail());
                     } else {
                         optionInfoChat.setVisibility(View.GONE);
