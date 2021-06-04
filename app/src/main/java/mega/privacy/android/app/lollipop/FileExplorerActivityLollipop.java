@@ -2451,7 +2451,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		ArrayList<MegaChatRoom> chats = new ArrayList<>();
 		ArrayList<MegaUser> users = new ArrayList<>();
 
-		createAndShowProgressDialog(true, getString(R.string.preparing_chats));
+		createAndShowProgressDialog(true, StringResourcesUtils.getString(R.string.preparing_chats));
 
 		for (ChatExplorerListItem item : listItems) {
 			if (item.getChat() != null) {
