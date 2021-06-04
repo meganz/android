@@ -1895,6 +1895,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun leaveMeeting() {
+        inMeetingViewModel.leaveMeeting()
         when {
             inMeetingViewModel.isGuest() -> {
                 meetingActivity.startActivity(
@@ -1906,7 +1907,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 meetingActivity.finish()
             }
             else -> {
-                inMeetingViewModel.leaveMeeting()
                 checkIfAnotherCallShouldBeShown()
             }
         }
