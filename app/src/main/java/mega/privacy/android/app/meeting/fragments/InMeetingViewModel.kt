@@ -181,6 +181,9 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return MegaChatCall
      */
     fun getCall(): MegaChatCall? {
+        if(currentChatId == MEGACHAT_INVALID_HANDLE)
+            return null
+
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             return inMeetingRepository.getMeeting(it.chatId)
         }
@@ -199,7 +202,10 @@ class InMeetingViewModel @ViewModelInject constructor(
             //Update call
             inMeetingRepository.getMeeting(currentChatId)?.let { call ->
                 logDebug("Num participants in the meeting is ${call.numParticipants}")
-                if (call.numParticipants == 1) {
+                if (call.numParticipants == 0) {
+                    logDebug("No participants in the call yet")
+                    return true
+                } else if (call.numParticipants == 1) {
                     val peerIds = call.peeridParticipants
                     peerIds?.let {
                         val isMe = isMe(it.get(0))
@@ -1815,7 +1821,6 @@ class InMeetingViewModel @ViewModelInject constructor(
 
         return hasOneModerator && isModerator() && participants.value?.none { isNormalUser(it.peerId) } == false
     }
-
 
     // For "join as guest" start
     fun chatLogout(listener: MegaChatRequestListenerInterface) =

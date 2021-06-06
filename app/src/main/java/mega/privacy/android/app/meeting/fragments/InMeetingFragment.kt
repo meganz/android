@@ -214,9 +214,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 when (it.status) {
                     MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> finishActivity()
                     MegaChatCall.CALL_STATUS_CONNECTING -> {
-                        if(inMeetingViewModel.isReconnectingStatus){
+                        if (inMeetingViewModel.isReconnectingStatus) {
                             reconnecting()
-                        }else{
+                        } else {
                             binding.reconnecting.isVisible = false
                             showFixedBanner(MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
                         }
@@ -226,6 +226,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         showFixedBanner(MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
                         checkMenuItemsVisibility()
                         checkChildFragments()
+                        if(it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                            controlVideoLocalOneToOneCall(it.hasLocalVideo())
+                        }
                     }
                 }
             }
@@ -239,9 +242,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             it.status != INVALID_CALL_STATUS &&
             (it.callCompositionChange == 1 || it.callCompositionChange == -1)
         ) {
-            if(inMeetingViewModel.isFromReconnectingStatus){
+            if (inMeetingViewModel.isFromReconnectingStatus) {
                 logDebug("Back from reconnecting")
-            }else{
+            } else {
                 logDebug("Change in call composition, review the UI")
                 when {
                     inMeetingViewModel.isOneToOneCall() -> {
@@ -309,9 +312,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val sessionStatusObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                if(inMeetingViewModel.isFromReconnectingStatus){
+                if (inMeetingViewModel.isFromReconnectingStatus) {
                     logDebug("Back from reconnecting")
-                }else{
+                } else {
                     when {
                         !inMeetingViewModel.isOneToOneCall() -> {
                             when (callAndSession.second.status) {
@@ -433,9 +436,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         chatId?.let {
             if (it != MEGACHAT_INVALID_HANDLE) {
                 if (it == inMeetingViewModel.getChatId()) {
-                    logDebug("Same call")
+                    logDebug("Same chat")
                 } else {
-                    logDebug("Different call")
+                    logDebug("Different chat")
                     sharedModel.updateChatRoomId(it)
                     inMeetingViewModel.setChatId(it)
                 }
@@ -443,7 +446,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         val meetingName: String = args.meetingName
-
         meetingName.let {
             if (!TextUtil.isTextEmpty(it)) {
                 sharedModel.setMeetingsName(it)
@@ -501,21 +503,23 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun takeActionByArgs() {
         when (args.action) {
-            MEETING_ACTION_CREATE ->{
+            MEETING_ACTION_CREATE -> {
+                logDebug("Action create");
                 camIsEnable = sharedModel.cameraLiveData.value!!
                 bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
                 initStartMeeting()
             }
             MEETING_ACTION_JOIN -> {
+                logDebug("Action join");
                 camIsEnable = sharedModel.cameraLiveData.value!!
                 bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
-
                 inMeetingViewModel.joinPublicChat(
                     args.chatId,
                     AutoJoinPublicChatListener(requireContext(), this)
                 )
             }
             MEETING_ACTION_GUEST -> {
+                logDebug("Action guest");
                 inMeetingViewModel.chatLogout(ChatRequestListener(onSuccess = { _, _, _ ->
                     inMeetingViewModel.createEphemeralAccountAndJoinChat(
                         args.firstName,
@@ -548,10 +552,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }))
             }
             MEETING_ACTION_RINGING_VIDEO_ON -> {
+                logDebug("Action ringing with video on");
                 sharedModel.micInitiallyOn()
                 sharedModel.camInitiallyOn()
             }
             MEETING_ACTION_RINGING_VIDEO_OFF -> {
+                logDebug("Action ringing with video off");
                 sharedModel.micInitiallyOn()
             }
             MEETING_ACTION_START -> {
@@ -676,7 +682,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         meetingActivity.setSupportActionBar(toolbar)
         val actionBar = meetingActivity.supportActionBar ?: return
 
-        if(args.action != MEETING_ACTION_GUEST) {
+        if (args.action != MEETING_ACTION_GUEST) {
             actionBar.setHomeButtonEnabled(true)
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
@@ -1044,7 +1050,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Show the correct UI in a meeting
      */
     private fun updateGroupUI() {
-        logDebug("Update group UI")
         inMeetingViewModel.getCall()?.let { call ->
             if (inMeetingViewModel.amIAloneOnTheCall(call.chatid)) {
                 waitingForConnection(call.chatid)
@@ -1064,13 +1069,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private fun reconnecting(){
+    private fun reconnecting() {
         removeUI()
+        logDebug("Show reconnecting UI")
         binding.reconnecting.isVisible = true
         showFixedBanner(MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
     }
 
-    private fun removeUI(){
+    private fun removeUI() {
         status = NOT_TYPE
         MegaApplication.getInstance().unregisterProximitySensor()
 
@@ -1088,7 +1094,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private fun checkMenuItemsVisibility(){
+    private fun checkMenuItemsVisibility() {
         checkGridSpeakerViewMenuItemVisibility()
         checkSwapCameraMenuItemVisibility()
     }
@@ -1125,12 +1131,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initOneToOneCall() {
         if (status == TYPE_IN_ONE_TO_ONE) return
 
-        status = TYPE_IN_ONE_TO_ONE
-        logDebug("One to One call")
         val call: MegaChatCall? = inMeetingViewModel.getCall()
         call?.let { currentCall ->
             val session = inMeetingViewModel.getSessionOneToOneCall(currentCall)
             session?.let { userSession ->
+                status = TYPE_IN_ONE_TO_ONE
+                logDebug("Show one to one call UI")
+
+                individualCallFragment?.let {
+                    removeChildFragment(it)
+                    individualCallFragment = null
+                }
+
                 logDebug("Create fragment")
                 individualCallFragment = IndividualCallFragment.newInstance(
                     currentCall.chatid,
@@ -1157,9 +1169,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun waitingForConnection(chatId: Long) {
         if (status == TYPE_WAITING_CONNECTION) return
 
-        logDebug("Waiting for connection call UI")
         status = TYPE_WAITING_CONNECTION
+        logDebug("Show waiting for connection call UI")
 
+        individualCallFragment?.let {
+            removeChildFragment(it)
+            individualCallFragment = null
+        }
         individualCallFragment = IndividualCallFragment.newInstance(
             chatId,
             megaApi.myUserHandleBinary,
@@ -1213,7 +1229,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (status == TYPE_IN_SPEAKER_VIEW) return
 
         status = TYPE_IN_SPEAKER_VIEW
-        logDebug("Group call - Speaker View")
+        logDebug("Show group call - Speaker View UI")
 
         gridViewCallFragment?.let {
             removeChildFragment(it)
@@ -1243,7 +1259,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (status == TYPE_IN_GRID_VIEW) return
 
         status = TYPE_IN_GRID_VIEW
-        logDebug("Group call - Grid View")
+        logDebug("Show group call - Grid View UI")
 
         speakerViewCallFragment?.let {
             removeChildFragment(it)
@@ -1350,12 +1366,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.text = StringResourcesUtils.getString(R.string.chat_connecting)
                 }
             }
-            
+
             MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
-                if (inMeetingViewModel.isRequestSent() && !MegaApplication.isCreatingMeeting(
-                        inMeetingViewModel.getChatId()
-                    )
-                ) {
+                val chatRoom = inMeetingViewModel.getChat()
+                if (inMeetingViewModel.isRequestSent() && chatRoom != null && chatRoom.isMeeting) {
                     CallUtil.activateChrono(false, meetingChrono, null)
                     toolbarSubtitle?.let {
                         it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
@@ -1377,7 +1391,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         gridViewMenuItem = menu.findItem(R.id.grid_view)
         swapCameraMenuItem = menu.findItem(R.id.swap_camera)
 
-       checkMenuItemsVisibility()
+        checkMenuItemsVisibility()
     }
 
     /**
@@ -1394,7 +1408,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun checkGridSpeakerViewMenuItemVisibility() {
         inMeetingViewModel.getCall()?.let { call ->
-            if(call.status == MegaChatCall.CALL_STATUS_CONNECTING){
+            if (call.status == MegaChatCall.CALL_STATUS_CONNECTING) {
                 gridViewMenuItem?.let {
                     it.isVisible = false
                 }
@@ -1533,7 +1547,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.alpha = 1f
                     logDebug("Show fixed banner")
                     it.isVisible = true
-                    if (type != TYPE_NETWORK_QUALITY && type!= TYPE_RECONNECTING) {
+                    if (type != TYPE_NETWORK_QUALITY && type != TYPE_RECONNECTING) {
                         it.animate()?.alpha(0f)?.duration = INFO_ANIMATION.toLong()
                     }
                 }
@@ -1633,8 +1647,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun controlVideoLocalOneToOneCall(camOn: Boolean) {
         individualCallFragment?.let {
             if (it.isAdded) {
+                val call = inMeetingViewModel.getCall()
                 when {
-                    camOn -> {
+                    call != null && call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && camOn -> {
                         it.checkVideoOn(megaApi.myUserHandleBinary, MEGACHAT_INVALID_HANDLE)
                     }
                     else -> {
@@ -1646,8 +1661,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         floatingWindowFragment?.let {
             if (it.isAdded) {
+                val call = inMeetingViewModel.getCall()
                 when {
-                    camOn -> {
+                    call != null && call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && camOn -> {
                         it.checkVideoOn(megaApi.myUserHandleBinary, MEGACHAT_INVALID_HANDLE)
                     }
                     else -> {
@@ -1931,9 +1947,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun finishActivity() {
         logDebug("Finishing the activity")
-        if (inMeetingViewModel.getChatId() != MEGACHAT_INVALID_HANDLE) {
-            MegaApplication.setCreatingMeeting(inMeetingViewModel.getChatId(), false)
-        }
         meetingActivity.finish()
     }
 
@@ -2030,7 +2043,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onCallStarted(chatId: Long, enableVideo: Boolean, enableAudio: Int) {
         logDebug("Call started")
-        MegaApplication.setCreatingMeeting(chatId, true)
         checkCallStarted(chatId)
     }
 
@@ -2058,7 +2070,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (chatId == inMeetingViewModel.getChatId()) {
             logDebug("Call answered")
             MegaApplication.setSpeakerStatus(chatId, true)
-            MegaApplication.setOpeningMeetingLink(chatId, false)
             checkCallStarted(chatId)
         }
     }
@@ -2079,7 +2090,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
         }
 
-        MegaApplication.setOpeningMeetingLink(args.chatId, false)
         finishActivity()
     }
 
@@ -2114,7 +2124,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onErrorJoinedChat(chatId: Long) {
         logDebug("Error joining the meeting so close it")
-        MegaApplication.setOpeningMeetingLink(args.chatId, false)
         finishActivity()
     }
 

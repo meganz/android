@@ -144,7 +144,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     }
 
     protected fun setMarginBottomOfMeetingButton(marginBottom: Float) {
-        logDebug("setMarginBottomOfMeetingButton: $marginBottom")
         val layoutParams = btn_start_join_meeting.layoutParams as ConstraintLayout.LayoutParams
         layoutParams.bottomMargin = Util.dp2px(marginBottom)
         btn_start_join_meeting.layoutParams = layoutParams

@@ -27,7 +27,9 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
 import nz.mega.sdk.MegaChatSession
+import nz.mega.sdk.MegaChatSession.SESSION_STATUS_IN_PROGRESS
 
 @AndroidEntryPoint
 class IndividualCallFragment : MeetingBaseFragment() {
@@ -63,14 +65,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
             when {
                 isFloatingWindow -> checkItIsOnlyAudio()
 
-                session.hasVideo() -> {
+                session.hasVideo() && session.status == SESSION_STATUS_IN_PROGRESS -> {
                     logDebug("Check if video should be on")
                     checkVideoOn(
                         session.peerid,
                         session.clientid
                     )
                 }
-
                 else -> {
                     logDebug("Video should be off")
                     videoOffUI(peerId, clientId)
@@ -214,7 +215,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         inMeetingViewModel.getCall()?.let {
             if (inMeetingViewModel.isMe(peerId)) {
-                if (it.hasLocalVideo()) {
+                if(it.status == CALL_STATUS_IN_PROGRESS && it.hasLocalVideo()){
                     logDebug("Check if local video should be on")
                     checkVideoOn(peerId, clientId)
                 } else {
@@ -224,7 +225,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             } else {
                 val session = inMeetingViewModel.getSession(clientId)
                 session?.let { participant ->
-                    if (participant.hasVideo()) {
+                    if (session.status == SESSION_STATUS_IN_PROGRESS && participant.hasVideo()) {
                         logDebug("Check if remote video should be on")
                         checkVideoOn(peerId, clientId)
                     } else {
@@ -355,9 +356,11 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private fun videoOnUI(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
 
-        logDebug("UI video on")
-        hideAvatar(peerId, clientId)
-        activateVideo(peerId, clientId)
+        inMeetingViewModel.getCall()?.let {
+            logDebug("UI video on")
+            hideAvatar(peerId, clientId)
+            activateVideo(peerId, clientId)
+        }
     }
 
     /**
@@ -462,7 +465,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             )
         ) {
             inMeetingViewModel.getSession(clientId)?.let {
-                if (it.hasVideo()) {
+                if (it.status == SESSION_STATUS_IN_PROGRESS && it.hasVideo()) {
                     logDebug("Update resolution")
                     closeVideo(peerId, clientId)
                     checkVideoOn(peerId, clientId)

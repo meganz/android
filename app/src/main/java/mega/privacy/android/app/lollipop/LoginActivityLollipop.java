@@ -319,15 +319,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         return initResult != MegaChatApi.INIT_ERROR;
     }
 
-    private void startJoinMeeting(long chatId, String meetingLink) {
-        CallUtil.openMeetingGuestMode(this, null, chatId, meetingLink);
-//        Intent intent = new Intent(LoginActivityLollipop.this, MeetingActivity.class);
-//        intent.setData(Uri.parse(meetingLink));
-//        intent.setAction(MEETING_ACTION_GUEST);
-//
-//        startActivity(intent);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 

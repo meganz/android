@@ -584,7 +584,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 				logDebug("Call has ended");
-				MegaApplication.setOpeningMeetingLink(chatId, false);
 				int termCode = call.getTermCode();
 				boolean isIgnored = call.isIgnored();
 				checkCallDestroyed(chatId, callId, termCode, isIgnored);
@@ -629,7 +628,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (!megaApi.isChatNotifiable(chatId))
 			return;
 
-		if(!isOpeningMeetingLink(chatId)){
+		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+		if(chatRoom != null && !chatRoom.isMeeting()){
 			logDebug("Incoming call");
 			createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
 			controlNumberOfCalls(listAllCalls, chatId, callStatus, true);
@@ -646,13 +646,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == typeAudioManager)
 			return;
 
+		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
 		logDebug("Controlling outgoing/in progress call");
-		if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && isOpeningMeetingLink(chatId)) {
-			clearIncomingCallNotification(chatId);
-			return;
+		if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING) {
+			if(chatRoom != null && chatRoom.isMeeting()){
+				clearIncomingCallNotification(chatId);
+				return;
+			}
 		}
 
-		if (!isCreatingMeeting(chatId)) {
+		if (chatRoom != null && !chatRoom.isMeeting()) {
 			createOrUpdateAudioManager(getSpeakerStatus(chatId), typeAudioManager);
 		}
 	}
@@ -996,7 +999,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			megaChatApi.addChatNotificationListener(this);
 			megaChatApi.addChatListener(globalChatListener);
 			megaChatApi.addChatCallListener(meetingListener);
-			megaChatApi.setPublicKeyPinning(false);
 			registeredChatListeners = true;
 		}
 	}
@@ -1378,7 +1380,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					MegaChatCall call = api.getChatCall(item.getChatId());
 					if (call != null && call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
 						if (notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
-							if(!isOpeningMeetingLink(item.getChatId())){
+							MegaChatRoom chatRoom = megaChatApi.getChatRoom(item.getChatId());
+							if(chatRoom != null && !chatRoom.isMeeting()){
 								notificationShown.add(item.getChatId());
 								showGroupCallNotification(item.getChatId());
 							}
@@ -1534,8 +1537,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			logWarning("Launch not in correct status");
 			return;
 		}
+
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup()) {
+		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup() && !chatRoom.isMeeting()) {
 			showGroupCallNotification(chatId);
 			return;
 		}
@@ -1886,30 +1890,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		hashMapVideo.put(chatId, videoStatus);
 	}
 
-	public static boolean isCreatingMeeting(long chatId) {
-		boolean entryExists = hashCreatingMeeting.containsKey(chatId);
-		if (entryExists) {
-			return hashCreatingMeeting.get(chatId);
-		}
-
-		return false;
-	}
-
 	public static void setCreatingMeeting(long chatId, boolean isCreatingMeeting) {
 		hashCreatingMeeting.put(chatId, isCreatingMeeting);
-	}
-
-	private static boolean isOpeningMeetingLink(long chatId) {
-		boolean entryExists = hashOpeningMeetingLink.containsKey(chatId);
-		if (entryExists) {
-			return hashOpeningMeetingLink.get(chatId);
-		}
-
-		return false;
-	}
-
-	public static void setOpeningMeetingLink(long chatId, boolean isOpeningMeetingLink) {
-		hashOpeningMeetingLink.put(chatId, isOpeningMeetingLink);
 	}
 
 	public static boolean isRequestSent(long callId) {
