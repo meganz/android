@@ -436,7 +436,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				}
 
 				if (request.getParamType() == LINK_IS_FOR_MEETING) {
-					logDebug("It's a meeting");
+					logDebug("It's a meeting link");
 
 					if (request.getFlag()) {
 						MegaHandleList list = request.getMegaHandleList();
@@ -465,6 +465,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 					}
 				} else {
 					// Normal Chat Link
+					logDebug("It's a chat link");
 					goToChatActivity();
 				}
 			}

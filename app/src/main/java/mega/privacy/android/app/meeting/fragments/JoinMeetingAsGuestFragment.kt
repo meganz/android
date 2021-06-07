@@ -3,7 +3,6 @@ package mega.privacy.android.app.meeting.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
@@ -34,6 +33,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
 
         // Hide Keyboard when click the butn
         Util.hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
+        releaseVideoDeviceAndRemoveChatVideoListener()
         val action = JoinMeetingFragmentDirections
             .actionGlobalInMeeting(
                 MeetingActivity.MEETING_ACTION_GUEST,

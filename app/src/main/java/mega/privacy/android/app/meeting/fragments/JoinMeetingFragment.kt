@@ -19,6 +19,7 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
             return
         }
 
+        releaseVideoDeviceAndRemoveChatVideoListener()
         val action = JoinMeetingFragmentDirections
             .actionGlobalInMeeting(MEETING_ACTION_JOIN, chatId, meetingName, meetingLink)
         findNavController().navigate(action)

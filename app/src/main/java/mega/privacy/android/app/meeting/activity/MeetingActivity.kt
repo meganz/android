@@ -16,7 +16,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
-import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
+import mega.privacy.android.app.meeting.fragments.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 // FIXME: Keep Meeting Activity from implementing this and that listeners
@@ -187,11 +187,7 @@ class MeetingActivity : PasscodeActivity() {
                     MegaApplication.getInstance().removeRTCAudioManager()
                 }
 
-                if(meetingAction == MEETING_ACTION_GUEST) {
-                    super.onBackPressed()
-                } else {
-                    onBackPressed()
-                }
+                onBackPressed()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -216,11 +212,23 @@ class MeetingActivity : PasscodeActivity() {
     }
 
     override fun onBackPressed() {
-        if(meetingAction == MEETING_ACTION_GUEST) return
+        when (val currentFragment = getCurrentFragment()) {
+            is CreateMeetingFragment -> {
+                currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
+            }
+            is JoinMeetingFragment -> {
+                currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
+            }
+            is JoinMeetingAsGuestFragment -> {
+                currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
+            }
+        }
 
         super.onBackPressed()
 
-        finish()
+        if(meetingAction != MEETING_ACTION_GUEST){
+            finish()
+        }
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {

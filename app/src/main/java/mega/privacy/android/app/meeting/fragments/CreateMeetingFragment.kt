@@ -38,7 +38,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
         // TODO: better to pass meeting name via fragment args in Navigation
         sharedModel.setMeetingsName(meetingName)
-
+        releaseVideoDeviceAndRemoveChatVideoListener()
         val action = InMeetingFragmentDirections.actionGlobalInMeeting(action = MEETING_ACTION_CREATE, meetingName = meetingName)
         findNavController().navigate(action)
     }
