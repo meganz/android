@@ -85,7 +85,7 @@
         app:layout_constraintGuide_end="92dp" />
 
     <ImageButton
-        android:id="@+id/exo_minus_15"
+        android:id="@+id/exo_rew"
         style="@style/AudioPlayerButton"
         android:layout_marginStart="10dp"
         android:src="@drawable/audio_player_15_minus"
@@ -102,7 +102,7 @@
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toEndOf="@id/exo_minus_15"
+        app:layout_constraintStart_toEndOf="@id/exo_rew"
         app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
     <View
@@ -138,13 +138,13 @@
         style="@style/AudioPlayerButton"
         android:src="@drawable/audio_player_next"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
-        app:layout_constraintEnd_toStartOf="@id/exo_plus_15"
+        app:layout_constraintEnd_toStartOf="@id/exo_ffwd"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
     <ImageButton
-        android:id="@+id/exo_plus_15"
+        android:id="@+id/exo_ffwd"
         style="@style/AudioPlayerButton"
         android:layout_marginEnd="10dp"
         android:src="@drawable/audio_player_15_plus"

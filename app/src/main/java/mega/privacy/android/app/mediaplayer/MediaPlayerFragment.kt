@@ -250,11 +250,15 @@ class MediaPlayerFragment : Fragment() {
             playerView.controllerHideOnTouch = true
 
             playerView.setShowShuffleButton(false)
+            playerView.setShowFastForwardButton(false)
+            playerView.setShowRewindButton(false)
             playerView.setRepeatToggleModes(RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE)
         } else {
             playerView.controllerHideOnTouch = false
 
             playerView.setShowShuffleButton(true)
+            playerView.setShowFastForwardButton(true)
+            playerView.setShowRewindButton(true)
             playerView.setRepeatToggleModes(
                 RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
             )
