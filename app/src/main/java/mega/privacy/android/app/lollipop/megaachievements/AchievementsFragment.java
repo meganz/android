@@ -25,6 +25,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 
@@ -366,13 +367,13 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		}
 		else{
 			figuresReferralBonusesLayout.setVisibility(View.GONE);
-			zeroFiguresReferralBonusesText.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue)));
+			zeroFiguresReferralBonusesText.setText(StringResourcesUtils.getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue)));
 			zeroFiguresReferralBonusesText.setVisibility(View.VISIBLE);
 		}
 
-		zeroFiguresInstallAppText.setText(getString(R.string.figures_achievements_text, getSizeString(installAppStorageValue)));
-		zeroFiguresAddPhoneText.setText(getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue)));
-		zeroFiguresInstallDesktopText.setText(getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue)));
+		zeroFiguresInstallAppText.setText(StringResourcesUtils.getString(R.string.figures_achievements_text, getSizeString(installAppStorageValue)));
+		zeroFiguresAddPhoneText.setText(StringResourcesUtils.getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue)));
+		zeroFiguresInstallDesktopText.setText(StringResourcesUtils.getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue)));
 
 		long count = details.getAwardsCount();
 

@@ -20,6 +20,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaAchievementsDetails;
 
@@ -152,10 +153,10 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 			if(awardId==-1){
 				logWarning("No award for this achievement");
 				checkIcon.setVisibility(View.GONE);
-				title.setText(getString(R.string.figures_achievements_text, getSizeString(installAppStorageValue)));
+				title.setText(StringResourcesUtils.getString(R.string.figures_achievements_text, getSizeString(installAppStorageValue)));
 				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 				sectionTitle.setVisibility(View.VISIBLE);
-				firstParagraph.setText(getString(R.string.paragraph_info_achievement_install_mobile_app, getSizeString(installAppStorageValue), getSizeString(installAppTransferValue)));
+				firstParagraph.setText(StringResourcesUtils.getString(R.string.paragraph_info_achievement_install_mobile_app, getSizeString(installAppStorageValue)));
 				secondParagraph.setVisibility(View.GONE);
 			}
 			else{
@@ -176,7 +177,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 
 				long storageAppInstall = details.getRewardStorageByAwardId(awardId);
 				long transferAppInstall = details.getRewardTransferByAwardId(awardId);
-				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_install_mobile_app, getSizeString(storageAppInstall)));
+				firstParagraph.setText(StringResourcesUtils.getString(R.string.result_paragraph_info_achievement_install_mobile_app, getSizeString(storageAppInstall)));
 				secondParagraph.setVisibility(View.GONE);
 			}
 		}else if(achievementType== MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
@@ -187,10 +188,10 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 			if(awardId==-1){
 				logDebug("No award for this achievement");
 				checkIcon.setVisibility(View.GONE);
-				title.setText(getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue)));
+				title.setText(StringResourcesUtils.getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue)));
 				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 				sectionTitle.setVisibility(View.VISIBLE);
-				firstParagraph.setText(getString(R.string.paragraph_info_achievement_add_phone, getSizeString(addPhoneStorageValue)));
+				firstParagraph.setText(StringResourcesUtils.getString(R.string.paragraph_info_achievement_add_phone, getSizeString(addPhoneStorageValue)));
 				secondParagraph.setVisibility(View.GONE);
 			}
 			else{
@@ -211,7 +212,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 
 				long storageAddPhone = details.getRewardStorageByAwardId(awardId);
 				long transferAddPhone = details.getRewardTransferByAwardId(awardId);
-				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_add_phone, getSizeString(storageAddPhone), getSizeString(transferAddPhone)));
+				firstParagraph.setText(StringResourcesUtils.getString(R.string.result_paragraph_info_achievement_add_phone, getSizeString(storageAddPhone)));
 				secondParagraph.setVisibility(View.GONE);
 			}
 		}
@@ -223,10 +224,10 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 			if(awardId==-1) {
 				logWarning("No award for this achievement");
 				checkIcon.setVisibility(View.GONE);
-				title.setText(getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue)));
+				title.setText(StringResourcesUtils.getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue)));
 				title.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
 				sectionTitle.setVisibility(View.VISIBLE);
-				firstParagraph.setText(getString(R.string.paragraph_info_achievement_install_desktop, getSizeString(installDesktopStorageValue), getSizeString(installDesktopTransferValue)));
+				firstParagraph.setText(StringResourcesUtils.getString(R.string.paragraph_info_achievement_install_desktop, getSizeString(installDesktopStorageValue)));
 				secondParagraph.setVisibility(View.GONE);
 			}
 			else{
@@ -247,7 +248,7 @@ public class InfoAchievementsFragment extends BaseFragment implements GetAchieve
 
 				long storageDesktopInstall = details.getRewardStorageByAwardId(awardId);
 				long transferDesktopInstall = details.getRewardTransferByAwardId(awardId);
-				firstParagraph.setText(getString(R.string.result_paragraph_info_achievement_install_desktop, getSizeString(storageDesktopInstall)));
+				firstParagraph.setText(StringResourcesUtils.getString(R.string.result_paragraph_info_achievement_install_desktop, getSizeString(storageDesktopInstall)));
 				secondParagraph.setVisibility(View.GONE);
 
 			}
