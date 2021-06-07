@@ -105,6 +105,9 @@
 
     <dimen name="bottom_navigation_view_height">56dp</dimen>
 
+    <dimen name="cu_view_type_button_height">36dp</dimen>
+    <dimen name="cu_view_type_layout_margin_bottom">8dp</dimen>
+
     <!-- Dark mode refactor start -->
 
     <dimen name="btn_padding_vertical">10dp</dimen>

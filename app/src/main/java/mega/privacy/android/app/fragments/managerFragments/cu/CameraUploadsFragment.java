@@ -2,14 +2,13 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -45,6 +44,7 @@ import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 
+import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.Constants.ANIMATION_DURATION;
@@ -65,6 +65,7 @@ import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
+import static mega.privacy.android.app.utils.Util.getStatusBarHeight;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
@@ -119,8 +120,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             return;
         }
 
-        mManagerActivity.changeAppBarElevation(viewModel.isSelecting()
-                || binding.cuList.canScrollVertically(SCROLLING_UP_DIRECTION));
+        boolean isScrolled = binding.cuList.canScrollVertically(SCROLLING_UP_DIRECTION);
+        mManagerActivity.changeAppBarElevation(viewModel.isSelecting() || isScrolled);
     }
 
     public void selectAll() {
@@ -354,16 +355,16 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.photos_empty)),
                 HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-        binding.allButton.setOnClickListener(v -> newViewClicked(ALL_VIEW));
-        binding.daysButton.setOnClickListener(v -> newViewClicked(DAYS_VIEW));
-        binding.monthsButton.setOnClickListener(v -> newViewClicked(MONTHS_VIEW));
-        binding.yearsButton.setOnClickListener(v -> newViewClicked(YEARS_VIEW));
+        binding.viewTypeLayout.allButton.setOnClickListener(v -> newViewClicked(ALL_VIEW));
+        binding.viewTypeLayout.daysButton.setOnClickListener(v -> newViewClicked(DAYS_VIEW));
+        binding.viewTypeLayout.monthsButton.setOnClickListener(v -> newViewClicked(MONTHS_VIEW));
+        binding.viewTypeLayout.yearsButton.setOnClickListener(v -> newViewClicked(YEARS_VIEW));
         updateViewSelected();
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.viewTypeLayout.getLayoutParams();
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.viewTypeLayout.container.getLayoutParams();
             params.width = outMetrics.heightPixels;
-            binding.viewTypeLayout.setLayoutParams(params);
+            binding.viewTypeLayout.container.setLayoutParams(params);
         }
     }
 
@@ -423,7 +424,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
             binding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
             binding.scroller.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
-            binding.viewTypeLayout.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
+            binding.viewTypeLayout.container.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
         });
 
         viewModel.nodeToOpen()
@@ -452,19 +453,13 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                             new CuActionModeCallback(context, this, viewModel, megaApi));
                 }
 
-                binding.viewTypeLayout.animate().translationY(220).setDuration(ANIMATION_DURATION)
-                        .withEndAction(() -> binding.viewTypeLayout.setVisibility(View.GONE)).start();
-
                 mActionMode.setTitle(String.valueOf(viewModel.getSelectedNodesCount()));
                 mActionMode.invalidate();
-            } else {
-                if (mActionMode != null) {
-                    mActionMode.finish();
-                    mActionMode = null;
-                }
-
-                binding.viewTypeLayout.setVisibility(View.VISIBLE);
-                binding.viewTypeLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+                animateUI(true);
+            } else if (mActionMode != null) {
+                mActionMode.finish();
+                mActionMode = null;
+                animateUI(false);
             }
         });
 
@@ -474,6 +469,52 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         viewModel.getDayCardsData().observe(getViewLifecycleOwner(), this::showDayCards);
         viewModel.getMonthCardsData().observe(getViewLifecycleOwner(), this::showMonthCards);
         viewModel.getYearCardsData().observe(getViewLifecycleOwner(), this::showYearCards);
+    }
+
+    private void animateUI(boolean hide) {
+        boolean visible = binding.viewTypeLayout.container.getVisibility() == View.VISIBLE;
+        if ((hide && !visible) || (!hide && visible)) {
+            return;
+        }
+
+        mManagerActivity.animateCULayout(hide || viewModel.isCUEnabled());
+        mManagerActivity.showHideBottomNavigationView(hide);
+        animateViewTypeLayout(hide);
+        mManagerActivity.setDrawerLockMode(hide);
+        checkScroll();
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            new Handler().postDelayed(() -> {
+                binding.cuContainer.setPadding(0, hide ? getStatusBarHeight() : 0, 0, 0);
+                addTranslucentNavigation(hide);
+            }, ANIMATION_DURATION);
+        }
+    }
+
+    private void animateViewTypeLayout(boolean hide) {
+        if (hide) {
+            binding.viewTypeLayout.container.animate()
+                    .translationY(getResources().getDimension(R.dimen.cu_view_type_button_height))
+                    .setDuration(ANIMATION_DURATION)
+                    .withEndAction(() -> binding.viewTypeLayout.container.setVisibility(View.GONE))
+                    .start();
+        } else {
+            binding.viewTypeLayout.container.animate()
+                    .translationY(0)
+                    .setDuration(ANIMATION_DURATION)
+                    .withStartAction(() -> binding.viewTypeLayout.container.setVisibility(View.VISIBLE))
+                    .start();
+        }
+    }
+
+    private void addTranslucentNavigation(boolean add) {
+        Window window = mManagerActivity.getWindow();
+
+        if (add) {
+            window.addFlags(FLAG_TRANSLUCENT_NAVIGATION);
+        } else {
+            window.clearFlags(FLAG_TRANSLUCENT_NAVIGATION);
+        }
     }
 
     private void updateEnableCUButtons(boolean cuEnabled) {
@@ -554,29 +595,30 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void updateViewSelected() {
-        setViewTypeButtonStyle(binding.allButton, false);
-        setViewTypeButtonStyle(binding.daysButton, false);
-        setViewTypeButtonStyle(binding.monthsButton, false);
-        setViewTypeButtonStyle(binding.yearsButton, false);
+        setViewTypeButtonStyle(binding.viewTypeLayout.allButton, false);
+        setViewTypeButtonStyle(binding.viewTypeLayout.daysButton, false);
+        setViewTypeButtonStyle(binding.viewTypeLayout.monthsButton, false);
+        setViewTypeButtonStyle(binding.viewTypeLayout.yearsButton, false);
 
         switch (selectedView) {
             case DAYS_VIEW:
-                setViewTypeButtonStyle(binding.daysButton, true);
+                setViewTypeButtonStyle(binding.viewTypeLayout.daysButton, true);
                 break;
 
             case MONTHS_VIEW:
-                setViewTypeButtonStyle(binding.monthsButton, true);
+                setViewTypeButtonStyle(binding.viewTypeLayout.monthsButton, true);
                 break;
 
             case YEARS_VIEW:
-                setViewTypeButtonStyle(binding.yearsButton, true);
+                setViewTypeButtonStyle(binding.viewTypeLayout.yearsButton, true);
                 break;
 
             default:
-                setViewTypeButtonStyle(binding.allButton, true);
+                setViewTypeButtonStyle(binding.viewTypeLayout.allButton, true);
         }
 
         updateFastScrollerVisibility();
+        updateScrollBehaviour();
         mManagerActivity.updateCuFragmentOptionsMenu();
         mManagerActivity.updateEnableCUButton(selectedView == ALL_VIEW
                 && gridAdapter.getItemCount() > 0 && !viewModel.isCUEnabled()
@@ -587,6 +629,18 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             mManagerActivity.hideCUProgress();
             binding.uploadProgress.setVisibility(View.GONE);
         }
+    }
+
+    private void updateScrollBehaviour() {
+        int bottomNavigationViewHeight = getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height);
+        int viewTypeLayoutMarginBottom = getResources().getDimensionPixelOffset(R.dimen.cu_view_type_layout_margin_bottom);
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.viewTypeLayout.container.getLayoutParams();
+        params.bottomMargin = selectedView != ALL_VIEW
+                ? bottomNavigationViewHeight + viewTypeLayoutMarginBottom
+                : viewTypeLayoutMarginBottom;
+
+        binding.viewTypeLayout.container.setLayoutParams(params);
+        mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW);
     }
 
     private void updateFastScrollerVisibility() {

@@ -13489,22 +13489,42 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return isFileExist;
 	}
 
+	public void enableHideBottomViewOnScroll(boolean enable) {
+		RelativeLayout layout = findViewById(R.id.container_bottom);
+		if (layout == null) {
+			return;
+		}
+
+		final CoordinatorLayout.LayoutParams fParams
+				= new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+		fParams.setMargins(0, 0, 0, enable ? 0 : getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
+		fragmentLayout.setLayoutParams(fParams);
+
+		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
+		params.setBehavior(enable ?
+				new com.google.android.material.behavior.HideBottomViewOnScrollBehavior<RelativeLayout>()
+				: null);
+	}
+
 	public void showHideBottomNavigationView(boolean hide) {
 		if (bNV == null) return;
 
 		final CoordinatorLayout.LayoutParams params = new CoordinatorLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+		int height = getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height);
 
 		if (hide && bNV.getVisibility() == View.VISIBLE) {
 			updateMiniAudioPlayerVisibility(false);
 			params.setMargins(0, 0, 0, 0);
 			fragmentLayout.setLayoutParams(params);
-			bNV.animate().translationY(220).setDuration(ANIMATION_DURATION).withEndAction(() -> bNV.setVisibility(View.GONE)).start();
+			bNV.animate().translationY(height).setDuration(ANIMATION_DURATION).withEndAction(() ->
+				bNV.setVisibility(View.GONE)
+			).start();
 		} else if (!hide && bNV.getVisibility() == View.GONE) {
-			params.setMargins(0, 0, 0,
-					getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
-			bNV.setVisibility(View.VISIBLE);
-			bNV.animate().translationY(0).setDuration(ANIMATION_DURATION).withEndAction(() -> {
+			bNV.animate().translationY(0).setDuration(ANIMATION_DURATION).withStartAction(() ->
+				bNV.setVisibility(View.VISIBLE)
+			).withEndAction(() -> {
 				updateMiniAudioPlayerVisibility(true);
+				params.setMargins(0, 0, 0, height);
 				fragmentLayout.setLayoutParams(params);
 			}).start();
 		}

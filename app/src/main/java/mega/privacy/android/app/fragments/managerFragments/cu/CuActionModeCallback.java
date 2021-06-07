@@ -123,10 +123,6 @@ class CuActionModeCallback implements ActionMode.Callback {
         logDebug("onCreateActionMode");
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.cloud_storage_action, menu);
-        ((ManagerActivityLollipop) mContext).animateCULayout(true);
-        ((ManagerActivityLollipop) mContext).showHideBottomNavigationView(true);
-        ((ManagerActivityLollipop) mContext).setDrawerLockMode(true);
-        mFragment.checkScroll();
         return true;
     }
 
@@ -134,10 +130,6 @@ class CuActionModeCallback implements ActionMode.Callback {
     public void onDestroyActionMode(ActionMode mode) {
         logDebug("onDestroyActionMode");
         mViewModel.clearSelection();
-        ((ManagerActivityLollipop) mContext).animateCULayout(mViewModel.isCUEnabled());
-        ((ManagerActivityLollipop) mContext).showHideBottomNavigationView(false);
-        mFragment.checkScroll();
-        ((ManagerActivityLollipop) mContext).setDrawerLockMode(false);
     }
 
     @Override
