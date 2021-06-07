@@ -105,6 +105,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -8902,6 +8903,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void saveNodesToDevice(List<MegaNode> nodes, boolean highPriority, boolean isFolderLink,
 								  boolean fromMediaViewer, boolean fromChat) {
 		nodeSaver.saveNodes(nodes, highPriority, isFolderLink, fromMediaViewer, fromChat);
+	}
+
+	/**
+	 * Save nodes to gallery.
+	 *
+	 * @param nodes nodes to save
+	 */
+	public void saveNodesToGallery(List<MegaNode> nodes) {
+		nodeSaver.saveNodes(nodes, false, false, false, true, true);
 	}
 
 	/**

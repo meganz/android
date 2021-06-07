@@ -4733,6 +4733,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                 false);
     }
 
+    public void saveNodesToGallery(List<MegaNode> nodes) {
+        nodeSaver.saveNodes(nodes, false, false, false, true, true);
+    }
+
     public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messages, final MegaChatRoom chat){
         logDebug("showConfirmationDeleteMessages");
 
