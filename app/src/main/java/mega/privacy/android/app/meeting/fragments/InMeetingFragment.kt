@@ -1369,7 +1369,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
                 val chatRoom = inMeetingViewModel.getChat()
-                if (inMeetingViewModel.isRequestSent() && chatRoom != null && chatRoom.isMeeting) {
+                if (inMeetingViewModel.isRequestSent() && chatRoom != null && !chatRoom.isMeeting) {
                     CallUtil.activateChrono(false, meetingChrono, null)
                     toolbarSubtitle?.let {
                         it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
@@ -1924,7 +1924,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private fun leaveMeeting() {
+    fun leaveMeeting() {
         inMeetingViewModel.leaveMeeting()
         when {
             inMeetingViewModel.isGuest() -> {

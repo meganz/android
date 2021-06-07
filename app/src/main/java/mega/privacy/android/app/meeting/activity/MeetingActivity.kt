@@ -214,13 +214,18 @@ class MeetingActivity : PasscodeActivity() {
     override fun onBackPressed() {
         when (val currentFragment = getCurrentFragment()) {
             is CreateMeetingFragment -> {
-                currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
+                currentFragment.releaseVideoAndHideKeyboard()
             }
             is JoinMeetingFragment -> {
                 currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
             }
             is JoinMeetingAsGuestFragment -> {
-                currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
+                currentFragment.releaseVideoAndHideKeyboard()
+            }
+            is InMeetingFragment -> {
+                if(meetingAction == MEETING_ACTION_GUEST){
+                    currentFragment.leaveMeeting()
+                }
             }
         }
 

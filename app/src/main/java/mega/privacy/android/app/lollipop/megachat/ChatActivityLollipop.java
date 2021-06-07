@@ -8076,15 +8076,17 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                     if (dbH == null) {
                         dbH = MegaApplication.getInstance().getDbH();
                     }
-                    ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
-                    String editedMessageId = editingMessage && messageToEdit != null ? Long.toString(messageToEdit.getMsgId()) : "";
-                    if (prefs != null) {
-                        prefs.setEditedMsgId(editedMessageId);
-                        prefs.setWrittenText(written);
-                        dbH.setWrittenTextItem(Long.toString(idChat), written, editedMessageId);
-                    } else {
-                        prefs = new ChatItemPreferences(Long.toString(idChat), written, editedMessageId);
-                        dbH.setChatItemPreferences(prefs);
+                    if(dbH != null){
+                        ChatItemPreferences prefs = dbH.findChatPreferencesByHandle(Long.toString(idChat));
+                        String editedMessageId = editingMessage && messageToEdit != null ? Long.toString(messageToEdit.getMsgId()) : "";
+                        if (prefs != null) {
+                            prefs.setEditedMsgId(editedMessageId);
+                            prefs.setWrittenText(written);
+                            dbH.setWrittenTextItem(Long.toString(idChat), written, editedMessageId);
+                        } else {
+                            prefs = new ChatItemPreferences(Long.toString(idChat), written, editedMessageId);
+                            dbH.setChatItemPreferences(prefs);
+                        }
                     }
                 }
             }
@@ -8094,26 +8096,40 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     }
 
     public void closeChat(boolean shouldLogout) {
-        logDebug("closeChat");
+        logDebug("*************** 1 closeChat");
         if (megaChatApi == null || chatRoom == null || idChat == MEGACHAT_INVALID_HANDLE) {
             return;
         }
+        logDebug("*************** 2 closeChat isMeeting? "+chatRoom.isMeeting());
+
         saveInputText();
+        logDebug("*************** 3 closeChat");
+
         shouldLogout = chatC.isInAnonymousMode() && shouldLogout;
+        logDebug("*************** 4 closeChat");
+
         megaChatApi.closeChatRoom(idChat, this);
+        logDebug("*************** 5 closeChat");
 
         if (chatRoom.isPreview()) {
             megaChatApi.closeChatPreview(idChat);
         }
+        logDebug("*************** 6 closeChat");
 
         MegaApplication.setClosedChat(true);
+        logDebug("*************** 7 closeChat");
+
         megaChatApi.removeChatListener(this);
+        logDebug("*************** 8 closeChat");
 
         if (shouldLogout) {
             megaChatApi.logout();
         }
+        logDebug("*************** 9 closeChat");
 
         chatRoom = null;
+        logDebug("*************** 10 closeChat");
+
         idChat = MEGACHAT_INVALID_HANDLE;
     }
 

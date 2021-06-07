@@ -31,9 +31,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
             return
         }
 
-        // Hide Keyboard when click the butn
-        Util.hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
-        releaseVideoDeviceAndRemoveChatVideoListener()
+        releaseVideoAndHideKeyboard()
         val action = JoinMeetingFragmentDirections
             .actionGlobalInMeeting(
                 MeetingActivity.MEETING_ACTION_GUEST,
@@ -44,6 +42,11 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
                 lastName
             )
         findNavController().navigate(action)
+    }
+
+    fun releaseVideoAndHideKeyboard() {
+        Util.hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
+        releaseVideoDeviceAndRemoveChatVideoListener()
     }
 
     private fun isGuestNameValid(): Boolean {

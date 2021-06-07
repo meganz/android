@@ -441,10 +441,14 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         videoListener = null
     }
 
+    /**
+     * Method for release the video device and removing the video listener.
+     */
     fun releaseVideoDeviceAndRemoveChatVideoListener() {
         if (sharedModel.cameraLiveData.value == true) {
             sharedModel.releaseVideoDevice()
         }
+
         removeChatVideoListener()
     }
 }
