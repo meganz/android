@@ -66,6 +66,22 @@
 	</androidx.preference.PreferenceCategory>
 
 	<androidx.preference.PreferenceCategory
+		android:key="settings_media"
+		android:title="@string/settings_media"
+		app:allowDividerAbove="false"
+		app:allowDividerBelow="false">
+
+		<androidx.preference.SwitchPreferenceCompat
+			android:key="settings_audio_background_play_enabled"
+			android:title="@string/settings_media_audio_files"
+			android:summary="@string/settings_background_play_hint"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false" />
+
+	</androidx.preference.PreferenceCategory>
+
+	<androidx.preference.PreferenceCategory
 		android:key="settings_security"
 		android:title="@string/settings_security_options_title"
 		app:allowDividerAbove="false"

@@ -744,6 +744,10 @@
     <string name="settings_appearance">Appearance</string>
     <!-- settings of the Features section -->
     <string name="settings_features">Features</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">Media</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">Audio files</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="settings_storage">Storage</string>
     <!-- Settings of the Passcode -->
@@ -3828,6 +3832,8 @@
     <string name="background_play_hint">Will play in the background</string>
     <!-- Text that indicates the audio will not be played in background -->
     <string name="not_background_play_hint">Will not play in the background</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">Playing on the background</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">Now playing</string>
     <!-- Text that indicates the song is now playing, but paused -->

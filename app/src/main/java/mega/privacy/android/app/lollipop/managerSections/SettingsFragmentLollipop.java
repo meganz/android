@@ -17,7 +17,6 @@ import androidx.preference.SwitchPreferenceCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +44,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.utils.ThemeHelper;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
@@ -150,6 +150,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         cancelAccount.setOnPreferenceClickListener(this);
         findPreference(KEY_ABOUT_COOKIE_POLICY).setOnPreferenceClickListener(this);
         findPreference(KEY_COOKIE_SETTINGS).setOnPreferenceClickListener(this);
+        findPreference(KEY_AUDIO_BACKGROUND_PLAY_ENABLED).setOnPreferenceClickListener(this);
 
         updateCancelAccountSetting();
 
@@ -411,6 +412,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
             case KEY_COOKIE_SETTINGS:
                 startActivity(new Intent(context, CookiePreferencesActivity.class));
+                break;
+
+            case KEY_AUDIO_BACKGROUND_PLAY_ENABLED:
+                MediaPlayerService.stopAudioPlayer(context);
                 break;
         }
 
