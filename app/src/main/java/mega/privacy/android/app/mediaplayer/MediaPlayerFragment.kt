@@ -212,12 +212,6 @@ class MediaPlayerFragment : Fragment() {
             viewHolder.layoutArtwork()
             service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
 
-            // we need setup control buttons again, because reset player would reset
-            // PlayerControlView
-            viewHolder.setupBgPlaySetting(service.viewModel.backgroundPlayEnabled()) {
-                playerService?.viewModel?.toggleBackgroundPlay() ?: false
-            }
-
             viewHolder.setupPlaylistButton(service.viewModel.playlist.value?.first) {
                 findNavController().navigate(R.id.action_player_to_playlist)
             }

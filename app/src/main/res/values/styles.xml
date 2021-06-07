@@ -434,7 +434,7 @@
     </style>
 
     <style name="AudioPlayerButton">
-        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:background">?selectableItemBackground</item>
         <item name="android:layout_width">52dp</item>
         <item name="android:layout_height">52dp</item>
     </style>

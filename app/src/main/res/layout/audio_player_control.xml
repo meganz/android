@@ -85,15 +85,15 @@
         app:layout_constraintGuide_end="92dp" />
 
     <ImageButton
-        android:id="@id/exo_shuffle"
+        android:id="@+id/exo_minus_15"
         style="@style/AudioPlayerButton"
         android:layout_marginStart="10dp"
+        android:src="@drawable/audio_player_15_minus"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/exo_prev"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/control_button_center"
-        tools:src="@drawable/exo_controls_shuffle_on" />
+        app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
     <ImageButton
         android:id="@id/exo_prev"
@@ -102,7 +102,7 @@
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toStartOf="@id/play_pause_placeholder"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toEndOf="@id/exo_shuffle"
+        app:layout_constraintStart_toEndOf="@id/exo_minus_15"
         app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
     <View
@@ -138,51 +138,46 @@
         style="@style/AudioPlayerButton"
         android:src="@drawable/audio_player_next"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
-        app:layout_constraintEnd_toStartOf="@id/exo_repeat_toggle"
+        app:layout_constraintEnd_toStartOf="@id/exo_plus_15"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
     <ImageButton
-        android:id="@id/exo_repeat_toggle"
+        android:id="@+id/exo_plus_15"
         style="@style/AudioPlayerButton"
         android:layout_marginEnd="10dp"
-        android:src="@drawable/audio_player_play_bg_on"
+        android:src="@drawable/audio_player_15_plus"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@id/exo_next"
-        app:layout_constraintTop_toTopOf="@id/control_button_center"
-        tools:src="@drawable/exo_controls_repeat_all" />
+        app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
     <ImageButton
-        android:id="@+id/background_play_toggle"
+        android:id="@id/exo_shuffle"
         style="@style/AudioPlayerButton"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:src="@drawable/audio_player_play_bg_on" />
+        app:layout_constraintEnd_toEndOf="@id/exo_prev"
+        app:layout_constraintStart_toStartOf="@id/exo_prev"
+        tools:src="@drawable/exo_controls_shuffle_on" />
 
-    <TextView
-        android:id="@+id/background_play_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="29dp"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Accent"
+    <ImageButton
+        android:id="@id/exo_repeat_toggle"
+        style="@style/AudioPlayerButton"
+        android:src="@drawable/audio_player_play_bg_on"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="@string/background_play_hint" />
+        tools:src="@drawable/exo_controls_repeat_all" />
 
     <ImageButton
         android:id="@+id/playlist"
         style="@style/AudioPlayerButton"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
         android:enabled="false"
         android:src="@drawable/audio_player_playlist"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="@id/exo_next"
+        app:layout_constraintStart_toStartOf="@id/exo_next" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
