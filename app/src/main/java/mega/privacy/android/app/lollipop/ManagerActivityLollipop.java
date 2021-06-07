@@ -2431,9 +2431,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			initGooglePlayPayments();
 
 			megaApi.addGlobalListener(this);
-
-			megaApi.shouldShowRichLinkWarning(this);
-			megaApi.isRichPreviewsEnabled(this);
 			megaApi.isGeolocationEnabled(this);
 
 			if(savedInstanceState==null) {
