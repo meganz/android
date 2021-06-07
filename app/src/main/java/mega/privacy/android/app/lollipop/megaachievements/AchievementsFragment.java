@@ -30,35 +30,31 @@ import nz.mega.sdk.MegaAchievementsDetails;
 
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.INVALID_TYPE;
 import static mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity.sFetcher;
-import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
+import static mega.privacy.android.app.utils.Util.getSizeString;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
 public class AchievementsFragment extends BaseFragment implements OnClickListener
 		, GetAchievementsListener.DataCallback {
-	private LinearLayout parentLinearLayout;
-
-	private RelativeLayout referralBonusesLayout;
-
-	private RelativeLayout addPhoneLayout;
 	private RelativeLayout registrationLayout;
-	private RelativeLayout installAppLayout;
-	private RelativeLayout installDesktopLayout;
-
-	private LinearLayout figuresInstallAppLayout;
+	private LinearLayout separatorRegistration;
+	private RelativeLayout figuresInstallAppLayout;
 	private TextView zeroFiguresInstallAppText;
-	private long transferQuota = 0;
-	private TextView textUnlockedRewardTransfer;
 
-	private LinearLayout figuresReferralBonusesLayout;
+	private RelativeLayout figuresReferralBonusesLayout;
 	private TextView zeroFiguresReferralBonusesText;
 
-	private LinearLayout figuresRegistrationLayout;
+	private RelativeLayout figuresRegistrationLayout;
 
-	private LinearLayout figuresInstallDesktopLayout;
+	private RelativeLayout figuresInstallDesktopLayout;
 	private TextView zeroFiguresInstallDesktopText;
 
-	private LinearLayout figuresAddPhoneLayout;
+	private RelativeLayout figuresAddPhoneLayout;
 	private TextView zeroFiguresAddPhoneText;
 
 	private ImageView installAppIcon;
@@ -68,67 +64,35 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 	private ImageView referralBonusIcon;
 
 	private TextView figureUnlockedRewardStorage, figureUnlockedRewardStorageUnit;
-	private long storageQuota = 0;
-	private TextView figureUnlockedRewardTransfer, figureUnlockedRewardTransferUnit;
 
-	private TextView titleReferralBonuses;
 	private TextView figureReferralBonusesStorage;
-	private TextView figureReferralBonusesTransfer;
+
 	private long storageReferrals;
 	private long transferReferrals;
-	private TextView textReferralBonusesStorage;
-	private TextView textReferralBonusesTransfer;
 
-	private TextView figureBaseQuotaStorage;
-	private TextView figureBaseQuotaTransfer;
-	private TextView textBaseQuotaStorage;
-	private TextView textBaseQuotaTransfer;
 
-	private TextView titleInstallApp;
 	private TextView figureInstallAppStorage;
-	private TextView figureInstallAppTransfer;
-	private long storageInstallApp;
-	private long transferInstallApp;
-	private long daysLeftInstallApp;
 
 	private TextView textInstallAppStorage;
-	private TextView textInstallAppTransfer;
 	private TextView daysLeftInstallAppText;
 
-	private TextView titleAddPhone;
 	private TextView figureAddPhoneStorage;
-	private TextView figureAddPhoneTransfer;
-	private long storageAddPhone;
-	private long transferAddPhone;
-	private long daysLeftAddPhone;
 
 	private TextView textAddPhoneStorage;
-	private TextView textAddPhoneTransfer;
+
 	private TextView daysLeftAddPhoneText;
 
-	private TextView titleRegistration;
 	private TextView figureRegistrationStorage;
-	private TextView figureRegistrationTransfer;
-	private long storageRegistration;
-	private long transferRegistration;
-	private long daysLeftRegistration;
 
 	private TextView textRegistrationStorage;
-	private TextView textRegistrationTransfer;
+
 	private TextView daysLeftRegistrationText;
 
-	private TextView titleInstallDesktop;
 	private TextView figureInstallDesktopStorage;
-	private TextView figureInstallDesktopTransfer;
-	private long storageInstallDesktop;
-	private long transferInstallDesktop;
-	private long daysLeftInstallDesktop;
 
 	private TextView textInstallDesktopStorage;
-	private TextView textInstallDesktopTransfer;
-	private TextView daysLeftInstallDesktopText;
 
-	private Button inviteFriendsButton;
+	private TextView daysLeftInstallDesktopText;
 
 	private AchievementsActivity mActivity;
 
@@ -150,47 +114,46 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 		View v = inflater.inflate(R.layout.fragment_achievements, container, false);
 
-		parentLinearLayout = (LinearLayout) v.findViewById(R.id.main_linear_layout_achievements);
-
-		inviteFriendsButton = (Button) v.findViewById(R.id.invite_button);
+		Button inviteFriendsButton = (Button) v.findViewById(R.id.invite_button);
 		inviteFriendsButton.setOnClickListener(this);
 
-		referralBonusesLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_layout);
+		RelativeLayout referralBonusesLayout = (RelativeLayout) v.findViewById(R.id.referral_bonuses_layout);
 		referralBonusesLayout.setOnClickListener(this);
 
-		titleReferralBonuses = (TextView) v.findViewById(R.id.title_referral_bonuses);
+		TextView titleReferralBonuses = (TextView) v.findViewById(R.id.title_referral_bonuses);
 
 		boolean isPortrait = Util.isScreenInPortrait(MegaApplication.getInstance());
 
 		titleReferralBonuses.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
 
-		figuresReferralBonusesLayout = (LinearLayout) v.findViewById(R.id.figures_referral_bonuses_layout);
+		figuresReferralBonusesLayout = (RelativeLayout) v.findViewById(R.id.figures_referral_bonuses_layout);
 		figuresReferralBonusesLayout.setVisibility(View.GONE);
 
 		zeroFiguresReferralBonusesText = (TextView) v.findViewById(R.id.zero_figures_referral_bonuses_text);
 
-        registrationLayout = (RelativeLayout) v.findViewById(R.id.registration_layout);
+		separatorRegistration = (LinearLayout) v.findViewById(R.id.separator_registration);
+		registrationLayout = (RelativeLayout) v.findViewById(R.id.registration_layout);
         registrationLayout.setOnClickListener(this);
 
-		titleRegistration = (TextView) v.findViewById(R.id.title_registration);
+		TextView titleRegistration = (TextView) v.findViewById(R.id.title_registration);
 		titleRegistration.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
 
-		figuresRegistrationLayout = (LinearLayout) v.findViewById(R.id.figures_registration_layout);
+		figuresRegistrationLayout = (RelativeLayout) v.findViewById(R.id.figures_registration_layout);
 
-        installAppLayout = (RelativeLayout) v.findViewById(R.id.install_app_layout);
+		RelativeLayout installAppLayout = (RelativeLayout) v.findViewById(R.id.install_app_layout);
         installAppLayout.setOnClickListener(this);
 
-		titleInstallApp = (TextView) v.findViewById(R.id.title_install_app);
+		TextView titleInstallApp = (TextView) v.findViewById(R.id.title_install_app);
 		titleInstallApp.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
 
-		figuresInstallAppLayout = (LinearLayout) v.findViewById(R.id.figures_install_app_layout);
+		figuresInstallAppLayout = (RelativeLayout) v.findViewById(R.id.figures_install_app_layout);
 		figuresInstallAppLayout.setVisibility(View.GONE);
 		zeroFiguresInstallAppText = (TextView) v.findViewById(R.id.zero_figures_install_app_text);
 
-        addPhoneLayout = v.findViewById(R.id.add_phone_layout);
+		RelativeLayout addPhoneLayout = v.findViewById(R.id.add_phone_layout);
         if(megaApi.smsAllowedState() == 2) {
             addPhoneLayout.setOnClickListener(this);
-            titleAddPhone = v.findViewById(R.id.title_add_phone);
+			TextView titleAddPhone = v.findViewById(R.id.title_add_phone);
 			titleAddPhone.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
         } else {
             v.findViewById(R.id.separator_add_phone).setVisibility(View.GONE);
@@ -200,13 +163,13 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
         figuresAddPhoneLayout.setVisibility(View.GONE);
         zeroFiguresAddPhoneText = v.findViewById(R.id.zero_figures_add_phone_text);
 
-        installDesktopLayout = (RelativeLayout) v.findViewById(R.id.install_desktop_layout);
+		RelativeLayout installDesktopLayout = (RelativeLayout) v.findViewById(R.id.install_desktop_layout);
         installDesktopLayout.setOnClickListener(this);
 
-		titleInstallDesktop = (TextView) v.findViewById(R.id.title_install_desktop);
+		TextView titleInstallDesktop = (TextView) v.findViewById(R.id.title_install_desktop);
 		titleInstallDesktop.setMaxWidth(scaleWidthPx(isPortrait ? 190 : 250, outMetrics));
 
-		figuresInstallDesktopLayout = (LinearLayout) v.findViewById(R.id.figures_install_desktop_layout);
+		figuresInstallDesktopLayout = (RelativeLayout) v.findViewById(R.id.figures_install_desktop_layout);
 		figuresInstallDesktopLayout.setVisibility(View.GONE);
 
 		zeroFiguresInstallDesktopText = (TextView) v.findViewById(R.id.zero_figures_install_desktop_text);
@@ -217,95 +180,63 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		registrationIcon = (ImageView) v.findViewById(R.id.registration_icon);
 		referralBonusIcon = (ImageView) v.findViewById(R.id.referral_bonuses_icon);
 
-		String transferQuotaString = getString(R.string.label_transfer_quota_achievements);
-		transferQuotaString = transferQuotaString.toLowerCase(Locale.getDefault());
-
 		String storageQuotaString = getString(R.string.unlocked_storage_title);
 		storageQuotaString = storageQuotaString.toLowerCase(Locale.getDefault());
 
+		String storageSpaceString = getString(R.string.storage_space);
+		storageSpaceString = storageSpaceString.toLowerCase(Locale.getDefault());
+
 		figureUnlockedRewardStorage = (TextView) v.findViewById(R.id.unlocked_storage_text);
 		figureUnlockedRewardStorageUnit = v.findViewById(R.id.unlocked_storage_unit);
-		figureUnlockedRewardTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_text);
-        figureUnlockedRewardTransferUnit = v.findViewById(R.id.unlocked_transfer_unit);
 
 		figureUnlockedRewardStorage.setText(getSizeString(0));
-		figureUnlockedRewardTransfer.setText(getSizeString(0));
-
-		textUnlockedRewardTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title);
 
 		figureReferralBonusesStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_referral);
-		figureReferralBonusesTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_referral);
-
 		figureReferralBonusesStorage.setText(getSizeString(0));
-		figureReferralBonusesTransfer.setText(getSizeString(0));
 
-		textReferralBonusesStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_referral);
-		textReferralBonusesStorage.setText(storageQuotaString);
-		textReferralBonusesTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_referral);
-		textReferralBonusesTransfer.setText(transferQuotaString);
+		TextView textReferralBonusesStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_referral);
+		textReferralBonusesStorage.setText(storageSpaceString);
 
-		figureBaseQuotaStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_base_quota);
-		figureBaseQuotaTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_base_quota);
-
+		TextView figureBaseQuotaStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_base_quota);
 		figureBaseQuotaStorage.setText(getSizeString(0));
-		figureBaseQuotaTransfer.setText(getSizeString(0));
-		figureBaseQuotaTransfer.setVisibility(View.INVISIBLE);
 
-		textBaseQuotaStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_base_quota);
+		TextView textBaseQuotaStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_base_quota);
 		textBaseQuotaStorage.setText(storageQuotaString);
-		textBaseQuotaTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_base_quota);
-		textBaseQuotaTransfer.setText(transferQuotaString);
-		textBaseQuotaTransfer.setVisibility(View.INVISIBLE);
 
 		figureInstallAppStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_install_app);
-		figureInstallAppTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_install_app);
 
 		figureInstallAppStorage.setText(getSizeString(0));
-		figureInstallAppTransfer.setText(getSizeString(0));
 
 		textInstallAppStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_install_app);
-		textInstallAppStorage.setText(storageQuotaString);
-		textInstallAppTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_install_app);
-		textInstallAppTransfer.setText(transferQuotaString);
+		textInstallAppStorage.setText(storageSpaceString);
 		daysLeftInstallAppText = (TextView) v.findViewById(R.id.days_left_text_install_app);
 		daysLeftInstallAppText.setText(("..."));
 
         figureAddPhoneStorage = v.findViewById(R.id.figure_unlocked_storage_text_add_phone);
-        figureAddPhoneTransfer = v.findViewById(R.id.figure_unlocked_transfer_text_add_phone);
 
         figureAddPhoneStorage.setText(getSizeString(0));
-        figureAddPhoneTransfer.setText(getSizeString(0));
 
         textAddPhoneStorage = v.findViewById(R.id.unlocked_storage_title_add_phone);
-        textAddPhoneStorage.setText(storageQuotaString);
-        textAddPhoneTransfer = v.findViewById(R.id.unlocked_transfer_title_add_phone);
-        textAddPhoneTransfer.setText(transferQuotaString);
+        textAddPhoneStorage.setText(storageSpaceString);
+
         daysLeftAddPhoneText = v.findViewById(R.id.days_left_text_add_phone);
         daysLeftAddPhoneText.setText(("..."));
 
 		figureRegistrationStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_registration);
-		figureRegistrationTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_registration);
-
 		figureRegistrationStorage.setText(getSizeString(0));
-		figureRegistrationTransfer.setText(getSizeString(0));
 
 		textRegistrationStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_registration);
-		textRegistrationStorage.setText(storageQuotaString);
-		textRegistrationTransfer = (TextView) v.findViewById(R.id.unlocked_transfer_title_registration);
-		textRegistrationTransfer.setText(transferQuotaString);
+		textRegistrationStorage.setText(storageSpaceString);
+
 		daysLeftRegistrationText = (TextView) v.findViewById(R.id.days_left_text_registration);
 		daysLeftRegistrationText.setText(("..."));
 
 		figureInstallDesktopStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_install_desktop);
-		figureInstallDesktopTransfer = (TextView) v.findViewById(R.id.figure_unlocked_transfer_text_install_desktop);
-
 		figureInstallDesktopStorage.setText(getSizeString(0));
-		figureInstallDesktopTransfer.setText(getSizeString(0));
 
 		textInstallDesktopStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_install_desktop);
-		textInstallDesktopStorage.setText(storageQuotaString);
-		textInstallDesktopTransfer= (TextView) v.findViewById(R.id.unlocked_transfer_title_install_desktop);
-		textInstallDesktopTransfer.setText(transferQuotaString);
+		textInstallDesktopStorage.setText(storageSpaceString);
+
 		daysLeftInstallDesktopText = (TextView) v.findViewById(R.id.days_left_text_install_desktop);
 		daysLeftInstallDesktopText.setText(("..."));
 
@@ -314,8 +245,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		daysLeftAddPhoneText.setVisibility(View.INVISIBLE);
 
 		figureUnlockedRewardStorage.setText("...");
-
-		figureUnlockedRewardTransfer.setText("...");
 
 		mAdsLoader.setAdViewContainer(v.findViewById(R.id.ad_view_container),
 				mActivity.getOutMetrics());
@@ -407,17 +336,12 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		logDebug("After referrals: storage: " + getSizeString(totalStorage) + " transfer " + getSizeString(totalTransfer));
 
 		long referralsStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
-		long referralsTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
 		long installAppStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
-		long installAppTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL);
         long addPhoneStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
-        long addPhoneTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
 		long installDesktopStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
-		long installDesktopTransferValue = details.getClassTransfer(MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL);
 
 		if(transferReferrals>0||storageReferrals>0){
 
-			figureReferralBonusesTransfer.setText(getSizeString(transferReferrals));
 			figureReferralBonusesStorage.setText(getSizeString(storageReferrals));
 
 			figuresReferralBonusesLayout.setVisibility(View.VISIBLE);
@@ -442,13 +366,13 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		}
 		else{
 			figuresReferralBonusesLayout.setVisibility(View.GONE);
-			zeroFiguresReferralBonusesText.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue), getSizeString(referralsTransferValue)));
+			zeroFiguresReferralBonusesText.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue)));
 			zeroFiguresReferralBonusesText.setVisibility(View.VISIBLE);
 		}
 
-		zeroFiguresInstallAppText.setText(getString(R.string.figures_achievements_text, getSizeString(installAppStorageValue), getSizeString(installAppTransferValue)));
-		zeroFiguresAddPhoneText.setText(getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue), getSizeString(addPhoneTransferValue)));
-		zeroFiguresInstallDesktopText.setText(getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue), getSizeString(installDesktopTransferValue)));
+		zeroFiguresInstallAppText.setText(getString(R.string.figures_achievements_text, getSizeString(installAppStorageValue)));
+		zeroFiguresAddPhoneText.setText(getString(R.string.figures_achievements_text, getSizeString(addPhoneStorageValue)));
+		zeroFiguresInstallDesktopText.setText(getString(R.string.figures_achievements_text, getSizeString(installDesktopStorageValue)));
 
 		long count = details.getAwardsCount();
 
@@ -467,8 +391,8 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 				figuresInstallAppLayout.setVisibility(View.VISIBLE);
 				zeroFiguresInstallAppText.setVisibility(View.GONE);
 
-				storageInstallApp = details.getRewardStorageByAwardId(awardId);
-				if(storageInstallApp>0){
+				long storageInstallApp = details.getRewardStorageByAwardId(awardId);
+				if(storageInstallApp >0){
 					figureInstallAppStorage.setText(getSizeString(storageInstallApp));
 					figureInstallAppStorage.setVisibility(View.VISIBLE);
 					textInstallAppStorage.setVisibility(View.VISIBLE);
@@ -478,19 +402,10 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 					textInstallAppStorage.setVisibility(View.INVISIBLE);
 				}
 
-				transferInstallApp = details.getRewardTransferByAwardId(awardId);
-				if(transferInstallApp>0){
-					figureInstallAppTransfer.setText(getSizeString(transferInstallApp));
-					figureInstallAppTransfer.setVisibility(View.VISIBLE);
-					textInstallAppTransfer.setVisibility(View.VISIBLE);
-				}
-				else{
-					figureInstallAppTransfer.setVisibility(View.INVISIBLE);
-					textInstallAppTransfer.setVisibility(View.INVISIBLE);
-				}
+				long transferInstallApp = details.getRewardTransferByAwardId(awardId);
 
 				daysLeftInstallAppText.setVisibility(View.VISIBLE);
-				daysLeftInstallApp = details.getAwardExpirationTs(i);
+				long daysLeftInstallApp = details.getAwardExpirationTs(i);
 				logDebug("Install App AwardExpirationTs: " + daysLeftInstallApp);
 
 				Calendar start = calculateDateFromTimestamp(daysLeftInstallApp);
@@ -526,8 +441,8 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
                 figuresAddPhoneLayout.setVisibility(View.VISIBLE);
                 zeroFiguresAddPhoneText.setVisibility(View.GONE);
 
-                storageAddPhone = details.getRewardStorageByAwardId(awardId);
-                if(storageAddPhone>0){
+				long storageAddPhone = details.getRewardStorageByAwardId(awardId);
+                if(storageAddPhone >0){
                     figureAddPhoneStorage.setText(getSizeString(storageAddPhone));
                     figureAddPhoneStorage.setVisibility(View.VISIBLE);
                     textAddPhoneStorage.setVisibility(View.VISIBLE);
@@ -537,20 +452,11 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
                     textAddPhoneStorage.setVisibility(View.INVISIBLE);
                 }
 
-                transferAddPhone = details.getRewardTransferByAwardId(awardId);
-                if(transferAddPhone>0){
-                    figureAddPhoneTransfer.setText(getSizeString(transferAddPhone));
-                    figureAddPhoneTransfer.setVisibility(View.VISIBLE);
-                    textAddPhoneTransfer.setVisibility(View.VISIBLE);
-                }
-                else{
-                    figureAddPhoneTransfer.setVisibility(View.INVISIBLE);
-                    textAddPhoneTransfer.setVisibility(View.INVISIBLE);
-                }
+				long transferAddPhone = details.getRewardTransferByAwardId(awardId);
 
                 daysLeftAddPhoneText.setVisibility(View.VISIBLE);
-                daysLeftAddPhone = details.getAwardExpirationTs(i);
-                logDebug("Add phone AwardExpirationTs: "+daysLeftAddPhone);
+				long daysLeftAddPhone = details.getAwardExpirationTs(i);
+                logDebug("Add phone AwardExpirationTs: "+ daysLeftAddPhone);
 
                 Calendar start = calculateDateFromTimestamp(daysLeftAddPhone);
                 Calendar end = Calendar.getInstance();
@@ -585,8 +491,8 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 				figuresInstallDesktopLayout.setVisibility(View.VISIBLE);
 				zeroFiguresInstallDesktopText.setVisibility(View.GONE);
 
-				storageInstallDesktop = details.getRewardStorageByAwardId(awardId);
-				if(storageInstallDesktop>0){
+				long storageInstallDesktop = details.getRewardStorageByAwardId(awardId);
+				if(storageInstallDesktop >0){
 					figureInstallDesktopStorage.setText(getSizeString(storageInstallDesktop));
 					textInstallDesktopStorage.setVisibility(View.VISIBLE);
 					textInstallDesktopStorage.setVisibility(View.VISIBLE);
@@ -596,19 +502,10 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 					textInstallDesktopStorage.setVisibility(View.INVISIBLE);
 				}
 
-				transferInstallDesktop = details.getRewardTransferByAwardId(awardId);
-				if(transferInstallDesktop>0){
-					figureInstallDesktopTransfer.setText(getSizeString(transferInstallDesktop));
-					figureInstallDesktopTransfer.setVisibility(View.VISIBLE);
-					textInstallDesktopTransfer.setVisibility(View.VISIBLE);
-				}
-				else{
-					figureInstallDesktopTransfer.setVisibility(View.INVISIBLE);
-					textInstallDesktopTransfer.setVisibility(View.INVISIBLE);
-				}
+				long transferInstallDesktop = details.getRewardTransferByAwardId(awardId);
 
 				daysLeftInstallDesktopText.setVisibility(View.VISIBLE);
-				daysLeftInstallDesktop = details.getAwardExpirationTs(i);
+				long daysLeftInstallDesktop = details.getAwardExpirationTs(i);
 				logDebug("Install Desktop AwardExpirationTs: " + daysLeftInstallDesktop);
 
 				Calendar start = calculateDateFromTimestamp(daysLeftInstallDesktop);
@@ -641,8 +538,12 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 			}
 			else if(type == MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME){
 				logDebug("MEGA_ACHIEVEMENT_WELCOME");
-				storageRegistration = details.getRewardStorageByAwardId(awardId);
-				if(storageRegistration>0){
+
+				registrationLayout.setVisibility(View.VISIBLE);
+				separatorRegistration.setVisibility(View.VISIBLE);
+				long storageRegistration = details.getRewardStorageByAwardId(awardId);
+
+				if(storageRegistration >0){
 					figureRegistrationStorage.setText(getSizeString(storageRegistration));
 					figureRegistrationStorage.setVisibility(View.VISIBLE);
 					textRegistrationStorage.setVisibility(View.VISIBLE);
@@ -652,18 +553,9 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 					textRegistrationStorage.setVisibility(View.INVISIBLE);
 				}
 
-				transferRegistration= details.getRewardTransferByAwardId(awardId);
-				if(transferRegistration>0){
-					figureRegistrationTransfer.setText(getSizeString(transferRegistration));
-					figureRegistrationTransfer.setVisibility(View.VISIBLE);
-					textRegistrationTransfer.setVisibility(View.VISIBLE);
-				}
-				else{
-					figureRegistrationTransfer.setVisibility(View.INVISIBLE);
-					textRegistrationTransfer.setVisibility(View.INVISIBLE);
-				}
+				long transferRegistration = details.getRewardTransferByAwardId(awardId);
 
-				daysLeftRegistration= details.getAwardExpirationTs(i);
+				long daysLeftRegistration = details.getAwardExpirationTs(i);
 				logDebug("Registration AwardExpirationTs: " + daysLeftRegistration);
 
 				Calendar start = calculateDateFromTimestamp(daysLeftRegistration);
@@ -698,18 +590,14 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 			}
 		}
 
-		storageQuota = details.currentStorage();
+		long storageQuota = details.currentStorage();
 
 		logDebug("My calculated totalTransfer: " + totalStorage);
 		String sizeString = getSizeString(storageQuota);
 		figureUnlockedRewardStorage.setText(getNumberAndUnit(sizeString)[0]);
 		figureUnlockedRewardStorageUnit.setText(getNumberAndUnit(sizeString)[1]);
 
-		transferQuota = details.currentTransfer();
-        sizeString = getSizeString(transferQuota);
 		logDebug("My calculated totalTransfer: " + totalTransfer);
-        figureUnlockedRewardTransfer.setText(getNumberAndUnit(sizeString)[0]);
-        figureUnlockedRewardTransferUnit.setText(getNumberAndUnit(sizeString)[1]);
 	}
 
     private String[] getNumberAndUnit(String sizeString) {
