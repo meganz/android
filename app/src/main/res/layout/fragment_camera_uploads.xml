@@ -74,10 +74,6 @@
         android:layout_below="@+id/upload_progress"
         android:clipToPadding="false" />
 
-    <include
-        android:id="@+id/view_type_layout"
-        layout="@layout/cu_view_type_layout" />
-
     <mega.privacy.android.app.components.scrollBar.FastScroller
         android:id="@+id/scroller"
         android:layout_width="wrap_content"

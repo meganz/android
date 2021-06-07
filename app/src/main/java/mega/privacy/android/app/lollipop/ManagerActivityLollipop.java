@@ -557,6 +557,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private MiniAudioPlayerController miniAudioPlayerController;
 
+	private LinearLayout cuViewTypes;
+	private TextView cuYearsButton;
+	private TextView cuMonthsButton;
+	private TextView cuDaysButton;
+	private TextView cuAllButton;
 	private LinearLayout cuLayout;
 	private Button enableCUButton;
 	private ProgressBar cuProgressBar;
@@ -2053,6 +2058,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			tabLayoutContacts.setTabMode(TabLayout.MODE_SCROLLABLE);
 		}
 
+		cuViewTypes = findViewById(R.id.cu_view_type);
+		cuYearsButton = findViewById(R.id.years_button);
+		cuMonthsButton = findViewById(R.id.months_button);
+		cuDaysButton = findViewById(R.id.days_button);
+		cuAllButton = findViewById(R.id.all_button);
 		cuLayout = findViewById(R.id.cu_layout);
 		cuProgressBar = findViewById(R.id.cu_progress_bar);
 		enableCUButton = findViewById(R.id.enable_cu_button);
@@ -5479,6 +5489,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if (item != DrawerItem.CAMERA_UPLOADS) {
 			cuLayout.setVisibility(View.GONE);
+			cuViewTypes.setVisibility(View.GONE);
 		}
 
 		if (item != DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
@@ -5558,6 +5569,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 				}
 
+				cuFragment.setViewTypes(cuViewTypes, cuYearsButton, cuMonthsButton, cuDaysButton, cuAllButton);
 				replaceFragment(cuFragment, FragmentTag.CAMERA_UPLOADS.getTag());
 				setToolbarTitle();
 				supportInvalidateOptionsMenu();
@@ -8961,6 +8973,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		setBottomNavigationMenuItemChecked(CAMERA_UPLOADS_BNV);
 		setToolbarTitle();
 		refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+	}
+
+	public void updateCUViewTypes(int visibility) {
+		cuViewTypes.setVisibility(visibility);
 	}
 
 	public void updateCULayout(int visibility) {

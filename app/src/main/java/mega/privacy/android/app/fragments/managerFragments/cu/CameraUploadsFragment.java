@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -97,6 +98,12 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     private CUGridViewAdapter gridAdapter;
     private CUCardViewAdapter cardAdapter;
     private ActionMode mActionMode;
+
+    private LinearLayout viewTypesLayout;
+    private TextView yearsButton;
+    private TextView monthsButton;
+    private TextView daysButton;
+    private TextView allButton;
 
     private CuViewModel viewModel;
 
@@ -253,13 +260,24 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
         if (viewModel.isEnableCUShown()) {
             mManagerActivity.updateCULayout(View.GONE);
+            mManagerActivity.updateCUViewTypes(View.GONE);
             return;
         }
 
+        mManagerActivity.updateCUViewTypes(View.VISIBLE);
         setupRecyclerView();
         setupOtherViews();
         observeLiveData();
         viewModel.getCUCards();
+    }
+
+    public void setViewTypes(LinearLayout cuViewTypes, TextView cuYearsButton,
+                             TextView cuMonthsButton, TextView cuDaysButton, TextView cuAllButton) {
+        this.viewTypesLayout = cuViewTypes;
+        this.yearsButton = cuYearsButton;
+        this.monthsButton = cuMonthsButton;
+        this.daysButton = cuDaysButton;
+        this.allButton = cuAllButton;
     }
 
     /**
@@ -355,16 +373,16 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.photos_empty)),
                 HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-        binding.viewTypeLayout.allButton.setOnClickListener(v -> newViewClicked(ALL_VIEW));
-        binding.viewTypeLayout.daysButton.setOnClickListener(v -> newViewClicked(DAYS_VIEW));
-        binding.viewTypeLayout.monthsButton.setOnClickListener(v -> newViewClicked(MONTHS_VIEW));
-        binding.viewTypeLayout.yearsButton.setOnClickListener(v -> newViewClicked(YEARS_VIEW));
+        allButton.setOnClickListener(v -> newViewClicked(ALL_VIEW));
+        daysButton.setOnClickListener(v -> newViewClicked(DAYS_VIEW));
+        monthsButton.setOnClickListener(v -> newViewClicked(MONTHS_VIEW));
+        yearsButton.setOnClickListener(v -> newViewClicked(YEARS_VIEW));
         updateViewSelected();
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.viewTypeLayout.container.getLayoutParams();
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) viewTypesLayout.getLayoutParams();
             params.width = outMetrics.heightPixels;
-            binding.viewTypeLayout.container.setLayoutParams(params);
+            viewTypesLayout.setLayoutParams(params);
         }
     }
 
@@ -424,7 +442,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
             binding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
             binding.scroller.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
-            binding.viewTypeLayout.container.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
+            viewTypesLayout.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
         });
 
         viewModel.nodeToOpen()
@@ -472,7 +490,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void animateUI(boolean hide) {
-        boolean visible = binding.viewTypeLayout.container.getVisibility() == View.VISIBLE;
+        boolean visible = viewTypesLayout.getVisibility() == View.VISIBLE;
         if ((hide && !visible) || (!hide && visible)) {
             return;
         }
@@ -493,16 +511,16 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private void animateViewTypeLayout(boolean hide) {
         if (hide) {
-            binding.viewTypeLayout.container.animate()
+            viewTypesLayout.animate()
                     .translationY(getResources().getDimension(R.dimen.cu_view_type_button_height))
                     .setDuration(ANIMATION_DURATION)
-                    .withEndAction(() -> binding.viewTypeLayout.container.setVisibility(View.GONE))
+                    .withEndAction(() -> viewTypesLayout.setVisibility(View.GONE))
                     .start();
         } else {
-            binding.viewTypeLayout.container.animate()
+            viewTypesLayout.animate()
                     .translationY(0)
                     .setDuration(ANIMATION_DURATION)
-                    .withStartAction(() -> binding.viewTypeLayout.container.setVisibility(View.VISIBLE))
+                    .withStartAction(() -> viewTypesLayout.setVisibility(View.VISIBLE))
                     .start();
         }
     }
@@ -595,30 +613,30 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void updateViewSelected() {
-        setViewTypeButtonStyle(binding.viewTypeLayout.allButton, false);
-        setViewTypeButtonStyle(binding.viewTypeLayout.daysButton, false);
-        setViewTypeButtonStyle(binding.viewTypeLayout.monthsButton, false);
-        setViewTypeButtonStyle(binding.viewTypeLayout.yearsButton, false);
+        setViewTypeButtonStyle(allButton, false);
+        setViewTypeButtonStyle(daysButton, false);
+        setViewTypeButtonStyle(monthsButton, false);
+        setViewTypeButtonStyle(yearsButton, false);
 
         switch (selectedView) {
             case DAYS_VIEW:
-                setViewTypeButtonStyle(binding.viewTypeLayout.daysButton, true);
+                setViewTypeButtonStyle(daysButton, true);
                 break;
 
             case MONTHS_VIEW:
-                setViewTypeButtonStyle(binding.viewTypeLayout.monthsButton, true);
+                setViewTypeButtonStyle(monthsButton, true);
                 break;
 
             case YEARS_VIEW:
-                setViewTypeButtonStyle(binding.viewTypeLayout.yearsButton, true);
+                setViewTypeButtonStyle(yearsButton, true);
                 break;
 
             default:
-                setViewTypeButtonStyle(binding.viewTypeLayout.allButton, true);
+                setViewTypeButtonStyle(allButton, true);
         }
 
         updateFastScrollerVisibility();
-        updateScrollBehaviour();
+        mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW);
         mManagerActivity.updateCuFragmentOptionsMenu();
         mManagerActivity.updateEnableCUButton(selectedView == ALL_VIEW
                 && gridAdapter.getItemCount() > 0 && !viewModel.isCUEnabled()
@@ -629,18 +647,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             mManagerActivity.hideCUProgress();
             binding.uploadProgress.setVisibility(View.GONE);
         }
-    }
-
-    private void updateScrollBehaviour() {
-        int bottomNavigationViewHeight = getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height);
-        int viewTypeLayoutMarginBottom = getResources().getDimensionPixelOffset(R.dimen.cu_view_type_layout_margin_bottom);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.viewTypeLayout.container.getLayoutParams();
-        params.bottomMargin = selectedView != ALL_VIEW
-                ? bottomNavigationViewHeight + viewTypeLayoutMarginBottom
-                : viewTypeLayoutMarginBottom;
-
-        binding.viewTypeLayout.container.setLayoutParams(params);
-        mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW);
     }
 
     private void updateFastScrollerVisibility() {

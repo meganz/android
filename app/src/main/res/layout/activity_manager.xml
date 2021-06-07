@@ -158,6 +158,19 @@
                 android:stateListAnimator="@anim/button_elevation"
                 android:tint="@android:color/white" />
 
+            <include
+                android:id="@+id/cu_view_type"
+                layout="@layout/cu_view_type_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/mini_audio_player"
+                android:layout_centerHorizontal="true"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
             <com.google.android.exoplayer2.ui.PlayerView
                 android:id="@+id/mini_audio_player"
                 android:layout_width="match_parent"
