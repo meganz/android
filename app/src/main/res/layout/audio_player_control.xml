@@ -14,23 +14,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <mega.privacy.android.app.components.DefaultTimeBar
+    <com.google.android.exoplayer2.ui.DefaultTimeBar
         android:id="@id/exo_progress"
+        style="@style/Widget.Mega.TimeBar"
         android:layout_width="0dp"
-        android:layout_height="26dp"
-        app:buffered_color="@color/grey_300"
+        android:layout_height="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toTopOf="@id/controller_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/controller_bg"
-        app:played_color="@color/teal_300_teal_200"
-        app:unplayed_color="@color/grey_200_grey_600" />
+        app:layout_constraintTop_toTopOf="@id/controller_bg" />
 
     <TextView
         android:id="@id/exo_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="24dp"
         android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
@@ -40,7 +40,7 @@
         android:id="@id/exo_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="24dp"
         android:textAppearance="@style/TextAppearance.Mega.Caption.Variant3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"

@@ -52,8 +52,9 @@
         app:layout_constraintStart_toEndOf="@id/play_pause_placeholder"
         app:layout_constraintTop_toTopOf="@id/play_pause_placeholder" />
 
-    <mega.privacy.android.app.components.DefaultTimeBar
+    <com.google.android.exoplayer2.ui.DefaultTimeBar
         android:id="@id/exo_progress"
+        style="@style/Widget.Mega.TimeBar"
         android:layout_width="0dp"
         android:layout_height="26dp"
         android:layout_marginBottom="70dp"
