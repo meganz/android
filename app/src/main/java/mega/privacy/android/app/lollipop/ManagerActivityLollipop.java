@@ -7570,10 +7570,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
             if (transfersWidgetLayout == null) return;
 
-            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
             params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM, outMetrics);
-            params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-
+            params.gravity = Gravity.END;
 			transfersWidgetLayout.setLayoutParams(params);
         }
     }
@@ -12986,23 +12985,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	/**
-	 * Updates the fabButton position depending on if the bottom navigation view is shown or not
-	 * and shows it.
-	 *
-	 * @param withBottomNavigationView	true if the bottom navigation view is shown, false otherwise
+	 * Updates the fabButton icon and shows it.
 	 */
-	private void updateFabPositionAndShow(boolean withBottomNavigationView) {
+	private void updateFabAndShow() {
 		fabButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_white));
-
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) fabButton.getLayoutParams();
-
-		if (withBottomNavigationView) {
-			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-		} else {
-			params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-		}
-
-		fabButton.setLayoutParams(params);
 		fabButton.show();
 	}
 
@@ -13016,7 +13002,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		switch (drawerItem) {
 			case CLOUD_DRIVE:
-				updateFabPositionAndShow(true);
+				updateFabAndShow();
 				break;
 
 			case SHARED_ITEMS:
@@ -13034,7 +13020,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							case MegaShare.ACCESS_OWNER:
 							case MegaShare.ACCESS_READWRITE:
 							case MegaShare.ACCESS_FULL:
-								updateFabPositionAndShow(true);
+								updateFabAndShow();
 								break;
 
 							case MegaShare.ACCESS_READ:
@@ -13049,7 +13035,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						if (deepBrowserTreeOutgoing <= 0) {
 							hideFabButton();
 						} else {
-							updateFabPositionAndShow(true);
+							updateFabAndShow();
 						}
 						break;
 
@@ -13059,7 +13045,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						if (deepBrowserTreeLinks <= 0) {
 							hideFabButton();
 						} else {
-							updateFabPositionAndShow(true);
+							updateFabAndShow();
 						}
 						break;
 
@@ -13072,7 +13058,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				switch (getTabItemContacts()) {
 					case CONTACTS_TAB:
 					case SENT_REQUESTS_TAB:
-						updateFabPositionAndShow(false);
+						updateFabAndShow();
 						break;
 
 					default:
@@ -13086,7 +13072,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				}
 
-				updateFabPositionAndShow(true);
+				updateFabAndShow();
 				break;
 
 			default:
@@ -13506,7 +13492,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void enableHideBottomViewOnScroll(boolean enable) {
-		RelativeLayout layout = findViewById(R.id.container_bottom);
+		LinearLayout layout = findViewById(R.id.container_bottom);
 		if (layout == null) {
 			return;
 		}
@@ -13520,6 +13506,28 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		params.setBehavior(enable ?
 				new com.google.android.material.behavior.HideBottomViewOnScrollBehavior<RelativeLayout>()
 				: null);
+	}
+
+	public void animateBottomView(boolean hide) {
+		LinearLayout bottomView = findViewById(R.id.container_bottom);
+		if (bottomView == null || fragmentLayout == null) {
+			return;
+		}
+
+		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fragmentLayout.getLayoutParams();
+
+		if (hide && bottomView.getVisibility() == View.VISIBLE) {
+			params.setMargins(0, 0, 0, 0);
+			bottomView.animate().translationY(bottomView.getHeight()).setDuration(ANIMATION_DURATION)
+					.withEndAction(() -> bottomView.setVisibility(View.GONE)).start();
+		} else if (!hide && bottomView.getVisibility() == View.GONE) {
+			params.setMargins(0, 0, 0,
+					getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
+
+			bottomView.animate().translationY(0).setDuration(ANIMATION_DURATION)
+					.withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
+					.withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
+		}
 	}
 
 	public void showHideBottomNavigationView(boolean hide) {
@@ -13937,17 +13945,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
         if (transfersWidgetLayout == null) return;
 
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
+        params.gravity = Gravity.END;
 
-        if (bNVHidden) {
-            params.bottomMargin = 0;
-            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        } else if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+        if (!bNVHidden && drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
             params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM, outMetrics);
-            params.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         } else {
             params.bottomMargin = 0;
-            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
         }
 
         transfersWidgetLayout.setLayoutParams(params);

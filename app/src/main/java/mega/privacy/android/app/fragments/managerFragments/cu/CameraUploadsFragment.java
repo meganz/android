@@ -490,14 +490,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void animateUI(boolean hide) {
-        boolean visible = viewTypesLayout.getVisibility() == View.VISIBLE;
-        if ((hide && !visible) || (!hide && visible)) {
-            return;
-        }
-
         mManagerActivity.animateCULayout(hide || viewModel.isCUEnabled());
-        mManagerActivity.showHideBottomNavigationView(hide);
-        animateViewTypeLayout(hide);
+        mManagerActivity.animateBottomView(hide);
         mManagerActivity.setDrawerLockMode(hide);
         checkScroll();
 
@@ -506,22 +500,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 binding.cuContainer.setPadding(0, hide ? getStatusBarHeight() : 0, 0, 0);
                 addTranslucentNavigation(hide);
             }, ANIMATION_DURATION);
-        }
-    }
-
-    private void animateViewTypeLayout(boolean hide) {
-        if (hide) {
-            viewTypesLayout.animate()
-                    .translationY(getResources().getDimension(R.dimen.cu_view_type_button_height))
-                    .setDuration(ANIMATION_DURATION)
-                    .withEndAction(() -> viewTypesLayout.setVisibility(View.GONE))
-                    .start();
-        } else {
-            viewTypesLayout.animate()
-                    .translationY(0)
-                    .setDuration(ANIMATION_DURATION)
-                    .withStartAction(() -> viewTypesLayout.setVisibility(View.VISIBLE))
-                    .start();
         }
     }
 
