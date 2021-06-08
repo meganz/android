@@ -80,6 +80,7 @@ class MeetingActivity : PasscodeActivity() {
 
                 toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
 
+                @Suppress("DEPRECATION")
                 defaultInsets.replaceSystemWindowInsets(
                     defaultInsets.systemWindowInsetLeft,
                     0,
