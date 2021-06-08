@@ -373,10 +373,22 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.photos_empty)),
                 HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-        allButton.setOnClickListener(v -> newViewClicked(ALL_VIEW));
-        daysButton.setOnClickListener(v -> newViewClicked(DAYS_VIEW));
-        monthsButton.setOnClickListener(v -> newViewClicked(MONTHS_VIEW));
-        yearsButton.setOnClickListener(v -> newViewClicked(YEARS_VIEW));
+        if (allButton != null) {
+            allButton.setOnClickListener(v -> newViewClicked(ALL_VIEW));
+        }
+
+        if (daysButton != null) {
+            daysButton.setOnClickListener(v -> newViewClicked(DAYS_VIEW));
+        }
+
+        if (monthsButton != null) {
+            monthsButton.setOnClickListener(v -> newViewClicked(MONTHS_VIEW));
+        }
+
+        if (yearsButton != null) {
+            yearsButton.setOnClickListener(v -> newViewClicked(YEARS_VIEW));
+        }
+
         updateViewSelected();
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -653,10 +665,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         switch (selectedView) {
             case DAYS_VIEW:
                 card = viewModel.dayClicked(position, card);
-                newViewClicked(ALL_VIEW);
                 int cuNodePosition = gridAdapter.getNodePosition(card.getNode().getHandle());
-                layoutManager.scrollToPosition(cuNodePosition);
                 openNode(cuNodePosition, gridAdapter.getNodeAtPosition(cuNodePosition));
+                newViewClicked(ALL_VIEW);
+                mManagerActivity.showBottomView();
+                layoutManager.scrollToPosition(cuNodePosition);
                 break;
 
             case MONTHS_VIEW:

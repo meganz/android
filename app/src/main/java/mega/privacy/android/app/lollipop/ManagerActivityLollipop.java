@@ -13505,6 +13505,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
 		params.setBehavior(enable ? new CustomHideBottomViewOnScrollBehaviour<LinearLayout>() : null);
+		layout.setLayoutParams(params);
+	}
+
+	public void showBottomView() {
+		LinearLayout bottomView = findViewById(R.id.container_bottom);
+		if (bottomView == null || fragmentLayout == null) {
+			return;
+		}
+
+		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fragmentLayout.getLayoutParams();
+		params.setMargins(0, 0, 0,
+				getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
+		bottomView.animate().translationY(0).setDuration(175)
+				.withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
+				.withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
 	}
 
 	public void animateBottomView(boolean hide) {
