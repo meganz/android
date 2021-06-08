@@ -29,7 +29,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -60,7 +59,6 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 	boolean multipleSelect;
 	DatabaseHandler dbH = null;
 	private SparseBooleanArray selectedItems;
-	ContactsFragmentLollipop fragment;
 	SparseBooleanArray selectedContacts;
 
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
@@ -375,9 +373,6 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					if (selectedItems.size() <= 0){
-						((ContactsFragmentLollipop) fragment).hideMultipleSelect();
-					}
 					notifyItemChanged(positionToflip);
 				}
 
@@ -420,9 +415,6 @@ public class MegaContactsAttachedLollipopAdapter extends RecyclerView.Adapter<Me
 
 				@Override
 				public void onAnimationEnd(Animation animation) {
-					if (selectedItems.size() <= 0){
-						((ContactsFragmentLollipop) fragment).hideMultipleSelect();
-					}
 				}
 
 				@Override
