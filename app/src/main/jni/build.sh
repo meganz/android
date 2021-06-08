@@ -461,8 +461,6 @@ if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
     downloadAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS}
     ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
 
-    BUILD_ARCHS="x86 armeabi-v7a x86_64 arm64-v8a"
-
     for ABI in ${BUILD_ARCHS}; do
         echo " * Prebuilding libwebsockets for ${ABI}"
         if [ "${ABI}" == "armeabi-v7a" ]; then
