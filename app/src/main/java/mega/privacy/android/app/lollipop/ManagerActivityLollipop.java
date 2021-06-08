@@ -13524,7 +13524,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			params.setMargins(0, 0, 0,
 					getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
 
-			bottomView.animate().translationY(0).setDuration(ANIMATION_DURATION)
+			int navigationBarId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+			int translationY = navigationBarId > 0
+					? getResources().getDimensionPixelSize(navigationBarId)
+					: bNV.getHeight();
+
+			bottomView.animate().translationY(translationY).setDuration(ANIMATION_DURATION)
 					.withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
 					.withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
 		}
