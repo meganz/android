@@ -105,7 +105,7 @@
     <!-- Menu item -->
     <string name="action_create_folder">Nuova cartella</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Create new text file</string>
+    <string name="action_create_txt">Crea un nuovo file di testo</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">Apri link</string>
     <!-- Menu item -->
@@ -426,7 +426,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Rinomina</string>
     <!-- Title of a dialog to rename a node. The place holder is to set the current name of the node. -->
-    <string name="rename_dialog_title">Rename %1$s</string>
+    <string name="rename_dialog_title">Rinomina %1$s</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="context_open_link_title">Apri link</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -749,9 +749,9 @@
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="settings_storage">Archivio</string>
     <!-- Settings of the Passcode -->
-    <string name="settings_passcode_lock">Passcode lock</string>
+    <string name="settings_passcode_lock">Blocco con passcode</string>
     <!-- Setting to allow the user to select the preferred passcode type -->
-    <string name="settings_passcode_option">Passcode options</string>
+    <string name="settings_passcode_option">Opzioni passcode</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">La compressione dei video consuma molta energia; MEGA ti chiederà di caricare il tuo dispositivo se i video da convertire sono più grandi di %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
@@ -892,7 +892,7 @@
     <!-- Settings option to change Passcode. -->
     <string name="settings_change_passcode">Cambia codice d’accesso</string>
     <!-- Settings option screen to change Passcode. -->
-    <string name="title_change_passcode">Change passcode lock</string>
+    <string name="title_change_passcode">Cambia blocco con passcode</string>
     <!-- Settings option to set the timer to ask for passcode. -->
     <string name="settings_require_passcode">Passcode richiesto</string>
     <!-- Option available to choose in some context to make an action immediately. -->
@@ -901,8 +901,8 @@
     <string name="pin_lock_enter">Entra</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="one">1 failed passcode attempt</item>
-        <item quantity="other">%1$d failed passcode attempts</item>
+        <item quantity="one">1 tentativo fallito del passcode</item>
+        <item quantity="other">%1$d tentativi falliti del passcode</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">Effettuerai il logout e i tuoi file salvati per l’offline saranno eliminati dopo 10 tentativi falliti</string>
@@ -1511,7 +1511,7 @@
         <item quantity="one">%1$s [A]sta scrivendo&#8230;[/A]</item>
         <item quantity="other">%1$s [A]stanno scrivendo&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]ed altri stanno scrivendo&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Altro</string>
@@ -2009,7 +2009,7 @@
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Versione di Android</string>
     <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">New text file</string>
+    <string name="dialog_title_new_text_file">Nuovo file di testo</string>
     <!-- Title of the dialog to create a new file by inserting the name -->
     <string name="dialog_title_new_file">Nuovo file</string>
     <!-- Input field description in the create file dialog. -->
@@ -2047,17 +2047,17 @@
     <!-- the user can’t choose this date -->
     <string name="snackbar_search_by_date">La data inserita non è valida</string>
     <!-- Error shown when the user left a name empty -->
-    <string name="empty_name">Invalid name</string>
+    <string name="empty_name">Nome non valido</string>
     <!-- Error shown when the user left names empty and names typed with not allowed characters -->
-    <string name="general_incorrect_names">Please correct your filenames before proceeding</string>
+    <string name="general_incorrect_names">Per favore, correggi i nomi dei tuoi file prima di procedere</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caratteri non ammessi</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+    <string name="invalid_characters_defined">I seguenti caratteri non sono permessi: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">Please name your file before proceeding</item>
-        <item quantity="other">Please name your files before proceeding</item>
+        <item quantity="one">Per favore, dai un nome al tuo file prima di procedere</item>
+        <item quantity="other">Per favore, dai un nome ai tuoi file prima di procedere</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
     <string name="audio_play">File audio</string>
@@ -2523,7 +2523,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
     <string name="verify_2fa_subtitle_delete_account">Elimina account</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
-    <string name="verify_2fa_subtitle_diable_2fa">Disable</string>
+    <string name="verify_2fa_subtitle_diable_2fa">Disabilita</string>
     <!-- Title of screen Lost authenticator decive -->
     <string name="title_lost_authenticator_device">Hai perso il tuo dispositivo autenticatore?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
@@ -2543,9 +2543,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Esporta la tua Chiave di Recupero per terminare</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
+    <string name="no_authentication_apps_title">App autenticazione a due fattori</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
+    <string name="open_play_store_2fa">Vuoi aprire il Google Play Store in modo da installare un’app per l’autenticazione?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2559,7 +2559,7 @@
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">Lo streaming non può essere eseguito e il file non è stato scaricato</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
-    <string name="error_fail_to_open_file_general">Unable to open file.</string>
+    <string name="error_fail_to_open_file_general">Impossibile aprire il file</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Non siamo stati capaci di aprire il file a causa della mancanza di connessione.</string>
     <!-- message when trying to save for offline a file that already exists -->
@@ -2733,7 +2733,7 @@
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="video_button">Video</string>
     <!-- Title of file explorer to send a link -->
-    <string name="title_file_explorer_send_link">Send link to&#8230;</string>
+    <string name="title_file_explorer_send_link">Invia link a&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Invia a&#8230;</string>
     <!-- Title of cloud explorer to upload a link or file -->
@@ -3827,15 +3827,15 @@
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Grigio</string>
     <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">Will play in the background</string>
+    <string name="background_play_hint">Verrà riprodotto in background</string>
     <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">Will not play in the background</string>
+    <string name="not_background_play_hint">Non verrà riprodotto in background</string>
     <!-- Text that indicates the song is now playing -->
-    <string name="audio_player_now_playing">Now playing</string>
+    <string name="audio_player_now_playing">Adesso in riproduzione</string>
     <!-- Text that indicates the song is now playing, but paused -->
-    <string name="audio_player_now_playing_paused">Now playing (paused)</string>
+    <string name="audio_player_now_playing_paused">Adesso in riproduzione (in pausa)</string>
     <!-- Title of the song info screen -->
-    <string name="audio_track_info">Track info</string>
+    <string name="audio_track_info">Informazioni sulla traccia</string>
     <!-- Action to get more information -->
     <string name="action_more_information">Maggiori informazioni</string>
     <!-- Preferences screen item title for Cookie Policy -->
@@ -3847,9 +3847,9 @@
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
     <string name="dialog_cookie_alert_message">Noi utilizziamo archiviazione locale e tecnologie simili (“Cookie”) per fornirti i nostri servizi, migliorare la tua esperienza con essi e personalizzare le pubblicità che vedi, incluse quelle tramite terze parti. Accetta l’utilizzo dei nostri Cookie dall’inizio della tua visita personalizza i Cookie nelle Impostazioni dei Cookie. Leggi di più riguardo la nostra [A]Politica dei Cookie[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
-    <string name="dialog_cookie_alert_unsaved">Cookie Settings unsaved.</string>
+    <string name="dialog_cookie_alert_unsaved">Impostazioni dei cookie non salvate</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
-    <string name="dialog_cookie_snackbar_saved">Cookie Settings changes have been saved</string>
+    <string name="dialog_cookie_snackbar_saved">I cambiamenti delle impostazioni dei cookie sono stati salvati</string>
     <!-- Cookie dialog third party title -->
     <string name="dialog_cookie_thirdparty_title">Cookie di terze parti</string>
     <!-- Cookie dialog third party first subtitle -->
@@ -3899,27 +3899,47 @@
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Impostato dal Risparmio energetico</string>
     <!-- Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app). -->
-    <string name="ask_for_select_sdcard_root">Please select SD card root.</string>
+    <string name="ask_for_select_sdcard_root">Per favore, seleziona il root della SD</string>
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
     <string name="cloud_drive_select_destination">Seleziona destinazione</string>
     <!-- Warning which alerts the user before discard changes -->
-    <string name="discard_changes_warning">Discard changes and close the editor?</string>
+    <string name="discard_changes_warning">Scartare i cambiamenti e chiudere l’editor?</string>
     <!-- Action discard -->
-    <string name="discard_close_action">Discard and close</string>
+    <string name="discard_close_action">Scarta e chiudi</string>
     <!-- Label indicating saving a file is in progress -->
-    <string name="saving_file">Saving file&#8230;</string>
+    <string name="saving_file">Salvataggio del file&#8230;</string>
     <!-- Label indicating a file was created successfully -->
-    <string name="file_created">File created</string>
+    <string name="file_created">File creato</string>
     <!-- Warning indicating a file was not created successfully -->
-    <string name="file_creation_failed">File creation failed. Try again.</string>
+    <string name="file_creation_failed">Creazione del file fallita. Riprova.</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
-    <string name="file_saved_to">File saved to %1$s</string>
+    <string name="file_saved_to">File salvato in %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">File not saved to %1$s. Try again.</string>
+    <string name="file_saved_to_failed">File non salvato in %1$s. Riprova.</string>
     <!-- Label indicating a file was updated successfully -->
-    <string name="file_updated">File updated</string>
+    <string name="file_updated">File aggiornato</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">File update failed. Try again.</string>
+    <string name="file_update_failed">Aggiornamento del file fallito. Riprova.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
-    <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
+    <string name="error_opening_file">Il file è troppo grande e non può essere aperto o visualizzato in anteprima.</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">File senza estensione (.%1$s)</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">Per continuare, devi inserire una estensione del file</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">Cambio dell’estensione file</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">Potresti non riuscire ad accedere a questo file se cambi l’estensione da “.%1$s” a “.%2$s”</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">Potresti non riuscire ad accedere a questo file se aggiungi l’estensione “.%1$s”</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">Potresti non riuscire ad accedere a questo file se rimuovi l’estensione “.%1$s”</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">Rimuovi estensione</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">Usa .%1$s</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">Nessuna estensione</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">Mantieni .%1$s</string>
 </resources>

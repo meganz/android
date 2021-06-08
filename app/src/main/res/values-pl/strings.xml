@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA zapewnia kontrolowane przez użytkownika szyfrowane przechowywanie w chmurze i czat za pośrednictwem standardowych przeglądarek internetowych, wraz z dedykowanymi aplikacjami na urządzenia mobilne. W przeciwieństwie do innych dostawców usług w chmurze, Twoje dane są szyfrowane i odszyfrowywane tylko przez urządzenia klienckie, a nigdy przez nas.\n\nPrześlij swoje pliki ze smartfona lub tabletu, a następnie wyszukuj, przechowuj, pobieraj, przesyłaj strumieniowo, przeglądaj, udostępniaj, zmieniaj nazwę lub usuwaj swoje pliki w dowolnym momencie, z dowolnego urządzenia, w dowolnym miejscu. Udostępniaj foldery swoim kontaktom i przeglądaj ich aktualizacje w czasie rzeczywistym. Proces szyfrowania oznacza, że ​​nie możemy uzyskać dostępu do Twojego hasła ani zresetować go, więc MUSISZ je zapamiętać (chyba że masz kopię zapasową klucza odzyskiwania), w przeciwnym razie utracisz dostęp do przechowywanych plików.\n\nMEGA zaszyfrowana przez użytkownika końcowego. Czat wideo zapewnia całkowitą prywatność i jest dostępny przez przeglądarkę od 2016 roku. Został rozszerzony na naszą aplikację mobilną, a historia czatów jest dostępna na wielu urządzeniach. Użytkownicy mogą również łatwo dodawać pliki do czatu ze swojego MEGA Cloud Drive.\n\nMEGA oferuje hojne 50 GB bezpłatnej przestrzeni dyskowej dla wszystkich zarejestrowanych użytkowników z dodatkowymi osiągnięciami i oferuje płatne plany ze znacznie wyższymi limitami:\n\n\nSubskrypcja Pro Lite: 4,99 EUR miesięcznie lub 49,99 EUR rocznie zapewnia 400 GB miejsca na dane i 1 TB limitu transferu miesięcznie.\nSubskrypcja Pro I: 9,99 EUR miesięcznie lub 99,99 EUR rocznie zapewnia 2 TB przestrzeni dyskowej i 2 TB limitu transferu miesięcznie.\nSubskrypcja Pro II: 19,99 EUR miesięcznie lub 199,99 EUR rocznie zapewnia 8 TB przestrzeni dyskowej i 8 TB limitu transferu miesięcznie. \nSubskrypcja Pro III: 29,99 € miesięcznie lub 299,99 € rocznie daje 16 TB przestrzeni dyskowej i 16 TB limitu transferu miesięcznie.\n\nSubskrypcje są odnawiane automatycznie na kolejne okresy subskrypcji o tej samej długości io taka sama cena jak w wybranym początkowym okresie. Aby zarządzać swoimi subskrypcjami, po prostu kliknij ikonę Sklepu Play na swoim urządzeniu mobilnym, zaloguj się za pomocą swojego identyfikatora Google (jeśli jeszcze tego nie zrobiłeś), a następnie kliknij aplikację MEGA. Będziesz mógł tam zarządzać swoją subskrypcją.\n\nUprawnienia aplikacji:\nWRITE_EXTERNAL_STORAGE -&gt; Pobierz swoje pliki z MEGA na swoje urządzenie i prześlij pliki z urządzenia do MEGA\nCAMERA -&gt; Weź zrób zdjęcie i prześlij swoje zdjęcia do MEGA\nREAD_CONTACTS -&gt; Z łatwością dodawaj kontakty z urządzenia jako kontakty MEGA\nRECORD_AUDIO i CAPTURE_VIDEO_OUTPUT (mikrofon i kamera) -&gt; MEGA zapewnia kompleksowe szyfrowane połączenia audio / wideo\n\n\nAby zwiększyć zaufanie użytkowników do systemu MEGA, publikowany jest cały kod po stronie klienta, aby zainteresowani badacze bezpieczeństwa mogli ocenić proces szyfrowania. Kod naszej aplikacji mobilnej znajduje się pod adresem: https://github.com/meganz/android\n\nAby uzyskać więcej informacji, odwiedź naszą witrynę:\nZobacz https://mega.nz/terms \n \n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA zapewnia kontrolowane przez użytkownika szyfrowane przechowywanie w chmurze i czat poprzez standardowe przeglądarki internetowe, wraz z dedykowanymi aplikacjami na urządzenia mobilne. W przeciwieństwie do innych dostawców usług przechowywania danych w chmurze, Twoje dane są szyfrowane i odszyfrowywane wyłącznie przez Twoje urządzenia klienckie, a nigdy przez nas.\n\nPrześlij swoje pliki ze smartfona lub tabletu, a następnie wyszukaj, przechowuj, pobierz, przesyłaj strumieniowo, przeglądaj, udostępniaj, zmieniaj nazwy lub usuwaj pliki w dowolnym czasie, z dowolnego urządzenia, w dowolnym miejscu. Udostępniaj foldery swoim kontaktom i obserwuj ich aktualizacje w czasie rzeczywistym. Proces szyfrowania oznacza, że nie możemy uzyskać dostępu ani zresetować Twojego hasła, więc MUSISZ je zapamiętać (chyba, że masz kopię zapasową Recovery Key) lub stracisz dostęp do swoich przechowywanych plików.\n\nSzyfrowany end-to-end użytkownika MEGA czat wideo pozwala na całkowitą prywatność i jest dostępny przez przeglądarkę od 2016 roku. Został on rozszerzony na naszą aplikację mobilną, z historią czatu dostępną na wielu urządzeniach. Użytkownicy mogą również łatwo dodawać pliki do czatu ze swojego MEGA Cloud Drive.\n\nMEGA oferuje hojne 50 GB darmowej pamięci masowej dla wszystkich zarejestrowanych użytkowników z bonusowymi osiągnięciami, a także oferuje płatne plany ze znacznie wyższymi limitami:\n\nSubskrypcja Pro Lite: 4,99 € za miesiąc lub 49,99 € za rok daje 400 GB przestrzeni dyskowej i 1 TB limitu transferu miesięcznie.\nSubskrypcja Pro I: 9,99 € za miesiąc lub 99,99 € za rok daje 2 TB przestrzeni dyskowej i 2 TB limitu transferu miesięcznie.\nSubskrypcja Pro II: 19,99 € miesięcznie lub 199,99 € rocznie daje Ci 8 TB przestrzeni dyskowej i 8 TB transferu miesięcznie.\nAbonament Pro III: 29,99 € miesięcznie lub 299,99 € rocznie daje Ci 16 TB przestrzeni dyskowej i 16 TB transferu miesięcznie.\n\nAbonamenty odnawiają się automatycznie na kolejne okresy abonamentowe o tym samym czasie trwania i w tej samej cenie, co wybrany okres początkowy. Aby zarządzać subskrypcjami, wystarczy kliknąć na ikonę Sklepu Play na swoim urządzeniu mobilnym, zalogować się za pomocą swojego identyfikatora Google (jeśli jeszcze tego nie zrobiłeś), a następnie kliknąć na aplikację MEGA. Tam będziesz mógł zarządzać swoją subskrypcją. Br]\nUprawnienia aplikacji: \nWRITE_EXTERNAL_STORAGE -&gt; Pobieraj swoje pliki z MEGA na urządzenie i przesyłaj pliki z urządzenia do MEGA\nCAMERA -&gt; Zrób zdjęcie i prześlij swoje zdjęcia do MEGA\nREAD_CONTACTS -. &gt; Łatwo dodawaj kontakty z urządzenia jako kontakty MEGA\nRECORD_AUDIO i CAPTURE_VIDEO_OUTPUT (mikrofon i kamera) -&gt; MEGA umożliwia szyfrowane połączenia audio/wideo end-to-end\n\n\nAby zwiększyć zaufanie użytkowników” do systemu MEGA, cały kod po stronie klienta jest publikowany, dzięki czemu zainteresowani badacze bezpieczeństwa mogą ocenić proces szyfrowania. Kod naszej aplikacji mobilnej znajduje się na stronie: https://github.com/meganz/android\n\n Więcej informacji można znaleźć na naszej stronie internetowej:\n\n\nZobacz https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA jest Cloud Storage z potężną, pełną prywatnością.</string>
     <!-- PRO Lite account -->
@@ -436,9 +436,9 @@
     <string name="context_remove_link_warning_text">Ten link nie będzie już&#160;dostępny publicznie.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
-        <item quantity="one">Ten link nie będzie już&#160;dostępny publicznie.</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="one">Ten link nie będzie już dostępny publicznie.</item>
+        <item quantity="few">Te linki nie będą już publicznie dostępne.</item>
+        <item quantity="many">Te linki nie będą już publicznie dostępne.</item>
         <item quantity="other">Te linki nie będą już publicznie dostępne.</item>
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -1555,7 +1555,7 @@
         <item quantity="many">%1$s [A]piszą&#8230;[/A]</item>
         <item quantity="other">%1$s [A]piszą&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]i pozostali piszą&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Więcej</string>
@@ -2619,7 +2619,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Gdy następnym razem zalogujesz się na swoje konto, zostaniesz poproszony o podanie 6-cyfrowego kodu podanego przez aplikację Authenticator.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Rozważ wyeksportowanie klucza <b>odzyskiwania</b> na wypadek utraty dostępu do aplikacji lub wyłączenia uwierzytelniania dwuczynnikowego w przyszłości.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Nieprawidłowy kod</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4096,4 +4096,24 @@
     <string name="file_update_failed">Aktualizacja pliku nie powiodła się. Spróbuj ponownie.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Plik jest zbyt duży i nie można go otworzyć ani wyświetlić jego podglądu.</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">Plik bez rozszerzenia (.%1$s)</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">Aby kontynuować, należy wpisać rozszerzenie pliku</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">Zmiana rozszerzenia pliku</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">Możesz nie być w stanie uzyskać dostępu do tego pliku, jeśli zmienisz go z “.%1$s” na “.%2$s”</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">Możesz nie być w stanie uzyskać dostępu do tego pliku. jeśli zmienisz go z pustego na “.%1$s”.</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">Możesz nie być w stanie uzyskać dostępu do tego pliku. jeśli zmienisz go z “.%1$s” na pusty</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">Usuń rozszerzenie</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">Użyj .%1$s</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">Brak rozszerzenia</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">Zachowaj .%1$s</string>
 </resources>

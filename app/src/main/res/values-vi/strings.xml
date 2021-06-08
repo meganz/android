@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA cung cấp không gian lưu trữ điện toán đám mây với công nghệ mã hoá đầu-cuối được điều hành bởi người sử dụng, cùng với dịch vụ chat thông qua trình duyệt web và các ứng dụng cho điện thoại di động. Không như các hãng khác, dữ liệu không thể bị giải mã bởi máy chủ, chỉ có thể thực hiện bởi người dùng trên chính chương trình được sử dụng.\n\nTải lên tệp tin từ smartphone hay máy tính bảng và quản lý bằng cách lưu trữ, tải về, truyền tải, chia sẻ, đổi tên, hay xóa bỏ dữ liệu vào bất cứ thời điểm, thiết bị muốn sử dụng ở bất cứ đâu. Chia sẻ thư mục với tên liên lạc và xem tương tác được cập nhật ngay tức thì. Bảo mật đầu-cuối mang nghĩa rằng mật khẩu BẮT BUỘC phải nhớ (hay cần phải có lưu lại Mã Phục Hồi) không thì sẽ mất toàn quyền truy cập vào tài khoản và mất hết dữ liệu.\n\nCông nghệ mã hóa đầu-cuối điều hành bởi người dùng cho phép thực hiện gọi video một cách bảo mật, và được hỗ trợ từ năm 2016 cho trình duyệt nay đã thực hiện cho app điện thoại, cùng với lịch sử cuộc trò chuyện có thể được xem trên nhiều thiết bị khác nhau. Nguời sử dụng còn có thể chia sẻ tệp tin từ Ổ Mây MEGA của mình vào cuộc chat.\n\nMEGA cung cấp cho mọi tài khoản không gian lưu trữ miễn phí lên đến 50 GB với các nhiệm vụ thưởng để mở rộng thêm không gian cùng các thuê bao trả phí như:\n\n\nGói Pro Lite: €4.99 (US$4.99) mỗi tháng hay €49.99 (US$49.99) mỗi năm cung cấp cho bạn 400 GB không gian lưu trữ và 1 TB cho băng thông truyền tải mỗi tháng.\nGói Pro I: €9.99 (US$9.99) mỗi tháng hay €99.99 (US$99.99) mỗi năm cung cấp cho bạn 2 TB không gian lưu trữ và 2 TB cho băng thông truyền tải mỗi tháng.\nGói Pro II: €19.99 (US$19.99) mỗi tháng hay €199.99 (US$199.99) mỗi năm cung cấp cho bạn 8 TB không gian lưu trữ và 8 TB cho băng thông truyền tải mỗi tháng.\nGói Pro III: €29.99 (US$29.99) mỗi tháng hay €299.99 (US$299.99) mỗi năm cung cấp cho bạn 16 TB không gian lưu trữ và 16 TB cho băng thông truyền tải mỗi tháng. tải mỗi tháng.\n\nGói thuê bao trả phí sẽ tự động mua chu kỳ mới vào ngày cuối hạn với cùng giá và thời hạn như thời kỳ ban đầu. Để quản lý việc mua gói cước, xin vào CH Play trên điện thoại, đăng nhập vào đia chỉ Gmail/Google ID (nếu chưa làm) và tìm đến app MEGA. Từ đó xem, quản lý, mua, hay hủy gói cước hạng thành viên.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Tải về tệp tin từ MEGA vào trong điện thoại và để lấy tệp tin trong máy tải lên MEGA\nCAMERA -&gt; Chụp ảnh và đăng tải lên MEGA\nREAD_CONTACTS -&gt; Để dễ dàng tìm các tên liên lạc có sử dụng MEGA\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (mic và camera) -&gt; MEGA cung cấp tính năng bảo mật đầu-cuối và cần dùng để thực hiện các cuộc gọi thoại/video\n\n\nCác lập trình viên cho ứng dụng Android muốn tương tác với mã nguồn của MEGA có thể xem qua: https://github.com/meganz/android\n\nĐể biết thêm thông tin xin vào website:\nSee https://mega.nz/terms\n\n\nTrên máy tính - https://mega.nz/</string>
+    <string name="full_description_text">MEGA cung cấp không gian lưu trữ điện toán đám mây với công nghệ mã hoá đầu-cuối được điều hành bởi người sử dụng, cùng với dịch vụ chat thông qua trình duyệt web và các ứng dụng cho điện thoại di động. Không như các hãng khác, dữ liệu không thể bị giải mã bởi máy chủ, chỉ có thể thực hiện bởi người dùng trên chính chương trình được sử dụng.\n\nTải lên tệp tin từ smartphone hay máy tính bảng và quản lý bằng cách lưu trữ, tải về, truyền tải, chia sẻ, đổi tên, hay xóa bỏ dữ liệu vào bất cứ thời điểm, thiết bị muốn sử dụng ở bất cứ đâu. Chia sẻ thư mục với tên liên lạc và xem tương tác được cập nhật ngay tức thì. Bảo mật đầu-cuối mang nghĩa rằng mật khẩu BẮT BUỘC phải nhớ (hay cần phải có lưu lại Mã Phục Hồi) không thì sẽ mất toàn quyền truy cập vào tài khoản và mất hết dữ liệu.\n\nCông nghệ mã hóa đầu-cuối điều hành bởi người dùng cho phép thực hiện gọi video một cách bảo mật, và được hỗ trợ từ năm 2016 cho trình duyệt nay đã thực hiện cho app điện thoại, cùng với lịch sử cuộc trò chuyện có thể được xem trên nhiều thiết bị khác nhau. Nguời sử dụng còn có thể chia sẻ tệp tin từ Ổ Mây MEGA của mình vào cuộc chat.\n\nMEGA cung cấp cho mọi tài khoản không gian lưu trữ miễn phí lên đến 50 GB với các nhiệm vụ thưởng để mở rộng thêm không gian cùng các thuê bao trả phí như:\n\n\nGói Pro Lite: €4.99 (US$4.99) mỗi tháng hay €49.99 (US$49.99) mỗi năm cung cấp cho bạn 400 GB không gian lưu trữ và 1 TB cho băng thông truyền tải mỗi tháng.\nGói Pro I: €9.99 (US$9.99) mỗi tháng hay €99.99 (US$99.99) mỗi năm cung cấp cho bạn 2 TB không gian lưu trữ và 2 TB cho băng thông truyền tải mỗi tháng.\nGói Pro II: €19.99 (US$19.99) mỗi tháng hay €199.99 (US$199.99) mỗi năm cung cấp cho bạn 8 TB không gian lưu trữ và 8 TB cho băng thông truyền tải mỗi tháng.\nGói Pro III: €29.99 (US$29.99) mỗi tháng hay €299.99 (US$299.99) mỗi năm cung cấp cho bạn 16 TB không gian lưu trữ và 16 TB cho băng thông truyền tải mỗi tháng. tải mỗi tháng.\n\nGói thuê bao trả phí sẽ tự động mua chu kỳ mới vào ngày cuối hạn với cùng giá và thời hạn như thời kỳ ban đầu. Để quản lý việc mua gói cước, xin vào CH Play trên điện thoại, đăng nhập vào Gmail/Google ID (nếu chưa làm) và tìm đến app MEGA. Từ đó xem, quản lý, mua, hay hủy gói thuê bao.\n\nCấp Quyền Ứng Dụng:\nWRITE_EXTERNAL_STORAGE -&gt; Tải về tệp tin từ MEGA vào trong điện thoại và để lấy tệp tin trong máy tải lên MEGA\nCAMERA -&gt; Chụp ảnh và đăng tải lên MEGA\nREAD_CONTACTS -&gt; Để dễ dàng tìm các tên liên lạc có sử dụng MEGA\nRECORD_AUDIO và CAPTURE_VIDEO_OUTPUT (micrô và camera) -&gt; MEGA cung cấp tính năng bảo mật đầu-cuối và cần dùng để thực hiện các cuộc gọi thoại/video\n\n\nĐể tăng cường sự tin cậy của người sử dụng, tất cả mã nguồn dùng cho phía máy khách đề được công bố, các lập trình viên và khảo sát an ninh mạng có thể vào xem và đánh giá. Mã nguồn xây dựng ứng dụng di động: https://github.com/meganz/android \n\nXem thêm tại website:\nVào https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA - Lưu Trữ Điện Toán Đám Mây với Bảo Mật Luôn Luôn Duy Trì.</string>
     <!-- PRO Lite account -->
@@ -169,11 +169,11 @@
     <!-- Login button -->
     <string name="login_text">Đăng nhập</string>
     <!-- email label -->
-    <string name="email_text">E-mail</string>
+    <string name="email_text">Email</string>
     <!-- password label -->
     <string name="password_text">Mật khẩu</string>
     <!-- Hint of the confirmation dialog to get link with password -->
-    <string name="confirm_password_text">Xác minh mật khẩu</string>
+    <string name="confirm_password_text">Xác thực mật khẩu</string>
     <!-- in the password edittext the user can see the password or asterisks. ABC shows the letters of the password -->
     <string name="abc">XEM</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
@@ -481,7 +481,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Thư mời đã được gửi lại lần nữa</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Lời mời đã được gửi tới %s thành công. Theo dõi tình trạng của lời mời trong phần Yêu Cầu Gửi Đi.</string>
+    <string name="context_contact_request_sent">Lời mời đã được gửi tới %s thành công. Theo dõi tình trạng của lời mời trong tab Yêu Cầu Gửi Đi.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Đã xóa tên liên lạc</string>
     <!-- error message -->
@@ -755,7 +755,7 @@
     <!-- description of switch ‘Open file when download is completed’ -->
     <string name="settings_auto_play_label">Mở tệp tin khi tải xong</string>
     <!-- Settings preference title for delete account -->
-    <string name="settings_delete_account">Hủy tài khoản</string>
+    <string name="settings_delete_account">Xóa tài khoản</string>
     <!-- Size of files in offline or cache folders -->
     <string name="settings_advanced_features_size">Hiện đang dùng %s</string>
     <!-- Calculating Size of files in offline or cache folders -->
@@ -1130,7 +1130,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Nâng cấp ngay</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Tăng cường kích thước của ổ mây.[A]Và lấy thêm không gian lưu trữ &amp; băng thông truyền tải với tài khoản hạng PRO!</string>
+    <string name="get_pro_account">Tăng cường dung lượng của ổ mây.[A]Lấy thêm không gian lưu trữ &amp; lượng băng thông truyền tải với tài khoản hạng PRO!</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">Mã Khóa Phục Hồi đã được sao lưu vào vị trí: %1s.[A]Đồng thời, mã khóa cũng sẽ có trong mục Lưu về Ngoại Tuyến.[A]Ghi chú: Tệp tin chứa mã khóa sẽ bị xóa nếu bạn đăng xuất tài khoản khỏi ứng dụng MEGA, vì vậy nên lưu và sao chép mã ở một nơi an toàn.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -1274,7 +1274,7 @@
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading">Đang tải danh bạ từ điện thoại&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
-    <string name="number_existing_invite_contact_request">%d yêu cầu đã được gửi đi.</string>
+    <string name="number_existing_invite_contact_request">%d yêu cầu đã được gửi đi rồi.</string>
     <!-- success message when reinviting multiple contacts -->
     <string name="number_correctly_invite_contact_request">%d lời mời đã được gửi đi thành công.</string>
     <!-- error message when reinviting multiple contacts -->
@@ -1489,7 +1489,7 @@
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]đang viết tin nhắn&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]và vài người khác đang viết tin nhắn&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Thêm nữa</string>
@@ -1628,11 +1628,11 @@
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_notification">
-        <item quantity="other">Đang tải lên thư mục số %1$d trong tổng %2$d</item>
+        <item quantity="other">Đang tải lên thư mục %1$d trong tổng số %2$d</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_paused_notification">
-        <item quantity="other">Tải lên %1$d trong tổng %2$d thư mục (tạm dừng)</item>
+        <item quantity="other">Tải lên %1$d trong tổng số %2$d thư mục (tạm dừng)</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
@@ -1678,7 +1678,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service is paused, Plural -->
     <plurals name="download_service_paused_notification">
-        <item quantity="other">Tải xuống %1$d trong tổng %2$d tệp (tạm dừng)</item>
+        <item quantity="other">Tải xuống %1$d trong tổng số %2$d tệp tin (tạm dừng)</item>
     </plurals>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Không đủ thông truyền tải</string>
@@ -2275,7 +2275,7 @@
     <string name="messages_forwarded_error">Lỗi. Không chuyển được tin nhắn</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="other">Lỗi. %1$d tin nhắn chưa được chuyển tiếp thành công</item>
+        <item quantity="other">Lỗi. %1$d tin nhắn chưa được chuyển đi thành công</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -2454,7 +2454,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Minh.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Nên cân nhắc và xuất ra <b>Mã Phục Hồi</b> để đề phòng trường hợp mất khả năng truy cập vào ứng dụng hoặc khi muốn tắt Xác Thực 2-Bước trong tương lai.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Mã không phù hợp</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2790,7 +2790,7 @@
     <!-- Menu item -->
     <string name="action_open_chat_link">Mở đường liên kết vào cuộc chát</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
-    <string name="invite_not_sent_already_sent">Lời mời đã được gửi tới %s trước đây rồi. Theo dõi tình trạng của lời mời trong phần Yêu Cầu Gửi Đi.</string>
+    <string name="invite_not_sent_already_sent">Lời mời đã được gửi tới tên liên lạc %s trước đây rồi. Theo dõi tình trạng của lời mời trong tab Yêu Cầu Gửi Đi.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
     <string name="save_qr_cloud_drive">Đang lưu %s vào Ổ Mây&#8230;</string>
     <!-- General label for folders -->
@@ -2939,7 +2939,7 @@
     </plurals>
     <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
     <plurals name="num_folders_num_files">
-        <item quantity="other">%1$d thư mục · %2$d tệp</item>
+        <item quantity="other">%1$d thư mục · %2$d tệp tin</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] đã thêm vào %2$s và %3$s[/B]</string>
@@ -3095,7 +3095,7 @@
     <string name="attachment_upload_panel_from_device">Từ File System</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
-        <item quantity="other">%d tệp tin chưa được gửi tới %d cuộc chát thành công</item>
+        <item quantity="other">%d tệp tin chưa được gửi tới %d cuộc chát</item>
     </plurals>
     <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_contacts_not_send">
@@ -3143,7 +3143,7 @@
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
-        <item quantity="other">%d phiên bản chưa được xóa xong</item>
+        <item quantity="other">%d phiên bản chưa xóa được</item>
     </plurals>
     <!-- Alert shown when the user tries to realize some action in chat and has not contacts -->
     <string name="no_contacts_invite">Bạn không có tên nào trong danh sách liên lạc. Xin mời bạn bè cùng tham gia sử dụng MEGA.</string>
@@ -3828,11 +3828,31 @@
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">Tệp đã được lưu vào %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">Tệp chưa lưu vào được %1$s. Xin thử lại.</string>
+    <string name="file_saved_to_failed">Tệp tin chưa lưu vào %1$s được. Xin thử lại.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Tệp tin đã được cập nhật</string>
     <!-- Warning indicating a file was not updated successfully -->
     <string name="file_update_failed">Tệp tin chưa được cập nhật. Xin thử lại.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Tệp tin quá lớn và không thể mở hoặc xem trước được.</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">Tệp tin viết thiếu dạng (.%1$s)</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">Để tiếp tục bạn phải viết đầy đủ tên và dạng tệp tin</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">Thay đổi dạng tệp tin</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">Bạn có thể sẽ không truy cập được vào tệp tin này        nếu bạn thay đổi “.%1$s” thành “.%2$s”</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">Bạn có thể sẽ không truy cập được vào tệp tin này        nếu bạn thay đổi dạng tệp vô danh thành “.%1$s”</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">Bạn có thể sẽ không truy cập được vào tệp tin này        nếu bạn thay đổi “.%1$s” thành dạng tệp vô danh</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">Dùng vô danh</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">Dùng .%1$s</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">Dữ vô danh</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">Giữ .%1$s</string>
 </resources>
