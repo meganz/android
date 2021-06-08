@@ -686,6 +686,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             actionBar.setHomeButtonEnabled(true)
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
+        } else {
+            actionBar.setHomeButtonEnabled(false)
+            actionBar.setDisplayHomeAsUpEnabled(false)
         }
 
         setHasOptionsMenu(true)
