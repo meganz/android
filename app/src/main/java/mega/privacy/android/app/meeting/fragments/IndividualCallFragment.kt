@@ -379,6 +379,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                             (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold())))
         ) {
             logDebug("The video should not be turned on")
+            videoOffUI(peerId, clientId)
             return
         }
 
