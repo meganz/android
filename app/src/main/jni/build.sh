@@ -441,15 +441,6 @@ if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
 fi
 echo "* crashlytics is ready"
 
-echo "* Setting up libwebsockets"
-if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
-    downloadAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS}
-    ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
-    touch ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
-fi
-echo "* libwebsockets is ready"
-
-
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
     WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
@@ -464,6 +455,43 @@ if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
 else
     echo "* WebRTC is not needed"
 fi
+
+echo "* Setting up libwebsockets"
+if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
+    downloadAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS}
+    ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
+
+    BUILD_ARCHS="x86 armeabi-v7a x86_64 arm64-v8a"
+
+    for ABI in ${BUILD_ARCHS}; do
+        echo " * Prebuilding libwebsockets for ${ABI}"
+        if [ "${ABI}" == "armeabi-v7a" ]; then
+            TARGET="arm"
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-implicit-int-conversion"
+        elif [ "${ABI}" == "arm64-v8a" ]; then
+            TARGET="arm64"
+        elif [ "${ABI}" == "x86" ]; then
+            TARGET=${ABI}
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-implicit-int-conversion"
+        elif [ "${ABI}" == "x86_64" ]; then
+            TARGET=${ABI}
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-shorten-64-to-32"
+        fi
+
+        rm -r ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build ||:
+        cmake -DCMAKE_INSTALL_PREFIX="${PWD}/${LIBWEBSOCKETS}/libwebsockets-android-${ABI}" -DANDROID_ABI=${ABI} -DANDROID_PLATFORM=${APP_PLATFORM} \
+        -DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake -DLWS_WITH_SHARED=OFF -DLWS_WITH_STATIC=ON -DLWS_WITHOUT_TESTAPPS=ON \
+        -DLWS_WITHOUT_SERVER=ON -DLWS_IPV6=ON -DLWS_STATIC_PIC=ON -DLWS_WITH_HTTP2=0 -DLWS_WITH_BORINGSSL=ON -DLWS_SSL_CLIENT_USE_OS_CA_CERTS=0 \
+        -DLWS_OPENSSL_INCLUDE_DIRS="${PWD}/megachat/webrtc/include/third_party/boringssl/src/include" -DLWS_OPENSSL_LIBRARIES="${PWD}/megachat/webrtc/libwebrtc_${TARGET}.a" \
+        -DLWS_WITH_LIBUV=1 -DLWS_LIBUV_INCLUDE_DIRS="${PWD}/libuv/libuv/include" -DLWS_LIBUV_LIBRARIES="${PWD}/libuv/libuv/libuv.a" "${EXTRA_FLAGS}" \
+        -S ${LIBWEBSOCKETS}/${LIBWEBSOCKETS} -B ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build
+        cmake --build ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build
+        cmake --install ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build
+    done
+
+    touch ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
+fi
+echo "* libwebsockets is ready"
 
 echo "* Setting up PdfViewer"
 if [ ! -f ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready ]; then
