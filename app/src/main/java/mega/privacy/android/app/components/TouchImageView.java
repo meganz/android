@@ -78,7 +78,7 @@ public class TouchImageView extends AppCompatImageView {
     public enum State {NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM}
 
     private State state;
-
+    private boolean onDrawReady = false;
     private float minScale;
     private float maxScale;
     private float superMinScale;
@@ -133,8 +133,10 @@ public class TouchImageView extends AppCompatImageView {
         } else if (getContext() instanceof ChatFullScreenImageViewer) {
             ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
         }
+        if (mScaleType == null) {
+            mScaleType = ScaleType.FIT_CENTER;
+        }
 
-        mScaleType = ScaleType.FIT_CENTER;
         minScale = 1;
         maxScale = 3;
         superMinScale = SUPER_MIN_MULTIPLIER * minScale;
@@ -183,6 +185,11 @@ public class TouchImageView extends AppCompatImageView {
 
         } else {
             mScaleType = type;
+            if (onDrawReady) {
+                // If the image is already rendered, scaleType has been called programmatically
+                // and the TouchImageView should be updated with the new scaleType.
+                setZoom(this);
+            }
         }
     }
 
@@ -408,6 +415,11 @@ public class TouchImageView extends AppCompatImageView {
      * @param scaleType Options for scaling the bounds of an image to the bounds of this view.
      */
     public void setZoom(float scale, float focusX, float focusY, ScaleType scaleType) {
+        // setZoom can be called before the image is on the screen, but at this point,
+        // image and view sizes have not yet been calculated in onMeasure.
+        if (!onDrawReady) {
+            return;
+        }
         if (scale < minScale || scale > maxScale) {
             throw new UnsupportedOperationException("Scale must be greater than minScale and less than maxScale");
         }
@@ -416,7 +428,7 @@ public class TouchImageView extends AppCompatImageView {
         }
         setScaleType(scaleType);
         resetZoom();
-        scaleImage(scale, viewWidth / 2, viewHeight / 2, false);
+        scaleImage(scale, viewWidth / 2f, viewHeight / 2f, false);
         matrix.getValues(m);
         m[Matrix.MTRANS_X] = -((focusX * getImageWidth()) - (viewWidth * 0.5f));
         m[Matrix.MTRANS_Y] = -((focusY * getImageHeight()) - (viewHeight * 0.5f));
@@ -474,7 +486,7 @@ public class TouchImageView extends AppCompatImageView {
         int drawableWidth = drawable.getIntrinsicWidth();
         int drawableHeight = drawable.getIntrinsicHeight();
 
-        PointF point = getDrawablePointFromTouchPoint(viewWidth / 2, viewHeight / 2);
+        PointF point = getDrawablePointFromTouchPoint(viewWidth / 2f, viewHeight / 2f);
         point.x /= drawableWidth;
         point.y /= drawableHeight;
         return point;
@@ -549,6 +561,12 @@ public class TouchImageView extends AppCompatImageView {
 
     public float getImageHeight() {
         return matchViewHeight * normalizedScale;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        onDrawReady = true;
+        super.onDraw(canvas);
     }
 
     @Override
@@ -710,18 +728,18 @@ public class TouchImageView extends AppCompatImageView {
      *
      * @param mode          Measure specification mode
      * @param size          the size from the supplied measure specification
-     * @param drawableWidth the drawable's intrinsic width
+     * @param drawableSize the drawable's intrinsic width
      * @return viewSize
      */
-    private int setViewSize(int mode, int size, int drawableWidth) {
+    private int setViewSize(int mode, int size, int drawableSize) {
         int viewSize;
         switch (mode) {
             case MeasureSpec.AT_MOST:
-                viewSize = Math.min(drawableWidth, size);
+                viewSize = Math.min(drawableSize, size);
                 break;
 
             case MeasureSpec.UNSPECIFIED:
-                viewSize = drawableWidth;
+                viewSize = drawableSize;
                 break;
             case MeasureSpec.EXACTLY:
             default:
@@ -921,7 +939,7 @@ public class TouchImageView extends AppCompatImageView {
             }
 
             if (animateToZoomBoundary) {
-                DoubleTapZoom doubleTap = new DoubleTapZoom(targetZoom, viewWidth / 2, viewHeight / 2, true);
+                DoubleTapZoom doubleTap = new DoubleTapZoom(targetZoom, viewWidth / 2f, viewHeight / 2f, true);
                 compatPostOnAnimation(doubleTap);
             }
         }
@@ -933,7 +951,6 @@ public class TouchImageView extends AppCompatImageView {
         if (stretchImageToSuper) {
             lowerScale = superMinScale;
             upperScale = superMaxScale;
-
         } else {
             lowerScale = minScale;
             upperScale = maxScale;
@@ -1013,11 +1030,15 @@ public class TouchImageView extends AppCompatImageView {
             // Used for translating image during scaling
             //
             startTouch = transformCoordBitmapToTouch(bitmapX, bitmapY);
-            endTouch = new PointF(viewWidth / 2, viewHeight / 2);
+            endTouch = new PointF(viewWidth / 2f, viewHeight / 2f);
         }
 
         @Override
         public void run() {
+            if (getDrawable() == null) {
+                setState(NONE);
+                return;
+            }
             float t = interpolate();
             float deltaScale = calculateDeltaScale(t);
             scaleImage(deltaScale, bitmapX, bitmapY, stretchImageToSuper);
