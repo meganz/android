@@ -502,6 +502,12 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         viewModel.getYearCardsData().observe(getViewLifecycleOwner(), this::showYearCards);
     }
 
+    /**
+     * Animates the UI by showing or hiding some views.
+     * Enables or disables the translucent navigation bar only if portrait mode.
+     *
+     * @param hide True if should hide the UI, false otherwise.
+     */
     private void animateUI(boolean hide) {
         mManagerActivity.animateCULayout(hide || viewModel.isCUEnabled());
         mManagerActivity.animateBottomView(hide);
@@ -511,12 +517,12 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             new Handler().postDelayed(() -> {
                 binding.cuContainer.setPadding(0, hide ? getStatusBarHeight() : 0, 0, 0);
-                addTranslucentNavigation(hide);
+                addTranslucentNavigationBar(hide);
             }, ANIMATION_DURATION);
         }
     }
 
-    private void addTranslucentNavigation(boolean add) {
+    private void addTranslucentNavigationBar(boolean add) {
         Window window = mManagerActivity.getWindow();
 
         if (add) {
@@ -526,6 +532,12 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         }
     }
 
+    /**
+     * Updates CU enable buttons visibility depending on if CU is enabled/disabled
+     * and if the view contains some node.
+     *
+     * @param cuEnabled True if CU is enabled, false otherwise.
+     */
     private void updateEnableCUButtons(boolean cuEnabled) {
         boolean emptyAdapter = gridAdapter == null || gridAdapter.getItemCount() <= 0;
         binding.emptyEnableCuButton.setVisibility(!cuEnabled && emptyAdapter ? View.VISIBLE : View.GONE);

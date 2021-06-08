@@ -4247,7 +4247,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	public void refreshFragment (String fTag) {
+	private void refreshFragment (String fTag) {
 		Fragment f = getSupportFragmentManager().findFragmentByTag(fTag);
 		if (f != null) {
 			logDebug("Fragment " + fTag + " refreshing");
@@ -8975,14 +8975,29 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
 	}
 
+	/**
+	 * Updates cuViewTypes view visibility.
+	 *
+	 * @param visibility New visibility value to set.
+	 */
 	public void updateCUViewTypes(int visibility) {
 		cuViewTypes.setVisibility(visibility);
 	}
 
+	/**
+	 * Updates cuLayout view visibility.
+	 *
+	 * @param visibility New visibility value to set.
+	 */
 	public void updateCULayout(int visibility) {
 		cuLayout.setVisibility(visibility);
 	}
 
+	/**
+	 * Updates enableCUButton view visibility and cuLayout if needed.
+	 *
+	 * @param visibility New visibiltiy value to set.
+	 */
 	public void updateEnableCUButton(int visibility) {
 		if (enableCUButton.getVisibility() == visibility) {
 			return;
@@ -8996,10 +9011,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		enableCUButton.setVisibility(visibility);
 	}
 
+	/**
+	 * Hides the CU progress bar.
+	 */
 	public void hideCUProgress() {
 		cuProgressBar.setVisibility(View.GONE);
 	}
 
+	/**
+	 * Updates the CU progress view.
+	 *
+	 * @param progress The current progress.
+	 * @param pending  The number of pending uploads.
+	 */
 	public void updateCUProgress(int progress, int pending) {
 		if (drawerItem != DrawerItem.CAMERA_UPLOADS || getCameraUploadFragment() == null
 				|| !cuFragment.shouldShowFullInfoAndOptions()) {
@@ -9022,6 +9046,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		cuProgressBar.setProgress(progress);
 	}
 
+	/**
+	 * Shows or hides the cuLayout and animates the transition.
+	 *
+	 * @param hide True if should hide it, false if should show it.
+	 */
 	public void animateCULayout(boolean hide) {
 		boolean visible = cuLayout.getVisibility() == View.VISIBLE;
 		if ((hide && !visible) || !hide && visible) {
@@ -13492,6 +13521,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return isFileExist;
 	}
 
+	/**
+	 * Sets or removes the layout behaviour to hide the bottom view when scrolling.
+	 *
+	 * @param enable True if should set the behaviour, false if should remove it.
+	 */
 	public void enableHideBottomViewOnScroll(boolean enable) {
 		LinearLayout layout = findViewById(R.id.container_bottom);
 		if (layout == null) {
@@ -13508,6 +13542,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		layout.setLayoutParams(params);
 	}
 
+	/**
+	 * Shows all the content of bottom view.
+	 */
 	public void showBottomView() {
 		LinearLayout bottomView = findViewById(R.id.container_bottom);
 		if (bottomView == null || fragmentLayout == null) {
@@ -13522,6 +13559,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				.withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
 	}
 
+	/**
+	 * Shows or hides the bottom view and animates the transition.
+	 *
+	 * @param hide True if should hide it, false if should show it.
+	 */
 	public void animateBottomView(boolean hide) {
 		LinearLayout bottomView = findViewById(R.id.container_bottom);
 		if (bottomView == null || fragmentLayout == null) {
