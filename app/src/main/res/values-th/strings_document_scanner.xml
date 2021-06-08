@@ -4,7 +4,7 @@
   <string name="scan_title_crop">ครอบตัด</string>
   <!-- Screen title for saving current scan (Document scanner) -->
   <string name="scan_title_save_scan">บันทึกการสแกน</string>
-  <!-- button -->
+  <!-- Label of the button to add a new page to the current document scan -->
   <string name="scan_action_add">เพิ่ม</string>
   <!-- Action of a button to save something -->
   <string name="scan_action_save">บันทึก</string>
@@ -37,15 +37,15 @@
   <!-- Body text shown on document scanner dialog to delete current scan -->
   <string name="scan_dialog_delete_body">ลบการสแกนปัจจุบันหรือไม่</string>
   <!-- Message shown when users deny camera permissions to scan documents -->
-  <string name="scan_requires_permission">จำเป็นต้องได้รับอนุญาตจากกล้องเพื่อสแกนเอกสาร</string>
+  <string name="scan_requires_permission">จำเป็นต้องได้รับอนุญาตให้ใช้กล้องเพื่อสแกนเอกสาร</string>
   <!-- Error text for incorrect name -->
-  <string name="scan_incorrect_name">Incorrect name</string>
+  <string name="scan_incorrect_name">ชื่อไม่ถูกต้อง</string>
   <!-- Error text for invalid characters -->
   <string name="scan_invalid_characters">ไม่ได้อนุญาตให้ใช้อักขระนี้</string>
   <!-- Snackbar text for incorrect name -->
-  <string name="scan_snackbar_incorrect_name">Correct your filename before proceeding</string>
+  <string name="scan_snackbar_incorrect_name">แก้ไขชื่อไฟล์ของคุณก่อนดำเนินการต่อ</string>
   <!-- Dialog message showing file progress -->
-  <string name="scan_dialog_progress">Preparing %1$s. Please wait&#8230;</string>
+  <string name="scan_dialog_progress">กำลังเตรียม %1$s กรุณารอสักครู่&#8230;</string>
   <!-- Error shown when the user writes a character not allowed -->
-  <string name="scan_snackbar_invalid_characters">The following characters are not allowed: ” * / : &lt; &gt; ? \ |</string>
+  <string name="scan_snackbar_invalid_characters">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: ” * / : &lt; &gt; ? \ |</string>
 </resources>

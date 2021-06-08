@@ -4,7 +4,7 @@
   <string name="scan_title_crop">قص</string>
   <!-- Screen title for saving current scan (Document scanner) -->
   <string name="scan_title_save_scan">حفظ المسح الضوئي</string>
-  <!-- button -->
+  <!-- Label of the button to add a new page to the current document scan -->
   <string name="scan_action_add">اضافة</string>
   <!-- Action of a button to save something -->
   <string name="scan_action_save">حفظ</string>
