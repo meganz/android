@@ -46,19 +46,32 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        const val CHECK_PSA_INTENT = "android.intent.action.checking.psa"
+        private const val CHECK_PSA_INTENT = "android.intent.action.checking.psa"
+
+        /** The wake lock being held while getting the PSA with the Url */
         val wakeLock: PowerManager.WakeLock =
             (MegaApplication.getInstance().getSystemService(Context.POWER_SERVICE) as PowerManager).run {
                 newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega::PsaWakelockTag")}
 
+        /** the callback being called when getting the PSA with the Url finished */
         var callback : ((Psa) -> Unit)? = null
 
+        /**
+         * Cancel the alarm of timed checking the PSA
+         * @param context the Context
+         */
         fun cancelAlarm(context: Context) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             /* cancel any pending alarm */
             alarmManager.cancel(pendingIntent)
         }
 
+        /**
+         * Start the alarm of timed checking the PSA
+         * @param context the Context
+         * @param delayMs the delay of firing the alarm since now
+         * @param cb the callback being called when getting the PSA with the Url finished
+         */
         fun setAlarm(context: Context, delayMs: Long, cb: ((Psa) -> Unit)? = null) {
             cancelAlarm(context)
 
@@ -82,7 +95,7 @@ class AlarmReceiver : BroadcastReceiver() {
             }
         }
 
-        /* get the application context */
+        /** The pending intent to send a broadcast when firing the alarm */
         private val pendingIntent: PendingIntent
             get() {
                 val context = MegaApplication.getInstance().applicationContext

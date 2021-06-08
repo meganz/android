@@ -105,7 +105,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * is on the top of the task stack
      */
     private final Observer<Psa> psaObserver = psa -> {
-        if (psa.getUrl() != null && isTopActivity(getClass(), this)) {
+        if (psa.getUrl() != null && isTopActivity(getClass().getName(), this)) {
             loadPsaInWebBrowser(psa);
         }
     };

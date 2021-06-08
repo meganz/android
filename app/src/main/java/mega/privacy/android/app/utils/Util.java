@@ -1496,7 +1496,7 @@ public class Util {
 
 	/**
 	 * Judge if current mode is Dark mode
-	 * @param context
+	 * @param context the Context
 	 * @return true if it is dark mode, false for light mode
 	 */
 	public static boolean isDarkMode(Context context) {
@@ -1613,11 +1613,11 @@ public class Util {
 
 	/**
 	 * Judge if an activity is on the top of the running app task
-	 * @param cls the class of the activity
-	 * @param context
+	 * @param className the class name of the activity
+	 * @param context the Context
 	 * @return true if the activity is on the task top, false otherwise
 	 */
-	public static boolean isTopActivity(Class cls, Context context) {
+	public static boolean isTopActivity(String className, Context context) {
 		ActivityManager am = (ActivityManager)context.getSystemService(ACTIVITY_SERVICE);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -1625,13 +1625,13 @@ public class Util {
 			for (ActivityManager.AppTask task : tasks) {
 				ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
 				if (taskInfo.id != -1) {  // Task is running
-					return taskInfo.topActivity.getClassName().contains(cls.getName());
+					return taskInfo.topActivity.getClassName().contains(className);
 				}
 			}
 		} else {
 			List<ActivityManager.RunningTaskInfo> runningTaskInfos = am.getRunningTasks(100);
 			for (ActivityManager.RunningTaskInfo info : runningTaskInfos) {
-				if (info.topActivity.getClassName().contains(cls.getName())) {
+				if (info.topActivity.getClassName().contains(className)) {
 					return true;
 				}
 			}

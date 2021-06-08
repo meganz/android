@@ -7680,7 +7680,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				drawerItem = DrawerItem.HOMEPAGE;
 			}
 			super.onBackPressed();
-//			moveTaskToBack(false);
 		}
 	}
 
@@ -7818,7 +7817,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				drawerItem = DrawerItem.HOMEPAGE;
 				if (fullscreenOfflineFragment != null) {
 					super.onBackPressed();
-//					moveTaskToBack(false);
 					return true;
 				} else {
 					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);

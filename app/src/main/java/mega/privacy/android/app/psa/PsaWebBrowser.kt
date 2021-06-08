@@ -93,7 +93,7 @@ class PsaWebBrowser : Fragment() {
         // Due to the possible delay introduced by JS showPSA,
         // If the activity is no longer the activity sit on the top at the moment
         // then don't show psa on it. Show psa even if the app(activity task) is already on the background.
-        if (!Util.isTopActivity(activity?.javaClass, requireContext())) return
+        if (!Util.isTopActivity(activity?.javaClass?.name, requireContext())) return
 
         uiHandler.post {
             binding.webView.visibility = View.VISIBLE
@@ -118,6 +118,12 @@ class PsaWebBrowser : Fragment() {
         }
     }
 
+    /**
+     * Whether the PSA web browser consumes the back key event or not
+     * If consumed, the parent container (e.g. Activity) should not respond to the back key
+     * event for this time
+     * @return true if consumed, false otherwise
+     */
     fun consumeBack(): Boolean {
         if (binding.webView.visibility == View.VISIBLE) {
             hidePSA()
