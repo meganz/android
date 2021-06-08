@@ -46,6 +46,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
 import static mega.privacy.android.app.utils.Constants.GET_THUMBNAIL_THROTTLE_MS;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
 import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
 import static mega.privacy.android.app.utils.FileUtil.isVideoFile;
@@ -193,6 +194,12 @@ class CuViewModel extends BaseRxViewModel {
 
     public boolean isSelecting() {
         return mSelecting;
+    }
+
+    public void resetOpenedNode() {
+        if (mNodeToOpen != null) {
+            mNodeToOpen.setValue(Pair.create(INVALID_POSITION, null));
+        }
     }
 
     /**

@@ -264,6 +264,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             return;
         }
 
+        viewModel.resetOpenedNode();
         mManagerActivity.updateCUViewTypes(View.VISIBLE);
         setupRecyclerView();
         setupOtherViews();
