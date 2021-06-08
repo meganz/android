@@ -198,6 +198,7 @@ import static mega.privacy.android.app.utils.LinksUtil.isMEGALinkAndRequiresTran
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -2464,7 +2465,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         inviteMenuItem.setVisible(false);
                     }
 
-                    contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
+                    contactInfoMenuItem.setTitle(getString(R.string.general_info));
                     contactInfoMenuItem.setVisible(true);
                 }
                 else {
@@ -2476,7 +2477,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         videoMenuItem.setVisible(false);
                     } else {
                         clearHistoryMenuItem.setVisible(true);
-                        contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
+                        contactInfoMenuItem.setTitle(getString(R.string.general_info));
                         contactInfoMenuItem.setVisible(true);
                     }
                     leaveMenuItem.setVisible(false);
@@ -3338,7 +3339,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             ProgressDialog temp = null;
             try{
                 temp = new ProgressDialog(this);
-                temp.setMessage(getString(R.string.upload_prepare));
+                temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
                 temp.show();
             }
             catch(Exception e){
@@ -4730,6 +4731,10 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void downloadNodeList(MegaNodeList nodeList) {
         nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true,
                 false);
+    }
+
+    public void saveNodesToGallery(List<MegaNode> nodes) {
+        nodeSaver.saveNodes(nodes, false, false, false, true, true);
     }
 
     public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messages, final MegaChatRoom chat){

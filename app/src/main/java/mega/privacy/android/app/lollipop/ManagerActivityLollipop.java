@@ -105,6 +105,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -277,6 +278,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -2429,9 +2431,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			initGooglePlayPayments();
 
 			megaApi.addGlobalListener(this);
-
-			megaApi.shouldShowRichLinkWarning(this);
-			megaApi.isRichPreviewsEnabled(this);
 			megaApi.isGeolocationEnabled(this);
 
 			if(savedInstanceState==null) {
@@ -8904,6 +8903,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	/**
+	 * Save nodes to gallery.
+	 *
+	 * @param nodes nodes to save
+	 */
+	public void saveNodesToGallery(List<MegaNode> nodes) {
+		nodeSaver.saveNodes(nodes, false, false, false, true, true);
+	}
+
+	/**
 	 * Save nodes to device.
 	 *
 	 * @param handles handles of nodes to save
@@ -9890,7 +9898,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				ProgressDialog temp = null;
 				try{
 					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.upload_prepare));
+					temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
 					temp.show();
 				}
 				catch(Exception e){
