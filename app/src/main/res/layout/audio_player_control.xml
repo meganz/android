@@ -9,7 +9,6 @@
         android:id="@+id/controller_bg"
         android:layout_width="0dp"
         android:layout_height="@dimen/audio_player_main_controller_height"
-        android:background="?attr/colorSurface"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -21,10 +20,10 @@
         android:layout_height="20dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toTopOf="@id/controller_bg"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@id/track_name"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/controller_bg" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@id/exo_position"

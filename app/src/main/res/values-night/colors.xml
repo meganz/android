@@ -263,4 +263,7 @@
 
     <!--  SnackBar Button text  -->
     <color name="teal_200_teal_300">@color/teal_300</color>
+
+    <!--  ExoPlayer Time Bar Unplayed  -->
+    <color name="grey_alpha_012_white_alpha_023">@color/white_alpha_023</color>
 </resources>
