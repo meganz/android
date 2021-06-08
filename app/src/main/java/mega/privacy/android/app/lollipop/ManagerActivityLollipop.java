@@ -130,6 +130,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -13503,9 +13504,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		fragmentLayout.setLayoutParams(fParams);
 
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) layout.getLayoutParams();
-		params.setBehavior(enable ?
-				new com.google.android.material.behavior.HideBottomViewOnScrollBehavior<RelativeLayout>()
-				: null);
+		params.setBehavior(enable ? new CustomHideBottomViewOnScrollBehaviour<LinearLayout>() : null);
 	}
 
 	public void animateBottomView(boolean hide) {
