@@ -551,19 +551,19 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private void showDayCards(List<CUCard> dayCards) {
         if (selectedView == DAYS_VIEW) {
-            cardAdapter.setCards(dayCards);
+            cardAdapter.submitList(dayCards);
         }
     }
 
     private void showMonthCards(List<CUCard> monthCards) {
         if (selectedView == MONTHS_VIEW) {
-             cardAdapter.setCards(monthCards);
+             cardAdapter.submitList(monthCards);
         }
     }
 
     private void showYearCards(List<CUCard> yearCards) {
         if (selectedView == YEARS_VIEW) {
-            cardAdapter.setCards(yearCards);
+            cardAdapter.submitList(yearCards);
         }
     }
 
