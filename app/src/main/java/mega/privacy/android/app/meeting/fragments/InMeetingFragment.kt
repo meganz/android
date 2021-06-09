@@ -669,7 +669,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             it.text = StringResourcesUtils.getString(R.string.chat_connecting)
         }
 
-        toolbar.setOnClickListener { if (!inMeetingViewModel.isOneToOneCall()) showMeetingInfoFragment() }
         bannerAnotherCallLayout = meetingActivity.banner_another_call
         bannerAnotherCallTitle = meetingActivity.banner_another_call_title
         bannerAnotherCallSubtitle = meetingActivity.banner_another_call_subtitle
@@ -717,6 +716,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 logDebug("Chat has changed")
                 inMeetingViewModel.setChatId(it)
                 bottomFloatingPanelViewHolder.updateMeetingType(!inMeetingViewModel.isOneToOneCall())
+                toolbar.setOnClickListener { showMeetingInfoFragment() }
             }
         }
 
@@ -1957,7 +1957,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Send share link
      */
     override fun onShareLink() {
-        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isChatRoomPublic()) {
+        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isChatRoomPublic() || inMeetingViewModel.isWaitingForLink()) {
             logError("Error getting the link, it is a private chat")
             return
         }
@@ -1977,6 +1977,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     fun shareLink() {
         logDebug("Share the link")
+        if (inMeetingViewModel.isGettingLink){
+            inMeetingViewModel.gotLink()
+            return
+        }
+
         meetingActivity.startActivity(Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, meetinglink)

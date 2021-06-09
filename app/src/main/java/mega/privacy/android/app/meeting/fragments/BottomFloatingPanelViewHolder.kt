@@ -321,6 +321,7 @@ class BottomFloatingPanelViewHolder(
     fun updateMeetingType(group: Boolean) {
         isGroup = group
         updatePanel(false)
+        updatePrivilege(inMeetingViewModel.getOwnPrivileges())
     }
 
     /**

@@ -29,7 +29,6 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
 import org.jetbrains.anko.defaultSharedPreferences
-import java.util.*
 
 class InMeetingViewModel @ViewModelInject constructor(
     private val inMeetingRepository: InMeetingRepository
@@ -68,6 +67,8 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     private val _speakerParticipant = MutableLiveData<Participant>(null)
     val speakerParticipant: LiveData<Participant> = _speakerParticipant
+
+    var isGettingLink = false
 
     private val updateCallObserver =
         Observer<MegaChatCall> {
@@ -283,6 +284,14 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
 
         return false
+    }
+
+    fun gettingLink(){
+        isGettingLink = true
+    }
+
+    fun gotLink() {
+        isGettingLink = false
     }
 
     /**

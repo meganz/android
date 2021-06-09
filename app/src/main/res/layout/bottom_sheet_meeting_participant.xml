@@ -47,7 +47,6 @@
                 android:gravity="center_vertical"
                 android:showModeratorIcon="@{participant.moderator}"
                 android:singleLine="true"
-                android:text="@{participant.name}"
                 android:textAppearance="?attr/textAppearanceSubtitle1" />
 
             <TextView
@@ -55,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="middle"
-                android:show="@{!viewModel.isItemGuest}"
+                android:show="@{!viewModel.participantGuest}"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
                 tools:text="@{viewModel.getEmail}" />

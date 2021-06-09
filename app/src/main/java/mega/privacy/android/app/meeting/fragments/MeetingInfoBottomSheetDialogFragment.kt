@@ -79,15 +79,38 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
         }
 
-        binding.edit.isVisible = inMeetingViewModel.isModerator()
-        binding.shareLink.isVisible = inMeetingViewModel.isLinkVisible() || inMeetingViewModel.isGuestLinkVisible()
-        binding.invite.isVisible = inMeetingViewModel.isLinkVisible()
+        shareViewModel.currentChatId.observe(this) {
+            updateView()
+            if (chatLink.isEmpty() && !inMeetingViewModel.isGettingLink) {
+                inMeetingViewModel.gettingLink()
+                getLink()
+            }
+        }
 
-        listenAction(binding.shareLink) { (parentFragment as InMeetingFragment).onShareLink() }
+        initAction()
+    }
+
+    fun updateView() {
+        binding.edit.isVisible = inMeetingViewModel.isModerator()
+        binding.shareLink.isVisible =
+            inMeetingViewModel.isLinkVisible() || inMeetingViewModel.isGuestLinkVisible()
+        binding.invite.isVisible = inMeetingViewModel.isLinkVisible()
+    }
+
+    fun initAction() {
+        listenAction(binding.shareLink) {
+            inMeetingViewModel.gotLink()
+            getLink()
+        }
         listenAction(binding.invite) { (parentFragment as InMeetingFragment).onInviteParticipants() }
         listenAction(binding.copyLink) { copyLink() }
         listenAction(binding.edit) { showRenameGroupDialog() }
     }
+
+    fun getLink() {
+        (parentFragment as InMeetingFragment).onShareLink()
+    }
+
 
     /**
      * After execute the action, close the item dialog

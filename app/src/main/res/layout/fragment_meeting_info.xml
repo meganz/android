@@ -9,6 +9,7 @@
         android:id="@+id/meeting_name"
         style="@style/BottomSheetInfoItem"
         android:layout_width="wrap_content"
+        android:paddingRight="0dp"
         android:text="meeting"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -17,9 +18,6 @@
         android:id="@+id/edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingVertical="10dp"
-        android:paddingRight="10dp"
-        android:scaleType="center"
         android:src="@drawable/ic_edit"
         app:layout_constraintBottom_toTopOf="@id/moderator_name"
         app:layout_constraintLeft_toRightOf="@id/meeting_name"

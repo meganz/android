@@ -74,6 +74,8 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
                     participant = participantItem
                 }
 
+        bottomViewModel.setShowingName(binding.name)
+
         contentView = binding.root
         dialog.setContentView(contentView)
         setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true)
