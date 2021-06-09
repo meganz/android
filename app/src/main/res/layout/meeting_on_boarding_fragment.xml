@@ -95,17 +95,6 @@
             app:layout_constraintVertical_bias="0.2" />
 
         <View
-            android:id="@+id/up_location"
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:background="@android:color/transparent"
-            app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline"
-            app:layout_constraintVertical_bias="0.25" />
-
-        <View
             android:id="@+id/fab_tip_location"
             android:layout_width="0dp"
             android:layout_height="1dp"
@@ -113,7 +102,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/up_location"
+            app:layout_constraintTop_toBottomOf="@id/meeting_thumbnail"
             app:layout_constraintVertical_bias="0.5" />
 
         <include
