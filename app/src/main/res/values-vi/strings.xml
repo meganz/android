@@ -289,9 +289,9 @@
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">Liên Lạc [A](%1$d)[/A]</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
-    <string name="sent_requests_empty">[B]Chưa có [/B][A]yêu cầu gửi đi nào[/A]</string>
+    <string name="sent_requests_empty">[B]Không có [/B][A]yêu cầu gửi đi nào[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
-    <string name="received_requests_empty">[B]Chưa có [/B][A]yêu cầu được nhận nào[/A]</string>
+    <string name="received_requests_empty">[B]Không có [/B][A]yêu cầu được nhận nào[/A]</string>
     <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">Các Phiên Truyền Tải</string>
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
@@ -642,8 +642,6 @@
     <string name="upload_to_filesystem_from">Chọn từ chỗ</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">đã tải lên</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Đang xử lý tệp tin</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="other">Đang xử lý tệp tin</item>
@@ -1561,7 +1559,7 @@
         <item>Ngoại Tuyến</item>
     </string-array>
     <!-- Text that indicates that a the offline section is currently empty -->
-    <string name="offline_empty_folder">Không có tệp tin nào được Lưu về Ngoại Tuyến</string>
+    <string name="offline_empty_folder">Không có tệp tin nào trong Lưu về Ngoại Tuyến</string>
     <!-- Positive confirmation to enable logs -->
     <string name="general_enable">Bật</string>
     <!-- Positive confirmation to allow MEGA to read contacts book. -->
@@ -1599,7 +1597,7 @@
     <!-- Dialog to confirm before removing completed transfers -->
     <string name="confirmation_to_clear_completed_transfers">Dọn các mục đã hoàn tất?</string>
     <!-- Title of the tab section for transfers in progress -->
-    <string name="title_tab_in_progress_transfers">Đang hoạt động</string>
+    <string name="title_tab_in_progress_transfers">Đang truyền</string>
     <!-- Title of the tab section for completed transfers -->
     <string name="title_tab_completed_transfers">Hoàn Tất</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
@@ -2135,7 +2133,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]Không có tệp tin nào trong [/B][A]Ổ Mây[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Không có tệp trong [/B][A]Lưu về Ngoại Tuyến[/A]</string>
+    <string name="context_empty_offline">[B]Không có tệp tin nào trong [/B][A]Lưu về Ngoại Tuyến[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]Không có tên [/B][A]Liên Lạc[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -2386,7 +2384,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">In</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Mã Khoá Phục Hồi đã được lưu vào máy</string>
+    <string name="save_MK_confirmation">Mã Phục Hồi đã được lưu vào máy</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Đang chờ)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -2508,7 +2506,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">Không mở được tệp tin này do có lỗi kết nối mạng.</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">Tệp tin đã có sẵn trong phần Lưu về Ngoại Tuyến</string>
+    <string name="file_already_exists">Tệp tin đã có sẵn trong Lưu về Ngoại Tuyến</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">Tin nhắn chưa được chuyển tiếp</item>
@@ -3572,7 +3570,7 @@
     <!-- Label of the floating action button of opening the new chat conversation -->
     <string name="fab_label_new_chat">Cuộc chát mới</string>
     <!-- Text that indicates that there’s no photo to show -->
-    <string name="homepage_empty_hint_photos">Không thấy ảnh nào</string>
+    <string name="homepage_empty_hint_photos">Không có ảnh nào</string>
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">Không có văn bản tài liệu nào</string>
     <!-- Text that indicates that there’s no audio to show -->
@@ -3855,4 +3853,12 @@
     <string name="action_keep_empty_old_extension">Dữ vô danh</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Giữ .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">Đã có một tệp tin tồn tại với cùng tên này</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">Đã có một mục tồn tại với cùng tên này</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Thông tin</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Lưu vào thư viện hình ảnh</string>
 </resources>
