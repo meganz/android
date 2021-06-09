@@ -73,8 +73,9 @@
 
 		<androidx.preference.SwitchPreferenceCompat
 			android:key="settings_audio_background_play_enabled"
-			android:title="@string/settings_media_audio_files"
 			android:summary="@string/settings_background_play_hint"
+			android:title="@string/settings_media_audio_files"
+			android:defaultValue="true"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />

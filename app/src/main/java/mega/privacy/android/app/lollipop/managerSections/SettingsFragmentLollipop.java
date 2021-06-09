@@ -2,7 +2,9 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.SwitchPreferenceCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -44,7 +47,9 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder;
 import mega.privacy.android.app.utils.ThemeHelper;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
@@ -91,10 +96,23 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private Preference aboutKarere;
     private Preference aboutApp;
     private Preference cancelAccount;
+    private MediaPlayerService playerService;
 
     private DisplayMetrics outMetrics;
     private boolean bEvaluateAppDialogShow = false;
     private AlertDialog evaluateAppDialog;
+
+    private final ServiceConnection mediaServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service)    {
+            playerService = ((MediaPlayerServiceBinder) service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            playerService = null;
+        }
+    };
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -255,7 +273,15 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         setOnlineOptions(isOnline(context) && megaApi != null && megaApi.getRootNode() != null);
+        Intent playerServiceIntent = new Intent(requireContext(), AudioPlayerService.class);
+        requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0);
         return v;
+    }
+
+    @Override
+    public void onDestroyView() {
+        requireContext().unbindService(mediaServiceConnection);
+        super.onDestroyView();
     }
 
     @Override
@@ -415,7 +441,9 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                 break;
 
             case KEY_AUDIO_BACKGROUND_PLAY_ENABLED:
-                MediaPlayerService.stopAudioPlayer(context);
+                if (playerService != null) {
+                    playerService.getViewModel().toggleBackgroundPlay();
+                }
                 break;
         }
 
