@@ -13,12 +13,26 @@ class CreateMeetingViewModel @ViewModelInject constructor(
 
     var meetingName: MutableLiveData<String> = MutableLiveData<String>()
 
+    /**
+     * set the default value of meetingName
+     */
     fun initMeetingName() {
-        meetingName.value = StringResourcesUtils.getString(
+        meetingName.value = "";
+    }
+
+    /**
+     * set the default value of hint
+     * @return the string of default meetingName
+     */
+    fun initHintMeetingName(): String {
+        return StringResourcesUtils.getString(
             R.string.type_meeting_name, repository.getMyFullName()
         )
     }
 
+    /**
+     * init RTC Audio Manager
+     */
     fun initRTCAudioManager() {
         MegaApplication.getInstance()
             .createOrUpdateAudioManager(true, AUDIO_MANAGER_CREATING_MEETING)

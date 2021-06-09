@@ -74,7 +74,7 @@
             android:textColor="@color/white"
             android:textColorHint="#9B9B9B"
             android:textSize="14sp"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
