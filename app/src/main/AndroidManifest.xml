@@ -633,6 +633,10 @@
             android:theme="@style/DocumentScannerTheme"
             android:windowSoftInputMode="stateHidden|adjustNothing"/>
 
+        <activity
+            android:name=".AskForDsiplayOverActivity"
+            android:launchMode="singleTask"/>
+
     </application>
 
 </manifest>
