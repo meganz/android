@@ -3565,7 +3565,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								stopRunningCameraUploadService(ManagerActivityLollipop.this);
 								dbH.setCamSyncEnabled(false);
 								sendBroadcast(new Intent(ACTION_UPDATE_DISABLE_CU_SETTING));
-								cuLayout.setVisibility(View.VISIBLE);
+
+								if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+									cuLayout.setVisibility(View.VISIBLE);
+								}
 							});
 
                     builder.setNegativeButton(getString(R.string.general_no), null);
@@ -8976,12 +8979,24 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	/**
+	 * Checks if should update some cu view visibility.
+	 *
+	 * @param visibility New requested visibility update.
+	 * @return True if should apply the visibility update, false otherwise.
+	 */
+	private boolean rightCUVisibilityChange(int visibility) {
+		return drawerItem == DrawerItem.CAMERA_UPLOADS || visibility == View.GONE;
+	}
+
+	/**
 	 * Updates cuViewTypes view visibility.
 	 *
 	 * @param visibility New visibility value to set.
 	 */
 	public void updateCUViewTypes(int visibility) {
-		cuViewTypes.setVisibility(visibility);
+		if (rightCUVisibilityChange(visibility)) {
+			cuViewTypes.setVisibility(visibility);
+		}
 	}
 
 	/**
@@ -8990,7 +9005,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param visibility New visibility value to set.
 	 */
 	public void updateCULayout(int visibility) {
-		cuLayout.setVisibility(visibility);
+		if (rightCUVisibilityChange(visibility)) {
+			cuLayout.setVisibility(visibility);
+		}
 	}
 
 	/**
@@ -9008,7 +9025,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			updateCULayout(visibility);
 		}
 
-		enableCUButton.setVisibility(visibility);
+		if (rightCUVisibilityChange(visibility)) {
+			enableCUButton.setVisibility(visibility);
+		}
 	}
 
 	/**
@@ -9060,7 +9079,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (hide) {
 			cuLayout.animate().translationY(-100).setDuration(ANIMATION_DURATION)
 					.withEndAction(() -> cuLayout.setVisibility(View.GONE)).start();
-		} else {
+		} else if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
 			cuLayout.setVisibility(View.VISIBLE);
 			cuLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
 		}

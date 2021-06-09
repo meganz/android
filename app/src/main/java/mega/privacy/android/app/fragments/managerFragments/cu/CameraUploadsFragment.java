@@ -455,7 +455,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             binding.emptyHint.setVisibility(nodes.isEmpty() ? View.VISIBLE : View.GONE);
             binding.cuList.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
             binding.scroller.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
-            viewTypesLayout.setVisibility(nodes.isEmpty() ? View.GONE : View.VISIBLE);
+            mManagerActivity.updateCUViewTypes(nodes.isEmpty() ? View.GONE : View.VISIBLE);
         });
 
         viewModel.nodeToOpen()
@@ -678,9 +678,9 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         switch (selectedView) {
             case DAYS_VIEW:
                 card = viewModel.dayClicked(position, card);
+                newViewClicked(ALL_VIEW);
                 int cuNodePosition = gridAdapter.getNodePosition(card.getNode().getHandle());
                 openNode(cuNodePosition, gridAdapter.getNodeAtPosition(cuNodePosition));
-                newViewClicked(ALL_VIEW);
                 mManagerActivity.showBottomView();
                 layoutManager.scrollToPosition(cuNodePosition);
                 break;
