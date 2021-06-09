@@ -75,17 +75,8 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         }
         binding.typeMeetingEditText.let {
             it.visibility = View.VISIBLE
-            it.hint = meetingName
+            it.hint = viewModel.initHintMeetingName()
             showKeyboardDelayed(type_meeting_edit_text)
-            it.setOnFocusChangeListener { v, hasFocus ->
-                run {
-                    if (hasFocus) {
-                        type_meeting_edit_text.setSelection(type_meeting_edit_text.text.length)
-                    } else {
-                        hideKeyboardView(v.context, type_meeting_edit_text, 0)
-                    }
-                }
-            }
         }
     }
 
