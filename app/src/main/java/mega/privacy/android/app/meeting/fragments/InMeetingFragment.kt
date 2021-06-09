@@ -725,18 +725,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 !it.isNullOrEmpty() -> {
                     logDebug("Link has changed")
                     meetinglink = it
-                    when {
-                        inMeetingViewModel.isWaitingForLink() -> {
-                            inMeetingViewModel.setWaitingForLink(false)
-                            shareLink()
-                        }
-                        else -> {
-                            inMeetingViewModel.startMeeting(
-                                camIsEnable,
-                                micIsEnable,
-                                StartChatCallListener(meetingActivity, this, this)
-                            )
-                        }
+                    if (inMeetingViewModel.getCall() == null) {
+                        inMeetingViewModel.startMeeting(
+                            camIsEnable,
+                            micIsEnable,
+                            StartChatCallListener(meetingActivity, this, this)
+                        )
+                    } else {
+                        shareLink()
                     }
                 }
             }
@@ -1957,7 +1953,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Send share link
      */
     override fun onShareLink() {
-        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isChatRoomPublic() || inMeetingViewModel.isWaitingForLink()) {
+        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isChatRoomPublic()) {
             logError("Error getting the link, it is a private chat")
             return
         }

@@ -554,5 +554,5 @@ class InMeetingRepository @Inject constructor(
     fun getParticipantEmail(peerId: Long): String? =
         ChatController(context).getParticipantEmail(peerId)
 
-    fun getOwnEmail(): String? = megaChatApi.myEmail
+    fun isGuest(): Boolean = megaApi.isEphemeralPlusPlus
 }
