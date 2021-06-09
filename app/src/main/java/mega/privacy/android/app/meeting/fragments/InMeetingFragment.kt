@@ -1926,7 +1926,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     fun leaveMeeting() {
         inMeetingViewModel.leaveMeeting()
         when {
-            inMeetingViewModel.isGuest() -> {
+            inMeetingViewModel.amIAGuest() -> {
                 meetingActivity.startActivity(
                     Intent(
                         meetingActivity,
@@ -2009,7 +2009,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onParticipantOption(participant: Participant) {
         val participantBottomSheet =
             MeetingParticipantBottomSheetDialogFragment.newInstance(
-                inMeetingViewModel.isGuest(),
+                inMeetingViewModel.amIAGuest(),
                 inMeetingViewModel.isModerator(),
                 status == TYPE_IN_SPEAKER_VIEW,
                 participant

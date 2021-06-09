@@ -1925,11 +1925,10 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Determine if I am a guest
      *
-     * @return
+     * @return True, if I am a guest. False if not
      */
-    fun isGuest(): Boolean {
-        // will change to  the official function provide by SDK team.
-        return inMeetingRepository.getOwnEmail().isNullOrEmpty()
+    fun amIAGuest(): Boolean {
+        return inMeetingRepository.amIAGuest()
     }
 
     fun isNormalUser(peerId: Long): Boolean {

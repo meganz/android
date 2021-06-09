@@ -554,5 +554,10 @@ class InMeetingRepository @Inject constructor(
     fun getParticipantEmail(peerId: Long): String? =
         ChatController(context).getParticipantEmail(peerId)
 
-    fun isGuest(): Boolean = megaApi.isEphemeralPlusPlus
+    /**
+     * Determine if I am a guest
+     *
+     * @return True, if my account is an ephemeral account. False otherwise
+     */
+    fun amIAGuest(): Boolean = megaApi.isEphemeralPlusPlus
 }
