@@ -613,52 +613,52 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun initLiveEventBus() {
         LiveEventBus.get(EVENT_PROXIMITY_SENSOR_CHANGE, Boolean::class.java)
-            .observeSticky(this, proximitySensorChangeObserver)
+            .observe(this, proximitySensorChangeObserver)
 
         LiveEventBus.get(EVENT_ERROR_STARTING_CALL, Long::class.java)
-            .observeSticky(this, errorStatingCallObserver)
+            .observe(this, errorStatingCallObserver)
 
         LiveEventBus.get(EVENT_NOT_OUTGOING_CALL, Long::class.java)
-            .observeSticky(this, noOutgoingCallObserver)
+            .observe(this, noOutgoingCallObserver)
 
         LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long::class.java)
-            .observeSticky(this, nameChangeObserver)
+            .observe(this, nameChangeObserver)
 
         LiveEventBus.get(EVENT_PRIVILEGES_CHANGE, MegaChatListItem::class.java)
-            .observeSticky(this, privilegesChangeObserver)
+            .observe(this, privilegesChangeObserver)
 
         LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long::class.java)
-            .observeSticky(this, visibilityChangeObserver)
+            .observe(this, visibilityChangeObserver)
 
         //Calls level
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observeSticky(this, callStatusObserver)
+            .observe(this, callStatusObserver)
 
         LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall::class.java)
-            .observeSticky(this, callCompositionObserver)
+            .observe(this, callCompositionObserver)
 
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .observeSticky(this, callOnHoldObserver)
+            .observe(this, callOnHoldObserver)
 
         LiveEventBus.get(EVENT_LOCAL_NETWORK_QUALITY_CHANGE, MegaChatCall::class.java)
-            .observeSticky(this, localNetworkQualityObserver)
+            .observe(this, localNetworkQualityObserver)
 
         //Sessions Level
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_STATUS_CHANGE)
-            .observeSticky(this, sessionStatusObserver as Observer<Any>)
+            .observe(this, sessionStatusObserver as Observer<Any>)
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
-            .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
+            .observe(this, sessionOnHoldObserver as Observer<Any>)
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE)
-            .observeSticky(this, remoteAVFlagsObserver as Observer<Any>)
+            .observe(this, remoteAVFlagsObserver as Observer<Any>)
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_HIRES_CHANGE)
-            .observeSticky(this, sessionHiResObserver as Observer<Any>)
+            .observe(this, sessionHiResObserver as Observer<Any>)
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_LOWRES_CHANGE)
-            .observeSticky(this, sessionLowResObserver as Observer<Any>)
+            .observe(this, sessionLowResObserver as Observer<Any>)
     }
 
     private fun initToolbar() {
