@@ -344,7 +344,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
                 sharedModel.setChatVideoInDevice(null)
                 // Hide avatar when camera open
-                meeting_thumbnail.visibility = View.GONE
+                meeting_thumbnail.visibility = View.INVISIBLE
                 activateVideo()
             }
             false -> {
