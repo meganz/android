@@ -66,6 +66,7 @@ class PsaWebBrowser : Fragment() {
     }
 
     fun loadPsa(url: String, psaId: Int) {
+        binding.webView.visibility = View.INVISIBLE
         this.psaId = psaId
 
         try {
