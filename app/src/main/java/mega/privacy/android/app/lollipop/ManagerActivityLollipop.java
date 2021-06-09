@@ -28,6 +28,7 @@ import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
@@ -4351,7 +4352,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private void observePsa() {
         psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), PsaManager.INSTANCE);
 
-		PsaManager.INSTANCE.getPsa().observe(this, this::showPsa);
+		LiveEventBus.get(EVENT_PSA, Psa.class).observe(this, psa -> {
+			if (psa.getUrl() == null) {
+				showPsa(psa);
+			}
+		});
     }
 
 	/**
@@ -7512,13 +7517,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void onBackPressed() {
 		logDebug("onBackPressed");
 
-		// If there is a displaying PSA, we should only close it, and not navigate back anymore,
-		// e.g. when we are at chat tab, and there is a displaying PSA, when we press back, if we
-		// keep executing the remaining logic, we would go back to cloud drive tab after close
-		// the PSA browser.
-		if (closeDisplayingPsa()) {
-			return;
-		}
+		// Let the PSA web browser fragment(if visible) to consume the back key event
+		if (psaWebBrowser.consumeBack()) return;
 
 		retryConnectionsAndSignalPresence();
 
@@ -7659,7 +7659,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             if(fragment != null && fragment.isFabExpanded()) {
                 fragment.collapseFab();
             } else {
-                super.onBackPressed();
+            	// The Psa requires the activity to load the new PSA even though the app
+				// is on the background. So don't call super.onBackPressed() since it will destroy
+				// this activity and its embedded web browser fragment.
+				moveTaskToBack(false);
             }
         } else {
 			handleBackPressIfFullscreenOfflineFragmentOpened();

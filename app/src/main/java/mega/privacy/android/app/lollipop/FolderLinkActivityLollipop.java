@@ -1441,6 +1441,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
+		if (psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		if (fileLinkFolderLink){

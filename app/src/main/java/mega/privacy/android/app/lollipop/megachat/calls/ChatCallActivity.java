@@ -1107,6 +1107,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     @Override
     public void onBackPressed() {
         logDebug("onBackPressed");
+        if (psaWebBrowser.consumeBack()) return;
         super.onBackPressed();
         finishActivity();
     }
