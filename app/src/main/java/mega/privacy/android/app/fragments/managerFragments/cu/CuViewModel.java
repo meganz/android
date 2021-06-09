@@ -120,18 +120,18 @@ class CuViewModel extends BaseRxViewModel {
             }
         };
 
-        loadCuNodes();
-        getCUCards();
+        loadNodes();
+        getCards();
 
         add(mOpenNodeAction.throttleFirst(1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mNodeToOpen::setValue, logErr("openNodeAction")));
 
         add(mCreatingThumbnailFinished.throttleLatest(1, TimeUnit.SECONDS, true)
-                .subscribe(ignored -> loadCuNodes(), logErr("creatingThumbnailFinished")));
+                .subscribe(ignored -> loadNodes(), logErr("creatingThumbnailFinished")));
 
         add(creatingPreviewFinished.throttleLatest(1, TimeUnit.SECONDS, true)
-                .subscribe(ignored -> getCUCards(), logErr("creatingPreviewFinished")));
+                .subscribe(ignored -> getCards(), logErr("creatingPreviewFinished")));
     }
 
     public LiveData<List<CUCard>> getDayCardsData() {
@@ -186,10 +186,6 @@ class CuViewModel extends BaseRxViewModel {
 
     public LiveData<Boolean> actionMode() {
         return mActionMode;
-    }
-
-    public void loadCuNodes() {
-        loadNodes(Single.defer(() -> Single.just(getCuNodes())));
     }
 
     public boolean isSelecting() {
@@ -376,8 +372,9 @@ class CuViewModel extends BaseRxViewModel {
         return camSyncEnabled;
     }
 
-    private void loadNodes(Single<List<CuNode>> source) {
-        add(source.subscribeOn(Schedulers.io())
+    public void loadNodes() {
+        add(Single.fromCallable(this::getCuNodes)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mCuNodes::setValue, logErr("loadCuNodes")));
     }
@@ -432,7 +429,7 @@ class CuViewModel extends BaseRxViewModel {
         return nodes;
     }
 
-    public void getCUCards() {
+    public void getCards() {
         List<CUCard> days = new ArrayList<>();
         List<CUCard> months = new ArrayList<>();
         List<CUCard> years = new ArrayList<>();

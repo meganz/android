@@ -118,8 +118,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     public void reloadNodes() {
-        viewModel.loadCuNodes();
-        viewModel.getCUCards();
+        viewModel.loadNodes();
+        viewModel.getCards();
     }
 
     public void checkScroll() {
@@ -269,7 +269,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         setupRecyclerView();
         setupOtherViews();
         observeLiveData();
-        viewModel.getCUCards();
+        viewModel.getCards();
     }
 
     public void setViewTypes(LinearLayout cuViewTypes, TextView cuYearsButton,

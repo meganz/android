@@ -874,7 +874,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 
 	public interface FullScreenCallback {
-    	void onTouchImage();
-    	void onPlayVideo();
+		void onTouchImage();
+
+		void onPlayVideo();
 	}
 }

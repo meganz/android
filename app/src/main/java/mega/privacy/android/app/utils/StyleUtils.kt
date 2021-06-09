@@ -9,15 +9,6 @@ import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 
 object StyleUtils {
 
-    fun TextView.setTextStyle(
-        context: Context,
-        textAppearance: Int,
-        textColor: Int,
-        isTextAttrColor: Boolean
-    ) {
-        setTextStyle(context, this, textAppearance, textColor, isTextAttrColor)
-    }
-
     @JvmStatic
     fun setTextStyle(
         context: Context,

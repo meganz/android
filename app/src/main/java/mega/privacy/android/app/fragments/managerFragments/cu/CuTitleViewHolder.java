@@ -2,13 +2,12 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.util.Pair;
 
-import androidx.core.text.HtmlCompat;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.ItemCameraUploadsTitleBinding;
 
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 
 class CuTitleViewHolder extends CuGridViewHolder {
@@ -35,7 +34,7 @@ class CuTitleViewHolder extends CuGridViewHolder {
             logWarning("Exception formatting text.", e);
         }
 
-        mBinding.headerText.setText(HtmlCompat.fromHtml(dateText, HtmlCompat.FROM_HTML_MODE_LEGACY));
+        mBinding.headerText.setText(toSpannedHtmlText(dateText));
     }
 
     @Override protected boolean handleClick() {

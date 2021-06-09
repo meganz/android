@@ -1111,14 +1111,14 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 	 *
 	 * @param nodes				 List of all nodes where search.
 	 * @param savedInstanceState Saved instance state if exists, null otherwise.
-	 * @param getVideosToo		 True if should get video and image handles, false otherwise.
+	 * @param includeVideos		 True if should get video and image handles, false otherwise.
 	 */
-	private void getImageHandles(List<MegaNode> nodes, Bundle savedInstanceState, boolean getVideosToo) {
+	private void getImageHandles(List<MegaNode> nodes, Bundle savedInstanceState, boolean includeVideos) {
 		int imageNumber = 0;
 		for (int i = 0; i < nodes.size(); i++) {
 			MegaNode n = nodes.get(i);
 			MimeTypeList mime = MimeTypeList.typeForName(n.getName());
-			boolean isImageHandle = getVideosToo
+			boolean isImageHandle = includeVideos
 					? mime.isImage() || mime.isVideoReproducible()
 					: mime.isImage();
 

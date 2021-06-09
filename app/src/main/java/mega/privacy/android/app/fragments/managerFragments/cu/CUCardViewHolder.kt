@@ -2,7 +2,6 @@ package mega.privacy.android.app.fragments.managerFragments.cu
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +10,7 @@ import mega.privacy.android.app.databinding.ItemCuCardBinding
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment.*
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
 class CUCardViewHolder(
     private val viewType: Int,
@@ -55,7 +55,7 @@ class CUCardViewHolder(
                 LogUtil.logWarning("Exception formatting text.", e)
             }
 
-            binding.dateText.text = HtmlCompat.fromHtml(date!!, HtmlCompat.FROM_HTML_MODE_LEGACY)
+            binding.dateText.text = date?.toSpannedHtmlText()
         }
 
         val numItems = card.numItems?.minus(1)
