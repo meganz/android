@@ -296,10 +296,14 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
         logDebug("Close video")
         videoSurfaceView.isVisible = false
-        rootLayout.background = ContextCompat.getDrawable(
-            requireContext(),
-            R.drawable.self_feed_floating_window_background
-        )
+
+        if(isFloatingWindow) {
+            rootLayout.background = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.self_feed_floating_window_background
+            )
+        }
+
         removeChatVideoListener(peerId, clientId)
     }
 
