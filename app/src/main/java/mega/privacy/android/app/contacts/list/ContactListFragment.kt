@@ -32,7 +32,7 @@ class ContactListFragment : Fragment() {
     private val receiver: BroadcastReceiver by lazy {
         object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                viewModel.updateContacts()
+                viewModel.retrieveContacts()
             }
         }
     }
@@ -99,11 +99,11 @@ class ContactListFragment : Fragment() {
         binding.listContacts.adapter = ConcatAdapter(adapterConfig, recentlyAddedAdapter, contactsAdapter)
         binding.listContacts.setHasFixedSize(true)
 
-        binding.btnRequests.setOnClickListener {
+        binding.bgRequests.setOnClickListener {
             findNavController().navigate(ContactListFragmentDirections.actionListToRequests())
         }
 
-        binding.btnGroups.setOnClickListener {
+        binding.bgGroups.setOnClickListener {
             findNavController().navigate(ContactListFragmentDirections.actionListToGroups())
         }
 
@@ -123,11 +123,16 @@ class ContactListFragment : Fragment() {
                 recentlyAddedAdapter.submitList(items)
             }
 
-        viewModel.getContacts(getString(R.string.section_contacts))
+        viewModel.getContactsWithHeaders(getString(R.string.section_contacts))
             .observe(viewLifecycleOwner) { items ->
                 binding.viewEmpty.isVisible = items.isNullOrEmpty()
                 contactsAdapter.submitList(items)
             }
+
+        viewModel.getIncomingContactRequestsSize().observe(viewLifecycleOwner) { size ->
+            binding.chipRequestCounter.text = size.toString()
+            binding.chipRequestCounter.isVisible = size > 0
+        }
     }
 
     private fun setupReceivers() {

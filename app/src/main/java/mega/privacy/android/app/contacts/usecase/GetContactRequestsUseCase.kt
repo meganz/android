@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
+import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.di.MegaApi
@@ -109,6 +110,9 @@ class GetContactRequestsUseCase @Inject constructor(
                 megaApi.getUserAttribute(request.email, USER_ATTR_FIRSTNAME, userAttrsListener)
             }
         }, BackpressureStrategy.BUFFER)
+
+    fun getIncomingRequestsSize(): Single<Int> =
+        Single.fromCallable { megaApi.incomingContactRequests.size }
 
     private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
         TextDrawable.builder()

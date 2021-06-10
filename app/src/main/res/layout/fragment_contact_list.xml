@@ -5,15 +5,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_requests"
-        style="@style/Widget.Mega.Button.TextButton.Row"
+    <View
+        android:id="@+id/bg_requests"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:text="@string/section_requests"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txt_requests"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/section_requests"
+        android:textAllCaps="true"
+        android:textAppearance="?textAppearanceButton"
+        android:textColor="?colorSecondary"
+        app:layout_constraintBottom_toBottomOf="@id/bg_requests"
+        app:layout_constraintStart_toStartOf="@id/bg_requests"
+        app:layout_constraintTop_toTopOf="@id/bg_requests" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip_request_counter"
+        style="@style/Widget.Mega.Chip.New"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/txt_requests"
+        app:layout_constraintStart_toEndOf="@id/txt_requests"
+        app:layout_constraintTop_toTopOf="@id/txt_requests"
+        tools:text="1"
+        tools:visibility="visible" />
 
     <View
         android:id="@+id/divider_btn_requests"
@@ -22,17 +49,31 @@
         android:background="@color/grey_alpha_012"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_requests" />
+        app:layout_constraintTop_toBottomOf="@id/bg_requests" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_groups"
-        style="@style/Widget.Mega.Button.TextButton.Row"
+    <View
+        android:id="@+id/bg_groups"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:text="@string/section_groups"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider_btn_requests" />
+
+    <TextView
+        android:id="@+id/txt_groups"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/section_groups"
+        android:textAllCaps="true"
+        android:textAppearance="?textAppearanceButton"
+        android:textColor="?colorSecondary"
+        app:layout_constraintBottom_toBottomOf="@id/bg_groups"
+        app:layout_constraintStart_toStartOf="@id/bg_groups"
+        app:layout_constraintTop_toTopOf="@id/bg_groups" />
 
     <View
         android:id="@+id/divider_btn_groups"
@@ -41,7 +82,7 @@
         android:background="@color/grey_alpha_012"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_groups" />
+        app:layout_constraintTop_toBottomOf="@id/bg_groups" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_contacts"

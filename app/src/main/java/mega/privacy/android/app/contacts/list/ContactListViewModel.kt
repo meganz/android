@@ -11,11 +11,13 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.list.data.ContactItem
+import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.utils.notifyObserver
 
 class ContactListViewModel @ViewModelInject constructor(
-    private val getContactsUseCase: GetContactsUseCase
+    private val getContactsUseCase: GetContactsUseCase,
+    private val getContactRequestsUseCase: GetContactRequestsUseCase
 ) : BaseRxViewModel() {
 
     companion object {
@@ -23,13 +25,15 @@ class ContactListViewModel @ViewModelInject constructor(
     }
 
     private val contacts: MutableLiveData<List<ContactItem.Data>> = MutableLiveData()
+    private val incomingRequestsSize: MutableLiveData<Int> = MutableLiveData(0)
     private var queryString: String? = null
 
     init {
-        updateContacts()
+        retrieveContacts()
+        retrieveIncomingContactRequestsSize()
     }
 
-    fun updateContacts() {
+    fun retrieveContacts() {
         composite.clear()
         getContactsUseCase.get()
             .subscribeOn(Schedulers.io())
@@ -45,7 +49,24 @@ class ContactListViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun getContacts(headerTitle: String): LiveData<List<ContactItem>> =
+    private fun retrieveIncomingContactRequestsSize() {
+        getContactRequestsUseCase.getIncomingRequestsSize()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { size ->
+                    incomingRequestsSize.value = size
+                },
+                onError = { error ->
+                    Log.e(TAG, error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
+
+    fun getIncomingContactRequestsSize(): LiveData<Int> = incomingRequestsSize
+
+    fun getContactsWithHeaders(headerTitle: String): LiveData<List<ContactItem>> =
         contacts.map { items ->
             val itemsWithHeaders = mutableListOf<ContactItem>()
             items?.forEachIndexed { index, item ->
