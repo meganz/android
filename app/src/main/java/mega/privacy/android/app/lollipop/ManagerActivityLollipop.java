@@ -206,6 +206,7 @@ import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
+import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
@@ -491,6 +492,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
 	private List<MegaSku> mSkuDetailsList;
+
+	// Determine if open this activity from meeting page, if true, will finish this activity when user click back icon
+	private boolean isFromMeeting = false;
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, MEDIA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
@@ -2641,6 +2645,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_MY_ACCOUNT)){
 						logDebug("Intent from chat - show my account");
+
+						if (getIntent().hasExtra(MeetingParticipantBottomSheetDialogFragment.EXTRA_FROM_MEETING)) {
+							isFromMeeting = getIntent().getBooleanExtra(MeetingParticipantBottomSheetDialogFragment.EXTRA_FROM_MEETING, false);
+						}
 
 						drawerItem=DrawerItem.ACCOUNT;
 						accountFragment=MY_ACCOUNT_FRAGMENT;
@@ -7619,6 +7627,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("The accountFragment is: " + accountFragment);
     		switch(accountFragment) {
 	    		case MY_ACCOUNT_FRAGMENT:
+	    			if (isFromMeeting){
+						finish();
+						break;
+					}
+
 					maFLol = (MyAccountFragmentLollipop) getSupportFragmentManager()
 							.findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
 	    			if (maFLol == null || maFLol.onBackPressed() == 0){
