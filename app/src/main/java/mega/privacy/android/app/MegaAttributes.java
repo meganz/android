@@ -20,6 +20,8 @@ public class MegaAttributes {
 	private String useHttpsOnly = "false";
 	private String showCopyright = "true";
 	private String showNotifOff = "true";
+
+	@Deprecated
 	private String staging = "false";
 	private String lastPublicHandle = "";
 	private String lastPublicHandleTimeStamp = "";
@@ -198,12 +200,16 @@ public class MegaAttributes {
 		this.showNotifOff = showNotifOff;
 	}
 
+	/**
+	 * Sets if is pointing to staging server.
+	 *
+	 * @return True if is pointing to staging, false if pointing to production server.
+	 * @deprecated Now more than one testing server is allowed in the app,
+	 * this DB value should not be used anymore. Use {@link #getApiServer} instead.
+	 */
+	@Deprecated
     public String getStaging(){
         return staging;
-    }
-
-    public void setStaging(String staging) {
-        this.staging = staging;
     }
 
 	public long getLastPublicHandle() {

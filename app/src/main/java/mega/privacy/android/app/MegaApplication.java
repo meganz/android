@@ -765,17 +765,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		//Logout check resumed pending transfers
 		TransfersManagement.checkResumedPendingTransfers();
 
-		boolean staging = false;
+		int apiServerValue = PRODUCTION_SERVER_VALUE;
+
 		if (dbH != null) {
-			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null && attrs.getStaging() != null) {
-				staging = Boolean.parseBoolean(attrs.getStaging());
-			}
+			apiServerValue = dbH.getApiServer();
 		}
 
-		if (staging) {
-			megaApi.changeApiUrl(STAGING_SERVER);
-			megaApiFolder.changeApiUrl(STAGING_SERVER);
+		if (apiServerValue != PRODUCTION_SERVER_VALUE) {
+			String apiServer = getApiServerFromValue(apiServerValue);
+			megaApi.changeApiUrl(apiServer);
+			megaApiFolder.changeApiUrl(apiServer);
 		}
 
 		boolean useHttpsOnly = false;

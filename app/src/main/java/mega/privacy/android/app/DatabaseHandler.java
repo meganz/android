@@ -3874,35 +3874,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return "true";
 	}
 
-	public void setStaging (boolean staging){
-		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
-		ContentValues values = new ContentValues();
-		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null && cursor.moveToFirst()) {
-				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_STAGING + "='" + encrypt(staging + "") + "' WHERE " + KEY_ID + " ='1'";
-				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-			} else {
-				values.put(KEY_STAGING, encrypt(staging + ""));
-				db.insert(TABLE_ATTRIBUTES, null, values);
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
-	}
-
-	public String getStaging (){
-
-		String selectQuery = "SELECT " + KEY_STAGING + " FROM " + TABLE_ATTRIBUTES + " WHERE " + KEY_ID + " = '1'";
-		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null && cursor.moveToFirst()) {
-				return decrypt(cursor.getString(0));
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
-		return "false";
-	}
-
 	public void setInvalidateSdkCache(boolean invalidateSdkCache){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
 		ContentValues values = new ContentValues();
