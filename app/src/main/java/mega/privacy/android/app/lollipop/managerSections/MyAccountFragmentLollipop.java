@@ -25,13 +25,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -44,10 +47,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.SMSVerificationActivity;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
@@ -64,6 +67,7 @@ import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -74,8 +78,13 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.enableOrDisableDialogButton;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.DBUtil.getApiServerFromValue;
+import static mega.privacy.android.app.utils.DBUtil.getApiServerValue;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -89,6 +98,10 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, GetUserDataListener.OnUserDataUpdateCallback, ResetPhoneNumberListener.OnResetPhoneNumberCallback {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
+
+	private static final String KEY_RPN_DIALOG_SHOWING = "removePhoneNumberDialogShowing";
+	private static final String IS_CHANGE_API_SERVER_SHOW = "IS_CHANGE_API_SERVER_SHOW";
+	private static final String API_SERVER_VALUE_CHECKED = "API_SERVER_VALUE_CHECKED";
 
 	private final int WIDTH = 500;
 
@@ -150,7 +163,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	private Bitmap qrAvatarSave;
 
 	private int numOfClicksLastSession = 0;
-	private boolean staging = false;
 
 	private DatabaseHandler dbH;
 
@@ -162,7 +174,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	private PhoneNumberBottomSheetDialogFragment phoneNumberBottomSheet;
 
-	private static final String KEY_RPN_DIALOG_SHOWING = "removePhoneNumberDialogShowing";
+	private AlertDialog changeApiServerDialog;
+	private int apiServerValueChecked = INVALID_VALUE;
+	private int currentApiServerValue = PRODUCTION_SERVER_VALUE;
 
     /**
      * Modify or remove verified phone number.
@@ -230,6 +244,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		avatarLayout.setOnClickListener(this);
 
 		boolean createLink = true;
+
 		if (savedInstanceState != null) {
 			byte[] avatarByteArray = savedInstanceState.getByteArray("qrAvatar");
 			if (avatarByteArray != null) {
@@ -244,6 +259,11 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
             if (savedInstanceState.getBoolean(KEY_RPN_DIALOG_SHOWING, false)) {
                 showConfirmRemovePhoneNumberDialog(isModify = savedInstanceState.getBoolean(KEY_IS_MODIFY, false));
             }
+
+            if (savedInstanceState.getBoolean(IS_CHANGE_API_SERVER_SHOW, false)) {
+            	apiServerValueChecked = savedInstanceState.getInt(API_SERVER_VALUE_CHECKED, INVALID_VALUE);
+            	showChangeApiServerDialog();
+			}
 		}
 
 		if (createLink) {
@@ -660,66 +680,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			}
 			case R.id.my_account_last_session_layout:{
 				numOfClicksLastSession++;
-				if (numOfClicksLastSession == 5){
-					numOfClicksLastSession = 0;
-					staging = false;
-					if (dbH != null){
-						MegaAttributes attrs = dbH.getAttributes();
-						if (attrs != null) {
-							if (attrs.getStaging() != null){
-								try{
-									staging = Boolean.parseBoolean(attrs.getStaging());
-								} catch (Exception e){ staging = false;}
-							}
-						}
-					}
 
-					if (!staging) {
-						DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								switch (which){
-									case DialogInterface.BUTTON_POSITIVE:
-										staging = true;
-										megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
-										if (dbH != null){
-											dbH.setStaging(true);
-										}
-
-										Intent intent = new Intent(context, LoginActivityLollipop.class);
-										intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-										intent.setAction(ACTION_REFRESH_STAGING);
-										startActivityForResult(intent, REQUEST_CODE_REFRESH_STAGING);
-										break;
-
-									case DialogInterface.BUTTON_NEGATIVE:
-										//No button clicked
-										break;
-								}
-							}
-						};
-
-						AlertDialog.Builder builder = new AlertDialog.Builder(context);
-						builder.setTitle(getResources().getString(R.string.staging_api_url_title));
-						builder.setMessage(getResources().getString(R.string.staging_api_url_text));
-
-						builder.setPositiveButton(R.string.general_yes, dialogClickListener);
-						builder.setNegativeButton(R.string.general_cancel, dialogClickListener);
-						builder.show();
-					}
-					else{
-						staging = false;
-                        megaApi.changeApiUrl("https://g.api.mega.co.nz/");
-						if (dbH != null){
-							dbH.setStaging(false);
-						}
-						Intent intent = new Intent(context, LoginActivityLollipop.class);
-						intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-						intent.setAction(ACTION_REFRESH_STAGING);
-
-						startActivityForResult(intent, REQUEST_CODE_REFRESH_STAGING);
-					}
+				if (numOfClicksLastSession < 5) {
+					break;
 				}
+
+				numOfClicksLastSession = 0;
+				showChangeApiServerDialog();
 				break;
 			}
             case R.id.add_phone_number:{
@@ -761,9 +728,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(removePhoneNumberDialog != null) {
-            removePhoneNumberDialog.dismiss();
-        }
+        dismissAlertDialogIfShown(removePhoneNumberDialog);
+		dismissAlertDialogIfShown(changeApiServerDialog);
     }
 
     public int onBackPressed(){
@@ -1033,6 +999,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		outState.putBoolean(KEY_RPN_DIALOG_SHOWING, removePhoneNumberDialogShowing);
 		outState.putBoolean(KEY_IS_MODIFY, isModify);
+		outState.putBoolean(IS_CHANGE_API_SERVER_SHOW, isAlertDialogShown(changeApiServerDialog));
+		outState.putInt(API_SERVER_VALUE_CHECKED, apiServerValueChecked);
 	}
 
     /**
@@ -1088,4 +1056,61 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         }, 3000);
 
     }
+
+	private void showChangeApiServerDialog() {
+		currentApiServerValue = dbH != null ? dbH.getApiServer() : PRODUCTION_SERVER_VALUE;
+		final int apiServerValue = apiServerValueChecked != INVALID_VALUE
+				? apiServerValueChecked
+				: currentApiServerValue;
+
+		ArrayList<String> stringsArray = new ArrayList<>();
+		stringsArray.add(PRODUCTION_SERVER_VALUE, StringResourcesUtils.getString(R.string.production_api_server));
+		stringsArray.add(STAGING_SERVER_VALUE, StringResourcesUtils.getString(R.string.staging_api_server));
+		stringsArray.add(STAGING_444_SERVER_VALUE, StringResourcesUtils.getString(R.string.staging444_api_server));
+		stringsArray.add(SANDBOX3_SERVER_VALUE, StringResourcesUtils.getString(R.string.sandbox3_api_server));
+
+		ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
+		ListView listView = new ListView(context);
+		listView.setAdapter(itemsAdapter);
+		AtomicReference<Integer> itemClicked = new AtomicReference<>();
+		itemClicked.set(apiServerValue);
+
+		View customTitle = getLayoutInflater().inflate(R.layout.dialog_api_server, null);
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context)
+				.setCustomTitle(customTitle)
+				.setPositiveButton(StringResourcesUtils.getString(R.string.general_ok), (dialog, which) ->
+						changeApiServer(apiServerValueChecked))
+				.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+				.setOnDismissListener(dialog -> apiServerValueChecked = INVALID_VALUE)
+				.setSingleChoiceItems(itemsAdapter, apiServerValue, (dialog, item) -> {
+					itemClicked.set(item);
+					apiServerValueChecked = item;
+					enableOrDisableDialogButton(context, item != currentApiServerValue,
+							((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE));
+				});
+
+		changeApiServerDialog = builder.create();
+		changeApiServerDialog.show();
+
+		enableOrDisableDialogButton(context, apiServerValue != currentApiServerValue,
+				changeApiServerDialog.getButton(AlertDialog.BUTTON_POSITIVE));
+	}
+
+    private void changeApiServer(int newApiServerValue) {
+		dismissAlertDialogIfShown(changeApiServerDialog);
+
+		if (newApiServerValue == currentApiServerValue) {
+			return;
+		}
+
+		String apiServer = getApiServerFromValue(newApiServerValue);
+		megaApi.changeApiUrl(apiServer);
+		dbH.setApiServer(getApiServerValue(apiServer));
+
+		Intent intent = new Intent(context, LoginActivityLollipop.class)
+				.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT)
+				.setAction(ACTION_REFRESH_API_SERVER);
+
+		startActivityForResult(intent, REQUEST_CODE_REFRESH_API_SERVER);
+	}
 }

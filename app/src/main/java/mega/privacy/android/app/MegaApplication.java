@@ -774,8 +774,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 
 		if (staging) {
-			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
-			megaApiFolder.changeApiUrl("https://staging.api.mega.co.nz/");
+			megaApi.changeApiUrl(STAGING_SERVER);
+			megaApiFolder.changeApiUrl(STAGING_SERVER);
 		}
 
 		boolean useHttpsOnly = false;

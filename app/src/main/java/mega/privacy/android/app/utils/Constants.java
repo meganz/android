@@ -42,7 +42,7 @@ public class Constants {
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;
     public static final int REQUEST_CODE_GET_CONTACTS = 1026;
     public static final int REQUEST_CODE_FILE_INFO = 1027;
-    public static final int REQUEST_CODE_REFRESH_STAGING = 1028;
+    public static final int REQUEST_CODE_REFRESH_API_SERVER = 1028;
     public static final int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
     public static final int REQUEST_CODE_SEND_LOCATION = 1030;
     public static final int REQUEST_CODE_COUNTRY_PICKER = 1031;
@@ -54,7 +54,7 @@ public class Constants {
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
-    public static final String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
+    public static final String ACTION_REFRESH_API_SERVER = "ACTION_REFRESH_STAGING";
     public static final String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
@@ -844,4 +844,15 @@ public class Constants {
     public static final int ORDER_CONTACTS = 1;
     public static final int ORDER_OTHERS = 2;
     public static final int ORDER_CAMERA = 3;
+
+    //Api servers
+    public static final String PRODUCTION_SERVER = "https://g.api.mega.co.nz/";
+    public static final String STAGING_SERVER = "https://staging.api.mega.co.nz/";
+    public static final String STAGING_444_SERVER = "https://staging.api.mega.co.nz:444/";
+    public static final String SANDBOX3_SERVER = "https://api-sandbox3.developers.mega.co.nz/";
+
+    public static final int PRODUCTION_SERVER_VALUE = 0;
+    public static final int STAGING_SERVER_VALUE = 1;
+    public static final int STAGING_444_SERVER_VALUE = 2;
+    public static final int SANDBOX3_SERVER_VALUE = 3;
 }

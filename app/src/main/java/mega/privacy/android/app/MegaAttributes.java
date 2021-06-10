@@ -27,6 +27,7 @@ public class MegaAttributes {
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN;
 	private String myChatFilesFolderHandle = "";
 	private String transferQueueStatus;
+	private int apiServer;
 
 	public MegaAttributes(String online, int attemps, String askSizeDownload, String askNoAppDownload, String fileLogger,
 						  String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp,
@@ -60,7 +61,7 @@ public class MegaAttributes {
 						  String accountDetailsTimeStamp, String paymentMethodsTimeStamp, String pricingTimeStamp, String extendedAccountDetailsTimeStamp,
 						  String invalidateSdkCache, String fileLoggerKarere, String useHttpsOnly, String showCopyright, String showNotifOff, String staging,
 						  String lastPublicHandle, String lastPublicHandleTimeStamp, int lastPublicHandleType, int storageState, String myChatFilesFolderHandle,
-						  String transferQueueStatus) {
+						  String transferQueueStatus, int apiServer) {
 		this.online = online;
 		this.attemps = attemps;
 		this.askNoAppDownload = askNoAppDownload;
@@ -82,6 +83,7 @@ public class MegaAttributes {
 		this.storageState = storageState;
 		this.myChatFilesFolderHandle = myChatFilesFolderHandle;
 		this.transferQueueStatus = transferQueueStatus;
+		this.apiServer = apiServer;
 	}
 	
 	public String getOnline(){
@@ -250,6 +252,14 @@ public class MegaAttributes {
 
 	public void setTransferQueueStatus(String transferQueueStatus) {
 		this.transferQueueStatus = transferQueueStatus;
+	}
+
+	public int getApiServer() {
+		return apiServer;
+	}
+
+	public void setApiServer(int apiServer) {
+		this.apiServer = apiServer;
 	}
 
 	/**

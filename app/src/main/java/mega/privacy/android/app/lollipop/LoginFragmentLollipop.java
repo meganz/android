@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -685,7 +683,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     startLoginInProcess();
                     return v;
                 }
-                else if (action.equals(ACTION_REFRESH_STAGING)){
+                else if (action.equals(ACTION_REFRESH_API_SERVER)){
                     twoFA = true;
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startFastLogin();
@@ -1066,7 +1064,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
             disableLoginButton();
             megaApi.fastLogin(gSession, this);
-            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_REFRESH_STAGING))  {
+            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_REFRESH_API_SERVER))  {
                 logDebug("megaChatApi.refreshUrl()");
                 megaChatApi.refreshUrl();
             }
@@ -1689,7 +1687,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
 
                     if (twoFA){
-                        intent.setAction(ACTION_REFRESH_STAGING);
+                        intent.setAction(ACTION_REFRESH_API_SERVER);
                         twoFA = false;
                     }
                     
@@ -2308,7 +2306,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public int onBackPressed() {
         logDebug("onBackPressed");
         //refresh, point to staging server, enable chat. block the back button
-        if (ACTION_REFRESH.equals(action) || ACTION_REFRESH_STAGING.equals(action)){
+        if (ACTION_REFRESH.equals(action) || ACTION_REFRESH_API_SERVER.equals(action)){
             return -1;
         }
         //login is in process
