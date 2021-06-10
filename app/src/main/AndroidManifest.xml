@@ -634,7 +634,8 @@
             android:windowSoftInputMode="stateHidden|adjustNothing"/>
 
         <activity
-            android:name=".AskForDsiplayOverActivity"
+            android:name=".activities.AskForDsiplayOverActivity"
+            android:theme="@style/ActivityDialog"
             android:launchMode="singleTask"/>
 
     </application>

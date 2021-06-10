@@ -1,6 +1,7 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.activities
 
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -8,12 +9,14 @@ import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.R
 
 class AskForDsiplayOverActivity : PasscodeActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.statusBarColor = Color.TRANSPARENT
         setContentView(R.layout.ask_for_display_over_activity_layout)
     }
 

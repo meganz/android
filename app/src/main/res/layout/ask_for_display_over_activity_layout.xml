@@ -1,24 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="25dp"
-        android:orientation="vertical">
+        android:layout_centerInParent="true"
+        android:layout_margin="32dp"
+        android:background="@drawable/background_ask_for_display_over"
+        android:elevation="1dp"
+        android:orientation="vertical"
+        android:paddingStart="15dp"
+        android:paddingTop="23dp"
+        android:paddingEnd="15dp"
+        android:paddingBottom="10dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="5dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginEnd="10dp"
             android:gravity="center"
             android:text="@string/ask_for_display_over_title"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textColor="@color/grey_087_white_087"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -37,33 +44,41 @@
             android:layout_gravity="center_horizontal"
             android:gravity="start"
             android:lineSpacingMultiplier="1.27"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
             android:text="@string/ask_for_display_over_msg"
             android:textAlignment="textStart"
-            android:textAppearance="?attr/textAppearanceSubtitle1" />
+            android:textColor="@color/grey_087_white_087"
+            android:textSize="16sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end">
+            android:layout_marginTop="20dp"
+            android:gravity="end"
+            android:orientation="horizontal">
 
             <Button
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
+                android:layout_marginStart="15dp"
                 android:onClick="notNow"
-                android:text="@string/verify_account_not_now_button" />
+                android:text="@string/verify_account_not_now_button"
+                android:textColor="@color/teal_300_teal_200" />
 
             <Button
                 style="?attr/borderlessButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
+                android:layout_marginStart="5dp"
                 android:onClick="toSetting"
-                android:text="@string/general_allow" />
+                android:text="@string/general_allow"
+                android:textColor="@color/teal_300_teal_200" />
         </LinearLayout>
 
     </LinearLayout>
 
-</ScrollView>
+</RelativeLayout>

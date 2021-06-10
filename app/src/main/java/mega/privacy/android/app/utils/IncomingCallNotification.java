@@ -17,7 +17,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import mega.privacy.android.app.AskForDsiplayOverActivity;
+import mega.privacy.android.app.activities.AskForDsiplayOverActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaChatApiAndroid;
