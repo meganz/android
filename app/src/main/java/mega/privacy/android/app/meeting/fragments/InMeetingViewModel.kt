@@ -68,8 +68,6 @@ class InMeetingViewModel @ViewModelInject constructor(
     private val _speakerParticipant = MutableLiveData<Participant>(null)
     val speakerParticipant: LiveData<Participant> = _speakerParticipant
 
-    var isGettingLink = false
-
     private val updateCallObserver =
         Observer<MegaChatCall> {
             if (isSameChatRoom(it.chatid)) {
@@ -284,14 +282,6 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
 
         return false
-    }
-
-    fun gettingLink(){
-        isGettingLink = true
-    }
-
-    fun gotLink() {
-        isGettingLink = false
     }
 
     /**

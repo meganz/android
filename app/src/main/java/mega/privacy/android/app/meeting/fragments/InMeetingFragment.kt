@@ -211,6 +211,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (it.status != INVALID_CALL_STATUS) {
             if (inMeetingViewModel.isSameCall(it.callId)) {
                 updateToolbarSubtitle(it)
+                updatePanelAndToolbar(it)
                 when (it.status) {
                     MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> finishActivity()
                     MegaChatCall.CALL_STATUS_CONNECTING -> {
@@ -235,6 +236,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         } else {
             checkAnotherCall()
         }
+    }
+
+    private fun updatePanelAndToolbar(chat: MegaChatCall?) {
+        if (chat?.status == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+            toolbar?.setOnClickListener { showMeetingInfoFragment() }
+        } else {
+            toolbar?.setOnClickListener { null }
+        }
+
+        bottomFloatingPanelViewHolder.updateMeetingType(!inMeetingViewModel.isOneToOneCall())
     }
 
     private val callCompositionObserver = Observer<MegaChatCall> {
@@ -483,6 +494,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             updateToolbarSubtitle(currentCall)
             enableOnHoldFab(currentCall.isOnHold)
+            updatePanelAndToolbar(currentCall)
         } else {
             enableOnHoldFab(false)
         }
@@ -715,8 +727,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             it?.let {
                 logDebug("Chat has changed")
                 inMeetingViewModel.setChatId(it)
-                bottomFloatingPanelViewHolder.updateMeetingType(!inMeetingViewModel.isOneToOneCall())
-                toolbar.setOnClickListener { showMeetingInfoFragment() }
             }
         }
 
@@ -732,7 +742,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             StartChatCallListener(meetingActivity, this, this)
                         )
                     } else {
-                        shareLink()
+                        if (inMeetingViewModel.isWaitingForLink()) {
+                            inMeetingViewModel.setWaitingForLink(false)
+                            shareLink()
+                        }
                     }
                 }
             }
@@ -1952,14 +1965,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     /**
      * Send share link
      */
-    override fun onShareLink() {
-        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isChatRoomPublic()) {
+    override fun onShareLink(sendLink: Boolean) {
+        if (inMeetingViewModel.isOneToOneCall() || !inMeetingViewModel.isChatRoomPublic() || inMeetingViewModel.isWaitingForLink()) {
             logError("Error getting the link, it is a private chat")
             return
         }
 
         if (meetinglink.isEmpty()) {
-            inMeetingViewModel.setWaitingForLink(true)
+            inMeetingViewModel.setWaitingForLink(sendLink)
             sharedModel.createChatLink(
                 inMeetingViewModel.getChatId(),
                 inMeetingViewModel.isModerator()
@@ -1973,10 +1986,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     fun shareLink() {
         logDebug("Share the link")
-        if (inMeetingViewModel.isGettingLink){
-            inMeetingViewModel.gotLink()
-            return
-        }
 
         meetingActivity.startActivity(Intent().apply {
             action = Intent.ACTION_SEND

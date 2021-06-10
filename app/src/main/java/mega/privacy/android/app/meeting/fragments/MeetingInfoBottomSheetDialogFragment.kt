@@ -81,9 +81,8 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         shareViewModel.currentChatId.observe(this) {
             updateView()
-            if (chatLink.isEmpty() && !inMeetingViewModel.isGettingLink) {
-                inMeetingViewModel.gettingLink()
-                getLink()
+            if (chatLink.isEmpty()) {
+                (parentFragment as InMeetingFragment).onShareLink(false)
             }
         }
 
@@ -99,18 +98,12 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     fun initAction() {
         listenAction(binding.shareLink) {
-            inMeetingViewModel.gotLink()
-            getLink()
+            (parentFragment as InMeetingFragment).onShareLink(true)
         }
         listenAction(binding.invite) { (parentFragment as InMeetingFragment).onInviteParticipants() }
         listenAction(binding.copyLink) { copyLink() }
         listenAction(binding.edit) { showRenameGroupDialog() }
     }
-
-    fun getLink() {
-        (parentFragment as InMeetingFragment).onShareLink()
-    }
-
 
     /**
      * After execute the action, close the item dialog

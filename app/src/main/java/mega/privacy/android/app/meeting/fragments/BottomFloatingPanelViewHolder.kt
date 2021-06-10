@@ -296,14 +296,14 @@ class BottomFloatingPanelViewHolder(
             }
 
             shareLink.setOnClickListener {
-                listener.onShareLink()
+                listener.onShareLink(true)
             }
 
             guestShareLink.setOnClickListener {
                 if (inMeetingViewModel.isModeratorOfPrivateRoom()) {
                     listener.onInviteParticipants()
                 } else {
-                    listener.onShareLink()
+                    listener.onShareLink(true)
                 }
             }
 
