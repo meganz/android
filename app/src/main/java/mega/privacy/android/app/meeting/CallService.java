@@ -5,10 +5,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -24,7 +22,6 @@ import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
@@ -34,12 +31,12 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
-import nz.mega.sdk.MegaHandleList;
 
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -48,7 +45,6 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -69,6 +65,11 @@ public class CallService extends Service{
 
     private ChatController chatC;
 
+    /**
+     * If is in meeting fragment.
+     */
+    private boolean isInMeeting = true;
+
     private final Observer<MegaChatCall> callStatusObserver = call -> {
         int callStatus = call.getStatus();
         logDebug("Call status " + callStatusToString(callStatus)+" current chat = "+currentChatId);
@@ -84,8 +85,11 @@ public class CallService extends Service{
         }
     };
 
-    private final Observer<MegaChatCall> callOnHoldObserver = call -> {
-        checkAnotherActiveCall();
+    private final Observer<MegaChatCall> callOnHoldObserver = call -> checkAnotherActiveCall();
+
+    private final Observer<Boolean> isInMeetingObserver = b -> {
+        isInMeeting = b;
+        updateNotificationContent();
     };
 
     public void onCreate() {
@@ -96,14 +100,13 @@ public class CallService extends Service{
 
         chatC = new ChatController(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-            mBuilder = new Notification.Builder(this);
-        mBuilderCompat = new NotificationCompat.Builder(this);
+        mBuilderCompat = new NotificationCompat.Builder(this, notificationChannelId);
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observeForever(callOnHoldObserver);
+        LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean.class).observeForever(isInMeetingObserver);
     }
 
     @Override
@@ -140,20 +143,28 @@ public class CallService extends Service{
     private void updateNotificationContent() {
         logDebug("Updating notification");
         MegaChatCall call = megaChatApi.getChatCall(currentChatId);
-        if (call == null)
-            return;
+        if (call == null) return;
 
         int notificationId = getCallNotificationId(call.getCallId());
 
         Notification notif;
         String contentText = "";
         PendingIntent intentCall = null;
+
         if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && call.isRinging()) {
             contentText = getString(R.string.title_notification_incoming_call);
             intentCall = getPendingIntentMeetingRinging(this, currentChatId, notificationId + 1);
         } else if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-            contentText = getString(call.isOnHold() ? R.string.call_on_hold : R.string.title_notification_call_in_progress);
-            intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId + 1);
+            if(call.isOnHold()) {
+                contentText = StringResourcesUtils.getString(R.string.call_on_hold);
+            } else {
+                contentText = StringResourcesUtils.getString(R.string.title_notification_call_in_progress);
+            }
+
+            // Quit in meeting page, and not guest user. Then can return to the call by tapping the notification.
+            if(!isInMeeting && !megaApi.isEphemeralPlusPlus()) {
+                intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId + 1);
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -161,18 +172,15 @@ public class CallService extends Service{
                 mBuilderCompatO.setContentText(contentText);
             }
 
-            if (intentCall != null) {
-                mBuilderCompatO.setContentIntent(intentCall);
-            }
+            mBuilderCompatO.setContentIntent(intentCall);
+
             notif = mBuilderCompatO.build();
         } else {
             if (!isTextEmpty(contentText)) {
                 mBuilderCompat.setContentText(contentText);
             }
 
-            if (intentCall != null) {
-                mBuilderCompatO.setContentIntent(intentCall);
-            }
+            mBuilderCompat.setContentIntent(intentCall);
 
             notif = mBuilderCompat.build();
         }
@@ -183,8 +191,7 @@ public class CallService extends Service{
     private void showCallInProgressNotification() {
         logDebug("Showing the notification");
         int notificationId = getCurrentCallNotifId();
-        if(notificationId == INVALID_CALL)
-            return;
+        if (notificationId == INVALID_CALL) return;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
@@ -193,14 +200,12 @@ public class CallService extends Service{
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.createNotificationChannel(channel);
 
-            PendingIntent intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId+1);
-
             mBuilderCompatO = new NotificationCompat.Builder(this, notificationChannelId);
             mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentIntent(intentCall)
                     .setAutoCancel(false)
-                    .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), intentCall)
+                    // Only use the action as indicator.
+                    .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), null)
                     .setOngoing(false)
                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
@@ -212,49 +217,38 @@ public class CallService extends Service{
                 title = getTitleChat(chat);
 
                 if (chat.isGroup()) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Bitmap largeIcon = createDefaultAvatar(-1, title);
-                        if (largeIcon != null) {
-                            mBuilderCompatO.setLargeIcon(largeIcon);
-                        }
+                    Bitmap largeIcon = createDefaultAvatar(-1, title);
+                    if (largeIcon != null) {
+                        mBuilderCompatO.setLargeIcon(largeIcon);
                     }
+
                 } else {
                     userHandle = chat.getPeerHandle(0);
                     email = chatC.getParticipantEmail(chat.getPeerHandle(0));
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
-                        if (largeIcon != null) {
-                            mBuilderCompatO.setLargeIcon(largeIcon);
-                        }
+                    Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
+                    if (largeIcon != null) {
+                        mBuilderCompatO.setLargeIcon(largeIcon);
                     }
                 }
 
                 mBuilderCompatO.setContentTitle(title);
                 updateNotificationContent();
-
             } else {
                 mBuilderCompatO.setContentTitle(getString(R.string.title_notification_call_in_progress));
                 mBuilderCompatO.setContentText(getString(R.string.action_notification_call_in_progress));
                 startForeground(notificationId, mBuilderCompatO.build());
             }
-
         } else {
-
-            mBuilderCompat = new NotificationCompat.Builder(this);
+            mBuilderCompat = new NotificationCompat.Builder(this, notificationChannelId);
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-
-            PendingIntent intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId+1);
 
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentIntent(intentCall)
                     .setAutoCancel(false)
-                    .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), intentCall)
+                    .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), null)
                     .setOngoing(false);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
-            }
+            mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
             String title;
             String email;
@@ -264,26 +258,21 @@ public class CallService extends Service{
                 title = getTitleChat(chat);
 
                 if (chat.isGroup()) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Bitmap largeIcon = createDefaultAvatar(-1, title);
-                        if (largeIcon != null) {
-                            mBuilderCompat.setLargeIcon(largeIcon);
-                        }
+                    Bitmap largeIcon = createDefaultAvatar(-1, title);
+                    if (largeIcon != null) {
+                        mBuilderCompat.setLargeIcon(largeIcon);
                     }
                 } else {
                     userHandle = chat.getPeerHandle(0);
                     email = chatC.getParticipantEmail(chat.getPeerHandle(0));
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
-                        if (largeIcon != null) {
-                            mBuilderCompat.setLargeIcon(largeIcon);
-                        }
+                    Bitmap largeIcon = setProfileContactAvatar(userHandle, title, email);
+                    if (largeIcon != null) {
+                        mBuilderCompat.setLargeIcon(largeIcon);
                     }
                 }
 
                 mBuilderCompat.setContentTitle(title);
                 updateNotificationContent();
-
             } else {
                 mBuilderCompat.setContentTitle(getString(R.string.title_notification_call_in_progress));
                 mBuilderCompat.setContentText(getString(R.string.action_notification_call_in_progress));

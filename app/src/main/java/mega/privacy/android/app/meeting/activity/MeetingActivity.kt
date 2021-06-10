@@ -10,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.MegaApplication
@@ -17,6 +18,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.fragments.*
+import mega.privacy.android.app.utils.Constants.EVENT_ENTER_IN_MEETING
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 // FIXME: Keep Meeting Activity from implementing this and that listeners
@@ -212,6 +214,20 @@ class MeetingActivity : PasscodeActivity() {
         showSnackbar(binding.navHostFragment, content)
     }
 
+    override fun onPause() {
+        super.onPause()
+        sendQuitCallEvent()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val currentFragment = getCurrentFragment()
+        if (currentFragment is InMeetingFragment) {
+            currentFragment.sendEnterCallEvent()
+        }
+    }
+
     override fun onBackPressed() {
         when (val currentFragment = getCurrentFragment()) {
             is CreateMeetingFragment -> {
@@ -224,18 +240,19 @@ class MeetingActivity : PasscodeActivity() {
                 currentFragment.releaseVideoAndHideKeyboard()
             }
             is InMeetingFragment -> {
-                if(meetingAction == MEETING_ACTION_GUEST){
-                    currentFragment.leaveMeeting()
-                }
+                sendQuitCallEvent()
             }
         }
-
-        super.onBackPressed()
 
         if(meetingAction != MEETING_ACTION_GUEST){
             finish()
         }
     }
+
+    private fun sendQuitCallEvent() = LiveEventBus.get(
+        EVENT_ENTER_IN_MEETING,
+        Boolean::class.java
+    ).post(false)
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         val keyCode = event.keyCode
