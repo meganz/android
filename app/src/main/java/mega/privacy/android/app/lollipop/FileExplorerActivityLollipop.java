@@ -1485,6 +1485,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onBackPressed() {
 		logDebug("tabShown: " + tabShown);
+		if (psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		cDriveExplorer = getCloudExplorerFragment();

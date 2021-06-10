@@ -1,5 +1,6 @@
 package mega.privacy.android.app.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -12,7 +13,7 @@ import androidx.annotation.RequiresApi
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
 
-class AskForDsiplayOverActivity : PasscodeActivity() {
+class AskForDsiplayOverActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

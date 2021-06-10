@@ -851,6 +851,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Override
 	public void onBackPressed() {
+		if (psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		if (cflF != null && cflF.isVisible() && cflF.onBackPressed() == 0) {
