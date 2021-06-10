@@ -861,8 +861,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		Fresco.initialize(this);
 
 		AdsLibInitializer.INSTANCE.init(this);
-
-		Util.writeAppLaunchedTime(this);
 	}
 
 	public void askForFullAccountInfo(){

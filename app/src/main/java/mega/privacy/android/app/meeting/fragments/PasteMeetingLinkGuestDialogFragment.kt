@@ -39,8 +39,6 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
 
     private var meetingLink: String = ""
 
-    private val megaChatApi = MegaApplication.getInstance().getMegaChatApi()
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = MaterialAlertDialogBuilder(requireContext())
         val inflater = requireActivity().layoutInflater;
@@ -85,8 +83,6 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
             // Using extra approach(getMegaHandleList of openChatPreview())
             // to judge if its a meeting link later on
             if (AndroidMegaRichLinkMessage.isChatLink(meetingLink)) {
-                // TODO: +Meeting, use open link activity or self logic to process the link?
-//                initMegaChat { checkMeetingLink() }
                 // Need to call the async checkChatLink() to check if the chat has a call and
                 // get the meeting name
                 // Delegate the checking to OpenLinkActivity
@@ -107,68 +103,6 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
         intent.data = Uri.parse(meetingLink)
         startActivity(intent)
     }
-
-    private fun initMegaChat(doAfterConnect: (() -> Unit)?) {
-        var initResult: Int = megaChatApi.getInitState()
-
-        if (initResult < MegaChatApi.INIT_WAITING_NEW_SESSION) {
-            initResult = megaChatApi.initAnonymous()
-        }
-
-        if (initResult == MegaChatApi.INIT_ERROR) {
-            showError(R.string.error_meeting_link_init_error)
-            return;
-        }
-
-        megaChatApi.connect(object : ChatBaseListener(requireContext()) {
-            override fun onRequestFinish(
-                api: MegaChatApiJava,
-                request: MegaChatRequest,
-                e: MegaChatError
-            ) {
-                if (request.type != MegaChatRequest.TYPE_CONNECT
-                    || e.errorCode != MegaChatError.ERROR_OK
-                ) {
-                    showError(R.string.error_meeting_link_init_error)
-                    return
-                }
-
-                doAfterConnect?.invoke()
-            }
-        })
-    }
-
-    private fun checkMeetingLink() = megaChatApi.checkChatLink(
-        meetingLink,
-        object : ChatBaseListener(requireContext()) {
-            override fun onRequestFinish(
-                api: MegaChatApiJava,
-                request: MegaChatRequest,
-                e: MegaChatError
-            ) {
-                if (e.errorCode == MegaChatError.ERROR_OK || e.errorCode == MegaChatError.ERROR_EXIST) {
-                    if (isTextEmpty(request.link) && request.chatHandle == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-                        showSnackbar(
-                            requireContext(),
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.error_meeting_link_init_error),
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                        )
-                        return
-                    }
-                    CallUtil.openMeetingGuestMode(requireContext(), null, request.chatHandle, request.link)
-                    dismiss()
-                } else if (e.errorCode == MegaChatError.ERROR_NOENT) {
-                    Util.showAlert(
-                        requireContext(),
-                        getString(R.string.invalid_link),
-                        getString(R.string.meeting_link)
-                    )
-                } else {
-                    showError(R.string.invalid_meeting_link_args)
-                }
-            }
-        })
 
     private fun showError(errorStringId: Int) {
         setErrorAwareInputAppearance(linkEdit, true)

@@ -1612,24 +1612,4 @@ public class Util {
     private static void changeToolBarElevationOnDarkMode(Activity activity, Toolbar tB, float elevation, boolean withElevation) {
         tB.setBackgroundColor(withElevation ? ColorUtils.getColorForElevation(activity, elevation) : android.R.color.transparent);
     }
-
-	/**
-	 * Note down how many times the app has been launched till now
-	 * @param context
-	 */
-	public static void writeAppLaunchedTime(Context context) {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		int time = sharedPreferences.getInt(KEY_LAUNCHED_TIME, 0);
-		sharedPreferences.edit().putInt(KEY_LAUNCHED_TIME, time + 1).apply();
-	}
-
-	/**
-	 * Return how many times the app has been launched till now
-	 * @param context
-	 * @return the number of time the app has been launched
-	 */
-	public static int readAppLaunchedTime(Context context) {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		return sharedPreferences.getInt(KEY_LAUNCHED_TIME, 0);
-	}
 }
