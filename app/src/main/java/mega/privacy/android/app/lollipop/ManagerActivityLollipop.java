@@ -8528,32 +8528,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
 	}
 
-	public void showConfirmationRemoveContact(final MegaUser c){
-		logDebug("showConfirmationRemoveContact");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						cC.removeContact(c);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1);
-		builder.setTitle(title);
-		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1);
-		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
-	}
-
 	public void showConfirmationRemoveContacts(final ArrayList<MegaUser> c){
 		logDebug("showConfirmationRemoveContacts");
 		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {

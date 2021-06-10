@@ -2,10 +2,14 @@ package mega.privacy.android.app.modalbottomsheet;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +23,10 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.utils.ContactUtil;
+import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -153,12 +160,11 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
                 break;
 
             case R.id.contact_list_option_start_conversation_layout:
-                ((ManagerActivityLollipop) context).startOneToOneChat(contact.getMegaUser());
+                startOneToOneChat(contact.getMegaUser());
                 break;
 
             case R.id.contact_list_option_call_layout:
-                startNewCall((ManagerActivityLollipop) context, (SnackbarShower) context,
-                        contact.getMegaUser());
+                startNewCall(getActivity(), (SnackbarShower) context, contact.getMegaUser());
                 break;
 
             case R.id.contact_list_option_send_file_layout:
@@ -174,7 +180,7 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
                 break;
 
             case R.id.contact_list_option_remove_layout:
-                ((ManagerActivityLollipop) context).showConfirmationRemoveContact(contact.getMegaUser());
+                showConfirmationRemoveContact(contact.getMegaUser());
                 break;
         }
 
@@ -197,5 +203,29 @@ public class ContactsBottomSheetDialogFragment extends BaseBottomSheetDialogFrag
             }
             contact = new MegaContactAdapter(getContactDB(megaUser.getHandle()), megaUser, fullName);
         }
+    }
+
+    private void startOneToOneChat(MegaUser user) {
+        MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
+        MegaChatPeerList peers = MegaChatPeerList.createInstance();
+
+        if (chat == null) {
+            peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+            megaChatApi.createChat(false, peers, null);
+        } else {
+            Intent intentOpenChat = new Intent(context, ChatActivityLollipop.class);
+            intentOpenChat.setAction(ACTION_CHAT_SHOW_MESSAGES);
+            intentOpenChat.putExtra(CHAT_ID, chat.getChatId());
+            startActivity(intentOpenChat);
+        }
+    }
+
+    private void showConfirmationRemoveContact(MegaUser megaUser) {
+        new MaterialAlertDialogBuilder(context)
+                .setTitle(getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, 1))
+                .setMessage(getResources().getQuantityString(R.plurals.confirmation_remove_contact, 1))
+                .setPositiveButton(R.string.general_remove, (dialog, which) -> cC.removeContact(megaUser))
+                .setNegativeButton(R.string.general_cancel, null)
+                .show();
     }
 }

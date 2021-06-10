@@ -28,6 +28,7 @@ import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -44,31 +45,34 @@ class GetContactsUseCase @Inject constructor(
 
     fun get(): Flowable<List<ContactItem.Data>> =
         Flowable.create({ emitter: FlowableEmitter<List<ContactItem.Data>> ->
-            val contacts = megaApi.contacts.map { megaUser ->
-                val firstName = megaChatApi.getUserFirstnameFromCache(megaUser.handle)
-                val lastName = megaChatApi.getUserLastnameFromCache(megaUser.handle)
-                val userStatus = megaChatApi.getUserOnlineStatus(megaUser.handle)
-                val userImageColor = megaApi.getUserAvatarColor(megaUser).toColorInt()
-                val placeholder = getImagePlaceholder(firstName ?: megaUser.email, userImageColor)
-                val userAvatarFile = getUserAvatarFile(context, megaUser.email)
-                val userAvatar = if (userAvatarFile?.exists() == true) {
-                    userAvatarFile.toUri()
-                } else {
-                    null
-                }
+            val contacts = megaApi.contacts
+                .filter { it.visibility == VISIBILITY_VISIBLE }
+                .map { megaUser ->
+                    val firstName = megaChatApi.getUserFirstnameFromCache(megaUser.handle)
+                    val lastName = megaChatApi.getUserLastnameFromCache(megaUser.handle)
+                    val userStatus = megaChatApi.getUserOnlineStatus(megaUser.handle)
+                    val userImageColor = megaApi.getUserAvatarColor(megaUser).toColorInt()
+                    val placeholder = getImagePlaceholder(firstName ?: megaUser.email, userImageColor)
+                    val userAvatarFile = getUserAvatarFile(context, megaUser.email)
+                    val userAvatar = if (userAvatarFile?.exists() == true) {
+                        userAvatarFile.toUri()
+                    } else {
+                        null
+                    }
 
-                ContactItem.Data(
-                    handle = megaUser.handle,
-                    email = megaUser.email,
-                    firstName = firstName,
-                    lastName = lastName,
-                    status = userStatus,
-                    statusColor = getUserStatusColor(userStatus),
-                    avatarUri = userAvatar,
-                    placeholder = placeholder,
-                    isNew = megaUser.wasRecentlyAdded()
-                )
-            }.toMutableList()
+                    ContactItem.Data(
+                        handle = megaUser.handle,
+                        email = megaUser.email,
+                        firstName = firstName,
+                        lastName = lastName,
+                        status = userStatus,
+                        statusColor = getUserStatusColor(userStatus),
+                        avatarUri = userAvatar,
+                        placeholder = placeholder,
+                        isNew = megaUser.wasRecentlyAdded()
+                    )
+                }
+                .toMutableList()
 
             emitter.onNext(contacts.sortedBy(ContactItem.Data::getTitle))
 

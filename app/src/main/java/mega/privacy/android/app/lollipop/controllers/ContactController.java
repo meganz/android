@@ -101,6 +101,8 @@ public class ContactController {
             megaApi.removeContact(c, (ManagerActivityLollipop) context);
         } else if (context instanceof ContactInfoActivityLollipop) {
             megaApi.removeContact(c, (ContactInfoActivityLollipop) context);
+        } else {
+            megaApi.removeContact(c);
         }
     }
 
