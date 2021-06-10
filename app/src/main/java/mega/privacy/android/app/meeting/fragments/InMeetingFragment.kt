@@ -612,15 +612,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             it.layoutParams = menuLayoutParams
         }
 
-        floatingWindowFragment?.updateOrientation(
-            newConfig.orientation,
-        )
+        floatingWindowFragment?.let {
+            if(it.isAdded){
+                it.updateOrientation(newConfig.orientation)
+            }
+        }
 
-        gridViewCallFragment?.updateLayout(
-            newConfig.orientation,
-            outMetrics.widthPixels,
-            outMetrics.heightPixels
-        )
+        gridViewCallFragment?.let {
+            if(it.isAdded){
+                it.updateLayout(
+                    newConfig.orientation,
+                    outMetrics.widthPixels,
+                    outMetrics.heightPixels)
+            }
+        }
     }
 
     private fun initLiveEventBus() {
@@ -1093,16 +1098,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         MegaApplication.getInstance().unregisterProximitySensor()
 
         individualCallFragment?.let {
-            removeChildFragment(it)
+            if (it.isAdded) {
+                removeChildFragment(it)
+            }
         }
         floatingWindowFragment?.let {
-            removeChildFragment(it)
+            if (it.isAdded) {
+                removeChildFragment(it)
+            }
         }
         speakerViewCallFragment?.let {
-            removeChildFragment(it)
+            if (it.isAdded) {
+                removeChildFragment(it)
+            }
         }
         gridViewCallFragment?.let {
-            removeChildFragment(it)
+            if (it.isAdded) {
+                removeChildFragment(it)
+            }
         }
     }
 
@@ -1151,8 +1164,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 logDebug("Show one to one call UI")
 
                 individualCallFragment?.let {
-                    removeChildFragment(it)
-                    individualCallFragment = null
+                    if (it.isAdded) {
+                        removeChildFragment(it)
+                        individualCallFragment = null
+                    }
                 }
 
                 logDebug("Create fragment")
@@ -1185,8 +1200,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Show waiting for connection call UI")
 
         individualCallFragment?.let {
-            removeChildFragment(it)
-            individualCallFragment = null
+            if (it.isAdded) {
+                removeChildFragment(it)
+                individualCallFragment = null
+            }
         }
         individualCallFragment = IndividualCallFragment.newInstance(
             chatId,
@@ -1203,8 +1220,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         floatingWindowFragment?.let {
-            removeChildFragment(it)
-            floatingWindowFragment = null
+            if(it.isAdded){
+                removeChildFragment(it)
+                floatingWindowFragment = null
+            }
         }
 
         checkGridSpeakerViewMenuItemVisibility()
@@ -1244,8 +1263,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Show group call - Speaker View UI")
 
         gridViewCallFragment?.let {
-            removeChildFragment(it)
-            gridViewCallFragment = null
+            if (it.isAdded) {
+                removeChildFragment(it)
+                gridViewCallFragment = null
+            }
         }
 
         if (speakerViewCallFragment == null) {
@@ -1274,8 +1295,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Show group call - Grid View UI")
 
         speakerViewCallFragment?.let {
-            removeChildFragment(it)
-            speakerViewCallFragment = null
+            if(it.isAdded){
+                removeChildFragment(it)
+                speakerViewCallFragment = null
+            }
         }
 
         if (gridViewCallFragment == null) {
@@ -2059,18 +2082,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         checkCallStarted(chatId)
     }
 
-    override fun onPause() {
-        super.onPause()
-        removeUI()
-    }
-
     override fun onDestroy() {
+        super.onDestroy()
+
         logDebug("Fragment destroyed")
         CallUtil.activateChrono(false, meetingChrono, null)
         MegaApplication.getInstance().unregisterProximitySensor()
         resumeAudioPlayerIfNotInCall(meetingActivity)
         RunOnUIThreadUtils.stop()
-        super.onDestroy()
     }
 
     override fun onResume() {

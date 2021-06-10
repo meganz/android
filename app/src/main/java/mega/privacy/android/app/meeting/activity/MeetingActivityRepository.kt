@@ -99,12 +99,14 @@ class MeetingActivityRepository @Inject constructor(
      * @param listener receive information about requests
      */
     fun switchCamera(chatId: Long, bOn: Boolean, listener: MegaChatRequestListenerInterface) {
-        if (bOn) {
-            logDebug("Enable local video")
-            megaChatApi.enableVideo(chatId, listener)
-        } else {
-            logDebug("Disable local video")
-            megaChatApi.disableVideo(chatId, listener)
+        megaChatApi.getChatCall(chatId)?.let {
+            if (bOn && !it.hasLocalVideo()) {
+                logDebug("Enable local video")
+                megaChatApi.enableVideo(chatId, listener)
+            } else if (!bOn && it.hasLocalVideo()) {
+                logDebug("Disable local video")
+                megaChatApi.disableVideo(chatId, listener)
+            }
         }
     }
 

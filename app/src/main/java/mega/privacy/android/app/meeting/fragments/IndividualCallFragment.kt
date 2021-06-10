@@ -294,7 +294,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private fun closeVideo(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
 
-        logDebug("Close video")
+        logDebug("Close video of $clientId")
         videoSurfaceView.isVisible = false
 
         if(isFloatingWindow) {
@@ -570,10 +570,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
+        super.onDestroy()
         logDebug("View destroyed")
         closeVideo(peerId, clientId)
         avatarImageView.setImageBitmap(null)
-        super.onDestroyView()
     }
 }
