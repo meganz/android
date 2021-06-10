@@ -29,5 +29,6 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         btn_start_join_meeting.setText(R.string.btn_join_meeting)
+        type_meeting_edit_text.visibility = View.GONE
     }
 }

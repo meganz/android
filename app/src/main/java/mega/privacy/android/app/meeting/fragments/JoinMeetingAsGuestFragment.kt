@@ -65,6 +65,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         btn_start_join_meeting.setText(R.string.btn_join_meeting_as_guest)
         Util.showKeyboardDelayed(edit_first_name)
         reLayoutCameraPreviewView()
+        type_meeting_edit_text.visibility = View.GONE
     }
 
     /**
