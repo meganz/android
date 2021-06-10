@@ -510,7 +510,7 @@ class InMeetingRepository @Inject constructor(
             megaApi.myUserHandleBinary,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname ?: "",
-            null, true, moderator, audio, video
+            null, true, moderator, audio, video, isGuest = megaApi.isEphemeralPlusPlus
         )
     }
 

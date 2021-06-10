@@ -62,11 +62,7 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
         }
     }
 
-    fun isParticipantGuest(): Boolean {
-        val isGuest = participant?.isGuest == true
-        Log.d("Joe", "isGuest:$isGuest")
-        return isGuest
-    }
+    fun isParticipantGuest(): Boolean = participant?.isGuest == true
 
     /**
      * Determine if show the `Add Contact` item
