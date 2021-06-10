@@ -1828,7 +1828,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             }
         } == true
 
-        return hasOneModerator && isModerator() && participants.value?.none { isNormalUser(it.peerId) } == false
+        return hasOneModerator && isModerator() && participants.value?.none { isStandardUser(it.peerId) } == false
     }
 
     // For "join as guest" start
@@ -1931,11 +1931,10 @@ class InMeetingViewModel @ViewModelInject constructor(
         return inMeetingRepository.amIAGuest()
     }
 
-    fun isNormalUser(peerId: Long): Boolean {
+    fun isStandardUser(peerId: Long): Boolean {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             val privileges = it.getPeerPrivilegeByHandle(peerId)
-            val email = inMeetingRepository.getParticipantEmail(peerId)
-            return privileges == MegaChatRoom.PRIV_STANDARD && !email.isNullOrEmpty()
+            return privileges == MegaChatRoom.PRIV_STANDARD
         }
 
         return false

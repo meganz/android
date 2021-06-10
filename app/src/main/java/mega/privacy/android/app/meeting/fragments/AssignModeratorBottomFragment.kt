@@ -41,8 +41,9 @@ class AssignModeratorBottomFragment(
         binding.btOk.setOnClickListener { makeModerators() }
         binding.toolbar.setNavigationOnClickListener { dismiss() }
 
-        inMeetingViewModel.participants.observe(this){ newData ->
-            update(newData.filter { inMeetingViewModel.isNormalUser(it.peerId) }.toMutableList())
+        inMeetingViewModel.participants.observe(this) { newData ->
+            update(newData.filter { inMeetingViewModel.isStandardUser(it.peerId) && !it.isGuest }
+                .toMutableList())
         }
 
 
