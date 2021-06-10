@@ -236,6 +236,7 @@ fi
 if [ "$1" == "clean_mega" ]; then
     echo "* Deleting Java bindings"
     make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &>> ${LOG_FILE}
+    rm -rf ${JAVA_OUTPUT_PATH}/nz/mega/sdk/*.java
     rm -rf megachat/megachat.cpp megachat/megachat.h
     echo "* Deleting tarballs"
     rm -rf ../obj/local/armeabi
@@ -249,6 +250,7 @@ fi
 if [ "$1" == "clean" ]; then
     echo "* Deleting Java bindings"
     make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &>> ${LOG_FILE}
+    rm -rf ${JAVA_OUTPUT_PATH}/nz/mega/sdk/*.java
     rm -rf megachat/megachat.cpp megachat/megachat.h
     
     echo "* Deleting source folders"    
