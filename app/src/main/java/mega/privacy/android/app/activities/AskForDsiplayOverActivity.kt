@@ -13,6 +13,12 @@ import androidx.annotation.RequiresApi
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
 
+/**
+ * A dialog style activity can lead to system setting page.
+ * Launched by notification even when the app is killed.
+ *
+ * @see mega.privacy.android.app.utils.IncomingCallNotification.toSystemSettingNotification
+ */
 class AskForDsiplayOverActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,11 +27,18 @@ class AskForDsiplayOverActivity : Activity() {
         setContentView(R.layout.ask_for_display_over_activity_layout)
     }
 
+    /**
+     * Close the activity.
+     */
     fun notNow(v: View) {
+        // This will keep showing after the activity is destroyed, so can't use snack bar.
         Toast.makeText(this, R.string.ask_for_display_over_explain, Toast.LENGTH_LONG).show()
         finish()
     }
 
+    /**
+     * Launch system setting page by implicit intent.
+     */
     @RequiresApi(Build.VERSION_CODES.M)
     fun toSetting(v: View) {
         val intent = Intent(
