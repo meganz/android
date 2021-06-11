@@ -4,7 +4,7 @@
   <string name="scan_title_crop">Ritaglia</string>
   <!-- Screen title for saving current scan (Document scanner) -->
   <string name="scan_title_save_scan">Salva scansione</string>
-  <!-- button -->
+  <!-- Label of the button to add a new page to the current document scan -->
   <string name="scan_action_add">Aggiungi</string>
   <!-- Action of a button to save something -->
   <string name="scan_action_save">Salva</string>
