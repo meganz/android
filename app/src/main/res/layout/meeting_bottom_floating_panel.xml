@@ -46,6 +46,15 @@
         app:on_icon="@drawable/ic_mic_on"
         tools:ignore="ContentDescription" />
 
+    <ImageView
+        android:id="@+id/mic_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="3dp"
+        android:src="@drawable/permission_waring"
+        app:layout_constraintRight_toRightOf="@id/fab_mic"
+        app:layout_constraintTop_toTopOf="@id/fab_mic" />
+
     <TextView
         android:id="@+id/fab_mic_label"
         android:layout_width="wrap_content"
@@ -69,6 +78,15 @@
         app:off_icon="@drawable/ic_meeting_video_off"
         app:on_icon="@drawable/ic_meeting_video_filled"
         tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/cam_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="3dp"
+        android:src="@drawable/permission_waring"
+        app:layout_constraintRight_toRightOf="@id/fab_cam"
+        app:layout_constraintTop_toTopOf="@id/fab_cam" />
 
     <TextView
         android:id="@+id/fab_cam_label"

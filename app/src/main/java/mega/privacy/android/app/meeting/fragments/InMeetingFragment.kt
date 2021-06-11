@@ -819,6 +819,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 onRequiresCameraPermission(l)
                                 // Continue expected action after granted
                                 sharedModel.clickCamera(true)
+                                bottomFloatingPanelViewHolder.updateCamPermissionWaring(true)
                             }
                         }
                         .setOnShowRationale { l -> onShowRationale(l) }
@@ -840,6 +841,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 onRequiresAudioPermission(l)
                                 // Continue expected action after granted
                                 sharedModel.clickMic(true)
+                                bottomFloatingPanelViewHolder.updateMicPermissionWaring(true)
                             }
                         }
                         .setOnShowRationale { l -> onShowRationale(l) }
@@ -851,6 +853,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         sharedModel.snackBarLiveData.observe(viewLifecycleOwner) {
             (requireActivity() as MeetingActivity).showSnackbar(it)
+        }
+        sharedModel.cameraGranted.observe(viewLifecycleOwner) {
+            bottomFloatingPanelViewHolder.updateCamPermissionWaring(it)
+        }
+        sharedModel.recordAudioGranted.observe(viewLifecycleOwner) {
+            bottomFloatingPanelViewHolder.updateMicPermissionWaring(it)
         }
     }
 

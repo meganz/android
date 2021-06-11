@@ -6699,9 +6699,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						if (drawerItem == DrawerItem.MEDIA_UPLOADS) {
 							backToDrawerItem(CLOUD_DRIVE_BNV);
 						}
-						else if (drawerItem == DrawerItem.ACCOUNT && comesFromNotifications) {
-							comesFromNotifications = false;
-							selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
+						else if (drawerItem == DrawerItem.ACCOUNT) {
+							if (comesFromNotifications){
+								comesFromNotifications = false;
+								selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
+							} else if (accountFragment == MY_ACCOUNT_FRAGMENT && isFromMeeting) {
+								finish();
+							}
 						}
 						else {
 							if (drawerItem == DrawerItem.SETTINGS) {

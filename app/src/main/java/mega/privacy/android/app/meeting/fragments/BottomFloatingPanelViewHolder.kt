@@ -617,6 +617,14 @@ class BottomFloatingPanelViewHolder(
         return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
     }
 
+    fun updateMicPermissionWaring(isGranted: Boolean){
+        floatingPanelView.micWarning.isVisible = !isGranted
+    }
+
+    fun updateCamPermissionWaring(isGranted: Boolean){
+        floatingPanelView.camWarning.isVisible = !isGranted
+    }
+
     companion object {
         private const val BOTTOM_PANEL_MIN_ALPHA = 0.32F
         private const val BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD = 0.5F

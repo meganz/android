@@ -62,10 +62,12 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     val speakerLiveData: LiveData<AppRTCAudioManager.AudioDevice> = _speakerLiveData
 
     // Permissions
-    private var cameraGranted: Boolean = false
+    private val _cameraGranted = MutableLiveData(false)
+    val cameraGranted :LiveData<Boolean> = _cameraGranted
     private val _cameraPermissionCheck: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     val cameraPermissionCheck: LiveData<Boolean> = _cameraPermissionCheck
-    private var recordAudioGranted: Boolean = false
+    private val _recordAudioGranted = MutableLiveData(false)
+    val recordAudioGranted :LiveData<Boolean> = _recordAudioGranted
     private val _recordAudioPermissionCheck: MutableLiveData<Boolean> =
         MutableLiveData<Boolean>(false)
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
@@ -294,7 +296,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
          * check audio permission
          * if haven't been granted, ask for the permission and return
          */
-        if (!recordAudioGranted) {
+        if (_recordAudioGranted.value == false) {
             _recordAudioPermissionCheck.value = true
             return
         }
@@ -334,7 +336,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
          * check camera permission
          * if haven't been granted, ask for the permission and return
          */
-        if (!cameraGranted) {
+        if (_cameraGranted.value == false) {
             _cameraPermissionCheck.value = true
             return
         }
@@ -390,7 +392,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param cameraPermission true: the permission is granted
      */
     fun setCameraPermission(cameraPermission: Boolean) {
-        cameraGranted = cameraPermission
+        _cameraGranted.value = cameraPermission
     }
 
     /**
@@ -399,7 +401,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param recordAudioPermission true: the permission is granted
      */
     fun setRecordAudioPermission(recordAudioPermission: Boolean) {
-        recordAudioGranted = recordAudioPermission
+        _recordAudioGranted.value = recordAudioPermission
     }
 
     /**
