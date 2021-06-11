@@ -85,6 +85,7 @@ public class CallUtil {
     public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link) {
         logDebug("Open join a meeting screen");
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        MegaApplication.setOpeningMeetingLink(chatId, true);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_JOIN);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
@@ -182,6 +183,7 @@ public class CallUtil {
     public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link) {
         logDebug("Open meeting in guest mode");
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        MegaApplication.setOpeningMeetingLink(chatId, true);
         Intent intent = new Intent(context, MeetingActivity.class);
         intent.setAction(MEETING_ACTION_GUEST);
         if (!isTextEmpty(meetingName)) {

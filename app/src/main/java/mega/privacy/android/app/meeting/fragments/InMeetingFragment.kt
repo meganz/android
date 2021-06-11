@@ -240,9 +240,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun updatePanelAndToolbar(chat: MegaChatCall?) {
         if (chat?.status == MegaChatCall.CALL_STATUS_IN_PROGRESS){
-            toolbar?.setOnClickListener { showMeetingInfoFragment() }
+            toolbar.setOnClickListener { showMeetingInfoFragment() }
         } else {
-            toolbar?.setOnClickListener { null }
+            toolbar.setOnClickListener {
+                null
+            }
         }
 
         bottomFloatingPanelViewHolder.updateMeetingType(!inMeetingViewModel.isOneToOneCall())
@@ -516,13 +518,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun takeActionByArgs() {
         when (args.action) {
             MEETING_ACTION_CREATE -> {
-                logDebug("Action create");
+                logDebug("Action create")
                 camIsEnable = sharedModel.cameraLiveData.value!!
                 bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
                 initStartMeeting()
             }
             MEETING_ACTION_JOIN -> {
-                logDebug("Action join");
+                logDebug("Action join")
                 camIsEnable = sharedModel.cameraLiveData.value!!
                 bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
                 inMeetingViewModel.joinPublicChat(
@@ -531,7 +533,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 )
             }
             MEETING_ACTION_GUEST -> {
-                logDebug("Action guest");
+                logDebug("Action guest")
                 inMeetingViewModel.chatLogout(ChatRequestListener(onSuccess = { _, _, _ ->
                     inMeetingViewModel.createEphemeralAccountAndJoinChat(
                         args.firstName,
@@ -548,6 +550,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                                 )
                                             }"
                                         )
+                                        MegaApplication.setOpeningMeetingLink(request.chatHandle, true)
                                         camIsEnable = sharedModel.cameraLiveData.value!!
                                         inMeetingViewModel.joinPublicChat(
                                             args.chatId,
@@ -564,12 +567,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }))
             }
             MEETING_ACTION_RINGING_VIDEO_ON -> {
-                logDebug("Action ringing with video on");
+                logDebug("Action ringing with video on")
                 sharedModel.micInitiallyOn()
                 sharedModel.camInitiallyOn()
             }
             MEETING_ACTION_RINGING_VIDEO_OFF -> {
-                logDebug("Action ringing with video off");
+                logDebug("Action ringing with video off")
                 sharedModel.micInitiallyOn()
             }
             MEETING_ACTION_START -> {
