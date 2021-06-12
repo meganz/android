@@ -78,11 +78,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var bannerAnotherCallTitle: EmojiTextView? = null
     private var bannerAnotherCallSubtitle: TextView? = null
 
-    private lateinit var bannerInfoLayout: View
-    private var bannerText: TextView? = null
-    private var bannerIcon: ImageView? = null
+    private lateinit var bannerMuteLayout: View
+    private var bannerMuteText: EmojiTextView? = null
+    private var bannerMuteIcon: ImageView? = null
 
-    private var bannerParticipant: TextView? = null
+    private var bannerParticipant: EmojiTextView? = null
+
+    private var bannerInfo: TextView? = null
 
     private lateinit var floatingWindowContainer: View
     private lateinit var floatingBottomSheet: View
@@ -146,7 +148,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.isSameChatRoom(it) -> {
                 logError("Error starting a call")
                 MegaApplication.getInstance().removeRTCAudioManager()
-                meetingActivity.finish()
+                finishActivity()
             }
         }
     }
@@ -219,15 +221,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             reconnecting()
                         } else {
                             binding.reconnecting.isVisible = false
-                            showFixedBanner(MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
+                            checkInfoBanner(TYPE_RECONNECTING)
                         }
                         checkMenuItemsVisibility()
                     }
                     MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
-                        showFixedBanner(MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
                         checkMenuItemsVisibility()
                         checkChildFragments()
-                        if(it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+                        if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                             controlVideoLocalOneToOneCall(it.hasLocalVideo())
                         }
                     }
@@ -239,7 +240,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun updatePanelAndToolbar(chat: MegaChatCall?) {
-        if (chat?.status == MegaChatCall.CALL_STATUS_IN_PROGRESS){
+        if (chat?.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
             toolbar.setOnClickListener { showMeetingInfoFragment() }
         } else {
             toolbar.setOnClickListener {
@@ -267,7 +268,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
                     else -> {
                         if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && !inMeetingViewModel.isRequestSent()) {
-                            showFixedBanner(
+                            showParticipantBanner(
                                 it.peeridCallCompositionChange,
                                 it.callCompositionChange
                             )
@@ -295,14 +296,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val localNetworkQualityObserver = Observer<MegaChatCall> {
         if (inMeetingViewModel.isSameCall(it.callId)) {
             logDebug("Change in the network quality")
-            showFixedBanner(MEGACHAT_INVALID_HANDLE, TYPE_NETWORK_QUALITY)
+            checkInfoBanner(TYPE_NETWORK_QUALITY)
         }
     }
 
     private val sessionOnHoldObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                showBannerInfo()
+                showMuteBanner()
                 val call = inMeetingViewModel.getCall()
                 call?.let {
                     logDebug("Change in session on hold status")
@@ -360,7 +361,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         }
                         else -> checkChildFragments()
                     }
-                    showBannerInfo()
+                    showMuteBanner()
                 }
             } else {
                 checkAnotherCall()
@@ -371,7 +372,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             //As the session has been established, I am no longer in the Request sent state
             if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                showBannerInfo()
+                showMuteBanner()
                 if (!inMeetingViewModel.isOneToOneCall()) {
                     val isAudioChange =
                         inMeetingViewModel.changesInRemoteAudioFlag(callAndSession.second)
@@ -550,7 +551,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                                 )
                                             }"
                                         )
-                                        MegaApplication.setOpeningMeetingLink(request.chatHandle, true)
+                                        MegaApplication.setOpeningMeetingLink(
+                                            request.chatHandle,
+                                            true
+                                        )
                                         camIsEnable = sharedModel.cameraLiveData.value!!
                                         inMeetingViewModel.joinPublicChat(
                                             args.chatId,
@@ -623,17 +627,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         floatingWindowFragment?.let {
-            if(it.isAdded){
+            if (it.isAdded) {
                 it.updateOrientation(newConfig.orientation)
             }
         }
 
         gridViewCallFragment?.let {
-            if(it.isAdded){
+            if (it.isAdded) {
                 it.updateLayout(
                     newConfig.orientation,
                     outMetrics.widthPixels,
-                    outMetrics.heightPixels)
+                    outMetrics.heightPixels
+                )
             }
         }
     }
@@ -700,9 +705,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bannerAnotherCallTitle = meetingActivity.banner_another_call_title
         bannerAnotherCallSubtitle = meetingActivity.banner_another_call_subtitle
         bannerParticipant = meetingActivity.banner_participant
-        bannerInfoLayout = meetingActivity.banner_info
-        bannerIcon = meetingActivity.banner_icon
-        bannerText = meetingActivity.banner_text
+        bannerInfo = meetingActivity.banner_info
+        bannerMuteLayout = meetingActivity.banner_mute
+        bannerMuteIcon = meetingActivity.banner_mute_icon
+        bannerMuteText = meetingActivity.banner_mute_text
         meetingChrono = meetingActivity.simple_chronometer
 
         meetingActivity.setSupportActionBar(toolbar)
@@ -897,7 +903,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 override fun onDragStart(view: View?) {
                     if (toolbar.isVisible) {
                         val maxTop =
-                            if (bannerInfoLayout.isVisible) bannerInfoLayout.bottom else toolbar.bottom
+                            if (bannerMuteLayout.isVisible) bannerMuteLayout.bottom else toolbar.bottom
                         dragTouchListener.setToolbarHeight(maxTop)
                         dragTouchListener.setBottomSheetHeight(floatingBottomSheet.top)
                     } else {
@@ -930,7 +936,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         toolbar.fadeInOut(dy = TOOLBAR_DY, toTop = true)
 
         if (bannerShouldBeShown) {
-            bannerInfoLayout.fadeInOut(dy = FLOATING_BOTTOM_SHEET_DY, toTop = true)
+            bannerMuteLayout.fadeInOut(dy = FLOATING_BOTTOM_SHEET_DY, toTop = true)
         }
 
         floatingBottomSheet.fadeInOut(dy = FLOATING_BOTTOM_SHEET_DY, toTop = false)
@@ -948,7 +954,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun checkRelativePositionWithToolbar() {
-        val maxTop = if (bannerInfoLayout.isVisible) bannerInfoLayout.bottom else toolbar.bottom
+        val maxTop = if (bannerMuteLayout.isVisible) bannerMuteLayout.bottom else toolbar.bottom
 
         val isIntersect = (maxTop - floatingWindowContainer.y) > 0
         if (toolbar.isVisible && isIntersect) {
@@ -1105,10 +1111,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun reconnecting() {
-        removeUI()
         logDebug("Show reconnecting UI")
+        removeUI()
         binding.reconnecting.isVisible = true
-        showFixedBanner(MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
+        checkInfoBanner(TYPE_RECONNECTING)
     }
 
     private fun removeUI() {
@@ -1178,8 +1184,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         call?.let { currentCall ->
             val session = inMeetingViewModel.getSessionOneToOneCall(currentCall)
             session?.let { userSession ->
-                status = TYPE_IN_ONE_TO_ONE
                 logDebug("Show one to one call UI")
+                status = TYPE_IN_ONE_TO_ONE
+                checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
                 individualCallFragment?.let {
                     if (it.isAdded) {
@@ -1214,8 +1221,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun waitingForConnection(chatId: Long) {
         if (status == TYPE_WAITING_CONNECTION) return
 
-        status = TYPE_WAITING_CONNECTION
         logDebug("Show waiting for connection call UI")
+        status = TYPE_WAITING_CONNECTION
+        checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
         individualCallFragment?.let {
             if (it.isAdded) {
@@ -1238,7 +1246,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         floatingWindowFragment?.let {
-            if(it.isAdded){
+            if (it.isAdded) {
                 removeChildFragment(it)
                 floatingWindowFragment = null
             }
@@ -1277,8 +1285,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initSpeakerViewMode() {
         if (status == TYPE_IN_SPEAKER_VIEW) return
 
-        status = TYPE_IN_SPEAKER_VIEW
         logDebug("Show group call - Speaker View UI")
+        status = TYPE_IN_SPEAKER_VIEW
+        checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
         gridViewCallFragment?.let {
             if (it.isAdded) {
@@ -1309,11 +1318,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initGridViewMode() {
         if (status == TYPE_IN_GRID_VIEW) return
 
-        status = TYPE_IN_GRID_VIEW
         logDebug("Show group call - Grid View UI")
+        status = TYPE_IN_GRID_VIEW
+        checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
         speakerViewCallFragment?.let {
-            if(it.isAdded){
+            if (it.isAdded) {
                 removeChildFragment(it)
                 speakerViewCallFragment = null
             }
@@ -1561,16 +1571,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             toolbar.alpha = 1 - it
             // When the bottom on the top, will set the toolbar invisible, otherwise will cover the scroll event of the panel
             toolbar.isVisible = it != 1.0f
-
-            when {
-                bannerInfoLayout.isVisible -> {
-                    bannerInfoLayout.alpha = 1 - it
-                }
+            if (bannerMuteLayout.isVisible) {
+                bannerMuteLayout.alpha = 1 - it
             }
-            when {
-                bannerAnotherCallLayout.isVisible -> {
-                    bannerAnotherCallLayout.alpha = 1 - it
-                }
+
+            if (bannerInfo != null && bannerInfo!!.isVisible) {
+                bannerInfo!!.alpha = 1 - it
+            }
+
+            if (bannerAnotherCallLayout.isVisible) {
+                bannerAnotherCallLayout.alpha = 1 - it
             }
         }
     }
@@ -1584,32 +1594,91 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun updateLocalAudio(micOn: Boolean) {
         bottomFloatingPanelViewHolder.updateMicIcon(micOn)
-        showBannerInfo()
+        showMuteBanner()
     }
 
     /**
      * Method that controls whether the fixed banner should be displayed.
      * This banner is displayed when a participant joins/leaves the meeting
-     * or when my network quality is low.
+     *
+     * @param peerId userHandle
+     * @param type Type of banner
      */
-    private fun showFixedBanner(peerId: Long, type: Int) {
+    private fun showParticipantBanner(peerId: Long, type: Int) {
         bannerParticipant?.let {
-            when {
-                inMeetingViewModel.showBannerFixedBanner(it, peerId, type) &&
-                        bottomFloatingPanelViewHolder.getState() != BottomSheetBehavior.STATE_EXPANDED -> {
-                    it.alpha = 1f
-                    logDebug("Show fixed banner")
-                    it.isVisible = true
-                    if (type != TYPE_NETWORK_QUALITY && type != TYPE_RECONNECTING) {
-                        it.animate()?.alpha(0f)?.duration = INFO_ANIMATION.toLong()
-                    }
-                }
-                else -> {
-                    logDebug("Hide fixed banner")
-                    it.isVisible = false
+            showFixedBanner(it, peerId, type)
+        }
+    }
+
+    /**
+     * Method that controls whether the fixed banner should be displayed.
+     * This banner is displayed when my network quality is low,
+     * I am in a state of reconnection or I am alone on the call
+     *
+     * @param type Type of banner
+     */
+    private fun checkInfoBanner(type: Int) {
+        bannerInfo?.let {
+            val shouldShow = inMeetingViewModel.shouldShowFixedBanner(
+                type
+            )
+            if (shouldShow) {
+                showFixedBanner(it, MEGACHAT_INVALID_HANDLE, type)
+                return
+            }
+
+            if (type != TYPE_RECONNECTING) {
+                val shouldShowReconnectingBanner = inMeetingViewModel.shouldShowFixedBanner(
+                    TYPE_RECONNECTING,
+                )
+                if (shouldShowReconnectingBanner) {
+                    showFixedBanner(it, MEGACHAT_INVALID_HANDLE, TYPE_RECONNECTING)
+                    return
                 }
             }
+            if (type != TYPE_NETWORK_QUALITY) {
+                val shouldShowNetworkQualityBanner = inMeetingViewModel.shouldShowFixedBanner(
+                    TYPE_NETWORK_QUALITY
+                )
+                if (shouldShowNetworkQualityBanner) {
+                    showFixedBanner(it, MEGACHAT_INVALID_HANDLE, TYPE_NETWORK_QUALITY)
+                    return
+                }
+            }
+            if (type != TYPE_SINGLE_PARTICIPANT) {
+                val shouldShowSingleParticipantBanner =
+                    inMeetingViewModel.shouldShowFixedBanner(
+                        TYPE_SINGLE_PARTICIPANT
+                    )
+                if (shouldShowSingleParticipantBanner) {
+                    showFixedBanner(it, MEGACHAT_INVALID_HANDLE, TYPE_SINGLE_PARTICIPANT)
+                    return
+                }
+            }
+
+            hideFixedBanner(it)
         }
+    }
+
+    private fun showFixedBanner(textView: TextView, peerId: Long, type: Int) {
+        logDebug("Show fixed banner: type = $type")
+        inMeetingViewModel.updateFixedBanner(textView, peerId, type)
+        textView.isVisible = true
+        if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            textView.alpha = 0f
+        } else {
+            textView.alpha = 1f
+        }
+
+        if (type == TYPE_JOIN || type == TYPE_LEFT) {
+            textView.animate()?.alpha(0f)?.duration = INFO_ANIMATION.toLong()
+        }
+    }
+
+    private fun hideFixedBanner(textView: TextView) {
+        logDebug("Hide fixed banner")
+        textView.alpha = 1f
+        textView.isVisible = false
     }
 
     /**
@@ -1617,11 +1686,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * This banner is displayed when the call is muted
      * or if the session or call is on hold.
      */
-    private fun showBannerInfo() {
-        bannerInfoLayout.let {
+    private fun showMuteBanner() {
+        bannerMuteLayout.let {
             bannerShouldBeShown = inMeetingViewModel.showAppropriateBanner(
-                bannerIcon,
-                bannerText
+                bannerMuteIcon,
+                bannerMuteText
             )
 
             when {
@@ -1640,13 +1709,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED || !toolbar.isVisible) {
                 when {
-                    bannerInfoLayout.isVisible -> {
-                        bannerInfoLayout.alpha = 0f
+                    bannerMuteLayout.isVisible -> {
+                        bannerMuteLayout.alpha = 0f
                     }
                 }
             }
 
-            // Delay a bit to wait for 'bannerInfoLayout' finish layouting, otherwise, its bottom is 0.
+            // Delay a bit to wait for 'bannerMuteLayout' finish layouting, otherwise, its bottom is 0.
             RunOnUIThreadUtils.runDelay(10) {
                 checkRelativePositionWithToolbar()
             }
@@ -1672,7 +1741,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             bottomFloatingPanelViewHolder.updateHoldIcon(isHold)
         }
 
-        showBannerInfo()
+        showMuteBanner()
         if (!inMeetingViewModel.isOneToOneCall()) {
             gridViewCallFragment?.let {
                 if (it.isAdded) {
@@ -1977,7 +2046,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    fun leaveMeeting() {
+    private fun leaveMeeting() {
         inMeetingViewModel.leaveMeeting()
         when {
             inMeetingViewModel.amIAGuest() -> {
@@ -1987,7 +2056,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         LeftMeetingActivity::class.java
                     )
                 )
-                meetingActivity.finish()
+                finishActivity()
             }
             else -> {
                 checkIfAnotherCallShouldBeShown()
@@ -2091,7 +2160,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         MegaApplication.getInstance().openCallService(chatId)
         inMeetingViewModel.setCall(chatId)
         checkChildFragments()
-        showBannerInfo()
+        showMuteBanner()
         checkAnotherCall()
     }
 

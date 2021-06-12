@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
@@ -180,7 +181,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return MegaChatCall
      */
     fun getCall(): MegaChatCall? {
-        if(currentChatId == MEGACHAT_INVALID_HANDLE)
+        if (currentChatId == MEGACHAT_INVALID_HANDLE)
             return null
 
         inMeetingRepository.getChatRoom(currentChatId)?.let {
@@ -541,93 +542,123 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Method to know if a banner needs to be displayed and updated
+     * Method for determining whether a banner should be displayed
      *
-     * @param bannerText the text of the banner to be edited
-     * @param peerId user handle
      * @param type type of banner
      * @return True, if should be shown. False, otherwise.
+
      */
-    fun showBannerFixedBanner(
-        bannerText: TextView?,
-        peerId: Long,
-        type: Int
-    ): Boolean {
+    fun shouldShowFixedBanner(type: Int): Boolean {
         when (type) {
-            TYPE_RECONNECTING ->{
-                //Check local network quality
+            TYPE_RECONNECTING -> {
                 _callLiveData.value?.let {
                     if (isReconnectingStatus) {
-                        bannerText?.let { textView ->
-                            textView.setBackgroundColor(
-                                ContextCompat.getColor(
-                                    MegaApplication.getInstance().applicationContext,
-                                    R.color.amber_700_amber_300
-                                )
-                            )
-                            textView.text = StringResourcesUtils.getString(
-                                R.string.reconnecting_message
-                            )
-                            return true
-                        }
+                        return true
                     }
-                }
-            }
-            TYPE_JOIN -> {
-                bannerText?.let {
-                    it.setBackgroundColor(
-                        ContextCompat.getColor(
-                            MegaApplication.getInstance().applicationContext,
-                            R.color.teal_300
-                        )
-                    )
-                    it.text = StringResourcesUtils.getString(
-                        R.string.contact_joined_the_call,
-                        getParticipantFullName(peerId)
-                    )
-                    return true
-                }
-            }
-
-            TYPE_LEFT -> {
-                bannerText?.let {
-                    it.setBackgroundColor(
-                        ContextCompat.getColor(
-                            MegaApplication.getInstance().applicationContext,
-                            R.color.teal_300
-                        )
-                    )
-                    it.text = StringResourcesUtils.getString(
-                        R.string.contact_left_the_call,
-                        getParticipantFullName(peerId)
-                    )
-                    return true
                 }
             }
 
             TYPE_NETWORK_QUALITY -> {
-                //Check local network quality
                 _callLiveData.value?.let { call ->
                     val quality = call.networkQuality
-                    if (quality == 0) {
-                        bannerText?.let {
-                            it.setBackgroundColor(
-                                ContextCompat.getColor(
-                                    MegaApplication.getInstance().applicationContext,
-                                    R.color.amber_700_amber_300
-                                )
-                            )
-                            it.text = StringResourcesUtils.getString(
-                                R.string.slow_connection_meeting
-                            )
-                            return true
-                        }
+                    if (quality == 0){
+                        return true
+                    }
+                }
+            }
+
+            TYPE_SINGLE_PARTICIPANT -> {
+                _callLiveData.value?.let {
+                    if (it.status >= CALL_STATUS_JOINING && !isRequestSent() && amIAloneOnTheCall(
+                            currentChatId
+                        )
+                    ) {
+                        return true
                     }
                 }
             }
         }
 
         return false
+    }
+
+    /**
+     * Method to show the appropriate banner
+     *
+     * @param bannerText the text of the banner to be edited
+     * @param peerId user handle
+     * @param type type of banner
+     * @return True, if should be shown. False, otherwise.
+     */
+    fun updateFixedBanner(
+        bannerText: TextView?,
+        peerId: Long,
+        type: Int
+    ) {
+        when (type) {
+            TYPE_JOIN ->
+                updateFixedBanner(
+                    bannerText,
+                    ContextCompat.getColor(
+                        MegaApplication.getInstance().applicationContext,
+                        R.color.teal_300
+                    ),
+                    StringResourcesUtils.getString(
+                        R.string.contact_joined_the_call,
+                        getParticipantFullName(peerId)
+                    )
+                )
+
+            TYPE_LEFT ->
+                updateFixedBanner(
+                    bannerText,
+                    ContextCompat.getColor(
+                        MegaApplication.getInstance().applicationContext,
+                        R.color.teal_300
+                    ),
+                    StringResourcesUtils.getString(
+                        R.string.contact_left_the_call,
+                        getParticipantFullName(peerId)
+                    )
+                )
+
+            TYPE_RECONNECTING ->
+                updateFixedBanner(
+                    bannerText,
+                    ContextCompat.getColor(
+                        MegaApplication.getInstance().applicationContext,
+                        R.color.amber_700_amber_300
+                    ),
+                    StringResourcesUtils.getString(R.string.reconnecting_message)
+                )
+
+            TYPE_NETWORK_QUALITY ->
+                updateFixedBanner(
+                    bannerText,
+                    ContextCompat.getColor(
+                        MegaApplication.getInstance().applicationContext,
+                        R.color.amber_700_amber_300
+                    ),
+                    StringResourcesUtils.getString(R.string.slow_connection_meeting)
+                )
+
+            TYPE_SINGLE_PARTICIPANT ->
+                updateFixedBanner(
+                    bannerText,
+                    ContextCompat.getColor(
+                        MegaApplication.getInstance().applicationContext,
+                        R.color.teal_300
+                    ),
+                    StringResourcesUtils.getString(R.string.banner_alone_on_the_call)
+                )
+        }
+    }
+
+    private fun updateFixedBanner(bannerText: TextView?, color: Int, text: String) {
+        bannerText?.let {
+            it.setBackgroundColor(color)
+            it.text = text
+        }
     }
 
     /**
@@ -646,7 +677,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return Banner text
      */
-    fun showAppropriateBanner(bannerIcon: ImageView?, bannerText: TextView?): Boolean {
+    fun showAppropriateBanner(bannerIcon: ImageView?, bannerText: EmojiTextView?): Boolean {
         //Check call or session on hold
         if (isCallOnHold() || isSessionOnHoldOfOneToOneCall()) {
             bannerIcon?.let {
@@ -940,7 +971,10 @@ class InMeetingViewModel @ViewModelInject constructor(
             val hasHiRes = needHiRes(status)
             val name = getParticipantName(session.peerid)
             val avatar = inMeetingRepository.getAvatarBitmap(it, session.peerid)
-            val email = inMeetingRepository.getEmailParticipant(session.peerid, GetUserEmailListener(MegaApplication.getInstance().applicationContext, this))
+            val email = inMeetingRepository.getEmailParticipant(
+                session.peerid,
+                GetUserEmailListener(MegaApplication.getInstance().applicationContext, this)
+            )
             var isGuest = false
             if (email == null) {
                 isGuest = true
@@ -1294,7 +1328,10 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param callId
      */
     private fun hangUpSpecificCall(callId: Long) {
-        inMeetingRepository.leaveMeeting(callId, HangChatCallListener(MegaApplication.getInstance(), this))
+        inMeetingRepository.leaveMeeting(
+            callId,
+            HangChatCallListener(MegaApplication.getInstance(), this)
+        )
     }
 
     /**
@@ -1302,7 +1339,10 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun leaveMeeting() {
         _callLiveData.value?.let {
-            inMeetingRepository.leaveMeeting(it.callId, HangChatCallListener(MegaApplication.getInstance(), this))
+            inMeetingRepository.leaveMeeting(
+                it.callId,
+                HangChatCallListener(MegaApplication.getInstance(), this)
+            )
         }
     }
 
@@ -1541,9 +1581,9 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param participant
      */
     fun onActivateVideo(participant: Participant, isSpeaker: Boolean) {
-        val session =  getSession(participant.clientId)
+        val session = getSession(participant.clientId)
 
-        if(session == null || participant.videoListener == null) return
+        if (session == null || participant.videoListener == null) return
 
         val isVisible = isParticipantVisible(participant)
         if ((!isVisible && !isSpeaker) || participant.videoListener == null) {
@@ -1657,13 +1697,13 @@ class InMeetingViewModel @ViewModelInject constructor(
             getSession(participant.clientId)?.let {
                 if (participant.hasHiRes) {
                     removeLowRes(participant.videoListener!!, it, chat.chatId)
-                    if(it.canRecvVideoLowRes()){
+                    if (it.canRecvVideoLowRes()) {
                         logDebug("Participant ${participant.clientId} video listener null")
                         participant.videoListener = null
                     }
                 } else {
                     removeHiRes(participant.videoListener!!, it, chat.chatId)
-                    if(it.canRecvVideoHiRes()){
+                    if (it.canRecvVideoHiRes()) {
                         logDebug("Participant ${participant.clientId} video listener null")
                         participant.videoListener = null
                     }
@@ -1845,7 +1885,7 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =
         inMeetingRepository.registerConnectionUpdateListener(chatId, callback)
-   // For join as guest end
+    // For join as guest end
 
     /**
      * Method for answer a call
@@ -1890,7 +1930,8 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return
      */
-    fun isLinkVisible(): Boolean = isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+    fun isLinkVisible(): Boolean =
+        isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
 
     /**
      * Determine if should hide or show the guest share link button
@@ -1950,7 +1991,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         return inMeetingRepository.getAvatarBitmapByPeerId(peerId)
     }
 
-    fun shouldShowTips():Boolean {
+    fun shouldShowTips(): Boolean {
         val sharedPreferences =
             MegaApplication.getInstance().applicationContext.defaultSharedPreferences
         return !sharedPreferences.getBoolean(IS_SHOWED_TIPS, false)

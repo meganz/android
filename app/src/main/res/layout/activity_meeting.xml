@@ -107,9 +107,8 @@
             android:textStyle="normal" />
     </LinearLayout>
 
-
     <LinearLayout
-        android:id="@+id/banner_info"
+        android:id="@+id/banner_mute"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="1dp"
@@ -120,15 +119,15 @@
         app:layout_constraintTop_toBottomOf="@id/banner_another_call">
 
         <ImageView
-            android:id="@+id/banner_icon"
+            android:id="@+id/banner_mute_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:src="@drawable/ic_mic_off"
             android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/banner_text"
+        <mega.privacy.android.app.components.twemoji.EmojiTextView
+            android:id="@+id/banner_mute_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -139,24 +138,25 @@
             android:text="@string/muted_own_micro"
             android:textColor="@color/white"
             android:textSize="14sp"
+            app:emojiSize="16sp"
             android:textStyle="normal" />
     </LinearLayout>
 
     <TextView
-        android:id="@+id/banner_participant"
+        android:id="@+id/banner_info"
+        style="@style/CallBanner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:elevation="1dp"
-        android:ellipsize="end"
-        android:fontFamily="sans-serif"
-        android:gravity="center"
-        android:maxLines="1"
-        android:minHeight="36dp"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        android:textStyle="normal"
         android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <mega.privacy.android.app.components.twemoji.EmojiTextView
+        android:id="@+id/banner_participant"
+        style="@style/CallBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:emojiSize="16sp"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <androidx.fragment.app.FragmentContainerView
