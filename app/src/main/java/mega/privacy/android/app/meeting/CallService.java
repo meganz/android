@@ -412,6 +412,7 @@ public class CallService extends Service{
     public void onDestroy() {
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).removeObserver(callStatusObserver);
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).removeObserver(callOnHoldObserver);
+        LiveEventBus.get(EVENT_ENTER_IN_MEETING, Boolean.class).removeObserver(isInMeetingObserver);
 
         cancelNotification();
         MegaApplication.setOpenCallChatId(MEGACHAT_INVALID_HANDLE);
