@@ -321,7 +321,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     /**
      * Get Avatar and display
      */
-    fun setProfileAvatar() {
+    open fun setProfileAvatar() {
         logDebug("setProfileAvatar")
         sharedModel.avatarLiveData.observe(viewLifecycleOwner) {
             meeting_thumbnail.setImageBitmap(it)

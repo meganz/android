@@ -51,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="3dp"
-        android:src="@drawable/permission_waring"
+        android:src="@drawable/ic_permission_warning"
         app:layout_constraintRight_toRightOf="@id/fab_mic"
         app:layout_constraintTop_toTopOf="@id/fab_mic" />
 
@@ -84,7 +84,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:elevation="3dp"
-        android:src="@drawable/permission_waring"
+        android:src="@drawable/ic_permission_warning"
         app:layout_constraintRight_toRightOf="@id/fab_cam"
         app:layout_constraintTop_toTopOf="@id/fab_cam" />
 

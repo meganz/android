@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
@@ -66,6 +67,19 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         Util.showKeyboardDelayed(edit_first_name)
         reLayoutCameraPreviewView()
         type_meeting_edit_text.visibility = View.GONE
+    }
+
+    override fun setProfileAvatar() {
+        meeting_thumbnail.apply {
+            borderColors = null
+            borderWidth = 0
+            setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_guest_avatar
+                )
+            )
+        }
     }
 
     /**
