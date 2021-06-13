@@ -6,7 +6,7 @@
         android:id="@+id/tour_fragment_base_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottom_layout">
+        android:layout_above="@id/join_meeting_as_guest">
 
         <RelativeLayout
             android:id="@+id/tour_fragment_container"
@@ -98,32 +98,16 @@
 
     </ScrollView>
 
-    <FrameLayout
-        android:id="@+id/bottom_layout"
+    <TextView
+        android:id="@+id/join_meeting_as_guest"
         android:layout_width="match_parent"
-        android:layout_height="103dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:layout_alignParentBottom="true"
-        android:background="@color/grey_020_grey_800">
-
-        <TextView
-            android:id="@+id/no_account"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            android:text="@string/onboarding_no_mega_account"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant" />
-
-        <TextView
-            android:id="@+id/join_meeting_as_guest"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="10dp"
-            android:layout_marginTop="52dp"
-            android:text="@string/join_meeting_as_guest"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AccentColor" />
-    </FrameLayout>
+        android:background="@color/grey_020_grey_800"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="25dp"
+        android:text="@string/join_meeting_as_guest"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Variant.AccentColor" />
 
 </RelativeLayout>
