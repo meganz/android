@@ -491,9 +491,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         val currentCall: MegaChatCall? = inMeetingViewModel.getCall()
         if (currentCall != null && currentCall.status > MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-            when {
-                currentCall.hasLocalAudio() -> sharedModel.micInitiallyOn()
-                currentCall.hasLocalVideo() -> sharedModel.camInitiallyOn()
+            if(currentCall.hasLocalAudio()) {
+                sharedModel.micInitiallyOn()
+            }
+            if(currentCall.hasLocalVideo()) {
+                sharedModel.camInitiallyOn()
             }
             updateToolbarSubtitle(currentCall)
             enableOnHoldFab(currentCall.isOnHold)
