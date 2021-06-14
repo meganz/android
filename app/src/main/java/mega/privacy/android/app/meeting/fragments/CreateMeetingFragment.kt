@@ -28,17 +28,25 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
     var chats = ArrayList<MegaChatRoom>()
 
     override fun onMeetingButtonClick() {
-        if (meetingName.isEmpty() || !isAllowedTitle(meetingName)) {
+        if (!isAllowedTitle(meetingName)) {
             type_meeting_edit_text.error =
                 StringResourcesUtils.getString(R.string.error_meeting_name_error)
             return
+        }
+
+        // if the name is empty, get the default name for the meeting
+        if (meetingName.isEmpty()) {
+            type_meeting_edit_text.setText(viewModel.initHintMeetingName())
         }
 
         logDebug("Meeting Name: $meetingName")
         releaseVideoAndHideKeyboard()
         // TODO: better to pass meeting name via fragment args in Navigation
         sharedModel.setMeetingsName(meetingName)
-        val action = InMeetingFragmentDirections.actionGlobalInMeeting(action = MEETING_ACTION_CREATE, meetingName = meetingName)
+        val action = InMeetingFragmentDirections.actionGlobalInMeeting(
+            action = MEETING_ACTION_CREATE,
+            meetingName = meetingName
+        )
         findNavController().navigate(action)
     }
 
