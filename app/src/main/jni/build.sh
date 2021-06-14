@@ -471,6 +471,7 @@ if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
             EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-implicit-int-conversion"
         elif [ "${ABI}" == "arm64-v8a" ]; then
             TARGET="arm64"
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-shorten-64-to-32"
         elif [ "${ABI}" == "x86" ]; then
             TARGET=${ABI}
             EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-implicit-int-conversion"
