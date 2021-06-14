@@ -462,6 +462,7 @@ echo "* Setting up libwebsockets"
 if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
     downloadAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS}
     ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
+    LWS_REF_PATH="${PWD}"
 
     for ABI in ${BUILD_ARCHS}; do
         echo "* Prebuilding libwebsockets for ${ABI}"
@@ -480,14 +481,17 @@ if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
 
         rm -r ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE} ||:
         mkdir -p ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
-        cmake -DCMAKE_INSTALL_PREFIX="${PWD}/${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/libwebsockets-android-${ABI}" -DANDROID_ABI=${ABI} -DANDROID_PLATFORM=${APP_PLATFORM} \
+        pushd ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
+        cmake -DCMAKE_INSTALL_PREFIX="${LWS_REF_PATH}/${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/libwebsockets-android-${ABI}" -DANDROID_ABI=${ABI} -DANDROID_PLATFORM=${APP_PLATFORM} \
         -DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake -DLWS_WITH_SHARED=OFF -DLWS_WITH_STATIC=ON -DLWS_WITHOUT_TESTAPPS=ON \
         -DLWS_WITHOUT_SERVER=ON -DLWS_IPV6=ON -DLWS_STATIC_PIC=ON -DLWS_WITH_HTTP2=0 -DLWS_WITH_BORINGSSL=ON -DLWS_SSL_CLIENT_USE_OS_CA_CERTS=0 \
-        -DLWS_OPENSSL_INCLUDE_DIRS="${PWD}/megachat/webrtc/include/third_party/boringssl/src/include" -DLWS_OPENSSL_LIBRARIES="${PWD}/megachat/webrtc/libwebrtc_${TARGET}.a" \
-        -DLWS_WITH_LIBUV=1 -DLWS_LIBUV_INCLUDE_DIRS="${PWD}/libuv/libuv/include" -DLWS_LIBUV_LIBRARIES="${PWD}/libuv/libuv/libuv.a" "${EXTRA_FLAGS}" \
-        -S ${LIBWEBSOCKETS}/${LIBWEBSOCKETS} -B ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
-        cmake --build ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
-        cmake --install ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
+        -DLWS_OPENSSL_INCLUDE_DIRS="${LWS_REF_PATH}/megachat/webrtc/include/third_party/boringssl/src/include" -DLWS_OPENSSL_LIBRARIES="${LWS_REF_PATH}/megachat/webrtc/libwebrtc_${TARGET}.a" \
+        -DLWS_WITH_LIBUV=1 -DLWS_LIBUV_INCLUDE_DIRS="${LWS_REF_PATH}/libuv/libuv/include" -DLWS_LIBUV_LIBRARIES="${LWS_REF_PATH}/libuv/libuv/libuv.a" "${EXTRA_FLAGS}" \
+        ../ &>> ${LOG_FILE}
+
+        cmake --build . &>> ${LOG_FILE}
+        cmake --build . --target install &>> ${LOG_FILE}
+        popd &>> ${LOG_FILE}
     done
 
     touch ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
