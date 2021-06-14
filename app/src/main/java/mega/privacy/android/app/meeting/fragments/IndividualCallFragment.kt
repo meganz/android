@@ -90,7 +90,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private val callOnHoldObserver = Observer<MegaChatCall> {
         if (inMeetingViewModel.isSameCall(it.callId)) {
             logDebug("Check changes in call on hold")
-            checkChangesInOnHold(it.isOnHold)
+
+            if(isAdded) {
+                checkChangesInOnHold(it.isOnHold)
+            }
         }
     }
 

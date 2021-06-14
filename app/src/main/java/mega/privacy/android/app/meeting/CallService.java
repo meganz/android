@@ -55,7 +55,6 @@ public class CallService extends Service{
     MegaChatApiAndroid megaChatApi;
     private long currentChatId;
 
-    private Notification.Builder mBuilder;
     private NotificationCompat.Builder mBuilderCompat;
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mBuilderCompatO;
@@ -161,9 +160,10 @@ public class CallService extends Service{
                 contentText = StringResourcesUtils.getString(R.string.title_notification_call_in_progress);
             }
 
-            // Quit in meeting page, and not guest user. Then can return to the call by tapping the notification.
-            if(!isInMeeting && !megaApi.isEphemeralPlusPlus()) {
-                intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId + 1);
+            // Quit in meeting page. Then can return to the call by tapping the notification.
+            if(!isInMeeting) {
+                boolean isGuest = megaApi.isEphemeralPlusPlus();
+                intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId + 1, isGuest);
             }
         }
 

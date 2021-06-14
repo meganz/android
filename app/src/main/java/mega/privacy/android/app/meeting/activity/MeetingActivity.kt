@@ -45,12 +45,15 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_CHAT_ID = "chat_id"
         const val MEETING_AUDIO_ENABLE = "audio_enable"
         const val MEETING_VIDEO_ENABLE = "video_enable"
+        const val MEETING_IS_GUEST = "is_guest"
     }
 
     private lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
     private var meetingAction: String? = null
+
+    private var isGuest = false
 
     // TODO: Move to a more common place
     private fun View.setMarginTop(marginTop: Int) {
@@ -67,6 +70,11 @@ class MeetingActivity : PasscodeActivity() {
         setContentView(binding.root)
 
         meetingAction = intent.action
+
+        isGuest = intent.getBooleanExtra(
+            MEETING_IS_GUEST,
+            false
+        )
 
         initActionBar()
         initNavigation()
@@ -113,7 +121,7 @@ class MeetingActivity : PasscodeActivity() {
                 // Toolbar should be set to TRANSPARENT in "Create Meeting"
                 actionBar.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }
-            MEETING_ACTION_JOIN,  MEETING_ACTION_GUEST
+            MEETING_ACTION_JOIN, MEETING_ACTION_GUEST
             -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_ACTION_IN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         }
@@ -158,9 +166,14 @@ class MeetingActivity : PasscodeActivity() {
                     false
                 )
             )
+
+            bundle.putBoolean(
+                MEETING_IS_GUEST,
+                isGuest
+            )
         }
 
-        if(meetingAction == MEETING_ACTION_START) {
+        if (meetingAction == MEETING_ACTION_START) {
             bundle.putString("action", MEETING_ACTION_START)
 
             bundle.putLong(
@@ -229,7 +242,9 @@ class MeetingActivity : PasscodeActivity() {
     }
 
     override fun onBackPressed() {
-        when (val currentFragment = getCurrentFragment()) {
+        val currentFragment = getCurrentFragment()
+
+        when (currentFragment) {
             is CreateMeetingFragment -> {
                 currentFragment.releaseVideoAndHideKeyboard()
             }
@@ -244,8 +259,10 @@ class MeetingActivity : PasscodeActivity() {
             }
         }
 
-        if(meetingAction != MEETING_ACTION_GUEST){
+        if (currentFragment !is InMeetingFragment) {
             finish()
+        } else {
+            if (!isGuest) finish()
         }
     }
 

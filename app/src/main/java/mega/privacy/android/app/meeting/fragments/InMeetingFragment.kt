@@ -48,6 +48,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
@@ -716,7 +717,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         meetingActivity.setSupportActionBar(toolbar)
         val actionBar = meetingActivity.supportActionBar ?: return
 
-        if (args.action != MEETING_ACTION_GUEST) {
+        val isGuest = arguments?.getBoolean(MEETING_IS_GUEST, false) ?: false
+
+        if (!isGuest && args.action != MEETING_ACTION_GUEST) {
             actionBar.setHomeButtonEnabled(true)
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)

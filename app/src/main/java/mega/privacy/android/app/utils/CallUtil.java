@@ -190,6 +190,7 @@ public class CallUtil {
             intent.putExtra(MEETING_NAME, meetingName);
         }
         intent.putExtra(MEETING_CHAT_ID, chatId);
+        intent.putExtra(MEETING_IS_GUEST, true);
         intent.setData(Uri.parse(link));
         context.startActivity(intent);
     }
@@ -922,11 +923,12 @@ public class CallUtil {
         return currentChatId;
     }
 
-    public static PendingIntent getPendingIntentMeetingInProgress(Context context, long chatIdCallToAnswer, int requestCode) {
+    public static PendingIntent getPendingIntentMeetingInProgress(Context context, long chatIdCallToAnswer, int requestCode, boolean isGuest) {
         Intent intentMeeting = new Intent(context, MeetingActivity.class);
         intentMeeting.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intentMeeting.setAction(MEETING_ACTION_IN);
         intentMeeting.putExtra(MEETING_CHAT_ID, chatIdCallToAnswer);
+        intentMeeting.putExtra(MEETING_IS_GUEST, isGuest);
         return PendingIntent.getActivity(context, requestCode, intentMeeting, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
