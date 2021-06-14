@@ -178,6 +178,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             R.id.action_rename -> renameNode()
             R.id.action_move -> selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
             R.id.action_copy -> selectFolderToCopy(this, longArrayOf(viewModel.getNode()!!.handle))
+            R.id.action_line_numbers -> updateLineNumbers()
             R.id.action_move_to_trash, R.id.action_remove -> moveToRubbishOrRemove(
                 viewModel.getNode()!!.handle,
                 this,
@@ -231,6 +232,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
         if (!isOnline(this)) {
             menu.toggleAllMenuItemsVisibility(false)
+            updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
             return
         }
 
@@ -238,11 +240,13 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             if (viewModel.getAdapterType() == OFFLINE_ADAPTER) {
                 menu.toggleAllMenuItemsVisibility(false)
                 menu.findItem(R.id.action_share).isVisible = true
+                updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 return
             }
 
             if (viewModel.getNode() == null || viewModel.getNode()!!.isFolder) {
                 menu.toggleAllMenuItemsVisibility(false)
+                updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 return
             }
 
@@ -250,19 +254,23 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 RUBBISH_BIN_ADAPTER -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_remove).isVisible = true
+                    updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
                 FILE_LINK_ADAPTER, ZIP_ADAPTER -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
                     menu.findItem(R.id.action_share).isVisible = true
+                    updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
                 FOLDER_LINK_ADAPTER -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
+                    updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
                 FROM_CHAT -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
+                    updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
 
                     if (megaChatApi.initState != MegaChatApi.INIT_ANONYMOUS) {
                         menu.findItem(R.id.chat_action_import).isVisible = true
@@ -279,6 +287,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                     if (megaApi.isInRubbish(viewModel.getNode())) {
                         menu.toggleAllMenuItemsVisibility(false)
                         menu.findItem(R.id.action_remove).isVisible = true
+                        updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                         return
                     }
 
@@ -301,6 +310,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
                     menu.findItem(R.id.action_copy).isVisible =
                         viewModel.getAdapterType() != FOLDER_LINK_ADAPTER
+                    updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                     menu.findItem(R.id.chat_action_import).isVisible = false
                     menu.findItem(R.id.action_remove).isVisible = false
                     menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
@@ -311,6 +321,17 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         } else {
             menu.toggleAllMenuItemsVisibility(false)
             menu.findItem(R.id.action_save).isVisible = true
+            updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
+        }
+    }
+
+    private fun updateLineNumbersMenuOption(lineNumbersOption: MenuItem) {
+        lineNumbersOption.apply {
+            isVisible = true
+            title = StringResourcesUtils.getString(
+                if (viewModel.shouldShowLineNumbers()) R.string.action_hide_line_numbers
+                else R.string.action_show_line_numbers
+            )
         }
     }
 
@@ -333,7 +354,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 setText(viewModel.getEditedText())
                 setSelection(savedInstanceState.getInt(CURSOR_POSITION))
             }
+
+            setLineNumberEnabled(viewModel.shouldShowLineNumbers())
         }
+
+        binding.contentText.setLineNumberEnabled(viewModel.shouldShowLineNumbers())
 
         binding.editFab.apply {
             hide()
@@ -368,7 +393,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         if (viewModel.needsReadOrIsReadingContent()) {
             showLoadingView()
         }
-        
+
         if (mode == VIEW_MODE) {
             supportActionBar?.title = null
             binding.nameText.isVisible = true
@@ -554,6 +579,13 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         val intent = Intent(this, FileExplorerActivityLollipop::class.java)
         intent.action = FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
         startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
+    }
+
+    private fun updateLineNumbers() {
+        val enabled = viewModel.setShowLineNumbers()
+        menu?.findItem(R.id.action_line_numbers)?.let { updateLineNumbersMenuOption(it) }
+        binding.contentText.setLineNumberEnabled(enabled)
+        binding.contentEditText.setLineNumberEnabled(enabled)
     }
 
     /**

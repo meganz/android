@@ -76,6 +76,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private var errorSettingContent = false
     private var localFileUri: String? = null
     private var streamingFileURL: URL? = null
+    private var showLineNumbers = false
 
     fun onTextFileEditorDataUpdate(): LiveData<TextFileEditorData> = textFileEditorData
 
@@ -153,6 +154,14 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     fun thereIsErrorSettingContent(): Boolean = errorSettingContent
 
     fun thereIsNoErrorSettingContent(): Boolean = !errorSettingContent
+
+    fun setShowLineNumbers(): Boolean {
+        showLineNumbers = !showLineNumbers
+
+        return shouldShowLineNumbers()
+    }
+
+    fun shouldShowLineNumbers(): Boolean = showLineNumbers
 
     fun canShowEditFab(): Boolean =
         isViewMode() && isEditableAdapter() && !isSaving()

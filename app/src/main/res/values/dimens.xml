@@ -122,4 +122,12 @@
     <dimen name="btn_21_padding_horizontal">21dp</dimen>
 
     <dimen name="btn_transparent_padding_vertical">8dp</dimen>
+
+    <dimen name="line_number_padding">6dp</dimen>
+    <dimen name="text_editor_padding_top">8dp</dimen>
+    <dimen name="text_editor_padding_bottom">120dp</dimen>
+    <dimen name="text_editor_padding_without_nLines">24dp</dimen>
+    <dimen name="text_editor_padding_start_with_nLines">36dp</dimen>
+    <dimen name="text_editor_padding_end_with_nLines">12dp</dimen>
+    <dimen name="line_number_size">10sp</dimen>
 </resources>

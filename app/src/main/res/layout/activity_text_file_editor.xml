@@ -21,37 +21,37 @@
         android:clipToPadding="false"
         app:layout_constraintTop_toBottomOf="@+id/file_editor_toolbar">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/content_text_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <TextView
+            <mega.privacy.android.app.textFileEditor.LineNumberTextView
                 android:id="@+id/content_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="120dp"
+                android:paddingStart="@dimen/text_editor_padding_without_nLines"
+                android:paddingTop="@dimen/text_editor_padding_top"
+                android:paddingEnd="@dimen/text_editor_padding_without_nLines"
+                android:paddingBottom="@dimen/text_editor_padding_bottom"
                 android:textAppearance="@style/TextAppearance.Mega.Body2"
                 android:textIsSelectable="true" />
 
-            <EditText
+            <mega.privacy.android.app.textFileEditor.LineNumberEditText
                 android:id="@+id/content_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
+                android:imeOptions="flagNoExtractUi"
                 android:inputType="textMultiLine"
-                android:paddingBottom="120dp"
+                android:paddingStart="@dimen/text_editor_padding_without_nLines"
+                android:paddingTop="@dimen/text_editor_padding_top"
+                android:paddingEnd="@dimen/text_editor_padding_without_nLines"
+                android:paddingBottom="@dimen/text_editor_padding_bottom"
                 android:textAppearance="@style/TextAppearance.Mega.Body2"
                 android:theme="@style/TransparentEditText.Transparent"
                 tools:ignore="Autofill,LabelFor" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </ScrollView>
 
