@@ -8,6 +8,7 @@ import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApi.INIT_ONLINE_SESSION
 
 class GlobalChatListener(private val application: MegaApplication) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
@@ -19,6 +20,16 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
     }
 
     override fun onChatInitStateUpdate(api: MegaChatApiJava?, newState: Int) {
+        if (newState == INIT_ONLINE_SESSION) {
+            api?.let {
+                val list = it.chatListItems
+                if (!list.isNullOrEmpty()) {
+                    for (i in 0 until list.size) {
+                        MegaApplication.getInstance().addCurrentGroupChat(list[i].chatId)
+                    }
+                }
+            }
+        }
     }
 
     override fun onChatOnlineStatusUpdate(

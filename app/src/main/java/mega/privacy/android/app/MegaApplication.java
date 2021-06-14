@@ -213,7 +213,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
     private AppRTCAudioManager rtcAudioManager = null;
-	private ArrayList<MegaChatListItem> currentActiveGroupChat = new ArrayList<>();
+	private ArrayList<Long> currentActiveGroupChat = new ArrayList<>();
 	private ArrayList<Long> notificationShown = new ArrayList<>();
     private AppRTCAudioManager rtcAudioManagerRingInCall;
     private static MegaApplication singleApplicationInstance;
@@ -1376,18 +1376,20 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (!item.isGroup() || notificationShown == null)
 			return;
 
-		if (item.getChanges() == 0 && !currentActiveGroupChat.contains(item)) {
-			currentActiveGroupChat.add(item);
-		}
-
 		if ((item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV))) {
 			if (item.getOwnPrivilege() != MegaChatRoom.PRIV_RM) {
-				if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(item)) {
-					currentActiveGroupChat.add(item);
+				if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(item.getChatId())) {
+					currentActiveGroupChat.add(item.getChatId());
 					MegaChatCall call = api.getChatCall(item.getChatId());
-					if (call != null && call.getStatus() == CALL_STATUS_USER_NO_PRESENT && !call.isRinging()) {
+					if(call == null){
+						logError("call is null");
+						return;
+					}
+
+					if (call.getStatus() == CALL_STATUS_USER_NO_PRESENT && !call.isRinging()) {
 						if (notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
 							MegaChatRoom chatRoom = megaChatApi.getChatRoom(item.getChatId());
+
 							if (chatRoom != null && (!chatRoom.isMeeting() || !isOpeningMeetingLink(item.getChatId()))) {
 								logDebug("Show notification");
 								notificationShown.add(item.getChatId());
@@ -1409,6 +1411,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			notificationShown.remove(item.getChatId());
 		}
 	}
+
+	public void addCurrentGroupChat(long chatId){
+		if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(chatId)) {
+			currentActiveGroupChat.add(chatId);
+		}
+	}
+
 	@Override
 	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
 

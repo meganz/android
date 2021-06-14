@@ -185,25 +185,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (inMeetingViewModel.isSameChatRoom(item.chatId)) {
             inMeetingViewModel.getCall()?.let { call ->
                 if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    when {
-                        item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) -> {
-                            logDebug("Change in my privileges")
-                            if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
-                                showSnackbar(
-                                    SNACKBAR_TYPE,
-                                    getString(R.string.be_new_moderator),
-                                    MEGACHAT_INVALID_HANDLE
-                                )
-                            }
-                            bottomFloatingPanelViewHolder.updatePrivilege(inMeetingViewModel.getOwnPrivileges())
-                        }
-                        item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS) -> {
-                            logDebug("Change in the privileges of a participant")
-                            updateRemotePrivileges(inMeetingViewModel.updateParticipantsPrivileges())
-                            bottomFloatingPanelViewHolder.updateRemotePrivileges(
-                                inMeetingViewModel.updateParticipantsPrivileges()
+                    if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
+                        logDebug("Change in my privileges")
+                        if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
+                            showSnackbar(
+                                SNACKBAR_TYPE,
+                                getString(R.string.be_new_moderator),
+                                MEGACHAT_INVALID_HANDLE
                             )
                         }
+                        bottomFloatingPanelViewHolder.updatePrivilege(inMeetingViewModel.getOwnPrivileges())
+                    }
+
+                    if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
+                        logDebug("Change in the privileges of a participant")
+                        updateRemotePrivileges(inMeetingViewModel.updateParticipantsPrivileges())
+                        bottomFloatingPanelViewHolder.updateRemotePrivileges(
+                            inMeetingViewModel.updateParticipantsPrivileges()
+                        )
                     }
                 }
             }
@@ -1874,18 +1873,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Remote changes detected")
         gridViewCallFragment?.let {
             if (it.isAdded) {
-                when {
-                    isAudioChange -> it.updateRemoteAudioVideo(TYPE_AUDIO, session)
-                    isVideoChange -> it.updateRemoteAudioVideo(TYPE_VIDEO, session)
+                if (isAudioChange) {
+                    it.updateRemoteAudioVideo(TYPE_AUDIO, session)
+                }
+                if (isVideoChange) {
+                    it.updateRemoteAudioVideo(TYPE_VIDEO, session)
                 }
             }
         }
 
         speakerViewCallFragment?.let {
             if (it.isAdded) {
-                when {
-                    isAudioChange -> it.updateRemoteAudioVideo(TYPE_AUDIO, session)
-                    isVideoChange -> it.updateRemoteAudioVideo(TYPE_VIDEO, session)
+                if (isAudioChange) {
+                    it.updateRemoteAudioVideo(TYPE_AUDIO, session)
+                }
+                if (isVideoChange) {
+                    it.updateRemoteAudioVideo(TYPE_VIDEO, session)
                 }
             }
         }
