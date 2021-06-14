@@ -2,15 +2,15 @@ package mega.privacy.android.app.textFileEditor
 
 import kotlin.collections.ArrayList
 
-class Pagination(text: String) {
+class Pagination(private val text: String, initialPage: Int) {
 
     companion object {
         private const val CHARS_FOR_PAGE = 20000
     }
 
-    private var pages: MutableList<String> = ArrayList()
-    private var editedPages: MutableList<String> = ArrayList()
-    private var currentPage = 0
+    private var pages: MutableList<String?> = ArrayList()
+    private var editedPages: MutableList<String?> = ArrayList()
+    private var currentPage = initialPage
 
     init {
         var i = 0
@@ -33,7 +33,29 @@ class Pagination(text: String) {
 
     fun size(): Int = pages.size
 
+    fun isNotEmpty(): Boolean = text.isNotEmpty()
+
     fun getCurrentPage(): Int = currentPage
 
-    fun getCurrentPageText(): String = pages[currentPage]
+    fun getCurrentPageText(): String? = editedPages[currentPage]
+
+    fun updatePage(text: String?) {
+        editedPages[currentPage] = text
+    }
+
+    fun editionFinished() {
+        pages = editedPages
+    }
+
+    fun isEdited(): Boolean = pages != editedPages
+
+    fun getEditedText(): String {
+        var editedText = ""
+
+        for (page in editedPages) {
+            editedText += page
+        }
+
+        return editedText
+    }
 }

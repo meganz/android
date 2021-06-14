@@ -458,18 +458,19 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     /**
      * Updates the UI and shows the read content.
      *
-     * @param contentRead Read content.
+     * @param content Pagination object with the read content.
      */
-    private fun showContentRead(contentRead: String) {
+    private fun showContentRead(content: Pagination) {
+        val currentContent = content.getCurrentPageText()
+
         if (viewModel.needsReadOrIsReadingContent()
-            || (contentRead.isNotEmpty() && contentRead == binding.contentText.text.toString())
+            || (content.isNotEmpty() && currentContent == binding.contentText.text.toString())
         ) {
             return
         }
 
-        val currentText = Pagination(contentRead).getCurrentPageText()
-        binding.contentText.text = currentText
-        binding.contentEditText.setText(currentText)
+        binding.contentText.text = currentContent
+        binding.contentEditText.setText(currentContent)
         binding.fileEditorScrollView.isVisible = true
         binding.loadingImage.isVisible = false
         binding.loadingProgressBar.isVisible = false

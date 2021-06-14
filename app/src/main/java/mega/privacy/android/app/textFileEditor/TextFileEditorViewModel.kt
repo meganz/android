@@ -68,8 +68,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private val mode: MutableLiveData<String> = MutableLiveData()
     private val savingMode: MutableLiveData<String> = MutableLiveData()
     private val fileName: MutableLiveData<String> = MutableLiveData()
-    private val contentText: MutableLiveData<String> = MutableLiveData()
-    private val editedText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
+    private val pagination: MutableLiveData<Pagination> = MutableLiveData()
 
     private var needsReadContent = false
     private var isReadingContent = false
@@ -84,7 +83,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getFileName(): LiveData<String> = fileName
 
-    fun onContentTextRead(): LiveData<String> = contentText
+    fun onContentTextRead(): LiveData<Pagination> = pagination
 
     fun getNode(): MegaNode? = textFileEditorData.value?.node
 
@@ -133,10 +132,10 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         savingMode.value = null
     }
 
-    fun getEditedText(): String? = editedText.value
+    fun getEditedText(): String? = pagination.value?.getCurrentPageText()
 
     fun setEditedText(text: String?) {
-        editedText.value = text
+        pagination.value?.updatePage(text)
     }
 
     fun getNameOfFile(): String = fileName.value ?: ""
@@ -166,11 +165,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     fun canShowEditFab(): Boolean =
         isViewMode() && isEditableAdapter() && !isSaving()
                 && !needsReadOrIsReadingContent() && thereIsNoErrorSettingContent()
-
-    init {
-        contentText.value = ""
-        editedText.value = ""
-    }
 
     /**
      * Checks if the file can be editable depending on the current adapter.
@@ -368,8 +362,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 sb.deleteRange(latestBreak, sb.length)
             }
 
-            contentText.postValue(sb.toString())
-            editedText.postValue(sb.toString())
+
+            pagination.postValue(Pagination(sb.toString(), 0))
             sb.clear()
         }
     }
@@ -395,7 +389,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         val fileWriter = FileWriter(tempFile.absolutePath)
         val out = BufferedWriter(fileWriter)
-        out.write(editedText.value ?: "")
+        out.write(pagination.value?.getEditedText() ?: "")
         out.close()
 
         if (!isFileAvailable(tempFile)) {
@@ -490,7 +484,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      *
      * @return True if the content has been modified, false otherwise.
      */
-    fun isFileEdited(): Boolean = contentText.value != editedText.value
+    fun isFileEdited(): Boolean = pagination.value?.isEdited() == true
 
     /**
      * Checks if the completed transfer refers to the same node of current view.
@@ -536,12 +530,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             return ERROR_FINISH_ACTION
         }
 
-        if (editedText.value == null) {
-            contentText.value = ""
-            editedText.value = ""
-        } else {
-            contentText.value = editedText.value
-        }
+        pagination.value?.editionFinished()
 
         textFileEditorData.value?.node =
             megaApi.getNodeByHandle(completedTransfer.nodeHandle.toLong())
