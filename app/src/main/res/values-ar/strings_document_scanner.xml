@@ -4,7 +4,7 @@
   <string name="scan_title_crop">قص</string>
   <!-- Screen title for saving current scan (Document scanner) -->
   <string name="scan_title_save_scan">حفظ المسح الضوئي</string>
-  <!-- button -->
+  <!-- Label of the button to add a new page to the current document scan -->
   <string name="scan_action_add">اضافة</string>
   <!-- Action of a button to save something -->
   <string name="scan_action_save">حفظ</string>
@@ -39,13 +39,13 @@
   <!-- Message shown when users deny camera permissions to scan documents -->
   <string name="scan_requires_permission">تحتاج إلى إعطاء إذن الوصول للكاميرا لمسح المستندات ضوئيًا</string>
   <!-- Error text for incorrect name -->
-  <string name="scan_incorrect_name">Incorrect name</string>
+  <string name="scan_incorrect_name">اسم غير صحيح</string>
   <!-- Error text for invalid characters -->
   <string name="scan_invalid_characters">عناصر غير صالحة</string>
   <!-- Snackbar text for incorrect name -->
-  <string name="scan_snackbar_incorrect_name">Correct your filename before proceeding</string>
+  <string name="scan_snackbar_incorrect_name">صحح اسم الملف قبل المتابعة</string>
   <!-- Dialog message showing file progress -->
-  <string name="scan_dialog_progress">Preparing %1$s. Please wait&#8230;</string>
+  <string name="scan_dialog_progress">جاري التحضير%1$s. يرجى الانتظار&#8230;</string>
   <!-- Error shown when the user writes a character not allowed -->
   <string name="scan_snackbar_invalid_characters">الأحرف التالية غير مسموح بها: ” * / : &lt; &gt; ? \ |</string>
 </resources>

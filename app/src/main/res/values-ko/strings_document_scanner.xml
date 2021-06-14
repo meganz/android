@@ -4,7 +4,7 @@
   <string name="scan_title_crop">자르기</string>
   <!-- Screen title for saving current scan (Document scanner) -->
   <string name="scan_title_save_scan">스캔 저장</string>
-  <!-- button -->
+  <!-- Label of the button to add a new page to the current document scan -->
   <string name="scan_action_add">추가</string>
   <!-- Action of a button to save something -->
   <string name="scan_action_save">저장</string>
@@ -45,7 +45,7 @@
   <!-- Snackbar text for incorrect name -->
   <string name="scan_snackbar_incorrect_name">진행하기 전 파일 이름을 수정하세요</string>
   <!-- Dialog message showing file progress -->
-  <string name="scan_dialog_progress">%1$s 준비중. 잠시 기다리세요&#x2026;</string>
+  <string name="scan_dialog_progress">%1$s 준비중. 잠시 기다리세요&#8230;</string>
   <!-- Error shown when the user writes a character not allowed -->
   <string name="scan_snackbar_invalid_characters">다음의 문자는 허용되지 않습니다: ” * / : &lt; &gt; ? \ |</string>
 </resources>

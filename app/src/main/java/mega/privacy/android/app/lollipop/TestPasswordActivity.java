@@ -208,6 +208,7 @@ public class TestPasswordActivity extends PasscodeActivity implements View.OnCli
 
     @Override
     public void onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return;
         dismissActivity(false);
         super.onBackPressed();
     }

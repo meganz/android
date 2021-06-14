@@ -35,7 +35,7 @@
     <item
         android:id="@+id/cab_menu_contact_info_chat"
         android:orderInCategory="125"
-        android:title="@string/contact_properties_activity"
+        android:title="@string/general_info"
         app:showAsAction="never" />
 
     <item

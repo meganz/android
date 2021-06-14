@@ -4,7 +4,7 @@
   <string name="scan_title_crop">裁剪</string>
   <!-- Screen title for saving current scan (Document scanner) -->
   <string name="scan_title_save_scan">保存扫描</string>
-  <!-- button -->
+  <!-- Label of the button to add a new page to the current document scan -->
   <string name="scan_action_add">新增</string>
   <!-- Action of a button to save something -->
   <string name="scan_action_save">保存</string>

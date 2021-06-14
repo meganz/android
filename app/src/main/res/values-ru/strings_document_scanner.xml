@@ -4,7 +4,7 @@
   <string name="scan_title_crop">Обрезать</string>
   <!-- Screen title for saving current scan (Document scanner) -->
   <string name="scan_title_save_scan">Сохранить скан</string>
-  <!-- button -->
+  <!-- Label of the button to add a new page to the current document scan -->
   <string name="scan_action_add">Добавить</string>
   <!-- Action of a button to save something -->
   <string name="scan_action_save">Сохранить</string>
@@ -37,7 +37,7 @@
   <!-- Body text shown on document scanner dialog to delete current scan -->
   <string name="scan_dialog_delete_body">Удалить текущее сканирование?</string>
   <!-- Message shown when users deny camera permissions to scan documents -->
-  <string name="scan_requires_permission">Для сканирования документов нужно разрешить доступ к камере.</string>
+  <string name="scan_requires_permission">Для сканирования документов нужно разрешить доступ к камере</string>
   <!-- Error text for incorrect name -->
   <string name="scan_incorrect_name">Неправильное имя</string>
   <!-- Error text for invalid characters -->
@@ -45,7 +45,7 @@
   <!-- Snackbar text for incorrect name -->
   <string name="scan_snackbar_incorrect_name">Исправьте имя файла, прежде чем продолжить</string>
   <!-- Dialog message showing file progress -->
-  <string name="scan_dialog_progress">Подготавливаем %1$s. Пожалуйста, подождите&#x2026;</string>
+  <string name="scan_dialog_progress">Подготавливаем %1$s. Пожалуйста, подождите&#8230;</string>
   <!-- Error shown when the user writes a character not allowed -->
   <string name="scan_snackbar_invalid_characters">Следующие символы не допускаются: ” * / : &lt; &gt; ? \ |</string>
 </resources>

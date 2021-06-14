@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA fornisce uno spazio di archiviazione cloud e una chat criptata e controllata dall’utente attraverso dei browser web, insieme a applicazioni per dispositivi mobili dedicate. Diversamente dagli altri spazi di archiviazione cloud, i tuoi dati sono criptati e decriptati solo dai tuoi dispositivi e mai da noi.\n\nCarica i tuoi file da smartphone o tablet e cerca, archivia, scarica, streamma, vedi, condividi, rinomina o elimina i tuoi file in qualunque momento, da qualunque dispositivo in qualunque luogo. Condividi le cartelle con i tuoi contatti e vedi i loro aggiornamenti in tempo reale. Il processo di criptazione serve a fare in modo che noi non possiamo accedere ai tuoi dati o resettare la tua password quindi DEVI ricordarla (oppure hai una copia della tua Chiave di Recupero) o perderai l’accesso a tutti i tuoi file archiviati.\n\nLa chat video criptata end-to-end ti permette di avere una privacy totale, ed è disponibile attraverso il tuo browser dal 2016. È stata estesa alla nostra app mobile, con la cronologia delle chat accessibile da più dispositivi. Gli utenti possono inoltre aggiungere facilmente file ad una chat dal loro Cloud Drive di MEGA.\n\nMEGA offre 50 GB di spazio di archiviazione gratuito a tutti gli utenti registrati con bonus ad obiettivi, ed offre dei piani a pagamento con limiti molto più alti.\n\n\nAbbonamento Pro Lite: €4.99 al mese o €49.99 l’anno ti dà 400 GB di spazio di archiviazione e 1 TB di banda di trasferimento mensile.\nAbbonamento Pro I: €9.99 al mese o €99.99 l’anno ti dà 2 TB di spazio di archiviazione e 2 TB di banda di trasferimento mensile.\nAbbonamento Pro II: €19.99 al mese o €199.99 l’anno ti dà 8 TB di spazio di archiviazione e 8 TB di banda di trasferimento mensile.\nAbbonamento Pro III: €29.99 al mese o €299.99 l’anno ti dà 16 TB di spazio di archiviazione e 16 TB di banda di trasferimento mensile.\n\nGli abbonamenti sono rinnovati automaticamente per i periodi successivi di stessa durata e prezzo. Per gestire i tuoi abbonamenti, ti basta cliccare sull’icona del Play Store, fare l’accesso con il tuo Google ID (se non l’hai già fatto) e poi cliccare sull’app MEGA. Potrai gestire i tuoi abbonamenti da lì.\n\nPermessi dell’app:\nWRITE_EXTERNAL_STORAGE -&gt; Scarica i tuoi file dal tuo account MEGA al tuo dispositivo e carica file dal tuo dispositivo al tuo account MEGA\nCAMERA -&gt; Scatta una foto e carica le tue foto e i tuoi video sul tuo account MEGA\nREAD_CONTACTS -&gt; Aggiungi facilmente i contatti dal tuo dispositivo ai contatti del tuo account MEGA\nRECORD_AUDIO &amp; CAPTURE_VIDEO_OUTPUT (microfono e fotocamera) -&gt; MEGA fornisce una criptazione end-to-end nelle chiamate audio e video\n\n\nPer migliorare la confidenza dell’utente all’interno del sistema di MEGA, tutto il codice sorgente del client viene pubblicato, quindi qualsiasi ricercatore di sicurezza può valutare da sé il processo di criptazione. Il codice della nostra app mobile sì trova all’indirizzo: https://github.com/meganz/android\n\nPer più informazioni, per favore visita il nostro sito web:\nVedi: https://mega.nz/terms\n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA fornisce uno spazio di archiviazione criptato controllato dall’utente e una chat tramite i normali browser web, insieme ad app dedicate per i dispositivi mobili. Diversamente dagli altri fornitori di archiviazione cloud, i tuoi dati sono criptati e decriptati solo dai tuoi dispositivi e mai da noi.\n\nFai l’upload dei tuoi file dal tuo smartphone o tablet e poi cerca, archivia, scarica, fai lo stream, vedi, condividi, rinomina o elimina i tuoi file in qualsiasi momento, da qualsiasi dispositivo ovunque. Condividi cartelle con i tuoi contatti e vedi i loro aggiornamenti in tempo reale. Il processo di criptazione implica che non possiamo accedere ai tuoi dati o fare il reset della tua password, quindi tu DEVI ricordarla (se non hai un backup della tua Chiave di Recupero) o perderai accesso ai tuoi file archiviati.\n\nLe videochiamate MEGA criptate end-to-end permettono una privacy totale, e sono state disponibili sui browser dal 2016. Sono state estese alle nostre app per mobile, con la cronologia delle chat accessibile da più dispositivi. Gli utenti possono anche aggiungere facilmente file alla chat dal loro MEGA Cloud Drive.\n\nMEGA offre un generoso spazio di archiviazione da 50GB gratuito per tutti gli utenti registrati con bonus ad obiettivi, e offre piani a pagamento con limiti molto più alti:\n\n\nAbbonamento Pro Lite: €4.99 al mese o €49.99 all’anno per 400GB di spazio di archiviazione e 1TB di banda di trasferimento al mese.\nAbbonamento Pro I: €9.99 al mese o €99.99 all’anno per 2TB di spazio di archiviazione e 2TB di banda di trasferimento al mese.\nAbbonamento Pro II: €19.99 al mese o €199.99 all’anno per 8TB di spazio di archiviazione e 8TB di banda di trasferimento al mese.\nAbbonamento Pro III: €29.99 al mese o €299.99 all’anno per 16TB di spazio di archiviazione e 16TB di banda di trasferimento al mese.\n\nGli abbonamenti sono rinnovati automaticamente per i periodi successivi di abbonamento della stessa durata e allo stesso prezzo del periodo iniziale scelto. Per gestire i tuoi abbonamenti, clicca sul Play Store, effettua l’accesso con il tuo Google ID (se non l’hai già fatto) e poi clicca sull’app di MEGA. Potrai gestire i tuoi abbonamenti da lì.\n\nPermessi dell’app:\nWRITE_EXTERNAL_STORAGE -&gt; Scarica i tuoi file da MEGA sul tuo dispositivo e carica file dal tuo dispositivo su MEGA\nCAMERA -&gt; Scatta una foto e carica le tue foto su MEGA\nREAD_CONTACTS -&gt; Aggiungi facilmente contatti dal tuo dispositivo come contatti MEGA\nRECORD_AUDIO e CAPTURE_VIDEO_OUTPUT (microfono e fotocamera) -&gt; MEGA fornisce chiamate audio e video criptate\n\n\nPer migliorare la confidenza degli utenti nel sistema di MEGA, tutto il codice sorgente dei client è stato pubblicato, affinché i ricercatori di sicurezza possano valutare il processo di criptazione. Il codice delle nostre app mobile è su: https://github.com/meganz/android \n\nPer maggiori informazioni, per favore visita il nostro sito web:\nVedi https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA è Cloud con potente Privacy sempre attiva.</string>
     <!-- PRO Lite account -->
@@ -218,8 +218,8 @@
     <string name="tour_privacy_title">Privacy MEGA</string>
     <!--  -->
     <string name="tour_access_title">Accesso MEGA</string>
-    <!--  -->
-    <string name="tour_space_text">Registrati adesso ed ottieni 50 GB* di spazio di archiviazione gratuito</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">Register now and get 20 GB+ of free space</string>
     <!--  -->
     <string name="tour_speed_text">I caricamenti sono veloci. Condividere rapidamente i file con tutti</string>
     <!--  -->
@@ -1109,9 +1109,9 @@
     <string name="invalid_email_title">Indirizzo email non valido</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Ti preghiamo di controllare l’indirizzo e-mail e riprovare.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Reset Password</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Per favore, inserisci la tua Chiave di Recupero qui sotto</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">La tua password è stata modificata.</string>
@@ -1142,7 +1142,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Fai l’upgrade ora</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Aumenta la tua capacità![A]Ottieni più spazio &amp; banda di trasferimento con un account PRO!</string>
+    <string name="get_pro_account">Aumenta la capacità del tuo cloud![A]Ottieni più spazio e banda di trasferimento con un account Pro!</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">La Chiave di Recupero è stata copiata in: %1s.[A]Mentre il file rimane in questo percorso, lo troverai salvato nella sezione Offline.[A]Nota: Verrà cancellato se effettui il logout, quindi per favore archivialo in un luogo sicuro.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -1511,7 +1511,7 @@
         <item quantity="one">%1$s [A]sta scrivendo&#8230;[/A]</item>
         <item quantity="other">%1$s [A]stanno scrivendo&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]ed altri stanno scrivendo&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">Altro</string>
@@ -1921,9 +1921,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invita degli amici e ottieni delle ricompense</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Ottieni %1$s di spazio di archiviazione e %2$s di banda di trasferimento per ogni utente invitato</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each referral. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">Ottieni %1$s di spazio di archiviazione e %2$s di banda di trasferimento</string>
+    <string name="figures_achievements_text">%1$s of storage. Valid for 365 days.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Ricompense sbloccate</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1953,7 +1953,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Come funziona</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invita i tuoi amici a creare un account MEGA gratuito e ad installare la nostra app. Per ogni registrazione avvenuta con successo e ogni app installata riceverai dello spazio di archiviazione bonus e della banda di trasferimento.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Non riceverai alcun bonus se inviti qualcuno che ha utilizzato MEGA in passato e non ti verrà notificato un rifiuto del genere. I contatti invitati dovranno installare l’applicazione MEGA per mobile o per desktop sui loro dispositivi.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1967,17 +1967,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">L’email è errata</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Quando installi MEGAsync ottieni %1$s di spazio di archiviazione aggiuntivo e %2$s di banda di trasferimento, entrambi validi per 180 giorni. L’app desktop di MEGA è disponibile per Windows, macOS e la maggior parte delle distribuzioni Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Quando installi l’app per mobile di MEGA ottieni %1$s di spazio di archiviazione complementare e %2$s di banda di trasferimento, entrambi validi per 180 giorni. L’app per mobile di MEGA è disponibile per iOS, Android e Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">When you install our mobile app you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS, Android and Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Quando verifichi il tuo numero di telefono ottieni %1$s di spazio di archiviazione e %2$s di banda di trasferimento, entrambi aggiuntivi e validi per 180 giorni.</string>
+    <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space, valid for 365 days.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Hai ricevuto %1$s di spazio di archiviazione e %2$s di banda di trasferimento per aver installato la nostra app desktop di MEGA.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA desktop app.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Hai ricevuto %1$s di spazio di archiviazione e %2$s di banda di trasferimento per aver installato la nostra app mobile.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing our mobile app.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Hai ricevuto %1$s di spazio di archiviazione e %2$s di banda di trasferimento per aver verificato il tuo numero di telefono.</string>
+    <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space for verifying your phone number.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Hai ricevuto %1$s di spazio di archiviazione gratuito come bonus per la tua registrazione.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2509,7 +2509,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La prossima volta che effettuerai l’accesso al tuo account ti verrà chiesto di inserire il codice di 6 cifre che ti è stato fornito dalla app di autenticazione.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Considera l’esportazione della tua <b>Chiave di Recupero</b> nel caso in cui tu perda accesso alle tue app o voglia disattivare l’autenticazione a due fattori in futuro.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">QR Code non valido</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -3334,7 +3334,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Inizia a chattare in sicurezza con i tuoi contatti utilizzando la criptazione end-to-end</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Ciao! Inizia una chat in sicurezza con me e ottieni fino a 50 GB di spazio di archiviazione gratuito. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hi! Have secure conversations on MEGA with me and get up to 20 GB+ free storage. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Nessun link della chat disponibile.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3922,4 +3922,24 @@
     <string name="file_update_failed">Aggiornamento del file fallito. Riprova.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Il file è troppo grande e non può essere aperto o visualizzato in anteprima.</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">File senza estensione (.%1$s)</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">Per continuare, devi inserire una estensione del file</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">Cambio dell’estensione file</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">Potresti non riuscire ad accedere a questo file se cambi l’estensione da “.%1$s” a “.%2$s”</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">Potresti non riuscire ad accedere a questo file se aggiungi l’estensione “.%1$s”</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">Potresti non riuscire ad accedere a questo file se rimuovi l’estensione “.%1$s”</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">Rimuovi estensione</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">Usa .%1$s</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">Nessuna estensione</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">Mantieni .%1$s</string>
 </resources>
