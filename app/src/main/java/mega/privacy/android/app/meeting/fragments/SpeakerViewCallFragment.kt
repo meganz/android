@@ -21,6 +21,7 @@ import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatSession
 
@@ -52,7 +53,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             speakerUser?.let {
                 if (inMeetingViewModel.isSpeakerSelectionAutomatic) {
                     logDebug("Received local audio level")
-                    inMeetingViewModel.assignMeAsSpeaker()
+                    selectSpeaker(megaApi.myUserHandleBinary, MEGACHAT_INVALID_HANDLE)
                 }
             }
         }
@@ -118,7 +119,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             itemAnimator = Util.noChangeRecyclerViewItemAnimator()
             clipToPadding = true
             setHasFixedSize(true)
-
             adapter = null
             recycledViewPool.clear()
         }
@@ -152,7 +152,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     private fun observeViewModel() {
-        inMeetingViewModel.participants.observeForever(participantsObserver)
+        inMeetingViewModel.participants.observe(viewLifecycleOwner, participantsObserver)
 
         inMeetingViewModel.pinItemEvent.observe(
             viewLifecycleOwner,
@@ -169,17 +169,16 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                     }
                 }
 
-                if (speakerUser == null) {
-                    logDebug("New speaker selected with clientId ${participantClicked.clientId}")
-                    selectSpeaker(participantClicked.peerId, participantClicked.clientId)
-                } else {
-                    if (speakerUser!!.peerId == participantClicked.peerId && speakerUser!!.clientId == participantClicked.clientId) {
+                if (speakerUser != null && speakerUser!!.peerId == participantClicked.peerId && speakerUser!!.clientId == participantClicked.clientId) {
+                    if(participantClicked.clientId == MEGACHAT_INVALID_HANDLE){
+                        logDebug("Same participant(Me), clientId ${speakerUser!!.clientId}")
+                    }else{
                         logDebug("Same participant, clientId ${speakerUser!!.clientId}")
                         adapter.updatePeerSelected(speakerUser!!)
-                    } else {
-                        logDebug("New speaker selected with clientId ${participantClicked.clientId}")
-                        selectSpeaker(participantClicked.peerId, participantClicked.clientId)
                     }
+                } else {
+                    logDebug("New speaker selected with clientId ${participantClicked.clientId}")
+                    selectSpeaker(participantClicked.peerId, participantClicked.clientId)
                 }
             })
 
@@ -241,6 +240,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      */
     private fun selectSpeaker(peerId: Long, clientId: Long) {
         logDebug("Selected new speaker with clientId $clientId")
+        if(clientId == MEGACHAT_INVALID_HANDLE){
+            inMeetingViewModel.assignMeAsSpeaker()
+        }
         val listParticipants = inMeetingViewModel.updatePeerSelected(peerId, clientId)
 
         if (listParticipants.isNotEmpty()) {
@@ -722,15 +724,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         fun newInstance() = SpeakerViewCallFragment()
     }
 
-    override fun onResume() {
-        val iterator = participants.iterator()
-        iterator.forEach {
-            inMeetingViewModel.resetSizeListener(it)
-        }
-
-        super.onResume()
-    }
-
     /**
      * Method for resizing the listener
      *
@@ -742,7 +735,13 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             peerId,
             clientId
         )?.let {
-            inMeetingViewModel.resetSizeListener(it)
+            if (!it.isVideoOn || it.videoListener == null)
+                return
+            it.videoListener?.let { listener ->
+                logDebug("Reset Size participant listener")
+                listener.height = 0
+                listener.width = 0
+            }
         }
     }
 
@@ -796,12 +795,5 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         logDebug("View destroyed")
         removeTextureView()
         super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        inMeetingViewModel.participants.removeObserver(
-            participantsObserver
-        )
-        super.onDestroy()
     }
 }

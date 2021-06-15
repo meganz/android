@@ -93,7 +93,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
         viewDataBinding.gridViewPager.adapter = adapterPager
         updateVisibleParticipantsGrid(newData)
 
-        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observeForever(
+        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observe(viewLifecycleOwner,
             participantsObserver
         )
     }
@@ -327,25 +327,10 @@ class GridViewCallFragment : MeetingBaseFragment() {
         }
     }
 
-    override fun onResume() {
-        val iterator = participants.iterator()
-        iterator.forEach {
-            (parentFragment as InMeetingFragment).inMeetingViewModel.resetSizeListener(it)
-        }
-        super.onResume()
-    }
-
     override fun onDestroyView() {
         logDebug("View destroyed")
         removeTextureView()
         super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.removeObserver(
-            participantsObserver
-        )
-        super.onDestroy()
     }
 
     private fun sliceBy6(data: MutableList<Participant>): MutableList<List<Participant>> {

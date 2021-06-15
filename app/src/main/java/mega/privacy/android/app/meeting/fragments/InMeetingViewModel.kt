@@ -1018,6 +1018,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                     if (it.peerId == session.peerid && it.clientId == session.clientid) {
                         if (it.isSpeaker) {
                             it.isSpeaker = false
+                            removeSpeakerParticipant()
                             assignMeAsSpeaker()
                         }
 
@@ -1159,13 +1160,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         return null
     }
 
-    /**
-     * Method for assigning me as a speaker.
-     * It's necessary to close the previous speaker's video and assign me as the speaker
-     *
-     */
-    fun assignMeAsSpeaker() {
-        logDebug("Assign me as speaker")
+    fun removeSpeakerParticipant(){
         _speakerParticipant.value?.let {
             if (getSession(it.clientId) == null) {
                 logDebug("The participant with clientId ${it.clientId} doesn't have session")
@@ -1175,7 +1170,15 @@ class InMeetingViewModel @ViewModelInject constructor(
                 onCloseVideo(it)
             }
         }
+    }
 
+    /**
+     * Method for assigning me as a speaker.
+     * It's necessary to close the previous speaker's video and assign me as the speaker
+     *
+     */
+    fun assignMeAsSpeaker() {
+        logDebug("Assign me as speaker")
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             _speakerParticipant.value = inMeetingRepository.getMeToSpeakerView(it)
         }
@@ -1786,21 +1789,6 @@ class InMeetingViewModel @ViewModelInject constructor(
                 addParticipantVisible(participant)
             }
             logDebug("Num visible participants is " + visibleParticipants.size)
-        }
-    }
-
-    /**
-     * Method for resizing the listener of a participant
-     *
-     * @param participant
-     */
-    fun resetSizeListener(participant: Participant) {
-        if (!participant.isVideoOn || participant.videoListener == null)
-            return
-        participant.videoListener?.let {
-            logDebug("Reset Size participant listener")
-            it.height = 0
-            it.width = 0
         }
     }
 
