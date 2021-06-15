@@ -1613,6 +1613,11 @@ class InMeetingViewModel @ViewModelInject constructor(
                 removeHiRes(participant.videoListener!!, session, currentChatId)
             }
 
+            if (session.hasVideo()) {
+                logDebug("The session had no video, check and delete if lowRes was allowed by default.")
+                removeLowRes(participant.videoListener!!, session, currentChatId)
+            }
+
             logDebug("Add low resolution of ${participant.clientId}")
             addLowRes(
                 participant.videoListener!!,
