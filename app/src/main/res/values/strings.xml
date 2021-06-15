@@ -4083,8 +4083,6 @@
     <string name="use_any_device">Use any device</string>
     <!-- the subtitle on left meeting page-->
     <string name="free_large_group_meeting">Free large group meeting</string>
-    <!-- the content of the button that allow user create account-->
-    <string name="create_mega_account">CREATE MEGA ACCOUNT</string>
 
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">View meeting chat</string>

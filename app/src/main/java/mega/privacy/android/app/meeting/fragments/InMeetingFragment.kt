@@ -240,14 +240,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun updatePanelAndToolbar(chat: MegaChatCall?) {
-        if (chat?.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-            toolbar.setOnClickListener { showMeetingInfoFragment() }
-        } else {
-            toolbar.setOnClickListener {
-                null
+        toolbar.setOnClickListener {
+            if (chat?.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+                showMeetingInfoFragment()
             }
         }
-
         bottomFloatingPanelViewHolder.updateMeetingType(!inMeetingViewModel.isOneToOneCall())
     }
 

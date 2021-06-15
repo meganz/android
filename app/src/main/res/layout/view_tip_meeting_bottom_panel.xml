@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
-            android:text="@string/general_ok" />
+            android:text="@string/button_permission_info" />
 
     </RelativeLayout>
 

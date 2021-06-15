@@ -16,7 +16,7 @@ class LeftMeetingActivity : BaseActivity() {
         binding = ActivityGuestLeaveMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btCreateMegaAccount.setOnClickListener {
+        binding.btCreateAccount.setOnClickListener {
             createAccount()
         }
 
