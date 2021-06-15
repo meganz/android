@@ -23,7 +23,7 @@ class Pagination(private val text: String, initialPage: Int) {
             if (nextIndexOfReturn > to) to = nextIndexOfReturn
             if (to > text.length) to = text.length
             pages.add(text.substring(i, to))
-            i = to + 1
+            i = to
         }
 
         if (i == 0) pages.add("")
@@ -47,7 +47,7 @@ class Pagination(private val text: String, initialPage: Int) {
         pages = editedPages
     }
 
-    fun isEdited(): Boolean = pages != editedPages
+    fun isEdited(): Boolean = text != getEditedText()
 
     fun getEditedText(): String {
         var editedText = ""
@@ -58,4 +58,20 @@ class Pagination(private val text: String, initialPage: Int) {
 
         return editedText
     }
+
+    fun previousPage() {
+        if (currentPage - 1 >= 0) {
+            currentPage--
+        }
+    }
+
+    fun nextPage() {
+        if (currentPage + 1 < pages.size) {
+            currentPage++
+        }
+    }
+
+    fun shouldShowPrevious(): Boolean = currentPage > 0
+
+    fun shouldShowNext(): Boolean = pages.size > 1 && currentPage + 1 < pages.size
 }

@@ -263,4 +263,6 @@
 
     <!--  SnackBar Button text  -->
     <color name="teal_200_teal_300">@color/teal_300</color>
+
+    <color name="grey_010_teal_100">@color/teal_100</color>
 </resources>

@@ -370,7 +370,19 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
             setOnClickListener {
                 viewModel.setEditMode()
+                binding.previous.hide()
+                binding.next.hide()
             }
+        }
+
+        binding.previous.apply {
+            hide()
+            setOnClickListener { viewModel.previousClicked() }
+        }
+
+        binding.next.apply {
+            hide()
+            setOnClickListener { viewModel.nextClicked() }
         }
     }
 
@@ -477,12 +489,25 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         binding.contentText.text = currentContent
         binding.contentEditText.setText(currentContent)
         binding.fileEditorScrollView.isVisible = true
+        binding.fileEditorScrollView.smoothScrollTo(0, 0)
         binding.loadingImage.isVisible = false
         binding.loadingProgressBar.isVisible = false
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
         if (viewModel.canShowEditFab()) {
             binding.editFab.show()
+        }
+
+        checkPaginationUI(content)
+    }
+
+    /**
+     * Checks if should show or not previous/next pagination buttons.
+     */
+    private fun  checkPaginationUI(pagination: Pagination) {
+        if (viewModel.isViewMode()) {
+            binding.previous.apply { if (pagination.shouldShowPrevious()) show() else hide() }
+            binding.next.apply { if (pagination.shouldShowNext()) show() else hide() }
         }
     }
 
@@ -508,6 +533,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 hide()
                 show()
             }
+
+            checkPaginationUI(viewModel.getPagination())
         }
 
         showSnackbar(

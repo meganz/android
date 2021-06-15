@@ -89,6 +89,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun onContentTextRead(): LiveData<Pagination> = pagination
 
+    fun getPagination(): Pagination = pagination.value!!
+
     fun getNode(): MegaNode? = textFileEditorData.value?.node
 
     fun getNodeAccess(): Int = megaApi.getAccess(getNode())
@@ -616,5 +618,15 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             FILE_LINK_ADAPTER -> shareLink(context, urlFileLink)
             else -> shareNode(context, getNode()!!) { updateNode() }
         }
+    }
+
+    fun previousClicked() {
+        pagination.value?.previousPage()
+        pagination.notifyObserver()
+    }
+
+    fun nextClicked() {
+        pagination.value?.nextPage()
+        pagination.notifyObserver()
     }
 }
