@@ -9,9 +9,7 @@
 
         <OnSwipe
             app:dragDirection="dragUp"
-            app:touchAnchorId="@id/list"
-            app:touchAnchorSide="top"
-            app:touchRegionId="@id/list" />
+            app:touchAnchorId="@id/list" />
     </Transition>
 
     <ConstraintSet android:id="@+id/collapsed">

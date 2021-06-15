@@ -97,7 +97,7 @@ class ContactListViewModel @ViewModelInject constructor(
                             }
                             itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
                         }
-                        items[index - 1].getFirstCharacter() != items[index].getFirstCharacter() -> {
+                        !items[index - 1].getFirstCharacter().equals(items[index].getFirstCharacter(), true) -> {
                             itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
                         }
                     }
