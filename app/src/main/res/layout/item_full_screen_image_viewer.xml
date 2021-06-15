@@ -35,7 +35,8 @@
         android:layout_centerInParent="true"
         android:background="@null"
         android:src="@drawable/video_player_play"
-        app:tint="@color/white" />
+        app:tint="@color/white"
+        android:visibility="gone"/>
 
     <ProgressBar
         android:id="@+id/full_screen_image_viewer_download_progress_bar"
