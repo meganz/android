@@ -379,6 +379,14 @@ class CuViewModel extends BaseRxViewModel {
                 .subscribe(mCuNodes::setValue, logErr("loadCuNodes")));
     }
 
+    /**
+     * Gets CU and MU content as CUNode objects.
+     * Content means images and videos which are located on CU and MU folders.
+     *
+     * Also requests needed thumbnails to show in holders if not exist yet.
+     *
+     * @return The list of CUNode objects.
+     */
     private List<CuNode> getCuNodes() {
         List<CuNode> nodes = new ArrayList<>();
         List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
@@ -394,7 +402,6 @@ class CuViewModel extends BaseRxViewModel {
             boolean sameYear = Year.from(LocalDate.now()).equals(Year.from(modifyDate));
             CuNode cuNode = new CuNode(node, pair.first,
                     thumbnail.exists() ? thumbnail : null,
-                    null,
                     isVideoFile(node.getName()) ? CuNode.TYPE_VIDEO : CuNode.TYPE_IMAGE,
                     dateString,
                     mSelectedNodes.containsKey(node.getHandle()));
@@ -429,6 +436,14 @@ class CuViewModel extends BaseRxViewModel {
         return nodes;
     }
 
+    /**
+     * Gets three different lists of cards, organizing CU and MU content in three different ways:
+     * - Day cards:   Content organized by days.
+     * - Month cards: Content organized by months.
+     * - Year cards:  Content organized by years.
+     *
+     * Also requests needed previews to show in cards if not exist yet.
+     */
     public void getCards() {
         List<CUCard> days = new ArrayList<>();
         List<CUCard> months = new ArrayList<>();
@@ -505,6 +520,14 @@ class CuViewModel extends BaseRxViewModel {
         yearCards.postValue(years);
     }
 
+    /**
+     * Checks a clicked card, if it is in the provided list and if is in right position.
+     *
+     * @param position Clicked position in the list.
+     * @param handle   Identifier of the card node.
+     * @param cards    List of cards to check.
+     * @return The checked card if found, null otherwise.
+     */
     private CUCard getClickedCard(int position, long handle, List<CUCard> cards) {
         if (cards == null) {
             return null;
@@ -526,10 +549,25 @@ class CuViewModel extends BaseRxViewModel {
         return card;
     }
 
+    /**
+     * Checks and gets the clicked day card.
+     *
+     * @param position Clicked position in the list.
+     * @param card     Clicked day card.
+     * @return The checked day card.
+     */
     public CUCard dayClicked(int position, CUCard card) {
         return getClickedCard(position, card.getNode().getHandle(), getDayCards());
     }
 
+    /**
+     * Checks the clicked month card and gets the day card to show after click on a month card.
+     *
+     * @param position Clicked position in the list.
+     * @param card     Clicked month card.
+     * @return A day card corresponding to the month of the year clicked, current day. If not exists,
+     * the closest day behind the current.
+     */
     public int monthClicked(int position, CUCard card) {
         CUCard monthCard = getClickedCard(position, card.getNode().getHandle(), getMonthCards());
         if (monthCard == null) {
@@ -553,6 +591,14 @@ class CuViewModel extends BaseRxViewModel {
         return 0;
     }
 
+    /**
+     * Checks the clicked year card and gets the month card to show after click on a year card.
+     *
+     * @param position Clicked position in the list.
+     * @param card     Clicked year card.
+     * @return A month card corresponding to the year clicked, current month. If not exists,
+     * the closest month behind the current.
+     */
     public int yearClicked(int position, CUCard card) {
         CUCard yearCard = getClickedCard(position, card.getNode().getHandle(), getYearCards());
         if (yearCard == null) {

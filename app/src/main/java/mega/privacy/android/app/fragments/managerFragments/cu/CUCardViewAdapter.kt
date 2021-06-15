@@ -6,6 +6,17 @@ import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.databinding.ItemCuCardBinding
 
+/**
+ * Adapter to show Camera Uploads cards organized by days, months or years.
+ *
+ * @param cardViewType Type of view:
+ *                          - DAYS_VIEW if days.
+ *                          - MONTHS_VIEW if months
+ *                          - YEARS_VIEW if years.
+ * @param cardWidth    Size to set as card view width.
+ * @param cardMargin   Size to set as card view margin.
+ * @param listener     Callback used to manage card events.
+ */
 class CUCardViewAdapter(
     private val cardViewType: Int,
     private val cardWidth: Int,

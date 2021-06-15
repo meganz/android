@@ -9013,7 +9013,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	/**
 	 * Updates enableCUButton view visibility and cuLayout if needed.
 	 *
-	 * @param visibility New visibiltiy value to set.
+	 * @param visibility New visibility value to set.
 	 */
 	public void updateEnableCUButton(int visibility) {
 		if (enableCUButton.getVisibility() == visibility) {

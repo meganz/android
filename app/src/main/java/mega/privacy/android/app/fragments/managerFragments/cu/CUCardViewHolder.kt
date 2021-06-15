@@ -12,6 +12,14 @@ import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
+/**
+ * Holder representing a card view.
+ *
+ * @param viewType   Type of view: DAYS_VIEW if days, MONTHS_VIEW if months, YEARS_VIEW if years.
+ * @param binding    Binding of the card view.
+ * @param cardWidth  Size to set as card view width.
+ * @param cardMargin Size to set as card view margin.
+ */
 class CUCardViewHolder(
     private val viewType: Int,
     private val binding: ItemCuCardBinding,
