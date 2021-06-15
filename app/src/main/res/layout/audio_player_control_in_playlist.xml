@@ -116,12 +116,11 @@
         android:id="@id/exo_repeat_toggle"
         style="@style/AudioPlayerButton"
         android:layout_marginEnd="10dp"
-        android:src="@drawable/audio_player_play_bg_on"
+        android:src="@drawable/exo_controls_repeat_all"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@id/exo_next"
-        app:layout_constraintTop_toTopOf="@id/control_button_center"
-        tools:src="@drawable/exo_controls_repeat_all" />
+        app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
