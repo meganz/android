@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.ViewModelInject
@@ -61,6 +62,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         const val NON_UPDATE_FINISH_ACTION = 0
         const val SUCCESS_FINISH_ACTION = 1
         const val ERROR_FINISH_ACTION = 2
+        const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
     }
 
     private val textFileEditorData: MutableLiveData<TextFileEditorData> =
@@ -76,6 +78,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private var localFileUri: String? = null
     private var streamingFileURL: URL? = null
     private var showLineNumbers = false
+
+    private lateinit var preferences: SharedPreferences
 
     fun onTextFileEditorDataUpdate(): LiveData<TextFileEditorData> = textFileEditorData
 
@@ -156,6 +160,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun setShowLineNumbers(): Boolean {
         showLineNumbers = !showLineNumbers
+        preferences.edit().putBoolean(SHOW_LINE_NUMBERS, showLineNumbers).apply()
 
         return shouldShowLineNumbers()
     }
@@ -183,12 +188,17 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Gets all necessary values from intent if available.
+     * Sets all necessary values from params if available.
      *
-     * @param intent Received intent.
-     * @param mi     Current phone memory info in case is needed to read the file on streaming.
+     * @param intent      Received intent.
+     * @param mi          Current phone memory info in case is needed to read the file on streaming.
+     * @param preferences Preference data.
      */
-    fun setValuesFromIntent(intent: Intent, mi: ActivityManager.MemoryInfo) {
+    fun setInitialValues(
+        intent: Intent,
+        mi: ActivityManager.MemoryInfo,
+        preferences: SharedPreferences
+    ) {
         val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
         textFileEditorData.value?.adapterType = adapterType
 
@@ -262,6 +272,9 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         setEditableAdapter()
 
         fileName.value = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name!!
+
+        this.preferences = preferences
+        showLineNumbers = preferences.getBoolean(SHOW_LINE_NUMBERS, false)
     }
 
     /**

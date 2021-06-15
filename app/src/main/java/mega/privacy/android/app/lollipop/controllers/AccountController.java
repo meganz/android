@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.StatFs;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 import androidx.print.PrintHelper;
 import androidx.appcompat.app.AlertDialog;
 
@@ -57,6 +58,7 @@ import nz.mega.sdk.MegaError;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
+import static mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.SHOW_LINE_NUMBERS;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate;
@@ -488,6 +490,9 @@ public class AccountController {
 
         //clear push token
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit().clear().apply();
+
+        //clear text editor preference
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_LINE_NUMBERS, false).apply();
 
         removeEmojisSharedPreferences();
 

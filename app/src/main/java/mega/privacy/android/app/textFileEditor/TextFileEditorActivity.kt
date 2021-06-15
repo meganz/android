@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
@@ -91,7 +92,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         if (savedInstanceState == null) {
             val mi = ActivityManager.MemoryInfo()
             (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
-            viewModel.setValuesFromIntent(intent, mi)
+            viewModel.setInitialValues(
+                intent,
+                mi,
+                PreferenceManager.getDefaultSharedPreferences(this)
+            )
         } else if (viewModel.thereIsErrorSettingContent()) {
             binding.editFab.hide()
             showErrorReadingContentDialog()
