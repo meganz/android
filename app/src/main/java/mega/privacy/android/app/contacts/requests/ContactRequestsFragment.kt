@@ -5,9 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -23,6 +21,7 @@ import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.contacts.requests.dialog.ContactRequestBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.FragmentContactRequestsBinding
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
+import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
@@ -55,6 +54,7 @@ class ContactRequestsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentContactRequestsBinding.inflate(inflater, container, false)
+        setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -72,6 +72,13 @@ class ContactRequestsFragment : Fragment() {
         binding.tabs.clearOnTabSelectedListeners()
         activity?.unregisterReceiver(receiver)
         super.onDestroyView()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.fragment_contact_search, menu)
+        menu.findItem(R.id.action_search)?.setupSearchView { query ->
+            viewModel.setQuery(query)
+        }
     }
 
     private fun setupView(savedInstanceState: Bundle?) {

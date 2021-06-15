@@ -14,6 +14,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.ReplyContactRequestUseCase
+import mega.privacy.android.app.utils.notifyObserver
 
 class ContactRequestsViewModel @ViewModelInject constructor(
     private val getContactRequestsUseCase: GetContactRequestsUseCase,
@@ -25,6 +26,7 @@ class ContactRequestsViewModel @ViewModelInject constructor(
     }
 
     private val contactRequests: MutableLiveData<List<ContactRequestItem>> = MutableLiveData()
+    private var queryString: String? = null
 
     init {
         updateRequests()
@@ -46,36 +48,53 @@ class ContactRequestsViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    fun getFilteredContactRequests(): LiveData<List<ContactRequestItem>> =
+        contactRequests.map { items ->
+            if (!queryString.isNullOrBlank()) {
+                items.filter { item ->
+                    item.name?.contains(queryString!!, true) == true
+                            || item.email?.contains(queryString!!, true) == true
+                }
+            } else {
+                items
+            }
+        }
+
     fun getIncomingRequest(): LiveData<List<ContactRequestItem>> =
-        contactRequests.map { it.filter { item -> !item.isOutgoing } }
+        getFilteredContactRequests().map { it.filter { item -> !item.isOutgoing } }
 
     fun getOutgoingRequest(): LiveData<List<ContactRequestItem>> =
-        contactRequests.map { it.filter { item -> item.isOutgoing } }
+        getFilteredContactRequests().map { it.filter { item -> item.isOutgoing } }
 
     fun getContactRequest(requestHandle: Long): LiveData<ContactRequestItem?> =
-        contactRequests.map { it.find { item -> item.handle == requestHandle } }
+        getFilteredContactRequests().map { it.find { item -> item.handle == requestHandle } }
 
     fun acceptRequest(requestHandle: Long) {
-        replyContactRequestUseCase.acceptReceivedRequest(requestHandle).subscribeToRequest()
+        replyContactRequestUseCase.acceptReceivedRequest(requestHandle).subscribeAndUpdate()
     }
 
     fun ignoreRequest(requestHandle: Long) {
-        replyContactRequestUseCase.ignoreReceivedRequest(requestHandle).subscribeToRequest()
+        replyContactRequestUseCase.ignoreReceivedRequest(requestHandle).subscribeAndUpdate()
     }
 
     fun declineRequest(requestHandle: Long) {
-        replyContactRequestUseCase.denyReceivedRequest(requestHandle).subscribeToRequest()
+        replyContactRequestUseCase.denyReceivedRequest(requestHandle).subscribeAndUpdate()
     }
 
     fun reinviteRequest(requestHandle: Long) {
-        replyContactRequestUseCase.remindSentRequest(requestHandle).subscribeToRequest()
+        replyContactRequestUseCase.remindSentRequest(requestHandle).subscribeAndUpdate()
     }
 
     fun removeRequest(requestHandle: Long) {
-        replyContactRequestUseCase.deleteSentRequest(requestHandle).subscribeToRequest()
+        replyContactRequestUseCase.deleteSentRequest(requestHandle).subscribeAndUpdate()
     }
 
-    private fun Completable.subscribeToRequest() {
+    fun setQuery(query: String?) {
+        queryString = query
+        contactRequests.notifyObserver()
+    }
+
+    private fun Completable.subscribeAndUpdate() {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

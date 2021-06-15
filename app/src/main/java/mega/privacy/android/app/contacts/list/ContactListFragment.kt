@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -21,6 +20,7 @@ import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.InviteContactActivity
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
@@ -70,31 +70,9 @@ class ContactListFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.fragment_contact_list, menu)
-
-        menu.findItem(R.id.action_search)?.apply {
-            setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-                override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                    viewModel.setQuery(null)
-                    return true
-                }
-
-                override fun onMenuItemActionExpand(item: MenuItem?): Boolean = true
-            })
-            (actionView as SearchView?)?.apply {
-                setOnCloseListener {
-                    viewModel.setQuery(null)
-                    false
-                }
-                setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        viewModel.setQuery(newText)
-                        return true
-                    }
-
-                    override fun onQueryTextSubmit(query: String?): Boolean = false
-                })
-            }
+        inflater.inflate(R.menu.fragment_contact_search, menu)
+        menu.findItem(R.id.action_search)?.setupSearchView { query ->
+            viewModel.setQuery(query)
         }
     }
 

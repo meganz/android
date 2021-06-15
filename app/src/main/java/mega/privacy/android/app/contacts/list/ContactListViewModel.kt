@@ -37,21 +37,6 @@ class ContactListViewModel @ViewModelInject constructor(
         retrieveContacts()
     }
 
-    fun retrieveContacts() {
-        getContactsUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { items ->
-                    contacts.value = items.toList()
-                },
-                onError = { error ->
-                    Log.e(TAG, error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
-    }
-
     private fun retrieveContactActions() {
         getContactRequestsUseCase.getIncomingRequestsSize()
             .subscribeOn(Schedulers.io())
@@ -62,6 +47,21 @@ class ContactListViewModel @ViewModelInject constructor(
                         ContactActionItem(Type.REQUESTS, getString(R.string.section_requests), size),
                         ContactActionItem(Type.GROUPS, getString(R.string.section_groups))
                     )
+                },
+                onError = { error ->
+                    Log.e(TAG, error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
+
+    fun retrieveContacts() {
+        getContactsUseCase.get()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { items ->
+                    contacts.value = items.toList()
                 },
                 onError = { error ->
                     Log.e(TAG, error.stackTraceToString())

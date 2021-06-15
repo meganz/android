@@ -2,9 +2,7 @@ package mega.privacy.android.app.contacts.group
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -18,6 +16,7 @@ import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
@@ -35,12 +34,20 @@ class ContactGroupsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentContactGroupsBinding.inflate(inflater, container, false)
+        setHasOptionsMenu(true)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.fragment_contact_search, menu)
+        menu.findItem(R.id.action_search)?.setupSearchView { query ->
+            viewModel.setQuery(query)
+        }
     }
 
     private fun setupView() {
