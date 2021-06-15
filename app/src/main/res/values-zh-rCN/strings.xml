@@ -217,7 +217,7 @@
     <!--  -->
     <string name="tour_access_title">随时随地访问 MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB+ of free space</string>
+    <string name="tour_space_text">立即注册即可获得20GB+免费存储空间</string>
     <!--  -->
     <string name="tour_speed_text">上传速度很快。立即分享给身边的朋友吧</string>
     <!--  -->
@@ -1877,9 +1877,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">邀请朋友，并获得奖励</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each referral. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">单次邀请奖励为%1$s存储空间。有效期为365天。</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">%1$s of storage. Valid for 365 days.</string>
+    <string name="figures_achievements_text">%1$s存储空间。有效期为365天。</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">解锁奖励</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1909,7 +1909,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">如何使用</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage.</string>
+    <string name="first_paragraph_achievement_invite_friends">邀请您的好友创建一个免费MEGA帐户并安装我们的手机App。每有一位用户成功注册并安装后，您将获得额外存储空间奖励。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">邀请曾经的MEGA用户不会获得奖励，您也不会对此收到通知。受邀的联系人必须在其设备上安装MEGA手机应用程序或MEGA桌面应用程序。</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1923,17 +1923,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">电子邮件格式错误</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
+    <string name="paragraph_info_achievement_install_desktop">安装MEGA桌面App后，您会获得%1$s免费存储空间，有效期为365天。MEGA桌面App适用于Windows，macOS和大多数Linux发行版。</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">When you install our mobile app you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS, Android and Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">安装MEGA手机App后，您会获得%1$s免费存储空间，有效期为365天。MEGA手机App适用于iOS，Android和Windows Phone。</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space, valid for 365 days.</string>
+    <string name="paragraph_info_achievement_add_phone">验证手机号后，您会获得%1$s免费存储空间，有效期为365天。</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA desktop app.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">您已通过安装MEGA桌面App获得了%1$s存储空间。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing our mobile app.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">您已通过安装MEGA手机App获得了%1$s存储空间。</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space for verifying your phone number.</string>
+    <string name="result_paragraph_info_achievement_add_phone">您已通过验证手机号获得了%1$s存储空间。</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已经收到%1$s的存储空间作为免费注册奖励。</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -3256,7 +3256,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">开始使用端到端加密安全的与您的联系人进行聊天</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hi! Have secure conversations on MEGA with me and get up to 20 GB+ free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">你好！和我一起使用MEGA，立即获得20GB+免费存储空间。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">无聊天链接可用。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3860,5 +3860,5 @@
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">信息</string>
     <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Save to gallery</string>
+    <string name="general_save_to_gallery">保存到图库</string>
 </resources>

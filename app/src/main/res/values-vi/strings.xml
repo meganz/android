@@ -95,7 +95,7 @@
     <!-- On clicking menu item upload in a incoming shared folder read only -->
     <string name="no_permissions_upload">Thư mục được đặt là “chỉ được xem”. Không thể tải lên bất kỳ nội dung nào.</string>
     <!-- confirmation message before removing the previously downloaded MasterKey file -->
-    <string name="remove_key_confirmation">Tác vụ này sẽ xóa tệp tin chứa Mã Khóa Phục Hồi khỏi máy</string>
+    <string name="remove_key_confirmation">Tác vụ này sẽ xóa tệp tin chứa Mã Phục Hồi khỏi máy</string>
     <!-- confirmation message before sending an invitation to a contact -->
     <string name="confirmation_add_contact">Bạn có chắc muốn gửi lời mời tới %s không?</string>
     <!-- Button where the user can sign off or logout -->
@@ -1032,9 +1032,9 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Tài Khoản Pro Lite</string>
     <!--  -->
-    <string name="backup_title">Sao lưu dự phòng Mã Khóa Phục Hồi</string>
+    <string name="backup_title">Sao lưu dự phòng Mã Phục Hồi</string>
     <!-- Subtitle of the screen to backup the master key -->
-    <string name="backup_subtitle">Mật khẩu là cần thiết để dịch Mã Khóa Phục Hồi</string>
+    <string name="backup_subtitle">Mật khẩu là cần thiết để dịch Mã Phục Hồi</string>
     <!-- First paragraph of the screen to backup the master key -->
     <string name="backup_first_paragraph">Dữ liệu của bạn chỉ có thể đọc được qua quá trình giải mã được dựa trên khóa mã chủ được thông dịch từ mật khẩu bạn đặt cho tài khoản. Điều này đồng nghĩa với việc nếu quên mất mật khẩu, và không lưu đề phòng Mã Khóa Phục Hồi, bạn sẽ không tài nào truy cập vào dữ liệu của mình được.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
@@ -1042,11 +1042,11 @@
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Các kẻ tấn công không thể nào truy cập vào tài khoản của bạn chỉ với mã-khóa không thôi. Thủ tục đặt lại mật khẩu yêu cầu bạn phải có mã-khóa master và quyền truy cập vào email của bạn.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Sao chép Mã Khóa Phục Hồi vào bộ ghi nhớ hoặc lưu lại mã dưới dạng tệp tin chữ</string>
+    <string name="backup_action">Sao chép Mã Phục Hồi vào bộ ghi nhớ hoặc lưu lại mã dưới dạng tệp tin chữ</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Lưu</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">Mã Khóa Phục Hồi đã được lưu lại vào bộ nhớ</string>
+    <string name="copy_MK_confirmation">Mã Phục Hồi đã được lưu lại vào bộ nhớ</string>
     <!-- Button to change the password -->
     <string name="change_pass">Thay đổi</string>
     <!-- Positive button to perform a general action -->
@@ -1058,11 +1058,11 @@
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Quên mất mật khẩu?</string>
     <!-- First paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_first_paragraph">Nếu bạn có Mã Khóa Phục Hồi, nhấn CÓ. Bạn sẽ được phép đặt lại mật khẩu mà không bị mất dữ liệu của tài khoản.</string>
+    <string name="forgot_pass_first_paragraph">Nếu bạn có Mã Phục Hồi, nhấn CÓ. Bạn sẽ được phép đặt lại mật khẩu mà không bị mất dữ liệu của tài khoản.</string>
     <!-- Second paragraph of the screen when the password has been forgotten -->
     <string name="forgot_pass_second_paragraph">Bạn vẫn có thể xuất ra Mã Phục Hồi ngay bây giờ nếu bạn vẫn có một phiên MEGA đang hoạt động từ bất kỳ máy tính hay app với tài khoản của bạn. Nếu không có, bạn không thể truy cập vào tài khoản của mình được nữa, nhưng vẫn có thể đăng ký lại một tài khoản mới với cùng địa chỉ email, bằng cách chọn nút KHÔNG.</string>
     <!-- Sentence to ask to the user if he has the master key in the screen when the password has been forgotten -->
-    <string name="forgot_pass_action">Bạn có Mã Khóa Phục Hồi của tài khoản không?</string>
+    <string name="forgot_pass_action">Bạn có Mã Phục Hồi của tài khoản không?</string>
     <!-- Title of the alert message to ask for the link to reset the pass with the MK -->
     <string name="title_alert_reset_with_MK">Vậy thì tốt!</string>
     <!-- Hint of the text where the user can write his e-mail -->
@@ -1070,7 +1070,7 @@
     <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
     <string name="text_alert_reset_with_MK">Xin nhập địa chỉ email của bạn ở dưới đây. Bạn sẽ nhận được một thư email có chứa đường liên kết khôi phục tài khoản để nhập Mã Phục Hồi và đặt lại mật khẩu.</string>
     <!-- Hint of the text when the user can write his master key -->
-    <string name="edit_text_insert_mk">Chỗ điền Mã Khóa Phục Hồi ở đây</string>
+    <string name="edit_text_insert_mk">Điền Mã Phục Hồi ở đây</string>
     <!-- Hint of the text where the user can write his password -->
     <string name="edit_text_insert_pass">điền mật khẩu ở đây</string>
     <!-- Text shown in the last alert dialog to confirm delete user account -->
@@ -1098,7 +1098,7 @@
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Đặt lại mật khẩu</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
-    <string name="text_dialog_insert_MK">Xin nhập Mã Khóa Phục Hồi ở dưới đây</string>
+    <string name="text_dialog_insert_MK">Xin nhập Mã Phục Hồi ở dưới đây</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Bạn vừa đổi mật khẩu.</string>
     <!-- Title of the dialog to park an account -->
@@ -1120,7 +1120,7 @@
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">Liên kết phục hồi này đã bị hết hạn, xin thử lại.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
-    <string name="text_reset_pass_logged_in">Mã Khóa Phục Hồi là cách duy nhất để đặt lại mật khẩu. Xin nhập mật khẩu ở dưới đây.</string>
+    <string name="text_reset_pass_logged_in">Mã Phục Hồi là cách duy nhất để đặt lại mật khẩu. Xin nhập mật khẩu ở dưới đây.</string>
     <!-- Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass -->
     <string name="email_verification_text_change_pass">Bạn sẽ nhận được một thư email chưa đường liên kết tới trang thực hiện việc đặt lại mật khẩu.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
@@ -1130,7 +1130,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Tăng cường dung lượng của ổ mây.[A]Lấy thêm không gian lưu trữ &amp; lượng băng thông truyền tải với tài khoản hạng PRO!</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Mã Khóa Phục Hồi đã được sao lưu vào vị trí: %1s.[A]Đồng thời, mã khóa cũng sẽ có trong mục Lưu về Ngoại Tuyến.[A]Ghi chú: Tệp tin chứa mã khóa sẽ bị xóa nếu bạn đăng xuất tài khoản khỏi ứng dụng MEGA, vì vậy nên lưu và sao chép mã ở một nơi an toàn.</string>
+    <string name="toast_master_key">Mã Phục Hồi đã được sao lưu vào vị trí: %1s.[A]Đồng thời, mã khóa cũng sẽ có trong mục Lưu về Ngoại Tuyến.[A]Ghi chú: Tệp tin chứa mã khóa sẽ bị xóa nếu bạn đăng xuất tài khoản khỏi ứng dụng MEGA, vì vậy nên lưu và sao chép mã ở một nơi an toàn.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Lỗi. Địa chỉ email này đã có người sử dụng.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1156,7 +1156,7 @@
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK">Mã khóa vừa nhập không phù hợp với tài khoản này. Xin kiểm tra lại cho chắc chắn là Mã Khóa chính xác và thử lại.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">Sai Mã Khóa Phục Hồi</string>
+    <string name="incorrect_MK_title">Sai Mã Phục Hồi</string>
     <!-- Alert Dialog to get link -->
     <string name="option_full_link">Liên kết kèm chìa khóa</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
@@ -2316,7 +2316,7 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Mật khẩu chính xác</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Mật khẩu không đúng.\nLưu lại Mã Khóa Phục Hồi ngay lập tức!</string>
+    <string name="test_pwd_wrong">Mật khẩu không đúng.\nLưu lại Mã Phục Hồi ngay lập tức!</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
     <string name="recovery_key_exported_dialog_text_logout">Trước khi tiến hành việc đăng xuất, xin thử điền mật khẩu để kiểm tra rằng mình còn nhớ chính xác.\nQuên mất mật khẩu và không có mã phục hồi sẽ không lấy lại được tài khoản.</string>
     <!-- Option that permits user copy to clipboard -->
@@ -2326,7 +2326,7 @@
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Tiến hành đăng xuất</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="recovery_key_bottom_sheet">Mã Khóa Phục Hồi</string>
+    <string name="recovery_key_bottom_sheet">Mã Phục Hồi</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Lưu vào File System</string>
     <!-- Message shown when something has been copied to clipboard -->
@@ -2434,11 +2434,11 @@
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">Bắt Đầu Cài Đặt</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">Quét hoặc sao chép đoạn chủng tử này vào app Lập Xác Minh.</string>
+    <string name="explain_qr_seed_2fa_1">Quét hoặc sao chép đoạn chủng tử này vào app Lập Xác Thực.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Xin đảm bảo lưu dự phòng đoạn chủng tử này ở nơi an toàn để đề phòng khi mất thiết bị.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
-    <string name="explain_confirm_2fa">Xin nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Minh.</string>
+    <string name="explain_confirm_2fa">Xin nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Thực.</string>
     <!-- Text button -->
     <string name="general_verify">Xác thực</string>
     <!-- Text button -->
@@ -2450,13 +2450,13 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Xác Minh 2-Bước được Bật</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Minh.</string>
+    <string name="description_2fa_enabled">Vào những lần đăng nhập tiếp theo, hệ thống sẽ yêu cầu nhập một đoạn mã dài 6 chữ số lấy từ App Lập Xác Thực.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Nên cân nhắc và xuất ra <b>Mã Phục Hồi</b> để đề phòng trường hợp mất khả năng truy cập vào ứng dụng hoặc khi muốn tắt Xác Thực 2-Bước trong tương lai.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Mã không phù hợp</string>
     <!-- Title of screen Lost authenticator decive -->
-    <string name="lost_your_authenticator_device">Thiết bị có cài app Lập Xác Minh đã bị mất?</string>
+    <string name="lost_your_authenticator_device">Thiết bị có cài app Lập Xác Thực đã bị mất?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">Xác Thực Đăng Nhập</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
@@ -2468,7 +2468,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Tắt</string>
     <!-- Title of screen Lost authenticator decive -->
-    <string name="title_lost_authenticator_device">Thiết bị có cài app Lập Xác Minh đã bị mất?</string>
+    <string name="title_lost_authenticator_device">Thiết bị có cài app Lập Xác Thực đã bị mất?</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
     <string name="error_disable_2fa">Lỗi phát sinh khi thực hiện tắt đi chức năng Xác Minh 2-Bước. Xin thử lại.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
@@ -2492,7 +2492,7 @@
     <!-- Label Play Store -->
     <string name="play_store_label">CH Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
-    <string name="text_2fa_help">Cần phải có một app lập xác minh để bật tính năng XM2B với MEGA. Bạn có thể tải và cài đặt Google Authenticator, Duo Mobile, Authy hoặc Microsoft Authenticator app về thiết bị của mình.</string>
+    <string name="text_2fa_help">Cần phải có một app lập xác thực để bật tính năng XT2B với MEGA. Bạn có thể tải và cài đặt Google Authenticator, Duo Mobile, Authy hoặc Microsoft Authenticator app về thiết bị của mình.</string>
     <!-- success message when importing multiple files from -->
     <string name="number_correctly_imported_from_chat">%d tệp tin đã được chia sẻ thành công</string>
     <!-- error message when importing multiple files from chat -->
@@ -3428,7 +3428,7 @@
     <!-- Label showing that a nickname has been added -->
     <string name="snackbar_nickname_added">Đã thêm biêt danh</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_removed">Đã xóa biêt danh</string>
+    <string name="snackbar_nickname_removed">Đã xóa biệt danh</string>
     <!-- Label showing that a nickname has not been added -->
     <string name="error_snackbar_nickname_added">Lỗi phát sinh khi thực hiện thêm tên biêt danh</string>
     <!-- title of a dialog to edit or remove the nickname -->

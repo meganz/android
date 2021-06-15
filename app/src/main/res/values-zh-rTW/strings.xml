@@ -1929,9 +1929,9 @@
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">當您驗證您的手機號碼時您將免費獲得%1$s儲存空間，有效期為365天。</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">您已經因為安裝MEGA桌面程式而獲得%1$s儲存空間獎勵。</string>
+    <string name="result_paragraph_info_achievement_install_desktop">您已經安裝我們的MEGA桌面應用程式而獲得%1$s儲存空間過了。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">您已因為安裝我們的手機應用程式而獲得%1$s儲存空間。</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">您已經安裝我們的手機應用程式而獲得%1$s儲存空間過了。</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="result_paragraph_info_achievement_add_phone">您已經因為驗證您的手機號碼而獲得%1$s儲存空間獎勵</string>
     <!-- info paragraph about the completed achievement registration -->

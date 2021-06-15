@@ -219,7 +219,7 @@
     <!--  -->
     <string name="tour_access_title">Acceso a MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB+ of free space</string>
+    <string name="tour_space_text">Regístrate ahora y obtén 20 GB de almacenamiento gratuito</string>
     <!--  -->
     <string name="tour_speed_text">Subidas rápidas. Comparte archivos rápidamente con todo el mundo</string>
     <!--  -->
@@ -1919,7 +1919,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invita a tus amigos y gana bonos</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each referral. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">%1$sde almacenamiento por cada invitación. Válido durante 365 días.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s de almacenamiento. Válido durante 365 días.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1965,7 +1965,7 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Correo electrónico no válido</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
+    <string name="paragraph_info_achievement_install_desktop">Al instalar la aplicación de escritorio, obtienes %1$s de almacenamiento adicional válido durante 365 días. La aplicación de escritorio de MEGA está disponible para Windows, macOS y la mayoría de las distribuciones de Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">Al instalar nuestra aplicación móvil, obtienes %1$s de espacio de almacenamiento válido durante 365 días. La aplicación móvil está disponible para iOS, Android y Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
@@ -2507,7 +2507,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La próxima vez que inicies sesión en su cuenta, tendrás que introducir un código de 6 dígitos proporcionado por tu aplicación de autenticación.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Considera exportar tu <b>Clave de recuperación</b> en caso de que pierdas el acceso a tu aplicación o quieras desactivar la autenticación de dos factores en el futuro.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Código no valido</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -3332,7 +3332,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Chatea de forma segura con tus contactos mediante el cifrado punto a punto</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hi! Have secure conversations on MEGA with me and get up to 20 GB+ free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">¡Hola! Habla conmigo de forma segura en MEGA y obtén 20 GB de almacenamiento gratuito. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Link de chat no disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
