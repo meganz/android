@@ -218,8 +218,8 @@
     <string name="tour_privacy_title">La confidentialité MEGA</string>
     <!--  -->
     <string name="tour_access_title">L’accès MEGA</string>
-    <!--  -->
-    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 50&#160;Go* d’espace de stockage gratuits</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 20&#160;Go+ d’espace de stockage gratuit</string>
     <!--  -->
     <string name="tour_speed_text">Les téléversements sont rapides. Partagez rapidement des fichiers avec tout le monde</string>
     <!--  -->
@@ -651,8 +651,6 @@
     <string name="upload_to_filesystem_from">Choisir de</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">téléversé</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Traitement du fichier</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Traitement du fichier</item>
@@ -1109,9 +1107,9 @@
     <string name="invalid_email_title">L’adresse courriel est invalide</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Veuillez vérifier l’adresse courriel et réessayer.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Réinitialisation du mot de passe</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Veuillez saisir votre clé de récupération ci-dessous</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Votre mot de passe a été changé.</string>
@@ -1210,7 +1208,7 @@
     <!-- confirmation message before removing mutiple contact request -->
     <string name="confirmation_remove_multiple_contact_request">Voulez-vous supprimer ces %d invitations ?</string>
     <!-- success message when replying to multiple received request -->
-    <string name="number_correctly_invitation_reply_sent">%d réponses à une demande ont été envoyées</string>
+    <string name="number_correctly_invitation_reply_sent">%d réponses à une demande ont été envoyées.</string>
     <!-- error message when replying to multiple received request -->
     <string name="number_incorrectly_invitation_reply_sent">%1$d réponses à une demande ont été envoyées avec succès mais %2$d n’ont pas été envoyées.</string>
     <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
@@ -1291,7 +1289,7 @@
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d demandes ont déjà été envoyées.</string>
     <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">%d invitations ont été envoyées avec succès</string>
+    <string name="number_correctly_invite_contact_request">%d invitations ont été envoyées avec succès.</string>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d invitations ont été envoyées avec succès, mais %2$d n’ont pas été envoyées.</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1921,9 +1919,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invitez des amis et obtenez des récompenses</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Obtenez %1$s d’espace de stockage et %2$s de transferts pour chaque parrainage</string>
+    <string name="figures_achievements_text_referrals">%1$s d’espace de stockage pour chaque parrainage. Valide pendant 365&#160;jours.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">Obtenez %1$s d’espace de stockage et %2$s de transferts</string>
+    <string name="figures_achievements_text">%1$s d’espace de stockage. Valide pendant 365&#160;jours.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Récompenses déverrouillées</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1953,7 +1951,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Fonctionnement</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invitez vos amis à créer un compte MEGA gratuit et à installer notre appli mobile. Pour chaque inscription et installation d’appli réussie, vous recevez de l’espace de stockage et un quota de transfert en prime.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invitez vos amis à créer un compte MEGA gratuit et à installer l’appli MEGA mobile. Pour chaque inscription et installation d’appli réussie, vous recevez de l’espace de stockage en prime.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Vous ne recevrez pas de crédit si vous invitez quelqu’un qui a utilisé MEGA par le passé et un tel refus ne vous sera pas signalé. Les contacts invités doivent installer l’appli MEGA mobile ou l’appli MEGA pour ordinateur sur leurs appareils.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1967,17 +1965,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">L’adresse courriel est mal formée</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">En installant MEGAsync, vous obtenez %1$s d’espace de stockage gratuit et %2$s de quota de transfert, tous deux valides pendant 180 jours. L’appli MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">En installant l’appli MEGA pour ordinateur, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. L’appli MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">En installant notre appli MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit et %2$s de quota de transfert, tous deux valides pendant 180 jours. Nos applis mobiles sont proposées pour iOS, Android et Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">En installant l’appli MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. Nos applis mobiles sont proposées pour iOS, Android et Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Quand vous confirmez votre numéro de téléphone, vous obtenez %1$s d’espace de stockage supplémentaire et %2$s de quota de transfert, tous deux valides pendant 180&#160;jours.</string>
+    <string name="paragraph_info_achievement_add_phone">Quand vous confirmez votre numéro de téléphone, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Vous avez obtenu %1$s d’espace de stockage et %2$s de quota de transfert pour avoir installé notre appli MEGA pour ordinateur.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre appli MEGA pour ordinateur.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Vous avez reçu %1$s d’espace de stockage et %2$s de quota de transfert pour avoir installé notre appli mobile.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre appli mobile.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Vous avez reçu %1$s d’espace de stockage et %2$s de quota de transfert pour avoir confirmé votre numéro de téléphone.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Vous avez reçu %1$s d’espace de stockage pour avoir confirmé votre numéro de téléphone.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Vous avez reçu %1$s d’espace de stockage comme prime gratuite d’inscription.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2586,7 +2584,7 @@
     <!-- Indicates that can type a contact email -->
     <string name="contact_email">Adresse courriel du contact</string>
     <!-- When it tries to add a contact in a list an is already added -->
-    <string name="contact_not_added">Vous avez déjà ajouté ce contact</string>
+    <string name="contact_not_added">Vous avez déjà ajouté ce contact.</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_invalid_format">Le format du message est invalide</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2623,11 +2621,11 @@
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">Désarchiver</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">%s conversation a été archivée</string>
+    <string name="success_archive_chat">La conversation %s a été archivée.</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
     <string name="error_archive_chat">Erreur. %s conversation n’a pas été archivée</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">La conversation %s a été désarchivée</string>
+    <string name="success_unarchive_chat">La conversation %s a été désarchivée.</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
     <string name="error_unarchive_chat">Erreur. Il a été impossible de désarchiver %s conversation</string>
     <!-- Message shown when the user has no archived chats -->
@@ -3048,7 +3046,7 @@
     <!-- Permissions screen explanation -->
     <string name="setup_mega_explanation">MEGA a besoin d’accéder à vos photos, à vos médias et à vos fichiers afin que vous puissiez les partager avec des amis, échanger des messages chiffrés et faire des appels chiffrés.</string>
     <!-- Title of the screen asking permissions for files -->
-    <string name="allow_acces_media_title">Autoriser l’accès aux photos, aux médias et aux fichiers</string>
+    <string name="allow_acces_media_title">Autoriser l’accès aux photos, aux médias et aux fichiers.</string>
     <!-- Subtitle of the screen asking permissions for files -->
     <string name="allow_acces_media_subtitle">Afin de partager des photos, des médias et des fichiers, MEGA a besoin de votre autorisation.</string>
     <!-- Title of the screen asking permissions for camera -->
@@ -3334,7 +3332,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Commencez à discuter en toute sécurité avec vos contacts grâce au chiffrement de bout en bout</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Bonjour. Conversez avec moi en toute sécurité sur MEGA et obtenez jusqu’à 50&#160;Go d’espace de stockage gratuits. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Bonjour. Conversez avec moi en toute sécurité sur MEGA et obtenez 20&#160;Go+ d’espace de stockage gratuit. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Aucun lien de conversation n’est disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3674,7 +3672,7 @@
     <!-- Option to  cancel a transfer -->
     <string name="option_cancel_transfer">Annuler le transfert</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
-    <string name="warning_message_resume_transfers">Reprendre les transferts pour poursuivre votre téléversement ?</string>
+    <string name="warning_message_resume_transfers">Reprendre les transferts pour poursuivre votre téléversement.</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%1$d%% sur %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
@@ -3755,7 +3753,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Sélectionner des transferts</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Échec de changement de priorité du transfert «&#160;%1$s&#160;»</string>
+    <string name="change_of_transfer_priority_failed">Échec de changement de priorité du transfert «&#160;%1$s&#160;».</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Envoyer la clé de déchiffrement séparément</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -3942,4 +3940,12 @@
     <string name="action_keep_empty_old_extension">Pas d’extension</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Conserver .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">Un fichier porte déjà ce nom</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">Un élément porte déjà ce nom</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Renseignements</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Enregistrer dans la galerie</string>
 </resources>

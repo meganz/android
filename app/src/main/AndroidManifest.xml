@@ -628,6 +628,12 @@
             android:theme="@style/DocumentScannerTheme"
             android:windowSoftInputMode="stateHidden|adjustNothing"/>
 
+        <receiver android:name=".psa.AlarmReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.checking.psa" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

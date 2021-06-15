@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA透過標準網頁瀏覽器以及行動裝置專屬應用程式提供用戶可控制的加密雲端儲存及對話功能。與其他雲端儲存服務供應商不同，您的資料僅可由您的客戶端裝置加密與解密，並非由我們加密。\n\n從智慧型手機或平板電腦上傳檔案，然後從任何裝置搜尋、儲存、下載、串流播放、查看、分享，重新命名或刪除您的檔案。可與您的聯絡人共享資料夾，並即時查看檔案更新狀況。加密功能表示我們無法訪問或重置您的密碼，因此您必須記住它（除非您有備份還原金鑰；忘記密碼時可透過金鑰重設帳號密碼），否則您將無法存取您所儲存的檔案。\n\n點對點用戶加密的MEGA視訊對話能確保完全的隱私，此功能從2016年起可透過瀏覽器使用，而且現在已支援我們的行動應用程式，可透過多個裝置檢視對話記錄。用戶還可透過MEGA雲端硬碟輕鬆地將檔案加到對話室中。\n \n MEGA為所有註冊用戶大方的提供50 GB的免費儲存空間以及成就獎勵，並提供更高空間上限的付費方案：\n\n\nPRO Lite 訂閱：每月4.99歐元或每年49.99歐元，每月為您提供400GB的儲存空間和1TB的傳輸配額。\nPRO I 訂閱：每月9.99歐元或每年99.99歐元，每月為您提供2TB的儲存空間和2TB的傳輸配額。\nPRO II 訂閱：每月19.99歐元或每年199.99歐元，為您提供8TB的儲存空間和每月8TB的傳輸配額。\nPRO III 訂閱：每月29.99歐元或每年299.99歐元，為您提供16TB的儲存空間和每月16TB的傳輸配額。\n\n訂閱將自動續訂，且續期與第一次訂閱的相同，價格也相同。欲管理您的訂閱，只需點擊行動裝置上的Play商店圖示，使用您的Google ID登錄（若您尚未登入的話），然後點擊MEGA應用程式，您就能夠管理您的訂閱。\n\n應用程式存取權限：\n外部儲存裝置資料寫入 - &gt;將您的檔案從MEGA下載到您的裝置並將檔案從您的裝置上傳到MEGA \n 相機 - &gt;拍照並將其上傳到MEGA \n 讀取聯絡人 - &gt; 輕鬆將裝置中的聯絡人匯入以作為MEGA聯絡人 \n錄音與影像截取輸出（存取麥克風與相機） - &gt; MEGA提供點對點加密音訊/視訊通話\n\n\n為了增加用戶對MEGA系統的信心，所有客戶端程式碼均已發布，有興趣的安全開發人員可以評估我們的加密過程。我們的行動應用程式代碼可於https://github.com/meganz/android 查詢。\n\n相關詳細資訊，請查詢我們的網站：\n請查詢：https://mega.nz/terms \n\n\n桌上型電腦系統 - https://mega.nz/</string>
+    <string name="full_description_text">MEGA透過標準網頁瀏覽器以及行動裝置專屬應用程式提供用戶可控制的加密雲端儲存及對話功能。與其他雲端儲存服務供應商不同，您的資料僅可由您的客戶端裝置加密與解密，並非由我們加密。\n\n從智慧型手機或平板電腦上傳檔案，然後從任何裝置搜尋、儲存、下載、串流播放、查看、共享，重新命名或刪除您的檔案。可與您的聯絡人共享資料夾，並即時查看檔案更新狀況。加密功能表示我們無法訪問或重置您的密碼，因此您必須記住它（除非您有備份還原金鑰；忘記密碼時可透過金鑰重設帳號密碼），否則您將無法存取您所儲存的檔案。\n\n點對點用戶加密的MEGA視訊對話能確保完全的隱私，此功能從2016年起可透過瀏覽器使用，而且現在已支援我們的行動應用程式，可透過多個裝置檢視對話記錄。用戶還可透過MEGA雲端硬碟輕鬆地將檔案加到對話室中。\n \n MEGA為所有註冊用戶大方的提供50 GB的免費儲存空間以及成就獎勵，並提供更高空間上限的付費方案：\n\n\nPRO Lite 訂閱：每月4.99歐元或每年49.99歐元，每月為您提供400GB的儲存空間和1TB的傳輸配額。\nPRO I 訂閱：每月9.99歐元或每年99.99歐元，每月為您提供2TB的儲存空間和2TB的傳輸配額。\nPRO II 訂閱：每月19.99歐元或每年199.99歐元，為您提供8TB的儲存空間和每月8TB的傳輸配額。\nPRO III 訂閱：每月29.99歐元或每年299.99歐元，為您提供16TB的儲存空間和每月16TB的傳輸配額。\n\n訂閱將自動續訂，且續期與第一次訂閱的相同，價格也相同。欲管理您的訂閱，只需點擊行動裝置上的Play商店圖示，使用您的Google ID登錄（若您尚未登入的話），然後點擊MEGA應用程式，您就能夠管理您的訂閱。\n\n應用程式存取權限：\n外部儲存裝置資料寫入 - &gt;將您的檔案從MEGA下載到您的裝置並將檔案從您的裝置上傳到MEGA \n 相機 - &gt;拍照並將其上傳到MEGA \n 讀取聯絡人 - &gt; 輕鬆將裝置中的聯絡人匯入以作為MEGA聯絡人 \n錄音與影像截取輸出（存取麥克風與相機） - &gt; MEGA提供點對點加密音訊/視訊通話\n\n\n為了增加用戶對MEGA系統的信心，所有客戶端程式碼均已發布，有興趣的安全開發人員可以評估我們的加密過程。我們的行動應用程式代碼可於https://github.com/meganz/android 查詢。\n\n相關詳細資訊，請查詢我們的網站：\n請查詢：https://mega.nz/terms \n\n\n桌上型電腦系統 - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA雲端空間功能強大，永遠保護您的隱私。</string>
     <!-- PRO Lite account -->
@@ -205,7 +205,7 @@
     <!-- After login, updating the file list, the file list should be processed before showing it to the user -->
     <string name="login_preparing_filelist">正在準備檔案列表</string>
     <!-- when the user tries to share something to MEGA without being logged -->
-    <string name="login_before_share">請先登入，以便使用MEGA分享功能</string>
+    <string name="login_before_share">請先登入，以便使用MEGA共享功能</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">您的確認連結已無效。您的帳戶可能已啟用，或您可能已取消註冊</string>
     <!--  -->
@@ -216,10 +216,10 @@
     <string name="tour_privacy_title">MEGA保有隱私</string>
     <!--  -->
     <string name="tour_access_title">MEGA輕鬆存取</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">立即註冊並獲得20 GB起的免費空間</string>
     <!--  -->
-    <string name="tour_space_text">現在註冊並獲得50GB *免費空間</string>
-    <!--  -->
-    <string name="tour_speed_text">上傳非常快。快速分享給身邊每一位朋友</string>
+    <string name="tour_speed_text">上傳非常快。快速共享給身邊每一位朋友</string>
     <!--  -->
     <string name="tour_privacy_text">使用MEGA的點對點加密技術來保存您的檔案</string>
     <!--  -->
@@ -299,7 +299,7 @@
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">相機上傳</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
-    <string name="tab_incoming_shares">傳入</string>
+    <string name="tab_incoming_shares">傳入的</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
     <string name="tab_outgoing_shares">傳出</string>
     <!-- Capital letters. Files with link. The title of a tab -->
@@ -351,7 +351,7 @@
     <!-- Adding new relationships (contacts) using the actions. -->
     <string name="contacts_list_empty_text">使用下方按鈕新增新聯絡人</string>
     <!-- Add new contacts before sharing. -->
-    <string name="contacts_explorer_list_empty_text">新增一個新聯絡人以分享檔案</string>
+    <string name="contacts_explorer_list_empty_text">新增一個新聯絡人以共享檔案</string>
     <!-- Error message -->
     <string name="error_not_enough_free_space">您的裝置可用空間不足</string>
     <!-- This is button text on the Get Link dialog. This lets the user get a public file/folder link without the decryption key e.g. https://mega.nz/#!Qo12lSpT. -->
@@ -393,9 +393,9 @@
     <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
     <string name="intent_not_available_file">您可能未安裝任何支援此檔案類型的應用程式</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
-    <string name="context_share_image">圖片分享使用</string>
+    <string name="context_share_image">圖片共享使用</string>
     <!-- create a link of a file and send it using an app from the device -->
-    <string name="context_get_link">分享連結</string>
+    <string name="context_get_link">共享連結</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">刪除連結</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -405,7 +405,7 @@
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">離開共享</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_clean_shares_menu">移除分享</string>
+    <string name="context_clean_shares_menu">移除共享</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_remove_link_menu">移除連結</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
@@ -467,11 +467,11 @@
     <!-- menu item -->
     <string name="context_send_file">發送檔案至對話中</string>
     <!-- menu item -->
-    <string name="context_send_contact">分享聯絡人至對話中</string>
+    <string name="context_send_contact">共享聯絡人至對話中</string>
     <!-- open a shared folder -->
     <string name="context_view_shared_folders">查看共享資料夾</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_sharing_folder">分享</string>
+    <string name="context_sharing_folder">共享中</string>
     <!-- Menu option to manage a shared folder. -->
     <string name="manage_share">管理共享</string>
     <!-- menu item -->
@@ -575,13 +575,13 @@
     <!-- error message when removing several contacts -->
     <string name="number_contact_not_removed">未能移除%d個聯絡人</string>
     <!-- success message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_shared_correctly">已成功與%d聯絡人分享資料夾</string>
+    <string name="number_contact_file_shared_correctly">已成功與%d聯絡人共享資料夾</string>
     <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">未能分享檔案給%d個聯絡人</string>
+    <string name="number_contact_file_not_shared_">未能共享檔案給%d個聯絡人</string>
     <!-- success message when sharing multiple files -->
-    <string name="number_correctly_shared">已成功分享%d個資料夾</string>
+    <string name="number_correctly_shared">已成功共享%d個資料夾</string>
     <!-- error message when sharing multiple files -->
-    <string name="number_no_shared">未能分享%d個資料夾</string>
+    <string name="number_no_shared">未能共享%d個資料夾</string>
     <!-- success message when sending a file to a contact -->
     <string name="context_correctly_copied_contact">已發送至：</string>
     <!-- success message when removing all the contacts of a shared folder -->
@@ -642,11 +642,9 @@
     <string name="upload_to_filesystem_from">選擇自</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">已上傳</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">檔案處理中</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
-        <item quantity="other">檔案處理中</item>
+        <item quantity="other">處理檔案中</item>
     </plurals>
     <!-- error message when downloading a file -->
     <string name="error_temporary_unavaible">資源暫時無法使用，請稍後再試。</string>
@@ -745,7 +743,7 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">影片壓縮很耗電力；如果要壓縮的影片大小超過%s，MEGA將會要求您主動為裝置充電。</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">如果啟用，您將上傳關於相片拍攝位置的資訊，所以分享時請格外小心。</string>
+    <string name="settings_camera_upload_include_gps_helper_label">如果啟用，您將上傳關於相片拍攝位置的資訊，所以共享時請格外小心。</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">進階</string>
     <!-- Settings preference title for cache -->
@@ -1097,26 +1095,26 @@
     <string name="invalid_email_title">無效電子郵件地址</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">請檢查電子郵件地址是否正確並再試一次。</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">密碼重設</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">請在下方輸入您的還原金鑰</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">您的密碼已更改。</string>
     <!-- Title of the dialog to park an account -->
-    <string name="park_account_dialog_title">封存帳戶</string>
+    <string name="park_account_dialog_title">停用帳戶</string>
     <!-- Button to park an account -->
-    <string name="park_account_button">封存</string>
+    <string name="park_account_button">停用</string>
     <!-- Title of the screen to park an account -->
     <string name="park_account_title">噢！</string>
     <!-- First paragraph of the screen to park an account -->
     <string name="park_account_first_paragraph">因我們嚴謹的點對點加密規範，如果您沒有密碼或還原金鑰，將會無法存取您的資料。</string>
     <!-- Second paragraph of the screen to park an account -->
-    <string name="park_account_second_paragraph">您可以先封存現有的帳戶，再以同一個電子信箱重新註冊。您的資料將會被保存至少60天。在這之間，如果您回想起您此一封存帳戶的密碼，請聯繫 support&#64;mega.nz 以尋求復原協助。</string>
+    <string name="park_account_second_paragraph">您可以先停用現有的帳戶，再以同一個電子信箱重新註冊。您的資料將會被保存至少60天。在這之間，如果您回想起您此一停用帳戶的密碼，請聯繫 support&#64;mega.nz 以尋求復原協助。</string>
     <!-- Text of the dialog message to ask for the link to park the account -->
-    <string name="dialog_park_account">請於下方輸入您的電子郵件地址。您將收到還原金鑰連結，讓您可以封存您的帳戶。</string>
+    <string name="dialog_park_account">請於下方輸入您的電子郵件地址。您將收到還原金鑰連結，讓您可以停用您的帳戶。</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">這是封存您的帳戶的最後一步，請輸入您的新密碼。您的資料將被保留至少60天。如果您之後想起了您已封存帳戶的密碼，請聯繫 support&#64;mega.nz 。</string>
+    <string name="park_account_text_last_step">這是停用您的帳戶的最後一步，請輸入您的新密碼。您的資料將被保留至少60天。如果您之後想起了您已停用帳戶的密碼，請聯繫 support&#64;mega.nz 。</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">請輸入新密碼</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1328,7 +1326,7 @@
     <!-- Title of the section to clear the chat content in the Contact Properties screen -->
     <string name="title_properties_chat_clear_chat">清空對話紀錄</string>
     <!-- Title of the section to share the contact in the Contact Properties screen -->
-    <string name="title_properties_chat_share_contact">分享聯絡人</string>
+    <string name="title_properties_chat_share_contact">共享聯絡人</string>
     <!-- Title of the screen to select the ringtone of the calls -->
     <string name="call_ringtone_title">來電鈴聲</string>
     <!-- Title of the screen to select the sound of the notifications -->
@@ -1879,9 +1877,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">邀請朋友以獲得獎勵</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">每筆推薦成功，皆可獲得%1$s的儲存空間和%2$s的傳輸配額</string>
+    <string name="figures_achievements_text_referrals">每推薦1個可獲得%1$s儲存空間獎勵。有效期為365天。</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">獲得%1$s的儲存空間和%2$s的傳輸配額</string>
+    <string name="figures_achievements_text">%1$s儲存空間。有效期為365天。</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">已解鎖的獎勵</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1911,7 +1909,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">如何使用</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">邀請你的朋友建立一個免費的MEGA帳戶，並安裝我們的手機應用程式吧！對於每筆成功的註冊和應用程式安裝，您都會收到免費儲存空間和傳輸配額的獎勵喔。</string>
+    <string name="first_paragraph_achievement_invite_friends">邀請你的朋友建立一個免費的MEGA帳戶，並安裝我們的手機應用程式。對於每筆成功的註冊和應用程式的安裝，您都會收到額外儲存空間的獎勵。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">如果受邀人使用過MEGA，您恐怕就無法獲得推薦獎勵了，而我們也不會發送相關通知給您。小提醒，受邀的聯絡人必須在其裝置上安裝MEGA手機應用程式或MEGA桌面應用程式喔。</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1925,17 +1923,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">電子郵件格式錯誤</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">您安裝MEGAsync後，將會獲得免費的%1$s儲存空間與%2$s傳輸配額，兩者的有效期限皆為180天。MEGA桌面應用程式可於Windows、MacOS和大多數的Linux發行版中使用。</string>
+    <string name="paragraph_info_achievement_install_desktop">當您安裝MEGA桌面應用程式時，您可免費獲得%1$s的儲存空間，有效期為365天。 MEGA桌面應用程式可在Windows、macOS和大多數Linux發行版使用。</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">安裝我們的手機應用程式後，您就可以獲得%1$s的免費儲存空間與%2$s的傳輸配額，兩者有效期皆為180天。無論在iOS、Android或Windows Phone系統中，您都可以找到我們的手機應用程式。</string>
+    <string name="paragraph_info_achievement_install_mobile_app">安裝我們的手機應用程式後，您可以免費獲得%1$s儲存空間，有效期為365天。無論在iOS、Android或Windows Phone系統中，您都可以找到我們的手機應用程式。</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">當您驗證您的手機門號時您將獲得%1$s免費儲存空間以及%2$s傳輸配額，兩者有效期皆為180天。</string>
+    <string name="paragraph_info_achievement_add_phone">當您驗證您的手機號碼時您將免費獲得%1$s儲存空間，有效期為365天。</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">因為您安裝了我們的MEGA桌面應用程式，您已獲得%1$s的儲存空間和%2$s的傳輸配額。</string>
+    <string name="result_paragraph_info_achievement_install_desktop">您已經安裝我們的MEGA桌面應用程式而獲得%1$s儲存空間過了。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">因為您安裝了我們的手機應用程式，您已獲得%1$s儲存空間以及%2$s傳輸配額。</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">您已經安裝我們的手機應用程式而獲得%1$s儲存空間過了。</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">因為您驗證了您的手機門號，您已獲得%1$s免費儲存空間以及%2$s傳輸配額。</string>
+    <string name="result_paragraph_info_achievement_add_phone">您已經因為驗證您的手機號碼而獲得%1$s儲存空間獎勵</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已經收到%1$s的儲存空間，這是免費的註冊獎勵喔。</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2015,7 +2013,7 @@
         <item quantity="other">在繼續操作之前，請命名您的檔案名稱</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
-    <string name="audio_play">音訊檔案</string>
+    <string name="audio_play">音樂檔案</string>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
     <string name="corrupt_pdf_dialog_text">發生錯誤。PDF檔案已損毀或不存在。</string>
     <!-- Label to include info of the user email in the feedback form -->
@@ -2087,7 +2085,7 @@
     <!-- Text of dialog shown when multiple contacts request has been sent -->
     <string name="invite_sent_text_multi">用戶已被邀請。一旦他們接受邀請，將會出現在您的聯絡人列表。</string>
     <!-- Text shown when it tries to share the QR and occurs an error to process the action -->
-    <string name="error_share_qr">嘗試分享QR檔案時發生錯誤，也許是因為檔案不存在，請稍後再試。</string>
+    <string name="error_share_qr">嘗試共享QR檔案時發生錯誤，也許是因為檔案不存在，請稍後再試。</string>
     <!-- Text shown when it tries to upload to Cloud Drive the QR and occurs an error to process the action -->
     <string name="error_upload_qr">嘗試上傳QR檔案時發生錯誤，也許是因為檔案不存在，請稍後再試。</string>
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
@@ -2193,7 +2191,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">由於多次違反MEGA的服務條款，您的帳戶已被暫停使用。請至您的電子信箱收信以了解詳情。</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">您的帳戶因違反MEGA的服務條款而被終止，例如：侵犯他人權益、分享和/或匯入非法資料，或濫用系統資源。</string>
+    <string name="account_suspended_breache_ToS">您的帳戶因違反MEGA的服務條款而被終止，例如：侵犯他人權益、共享和/或匯入非法資料，或濫用系統資源。</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">檔案載入中</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2496,9 +2494,9 @@
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">您需要身份驗證應用程式才能在MEGA上啟用2FA雙重驗證。您可以在手機或平板電腦裡下載並安裝Google Authenticator、Duo Mobile，Authy或Microsoft Authenticator應用程式。</string>
     <!-- success message when importing multiple files from -->
-    <string name="number_correctly_imported_from_chat">已成功分享%d個檔案</string>
+    <string name="number_correctly_imported_from_chat">已成功共享%d個檔案</string>
     <!-- error message when importing multiple files from chat -->
-    <string name="number_no_imported_from_chat">未能分享%d個檔案</string>
+    <string name="number_no_imported_from_chat">未能共享%d個檔案</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">預覽內容</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
@@ -2588,7 +2586,7 @@
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
     <string name="invite_contacts">邀請聯絡人</string>
     <!-- Label shown when the user wants to share something with other contacts -->
-    <string name="share_with">與&#8230;分享</string>
+    <string name="share_with">與&#8230;共享</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading_share">載入聯絡人&#8230;</string>
     <!-- Title of the screen New Group -->
@@ -2610,7 +2608,7 @@
     <!-- subtitle of the option in Settings to delete all the versions of the account -->
     <string name="settings_file_management_subtitle_delete_versions">所有當前版本檔案將保留。僅歷史版本的檔案會被刪除。</string>
     <!-- Text of the dialog to delete all the file versions of the account -->
-    <string name="text_confirmation_dialog_delete_versions">您即將刪除所有檔案的歷史版本記錄。由聯絡人分享給您的任何檔案版本都只有對方能刪除。\n\n請注意，當前的這個檔案不會被刪除。</string>
+    <string name="text_confirmation_dialog_delete_versions">您即將刪除所有檔案的歷史版本記錄。由聯絡人共享給您的任何檔案版本都只有對方能刪除。\n\n請注意，當前的這個檔案不會被刪除。</string>
     <!-- success message when deleting all the versions of the account -->
     <string name="success_delete_versions">已成功刪除檔案版本</string>
     <!-- error message when deleting all the versions of the account -->
@@ -2630,7 +2628,7 @@
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
     <string name="confirmation_invite_contact_already_added">您已新增聯絡人%s。</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
-    <string name="confirmation_share_contact">要與%s分享？</string>
+    <string name="confirmation_share_contact">要與%s共享？</string>
     <!-- Text button for init a group chat -->
     <string name="new_group_chat_label">新群組對話</string>
     <!-- Label shown when the user wants to add contacts into a chat conversation -->
@@ -2980,11 +2978,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">設定MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA需存取您的相片、媒體與檔案，好讓您可與朋友分享、交換加密訊息與進行安全通話。</string>
+    <string name="setup_mega_explanation">MEGA需存取您的相片、媒體與檔案，好讓您可與朋友共享、交換加密訊息與進行安全通話。</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">允許存取相片、媒體與檔案。</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">為了分享相片、媒體與檔案，MEGA需要您的允許。</string>
+    <string name="allow_acces_media_subtitle">為了共享相片、媒體與檔案，MEGA需要您的允許。</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">啟用相機</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -3258,7 +3256,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">使用點對點加密安全地與您的聯絡人對話</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">嗨！一起在MEGA上與我進行安全的對談，並且獲得高達50GB的免費儲存空間。%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">嗨！一起在MEGA上與我進行安全的對談，並且獲得高達20 GB起的免費儲存空間。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">沒有可用的對話連結。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3612,7 +3610,7 @@
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
     <string name="retention_history_disabled">[A]%1$s[/A][B]停用訊息清除功能。[/B]</string>
     <!-- Subtitle of the section to clear the chat content in the Manage chat history screen -->
-    <string name="subtitle_properties_chat_clear">刪除此對話中所有訊息和分享的檔案。此動作是無法復原的。</string>
+    <string name="subtitle_properties_chat_clear">刪除此對話中所有訊息和共享的檔案。此動作是無法復原的。</string>
     <!-- Title of the history retention option -->
     <string name="title_properties_history_retention">歷史記錄清除</string>
     <!-- Subtitle of the history retention option when history retention is disabled -->
@@ -3678,7 +3676,7 @@
     <!-- Label key referring to a link decryption key -->
     <string name="key_label">金鑰</string>
     <!-- Button which action is share the decryption key of a link -->
-    <string name="button_share_key">分享金鑰</string>
+    <string name="button_share_key">共享金鑰</string>
     <!-- Button which action is copy the decryption key of a link -->
     <string name="button_copy_key">複製金鑰</string>
     <!-- Button which action is copy the password of a link -->
@@ -3704,17 +3702,17 @@
     <!-- Reset password label -->
     <string name="reset_password_label">重設密碼</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
-    <string name="share_key_warning">分享此連結的金鑰？</string>
+    <string name="share_key_warning">共享此連結的金鑰？</string>
     <!-- Warning show to the user when has set a password protection of a link and tries to share the link -->
-    <string name="share_password_warning">分享此連結的密碼？</string>
+    <string name="share_password_warning">共享此連結的密碼？</string>
     <!-- Button which action is share the password of a link -->
-    <string name="button_share_password">分享密碼</string>
+    <string name="button_share_password">共享密碼</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
     <string name="share_link_with_key">連結: %1$s\n\n金鑰: %2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">連結: %1$s\n\n密碼: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA需要您的授權才能分享檔案。</string>
+    <string name="files_required_permissions_warning">MEGA需要您的授權才能共享檔案。</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">喜歡</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3855,4 +3853,12 @@
     <string name="action_keep_empty_old_extension">沒有副檔名</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">保留 .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">已經有一個檔案使用相同名稱</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">已經有一個項目使用相同名稱</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">資訊</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">儲存至相簿</string>
 </resources>

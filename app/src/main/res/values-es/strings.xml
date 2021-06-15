@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA ofrece un servicio de almacenamiento en la nube y de chat cifrado y controlado por el usuario a través del navegador web y de la aplicación para dispositivos móviles. A diferencia de otros proveedores de almacenamiento en la nube, tus datos son cifrados y descifrados únicamente en tus dispositivos y nunca por nosotros.\n\nSube tus archivos desde tu smartphone o tablet, luego busca, almacena, descarga, muestra, reproduce, comparte, renombra o elimina tus archivos en cualquier momento, desde cualquier dispositivo, en cualquier lugar. Comparte carpetas con tus contactos y comprueba sus actualizaciones en tiempo real. El cifrado nos impide conocer o restablecer tu contraseña, por lo que DEBES recordarla (o tener una copia de seguridad de tu Clave de recuperación) o perderás el acceso a tus archivos almacenados.\n\nLas videollamadas cifradas punto a punto de MEGA permiten una privacidad absoluta y llevan estando disponibles en el navegador desde 2016. Se proporcionan también en nuestra app para móvil, con el historial de chat accesible a través de múltiples dispositivos. Además los usuarios pueden añadir fácilmente archivos a un chat directamente desde su nube de MEGA.\n\nMEGA brinda un almacenamiento gratuito de 50 GB sujeto al programa de logros para todos los usuarios registrados, y ofrece planes de pago con límites mucho más amplios:\n\n\nSuscripción Pro LITE: 4,99€ al mes o 49,99€ al año, con 400 GB de espacio de almacenamiento y 1 TB de cuota de transferencia al mes.\nSuscripción Pro I: 9,99€ al mes o 99,99€ al año, con 2 TB de espacio de almacenamiento y 2 TB de cuota de transferencia al mes.\nSuscripción Pro II: 19,99€ al mes o 199,99€ al año, con 8 TB de espacio de almacenamiento y 8 TB de cuota de transferencia al mes.\nSuscripción Pro III: 29,99€ al mes o 299,99€ al año, con 16 TB de espacio de almacenamiento y 16 TB de cuota de transferencia al mes.\n\nLa suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente. Para gestionar tu suscripción, ve a la Play Store en tu dispositivo móvil, inicia sesión con tu Google ID (si aún no lo has hecho) y luego pulsa en la aplicación de MEGA. Desde aquí, podrás gestionar tu suscripción.\n\nPermisos de la aplicación:\nWRITE_EXTERNAL_STORAGE -&gt; Descarga tus archivos de MEGA a tu dispositivo y sube archivos desde tu dispositivo a MEGA\nCAMERA -&gt; Haz fotos y súbelas a MEGA\nREAD_CONTACTS -&gt; Añade contactos desde tu dispositivo a MEGA\nRECORD_AUDIO y CAPTURE_VIDEO_OUTPUT (micrófono y cámara) -&gt; MEGA proporciona llamadas y videollamadas cifradas punto a punto\n\n\nPara que los usuarios confíen plenamente en el sistema de MEGA, todo el código del cliente es público y los ingenieros de seguridad podrán evaluar nuestro proceso de cifrado. El código de nuestra aplicación móvil se encuentra en: https://github.com/meganz/android\n\nPara obtener más información, consulta nuestro sitio web:\nhttps://mega.nz/terms\n\n\nDesde ordenador - https://mega.nz/</string>
+    <string name="full_description_text">MEGA ofrece un servicio de almacenamiento en la nube y de chat cifrado y controlado por el usuario a través del navegador y de la aplicación para dispositivos móviles. A diferencia de otros proveedores de almacenamiento en la nube, tus datos son cifrados y descifrados únicamente en tus dispositivos y nunca por nosotros.\n\nSube tus archivos desde tu smartphone o tablet, luego busca, almacena, descarga, muestra, reproduce, comparte, renombra o elimina tus archivos en cualquier momento, desde cualquier dispositivo, en cualquier lugar. Comparte carpetas con tus contactos y comprueba sus actualizaciones en tiempo real. El cifrado nos impide conocer o restablecer tu contraseña, por lo que DEBES recordarla (o tener una copia de seguridad de tu Clave de recuperación) o perderás el acceso a tus archivos almacenados.\n\nLas videollamadas cifradas punto a punto de MEGA permiten una privacidad absoluta y llevan estando disponibles en el navegador desde 2016. Se proporcionan también en nuestra app para móvil, con el historial de chat accesible a través de múltiples dispositivos. Además los usuarios pueden añadir fácilmente archivos a un chat directamente desde su nube de MEGA.\n\nMEGA brinda un almacenamiento gratuito de 50 GB sujeto al programa de logros para todos los usuarios registrados, y ofrece planes de pago con límites mucho más amplios:\n\n\nSuscripción Pro LITE: 4,99€ al mes o 49,99€ al año, con 400 GB de espacio de almacenamiento y 1 TB de cuota de transferencia al mes.\nSuscripción Pro I: 9,99€ al mes o 99,99€ al año, con 2 TB de espacio de almacenamiento y 2 TB de cuota de transferencia al mes.\nSuscripción Pro II: 19,99€ al mes o 199,99€ al año, con 8 TB de espacio de almacenamiento y 8 TB de cuota de transferencia al mes.\nSuscripción Pro III: 29,99€ al mes o 299,99€ al año, con 16 TB de espacio de almacenamiento y 16 TB de cuota de transferencia al mes.\n\nLa suscripción se renueva automáticamente con la misma duración y precio elegidos inicialmente. Para gestionar tu suscripción, ve a la Play Store en tu dispositivo móvil, inicia sesión con tu Google ID (si aún no lo has hecho) y luego pulsa en la aplicación de MEGA. Desde aquí, podrás gestionar tu suscripción.\n\nPermisos de la aplicación:\nWRITE_EXTERNAL_STORAGE -&gt; Descarga tus archivos de MEGA a tu dispositivo y sube archivos desde tu dispositivo a MEGA\nCAMERA -&gt; Haz fotos y súbelas a MEGA\nREAD_CONTACTS -&gt; Añade contactos desde tu dispositivo a MEGA\nRECORD_AUDIO y CAPTURE_VIDEO_OUTPUT (micrófono y cámara) -&gt; MEGA proporciona llamadas y videollamadas cifradas punto a punto\n\n\nPara que los usuarios confíen plenamente en el sistema de MEGA, todo el código del cliente es público y los ingenieros de seguridad podrán evaluar nuestro proceso de cifrado. El código de nuestra aplicación móvil se encuentra en: https://github.com/meganz/android \n\nPara obtener más información, consulta nuestro sitio web:\nhttps://mega.nz/terms \n\n\nDesde ordenador - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA es almacenamiento en la nube con privacidad permanente y sin iguales.</string>
     <!-- PRO Lite account -->
@@ -218,8 +218,8 @@
     <string name="tour_privacy_title">Privacidad en MEGA</string>
     <!--  -->
     <string name="tour_access_title">Acceso a MEGA</string>
-    <!--  -->
-    <string name="tour_space_text">Regístrate ahora y obtén 50 GB de almacenamiento gratuito</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">Regístrate ahora y obtén 20 GB de almacenamiento gratuito</string>
     <!--  -->
     <string name="tour_speed_text">Subidas rápidas. Comparte archivos rápidamente con todo el mundo</string>
     <!--  -->
@@ -651,8 +651,6 @@
     <string name="upload_to_filesystem_from">Escoge de</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">subido</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Procesando archivo</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Procesando archivo</item>
@@ -1109,9 +1107,9 @@
     <string name="invalid_email_title">Correo electrónico no válido</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Por favor, comprueba la dirección de correo electrónico y vuelve a intentarlo.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Restablecer la contraseña</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Introducir la Clave de recuperación</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Tu contraseña ha sido cambiada.</string>
@@ -1921,9 +1919,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invita a tus amigos y gana bonos</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Obtén %1$s de almacenamiento y %2$s de transferencia por cada invitación</string>
+    <string name="figures_achievements_text_referrals">%1$sde almacenamiento por cada invitación. Válido durante 365 días.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">Obtén %1$s de almacenamiento y %2$s de transferencia</string>
+    <string name="figures_achievements_text">%1$s de almacenamiento. Válido durante 365 días.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Bonos desbloqueados:</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1953,7 +1951,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cómo funciona</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invita a tus amigos a crear una cuenta gratuita de MEGA e instalar nuestra aplicación móvil. Por cada registro e instalación de la aplicación, recibirás un bono adicional de almacenamiento y de transferencia.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invita a tus amigos a crear una cuenta gratuita de MEGA e instalar nuestra aplicación móvil. Por cada registro e instalación de la aplicación, recibirás un bono adicional de almacenamiento.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Si invitas a alguien que haya usado MEGA anteriormente no recibirás el bono y tampoco se te notificará. Los contactos invitados tendrán que instalar la aplicación móvil o la aplicación de escritorio de MEGA en sus dispositivos.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1967,17 +1965,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Correo electrónico no válido</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Al instalar MEGAsync, obtienes %1$s de espacio de almacenamiento gratuito más %2$s de cuota de transferencia, ambos válidos por 180 días. La aplicación de escritorio de MEGA está disponible para Windows, macOS y la mayoría de las distribuciones de Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">Al instalar la aplicación de escritorio, obtienes %1$s de almacenamiento adicional válido durante 365 días. La aplicación de escritorio de MEGA está disponible para Windows, macOS y la mayoría de las distribuciones de Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Al instalar nuestra aplicación móvil, obtienes %1$s de espacio de almacenamiento y %2$s de cuota de transferencia, ambos válidos durante 180 días. La aplicación móvil está disponible para iOS, Android y Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Al instalar nuestra aplicación móvil, obtienes %1$s de espacio de almacenamiento válido durante 365 días. La aplicación móvil está disponible para iOS, Android y Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Si confirmas número de teléfono, obtienes %1$s de espacio de almacenamiento gratuito más %2$s de cuota de transferencia, ambos válidos por 180 días.</string>
+    <string name="paragraph_info_achievement_add_phone">Si confirmas tu número de teléfono, obtienes %1$s de espacio de almacenamiento gratuito válido durante 365 días.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Has obtenido %1$s de espacio de almacenamiento y %2$s de cuota de transferencia por haber instalado nuestra aplicación de escritorio.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Has obtenido %1$s de espacio de almacenamiento por instalar nuestra aplicación de escritorio.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Has obtenido %1$s de espacio de almacenamiento y %2$s de cuota de transferencia por haber instalado nuestra aplicación para móvil.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Has obtenido %1$s de espacio de almacenamiento por instalar nuestra aplicación para móvil.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Has recibido %1$s de espacio de almacenamiento y %2$s de cuota de transferencia por haber verificado tu número de teléfono.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Has obtenido %1$s de espacio de almacenamiento por verificar tu número de teléfono.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Has obtenido %1$s de espacio de almacenamiento por haberte registrado.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2509,7 +2507,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La próxima vez que inicies sesión en su cuenta, tendrás que introducir un código de 6 dígitos proporcionado por tu aplicación de autenticación.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Considera exportar tu <b>Clave de recuperación</b> en caso de que pierdas el acceso a tu aplicación o quieras desactivar la autenticación de dos factores en el futuro.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Código no valido</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -3334,7 +3332,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Chatea de forma segura con tus contactos mediante el cifrado punto a punto</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">¡Hola! Habla conmigo de forma segura y obtén hasta 50 GB de almacenamiento gratuito. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">¡Hola! Habla conmigo de forma segura en MEGA y obtén 20 GB de almacenamiento gratuito. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Link de chat no disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3942,4 +3940,12 @@
     <string name="action_keep_empty_old_extension">Sin extensión</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Dejar .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">Ya existe un archivo con el mismo nombre</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">Ya existe un elemento con el mismo nombre</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Información</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Guardar en la galería</string>
 </resources>
