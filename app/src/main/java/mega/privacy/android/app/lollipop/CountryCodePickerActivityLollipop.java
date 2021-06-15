@@ -181,6 +181,7 @@ public class CountryCodePickerActivityLollipop extends PasscodeActivity implemen
 
     @Override
     public void onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return;
         finish();
     }
 

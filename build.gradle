@@ -49,8 +49,8 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "4.1.2"
-    versionCode = 371
+    appVersion = "4.1.5"
+    versionCode = 381
 
     // Sdk and tools
     compileSdkVersion = 29

@@ -267,9 +267,6 @@
     <!-- Date picker background color -->
     <color name="white_grey_800">@color/white</color>
 
-    <!-- My QR code fragment background color -->
-    <color name="white_grey_700">@color/white</color>
-
     <!-- Emoji keyboard background -->
     <color name="grey_010_grey_800">@color/grey_010</color>
 
@@ -417,6 +414,18 @@
     <!-- Error text highlight color (selection background), import to MEGA screen-->
     <color name="teal_100_teal_500">@color/teal_100</color>
 
+    <!-- QR code page background color -->
+    <color name="white_grey_700">@color/white</color>
+
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/white_alpha_090</color>
+
+    <!--  SnackBar background  -->
+    <color name="grey_alpha_087_white">@color/grey_alpha_087</color>
+
+    <!--  SnackBar text  -->
+    <color name="white_alpha_087_grey_alpha_087">@color/white_alpha_087</color>
+
+    <!--  SnackBar Button text  -->
+    <color name="teal_200_teal_300">@color/teal_200</color>
 </resources>

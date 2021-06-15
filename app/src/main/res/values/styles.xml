@@ -162,6 +162,18 @@
         <item name="android:minHeight">0dp</item>
     </style>
 
+    <!--- SnackBar -->
+    <style name="Widget.Mega.SnackBar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="actionTextColorAlpha">1</item>
+        <item name="backgroundTintMode">add</item>
+        <item name="backgroundTint">@color/grey_alpha_087_white</item>
+        <item name="textColor">@color/white_alpha_087_grey_alpha_087</item>
+    </style>
+
+    <style name="Widget.Mega.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">@color/teal_200_teal_300</item>
+    </style>
+
     <!--- SeekBar white, chat room own voice clip -->
     <style name="Widget.Mega.SeekBar.White" parent="Widget.AppCompat.SeekBar">
         <item name="android:progressBackgroundTint">@color/white_alpha_038</item>
@@ -281,7 +293,6 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:text">@string/title_achievement_invite_friends</item>
         <item name="android:layout_marginTop">24dp</item>
-        <item name="android:layout_marginBottom">24dp</item>
         <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Variant</item>
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:textColor">@color/dark_blue_500_200</item>
@@ -290,6 +301,7 @@
     <style name="how_works_first_p">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">24dp</item>
         <item name="android:layout_marginBottom">16dp</item>
         <item name="android:layout_marginLeft">24dp</item>
         <item name="android:layout_marginRight">24dp</item>
@@ -528,6 +540,15 @@
         <item name="android:paddingStart">18dp</item>
         <item name="android:paddingEnd">18dp</item>
         <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
         <item name="drawableTint">?android:attr/textColorSecondary</item>
     </style>
+
+    <style name="BottomSheetOption.Red">
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Red</item>
+        <item name="drawableTint">@color/red_600_red_300</item>
+    </style>
+
 </resources>

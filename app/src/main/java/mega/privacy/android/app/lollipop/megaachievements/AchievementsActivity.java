@@ -189,7 +189,7 @@ public class AchievementsActivity extends PasscodeActivity {
     @Override
     public void onBackPressed() {
         logDebug("onBackPressedLollipop");
-
+        if (psaWebBrowser.consumeBack()) return;
         if(getSupportFragmentManager().findFragmentById(R.id.fragment_container_achievements) instanceof AchievementsFragment){
             // GC the fetcher as user manually leave the activity
             sFetcher.setDataCallback(null);

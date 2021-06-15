@@ -344,10 +344,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				logDebug("TYPE_FETCH_NODES");
 				if (e.getErrorCode() == MegaError.API_OK){
 					askForFullAccountInfo();
-					GetAttrUserListener listener = new GetAttrUserListener(getApplicationContext(), true);
+
+					GetAttrUserListener listener = new GetAttrUserListener(getApplicationContext());
+					megaApi.shouldShowRichLinkWarning(listener);
+					megaApi.isRichPreviewsEnabled(listener);
+
+					listener = new GetAttrUserListener(getApplicationContext(), true);
 					if (dbH != null && dbH.getMyChatFilesFolderHandle() == INVALID_HANDLE) {
 						megaApi.getMyChatFilesFolder(listener);
 					}
+
 					//Ask for MU and CU folder when App in init state
 					logDebug("Get CU attribute on fetch nodes.");
 					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));

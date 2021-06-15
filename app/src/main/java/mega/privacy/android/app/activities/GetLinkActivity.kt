@@ -8,7 +8,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
@@ -28,7 +27,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.util.*
 
-class GetLinkActivity : BaseActivity(), GetLinkInterface, SnackbarShower {
+class GetLinkActivity : PasscodeActivity(), GetLinkInterface, SnackbarShower {
     companion object {
         const val GET_LINK_FRAGMENT = 0
         const val COPYRIGHT_FRAGMENT = 1
@@ -441,6 +440,7 @@ class GetLinkActivity : BaseActivity(), GetLinkInterface, SnackbarShower {
     }
 
     override fun onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return
         if (visibleFragment == DECRYPTION_KEY_FRAGMENT || visibleFragment == PASSWORD_FRAGMENT) {
             if (visibleFragment == PASSWORD_FRAGMENT) {
                 passwordFragment.resetView()

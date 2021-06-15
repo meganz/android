@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX;
+
 /*
  * Mime type for files
  */
@@ -102,39 +104,45 @@ public class MimeTypeList {
 			name = "";
 		}
 		String fixedName = name.trim().toLowerCase();
-		String extension = null;
+		String extension = "";
 		int index = fixedName.lastIndexOf(".");
-		if((index != -1) && ((index+1)<fixedName.length())) {
+
+		if (index != INVALID_INDEX && index + 1 < fixedName.length()) {
 			extension = fixedName.substring(index + 1);
-		} else {
-			extension = fixedName;
 		}
+
 		String detectedType = MimeTypeMap.getSingleton()
 				.getMimeTypeFromExtension(extension);
+
 		if (detectedType == null) {
-			if(extension.equals("mkv")) {
-				detectedType = "video/x-matroska";
-			}
-			else if (extension.equals("heic")) {
-				detectedType = "image/heic";
-			}
-			else if (extension.equals("url")) {
-				detectedType = "web/url";
-			}else if(extension.equals("webp")) {
-				detectedType = "image/webp";
-			}
-			else {
-				detectedType = "application/octet-stream";
+			switch (extension) {
+				case "mkv":
+					detectedType = "video/x-matroska";
+					break;
+				case "heic":
+					detectedType = "image/heic";
+					break;
+				case "url":
+					detectedType = "web/url";
+					break;
+				case "webp":
+					detectedType = "image/webp";
+					break;
+				default:
+					detectedType = "application/octet-stream";
+					break;
 			}
 		}
-		if (extension == null) {
-			extension = "";
-		}
+
 		return new MimeTypeList(detectedType, extension);
 	}
 
 	public String getType() {
 		return type;
+	}
+
+	public String getExtension() {
+		return extension;
 	}
 	
 	public boolean isDocument(){
@@ -275,7 +283,7 @@ public class MimeTypeList {
 	 *
 	 * @return True if the file is openable, false otherwise.
 	 */
-	private boolean isValidTextFileType() {
+	public boolean isValidTextFileType() {
 				//Text
 		return type.startsWith("text/plain")
 
