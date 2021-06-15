@@ -2096,7 +2096,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             return
         }
 
-        shareLink()
+        if (sendLink)
+            shareLink()
     }
 
     fun shareLink() {
