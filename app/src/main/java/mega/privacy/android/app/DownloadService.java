@@ -51,6 +51,7 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
+import mega.privacy.android.app.utils.RatingUtil;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -156,6 +157,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private final CompositeDisposable rxSubscriptions = new CompositeDisposable();
 	private final Handler uiHandler = new Handler(Looper.getMainLooper());
+	private boolean isRatingShowed = false;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -1317,6 +1319,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
 			logDebug("Progress: " + progressPercent + "%");
 
+			showRating(this, totalSizePendingTransfer, megaApi.getCurrentDownloadSpeed());
+
 			String message = "";
 			if (totalTransfers == 0){
 				message = getString(R.string.download_preparing_files);
@@ -1426,6 +1430,20 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			} else {
 				mNotificationManager.notify(NOTIFICATION_DOWNLOAD, notification);
 			}
+		}
+	}
+
+	/**
+	 * Determine if should show the rating page to users
+	 *
+	 * @param context
+	 * @param total the total size of uploading file
+	 * @param currentDownloadSpeed current downloading speed
+	 */
+	private void showRating(Context context, long total, int currentDownloadSpeed) {
+		if (!isRatingShowed) {
+			new RatingUtil()
+					.showReviewDialogBaseOnCondition(context, total, currentDownloadSpeed, () -> isRatingShowed = true);
 		}
 	}
 
