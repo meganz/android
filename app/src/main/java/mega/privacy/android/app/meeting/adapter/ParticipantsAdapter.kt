@@ -86,7 +86,7 @@ class ParticipantsAdapter(
         }
 
         val participant = participants.last()
-        participant.isModerator = true
+        participant.isModerator = inMeetingViewModel.isParticipantModerator(peerId)
         val index = localList.indexOf(participant)
         notifyItemChanged(index, participant)
     }

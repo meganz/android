@@ -791,7 +791,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method to know if the participant is a moderator.
      */
-    private fun isParticipantModerator(peerId: Long): Boolean {
+    fun isParticipantModerator(peerId: Long): Boolean {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             val privileges = it.getPeerPrivilegeByHandle(peerId)
             return privileges == MegaChatRoom.PRIV_MODERATOR
