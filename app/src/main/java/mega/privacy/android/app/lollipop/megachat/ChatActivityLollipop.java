@@ -3699,6 +3699,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     @Override
     public void onBackPressed() {
         logDebug("onBackPressed");
+        if (psaWebBrowser.consumeBack()) return;
+
         retryConnectionsAndSignalPresence();
         if (emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
             emojiKeyboard.hideBothKeyboard(this);
@@ -4731,6 +4733,10 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void downloadNodeList(MegaNodeList nodeList) {
         nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true,
                 false);
+    }
+
+    public void saveNodesToGallery(List<MegaNode> nodes) {
+        nodeSaver.saveNodes(nodes, false, false, false, true, true);
     }
 
     public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messages, final MegaChatRoom chat){

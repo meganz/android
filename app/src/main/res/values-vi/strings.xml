@@ -216,8 +216,8 @@
     <string name="tour_privacy_title">An Ninh MEGA</string>
     <!--  -->
     <string name="tour_access_title">Truy Cập MEGA</string>
-    <!--  -->
-    <string name="tour_space_text">Đăng ký ngay và nhận miễn phí ngay 50 GB* không gian lưu trữ</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">Đăng ký ngay và nhận miễn phí ngay 20+ GB không gian lưu trữ</string>
     <!--  -->
     <string name="tour_speed_text">Upload cực nhanh. Chia sẻ dữ liệu với mọi người thật nhanh chóng</string>
     <!--  -->
@@ -267,7 +267,7 @@
     <!-- The name of every users root drive in the cloud of MEGA. -->
     <string name="section_cloud_drive">Ổ Mây</string>
     <!-- Label to reference a recents section -->
-    <string name="section_recents">Sử Dụng Mới Đây</string>
+    <string name="section_recents">Sử Dụng Gần Đây</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
     <string name="section_secondary_media_uploads">Media Uploads</string>
     <!-- Section name for the “Messages” section.Preferably one word. There is little space for this word. -->
@@ -633,7 +633,7 @@
     <!-- upload to. Then choose an Image file -->
     <string name="upload_to_image">Hình</string>
     <!-- upload to. Then choose an Audio file -->
-    <string name="upload_to_audio">Thoại</string>
+    <string name="upload_to_audio">Âm Thanh</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">Video</string>
     <!-- upload to. Then choose to browse the file system to choose a file -->
@@ -1097,9 +1097,9 @@
     <string name="invalid_email_title">Địa chỉ email không phù hợp</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Xin vui lòng kiểm tra địa chỉ email và thử lại.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Đặt lại mật khẩu</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Xin nhập Mã Khóa Phục Hồi ở dưới đây</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Bạn vừa đổi mật khẩu.</string>
@@ -1861,7 +1861,7 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Đang loại bỏ tên liên lạc khỏi mục chia sẻ</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">Bỏ vào thùng rác?</string>
+    <string name="confirmation_move_to_rubbish">Chuyển vào Thùng Rác?</string>
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Bạn có chắc muốn chuyển thư mục này vào Thùng Rác? Thao tác ngày sẽ tắt Camera Uploads.</string>
     <!-- Confirmation message before removing MU folder -->
@@ -1879,9 +1879,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Mời bạn bè tham gia và nhận thưởng</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Nhận thêm %1$s vào không gian lưu trữ và %2$s để truyền tải cho mỗi lời giới thiệu bạn bè</string>
+    <string name="figures_achievements_text_referrals">%1$s vào không gian lưu trữ cho mỗi lần mời. Hạn dùng là 365 ngày.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">Nhận thêm %1$s vào không gian lưu trữ và %2$s để truyền tải</string>
+    <string name="figures_achievements_text">%1$s vào không gian lưu trữ. Hạn dùng là 365 ngày.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Phần thưởng đã nhận</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1911,7 +1911,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cách hoạt động</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Mời bạn bè tham gia tạo tài khoản MEGA miễn phí và cài đặt ứng dụng trên thiết bị di động. Bạn sẽ nhận được thưởng thêm không gian lưu trữ và băng thông cho mỗi lần đăng ký và cài đặt thành công.</string>
+    <string name="first_paragraph_achievement_invite_friends">Mời bạn bè tham gia tạo tài khoản MEGA miễn phí và cài đặt ứng dụng trên thiết bị di động. Bạn sẽ nhận được thưởng thêm không gian lưu trữ cho mỗi lần đăng ký và cài đặt thành công.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bạn sẽ không nhận được thưởng khi gửi lời mời tới những người đã có sẵn tài khoản với MEGA, hệ thống sẽ không gửi thông báo nào cho biết rằng lời mời đã bị từ chối. Những người được mời cần phải cài app trên điện thoại hay máy tính của mình.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1925,17 +1925,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Địa chỉ email không đúng cú pháp</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Sau khi cài đặt MEGAsync trên máy tính, bạn sẽ nhận được thêm %1$s cho không gian lưu trữ và %2$s cho băng thông truyền tải, hạn sử dụng là 180 ngày. Chúng tôi còn có chưởng trình dành cho Windows, macOS và đa số các máy Linux distros.</string>
+    <string name="paragraph_info_achievement_install_desktop">Sau khi cài đặt MEGA trên máy tính, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, có hạn sử dụng là 365 ngày. MEGA còn có apps dành cho Windows, macOS và đa số các máy Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Sau khi cài đặt ứng dụng MEGA trên điện thoại, bạn sẽ nhận được thêm %1$s cho không gian lưu trữ và %2$s cho băng thông truyền tải, hạn sử dụng là 180 ngày. Chúng tôi còn có ứng dụng dành cho iOS, Android, và Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Sau khi cài đặt ứng dụng MEGA trên điện thoại, bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, hạn sử dụng là 365 ngày. Chúng tôi còn có ứng dụng di động dành cho iOS, Android, và Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Sau khi xác thực số điện thoại bạn sẽ nhận được thêm %1$s cho không gian lưu trữ và %2$s cho băng thông truyền tải, hạn sử dụng là 180 ngày.</string>
+    <string name="paragraph_info_achievement_add_phone">Sau khi xác thực số điện thoại bạn sẽ nhận được thêm %1$s vào không gian lưu trữ, hạn sử dụng là 365 ngày.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Bạn đã nhận được %1$s không gian lưu trữ và %2$s cho băng thông truyền tải từ việc cài ứng dụng MEGA cho máy tính.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Bạn đã nhận được %1$s không gian lưu trữ từ việc cài ứng dụng MEGA cho máy tính.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Bạn đã nhận được %1$s không gian lưu trữ và %2$s cho băng thông truyền tải từ việc cài MEGA trên trên điện thoại.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Bạn đã nhận được %1$s không gian lưu trữ từ việc cài ứng dụng MEGA cho dI động.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Tài khoản đã nhận thêm được %1$s không gian lưu trữ và %2$s băng thông truyền tải qua việc xác thực số điện thoại thành công.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Bạn đã nhận được %1$s không gian lưu trữ từ việc xác thực số điện thoại thành công.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Bạn đã nhận được %1$s không gian lưu trữ từ việc đăng ký tài khoản.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2222,10 +2222,10 @@
     <string name="label_mega_byte">MB</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
     <plurals name="number_of_versions">
-        <item quantity="other">%1$d phiên bản</item>
+        <item quantity="other">%1$d phiên bản lưu</item>
     </plurals>
     <!-- Title of the section Versions for files -->
-    <string name="title_section_versions">Các phiên bản</string>
+    <string name="title_section_versions">Phiên bản lưu</string>
     <!-- Header of the item to show the current version of a file in a list -->
     <string name="header_current_section_item">Phiên bản hiện tại</string>
     <!--  -->
@@ -2262,9 +2262,9 @@
     <!-- Refers to a location of file -->
     <string name="file_properties_info_location">Vị trí</string>
     <!-- Title of the label to show the size of the current files inside a folder -->
-    <string name="file_properties_folder_current_versions">Số phiên bản hiện có</string>
+    <string name="file_properties_folder_current_versions">Phiên bản hiện tại</string>
     <!-- Title of the label to show the size of the versioned files inside a folder -->
-    <string name="file_properties_folder_previous_versions">Lich sử phiên bản của các tệp tin</string>
+    <string name="file_properties_folder_previous_versions">Các phiên bản trước</string>
     <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
     <plurals name="number_of_versions_inside_folder">
         <item quantity="other">%1$d têp tin có phiên bản</item>
@@ -2600,13 +2600,13 @@
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
     <string name="confirmation_delete_contact">Loại bỏ %s khỏi cuộc chát?</string>
     <!-- Settings preference title to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_title">Phiên bản tệp tin</string>
+    <string name="settings_file_management_file_versions_title">Phiên bản lưu tệp tin</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <string name="settings_file_management_file_versions_subtitle">Có %1$d mục lịch sử phiên bản tệp tin, chiếm dụng %2$s</string>
     <!-- Title of the section File management on Settings section -->
     <string name="settings_file_management_category">Quản Lý Tệp Tin</string>
     <!-- Option in Settings to delete all the versions of the account -->
-    <string name="settings_file_management_delete_versions">Xóa hết tất cả các phiên bản cũ đang ghi nhớ</string>
+    <string name="settings_file_management_delete_versions">Xóa hết tất cả các phiên bản cũ đang lưu</string>
     <!-- subtitle of the option in Settings to delete all the versions of the account -->
     <string name="settings_file_management_subtitle_delete_versions">Tất cả các tệp tin đều được giữ nguyên. Chỉ có các nội dung ghi lại phiên bản lịch sử tệp tin sẽ bị xoá.</string>
     <!-- Text of the dialog to delete all the file versions of the account -->
@@ -3130,7 +3130,7 @@
     <!-- Action delete all file versions -->
     <string name="delete_versions">Xoá các phiên bản cũ</string>
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
-    <string name="title_delete_version_history">Xóa các phiên bản cũ?</string>
+    <string name="title_delete_version_history">Xoá các phiên bản cũ?</string>
     <!-- Text of the dialog shown when it wants to delete the version history of a file -->
     <string name="text_delete_version_history">Xin lưu ý rằng tệp tin hiện hành trong tài khoản sẽ không bị xóa đi.</string>
     <!-- Alert shown when the version history was deleted correctly -->
@@ -3214,13 +3214,13 @@
     <!-- Subtitle of the call screen when a participant puts the call on hold. The placeholder indicates the user who put the call on hold -->
     <string name="session_on_hold">Cuộc gọi với %s đang giữ</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
-    <string name="hold_and_answer_call_incoming">Giữ hiện tại &amp; Trả lời cuộc gọi đến</string>
+    <string name="hold_and_answer_call_incoming">Trả lời &amp; Tạm giữ cuộc hiện tại</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
-    <string name="hold_and_join_call_incoming">Giữ hiện tại &amp; Tham gia cuộc gọi đến</string>
+    <string name="hold_and_join_call_incoming">Tham gia &amp; Tạm giữ cuộc hiện tại</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other. -->
-    <string name="end_and_answer_call_incoming">Kết thúc hiện tại &amp; Trả lời cuộc gọi đến</string>
+    <string name="end_and_answer_call_incoming">Trả lời &amp; Kết thúc cuộc hiện tại</string>
     <!-- The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other. -->
-    <string name="end_and_join_call_incoming">Kết thúc hiện tại &amp; Tham gia cuộc gọi đến</string>
+    <string name="end_and_join_call_incoming">Tham gia &amp; Kết thúc cuộc hiện tại</string>
     <!-- when trying to download a file that is already downloaded in the device and has to copy in another path -->
     <string name="copy_already_downloaded">Tệp tin đã được tải xuống từ trước. Bản sao đã được tạo ra ở vị trí đã chọn.</string>
     <!-- Title of the dialog shown when you want to join a group call -->
@@ -3258,7 +3258,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Mở một cuộc trò chuyện với các tên liên lạc nằm trong danh sách, với tính bảo mật tối ưu</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Xin chào! Mời bạn cùng sử dụng MEGA để có ngay 50 GB không gian lưu trữ miễn phí và công cụ giao tiếp bảo mật. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Xin chào! Mời bạn cùng sử dụng MEGA để có ngay 20+ GB không gian lưu trữ miễn phí và công cụ giao tiếp bảo mật. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Không có liên kết nào cả.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3300,11 +3300,11 @@
     <!-- Title of the create account screen -->
     <string name="create_account_title">Tạo tài khoản MEGA</string>
     <!-- Label to reference a recents section -->
-    <string name="recents_label">Sử Dụng Mới Đây</string>
+    <string name="recents_label">Sử Dụng Gần Đây</string>
     <!-- Label to reference a chats section -->
     <string name="chats_label">Cuộc chát</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Không có tệp tin nào trong [/B][A]Sử Dụng Mới Đây[/A]</string>
+    <string name="context_empty_recents">[B]Không có tệp tin nào trong [/B][A]Sử Dụng Gần Đây[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s và %2$d mục nữa</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3566,7 +3566,7 @@
     <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
     <string name="label_contact_credentials">Chứng thực của %s</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
-    <string name="category_documents">Văn bản</string>
+    <string name="category_documents">Văn Bản</string>
     <!-- The label under the button of opening all-documents screen -->
     <string name="section_documents">Tài Liệu</string>
     <!-- Label of the floating action button of opening the new chat conversation -->

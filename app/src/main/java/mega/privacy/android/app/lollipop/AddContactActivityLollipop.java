@@ -3075,6 +3075,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
     @Override
     public void onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 
         if (onNewGroup) {
