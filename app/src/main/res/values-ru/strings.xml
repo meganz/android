@@ -4000,10 +4000,6 @@
     <string name="label_purple">Фиолетовый</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Серый</string>
-    <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">Будет играть в фоновом режиме</string>
-    <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">Не будет играть в фоновом режиме</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">Сейчас играет</string>
     <!-- Text that indicates the song is now playing, but paused -->

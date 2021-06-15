@@ -3826,10 +3826,6 @@
     <string name="label_purple">Viola</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Grigio</string>
-    <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">Verrà riprodotto in background</string>
-    <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">Non verrà riprodotto in background</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">Adesso in riproduzione</string>
     <!-- Text that indicates the song is now playing, but paused -->
