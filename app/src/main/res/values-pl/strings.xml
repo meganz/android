@@ -222,8 +222,8 @@
     <string name="tour_privacy_title">MEGA Prywatność</string>
     <!--  -->
     <string name="tour_access_title">MEGA Dostępność</string>
-    <!--  -->
-    <string name="tour_space_text">Zarejestruj się teraz i uzyskaj 50 GB* wolnego miejsca</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">Zarejestruj się teraz i uzyskaj ponad 20 GB bezpłatnego miejsca</string>
     <!--  -->
     <string name="tour_speed_text">Wgrywanie jest szybkie. Udostępniaj pliki z każdym</string>
     <!--  -->
@@ -674,8 +674,8 @@
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Przetwarzanie pliku</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Przetwarzanie plików</item>
+        <item quantity="many">Przetwarzanie plików</item>
         <item quantity="other">Przetwarzanie plików</item>
     </plurals>
     <!-- error message when downloading a file -->
@@ -1133,9 +1133,9 @@
     <string name="invalid_email_title">Niepoprawny adres email</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Sprawdź adres e-mail ponownie.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Reset hasła</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Wprowadź swój klucz poniżej</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Twoje hasło zostało zmienione.</string>
@@ -2005,9 +2005,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Zaproś znajomych i odbierz nagrody</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Odbierz %1$s dodatkowej powierzchni i %2$s dodatkowego transferu za każde polecenie</string>
+    <string name="figures_achievements_text_referrals">%1$s pamięci masowej za każdą poleconą osobę. Ważny przez 365 dni.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">Odbierz %1$s dodatkowej powierzchni i %2$s dodatkowego transferu</string>
+    <string name="figures_achievements_text">%1$s przechowywania danych. Ważny przez 365 dni.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Nagrody</string>
     <!-- title of the section for unlocked storage quota -->
@@ -2037,7 +2037,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Jak to działa</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Zaproś swoich znajomych do utworzenia bezpłatnego konta na MEGA i instalacji naszej aplikacji mobilnej. Za każdą rejestrację otrzymasz bonus w postaci dodatkowej powierzchni na pliki i zwiększony limit transferu.</string>
+    <string name="first_paragraph_achievement_invite_friends">Zaproś swoich znajomych do założenia darmowego konta MEGA i zainstalowania naszej aplikacji mobilnej. Za każdą udaną rejestrację i instalację aplikacji otrzymasz bonusowy magazyn.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Nie otrzymasz bonusów za zaproszenie osób już korzystających z MEGA lub tych które już korzystały w przeszłości. Zaproszone kontakty muszą zainstalować aplikację MEGA na telefonie lub komputerze stacjonarnym.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -2051,17 +2051,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email nie jest prawidłowy</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Kiedy zainstalujesz MEGAsync otrzymasz %1$s darmowej powierzchni oraz %2$s dodatkowego transferu ważnych przez 180 dni. Aplikacja MEGA desktop jest dostępna na Windows, macOS oraz Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">Po zainstalowaniu aplikacji MEGA desktop otrzymujesz %1$s bezpłatnej przestrzeni dyskowej, ważnej przez 365 dni. Aplikacja MEGA jest dostępna dla systemów Windows, macOS i większości dystrybucji Linuksa.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Podczas instalacji aplikacji mobilnej otrzymasz %1$s bepłatnie dodatkową powierzchnię na pliki oraz %2$s dodatkowy transfer, oba bonusy ważne przez kolejne 180 dni. Aplikacja mobilna dostępna jest na iOS, Adroid oraz Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Po zainstalowaniu naszej aplikacji mobilnej otrzymasz %1$s bezpłatnej przestrzeni dyskowej, ważnej przez 365 dni. Oferujemy aplikacje mobilne dla systemów iOS, Android i Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Po zweryfikowaniu numeru telefonu otrzymujesz %1$s bezpłatnej przestrzeni dyskowej plus %2$s limitu transferu, oba ważne przez 180 dni.</string>
+    <string name="paragraph_info_achievement_add_phone">Po zweryfikowaniu numeru telefonu otrzymasz %1$s darmowej przestrzeni dyskowej, ważnej przez 365 dni.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Otrzymałeś %1$s darmowej powierzchni oraz %2$s dodatkowego transferu za zaintsalowanie aplikacji MEGA.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Otrzymałeś %1$s przestrzeni dyskowej za instalację naszej aplikacji desktopowej MEGA.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Otrzymałeś %1$s dodatkowej powierzchni oraz %2$s dodatkowego transferu z zainstalowanie aplikacji mobilnej.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Otrzymałeś %1$s przestrzeni dyskowej za zainstalowanie naszej aplikacji mobilnej.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Otrzymałeś %1$s przestrzeni dyskowej i %2$s limitu transferu na weryfikację twojego numeru telefonu.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Otrzymałeś %1$s przestrzeni dyskowej za weryfikację Twojego numeru telefonu.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Otrzymałeś %1$s powierzchni na pliki jako bonus za rejestrację.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -3486,7 +3486,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Zacznij czatować bezpiecznie ze swoimi kontaktami za pomocą szyfrowania end-to-end</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Cześć! Nawiąż ze mną bezpieczne rozmowy na temat MEGA i uzyskaj do 50 GB bezpłatnej przestrzeni dyskowej. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Cześć! Prowadź ze mną bezpieczne rozmowy na MEGA i zyskaj do 20 GB+ darmowej przestrzeni dyskowej. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Brak dostępnego linku do czatu.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->

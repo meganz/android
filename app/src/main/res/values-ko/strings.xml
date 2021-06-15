@@ -216,8 +216,8 @@
     <string name="tour_privacy_title">MEGA 프라이버시</string>
     <!--  -->
     <string name="tour_access_title">MEGA 접근</string>
-    <!--  -->
-    <string name="tour_space_text">지금 가입하고 50GB*의 무료 공간을 받으세요</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">지금 가입하고 20GB 이상의 무료 공간을 받으세요</string>
     <!--  -->
     <string name="tour_speed_text">업로드는 매우 빠릅니다. 모두와 빠르게 파일을 공유하세요</string>
     <!--  -->
@@ -412,7 +412,7 @@
     <string name="context_remove_link_warning_text">이 링크는 더 이상 공개되지 않습니다.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
-        <item quantity="other">이 링크들은 더 이상 공개적으로 이용할 수 없습니다.</item>
+        <item quantity="other">이 링크들은 더 이상 공개되지 않습니다.</item>
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">이름 바꾸기</string>
@@ -437,11 +437,11 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_upload">업로드</string>
     <!-- while copying a file or folder -->
-    <string name="context_copying">복사중</string>
+    <string name="context_copying">복사 중</string>
     <!-- menu item -->
     <string name="context_move_to_trash">휴지통으로 이동</string>
     <!-- menu item -->
-    <string name="context_delete_from_mega">MEGA에서 삭제</string>
+    <string name="context_delete_from_mega">MEGA에서 제거</string>
     <!-- Input field description in the create folder dialog. -->
     <string name="context_new_folder_name">폴더 이름</string>
     <!-- when adding a new contact. in the dialog -->
@@ -453,7 +453,7 @@
     <!-- Menu option title -->
     <string name="context_clear_rubbish">휴지통 비우기</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">휴지통에서 모든 항목을 완전히 삭제하려고 합니다.</string>
+    <string name="clear_rubbish_confirmation">휴지통에서 모든 항목을 완전히 제거하려고 합니다.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">보내기</string>
     <!-- send the file to inbox -->
@@ -477,17 +477,17 @@
     <!-- menu item -->
     <string name="context_delete">삭제</string>
     <!-- success message when removing a contact request -->
-    <string name="context_contact_invitation_deleted">요청 삭제됨</string>
+    <string name="context_contact_invitation_deleted">요청이 삭제되었습니다</string>
     <!-- success message when reinvite a contact -->
-    <string name="context_contact_invitation_resent">요청 재발송됨</string>
+    <string name="context_contact_invitation_resent">요청이 재발송되었습니다</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">%s님께 요청이 올바르게 전송되었습니다. 상태는 보낸 전송 탭에서 확인할 수 있습니다.</string>
+    <string name="context_contact_request_sent">%s님께 요청이 성공적으로 전송되었습니다. 상태는 보낸 요청 탭에서 확인할 수 있습니다.</string>
     <!-- success message when removing a contact -->
-    <string name="context_contact_removed">연락처가 삭제되었습니다</string>
+    <string name="context_contact_removed">연락처가 제거되었습니다</string>
     <!-- error message -->
-    <string name="context_contact_not_removed">오류. 연락처가 삭제되지 않았습니다</string>
+    <string name="context_contact_not_removed">오류. 연락처가 제거되지 않았습니다</string>
     <!-- success message when chaning the permissionss -->
-    <string name="context_permissions_changed">권한이 변경됨</string>
+    <string name="context_permissions_changed">권한이 변경되었습니다</string>
     <!-- error message -->
     <string name="context_permissions_not_changed">오류. 권한이 변경되지 않았습니다</string>
     <!-- message when trying to create a folder that already exists -->
@@ -499,29 +499,29 @@
     <!-- success message when creating a folder -->
     <string name="context_folder_created">폴더가 생성되었습니다</string>
     <!-- error message when creating a folder -->
-    <string name="context_folder_no_created">오류. 폴더가 생성되지 않음</string>
+    <string name="context_folder_no_created">오류. 폴더가 생성되지 않았습니다</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">올바르게 이름이 바뀌었습니다</string>
+    <string name="context_correctly_renamed">이름이 성공적으로 바뀌었습니다</string>
     <!-- error message -->
     <string name="context_no_renamed">오류. 이름이 바뀌지 않았습니다</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">올바르게 복사되었습니다</string>
+    <string name="context_correctly_copied">성공적으로 복사되었습니다</string>
     <!-- success message when sending a node to Inbox -->
-    <string name="context_correctly_sent_node">수신함으로 보내짐</string>
+    <string name="context_correctly_sent_node">수신함으로 보냈습니다</string>
     <!-- error message when sending a node to Inbox -->
-    <string name="context_no_sent_node">오류. 수신함으로 보내지지 않음</string>
+    <string name="context_no_sent_node">오류. 수신함으로 보내지 못 했습니다</string>
     <!-- error message -->
     <string name="context_no_copied">오류. 복사되지 않았습니다</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">대상 폴더를 선택하세요</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">올바르게 이동되었습니다</string>
+    <string name="context_correctly_moved">성공적으로 이동되었습니다</string>
     <!-- success message when moving a node -->
     <string name="number_correctly_moved">%d개의 항목이 성공적으로 이동되었습니다.</string>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d개의 항목이 이동되지 않았습니다</string>
+    <string name="number_incorrectly_moved">%d개의 항목이 성공적으로 이동되지 않았습니다</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">휴지통으로 잘 이동되었습니다</string>
+    <string name="context_correctly_moved_to_rubbish">휴지통으로 성공적으로 이동되었습니다</string>
     <!-- success message when moving a node -->
     <string name="number_correctly_moved_to_rubbish">%d개의 항목이 휴지통으로 이동되었습니다</string>
     <!-- success message when moving a node -->
@@ -529,9 +529,9 @@
     <!-- error message -->
     <string name="context_no_moved">오류. 이동되지 않았습니다</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">올바르게 공유되었습니다</string>
+    <string name="context_correctly_shared">성공적으로 공유되었습니다</string>
     <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">오류. %d개의 공유가 완료되지 않음</string>
+    <string name="context_no_shared_number">오류. %d개의 공유가 완료되지 않았습니다</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared_removed">공유를 성공적으로 제거하였습니다</string>
     <!-- error message when sharing a folder -->
@@ -559,7 +559,7 @@
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d개의 폴더에서 성공적으로 떠나지 못했습니다</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_sent">%d개의 연락처에게 파일이 잘 전송되었습니다</string>
+    <string name="number_correctly_sent">%d개의 연락처에 파일이 성공적으로 전송되었습니다</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_sent">%d개의 연락처에게 파일이 전송되지 않았습니다</string>
     <!-- success message when sending multiple files -->
@@ -607,7 +607,7 @@
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
     <string name="message_user_purchased_subscription">%1$s에 %2$s 구독해주셔서 고맙습니다!</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
-    <string name="message_user_purchased_subscription_down_grade">당신의 새 구독은 기존 구독이 만료된 이후 시작되며, 새로운 비용은 그 때 결제됩니다.</string>
+    <string name="message_user_purchased_subscription_down_grade">새 구독은 현재 구독이 만료된 후 시작되며, 새 가격도 그 때 결제됩니다.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
     <string name="message_user_payment_pending">당신의 구독은 Google에 의해 결제가 처리된 이후 시작됩니다.</string>
     <!--  -->
@@ -759,7 +759,7 @@
     <!-- Size of files in offline or cache folders -->
     <string name="settings_advanced_features_size">현재 %s 사용중</string>
     <!-- Calculating Size of files in offline or cache folders -->
-    <string name="settings_advanced_features_calculating">계산중</string>
+    <string name="settings_advanced_features_calculating">계산 중</string>
     <!-- title of the setting to set the default download location -->
     <string name="settings_storage_download_location">기본 다운로드 위치</string>
     <!-- Whether to always ask the user each time. -->
@@ -1097,9 +1097,9 @@
     <string name="invalid_email_title">잘못된 이메일 주소</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">이메일 주소를 확인하고 다시 시도하세요.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">암호 재설정</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">복구 키를 아래에 입력하세요</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">암호가 변경되었습니다.</string>
@@ -1240,7 +1240,7 @@
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">입력한 폴더 링크의 복호화 키가 잘못 되었습니다.</string>
     <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
-    <string name="my_account_my_credentials">내 자격증명</string>
+    <string name="my_account_my_credentials">내 자격 증명</string>
     <!-- Word to indicate the limited bandwidth of the free accounts -->
     <string name="limited_bandwith">제한됨</string>
     <!-- Item of the navigation title for the chat section -->
@@ -1412,7 +1412,7 @@
     <!-- success message when inviting multiple contacts to a group chat -->
     <string name="number_correctly_add_participant">%d명의 참여자가 올바르게 초대되었습니다</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d명의 참가자가 올바르게 초대되었지만 %2$d명은 초대되지 않았습니다.</string>
+    <string name="number_no_add_participant_request">참여자 %1$d명은 성공적으로 초대되었지만 %2$d명은 초대되지 않았습니다.</string>
     <!-- chat message when the permissions for a user has been changed -->
     <string name="message_permissions_changed">[A]%1$s[/A]님이 [E]%3$s[/E]님에[D] 의해 [/D] [C]%2$s[/C](으)로 [B]변경되었습니다[/B]</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -1644,7 +1644,7 @@
     </plurals>
     <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
     <plurals name="folder_upload_service_final_notification">
-        <item quantity="other">폴더 %1$d개 업로드 완료</item>
+        <item quantity="other">폴더 %1$d개 업로드됨</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">전체 크기: %1$s</string>
@@ -1719,7 +1719,7 @@
     <!-- Text shown after the confirmation email has been sent to the new email address -->
     <string name="confirm_email_misspelled_email_sent">이메일 발송됨</string>
     <!-- text_copyright_alert_title -->
-    <string name="copyright_alert_title">모든 사용자에게 저작권 경고</string>
+    <string name="copyright_alert_title">모든 이용자에게 저작권 경고</string>
     <!-- text_copyright_alert_first_paragraph -->
     <string name="copyright_alert_first_paragraph">MEGA는 다른 사람들의 저작권을 존중하고 MEGA 클라우드 서비스의 이용자들이 저작권법을 준수할 것을 요구합니다.</string>
     <!-- text_copyright_alert_second_paragraph -->
@@ -1757,7 +1757,7 @@
     <!--  -->
     <string name="camera_uploads_upload_videos">동영상 업로드</string>
     <!-- Message when an user avatar has been changed successfully -->
-    <string name="success_changing_user_avatar">프로필 사진 업데이트됨</string>
+    <string name="success_changing_user_avatar">프로필 사진이 업데이트되었습니다</string>
     <!-- Message when an error ocurred when changing an user avatar -->
     <string name="error_changing_user_avatar_image_not_available">오류. 선택한 이미지가 존재하지 않습니다.</string>
     <!-- Message when an error ocurred when changing an user avatar -->
@@ -1777,7 +1777,7 @@
     <!-- Message show when a participant has been successfully removed from a group chat -->
     <string name="remove_participant_success">참가자 제거됨</string>
     <!-- Message show when a participant hasn’t been successfully removed from a group chat -->
-    <string name="remove_participant_error">오류. 참가자가 제거되지 않음</string>
+    <string name="remove_participant_error">오류. 참여자가 제거되지 않았습니다</string>
     <!--  -->
     <string name="no_files_selected_warning">파일이 선택되지 않음</string>
     <!--  -->
@@ -1815,7 +1815,7 @@
     <!--  -->
     <string name="attachment_uploading_state_error">오류. 전송되지 않음.</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending -->
-    <string name="already_downloaded_multiple">%d개의 파일이 이미 다운로드 되었습니다.</string>
+    <string name="already_downloaded_multiple">파일 %d개는 이미 다운로드 하였습니다.</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
     <string name="pending_multiple">파일 %d개 대기중.</string>
     <!--  -->
@@ -1879,9 +1879,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">친구를 초대하고 보상을 받으세요</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">초대할 때마다 %1$s의 저장 공간과 %2$s의 전송 할당량을 받습니다</string>
+    <string name="figures_achievements_text_referrals">추천한 가입자마다 %1$s의 용량. 365일간 이용 가능</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">%1$s의 저장 공간과 %2$s의 전송 할당량을 받으세요</string>
+    <string name="figures_achievements_text">%1$s의 용량. 365일간 이용 가능</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">해제된 보상</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1911,7 +1911,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">작동 원리</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">친구가 무료 MEGA 계정을 만들고 우리의 모바일 앱을 설치하도록 초대하세요. 성공적으로 가입하고 앱을 설치할 때마다 당신은 보너스 저장소와 전송 할당량을 받습니다.</string>
+    <string name="first_paragraph_achievement_invite_friends">친구를 초대하여 무료 MEGA 계정을 만들게 하고 모바일 앱을 설치하게 하세요. 성공한 가입과 앱 설치마다 보너스 용량을 받게 됩니다.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">MEGA를 이전에 사용했던 사람을 초대하면 보상을 받지 못하게 되며 이러한 거절은 통보되지 않습니다. 초대된 연락처는 반드시 MEGA 모바일 앱 또는 MEGA 데스크톱 앱을 기기에 설치하여야 합니다.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1925,17 +1925,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">이메일이 변형되었습니다</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">MEGAsync를 설치하면 %1$s의 보상 저장 공간과 %2$s의 전송 할당량을 받게 되며, 둘 다 180일간 유효합니다. MEGA 데스크톱 앱은 Windows, macOS, 그리고 대부분의 Linux 배포판에서 사용 가능합니다.</string>
+    <string name="paragraph_info_achievement_install_desktop">MEGA 데스크톱 앱을 설치하면 %1$s의 무료 저장 공간을 받게 되며, 365일간 이용 가능합니다. MEGA 데스크톱 앱은 Windows, macOS 그리고 대부분의 Linux 배포판에서 이용 가능합니다.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">MEGA 모바일 앱을 설치하면 180일간 이용할 수 있는 %1$s의 추가 저장 공간과 %2$s의 전송 할당량을 받게 됩니다. MEGA 모바일 앱은 iOS, Android 그리고 Windows Phone에서 사용 가능합니다.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">MEGA 모바일 앱을 설치하면 %1$s의 무료 저장 공간을 받게 되며, 365일간 이용 가능합니다. 모바일 앱은 iOS, Android 그리고 Windows Phone에서 이용 가능합니다.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">전화번호를 인증하면 180일간 유효한 %1$s의 무료 저장 공간과 %2$s의 전송 할당량을 드립니다.</string>
+    <string name="paragraph_info_achievement_add_phone">휴대 전화 번호를 인증하면 %1$s의 무료 저장 공간을 받게 되며, 365일간 이용 가능합니다.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">당신은 MEGA 데스크톱 앱을 설치하여 %1$s의 저장 공간과 %2$s의 전송 할당량을 받았습니다.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">MEGA 데스크톱 앱을 설치하여 %1$s의 저장 공간을 받았습니다.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">당신은 우리의 모바일 앱을 설치하여 %1$s의 저장 공간과 %2$s의 전송 할당량을 받았습니다.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">모바일 앱을 설치하여 %1$s의 저장 공간을 받았습니다.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">전화번호를 인증하여서 %1$s의 무료 저장 공간과 %2$s의 전송 할당량을 받았습니다.</string>
+    <string name="result_paragraph_info_achievement_add_phone">휴대 전화 번호를 인증하여 %1$s의 저장 공간을 받았습니다.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">당신은 무료 가입 보너스로 %1$s의 저장 공간을 받았습니다.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2025,7 +2025,7 @@
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">대화가 이미 존재합니다</string>
     <!-- before sharing a file, has to be downloaded -->
-    <string name="not_download">파일이 다운로드되지 않았습니다</string>
+    <string name="not_download">파일이 아직 다운로드되지 않았습니다</string>
     <!-- Error shown when a user is starting a chat or adding new participants in a group chat and writes a contact mail that has not added -->
     <string name="not_permited_add_email_to_invite">MEGA 연락처만 추가할 수 있습니다.</string>
     <!-- Info label about the connectivity state of the chat -->
@@ -2213,7 +2213,7 @@
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_kilo_byte">%s KB/s</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%s MB/s</string>
+    <string name="label_file_speed_mega_byte">%sMB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%s GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -2288,7 +2288,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Android 기기 [A]설정[/A]을 엽니다</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">[A]앱 &amp; 알림[/A]을 엽니다</string>
+    <string name="turn_on_notifications_second_step">[A]앱 &amp; 알림[/A] 열기</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">[A]MEGA[/A]를 선택합니다</string>
     <!-- Fourth step to turn on notifications -->
@@ -2297,7 +2297,7 @@
     <string name="turn_on_notifications_fifth_step">켜기로 전환하고 설정하세요</string>
     <!-- Alert message after sending to chat one or several messages to several chats, version items -->
     <plurals name="files_send_to_chat_success">
-        <item quantity="other">전송된 파일</item>
+        <item quantity="other">전송한 파일</item>
     </plurals>
     <!-- Error message after sending to chat one or several messages to several chats -->
     <string name="files_send_to_chat_error">오류. 올바르게 전송되지 않음</string>
@@ -2454,7 +2454,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">다음번 로그인 때 당신의 인증기 앱에서 생성된 6자리 코드를 요구합니다.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">나중에 앱에 대한 접근을 잃었거나 2단계 인증을 비활성화하고 싶을 때를 대비하여 <b>복구 키</b>를 내보내는 것을 고려하세요.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">잘못된 코드</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2648,9 +2648,9 @@
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
     <string name="text_almost_full_warning">클라우드 드라이브가 거의 찼습니다. Pro로 업그레이드하고 최대 %1$s TB의 저장소와 %2$s TB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 %1$s TB의 저장소와 %2$s TB의 전송 할당량을 받으세요.</string>
+    <string name="text_almost_full_warning_pro_account">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 %1$sTB의 저장소와 %2$sTB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">클라우드 드라이브가 거의 찼습니다. 더 많은 저장소가 필요하다면 맞춤 요금제를 위해 MEGA 고객 지원에 연락하세요.</string>
+    <string name="text_almost_full_warning_pro3_account">클라우드 드라이브가 거의 찼습니다. 더 많은 저장소가 필요하시면 MEGA 고객 지원에 연락하여 맞춤 요금제를 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">클라우드 드라이브가 가득 찼습니다. Pro로 업그레이드하고 최대 %1$s TB의 저장소와 %2$s TB의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
@@ -2746,7 +2746,7 @@
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="make_chat_private_option_text">암호화 키 순환은 약간 더 안전하지만, 대화 링크를 만들 수 없고 새 참여자들이 지난 메시지를 볼 수 없게 됩니다.</string>
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
-    <string name="make_chat_private_not_available_text">암호화 키 순환은 100명 이상의 참여자가 있는 대화에서는 해제됩니다.</string>
+    <string name="make_chat_private_not_available_text">암호화 키 순환은 100명 이상의 참여자가 있는 대화에서는 비활성화됩니다.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
     <string name="warning_make_chat_private">참여자 수가 제한을 초과하였기 때문이 이 대화를 비밀 대화로 전환할 수 없습니다.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2838,7 +2838,7 @@
     <!-- Subtitle of file takedown historic notification -->
     <string name="subtitle_file_takedown_notification">[A]공개적으로 공유한 파일 [/A][B]%s[/B][C] 이/가 게시중단 되었습니다.[/C]</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]공개적으로 공유한 폴더 [/A][B]%s[/B][C] 이/가 게시중단 되었습니다.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]당신이 공개적으로 공유한 [/A][B]%s[/B][C] 폴더가 게시중단 되었습니다.[/C]</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">이 파일은 게시중단 통보 대상입니다.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -3258,7 +3258,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">종단간 암호화를 통하여 당신의 연락처와 안전하게 대화를 시작하세요</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">안녕하세요! 저와 MEGA에서 안전한 대화를 하고 최대 50GB의 무료 저장 공간을 받으세요. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">안녕하세요! 저와 MEGA에서 안전하게 대화하고 20GB 이상의 무료 저장소를 받으세요. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">사용 가능한 대화 링크 없음</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3388,7 +3388,7 @@
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text_2">문제를 해결하고 계정을 활성화하려면 비즈니스 계정 관리자에게 연락하세요.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
-    <string name="logout_warning_offline">로그아웃하면 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
+    <string name="logout_warning_offline">로그아웃할 때, 오프라인 섹션의 파일들이 당신의 기기에서 삭제됩니다.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
     <string name="logout_warning_transfers">로그아웃하면, 진행중인 전송은 취소됩니다.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files and transfers in progress. -->
@@ -3516,7 +3516,7 @@
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%d초</string>
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
-    <string name="label_verify_credentials">자격증명 인증중</string>
+    <string name="label_verify_credentials">자격 증명 인증 중</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">인증되지 않음</string>
     <!-- Action indicating something was verified. -->
@@ -3526,11 +3526,11 @@
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">현실에서 가장 확실한 방법은 직접 만나는 것입니다. 만약 증명된 OTR이나 PGP 같은 이미 증명된 다른 방법이 있다면, 그것을 사용해도 좋습니다.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">당신의 자격증명</string>
+    <string name="label_your_credentials">당신의 자격 증명</string>
     <!-- Button to reset credentials -->
     <string name="action_reset">재설정</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
-    <string name="already_verifying_credentials">자격증명 업데이트중. 나중에 다시 시도하세요.</string>
+    <string name="already_verifying_credentials">자격 증명 업데이트 중. 나중에 다시 시도하세요.</string>
     <!-- Info message displayed when the user is joining a chat conversation -->
     <string name="joining_label">참여하는 중&#8230;</string>
     <!-- Info message displayed when the user is leaving a chat conversation -->
@@ -3564,7 +3564,7 @@
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">보기</string>
     <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
-    <string name="label_contact_credentials">%s님의 자격증명</string>
+    <string name="label_contact_credentials">%s님의 자격 증명</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
     <string name="category_documents">문서</string>
     <!-- The label under the button of opening all-documents screen -->
@@ -3610,7 +3610,7 @@
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">대화 기록 삭제</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
-    <string name="retention_history_disabled">[A]%1$s[/A][B]님이 메시지 삭제를 해제하였습니다.[/B]</string>
+    <string name="retention_history_disabled">[A]%1$s[/A][B]님이 메시지 비우기를 비활성화 하였습니다.[/B]</string>
     <!-- Subtitle of the section to clear the chat content in the Manage chat history screen -->
     <string name="subtitle_properties_chat_clear">이 대화 내의 모든 메시지와 공유된 파일을 삭제합니다. 이 행동은 되돌릴 수 없습니다.</string>
     <!-- Title of the history retention option -->
@@ -3626,7 +3626,7 @@
     <!-- Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month -->
     <string name="history_retention_option_one_month">1개월</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted -->
-    <string name="history_retention_option_custom">사용자 지정</string>
+    <string name="history_retention_option_custom">이용자 지정</string>
     <!-- Title of the Manage chat history screen -->
     <string name="title_properties_manage_chat">대화 기록 관리</string>
     <!-- Subtitle of the dialogue to select a retention time -->
@@ -3780,7 +3780,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">성능과 분석 쿠키</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_performance_summary">당신이 우리의 서비스를 어떻게 이용하는지 이해하도록 돕고 우리가 향상시킬 수 있도록 데이터를 제공해주세요. 이 쿠키를 허용하지 않는다면 설계를 향상시킬 수 있는 데이터가 우리에게 덜 제공됩니다.</string>
+    <string name="preference_cookies_performance_summary">당신이 우리의 서비스를 어떻게 이용하는지 이해할 수 있도록 도와주시고 향상할 수 있도록 데이터를 제공해주세요. 이러한 쿠키들을 허용하지 않는 것은 우리가 설계를 개선하는 데에 쓸 수 있는 데이터가 적어진다는 뜻입니다.</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_advertising_title">광고 쿠키</string>
     <!-- Preference screen item summary -->

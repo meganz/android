@@ -219,8 +219,8 @@
     <string name="tour_privacy_title">MEGA Confidențialitate</string>
     <!--  -->
     <string name="tour_access_title">MEGA Acces</string>
-    <!--  -->
-    <string name="tour_space_text">Înregistrează-te acum și obține 50 GB* spațiu gratuit.</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">Register now and get 20 GB+ of free space</string>
     <!--  -->
     <string name="tour_speed_text">Încărcările sunt rapide. Partajează rapid fișiere cu toți.</string>
     <!--  -->
@@ -1118,9 +1118,9 @@
     <string name="invalid_email_title">Adresă de e-mail nevalidă</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Te rugăm să verifici adresa de e-mail și să încerci din nou.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Resetarea parolei</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Te rugăm să introduci cheia ta de recuperare mai jos</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Parola ta a fost modificată.</string>
@@ -1957,9 +1957,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invită prieteni și obține recompense</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Obține %1$s stocare și %2$s transferuri pentru fiecare recomandare</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each referral. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">Obține %1$s stocare și %2$s transferuri</string>
+    <string name="figures_achievements_text">%1$s of storage. Valid for 365 days.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Recompense deblocate</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1989,7 +1989,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cum funcționează</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invită-ți prietenii să-și facă un cont MEGA gratuit și să-și instaleze aplicația noastră mobilă. Pentru fiecare înscriere cu succes și instalare a aplicației, vei primi spațiu de stocare și cotă de transfer drept bonus.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Nu vei primi credit pentru invitarea cuiva care a folosit MEGA anterior și nu vei fi notificat despre o astfel de respingere. Contactele invitate trebuie să instaleze aplicația mobilă MEGA sau aplicația desktop MEGA pe dispozitivele acestora.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -2003,17 +2003,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">E-mailul este malformat</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Atunci când instalezi MEGAsync, primești %1$s spațiu de stocare complementar, plus %2$s cotă de transfer, ambele valabile pentru 180 de zile. Aplicația desktop MEGA este disponibilă pentru Windows, macOS și majoritatea distribuțiilor Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Atunci când instalezi aplicația noastră mobilă, primești %1$s spațiu de stocare complementar, plus %2$s cotă de transfer, ambele valabile pentru 180 de zile. Oferim aplicații mobile pentru iOS, Android și Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">When you install our mobile app you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS, Android and Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Atunci când îți verifici numărul de telefon, primești %1$s spațiu de stocare complementar, plus %2$s cotă de transfer, ambele valabile pentru 180 de zile.</string>
+    <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space, valid for 365 days.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Ai primit %1$s spațiu de stocare și %2$s cotă de transfer pentru instalarea aplicației noastre desktop MEGA.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA desktop app.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Ai primit %1$s spațiu de stocare și %2$s cotă de transfer pentru instalarea aplicației noastre mobile.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing our mobile app.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Ai primit %1$s spațiu de stocare și %2$s cotă de transfer pentru verificarea numărului tău de telefon.</string>
+    <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space for verifying your phone number.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Ai primit %1$s spațiu de stocare ca bonus de înregistrare gratuită.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -3402,7 +3402,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Începe să chatuiești în siguranță cu contactele tale folosind criptarea capăt-la-capăt</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Bună! Conversează securizat pe MEGA cu mine și obține până la 50 GB spațiu de stocare gratuit. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hi! Have secure conversations on MEGA with me and get up to 20 GB+ free storage. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Niciun link de chat disponibil.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->

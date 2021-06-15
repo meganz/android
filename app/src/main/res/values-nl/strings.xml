@@ -218,8 +218,8 @@
     <string name="tour_privacy_title">MEGA Privacy</string>
     <!--  -->
     <string name="tour_access_title">MEGA Toegang</string>
-    <!--  -->
-    <string name="tour_space_text">Registreer nu en krijg 50GB * aan gratis opslag</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">Registreer nu en krijg 20 GB+ aan gratis opslag</string>
     <!--  -->
     <string name="tour_speed_text">Uploads zijn snel. Deel uw bestanden snel met iedereen</string>
     <!--  -->
@@ -1109,9 +1109,9 @@
     <string name="invalid_email_title">Ongeldig e-mailadres</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Controleer het e-mail adres en probeer opnieuw.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Wachtwoord resetten</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Voer uw Herstelsleutel hieronder in</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Uw wachtwoord is gewijzigd.</string>
@@ -1750,9 +1750,9 @@
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Verbinden&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
-    <string name="context_contact_already_invited">%s was al uitgenodigd. Raadpleeg uw afwachtende verzoeken.</string>
+    <string name="context_contact_already_invited">%s was al uitgenodigd. Raadpleeg uw lopende verzoeken.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Als u uw e-mailadres fout heeft geschreven, verbeter het en klik [A]Opnieuw Verzenden[A]</string>
+    <string name="confirm_email_misspelled">Als u uw e-mailadres fout heeft geschreven, verbeter het en klik op [A]Opnieuw Verzenden[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Opnieuw verzenden</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1762,9 +1762,9 @@
     <!-- text_copyright_alert_first_paragraph -->
     <string name="copyright_alert_first_paragraph">MEGA respecteert het auteursrecht van anderen en eist dat de gebruikers van de MEGA cloud service zich aan de auteurswetten houden.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Het is strikt verboden om de MEGA cloud dienst te gebruiken om inbreuk te maken op auteursrecht.U mag niet uploaden, downloaden, opslaan, delen, weergeven, streamen, verdelen, mailen, linken naar, overdragen of anders beschikbaar maken van elk bestand, gegevens inhoud die inbreuk maken op auteursrecht of andere eigendom rechten of elk persoon of entiteit.</string>
+    <string name="copyright_alert_second_paragraph">Het is strikt verboden om de MEGA cloud dienst te gebruiken om inbreuk te maken op auteursrecht. U mag niet uploaden, downloaden, opslaan, delen, weergeven, streamen, verdelen, mailen, linken naar, overdragen of anders beschikbaar maken van elk bestand, gegevens inhoud die inbreuk maken op auteursrecht of andere eigendom rechten of elk persoon of entiteit.</string>
     <!-- text of the Agree button -->
-    <string name="copyright_alert_agree_button">Instemmen</string>
+    <string name="copyright_alert_agree_button">Akkoord</string>
     <!-- text of the Disagree button -->
     <string name="copyright_alert_disagree_button">Oneens</string>
     <!-- Hint how to cancel the download -->
@@ -1787,7 +1787,7 @@
     <!-- error message -->
     <string name="context_link_action_error">Link actie mislukt. Probeer later nogmaals.</string>
     <!-- title of the dialog shown when sending or sharing a folder -->
-    <string name="title_write_user_email">Schrijf de gebruiker een e-mail</string>
+    <string name="title_write_user_email">Schrijf de gebruiker’s e-mail</string>
     <!-- title of the screen to see the details of several node attachments -->
     <string name="activity_title_files_attached">Bestanden bijgevoegd</string>
     <!-- title of the screen to see the details of several contact attachments -->
@@ -1799,7 +1799,7 @@
     <!--  -->
     <string name="camera_uploads_upload_videos">Video’s Uploaden</string>
     <!-- Message when an user avatar has been changed successfully -->
-    <string name="success_changing_user_avatar">Profielfoto geupdate</string>
+    <string name="success_changing_user_avatar">Profielfoto bijgewerkt</string>
     <!-- Message when an error ocurred when changing an user avatar -->
     <string name="error_changing_user_avatar_image_not_available">Fout. Geselecteerde afbeelding bestaat niet</string>
     <!-- Message when an error ocurred when changing an user avatar -->
@@ -1807,11 +1807,11 @@
     <!-- Message when an user avatar has been deleted successfully -->
     <string name="success_deleting_user_avatar">Profielfoto verwijderd</string>
     <!-- Message when an error ocurred when deleting an user avatar -->
-    <string name="error_deleting_user_avatar">Fout met het verwijderen van de profielfoto</string>
+    <string name="error_deleting_user_avatar">Fout tijdens het verwijderen van de profielfoto</string>
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">Een fout was opgetreden bij het wijzigen van de naam</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Uw naam was correct bijgewerkt</string>
+    <string name="success_changing_user_attributes">Uw naam was succesvol bijgewerkt</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Deelnemer toegevoegd</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1829,19 +1829,19 @@
     <!--  -->
     <string name="attachment_upload_panel_photo">Van apparaat</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
-    <string name="delete_account">Verwijder account</string>
+    <string name="delete_account">Account verwijderen</string>
     <!-- Text shown in the alert dialog to confirm the deletion of an account -->
-    <string name="delete_account_text">Als u uw account verwijdert, heeft u geen toegang tot uw accountgegevens, uw MEGA-contacten of gesprekken. \nU kunt deze actie niet ongedaan maken.</string>
+    <string name="delete_account_text">Als u uw account verwijdert, heeft u geen toegang tot uw gegevens, uw MEGA-contacten of gesprekken. \nU kunt deze actie niet ongedaan maken.</string>
     <!-- menu item -->
-    <string name="delete_button">Verwijder</string>
+    <string name="delete_button">Verwijderen</string>
     <!--  -->
-    <string name="file_properties_info_info_file">Info</string>
+    <string name="file_properties_info_info_file">Informatie</string>
     <!-- Refers to the size of a file. -->
     <string name="file_properties_info_size">Totale grootte</string>
     <!-- header of a status field for what content a user has shared to you -->
     <string name="file_properties_info_content">Bevat</string>
     <!--  -->
-    <string name="file_properties_shared_folder_public_link_name">Koppeling</string>
+    <string name="file_properties_shared_folder_public_link_name">Link</string>
     <!-- Refers to access rights for a file folder. -->
     <string name="file_properties_shared_folder_full_access">Volledige toegang</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1859,7 +1859,7 @@
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending -->
     <string name="already_downloaded_multiple">%d bestanden al gedownload.</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
-    <string name="pending_multiple">%d bestanden in afwachting.</string>
+    <string name="pending_multiple">%d bestanden in behandeling.</string>
     <!--  -->
     <string name="contact_is_me">Geen opties beschikbaar, u heeft zichzelf geselecteerd</string>
     <!-- Confirmation before deleting one attachment -->
@@ -1893,7 +1893,7 @@
     <!-- Title of the section to remove contact in the Contact Properties screen -->
     <string name="title_properties_remove_contact">Contact verwijderen</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
-    <string name="title_properties_chat_notifications_contact">Chat notificaties</string>
+    <string name="title_properties_chat_notifications_contact">Gespreksmeldingen</string>
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B]heeft de chatgeschiedenis gewist[/B]</string>
     <!-- Notification title to show the number of unread chats, unread messages -->
@@ -1903,29 +1903,29 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Verwijderen van gedeelde map</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">Verplaatsen naar prullenbak?</string>
+    <string name="confirmation_move_to_rubbish">Verplaatsen naar Prullenbak?</string>
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Weet u zeker dat u deze map naar de Prullenbak wilt verplaatsen? Dit schakelt de Camera Uploads uit.</string>
     <!-- Confirmation message before removing MU folder -->
     <string name="confirmation_move_mu_folder_to_rubbish">Weet u zeker dat u deze map wilt verplaatsen naar de Prullenbak? Hierdoor worden Secundaire Media Uploads uitgeschakeld.</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">Verplaatsen naar prullenbak?</string>
+    <string name="confirmation_move_to_rubbish_plural">Verplaatsen naar Prullenbak?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Verwijderen van MEGA?</string>
     <!-- label to indicate the state of an upload in chat -->
     <string name="attachment_uploading_state">Uploaden&#8230;</string>
     <!-- Title of the section to enable notifications in the Contact Properties screen -->
-    <string name="title_properties_contact_notifications_for_chat">Chat notificaties</string>
+    <string name="title_properties_contact_notifications_for_chat">Gespreksmeldingen</string>
     <!-- title of the section for achievements -->
-    <string name="achievements_title">Beloningen</string>
+    <string name="achievements_title">Prestaties</string>
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Nodig vrienden uit en krijg beloningen</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Krijg %1$s aan opslag en %2$s aan overdrachten voor elke verwijzing</string>
+    <string name="figures_achievements_text_referrals">%1$s aan opslag voor elke verwijzing. Geldig voor 365 dagen.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">Krijg %1$s aan opslag en %2$s aan overdrachten</string>
+    <string name="figures_achievements_text">%1$s aan opslag. Geldig voor 365 dagen.</string>
     <!-- title of the section for unlocked rewards -->
-    <string name="unlocked_rewards_title">Gewonnen beloningen</string>
+    <string name="unlocked_rewards_title">Verkregen beloningen</string>
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">Opslag Tegoed</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
@@ -1943,41 +1943,41 @@
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Geen bestanden in Camera Uploads</string>
     <!-- indicates the number of days left related to a achievement -->
-    <string name="general_num_days_left">%1$d d over</string>
+    <string name="general_num_days_left">%1$d over</string>
     <!-- State to indicate something has expired (achivements of business status account for instance) -->
     <string name="expired_label">Verlopen</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Gebruik geen HTTP</string>
     <!-- subtitle of the advanced setting to choose the use of https -->
-    <string name="setting_subtitle_use_https_only">Schakel deze optie alleen in als uw transfers niet starten. In normale omstandigheden is HTTP voldoende als alle transfers al zijn gecodeerd.</string>
+    <string name="setting_subtitle_use_https_only">Schakel deze optie alleen in als uw overdrachten niet starten. In normale omstandigheden is HTTP voldoende als alle transfers al zijn gecodeerd.</string>
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Hoe het werkt</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Nodig uw vrienden uit om een gratis MEGA account te creëren en installeer onze mobiele applicatie. Bij elke succesvolle aanmelding en applicatie installatie ontvangt u bonus opslag en overdracht tegoed.</string>
+    <string name="first_paragraph_achievement_invite_friends">Nodig uw vrienden uit om een gratis MEGA account te creëren en installeer onze mobiele applicatie. Voor elke succesvolle aanmelding en applicatie installatie ontvangt u een bonus opslag.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">U ontvangt geen tegoed voor het uitnodigen van iemand die MEGA voorheen al heeft gebruikt en u wordt voor deze afwijzing niet op de hoogte gebracht. Uitgenodigde contacten moeten de MEGA mobiele applicatie of MEGA desktop applicatie installeren op hun apparaten.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">Selecteer contacten vanuit de contactlijst op uw telefoon of voer meerdere email-adressen in.</string>
     <!-- title of the dialog to confirm the contact request -->
-    <string name="title_confirmation_invite_friends">Nodig vrienden uit bij MEGa</string>
+    <string name="title_confirmation_invite_friends">Nodig vrienden uit bij MEGA</string>
     <!-- Text shown when the user sends a contact invitation -->
-    <string name="subtitle_confirmation_invite_friends">Verzend Uitnodiging</string>
+    <string name="subtitle_confirmation_invite_friends">Verstuur Uitnodiging</string>
     <!-- paragraph of the dialog to confirm the contact request -->
-    <string name="paragraph_confirmation_invite_friends">Moedig uw vrienden aan tot het registreren en installeren van een MEGA app. Zolang als uw vriend dezelfde e-mailadres gebruikt als degene die u heeft ingevoerd, ontvangt u uw overdracht tegoed.</string>
+    <string name="paragraph_confirmation_invite_friends">Moedig uw vrienden aan tot het registreren en installeren van een MEGA applicatie. Zolang als uw vriend dezelfde e-mailadres gebruikt als degene die u heeft ingevoerd, ontvangt u uw overdracht tegoed.</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email is misvormed</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Wanneer u MEGAsync installeert krijgt u %1$s aan extra opslag ruimte plus %2$s aan overdracht tegoed, beide geldig voor 180 dagen. MEGA desktop applicatie is beschikbaar voor Windows, macOS en de meeste Linux distributies.</string>
+    <string name="paragraph_info_achievement_install_desktop">Wanneer u de MEGA desktop applicatie installeert krijgt u %1$s aan extra opslag ruimte, geldig voor 365 dagen. De MEGA desktop applicatie is beschikbaar voor Windows, macOS en de meeste Linux distributies.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Wanneer u onze mobiele applicatie installeert krijgt u %1$s aan extra opslag ruimte plus %2$s aan overdracht tegoed, beide geldig voor 180 dagen. We bieden mobiele applicaties voor iOS, Android en Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Wanneer u onze mobiele applicatie installeert krijgt u %1$s aan extra opslagruimte, geldig voor 365 dagen. We bieden mobiele applicaties voor iOS, Android en Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Wanneer u uw telefoonnummer verifieert krijgt u %1$s aan gratis opslagruimte plus %2$s aan overdracht tegoed, beide geldig tot 180 dagen.</string>
+    <string name="paragraph_info_achievement_add_phone">Wanneer u uw telefoonnummer verifieert krijgt u %1$s aan extra opslagruimte, geldig voor 365 dagen.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s aan opslag ruimte en %2$s overdracht tegoed ontvangen voor het installeren van onze MEGA desktop applicatie.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s opslagruimte ontvangen voor het installeren van onze MEGA desktop applicatie.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">U heeft %1$s aan opslag ruimte en %2$s overdracht tegoed ontvangen voor het installeren van onze mobiele applicatie.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">U heeft %1$s opslagruimte ontvangen voor het installeren van onze mobiele applicatie.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">U heeft %1$s opslagruimte en %2$s overdracht tegoed voor het verifiëren ervan uw telefoonnummer ontvangen.</string>
+    <string name="result_paragraph_info_achievement_add_phone">U heeft %1$s opslagruimte ontvangen voor het verifiëren van uw telefoonnummer.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">U heeft %1$s opslag ruimte ontvangen als uw gratis registratie bonus.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -1985,7 +1985,7 @@
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Gedeelde map</item>
-        <item quantity="other">Deel mappen</item>
+        <item quantity="other">Gedeelde mappen</item>
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
@@ -1999,9 +1999,9 @@
     <!-- Settings preference title for help centre -->
     <string name="settings_help_centre">Help Centrum</string>
     <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Feedback versturen</string>
+    <string name="settings_help_preference">Feedback Versturen</string>
     <!-- mail subject -->
-    <string name="setting_feedback_subject">Android terugkoppeling</string>
+    <string name="setting_feedback_subject">Android feedback</string>
     <!-- mail body -->
     <string name="setting_feedback_body">Schrijf hier uw feedback:</string>
     <!-- mail body -->
@@ -2015,9 +2015,9 @@
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Bestand Naam</string>
     <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="dialog_title_new_link">Koppeling naam</string>
+    <string name="dialog_title_new_link">Link naam</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
-    <string name="context_new_link_name">Koppeling URL</string>
+    <string name="context_new_link_name">Link URL</string>
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">ONDERWERP</string>
     <!-- Title of the field content when a new file is created to upload -->
@@ -2029,9 +2029,9 @@
     <!-- name of the button to attach file from MEGA to another app -->
     <string name="general_attach">Toevoegen</string>
     <!-- when add or share a file with a new contact, it can type by name or mail -->
-    <string name="type_contact">Contact naam of email</string>
+    <string name="type_contact">Contactnaam of email</string>
     <!-- when add or share a file with a new contact, message displayed to warn that the maximum number has been reached -->
-    <string name="max_add_contact">Geen contacten kunnen meer toegevoegd worden op dit moment</string>
+    <string name="max_add_contact">Geen contacten kunnen meer worden toegevoegd op dit moment</string>
     <!-- when changing the password , the old password and new password are equals -->
     <string name="old_and_new_passwords_equals">Het nieuwe wachtwoord kan niet hetzelfde zijn als het oude wachtwoord</string>
     <!-- Menu item -->
@@ -2053,7 +2053,7 @@
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ongeldige tekens</string>
     <!-- Error shown when the user writes a character not allowed -->
-    <string name="invalid_characters_defined">De volgende tekens zijn niet toegestaan: ”* /: &lt;&gt;?​\ |</string>
+    <string name="invalid_characters_defined">De volgende tekens zijn niet toegestaan: ” * / : &lt; &gt; ? ​\ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Geef uw bestand een naam voordat u verder gaat</item>
@@ -2076,13 +2076,13 @@
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">Opnieuw verbinden met het gesprek</string>
     <!-- Message show when a call cannot be established -->
-    <string name="call_error">Fout. Het gesprek kon niet uitgevoerd worden</string>
+    <string name="call_error">Fout. De oproep kon niet uitgevoerd worden</string>
     <!-- Title of dialog to evaluate the app -->
     <string name="title_evaluate_the_app_panel">Bent u tevreden met deze applicatie?</string>
     <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Ja, geef deze app uw mening</string>
+    <string name="rate_the_app_panel">Ja, geef deze applicatie uw mening</string>
     <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Nee, stuur terugkoppeling</string>
+    <string name="send_feedback_panel">Nee, verstuur feedback</string>
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Geavanceerde opties</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
@@ -2142,7 +2142,7 @@
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Uitnodiging niet verzonden</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
-    <string name="invite_not_sent_text">DE QR code of contact koppeling is ongeldig. Probeer een geldige code te scannen of een geldige link te openen.</string>
+    <string name="invite_not_sent_text">De QR code of contact link is ongeldig. Probeer een geldige code te scannen of een geldige link te openen.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">De uitnodiging was niet verstuurd. %s is al in uw contactlijst.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
@@ -2152,7 +2152,7 @@
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">QR code scannen</string>
     <!-- get the contact link and copy it -->
-    <string name="button_copy_link">Kopieer Koppeling</string>
+    <string name="button_copy_link">Link kopiëren</string>
     <!-- Create QR code -->
     <string name="button_create_qr">QR code Creëren</string>
     <!-- Text shown when it has been created the QR code successfully -->
@@ -2162,11 +2162,11 @@
     <!-- positive button on dialog to view a contact -->
     <string name="contact_view">Weergeven</string>
     <!-- Item menu option to reproduce audio or video in external reproductors -->
-    <string name="external_play">Open met</string>
+    <string name="external_play">Openen met</string>
     <!-- to share a file using Facebook, Whatsapp, etc -->
-    <string name="context_share">Deel met gebruik van</string>
+    <string name="context_share">Delen via</string>
     <!-- Message shown if the user choose enable button and he is not logged in -->
-    <string name="error_enable_chat_before_login">Meld u aan voordat u de chat inschakelt</string>
+    <string name="error_enable_chat_before_login">Log in voordat u de chat inschakelt</string>
     <!-- title of a tag to search for a specific period within the search by date option in Camera upload -->
     <string name="label_set_period">Periode instellen</string>
     <!-- Text of the empty screen when there are not chat conversations -->
@@ -2174,7 +2174,7 @@
     <!-- Text of the empty screen when there are not elements in Camera Uploads -->
     <string name="context_empty_camera_uploads">[B]Geen media op [/B][A]Camera Uploads[/A]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[B]Leegmaken[/B][A]Prullenbak[/A]</string>
+    <string name="context_empty_rubbish_bin">[B]Lege[/B][A]Prullenbak[/A]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
     <string name="context_empty_inbox">[B]Geen bestanden in uw [/B][A]Inbox[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
@@ -2194,19 +2194,19 @@
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
     <string name="context_empty_links">[B]Nee [/B][A]Openbare Links[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
-    <string name="tab_sent_requests">Verstuur aanvragen</string>
+    <string name="tab_sent_requests">Verstuurde verzoeken</string>
     <!-- Title of the received requests tab. Capital letters -->
-    <string name="tab_received_requests">Ontvangen aanvragen</string>
+    <string name="tab_received_requests">Ontvangen verzoeken</string>
     <!-- Title dialog overquota error -->
-    <string name="overquota_alert_title">Tegoed overschreden</string>
+    <string name="overquota_alert_title">Opslag tegoed overschreden</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
-    <string name="invalid_link">Ongeldige koppeling, vraag om een nieuwe geldige koppeling</string>
+    <string name="invalid_link">Ongeldige link, vraag om een nieuwe geldige link</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
-    <string name="invalid_link_password">Ongeldig linkwachtwoord</string>
+    <string name="invalid_link_password">Ongeldig link wachtwoord</string>
     <!-- Error message shown when user tries to open a not valid MEGA link -->
     <string name="open_link_not_valid_link">De link die u probeert te openen, is geen geldige MEGA-link.</string>
     <!-- Message shown when a link is being processing -->
-    <string name="processing_link">Koppeling verwerken&#8230;</string>
+    <string name="processing_link">Link verwerken&#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
     <string name="passwd_weak">Uw wachtwoord is makkelijk te raden. Probeer uw wachtwoord langer te maken. Combineer hoofdletter en kleine letters. Voeg speciale tekens toe. Gebruik geen namen of woordenboek woorden.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
@@ -2216,17 +2216,17 @@
     <!-- Message shown when it is creating an acount and it is been introduced a strong password -->
     <string name="passwd_strong">Dit wachtwoord zal de meest geavanceerde brute-force aanvallen weerstaan. Zorg ervoor dat u deze goed onthoudt.</string>
     <!-- Password very weak -->
-    <string name="pass_very_weak">Heel Zwak</string>
+    <string name="pass_very_weak">Heel zwak</string>
     <!-- Password weak -->
     <string name="pass_weak">Zwak</string>
     <!-- Password medium -->
-    <string name="pass_medium">Middelmatig</string>
+    <string name="pass_medium">Gemiddeld</string>
     <!-- Password good -->
     <string name="pass_good">Goed</string>
     <!-- Password strong -->
     <string name="pass_strong">Sterk</string>
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
-    <string name="title_notification_call_in_progress">Gesprek in behandeling</string>
+    <string name="title_notification_call_in_progress">Oproep in behandeling</string>
     <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
     <string name="action_notification_call_in_progress">Klik om terug te gaan naar het gesprek</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
@@ -2236,7 +2236,7 @@
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Telefoon contacten</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
-    <string name="account_suspended_multiple_breaches_ToS">Uw account is geschorst door meerdere misbruiken van MEGA’s Algemene Voorwaarden. Controleer uw email postbak.</string>
+    <string name="account_suspended_multiple_breaches_ToS">Uw account is geschorst door meerdere misbruiken van MEGA’s Algemene Voorwaarden. Controleer uw email postvak in.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
     <string name="account_suspended_breache_ToS">Uw account was beëindigd door een schending van MEGA’s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2280,7 +2280,7 @@
         <item quantity="other">Vorige versies</item>
     </plurals>
     <!-- option menu to revert a file version -->
-    <string name="general_revert">Terugkeren</string>
+    <string name="general_revert">Terughalen</string>
     <!-- option menu to clear all the previous versions -->
     <string name="menu_item_clear_versions">Vorige versies wissen</string>
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
@@ -2293,13 +2293,13 @@
     <!-- Content of the dialog to confirm that several versions are going to be deleted -->
     <string name="content_dialog_delete_multiple_version">Deze %d versies worden permanent verwijderd.</string>
     <!-- Title of the notification shown when a file is uploading to a chat -->
-    <string name="chat_upload_title_notification">Uploaden gesprek</string>
+    <string name="chat_upload_title_notification">Gesprek uploaden</string>
     <!-- Label for the option on setting to set up the quality of multimedia files uploaded to the chat -->
     <string name="settings_chat_upload_quality">Video kwaliteit</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
     <string name="settings_video_upload_quality">Video Kwaliteit</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
-    <string name="on_refuse_storage_permission">Camera Uploads heeft toegang nodig tot uw foto’s en andere media op uw apparaat. Gaar naar de instellingen pagina en geef toestemming.</string>
+    <string name="on_refuse_storage_permission">Camera Uploads heeft toegang nodig tot uw foto’s en andere media op uw apparaat. Ga naar de instellingen pagina en geef toestemming.</string>
     <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Originele kwaliteit</item>
@@ -2370,21 +2370,21 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Wachtwoord geaccepteerd</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Verkeerd wachtwoord.\nBackup uw Herstelsleutel zo snel mogelijk!</string>
+    <string name="test_pwd_wrong">Onjuist wachtwoord.\nMaak zo snel mogelijk een Backup van uw Herstelsleutel!</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
     <string name="recovery_key_exported_dialog_text_logout">U staat op het punt om uit te loggen, test uw wachtwoord om zeker te zijn dat u het herinnerd.\n als u uw wachtwoord verliest, verliest u toegang tot uw MEGA gegevens.</string>
     <!-- Option that permits user copy to clipboard -->
-    <string name="option_copy_to_clipboard">Kopieer naar klembord</string>
+    <string name="option_copy_to_clipboard">Kopiëren naar klembord</string>
     <!-- Option that permits user export his recovery key -->
     <string name="option_export_recovery_key">Herstelsleutel Exporteren</string>
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Doorgaan met uitloggen</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="recovery_key_bottom_sheet">Herstel Sleutel</string>
+    <string name="recovery_key_bottom_sheet">Herstelsleutel</string>
     <!-- Option that permits user save on File System -->
     <string name="option_save_on_filesystem">Opslaan op Bestandssysteem</string>
     <!-- Message shown when something has been copied to clipboard -->
-    <string name="message_copied_to_clipboard">Gekopiëerd naar klembord</string>
+    <string name="message_copied_to_clipboard">Gekopieerd naar klembord</string>
     <!-- text of the label to show that you have messages unread in the chat conversation -->
     <string name="message_jump_latest">Ga naar de laatste</string>
     <!-- text of the label to show that you have new messages in the chat conversation -->
@@ -2416,11 +2416,11 @@
     <!-- Title of the preference Recovery key on Settings section -->
     <string name="settings_recovery_key_title">Reservekopie Herstelsleutel</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_summary">Het exporteren en bewaren van de Master Key op een veilige locatie stelt u in staat om een nieuw wachtwoord in te stellen zonder het verlies van gegevens.</string>
+    <string name="settings_recovery_key_summary">Het exporteren en bewaren van de Herstelsleutel op een veilige locatie stelt u in staat om een nieuw wachtwoord in te stellen zonder het verlies van gegevens.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
     <string name="login_connectivity_issues">Niet in staat om MEGA te bereiken. Controleer uw connectiviteit of probeer later nogmaals.</string>
     <!-- message when a temporary error on logging in is due to servers busy -->
-    <string name="login_servers_busy">De servers zijn te druk.Wacht a.u.b.</string>
+    <string name="login_servers_busy">De servers zijn te druk. Wacht a.u.b.</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
     <string name="login_API_lock">Dit process duurt langer dan verwacht. Wacht alstublieft.</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to a rate limit -->
@@ -2432,17 +2432,17 @@
     <!-- when open audio video player, the file that it try to open is damaged or does not exist -->
     <string name="corrupt_video_dialog_text">Fout. Het bestand is corrupt of bestaat niet.</string>
     <!-- Title of the screen Playlist -->
-    <string name="section_playlist">Speellijst</string>
+    <string name="section_playlist">Afspeellijst</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing -->
     <string name="playlist_state_playing">Nu afspelen&#8230;</string>
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
     <string name="playlist_state_paused">Gepauzeerd</string>
     <!-- Menu option to print the recovery key from Offline section -->
-    <string name="context_option_print">Uitprinten</string>
+    <string name="context_option_print">Printen</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
     <string name="save_MK_confirmation">De Herstelsleutel was succesvol opgeslagen</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
-    <string name="pending_outshare_indicator">(Afwachting)</string>
+    <string name="pending_outshare_indicator">(In behandeling)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="option_enable_chat_rich_preview">Rijke URL Weergave</string>
     <!-- Button to allow the rich links previews on chat -->
@@ -2475,23 +2475,23 @@
     <!-- Empty state message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty_new">[B]Geen voltooide [/B][A] Overdrachten[/A]</string>
     <!-- Empty state text that indicates that a folder is currently empty -->
-    <string name="file_browser_empty_folder_new">[B]Leegmaken[/B][A]Map[/A]</string>
+    <string name="file_browser_empty_folder_new">[A]Map[/A][B]leegmaken[/B]</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with customized title) -->
     <string name="type_message_hint_with_customized_title">Schrijf bericht naar “%s”&#8230;</string>
     <!-- Hint shown in the field to write a message in the chat screen (chat with default title) -->
     <string name="type_message_hint_with_default_title">Schrijf bericht naar %s&#8230;</string>
     <!-- Title of setting Two-Factor Authentication -->
-    <string name="settings_2fa">Twee-Stap Authenticatie</string>
+    <string name="settings_2fa">Twee-Stap’s Authenticatie</string>
     <!-- Subtitle of setting Two-Factor Authentication when the preference is disabled -->
-    <string name="setting_subtitle_2fa">Twee-Stap Authenticatie is een tweede laag aan beveiliging voor uw account</string>
+    <string name="setting_subtitle_2fa">Twee-Stap’s Authenticatie is een tweede laag aan beveiliging voor uw account</string>
     <!-- Title of the screen Two-Factor Authentication -->
-    <string name="title_2fa">Waarom heeft u twee-stap authenticatie nodig?</string>
+    <string name="title_2fa">Waarom heeft u twee-stap’s authenticatie nodig?</string>
     <!--  -->
     <string name="two_factor_authentication_explain">Twee-stap authenticatie is een tweede laag aan beveiliging voor uw account. Wat betekent dat zelfs als iemand uw wachtwoord weet ze geen toegang kunnen krijgen, zonder ook toegang te hebben tot de 6 cijferige code waar alleen u toegang tot heeft.</string>
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
-    <string name="button_setup_2fa">Begin de Installatie</string>
+    <string name="button_setup_2fa">Begin het Instellen</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">Scan of kopieer de seed naar uw Authenticator Applicatie</string>
+    <string name="explain_qr_seed_2fa_1">Scan of kopieer de seed naar uw Authenticator Applicatie.</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
     <string name="explain_qr_seed_2fa_2">Zorg ervoor dat u een backup maakt op een veilige plek voor het geval u uw apparaat verliest.</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
@@ -2505,7 +2505,7 @@
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
     <string name="qr_seed_text_error">Een fout heeft opgetreden bij het genereren van de seed of QR code, probeer nogmaals.</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="title_2fa_enabled">Twee-Stap Authenticatie Ingeschakeld</string>
+    <string name="title_2fa_enabled">Twee-Stap’s Authenticatie Ingeschakeld</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw Authenticatie Applicatie.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
@@ -2521,7 +2521,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
     <string name="verify_2fa_subtitle_change_email">E-mailadres wijzigen</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for cancelling account -->
-    <string name="verify_2fa_subtitle_delete_account">Verwijder account</string>
+    <string name="verify_2fa_subtitle_delete_account">Account Verwijderen</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Uitschakelen</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2537,9 +2537,9 @@
     <!-- Text of the button which action is to show the authentication apps -->
     <string name="open_app_button">Openen in</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
-    <string name="intent_not_available_2fa">Er is geen enkele beschikbare applicatie om Twee-Stap Authenticatie op uw apparaat in te schakelen.</string>
+    <string name="intent_not_available_2fa">Er is geen enkele beschikbare applicatie om Twee-Stap’s Authenticatie op uw apparaat in te schakelen.</string>
     <!-- Text button -->
-    <string name="general_close">Sluit</string>
+    <string name="general_close">Sluiten</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Exporteer uw Herstelsleutel om te voltooien</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
@@ -2549,7 +2549,7 @@
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
-    <string name="text_2fa_help">U heeft een authenticatie applicatie nodig om 2FA in te schakelen op MEGA.U kunt de applicatie Google Authenticator, Duo Mobile, Authy of Microsoft Authenticator downloaden en installeren voor uw telefoon of tablet.</string>
+    <string name="text_2fa_help">U heeft een authenticatie applicatie nodig om 2FA in te schakelen op MEGA. U kunt de applicatie Google Authenticator, Duo Mobile, Authy of Microsoft Authenticator downloaden en installeren voor uw telefoon of tablet.</string>
     <!-- success message when importing multiple files from -->
     <string name="number_correctly_imported_from_chat">%d bestanden succesvol gedeeld</string>
     <!-- error message when importing multiple files from chat -->
@@ -2584,13 +2584,13 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Oproep was niet beantwoord[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Contact E-mail</string>
+    <string name="contact_email">Contact’s E-mail</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">U heeft dit contact al toegevoegd.</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_invalid_format">Ongeldig bericht formaat</string>
     <!-- Content of a normal message that cannot be recognized -->
-    <string name="error_message_invalid_signature">Ongeldig bericht handtekening</string>
+    <string name="error_message_invalid_signature">Ongeldig handtekening bericht</string>
     <!-- When the user tries to reproduce a file through streaming and ocurred an error creating it -->
     <string name="error_streaming">Een fout heeft opgetreden tijdens het creëren van de stream</string>
     <!-- Menu option to restore an item from the Rubbish bin -->
@@ -2609,19 +2609,19 @@
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdrop mappen worden nog niet ondersteund</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
-    <string name="pre_overquota_alert_text">Deze actie kon niet voltooid worden omdat het u over de huidige opslag limiet brengt.Wilt u uw account upgraden?</string>
+    <string name="pre_overquota_alert_text">Deze actie kon niet voltooid worden omdat het u over de huidige opslag limiet brengt. Wilt u uw account upgraden?</string>
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">Gearchiveerde gesprekken</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Opgeslagen gesprekken (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Gearchiveerd gesprek</string>
+    <string name="archive_chat_option">Gesprek archiveren</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Gesprek niet archiveren</string>
+    <string name="unarchive_chat_option">Gesprek dearchiveren</string>
     <!-- Confirmation button of the dialog to archive a chat -->
-    <string name="general_archive">Archief</string>
+    <string name="general_archive">Archiveren</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
-    <string name="general_unarchive">Niet archiveren</string>
+    <string name="general_unarchive">Dearchiveren</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
     <string name="success_archive_chat">%s gesprek was opgeslagen.</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
@@ -2629,7 +2629,7 @@
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
     <string name="success_unarchive_chat">%s gesprek uit het archief gehaald.</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Fout. %s was niet in staat om het gesprek uit het archief te halen.</string>
+    <string name="error_unarchive_chat">Fout. %s was niet in staat om het gesprek te dearchiveren</string>
     <!-- Message shown when the user has no archived chats -->
     <string name="archived_chats_empty">[A]Geen[/A] [B]Gearchiveerde Gesprekken[/B]</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
@@ -2645,7 +2645,7 @@
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
     <string name="invite_contacts">Contacten uitnodigen</string>
     <!-- Label shown when the user wants to share something with other contacts -->
-    <string name="share_with">Deel met</string>
+    <string name="share_with">Delen met</string>
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading_share">Contacten laden&#8230;</string>
     <!-- Title of the screen New Group -->
@@ -2659,9 +2659,9 @@
     <!-- Settings preference title to show file versions info of the account -->
     <string name="settings_file_management_file_versions_title">Bestandsversies</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
-    <string name="settings_file_management_file_versions_subtitle">%1$d bestandsversies, heeft een totaal van %2$s</string>
+    <string name="settings_file_management_file_versions_subtitle">%1$d bestandsversies, hebben een totaal van %2$s</string>
     <!-- Title of the section File management on Settings section -->
-    <string name="settings_file_management_category">Bestandsmanagement</string>
+    <string name="settings_file_management_category">Bestandsbeheer</string>
     <!-- Option in Settings to delete all the versions of the account -->
     <string name="settings_file_management_delete_versions">Verwijder alle oudere versies van mijn bestanden</string>
     <!-- subtitle of the option in Settings to delete all the versions of the account -->
@@ -2677,21 +2677,21 @@
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Versionering inschakelen of uitschakelen voor uw gehele account. \nVersionering uischakelen zorgt er niet voor dat uw contacten nieuwe versies kunnen creëren in gedeelde mappen.</string>
     <!-- section title to select a chat to send a file -->
-    <string name="choose_chat">Kies gesprek</string>
+    <string name="choose_chat">Gesprek kiezen</string>
     <!-- Hint shown to guide user on activity add contacts -->
-    <string name="type_mail">Tik, enter naam of email</string>
+    <string name="type_mail">Tik, naam of email invoeren</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
-    <string name="confirmation_invite_contact">Wilt u %s naar uw contacten toevoegen?</string>
+    <string name="confirmation_invite_contact">Wilt u %s tot uw contacten toevoegen?</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
     <string name="confirmation_not_invite_contact">U heeft het contact %s al toegevoegd.</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned and is already added before -->
     <string name="confirmation_invite_contact_already_added">U heeft het contact %s al toegevoegd.</string>
     <!-- Text of the confirm dialog shown when it wants to add a contact from a QR scaned -->
-    <string name="confirmation_share_contact">Deel met %s?</string>
+    <string name="confirmation_share_contact">Delen met %s?</string>
     <!-- Text button for init a group chat -->
     <string name="new_group_chat_label">Nieuw groep gesprek</string>
     <!-- Label shown when the user wants to add contacts into a chat conversation -->
-    <string name="send_contacts">Stuur contacten</string>
+    <string name="send_contacts">Verstuur contacten</string>
     <!-- Title of the alert when the account have been logged out from another client -->
     <string name="title_alert_logged_out">Afgemeld</string>
     <!-- Text shown to indicate user that his account has already been confirmed -->
@@ -2735,9 +2735,9 @@
     <!-- Title of file explorer to send a link -->
     <string name="title_file_explorer_send_link">Link verzenden naar &#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
-    <string name="title_chat_explorer">Verstuur naar&#8230;</string>
+    <string name="title_chat_explorer">Versturen naar&#8230;</string>
     <!-- Title of cloud explorer to upload a link or file -->
-    <string name="title_cloud_explorer">Upload naar&#8230;</string>
+    <string name="title_cloud_explorer">Uploaden  naar&#8230;</string>
     <!-- More button in contact info page -->
     <string name="contact_info_button_more">Meer</string>
     <!-- Section title to select a file to perform an action, more files -->
@@ -2748,7 +2748,7 @@
     <!-- Title of confirmation dialog of sending invitation to a contact -->
     <string name="title_confirm_send_invitation">%1$s Uitodigen?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
-    <string name="title_share_folder_explorer">Kies een map</string>
+    <string name="title_share_folder_explorer">Kies map</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
     <string name="login_warning_abort_transfers">Alle overdrachten worden geannuleerd, wilt u inloggen?</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -2772,7 +2772,7 @@
     <!-- When app is retrieving push message -->
     <string name="retrieving_message_title">Bericht binnenhalen</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Prullenbak Legen Rooster</string>
+    <string name="settings_rb_scheduler_enable_title">Prullenbak Opruimplanner</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
     <string name="settings_rb_scheduler_enable_subtitle">De Prulenbak wordt automatisch voor u gewist.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2786,7 +2786,7 @@
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="settings_rb_scheduler_select_days_subtitle">%d dagen</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
-    <string name="settings_video_compression_queue_size_popup_title">Laat me weten wanneer de maat groter is dan</string>
+    <string name="settings_video_compression_queue_size_popup_title">Laat me weten wanneer de grootte groter is dan</string>
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Als video’s die gecomprimeerd moeten worden groter zijn dan</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
@@ -2794,25 +2794,25 @@
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">dagen</string>
     <!-- Title of the option to generate a public chat link -->
-    <string name="get_chat_link_option">Haal gesprekslink</string>
+    <string name="get_chat_link_option">Gesprekslink ophalen</string>
     <!-- Title of the option to manage a public chat link -->
-    <string name="manage_chat_link_option">Beheer Gesprek Koppeling</string>
+    <string name="manage_chat_link_option">Beheer Gesprekslink</string>
     <!-- Title of the option to make a public chat private -->
     <string name="make_chat_private_option">Schakel Rotatie van Coderingssleutel in</string>
     <!-- Title of the view to inform that a chat is private -->
-    <string name="private_chat">Roulatie van coderingssleutel ingeschakeld</string>
+    <string name="private_chat">Rotatie van coderingssleutel ingeschakeld</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="make_chat_private_option_text">Het omwisselen van de coderingssleutel is iets veiliger, maar u kunt geen chatlink maken en nieuwe deelnemers zullen geen eerdere berichten zien.</string>
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
-    <string name="make_chat_private_not_available_text">Roulatie van coderingssleutel is uitgeschakeld voor gesprekken met meer dan 100 deelnemers.</string>
+    <string name="make_chat_private_not_available_text">Rotatie van coderingssleutel is uitgeschakeld voor gesprekken met meer dan 100 deelnemers.</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
     <string name="warning_make_chat_private">Kan deze chat niet omzetten in privé omdat de deelnemerslimiet is overschreden.</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s [/A][B] heeft een gesprekskoppeling gemaakt.[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
-    <string name="message_deleted_chat_link">[A]%1$s[/A][B] heeft een chat link verwijderd.[/B]</string>
+    <string name="message_deleted_chat_link">[A]%1$s[/A][B] heeft een chatlink verwijderd.[/B]</string>
     <!-- Title of the option to delete a chat link -->
-    <string name="action_delete_link">Verwijder Gesprekskoppeling</string>
+    <string name="action_delete_link">Gesprekslink verwijderen</string>
     <!-- Title of the alert when a chat link is invalid -->
     <string name="title_alert_chat_link_error">Gesprekslink</string>
     <!-- Text of the dialog to confirm after closing all other sessions -->
@@ -2826,27 +2826,27 @@
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">Waarnemers</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link -->
-    <string name="error_chat_link">Fout bij laden van de Gesprekskoppeling.</string>
+    <string name="error_chat_link">Fout bij het laden van de Gesprekslink.</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
-    <string name="error_chat_link_init_error">Fout bij initialiseren van het gesprek bij het laden van de Gesprekskoppeling.</string>
+    <string name="error_chat_link_init_error">Fout bij het initialiseren van de chat bij het laden van de gesprekslink.</string>
     <!-- Message on the alert to preview a chat link if the user is already a participant -->
     <string name="alert_already_participant_chat_link">U neemt al deel aan dit gesprek.</string>
     <!-- Message on the alert to close a chat preview if the link is invalid -->
     <string name="alert_invalid_preview">Deze chat weergave is niet langer beschikbaar. Als u deze weergave verlaat, bent u niet in staat het te heropenen.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
-    <string name="message_set_chat_private">[A]%1$s[/A][B] ingeschakelde coderingssleutelrotatie.[/B]</string>
+    <string name="message_set_chat_private">[A]%1$s[/A][B] coderingssleutelrotatie ingeschakeld.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
     <string name="invalid_chat_link">Dit gesprek is niet langer beschikbaar</string>
     <!-- error message shown when a chat link is not well formed -->
-    <string name="invalid_chat_link_args">Ongeldige Gesprekskoppeling</string>
+    <string name="invalid_chat_link_args">Ongeldige Gesprekslink</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
-    <string name="ekr_label">Rotatie van Coderingssleutel</string>
+    <string name="ekr_label">Coderingssleutel Rotatie</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="ekr_explanation">Het omwisselen van de coderingssleutel is iets veiliger, maar u kunt geen chatlink maken en nieuwe deelnemers zullen geen eerdere berichten zien.</string>
+    <string name="ekr_explanation">Het roteren van de coderingssleutel is iets veiliger, maar u kunt geen chatlink maken en nieuwe deelnemers zullen geen eerdere berichten zien.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">Het omwisselen van de coderingssleutel is iets veiliger, maar u kunt geen chatlink maken en nieuwe deelnemers zullen geen eerdere berichten zien.</string>
     <!-- Menu item -->
-    <string name="action_open_chat_link">Gesprekskoppeling Openen</string>
+    <string name="action_open_chat_link">Gesprekslink Openen</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">De uitnodiging naar contact %s was al verzonden en kan gezien worden in de Verzonden Verzoeken tabblad.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
@@ -2858,9 +2858,9 @@
     <!-- Item menu option upon right click on one or multiple files -->
     <string name="general_save_to_device">Opslaan naar apparaat</string>
     <!-- Title of cloud explorer to upload a file -->
-    <string name="title_upload_explorer">Upload naar MEGA</string>
+    <string name="title_upload_explorer">Uploaden naar MEGA</string>
     <!-- Label choose destination -->
-    <string name="choose_destionation">Kies locatie</string>
+    <string name="choose_destionation">Locatie kiezen</string>
     <!-- Label that indicates show more items -->
     <string name="general_show_more">Meer Weergeven</string>
     <!-- Label that indicates show less items -->
@@ -2876,7 +2876,7 @@
     <!-- Title of the historic notification for a contact request cancelled -->
     <string name="title_contact_request_notification_cancelled">Contact verzoek geannuleerd</string>
     <!-- Subtitle of the historic notification for contact request cancelled -->
-    <string name="subtitle_contact_request_notification_cancelled">[A]%s [/A][B]heeft de contact verzoek geannuleerd.[/B]</string>
+    <string name="subtitle_contact_request_notification_cancelled">[A]%s [/A][B]heeft het contact verzoek geannuleerd.[/B]</string>
     <!-- Title of the historic notification when an user deletes you as contact -->
     <string name="title_contact_notification_deleted">Contact verwijderd</string>
     <!-- Subtitle of the historic notification when an user deletes you as contact -->
@@ -2886,7 +2886,7 @@
     <!-- Subtitle of the historic notification when an user blocks you as contact -->
     <string name="subtitle_contact_notification_blocked">[A]%s [/A][B]heeft u als een contact geblokkeerd.[/B]</string>
     <!-- Item of the navigation title for the notification section when there is any unread -->
-    <string name="section_notification_with_unread">Notificaties [A](%1$d)[/A]</string>
+    <string name="section_notification_with_unread">Meldingen [A](%1$d)[/A]</string>
     <!-- Text shown in the notifications section. When a contact has nickname, nickname (email) will be shown -->
     <string name="section_notification_user_with_nickname">[A]%1$s (%2$s)[/A]</string>
     <!-- Title of the historic notification for an account deleted -->
@@ -2898,13 +2898,13 @@
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]Uw publieke gedeelde map [/A][B]%s[/B][C] is weggehaald.[/C]</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
-    <string name="message_file_takedown_pop_out_notification">Dit bestand is het onderwerp van een take-down-verzoek geweest.</string>
+    <string name="message_file_takedown_pop_out_notification">Dit bestand is het onderwerp van een take-down-melding geweest.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
-    <string name="message_folder_takedown_pop_out_notification">Deze map is het onderwerp van een take-down-verzoek geweest.</string>
+    <string name="message_folder_takedown_pop_out_notification">Deze map is het onderwerp van een take-down-melding geweest.</string>
     <!-- option to dispute taken down file or folder -->
-    <string name="dispute_takendown_file">Geschil Verwijdering</string>
+    <string name="dispute_takendown_file">Verwijdering van geschil</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Niet toegangelijk door ToS/AUP schending</string>
+    <string name="error_download_takendown_node">Niet toegangelijk door overtreding van de Algemene Voorwaarden</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
         <item quantity="one">%d-bestand is niet gedownload vanwege ToS/AUP-schending.</item>
@@ -2951,9 +2951,9 @@
     <!-- Option of yearly billing period. Placeholder: purchase price -->
     <string name="billed_yearly_text">[A]Jaarlijks[/A] %s/jaar</string>
     <!-- dialog option cancel in alert dialog -->
-    <string name="button_cancel">Annuleer</string>
+    <string name="button_cancel">Annuleren</string>
     <!-- dialog option continue in alert dialog -->
-    <string name="button_continue">Vervolgen</string>
+    <string name="button_continue">Doorgaan</string>
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (abonnement)</string>
     <!-- one of the payment methods -->
@@ -2981,7 +2981,7 @@
     <!-- Notification message when compressing video to show the compressed percentage. Please, keep the placeholder because it is for adding the percentage value at runtime. -->
     <string name="message_compress_video">%s is gecomprimeerd</string>
     <!-- notification title when compressing video -->
-    <string name="title_compress_video">Video’s comprimeren %1$d/%2$d</string>
+    <string name="title_compress_video">Video’s Comprimeren %1$d/%2$d</string>
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Ongeldige map geselecteerd</string>
     <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
@@ -3028,9 +3028,9 @@
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s en %2$d meer</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
-    <string name="message_error_set_title_get_link">Voordat u een koppeling kunt genereren voor dit gesprek, moet u een omschrijving instellen:</string>
+    <string name="message_error_set_title_get_link">Voordat u een link kunt genereren voor dit gesprek, moet u een omschrijving instellen:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Gesprekskoppeling gekopieerd naar het klembord</string>
+    <string name="chat_link_copied_clipboard">Gesprekslink gekopieerd naar het klembord</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]Van[/A] %s / [A]maand[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -3040,9 +3040,9 @@
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">SSL sleutel fout</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGA kan geen veilige verbinding maken via SSL. Mogelijk gebruikt u openbare wifi met aanvullende vereisten.</string>
+    <string name="ssl_error_dialog_text">MEGA kan geen veilige verbinding maken via SSL. Mogelijk gebruikt u openbare Wi-Fi met aanvullende vereisten.</string>
     <!-- Text of the empty screen for the notifications section -->
-    <string name="context_empty_notifications">[B]Geen [/B][A]Notificaties[/A]</string>
+    <string name="context_empty_notifications">[B]Geen [/B][A]Meldingen[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA Instellen</string>
     <!-- Permissions screen explanation -->
@@ -3109,7 +3109,7 @@
     <!-- Text of the empty screen for the chat shared files -->
     <string name="context_empty_shared_files">[B]No [/B][A]Shared Files[/A]</string>
     <!-- Text to indicate that a contact has joined a group call -->
-    <string name="contact_joined_the_call">%1$s is toegetreden tot de oproep</string>
+    <string name="contact_joined_the_call">%1$s neemt deel tot de oproep</string>
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s heeft de oproep verlaten</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
@@ -3131,17 +3131,17 @@
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">Berichten bevatten ongeldige metadata</string>
     <!-- Title of the activity that sends a location -->
-    <string name="title_activity_maps">Stuur locatie</string>
+    <string name="title_activity_maps">Verstuur locatie</string>
     <!-- Label layout on maps activity that permits send current location -->
-    <string name="current_location_label">Verzend uw huidige locatie</string>
+    <string name="current_location_label">Verstuur uw huidige locatie</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
-    <string name="current_location_landscape_label">Verzend uw huidige locatie: [A]%1$s[/A]</string>
+    <string name="current_location_landscape_label">Verstuur uw huidige locatie: [A]%1$s[/A]</string>
     <!-- Label layout on maps activity indicating nearby places -->
     <string name="nearby_places_label">Plaatsen in de buurt</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
-    <string name="explanation_send_location">Deze locatie wordt geopend met behulp van een externe kaartenleverancier buiten het end-to-end gecodeerde MEGA-platform.</string>
+    <string name="explanation_send_location">Deze locatie wordt geopend met behulp van een externe kaartenleverancier buiten de end-to-end gecodeerde MEGA-platform.</string>
     <!-- Title of the location marker set by the user -->
-    <string name="title_marker_maps">Verzend deze locatie</string>
+    <string name="title_marker_maps">Verstuur deze locatie</string>
     <!-- Label shown when after a maps search and no places were found -->
     <string name="no_places_found">Er zijn geen plaatsen gevonden</string>
     <!-- Title of the dialog shown when the location is disabled -->
@@ -3162,7 +3162,7 @@
     <!-- Title of a chat message that contains geolocation info -->
     <string name="title_geolocation_message">Vastgezette locatie</string>
     <!-- Text of the button to indicate an attachment upload from file system -->
-    <string name="attachment_upload_panel_from_device">Van Bestandssysteem</string>
+    <string name="attachment_upload_panel_from_device">Vanuit Bestandssysteem</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
         <item quantity="one">%d bestand is niet verzonden naar %d gesprekken</item>
@@ -3202,7 +3202,7 @@
     <!-- Error message when the attachment cannot be sent to any of the selected chats -->
     <string name="error_sent_as_message">Fout. Het bestand was niet verzonden naar elk van de geselecteerde gesprekken</string>
     <!-- Action delete all file versions -->
-    <string name="delete_versions">Verwijder vorige versies</string>
+    <string name="delete_versions">Vorige versies verwijderen</string>
     <!-- Title of the dialog shown when it wants to delete the version history of a file -->
     <string name="title_delete_version_history">Vorige versies verwijderen?</string>
     <!-- Text of the dialog shown when it wants to delete the version history of a file -->
@@ -3228,7 +3228,7 @@
     <!-- Title of first tour screen -->
     <string name="title_tour_one">U heeft de sleutels</string>
     <!-- Content of first tour screen -->
-    <string name="content_tour_one">Veiligheid is waarom we bestaan, uw bestanden zijn veilig bij ons achter een goed geolied coderingsapparaat waar alleen u toegang heeft tot uw bestanden.</string>
+    <string name="content_tour_one">Veiligheid is waarom we bestaan, uw bestanden zijn veilig bij ons achter een goed geoliede coderingsapparaat waar alleen u toegang heeft tot uw bestanden.</string>
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Gecodeerd gesprek</string>
     <!-- Content of second tour screen -->
@@ -3240,7 +3240,7 @@
     <!-- Title of fourth tour screen -->
     <string name="title_tour_four">Uw Foto’s in de Cloud</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_four">Camera uploads is een essentieel kenmerk voor elk mobiel apparaat en wij hebben u bedekt. Creëer uw account nu.</string>
+    <string name="content_tour_four">Camera uploads zijn een essentiële functie voor elk mobiel apparaat en wij helpen u daarbij. Creëer uw account nu.</string>
     <!-- Title of the dialog shown when a pdf required password -->
     <string name="title_pdf_password">Vul uw wachtwoord in</string>
     <!-- Text of the dialog shown when a pdf required password -->
@@ -3266,11 +3266,11 @@
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Dit gesprek blijft niet langer toegankelijk via de gesprekslink zodra het is verwijderd.</string>
     <!-- Description text of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_warning_text">Met Gecodeerde Sleutelrotatie kunt u geen Gesprekskoppeling krijgen zonder een nieuwe groepgesprek te maken.</string>
+    <string name="context_create_chat_link_warning_text">Met Gecodeerde Sleutelrotatie kunt u geen Gesprekslink krijgen zonder een nieuwe groepgesprek te maken.</string>
     <!-- Question of the dialog to generate a public chat link -->
-    <string name="context_create_chat_link_question_text">Wilt u een nieuwe groepsgesprek maken en een Gesprekskoppeling krijgen?</string>
+    <string name="context_create_chat_link_question_text">Wilt u een nieuwe groepsgesprek maken en een Gesprekslink krijgen?</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="context_make_private_chat_warning_text">Het omwisselen van de coderingssleutel is iets veiliger, maar u kunt geen chatlink maken en nieuwe deelnemers zullen geen eerdere berichten zien.</string>
+    <string name="context_make_private_chat_warning_text">Het roteren van de coderingssleutel is iets veiliger, maar u kunt geen chatlink maken en nieuwe deelnemers zullen geen eerdere berichten zien.</string>
     <!-- Message shown when a user has joined to a public chat successfully -->
     <string name="message_joined_successfully">U heeft zich succesvol aangesloten tot het gesprek</string>
     <!-- Label that indicates the steps of a wizard -->
@@ -3278,7 +3278,7 @@
     <!-- Hint of the Search view -->
     <string name="hint_action_search">Zoeken&#8230;</string>
     <!-- Notification button which is displayed to answer an incoming call if the call screen is not displayed for some reason. -->
-    <string name="answer_call_incoming">Antwoord</string>
+    <string name="answer_call_incoming">Antwoorden</string>
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Negeren</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
@@ -3296,7 +3296,7 @@
     <!-- The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other. -->
     <string name="end_and_answer_call_incoming">Beëindigen en Antwoorden</string>
     <!-- The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other. -->
-    <string name="end_and_join_call_incoming">Beëindigen en Toetreden</string>
+    <string name="end_and_join_call_incoming">Beëindigen en Aansluiten</string>
     <!-- when trying to download a file that is already downloaded in the device and has to copy in another path -->
     <string name="copy_already_downloaded">Bestand al gedownload. Gekopieerd naar de geselecteerde bestemming.</string>
     <!-- Title of the dialog shown when you want to join a group call -->
@@ -3306,25 +3306,25 @@
     <!-- Text of the dialog shown when you want to join a group call but you are in another active call -->
     <string name="text_join_another_call">Om toe te treden tot dit gesprek moet u het huidige gesprek stoppen of in de wacht zetten.</string>
     <!-- Hint shown in the open chat link alert dialog -->
-    <string name="hint_enter_chat_link">Voer gesprekslink in</string>
+    <string name="hint_enter_chat_link">Gesprekslink invoeren</string>
     <!-- Hint shown in the open link alert dialog -->
-    <string name="hint_paste_link">Plak link</string>
+    <string name="hint_paste_link">Link plakken</string>
     <!-- Error shown when it tries to open an invalid file or folder link -->
     <string name="invalid_file_folder_link">Ongeldig bestand of map koppeling</string>
     <!-- Error shown when it tries to open an invalid file or folder link and the text view is empty -->
-    <string name="invalid_file_folder_link_empty">Voer een geldige bestand of map koppeling in</string>
+    <string name="invalid_file_folder_link_empty">Voer een geldige bestand of map link in</string>
     <!-- Error shown when it tries to open an invalid chat link and the text view is empty -->
     <string name="invalid_chat_link_empty">Voer een geldige gesprek link in</string>
     <!-- Error shown when it tries to open a chat link from the Cloud Drive section -->
-    <string name="valid_chat_link">U heeft een gesprek link gekplakt.</string>
+    <string name="valid_chat_link">U heeft een gesprekslink gekplakt.</string>
     <!-- Error shown when it tries to open a contact link from the Cloud Drive section -->
     <string name="valid_contact_link">U heeft een contact link geplakt.</string>
     <!-- Menu item -->
-    <string name="action_open_contact_link">Open contact link</string>
+    <string name="action_open_contact_link">Contact link openen</string>
     <!-- Explanation of the dialog shown to share a chat link -->
-    <string name="copy_link_explanation">Personen kunnen aansluiten tot uw groep door deze koppeling te gebruiken.</string>
+    <string name="copy_link_explanation">Personen kunnen aansluiten tot uw groep door deze link te gebruiken.</string>
     <!-- Label that indicates the creation of a chat link -->
-    <string name="new_chat_link_label">Nieuwe Gesprek Link</string>
+    <string name="new_chat_link_label">Nieuwe gesprekslink</string>
     <!-- Title of the dialog shown when the user it is creating a chat link and the chat has not title -->
     <string name="enter_group_name">Voer groep naam in</string>
     <!-- Alert shown when the user it is creating a chat link and the chat has not title -->
@@ -3334,9 +3334,9 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Begin met veilig chatten met uw contacten door gebruik van end-to-end encryptie</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hoi! Houd veilige gesprekken op MEGA met mij en krijg tot 50 GB gratis opslag. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hoi! Krijg veilige gesprekken op MEGA met mij en krijg tot 20 GB+ gratis opslag. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
-    <string name="no_chat_link_available">Geen Gesprekslink beschikbaar.</string>
+    <string name="no_chat_link_available">Geen gesprekslink beschikbaar.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
     <string name="chat_link_deleted">Gesprek link succesvol verwijderd.</string>
     <!-- The status of pending contact request (ACCEPTED), placeholder is contact request creation time -->
@@ -3350,7 +3350,7 @@
     <!-- The status of pending contact request (REMINDED), placeholder is contact request creation time -->
     <string name="contact_request_status_reminded">%1$s (HERINNERD)</string>
     <!-- The status of pending contact request (PENDING), placeholder is contact request creation time -->
-    <string name="contact_request_status_pending">%1$s (AFWACHTING)</string>
+    <string name="contact_request_status_pending">%1$s (IN BEHANDELING)</string>
     <!-- Message shown when it restored successfully a file version -->
     <string name="version_restored">Versie succesvol hersteld.</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
@@ -3371,7 +3371,7 @@
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
     <plurals name="file_pending_download">
         <item quantity="one">%d bestand in afwachting.</item>
-        <item quantity="other">%d bestanden in afwachting.</item>
+        <item quantity="other">%d bestanden in behandeling.</item>
     </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Inloggen in MEGA</string>
@@ -3440,7 +3440,7 @@
     <!-- Business expired account Overdue payment page header. -->
     <string name="payment_overdue_label">Betaling over tijd</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
-    <string name="business_management_alert">Gebruikers beheer is alleen beschikbaar vanuit een desktop web browser.</string>
+    <string name="business_management_alert">Gebruikersbeheer is alleen beschikbaar vanuit een desktop web browser.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Verbruik</string>
     <!-- Title of usage storage details section in Storage -->
@@ -3464,7 +3464,7 @@
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Er is iets fout gegaan</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text_2">Neem contact op met uw zakelijke accountbeheerder om het probleem op te lossen en uw account te activeren,.</string>
+    <string name="expired_user_business_text_2">Neem contact op met uw zakelijke accountbeheerder om het probleem op te lossen en uw account te activeren.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
     <string name="logout_warning_offline">Wanneer u zich afmeldt, worden bestanden uit uw offline-gedeelte van uw apparaat verwijderd.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
@@ -3478,7 +3478,7 @@
     <!-- Alert shown to the user when they is trying to create an empty group for attach a file -->
     <string name="error_creating_group_and_attaching_file">Selecteer één of meer contacten.</string>
     <!-- Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts -->
-    <string name="contacts_sent">%s Contactpersonen verstuurd.</string>
+    <string name="contacts_sent">%s Contacten verstuurd.</string>
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
     <string name="my_chat_files_folder">Mijn gesprek bestanden</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
@@ -3496,13 +3496,13 @@
     <!-- Error shown when the user tries to resend the email to unblock their account before the time needed to permit send it again -->
     <string name="resend_email_error">E-mail al verzonden. Wacht een paar minuten voordat u het opnieuw probeert.</string>
     <!-- Title of a helping view about locked accounts -->
-    <string name="locked_accounts_label">Vergrendelde Accounts</string>
+    <string name="locked_accounts_label">Gesloten Accounts</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
-    <string name="locked_accounts_text_1">Het is mogelijk dat u hetzelfde wachtwoord gebruikt voor uw MEGA-account als voor andere services en dat ten minste een van deze andere services een gegevenslek heeft geleden.</string>
+    <string name="locked_accounts_text_1">Het is mogelijk dat u hetzelfde wachtwoord gebruikt voor uw MEGA-account als voor andere diensten en dat ten minste één van deze andere diensten een gegevenslek heeft geleden.</string>
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
     <string name="locked_accounts_text_2">Uw wachtwoord is gelekt en wordt nu door slechte personen gebruikt om in te loggen op uw accounts, inclusief, maar niet beperkt tot, uw MEGA-account.</string>
     <!-- Button to add a nickname for a user -->
-    <string name="add_nickname">Bijnaam instellen</string>
+    <string name="add_nickname">Bijnaam Instellen</string>
     <!-- Button to update a nickname for a user -->
     <string name="edit_nickname">Bijnaam Wijzigen</string>
     <!-- Label showing that a nickname has been added -->
@@ -3526,11 +3526,11 @@
     <!-- Text shown for the action create new file -->
     <string name="create_new_file_action">Creëer een nieuw bestand</string>
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
-    <string name="permissions_error_label">Toestemming fout</string>
+    <string name="permissions_error_label">Toestemmingsfout</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">U hebt niet de vereiste machtigingen om dit bestand terug te zetten. Om door te gaan, kunnen we een nieuw bestand maken met de teruggekeerde gegevens. Wilt u doorgaan?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Versie is met succes aangemaakt als een nieuw bestand.</string>
+    <string name="version_as_new_file_created">Versie is succesvol aangemaakt als een nieuw bestand.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">op %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -3558,9 +3558,9 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Uw overdrachten zijn onderbroken. Upgrade uw account of wacht %s om door te gaan.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Overdracht van quota</string>
+    <string name="label_transfer_over_quota">Overdracht over tegoed</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Opslag boven tegoed</string>
+    <string name="label_storage_over_quota">Opslag over tegoed</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Neem meer overdracht tegoed</string>
     <!-- Warning show to the user when a folder does not exist -->
@@ -3583,32 +3583,32 @@
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
     <string name="over_disk_quota_paywall_deletion_warning_no_data">[B]U moet upgraden [/B]. Uw gegevens worden momenteel verwijderd.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk. -->
-    <string name="over_disk_quota_paywall_deletion_warning_no_time_left">[B]U moet onmiddellijk handelen om uw gegevens op te slaan. [/B]</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_time_left">[B]U moet onmiddellijk handelen om uw gegevens te bewaren. [/B]</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
         <item quantity="one">1 dag</item>
         <item quantity="other">%d dagen</item>
     </plurals>
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="label_time_in_hours">%dh</string>
+    <string name="label_time_in_hours">%du</string>
     <!-- Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_minutes">%dm</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
     <string name="label_time_in_seconds">%ds</string>
     <!-- Title for a section on the fingerprint warning dialog. Below it is a button which will allow the user to verify their contact’s fingerprint credentials. -->
-    <string name="label_verify_credentials">Controleer aanmeldgegevens</string>
+    <string name="label_verify_credentials">Verifieer aanmeldgegevens</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Niet geverifieerd</string>
     <!-- Action indicating something was verified. -->
     <string name="label_verified">Geverifieerd</string>
     <!-- ”Verify user” dialog title -->
-    <string name="authenticity_credentials_label">Authenticiteit Referenties</string>
+    <string name="authenticity_credentials_label">Authenticiteit Inloggegevens</string>
     <!-- ”Verify user” dialog description -->
     <string name="authenticity_credentials_explanation">Dit kan het beste gebeuren door elkaar in het echte leven, face to face te ontmoeten. Als u een andere al geverifieerde kanaal heeft, zoals geverifieerd OTR of PGP, dan kunt u deze ook gebruiken.</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
-    <string name="label_your_credentials">Uw Identiteit</string>
+    <string name="label_your_credentials">Uw Gegevens</string>
     <!-- Button to reset credentials -->
-    <string name="action_reset">Reset</string>
+    <string name="action_reset">Resetten</string>
     <!-- Warning shown to the user when tries to approve/reset contact credentials and another request of this type is already running. -->
     <string name="already_verifying_credentials">Inloggegevens bijwerken. Probeer het later opnieuw.</string>
     <!-- Info message displayed when the user is joining a chat conversation -->
@@ -3618,9 +3618,9 @@
     <!-- Text in the confirmation dialog for removing the associated phone number of current account. -->
     <string name="remove_phone_number">Uw telefoonnummer verwijderen?</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Uw telefoonnummer is succesvol verwijderd.</string>
+    <string name="remove_phone_number_success">Uw telefoonnummer is succesvol gereset.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
-    <string name="remove_phone_number_fail">Uw telefoonnummer verwijdering is mislukt.</string>
+    <string name="remove_phone_number_fail">Het verwijderen van je telefoonnummer is mislukt.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">Zoeken in MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
@@ -3642,7 +3642,7 @@
     <!-- Message for action to remove the registered phone number. -->
     <string name="remove_phone_number_message">Hiermee wordt uw gekoppelde telefoonnummer uit uw account verwijderd. Als u er later voor kiest om een ​​telefoonnummer toe te voegen, moet u dit verifiëren.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
-    <string name="action_see">Zien</string>
+    <string name="action_see">Weergeven</string>
     <!-- “Verify user” dialog description. Please, keep the placeholder, is to set the name of a contact: Joana’s credentials -->
     <string name="label_contact_credentials">%s’s inloggegevens</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
@@ -3670,7 +3670,7 @@
     <!-- Title of a dialog to confirm the action of resume all transfers -->
     <string name="warning_resume_transfers">Overdrachten hervatten?</string>
     <!-- Option to  resume all transfers -->
-    <string name="option_resume_transfers">Hervat transfers</string>
+    <string name="option_resume_transfers">Overdrachten hervatten</string>
     <!-- Option to  cancel a transfer -->
     <string name="option_cancel_transfer">Overdracht annuleren</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
@@ -3682,7 +3682,7 @@
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_disabled">Uitgeschakelde speciale informatie voor gespreksberichten</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
-    <string name="limit_reaction_per_user">U Heeft de maximale limiet van %d reacties bereikt.</string>
+    <string name="limit_reaction_per_user">U heeft de maximale limiet van %d reacties bereikt.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Dit bericht heeft de maximale limiet van %d reacties bereikt.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
@@ -3698,17 +3698,17 @@
     <!-- Subtitle of the history retention option when history retention is disabled -->
     <string name="subtitle_properties_history_retention">Verwijder automatisch berichten die ouder zijn dan een bepaalde tijd.</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled -->
-    <string name="history_retention_option_disabled">Uitgezet</string>
+    <string name="history_retention_option_disabled">Uitgeschakeld</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day -->
-    <string name="history_retention_option_one_day">Een dag</string>
+    <string name="history_retention_option_one_day">Één dag</string>
     <!-- SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week -->
-    <string name="history_retention_option_one_week">Een week</string>
+    <string name="history_retention_option_one_week">Één week</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month -->
-    <string name="history_retention_option_one_month">Een maand</string>
+    <string name="history_retention_option_one_month">Één maand</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted -->
     <string name="history_retention_option_custom">Aangepast</string>
     <!-- Title of the Manage chat history screen -->
-    <string name="title_properties_manage_chat">Beheer chat geschiedenis</string>
+    <string name="title_properties_manage_chat">Beheer gespreksgeschiedenis</string>
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Automatisch berichten verwijderen ouder dan:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
@@ -3755,13 +3755,13 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Selecteer overdrachten</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">De prioriteitswijziging van de overdracht ‘%1$s’ is mislukt.</string>
+    <string name="change_of_transfer_priority_failed">De prioriteitswijziging van de overdracht ”%1$s” is mislukt.</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Verzend de decoderingssleutel afzonderlijk</string>
     <!-- Explanation option to send separated the link and decryption key -->
     <string name="explanation_send_decryption_key_separately">Exporteer link en decoderingssleutel afzonderlijk.</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
-    <string name="learn_more_option">Leer meer</string>
+    <string name="learn_more_option">Meer leren</string>
     <!-- Label key referring to a link decryption key -->
     <string name="key_label">Sleutel</string>
     <!-- Button which action is share the decryption key of a link -->
@@ -3787,15 +3787,15 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro-gebruikers hebben exclusieve toegang tot extra linkbeveiligingsfuncties die uw account nog veiliger maken.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Ons end-to-end-versleutelingssysteem vereist een unieke sleutel die automatisch voor dit bestand wordt gegenereerd. Er wordt standaard een koppeling met deze sleutel gemaakt, maar u kunt de decoderingssleutel afzonderlijk exporteren voor een extra beveiligingslaag.</string>
+    <string name="decryption_key_explanation">Onze end-to-end-versleutelingssysteem vereist een unieke sleutel die automatisch voor dit bestand wordt gegenereerd. Er wordt standaard een link met deze sleutel gemaakt, maar u kunt de decoderingssleutel afzonderlijk exporteren voor een extra beveiligingslaag.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Wachtwoord resetten</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
     <string name="share_key_warning">Deel de sleutel voor deze link?</string>
     <!-- Warning show to the user when has set a password protection of a link and tries to share the link -->
-    <string name="share_password_warning">Deel het wachtwoord voor deze link?</string>
+    <string name="share_password_warning">Het wachtwoord delen voor deze link?</string>
     <!-- Button which action is share the password of a link -->
-    <string name="button_share_password">Deel wachtwoord</string>
+    <string name="button_share_password">Wachtwoord delen</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
     <string name="share_link_with_key">Link: %1$s \n\n Sleutel:%2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
@@ -3805,11 +3805,11 @@
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Favoriet</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
-    <string name="file_properties_unfavourite">Verwijder favoriet</string>
+    <string name="file_properties_unfavourite">Favoriet verwijderen</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
     <string name="file_properties_label">Label&#8230;</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
-    <string name="action_remove_label">Verwijder label</string>
+    <string name="action_remove_label">Label verwijderen</string>
     <!-- Title text to show label selector. -->
     <string name="title_label">Label</string>
     <!-- A user can mark a folder or file with red colour. -->
@@ -3841,11 +3841,11 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Voordat u doorgaat</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We gebruiken lokale opslag en vergelijkbare technologieën (‘cookies’) om u onze services te bieden, uw ervaring met onze services te verbeteren en de advertenties die u ziet, aan te passen, ook via derden. Accepteer ons gebruik van cookies vanaf het begin van uw bezoek of pas cookies aan in Cookie-instellingen. Lees meer in ons [A]Cookiebeleid[/A].</string>
+    <string name="dialog_cookie_alert_message">We gebruiken lokale opslag en vergelijkbare technologieën (‘cookies’) om u onze diensten te bieden, uw ervaring met onze diensten te verbeteren en de advertenties die u ziet, aan te passen, ook via derden. Accepteer ons gebruik van cookies vanaf het begin van uw bezoek of pas cookies aan in Cookie-instellingen. Lees meer in ons [A]Cookiebeleid[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie-Instellingen niet opgeslagen</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
-    <string name="dialog_cookie_snackbar_saved">Wijzigingen in de cookie-instellingen zijn opgeslagen.</string>
+    <string name="dialog_cookie_snackbar_saved">Wijzigingen in de Cookie-Instellingen zijn opgeslagen</string>
     <!-- Cookie dialog third party title -->
     <string name="dialog_cookie_thirdparty_title">Cookies van derden</string>
     <!-- Cookie dialog third party first subtitle -->
@@ -3853,21 +3853,21 @@
     <!-- Cookie dialog third party second subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle2">Categorie: Advertentiecookies</string>
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Gebruikt door Google om: \n• de advertenties aan te passen die Google toont op onze en andere diensten en websites, op basis van zaken als uw locatie en andere websites die u eerder heeft bezocht;\n• bij te houden hoe vaak u bepaalde advertenties te zien krijgt;\n• zorgen voor fraudepreventie; en\n• bepalen wanneer u op een bepaalde advertentie klikt en vervolgens de volgende acties volgen die u onderneemt in reactie op die advertentie.\n https://policies.google.com/technologies/partner-sites</string>
+    <string name="dialog_cookie_thirdparty_message">Gebruikt door Google om: \n• de advertenties aan te passen die Google toont op onze en andere diensten en websites, op basis van zaken als uw locatie en andere websites die u eerder heeft bezocht;\n• Weergeven hoe vaak u bepaalde advertenties te zien krijgt;\n• zorgen voor fraudepreventie; en\n• bepalen wanneer u op een bepaalde advertentie klikt en vervolgens de volgende acties volgen die u onderneemt in reactie op die advertentie.\n https://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_accept">Accepteer cookies</string>
+    <string name="preference_cookies_accept">Cookies Accepteren</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_essential_title">Essentiële cookies</string>
+    <string name="preference_cookies_essential_title">Essentiële Cookies</string>
     <!-- Preference screen item summary -->
     <string name="preference_cookies_essential_summary">Essentieel om u belangrijke functionaliteit en veilige toegang tot onze diensten te bieden. Om deze reden hebben ze geen toestemming nodig.</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_preference_title">Voorkeur cookies</string>
+    <string name="preference_cookies_preference_title">Cookie Voorkeuren</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_preference_summary">Sta ons toe om bepaalde weergave- en opmaakinstellingen die u kiest te onthouden. Als u deze cookies niet accepteert, kunnen we sommige dingen niet voor u onthouden, zoals uw favoriete schermindeling.</string>
+    <string name="preference_cookies_preference_summary">Sta ons toe om bepaalde weergave- en opmaakinstellingen die u kiest te onthouden. Als u deze Cookies niet accepteert, kunnen we sommige dingen niet voor u onthouden, zoals uw favoriete schermindeling.</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Prestatie- en Analyse Cookies</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_performance_summary">Help ons te begrijpen hoe u onze services gebruikt en verstrek ons ​​gegevens die we kunnen gebruiken om verbeteringen aan te brengen. Als u deze cookies niet accepteert, hebben we minder gegevens tot onze beschikking om het ontwerp te verbeteren.</string>
+    <string name="preference_cookies_performance_summary">Help ons te begrijpen hoe u onze diensten gebruikt en verstrek ons gegevens die we kunnen gebruiken om verbeteringen aan te brengen. Als u deze Cookies niet accepteert, hebben we minder gegevens tot onze beschikking om het ontwerp te verbeteren.</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_advertising_title">Advertentie Cookies</string>
     <!-- Preference screen item summary -->
@@ -3875,13 +3875,13 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_thirdparty_title">Cookies van derden</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Dit zijn Cookies die worden beheerd door iemand anders dan wij; we gebruiken deze Cookies om de soorten functionaliteit te bieden die hierboven zijn beschreven. Het niet accepteren van deze Cookies heeft verschillende gevolgen, afhankelijk van het type cookie dat elke Cookie van een derde partij is. Klik op “Meer Informatie” hieronder voor details over alle Cookies van derden die we gebruiken.</string>
+    <string name="preference_cookies_thirdparty_summary">Dit zijn Cookies die worden beheerd door iemand anders dan wij; we gebruiken deze Cookies om de soorten functionaliteit te bieden die hierboven zijn beschreven. Het niet accepteren van deze Cookies heeft verschillende gevolgen, afhankelijk van het type Cookie dat elke Cookie van een derde partij is. Klik op “Meer Informatie” hieronder voor details over alle Cookies van derden die we gebruiken.</string>
     <!-- Preference screen item action button -->
     <string name="preference_cookies_policies_privacy">Privacybeleid</string>
     <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_cookie">Cookie beleid</string>
+    <string name="preference_cookies_policies_cookie">Cookie Beleid</string>
     <!-- Preference screen item state description -->
-    <string name="preference_cookies_always_on">Altijd aan</string>
+    <string name="preference_cookies_always_on">Altijd Aan</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
     <string name="menu_scan_document">Document scannen</string>
     <!-- Message displayed when clicking on a contact attached to the chat that is not my contact -->
@@ -3893,7 +3893,7 @@
     <!-- Option of color theme, follow the system setting. -->
     <string name="theme_system_default">Systeem standaard</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
-    <string name="theme_battery_saver">Ingesteld door batterijbesparing</string>
+    <string name="theme_battery_saver">Ingesteld door Batterijbesparing</string>
     <!-- Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app). -->
     <string name="ask_for_select_sdcard_root">Selecteer de root van de SD-kaart.</string>
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
@@ -3901,7 +3901,7 @@
     <!-- Warning which alerts the user before discard changes -->
     <string name="discard_changes_warning">Wijzigingen negeren en de editor sluiten?</string>
     <!-- Action discard -->
-    <string name="discard_close_action">Gooi weg en sluit</string>
+    <string name="discard_close_action">Weggooien en sluiten</string>
     <!-- Label indicating saving a file is in progress -->
     <string name="saving_file">Bestand opslaan&#8230;</string>
     <!-- Label indicating a file was created successfully -->

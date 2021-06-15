@@ -216,8 +216,8 @@
     <string name="tour_privacy_title">MEGA保有隱私</string>
     <!--  -->
     <string name="tour_access_title">MEGA輕鬆存取</string>
-    <!--  -->
-    <string name="tour_space_text">現在註冊並獲得50GB *免費空間</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">立即註冊並獲得20 GB起的免費空間</string>
     <!--  -->
     <string name="tour_speed_text">上傳非常快。快速分享給身邊每一位朋友</string>
     <!--  -->
@@ -646,7 +646,7 @@
     <string name="upload_prepare">檔案處理中</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
-        <item quantity="other">檔案處理中</item>
+        <item quantity="other">處理檔案中</item>
     </plurals>
     <!-- error message when downloading a file -->
     <string name="error_temporary_unavaible">資源暫時無法使用，請稍後再試。</string>
@@ -1097,26 +1097,26 @@
     <string name="invalid_email_title">無效電子郵件地址</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">請檢查電子郵件地址是否正確並再試一次。</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">密碼重設</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">請在下方輸入您的還原金鑰</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">您的密碼已更改。</string>
     <!-- Title of the dialog to park an account -->
-    <string name="park_account_dialog_title">封存帳戶</string>
+    <string name="park_account_dialog_title">停用帳戶</string>
     <!-- Button to park an account -->
-    <string name="park_account_button">封存</string>
+    <string name="park_account_button">停用</string>
     <!-- Title of the screen to park an account -->
     <string name="park_account_title">噢！</string>
     <!-- First paragraph of the screen to park an account -->
     <string name="park_account_first_paragraph">因我們嚴謹的點對點加密規範，如果您沒有密碼或還原金鑰，將會無法存取您的資料。</string>
     <!-- Second paragraph of the screen to park an account -->
-    <string name="park_account_second_paragraph">您可以先封存現有的帳戶，再以同一個電子信箱重新註冊。您的資料將會被保存至少60天。在這之間，如果您回想起您此一封存帳戶的密碼，請聯繫 support&#64;mega.nz 以尋求復原協助。</string>
+    <string name="park_account_second_paragraph">您可以先停用現有的帳戶，再以同一個電子信箱重新註冊。您的資料將會被保存至少60天。在這之間，如果您回想起您此一停用帳戶的密碼，請聯繫 support&#64;mega.nz 以尋求復原協助。</string>
     <!-- Text of the dialog message to ask for the link to park the account -->
-    <string name="dialog_park_account">請於下方輸入您的電子郵件地址。您將收到還原金鑰連結，讓您可以封存您的帳戶。</string>
+    <string name="dialog_park_account">請於下方輸入您的電子郵件地址。您將收到還原金鑰連結，讓您可以停用您的帳戶。</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">這是封存您的帳戶的最後一步，請輸入您的新密碼。您的資料將被保留至少60天。如果您之後想起了您已封存帳戶的密碼，請聯繫 support&#64;mega.nz 。</string>
+    <string name="park_account_text_last_step">這是停用您的帳戶的最後一步，請輸入您的新密碼。您的資料將被保留至少60天。如果您之後想起了您已停用帳戶的密碼，請聯繫 support&#64;mega.nz 。</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">請輸入新密碼</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -1879,9 +1879,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">邀請朋友以獲得獎勵</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">每筆推薦成功，皆可獲得%1$s的儲存空間和%2$s的傳輸配額</string>
+    <string name="figures_achievements_text_referrals">每推薦1個可獲得%1$s儲存空間獎勵。有效期為365天。</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">獲得%1$s的儲存空間和%2$s的傳輸配額</string>
+    <string name="figures_achievements_text">%1$s儲存空間。有效期為365天。</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">已解鎖的獎勵</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1911,7 +1911,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">如何使用</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">邀請你的朋友建立一個免費的MEGA帳戶，並安裝我們的手機應用程式吧！對於每筆成功的註冊和應用程式安裝，您都會收到免費儲存空間和傳輸配額的獎勵喔。</string>
+    <string name="first_paragraph_achievement_invite_friends">邀請你的朋友建立一個免費的MEGA帳戶，並安裝我們的手機應用程式。對於每筆成功的註冊和應用程式的安裝，您都會收到額外儲存空間的獎勵。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">如果受邀人使用過MEGA，您恐怕就無法獲得推薦獎勵了，而我們也不會發送相關通知給您。小提醒，受邀的聯絡人必須在其裝置上安裝MEGA手機應用程式或MEGA桌面應用程式喔。</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1925,17 +1925,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">電子郵件格式錯誤</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">您安裝MEGAsync後，將會獲得免費的%1$s儲存空間與%2$s傳輸配額，兩者的有效期限皆為180天。MEGA桌面應用程式可於Windows、MacOS和大多數的Linux發行版中使用。</string>
+    <string name="paragraph_info_achievement_install_desktop">當您安裝MEGA桌面應用程式時，您可獲得%1$s的贈送儲存空間，有效期為365天。 MEGA桌面應用程式可在Windows、macOS和大多數Linux發行版使用。</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">安裝我們的手機應用程式後，您就可以獲得%1$s的免費儲存空間與%2$s的傳輸配額，兩者有效期皆為180天。無論在iOS、Android或Windows Phone系統中，您都可以找到我們的手機應用程式。</string>
+    <string name="paragraph_info_achievement_install_mobile_app">安裝我們的手機應用程式後，您可以獲得%1$s免費儲存空間，有效期為365天。無論在iOS、Android或Windows Phone系統中，您都可以找到我們的手機應用程式。</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">當您驗證您的手機門號時您將獲得%1$s免費儲存空間以及%2$s傳輸配額，兩者有效期皆為180天。</string>
+    <string name="paragraph_info_achievement_add_phone">當您驗證您的手機號碼時您將獲得%1$s免費儲存空間，有效期為365天。</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">因為您安裝了我們的MEGA桌面應用程式，您已獲得%1$s的儲存空間和%2$s的傳輸配額。</string>
+    <string name="result_paragraph_info_achievement_install_desktop">您已經因為安裝MEGA桌面程式而獲得%1$s儲存空間獎勵。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">因為您安裝了我們的手機應用程式，您已獲得%1$s儲存空間以及%2$s傳輸配額。</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">您已因為安裝我們的手機應用程式而獲得%1$s儲存空間。</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">因為您驗證了您的手機門號，您已獲得%1$s免費儲存空間以及%2$s傳輸配額。</string>
+    <string name="result_paragraph_info_achievement_add_phone">您已經因為驗證您的手機號碼而獲得%1$s儲存空間獎勵</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已經收到%1$s的儲存空間，這是免費的註冊獎勵喔。</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -3258,7 +3258,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">使用點對點加密安全地與您的聯絡人對話</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">嗨！一起在MEGA上與我進行安全的對談，並且獲得高達50GB的免費儲存空間。%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">嗨！一起在MEGA上與我進行安全的對談，並且獲得高達20 GB起的免費儲存空間。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">沒有可用的對話連結。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
