@@ -44,9 +44,9 @@ class ContactGroupsFragment : Fragment() {
     }
 
     private fun setupView() {
-        binding.listGroups.adapter = groupsAdapter
-        binding.listGroups.setHasFixedSize(true)
-        binding.listGroups.addItemDecoration(
+        binding.list.adapter = groupsAdapter
+        binding.list.setHasFixedSize(true)
+        binding.list.addItemDecoration(
             DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
                 setDrawable(ResourcesCompat.getDrawable(resources, R.drawable.contact_list_divider, null)!!)
             }

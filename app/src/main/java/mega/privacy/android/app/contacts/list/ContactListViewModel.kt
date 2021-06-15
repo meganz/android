@@ -9,10 +9,14 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.contacts.list.data.ContactActionItem
+import mega.privacy.android.app.contacts.list.data.ContactActionItem.Type
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
 
 class ContactListViewModel @ViewModelInject constructor(
@@ -25,16 +29,15 @@ class ContactListViewModel @ViewModelInject constructor(
     }
 
     private val contacts: MutableLiveData<List<ContactItem.Data>> = MutableLiveData()
-    private val incomingRequestsSize: MutableLiveData<Int> = MutableLiveData(0)
+    private val contactActions: MutableLiveData<List<ContactActionItem>> = MutableLiveData()
     private var queryString: String? = null
 
     init {
+        retrieveContactActions()
         retrieveContacts()
-        retrieveIncomingContactRequestsSize()
     }
 
     fun retrieveContacts() {
-        composite.clear()
         getContactsUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -49,13 +52,16 @@ class ContactListViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    private fun retrieveIncomingContactRequestsSize() {
+    private fun retrieveContactActions() {
         getContactRequestsUseCase.getIncomingRequestsSize()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { size ->
-                    incomingRequestsSize.value = size
+                    contactActions.value = listOf(
+                        ContactActionItem(Type.REQUESTS, getString(R.string.section_requests), size),
+                        ContactActionItem(Type.GROUPS, getString(R.string.section_groups))
+                    )
                 },
                 onError = { error ->
                     Log.e(TAG, error.stackTraceToString())
@@ -64,7 +70,20 @@ class ContactListViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun getIncomingContactRequestsSize(): LiveData<Int> = incomingRequestsSize
+    fun getContactActions(): LiveData<List<ContactActionItem>> =
+        contactActions
+
+    fun getRecentlyAddedContacts(headerTitle: String): LiveData<List<ContactItem>> =
+        contacts.map { items ->
+            if (queryString.isNullOrBlank() && items.firstOrNull { it.isNew } != null) {
+                val itemsWithHeaders = mutableListOf<ContactItem>()
+                itemsWithHeaders.add(ContactItem.Header(headerTitle))
+                itemsWithHeaders.addAll(items.filter { it.isNew })
+                itemsWithHeaders
+            } else {
+                emptyList()
+            }
+        }
 
     fun getContactsWithHeaders(headerTitle: String): LiveData<List<ContactItem>> =
         contacts.map { items ->
@@ -88,18 +107,6 @@ class ContactListViewModel @ViewModelInject constructor(
                 }
             }
             itemsWithHeaders
-        }
-
-    fun getRecentlyAddedContacts(headerTitle: String): LiveData<List<ContactItem>> =
-        contacts.map { items ->
-            if (queryString.isNullOrBlank() && items.firstOrNull { it.isNew } != null) {
-                val itemsWithHeaders = mutableListOf<ContactItem>()
-                itemsWithHeaders.add(ContactItem.Header(headerTitle))
-                itemsWithHeaders.addAll(items.filter { it.isNew })
-                itemsWithHeaders
-            } else {
-                emptyList()
-            }
         }
 
     fun setQuery(query: String?) {

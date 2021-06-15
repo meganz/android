@@ -61,7 +61,7 @@ ext {
     // App dependencies
     appCompatVersion = '1.2.0'
     daggerVersion = "2.24"
-    constraintLayoutVersion = '2.0.3'
+    constraintLayoutVersion = '2.0.4'
     coroutinesVersion = "1.4.1"
     fragmentKtxVersion = '1.2.5'
     glideVersion = '4.10.0'

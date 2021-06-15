@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.*
+import mega.privacy.android.app.contacts.list.adapter.ContactActionsListAdapter
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.InviteContactActivity
@@ -37,6 +38,9 @@ class ContactListFragment : Fragment() {
         }
     }
 
+    private val actionsAdapter by lazy {
+        ContactActionsListAdapter(::onRequestsClick, ::onGroupsClick)
+    }
     private val recentlyAddedAdapter by lazy {
         ContactListAdapter(::onContactClick, ::onContactMoreInfoClick)
     }
@@ -96,16 +100,8 @@ class ContactListFragment : Fragment() {
 
     private fun setupView() {
         val adapterConfig = ConcatAdapter.Config.Builder().setStableIdMode(ConcatAdapter.Config.StableIdMode.ISOLATED_STABLE_IDS).build()
-        binding.listContacts.adapter = ConcatAdapter(adapterConfig, recentlyAddedAdapter, contactsAdapter)
-        binding.listContacts.setHasFixedSize(true)
-
-        binding.bgRequests.setOnClickListener {
-            findNavController().navigate(ContactListFragmentDirections.actionListToRequests())
-        }
-
-        binding.bgGroups.setOnClickListener {
-            findNavController().navigate(ContactListFragmentDirections.actionListToGroups())
-        }
+        binding.list.adapter = ConcatAdapter(adapterConfig, actionsAdapter, recentlyAddedAdapter, contactsAdapter)
+        binding.list.setHasFixedSize(true)
 
         binding.btnAddContact.setOnClickListener {
             startActivity(Intent(requireContext(), InviteContactActivity::class.java))
@@ -118,6 +114,10 @@ class ContactListFragment : Fragment() {
     }
 
     private fun setupObservers() {
+        viewModel.getContactActions().observe(viewLifecycleOwner) { items ->
+            actionsAdapter.submitList(items)
+        }
+
         viewModel.getRecentlyAddedContacts(getString(R.string.section_recently_added))
             .observe(viewLifecycleOwner) { items ->
                 recentlyAddedAdapter.submitList(items)
@@ -128,11 +128,6 @@ class ContactListFragment : Fragment() {
                 binding.viewEmpty.isVisible = items.isNullOrEmpty()
                 contactsAdapter.submitList(items)
             }
-
-        viewModel.getIncomingContactRequestsSize().observe(viewLifecycleOwner) { size ->
-            binding.chipRequestCounter.text = size.toString()
-            binding.chipRequestCounter.isVisible = size > 0
-        }
     }
 
     private fun setupReceivers() {
@@ -152,5 +147,13 @@ class ContactListFragment : Fragment() {
     private fun onContactMoreInfoClick(userEmail: String) {
         ContactsBottomSheetDialogFragment.newInstance(userEmail)
             .show(childFragmentManager, userEmail)
+    }
+
+    private fun onRequestsClick() {
+        findNavController().navigate(ContactListFragmentDirections.actionListToRequests())
+    }
+
+    private fun onGroupsClick() {
+        findNavController().navigate(ContactListFragmentDirections.actionListToGroups())
     }
 }

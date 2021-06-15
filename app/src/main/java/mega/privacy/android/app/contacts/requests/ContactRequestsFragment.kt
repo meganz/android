@@ -75,9 +75,9 @@ class ContactRequestsFragment : Fragment() {
     }
 
     private fun setupView(savedInstanceState: Bundle?) {
-        binding.listContacts.adapter = adapter
-        binding.listContacts.setHasFixedSize(true)
-        binding.listContacts.addItemDecoration(
+        binding.list.adapter = adapter
+        binding.list.setHasFixedSize(true)
+        binding.list.addItemDecoration(
             DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
                 setDrawable(ResourcesCompat.getDrawable(resources, R.drawable.contact_list_divider, null)!!)
             }
