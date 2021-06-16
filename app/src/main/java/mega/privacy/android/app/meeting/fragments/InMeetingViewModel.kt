@@ -571,7 +571,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                 _callLiveData.value?.let {
                     if (it.status >= CALL_STATUS_JOINING && !isRequestSent() && amIAloneOnTheCall(
                             currentChatId
-                        )
+                        ) && it.numParticipants == 1
                     ) {
                         return true
                     }

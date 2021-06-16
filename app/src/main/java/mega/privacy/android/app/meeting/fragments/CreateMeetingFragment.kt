@@ -94,7 +94,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         binding.createviewmodel = viewModel
         // Set default meeting name
         viewModel.initMeetingName()
-        viewModel.initRTCAudioManager()
+        initRTCAudioManager()
 
         viewModel.meetingName.observe(viewLifecycleOwner) {
             meetingName = it
