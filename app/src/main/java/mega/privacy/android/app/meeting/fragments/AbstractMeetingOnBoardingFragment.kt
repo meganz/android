@@ -161,7 +161,29 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     private fun initBinding() {
         binding = MeetingOnBoardingFragmentBinding.inflate(layoutInflater)
         binding.lifecycleOwner = this
-        binding.btnStartJoinMeeting.setOnClickListener { onMeetingButtonClick() }
+        binding.btnStartJoinMeeting.setOnClickListener {
+            permissionsRequester = permissionsBuilder(
+                listOf(Manifest.permission.RECORD_AUDIO).toCollection(
+                    java.util.ArrayList()
+                )
+            )
+                .setOnPermissionDenied { l -> onPermissionDenied(l) }
+                .setOnRequiresPermission { l ->
+                    run {
+                        onRequiresPermission(l)
+                        onMeetingButtonClick()
+                    }
+                }
+                .setOnShowRationale { l -> onShowRationale(l) }
+                .setOnNeverAskAgain { l ->
+                    run {
+                        onNeverAskAgain(l)
+                        showSnackBar()
+                    }
+                }
+                .build()
+            permissionsRequester.launch(false)
+        }
     }
 
     /**
@@ -268,7 +290,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     /**
      * Notify the client to manually open the permission in system setting, This only needed when bRequested is true
      */
-    private fun showSnackBar() {
+    protected fun showSnackBar() {
         val warningText =
             StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
         (activity as BaseActivity).showSnackbar(

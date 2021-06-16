@@ -72,7 +72,7 @@ open class MeetingBaseFragment : BaseFragment() {
     }
 
     private fun onCheckRequiresPermission(permissions: ArrayList<String>) {
-        permissions.forEach() {
+        permissions.forEach {
             logDebug("user check the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {
@@ -86,7 +86,7 @@ open class MeetingBaseFragment : BaseFragment() {
     }
 
     private fun onCheckPermissionDenied(permissions: ArrayList<String>) {
-        permissions.forEach() {
+        permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
                 Manifest.permission.CAMERA -> {

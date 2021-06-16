@@ -41,8 +41,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
         logDebug("Meeting Name: $meetingName")
         releaseVideoAndHideKeyboard()
-        // TODO: better to pass meeting name via fragment args in Navigation
-        sharedModel.setMeetingsName(meetingName)
+
         val action = InMeetingFragmentDirections.actionGlobalInMeeting(
             action = MEETING_ACTION_CREATE,
             meetingName = meetingName
