@@ -2183,6 +2183,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         MegaApplication.getInstance().unregisterProximitySensor()
         resumeAudioPlayerIfNotInCall(meetingActivity)
         RunOnUIThreadUtils.stop()
+        bottomFloatingPanelViewHolder.onDestroy()
     }
 
     override fun onResume() {
