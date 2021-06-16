@@ -772,6 +772,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 
 		if (apiServerValue != PRODUCTION_SERVER_VALUE) {
+			if (apiServerValue == SANDBOX3_SERVER_VALUE) {
+				megaApi.setPublicKeyPinning(false);
+			}
+
 			String apiServer = getApiServerFromValue(apiServerValue);
 			megaApi.changeApiUrl(apiServer);
 			megaApiFolder.changeApiUrl(apiServer);

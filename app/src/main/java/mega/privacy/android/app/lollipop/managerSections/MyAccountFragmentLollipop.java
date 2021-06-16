@@ -1103,6 +1103,12 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			return;
 		}
 
+		if (currentApiServerValue == SANDBOX3_SERVER_VALUE) {
+			megaApi.setPublicKeyPinning(true);
+		} else if (newApiServerValue != SANDBOX3_SERVER_VALUE) {
+			megaApi.setPublicKeyPinning(false);
+		}
+
 		String apiServer = getApiServerFromValue(newApiServerValue);
 		megaApi.changeApiUrl(apiServer);
 		dbH.setApiServer(getApiServerValue(apiServer));
