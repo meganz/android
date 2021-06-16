@@ -576,13 +576,14 @@ class CuViewModel extends BaseRxViewModel {
 
         List<CUCard> dayCards = getDayCards();
         LocalDate cardLocalDate = monthCard.getLocalDate();
-        int currentDay = LocalDate.now().getDayOfYear();
+        int currentDay = LocalDate.now().getDayOfMonth();
 
         for (int i = 0; i < dayCards.size(); i++) {
             LocalDate localDate = dayCards.get(i).getLocalDate();
 
             if (localDate.getYear() <= cardLocalDate.getYear()
-                    && localDate.getDayOfYear() <= currentDay) {
+                    && localDate.getMonthValue() <= cardLocalDate.getMonthValue()
+                    && localDate.getDayOfMonth() <= currentDay) {
                 //Month of year clicked, current day. If not exists, the closest day behind the current.
                 return i;
             }
