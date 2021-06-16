@@ -1606,6 +1606,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		super.onCreate(savedInstanceState);
 		logDebug("onCreate after call super");
 
+		// This block for solving the issue below:
+		// Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,
+		// and then switch the app to foreground, causing the app to create a new instantiation.
+		if (!isTaskRoot()) {
+			Intent intent = getIntent();
+			if (intent != null) {
+				String action = intent.getAction();
+				if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && Intent.ACTION_MAIN.equals(action)) {
+					finish();
+					return;
+				}
+			}
+		}
+
 		boolean selectDrawerItemPending = true;
 		//upload from device, progress dialog should show when screen orientation changes.
         if (shouldShowDialog) {
@@ -4197,7 +4211,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		dbH.removeSentPendingMessages();
 
-    	if (megaApi.getRootNode() != null){
+    	if (megaApi != null && megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
     		megaApi.removeTransferListener(this);
     		megaApi.removeRequestListener(this);
