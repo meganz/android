@@ -426,7 +426,9 @@ public class TouchImageView extends AppCompatImageView {
         if (focusX < 0 || focusX > 1 || focusY < 0 || focusY > 1) {
             throw new UnsupportedOperationException("focusX and focusY must range in value between 0 and 1");
         }
-        setScaleType(scaleType);
+        if (scaleType != mScaleType) {
+            setScaleType(scaleType);
+        }
         resetZoom();
         scaleImage(scale, viewWidth / 2f, viewHeight / 2f, false);
         matrix.getValues(m);
