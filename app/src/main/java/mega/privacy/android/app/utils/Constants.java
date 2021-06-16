@@ -846,6 +846,7 @@ public class Constants {
     public static final int ORDER_CAMERA = 3;
 
     //Api servers
+    public static final String API_SERVER = "API_SERVER";
     public static final String PRODUCTION_SERVER = "https://g.api.mega.co.nz/";
     public static final String STAGING_SERVER = "https://staging.api.mega.co.nz/";
     public static final String STAGING_444_SERVER = "https://staging.api.mega.co.nz:444/";

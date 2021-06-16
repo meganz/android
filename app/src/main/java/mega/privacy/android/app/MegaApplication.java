@@ -31,6 +31,8 @@ import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
+import androidx.preference.PreferenceManager;
+
 import android.text.Html;
 import android.text.Spanned;
 
@@ -765,11 +767,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		//Logout check resumed pending transfers
 		TransfersManagement.checkResumedPendingTransfers();
 
-		int apiServerValue = PRODUCTION_SERVER_VALUE;
-
-		if (dbH != null) {
-			apiServerValue = dbH.getApiServer();
-		}
+		int apiServerValue = PreferenceManager.getDefaultSharedPreferences(this)
+				.getInt(API_SERVER, PRODUCTION_SERVER_VALUE);
 
 		if (apiServerValue != PRODUCTION_SERVER_VALUE) {
 			if (apiServerValue == SANDBOX3_SERVER_VALUE) {

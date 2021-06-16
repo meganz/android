@@ -42,7 +42,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 62;
+	private static final int DATABASE_VERSION = 61;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -228,7 +228,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_STORAGE_STATE = "storagestate";
 	private static final String KEY_MY_CHAT_FILES_FOLDER_HANDLE = "mychatfilesfolderhandle";
 	private static final String KEY_TRANSFER_QUEUE_STATUS = "transferqueuestatus";
-	private static final String KEY_API_SERVER = "apiserver";
 
 	private static final String KEY_PENDING_MSG_ID_CHAT = "idchat";
 	private static final String KEY_PENDING_MSG_TIMESTAMP = "timestamp";
@@ -409,8 +408,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_STORAGE_STATE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "',"              //18
 				+ KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "', "  //19
 				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "', " 		//20
-				+ KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN DEFAULT '" + encrypt("false") + "',"											//21 - True if the queue is paused, false otherwise
-				+ KEY_API_SERVER + " INTEGER DEFAULT '" + encrypt(String.valueOf(PRODUCTION_SERVER_VALUE)) + "'"							//22
+				+ KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN DEFAULT '" + encrypt("false") + "'"											//21				//22
 				+ ")";
 		db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
@@ -924,11 +922,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_REQUIRE_TIME
 					+ " = '" + encrypt("" + (isPasscodeLockEnabled(db) ? REQUIRE_PASSCODE_IMMEDIATE : REQUIRE_PASSCODE_INVALID)) + "';");
-		}
-
-		if (oldVersion <= 61) {
-			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_API_SERVER + " INTEGER;");
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_API_SERVER + " = '" + encrypt(String.valueOf(PRODUCTION_SERVER_VALUE)) + "';");
 		}
 	}
 
@@ -2120,7 +2113,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_LAST_PUBLIC_HANDLE_TYPE, encrypt(Integer.toString(attr.getLastPublicHandleType())));
 		values.put(KEY_MY_CHAT_FILES_FOLDER_HANDLE, encrypt(Long.toString(attr.getMyChatFilesFolderHandle())));
 		values.put(KEY_TRANSFER_QUEUE_STATUS, encrypt(attr.getTransferQueueStatus()));
-		values.put(KEY_API_SERVER, encrypt(Integer.toString(attr.getApiServer())));
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 
@@ -2152,7 +2144,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String lastPublicHandleType = decrypt(cursor.getString(19));
 				String myChatFilesFolderHandle = decrypt(cursor.getString(20));
 				String transferQueueStatus = decrypt(cursor.getString(21));
-				String apiServer = decrypt(cursor.getString(22));
 
 				attr = new MegaAttributes(online,
 						intents != null && !intents.isEmpty() ? Integer.parseInt(intents) : 0,
@@ -2162,7 +2153,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						staging, lastPublicHandle, lastPublicHandleTimeStamp,
 						lastPublicHandleType != null && !lastPublicHandleType.isEmpty() ? Integer.parseInt(lastPublicHandleType) : MegaApiJava.AFFILIATE_TYPE_INVALID,
 						storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN,
-						myChatFilesFolderHandle, transferQueueStatus, Integer.parseInt(apiServer));
+						myChatFilesFolderHandle, transferQueueStatus);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -3839,26 +3830,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setTransferQueueStatus(boolean transferQueueStatus) {
 		logInfo("Setting the storage state in the DB");
 		setStringValue(TABLE_ATTRIBUTES, KEY_TRANSFER_QUEUE_STATUS, transferQueueStatus + "");
-	}
-
-	/**
-	 * Gets the current API server value.
-	 *
-	 * @return The API server.
-	 */
-	public int getApiServer() {
-		logInfo("Getting the storage state from DB");
-		return getIntValue(TABLE_ATTRIBUTES, KEY_API_SERVER, PRODUCTION_SERVER_VALUE);
-	}
-
-	/**
-	 * Sets the current API server value.
-	 *
-	 * @param apiServer The API server.
-	 */
-	public void setApiServer(int apiServer) {
-		logInfo("Setting the storage state in the DB");
-		setStringValue(TABLE_ATTRIBUTES, KEY_API_SERVER, apiServer + "");
 	}
 
 	public String getShowNotifOff (){

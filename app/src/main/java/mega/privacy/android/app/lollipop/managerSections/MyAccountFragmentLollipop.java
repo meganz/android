@@ -19,6 +19,8 @@ import android.os.Handler;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
+import androidx.preference.PreferenceManager;
+
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -1058,7 +1060,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
     }
 
 	private void showChangeApiServerDialog() {
-		currentApiServerValue = dbH != null ? dbH.getApiServer() : PRODUCTION_SERVER_VALUE;
+		currentApiServerValue = PreferenceManager.getDefaultSharedPreferences(context)
+				.getInt(API_SERVER, PRODUCTION_SERVER_VALUE);
+
 		final int apiServerValue = apiServerValueChecked != INVALID_VALUE
 				? apiServerValueChecked
 				: currentApiServerValue;
@@ -1111,7 +1115,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		String apiServer = getApiServerFromValue(newApiServerValue);
 		megaApi.changeApiUrl(apiServer);
-		dbH.setApiServer(getApiServerValue(apiServer));
+		PreferenceManager.getDefaultSharedPreferences(context).edit()
+				.putInt(API_SERVER, getApiServerValue(apiServer)).apply();
 
 		Intent intent = new Intent(context, LoginActivityLollipop.class)
 				.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT)
