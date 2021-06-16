@@ -82,7 +82,9 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -95,6 +97,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
     private AlertDialog insertMKDialog;
+    private AlertDialog changeApiServerDialog;
 
     private TextView loginTitle;
     private TextView newToMega;
@@ -248,6 +251,11 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginTitle.setText(R.string.login_to_mega);
         loginTitle.setOnClickListener(this);
+        loginTitle.setOnLongClickListener(v12 -> {
+            changeApiServerDialog
+                    = showChangeApiServerDialog((LoginActivityLollipop) context, megaApi);
+            return true;
+        });
 
         et_userLayout = v.findViewById(R.id.login_email_text_layout);
         et_user = v.findViewById(R.id.login_email_text);
@@ -2271,6 +2279,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         closeCancelDialog();
+        dismissAlertDialogIfShown(changeApiServerDialog);
         super.onDestroy();
     }
 
