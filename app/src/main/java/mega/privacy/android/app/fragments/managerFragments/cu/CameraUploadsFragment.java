@@ -137,6 +137,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     public int onBackPressed() {
         if (mManagerActivity.isFirstNavigationLevel()) {
+            if (selectedView != ALL_VIEW) {
+                mManagerActivity.enableHideBottomViewOnScroll(false);
+                mManagerActivity.showBottomView();
+            }
+
             return 0;
         } else if (isEnableCUFragmentShown()) {
             skipCUSetup();
@@ -392,7 +397,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
         updateViewSelected();
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+                && viewTypesLayout != null) {
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) viewTypesLayout.getLayoutParams();
             params.width = outMetrics.heightPixels;
             viewTypesLayout.setLayoutParams(params);
@@ -663,6 +669,10 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void setViewTypeButtonStyle(TextView textView, boolean enabled) {
+        if (textView == null) {
+            return;
+        }
+
         textView.setBackgroundResource(enabled
                 ? R.drawable.background_18dp_rounded_selected_button
                 : R.drawable.background_18dp_rounded_unselected_button);
