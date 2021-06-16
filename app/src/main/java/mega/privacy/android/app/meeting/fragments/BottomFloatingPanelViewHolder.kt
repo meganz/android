@@ -61,8 +61,13 @@ class BottomFloatingPanelViewHolder(
     private var savedCamState: Boolean = false
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
         AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
-
     private val participantsAdapter = ParticipantsAdapter(inMeetingViewModel, listener)
+
+    private var currentHeight = 0
+
+    val layoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+        initTipsAndRatio()
+    }
 
     init {
         initButtonsState()
@@ -72,6 +77,12 @@ class BottomFloatingPanelViewHolder(
         updateShareAndInviteButton()
         updatePanel()
         initTipsAndRatio()
+
+        binding.root.addOnLayoutChangeListener(layoutListener)
+    }
+
+    fun onDestroy(){
+        binding.root.removeOnLayoutChangeListener(layoutListener)
     }
 
     /**
@@ -79,6 +90,10 @@ class BottomFloatingPanelViewHolder(
      */
     private fun initTipsAndRatio() {
         floatingPanelView.backgroundMask.post {
+            if (binding.root.measuredHeight == currentHeight)
+                return@post
+
+            currentHeight = binding.root.measuredHeight
             if (inMeetingViewModel.shouldShowTips()) {
                 initPopWindow(floatingPanelView.backgroundMask)
             }
@@ -116,6 +131,11 @@ class BottomFloatingPanelViewHolder(
     fun initPopWindow(anchor: View) {
         val view: View = LayoutInflater.from(context)
             .inflate(R.layout.view_tip_meeting_bottom_panel, null, false)
+
+        if (popWindow != null && popWindow?.isShowing == true){
+            popWindow?.dismiss()
+        }
+
         popWindow = PopupWindow(
             view,
             context.resources.getDimension(R.dimen.bottom_sheet_tip_width).toInt(),

@@ -91,9 +91,8 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     fun updateView() {
         binding.edit.isVisible = inMeetingViewModel.isModerator()
-        binding.shareLink.isVisible =
-            inMeetingViewModel.isLinkVisible() || inMeetingViewModel.isGuestLinkVisible()
-        binding.invite.isVisible = inMeetingViewModel.isLinkVisible()
+        binding.shareLink.isVisible = inMeetingViewModel.isChatRoomPublic()
+        binding.invite.isVisible = inMeetingViewModel.isModerator()
     }
 
     fun initAction() {
