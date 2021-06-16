@@ -96,16 +96,14 @@ class ContactListFragment : Fragment() {
             actionsAdapter.submitList(items)
         }
 
-        viewModel.getRecentlyAddedContacts(getString(R.string.section_recently_added))
-            .observe(viewLifecycleOwner) { items ->
-                recentlyAddedAdapter.submitList(items)
-            }
+        viewModel.getRecentlyAddedContacts().observe(viewLifecycleOwner) { items ->
+            recentlyAddedAdapter.submitList(items)
+        }
 
-        viewModel.getContactsWithHeaders(getString(R.string.section_contacts))
-            .observe(viewLifecycleOwner) { items ->
-                binding.viewEmpty.isVisible = items.isNullOrEmpty()
-                contactsAdapter.submitList(items)
-            }
+        viewModel.getContactsWithHeaders().observe(viewLifecycleOwner) { items ->
+            binding.viewEmpty.isVisible = items.isNullOrEmpty()
+            contactsAdapter.submitList(items)
+        }
     }
 
     private fun setupReceivers() {

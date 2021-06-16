@@ -73,33 +73,26 @@ class ContactListViewModel @ViewModelInject constructor(
     fun getContactActions(): LiveData<List<ContactActionItem>> =
         contactActions
 
-    fun getRecentlyAddedContacts(headerTitle: String): LiveData<List<ContactItem>> =
+    fun getRecentlyAddedContacts(): LiveData<List<ContactItem>> =
         contacts.map { items ->
-            if (queryString.isNullOrBlank() && items.firstOrNull { it.isNew } != null) {
+            if (queryString.isNullOrBlank() && items.any { it.isNew }) {
                 val itemsWithHeaders = mutableListOf<ContactItem>()
-                itemsWithHeaders.add(ContactItem.Header(headerTitle))
+                itemsWithHeaders.add(ContactItem.Header(getString(R.string.section_recently_added)))
                 itemsWithHeaders.addAll(items.filter { it.isNew })
+                itemsWithHeaders.add(ContactItem.Header(getString(R.string.section_contacts)))
                 itemsWithHeaders
             } else {
                 emptyList()
             }
         }
 
-    fun getContactsWithHeaders(headerTitle: String): LiveData<List<ContactItem>> =
+    fun getContactsWithHeaders(): LiveData<List<ContactItem>> =
         contacts.map { items ->
             val itemsWithHeaders = mutableListOf<ContactItem>()
             items?.forEachIndexed { index, item ->
                 if (queryString.isNullOrBlank()) {
-                    when {
-                        index == 0 -> {
-                            if (items.firstOrNull { it.isNew } != null) {
-                                itemsWithHeaders.add(ContactItem.Header(headerTitle))
-                            }
-                            itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
-                        }
-                        !items[index - 1].getFirstCharacter().equals(items[index].getFirstCharacter(), true) -> {
-                            itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
-                        }
+                    if (index == 0 || !items[index - 1].getFirstCharacter().equals(items[index].getFirstCharacter(), true)) {
+                        itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
                     }
                     itemsWithHeaders.add(item)
                 } else if (item.matches(queryString!!)) {
