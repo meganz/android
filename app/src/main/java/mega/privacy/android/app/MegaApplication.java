@@ -112,6 +112,11 @@ import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER_PREFERENCES;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.PRODUCTION_SERVER_VALUE;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.SANDBOX3_SERVER_VALUE;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -767,7 +772,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		//Logout check resumed pending transfers
 		TransfersManagement.checkResumedPendingTransfers();
 
-		int apiServerValue = PreferenceManager.getDefaultSharedPreferences(this)
+		int apiServerValue = getSharedPreferences(API_SERVER_PREFERENCES, MODE_PRIVATE)
 				.getInt(API_SERVER, PRODUCTION_SERVER_VALUE);
 
 		if (apiServerValue != PRODUCTION_SERVER_VALUE) {

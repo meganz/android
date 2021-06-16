@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -19,7 +18,6 @@ import android.os.Handler;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
-import androidx.preference.PreferenceManager;
 
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -27,16 +25,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
@@ -49,7 +44,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -62,14 +56,12 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.listeners.GetUserDataListener;
 import mega.privacy.android.app.listeners.ResetPhoneNumberListener;
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.adapters.LastContactsAdapter;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -81,12 +73,10 @@ import nz.mega.sdk.MegaUser;
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.enableOrDisableDialogButton;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.DBUtil.getApiServerFromValue;
-import static mega.privacy.android.app.utils.DBUtil.getApiServerValue;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -102,8 +92,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
 	private static final String KEY_RPN_DIALOG_SHOWING = "removePhoneNumberDialogShowing";
-	private static final String IS_CHANGE_API_SERVER_SHOW = "IS_CHANGE_API_SERVER_SHOW";
-	private static final String API_SERVER_VALUE_CHECKED = "API_SERVER_VALUE_CHECKED";
+	private static final String IS_CHANGE_API_SERVER_SHOWN = "IS_CHANGE_API_SERVER_SHOWN";
 
 	private final int WIDTH = 500;
 
@@ -177,8 +166,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	private PhoneNumberBottomSheetDialogFragment phoneNumberBottomSheet;
 
 	private AlertDialog changeApiServerDialog;
-	private int apiServerValueChecked = INVALID_VALUE;
-	private int currentApiServerValue = PRODUCTION_SERVER_VALUE;
 
     /**
      * Modify or remove verified phone number.
@@ -262,9 +249,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
                 showConfirmRemovePhoneNumberDialog(isModify = savedInstanceState.getBoolean(KEY_IS_MODIFY, false));
             }
 
-            if (savedInstanceState.getBoolean(IS_CHANGE_API_SERVER_SHOW, false)) {
-            	apiServerValueChecked = savedInstanceState.getInt(API_SERVER_VALUE_CHECKED, INVALID_VALUE);
-            	showChangeApiServerDialog();
+            if (savedInstanceState.getBoolean(IS_CHANGE_API_SERVER_SHOWN, false)) {
+				changeApiServerDialog =
+						showChangeApiServerDialog((ManagerActivityLollipop) context, megaApi);
 			}
 		}
 
@@ -688,7 +675,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				}
 
 				numOfClicksLastSession = 0;
-				showChangeApiServerDialog();
+				changeApiServerDialog =
+						showChangeApiServerDialog((ManagerActivityLollipop) context, megaApi);
 				break;
 			}
             case R.id.add_phone_number:{
@@ -1001,8 +989,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		outState.putBoolean(KEY_RPN_DIALOG_SHOWING, removePhoneNumberDialogShowing);
 		outState.putBoolean(KEY_IS_MODIFY, isModify);
-		outState.putBoolean(IS_CHANGE_API_SERVER_SHOW, isAlertDialogShown(changeApiServerDialog));
-		outState.putInt(API_SERVER_VALUE_CHECKED, apiServerValueChecked);
+		outState.putBoolean(IS_CHANGE_API_SERVER_SHOWN, isAlertDialogShown(changeApiServerDialog));
 	}
 
     /**
@@ -1058,70 +1045,4 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
         }, 3000);
 
     }
-
-	private void showChangeApiServerDialog() {
-		currentApiServerValue = PreferenceManager.getDefaultSharedPreferences(context)
-				.getInt(API_SERVER, PRODUCTION_SERVER_VALUE);
-
-		final int apiServerValue = apiServerValueChecked != INVALID_VALUE
-				? apiServerValueChecked
-				: currentApiServerValue;
-
-		ArrayList<String> stringsArray = new ArrayList<>();
-		stringsArray.add(PRODUCTION_SERVER_VALUE, StringResourcesUtils.getString(R.string.production_api_server));
-		stringsArray.add(STAGING_SERVER_VALUE, StringResourcesUtils.getString(R.string.staging_api_server));
-		stringsArray.add(STAGING_444_SERVER_VALUE, StringResourcesUtils.getString(R.string.staging444_api_server));
-		stringsArray.add(SANDBOX3_SERVER_VALUE, StringResourcesUtils.getString(R.string.sandbox3_api_server));
-
-		ArrayAdapter<String> itemsAdapter = new ArrayAdapter<>(context, R.layout.checked_text_view_dialog_button, stringsArray);
-		ListView listView = new ListView(context);
-		listView.setAdapter(itemsAdapter);
-		AtomicReference<Integer> itemClicked = new AtomicReference<>();
-		itemClicked.set(apiServerValue);
-
-		View customTitle = getLayoutInflater().inflate(R.layout.dialog_api_server, null);
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context)
-				.setCustomTitle(customTitle)
-				.setPositiveButton(StringResourcesUtils.getString(R.string.general_ok), (dialog, which) ->
-						changeApiServer(apiServerValueChecked))
-				.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
-				.setOnDismissListener(dialog -> apiServerValueChecked = INVALID_VALUE)
-				.setSingleChoiceItems(itemsAdapter, apiServerValue, (dialog, item) -> {
-					itemClicked.set(item);
-					apiServerValueChecked = item;
-					enableOrDisableDialogButton(context, item != currentApiServerValue,
-							((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE));
-				});
-
-		changeApiServerDialog = builder.create();
-		changeApiServerDialog.show();
-
-		enableOrDisableDialogButton(context, apiServerValue != currentApiServerValue,
-				changeApiServerDialog.getButton(AlertDialog.BUTTON_POSITIVE));
-	}
-
-    private void changeApiServer(int newApiServerValue) {
-		dismissAlertDialogIfShown(changeApiServerDialog);
-
-		if (newApiServerValue == currentApiServerValue) {
-			return;
-		}
-
-		if (currentApiServerValue == SANDBOX3_SERVER_VALUE) {
-			megaApi.setPublicKeyPinning(true);
-		} else if (newApiServerValue != SANDBOX3_SERVER_VALUE) {
-			megaApi.setPublicKeyPinning(false);
-		}
-
-		String apiServer = getApiServerFromValue(newApiServerValue);
-		megaApi.changeApiUrl(apiServer);
-		PreferenceManager.getDefaultSharedPreferences(context).edit()
-				.putInt(API_SERVER, getApiServerValue(apiServer)).apply();
-
-		Intent intent = new Intent(context, LoginActivityLollipop.class)
-				.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT)
-				.setAction(ACTION_REFRESH_API_SERVER);
-
-		startActivityForResult(intent, REQUEST_CODE_REFRESH_API_SERVER);
-	}
 }

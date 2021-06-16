@@ -5,14 +5,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 
-import static mega.privacy.android.app.utils.Constants.PRODUCTION_SERVER;
-import static mega.privacy.android.app.utils.Constants.PRODUCTION_SERVER_VALUE;
-import static mega.privacy.android.app.utils.Constants.SANDBOX3_SERVER;
-import static mega.privacy.android.app.utils.Constants.SANDBOX3_SERVER_VALUE;
-import static mega.privacy.android.app.utils.Constants.STAGING_444_SERVER;
-import static mega.privacy.android.app.utils.Constants.STAGING_444_SERVER_VALUE;
-import static mega.privacy.android.app.utils.Constants.STAGING_SERVER;
-import static mega.privacy.android.app.utils.Constants.STAGING_SERVER_VALUE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class DBUtil {
@@ -197,51 +189,5 @@ public class DBUtil {
         }
 
         return false;
-    }
-
-    /**
-     * Gets the DB value from URL api server.
-     *
-     * @param apiServer URL api server.
-     * @return The api server DB value.
-     */
-    public static int getApiServerValue(String apiServer) {
-        switch (apiServer) {
-            case STAGING_SERVER:
-                return STAGING_SERVER_VALUE;
-
-            case STAGING_444_SERVER:
-                return STAGING_444_SERVER_VALUE;
-
-            case SANDBOX3_SERVER:
-                return SANDBOX3_SERVER_VALUE;
-
-            case PRODUCTION_SERVER:
-            default:
-                return PRODUCTION_SERVER_VALUE;
-        }
-    }
-
-    /**
-     * Gets the URL api server from its DB value.
-     *
-     * @param apiServerValue Api server DB value.
-     * @return The URL api server.
-     */
-    public static String getApiServerFromValue(int apiServerValue) {
-        switch (apiServerValue) {
-            case STAGING_SERVER_VALUE:
-                return STAGING_SERVER;
-
-            case STAGING_444_SERVER_VALUE:
-                return STAGING_444_SERVER;
-
-            case SANDBOX3_SERVER_VALUE:
-                return SANDBOX3_SERVER;
-
-            case PRODUCTION_SERVER_VALUE:
-            default:
-                return PRODUCTION_SERVER;
-        }
     }
 }

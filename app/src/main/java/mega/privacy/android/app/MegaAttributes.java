@@ -202,11 +202,10 @@ public class MegaAttributes {
 	 * Sets if is pointing to staging server.
 	 *
 	 * @return True if is pointing to staging, false if pointing to production server.
-	 *
 	 * @deprecated Now more than one testing server is allowed in the app,
 	 * this DB value should not be used anymore.
-	 * Use PreferenceManager.getDefaultSharedPreferences(context)
-	 * 			.getInt(API_SERVER, PRODUCTION_SERVER_VALUE); instead.
+	 * Use getSharedPreferences(API_SERVER_PREFERENCES, MODE_PRIVATE)
+	 * 		.getInt(API_SERVER, PRODUCTION_SERVER_VALUE); instead.
 	 */
 	@Deprecated
     public String getStaging(){

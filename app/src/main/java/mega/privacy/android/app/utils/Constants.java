@@ -844,16 +844,4 @@ public class Constants {
     public static final int ORDER_CONTACTS = 1;
     public static final int ORDER_OTHERS = 2;
     public static final int ORDER_CAMERA = 3;
-
-    //Api servers
-    public static final String API_SERVER = "API_SERVER";
-    public static final String PRODUCTION_SERVER = "https://g.api.mega.co.nz/";
-    public static final String STAGING_SERVER = "https://staging.api.mega.co.nz/";
-    public static final String STAGING_444_SERVER = "https://staging.api.mega.co.nz:444/";
-    public static final String SANDBOX3_SERVER = "https://api-sandbox3.developers.mega.co.nz/";
-
-    public static final int PRODUCTION_SERVER_VALUE = 0;
-    public static final int STAGING_SERVER_VALUE = 1;
-    public static final int STAGING_444_SERVER_VALUE = 2;
-    public static final int SANDBOX3_SERVER_VALUE = 3;
 }
