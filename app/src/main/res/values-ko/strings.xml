@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA는 휴대 기기를 위한 전용 앱을 더불어, 표준 웹 브라우저를 통해 이용자 제어 암호화 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 우리가 아닌 당신의 클라이언트 기기에서만 암호화되고 복호화됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드하고 언제, 어디서나, 어느 기기에서든 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 폴더를 공유하고 그들이 수정하는 것을 실시간으로 보세요. 암호화 과정은 우리가 당신의 암호에 접근하거나 재설정할 수 없다는 것을 의미하므로 반드시 기억하지 않으면 (복구 키를 백업하지 않았다면) 저장한 파일들에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 임호화 MEGA 영상 통화는 완전한 개인 정보 보호를 가능하게 하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 이는 우리의 모바일 앱으로 확장되어, 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 MEGA 클라우드 드라이브에서 대화에 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 넉넉한 50GB 무료 공간을 보너스 도전과제와 함께 모든 가입자에게 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPro Lite 구독: 매달 4.99 € 또는 매년 49.99 €로 매달 400GB의 저장 공간과 1TB의 전송 할당량을 받을 수 있습니다.\nPro I 구독: 매달 9.99 € 또는 매년 99.99 €로 매달 2TB의 저장 공간과 2TB의 전송 할당량을 받을 수 있습니다.\nPro II 구독: 매달 19.99 € 또는 매년 199.99 €로 매달 8TB의 저장 공간과 8TB의 전송 할당량을 받을 수 있습니다.\nPro III 구독: 매달 29.99 € 또는 매년 299.99 €로 매달 16TB의 저장 공간과 16TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 동일한 기간과 동일한 요금으로 연속적으로 자동 갱신됩니다. 구독을 관리하려면, 휴대 기기에서 Play 스토어 아이콘을 클릭하고, Google ID로 로그인한 후 (아직 하지 않았다면) MEGA 앱을 클릭하세요. 그 곳에서 구독을 관리할 수 있습니다.\n\n앱 권한:\n외부 저장소 쓰기 -&gt; MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드 합니다\n카메라 -&gt; 사진을 찍고 MEGA로 사진을 업로드합니다\n연락처 읽기 -&gt; 당신의 기기에서 연락처를 MEGA 연락처로 쉽게 추가합니다\n오디오 녹음과 비디오 출력 캡처 (마이크와 카메라) -&gt; MEGA가 종단간 암호화 음성/영상 통화를 제공하는데에 필요합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰를 향상시키기 위해, 모든 클라이언트 사이드 코드는 공개되며, 관심 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android \n\n자세한 정보는, 우리의 웹사이트를 확인하세요:\nhttps://mega.nz/terms 를 확인하세요\n\n\n데스크톱 - https://mega.nz/</string>
+    <string name="full_description_text">MEGA는 휴대 기기를 위한 전용 앱과 함께, 표준 웹 브라우저를 통해 이용자 제어 암호화 클라우드 저장소와 대화를 제공합니다. 다른 클라우드 저장소 제공자들과 달리, 당신의 데이터는 우리가 아닌 당신의 클라이언트 기기에서만 암호화되고 복호화됩니다.\n\n당신의 스마트폰 또는 태블릿에서 파일을 업로드하고 언제, 어느 기기에서든, 어디서나 당신의 파일을 검색, 저장, 다운로드, 스트림, 보기, 공유, 이름 변경 또는 삭제할 수 있습니다. 당신의 지인들과 폴더를 공유하고 그들이 수정하는 것을 실시간으로 보세요. 암호화 과정은 우리가 당신의 암호에 접근하거나 재설정할 수 없다는 것을 의미하므로 반드시 기억하지 않으면 (복구 키를 백업하지 않았다면) 저장한 파일들에 대한 접근을 잃게 됩니다.\n\n종단간 이용자 임호화 MEGA 영상 통화는 완전한 개인 정보 보호를 가능하게 하며, 2016년부터 브라우저를 통해 이용 가능했습니다. 이는 우리의 모바일 앱으로 확장되어, 여러 기기에서 대화 기록에 접근할 수 있습니다. 이용자들은 MEGA 클라우드 드라이브에서 대화에 파일을 쉽게 추가할 수 있습니다.\n\nMEGA는 넉넉한 50GB 무료 공간을 보너스 도전과제와 함께 모든 가입자에게 제공하며, 더 높은 한도를 가진 유료 요금제를 제공합니다:\n\n\nPro Lite 구독: 매달 4.99 € 또는 매년 49.99 €로 매달 400GB의 저장 공간과 1TB의 전송 할당량을 받을 수 있습니다.\nPro I 구독: 매달 9.99 € 또는 매년 99.99 €로 매달 2TB의 저장 공간과 2TB의 전송 할당량을 받을 수 있습니다.\nPro II 구독: 매달 19.99 € 또는 매년 199.99 €로 매달 8TB의 저장 공간과 8TB의 전송 할당량을 받을 수 있습니다.\nPro III 구독: 매달 29.99 € 또는 매년 299.99 €로 매달 16TB의 저장 공간과 16TB의 전송 할당량을 받을 수 있습니다.\n\n구독은 처음 선택했던 기간과 동일한 기간과 동일한 요금으로 연속적으로 자동 갱신됩니다. 구독을 관리하려면, 휴대 기기에서 Play 스토어 아이콘을 클릭하고, Google ID로 로그인한 후 (아직 하지 않았다면) MEGA 앱을 클릭하세요. 그 곳에서 구독을 관리할 수 있을 것입니다.\n\n앱 권한:\n외부 저장소 쓰기 -&gt; MEGA에서 당신의 기기로 파일을 다운로드하고 당신의 기기에서 MEGA로 파일을 업로드 합니다\n카메라 -&gt; 사진을 찍고 MEGA로 사진을 업로드합니다\n연락처 읽기 -&gt; 당신의 기기에서 연락처를 MEGA 연락처로 쉽게 추가합니다\n오디오 녹음과 비디오 출력 캡처 (마이크와 카메라) -&gt; MEGA가 종단간 암호화 음성/영상 통화를 제공하는데에 필요합니다\n\n\nMEGA 시스템에 대한 이용자의 신뢰를 향상시키기 위해, 모든 클라이언트 측 코드는 공개되며, 관심 있는 보안 연구자들은 암호화 과정을 평가할 수 있습니다. 우리의 모바일 앱의 코드는 다음에 있습니다: https://github.com/meganz/android \n\n자세한 정보는, 우리의 웹사이트를 확인하세요:\nhttps://mega.nz/terms 를 확인하세요\n\n\n데스크톱 - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA는 강력한 상시 개인 정보 보호를 가진 클라우드 저장소입니다.</string>
     <!-- PRO Lite account -->
@@ -642,8 +642,6 @@
     <string name="upload_to_filesystem_from">다음에서 고르기</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">업로드됨</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">파일 처리중</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="other">파일 처리중</item>
@@ -1130,7 +1128,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">지금 업그레이드</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">클라우드 저장공간을 키우세요! [A]PRO 계정으로 더 많은 공간과 전송 할당량을 얻으세요!</string>
+    <string name="get_pro_account">클라우드 용량을 늘리세요![A]Pro 계정으로 더 많은 공간과 전송 할당량을 얻으세요!</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">복구 키가 다음에 백업되었습니다: %1s.[A]파일이 이 경로에 남아있으면, 오프라인용으로 저장 섹션에서 찾을 수 있습니다.[A]참고: 로그아웃하면 삭제됩니다, 안전한 곳에 보관하세요.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -1879,7 +1877,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">친구를 초대하고 보상을 받으세요</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">추천한 가입자마다 %1$s의 용량. 365일간 이용 가능</string>
+    <string name="figures_achievements_text_referrals">각 추천인마다 %1$s의 저장소. 365일간 이용 가능</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s의 용량. 365일간 이용 가능</string>
     <!-- title of the section for unlocked rewards -->
@@ -3851,4 +3849,12 @@
     <string name="action_keep_empty_old_extension">공백 유지</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">.%1$s 유지</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">같은 이름의 파일이 존재합니다</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">같은 이름의 항목이 존재합니다</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">정보</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">갤러리에 저장</string>
 </resources>

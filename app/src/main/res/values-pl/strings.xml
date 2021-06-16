@@ -669,8 +669,6 @@
     <string name="upload_to_filesystem_from">Wybierz z</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">wgrany</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Przetwarzanie pliku</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Przetwarzanie pliku</item>
@@ -2037,7 +2035,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Jak to działa</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Zaproś swoich znajomych do założenia darmowego konta MEGA i zainstalowania naszej aplikacji mobilnej. Za każdą udaną rejestrację i instalację aplikacji otrzymasz bonusowy magazyn.</string>
+    <string name="first_paragraph_achievement_invite_friends">Zaproś swoich znajomych do założenia darmowego konta MEGA i zainstalowania naszej aplikacji mobilnej. Za każdą udaną rejestrację i instalację aplikacji otrzymasz bonus w postaci dodatkowej pamięci.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Nie otrzymasz bonusów za zaproszenie osób już korzystających z MEGA lub tych które już korzystały w przeszłości. Zaproszone kontakty muszą zainstalować aplikację MEGA na telefonie lub komputerze stacjonarnym.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -4112,4 +4110,12 @@
     <string name="action_keep_empty_old_extension">Brak rozszerzenia</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Zachowaj .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">Istnieje już plik o tej samej nazwie</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">Istnieje już element o tej samej nazwie</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Info</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Zapisz do galerii</string>
 </resources>

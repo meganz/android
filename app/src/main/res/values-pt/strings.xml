@@ -219,7 +219,7 @@
     <!--  -->
     <string name="tour_access_title">Acesso MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB+ of free space</string>
+    <string name="tour_space_text">Cadastre-se agora e obtenha 20 GB de espaço gratuito</string>
     <!--  -->
     <string name="tour_speed_text">Os envios são rápidos. Compartilhe rapidamente arquivos com todo mundo</string>
     <!--  -->
@@ -651,8 +651,6 @@
     <string name="upload_to_filesystem_from">Selecionar do</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">enviado</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Processando arquivo</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Processando arquivo</item>
@@ -1921,9 +1919,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Convide amigos e ganhe bônus</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each referral. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">%1$s de espaço de armazenamento por cada indicação. Válido por 365 dias.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">%1$s of storage. Valid for 365 days.</string>
+    <string name="figures_achievements_text">%1$s de espaço de armazenamento. Válido por 365 dias.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Bônus obtidos</string>
     <!-- title of the section for unlocked storage quota -->
@@ -3938,4 +3936,12 @@
     <string name="action_keep_empty_old_extension">Sem extensão</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Manter .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">Já existe um arquivo com o mesmo nome</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">Já existe um item com este nome</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Info</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Save to gallery</string>
 </resources>
