@@ -23,7 +23,7 @@
   <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
   <string name="api_enoent">未找到</string>
   <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
-  <string name="api_ecircular">偵測到循環鏈接SDK</string>
+  <string name="api_ecircular">偵測到循環連結</string>
   <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
   <string name="api_eaccess">存取遭拒</string>
   <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
@@ -45,7 +45,7 @@
   <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
   <string name="api_etoomanyconnections">連結數過量</string>
   <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
-  <string name="api_ewrite">寫入錯誤</string>
+  <string name="api_ewrite">編輯錯誤</string>
   <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
   <string name="api_eread">讀取錯誤</string>
   <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->

@@ -589,6 +589,7 @@ public class FileContactListActivityLollipop extends PasscodeActivity implements
 	@Override
 	public void onBackPressed() {
 		logDebug("onBackPressed");
+		if (psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		if (adapter.getPositionClicked() != -1){

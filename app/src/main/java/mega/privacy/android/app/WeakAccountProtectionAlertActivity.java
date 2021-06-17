@@ -102,6 +102,7 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
 
     @Override
     public void onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return;
 //        Do nothing: do not permit to skip the warning, account blocked
     }
 

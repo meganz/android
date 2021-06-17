@@ -170,7 +170,7 @@ public class ChooseAccountFragmentLollipop extends UpgradeAccountFragmentLollipo
     @Override
     public void setPricingInfo() {
         //Currently the API side doesn't return this value, so we have to hardcode.
-        String textToShowFreeStorage = "[A] 50 GB [/A]" + getString(R.string.label_storage_upgrade_account) + " ";
+        String textToShowFreeStorage = "[A] 20 GB+ [/A]" + getString(R.string.label_storage_upgrade_account) + " ";
         try {
             textToShowFreeStorage = textToShowFreeStorage.replace("[A]", "<font color='"
                     + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)

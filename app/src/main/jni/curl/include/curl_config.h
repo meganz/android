@@ -785,6 +785,9 @@
 /* if you have the zlib.h header file */
 #define HAVE_ZLIB_H 1
 
+/* Define to 1 if you have the getpeername function. */
+#define HAVE_GETPEERNAME 1
+
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
 
