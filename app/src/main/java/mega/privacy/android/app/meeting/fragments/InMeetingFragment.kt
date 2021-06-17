@@ -57,6 +57,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -253,7 +254,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             it.status != INVALID_CALL_STATUS &&
             (it.callCompositionChange == 1 || it.callCompositionChange == -1)
         ) {
-            if (inMeetingViewModel.isFromReconnectingStatus) {
+            if (inMeetingViewModel.isFromReconnectingStatus || inMeetingViewModel.isReconnectingStatus || !isOnline(requireContext())) {
                 logDebug("Back from reconnecting")
             } else {
                 logDebug("Change in call composition, review the UI")
