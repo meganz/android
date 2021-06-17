@@ -22,7 +22,7 @@ class VideoGridViewAdapter(
         currentList.indexOfFirst { it.peerId == peerId && it.clientId == clientId }
 
     override fun onBindViewHolder(gridHolder: VideoMeetingViewHolder, position: Int) {
-        logDebug("Bind view holder position $position")
+        logDebug("Bind view holder position $position, pagePosition $pagePosition")
         gridHolder.bind(inMeetingViewModel, getItem(position), itemCount, pagePosition == 0)
     }
 

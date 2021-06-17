@@ -1595,7 +1595,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         if (session == null || participant.videoListener == null) return
 
         val isVisible = isParticipantVisible(participant)
-        if ((!isVisible && !isSpeaker) || participant.videoListener == null) {
+        if (!isVisible && !isSpeaker) {
             logDebug("No activate video, the participant with clientId ${participant.clientId} is not visible")
             return
         }

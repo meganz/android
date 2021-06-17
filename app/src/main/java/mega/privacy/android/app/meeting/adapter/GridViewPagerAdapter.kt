@@ -202,7 +202,6 @@ class GridViewPagerAdapter(
             logDebug("This page should be deleted $pageWithChange")
             if (adapterList.isNotEmpty() && adapterList.size > lastPageNum) {
                 adapterList[lastPageNum]?.submitList(null)
-
                 notifyItemRemoved(lastPageNum)
             }
 
@@ -228,7 +227,7 @@ class GridViewPagerAdapter(
      */
     private fun checkPagesToUpdate(position: Int, numPage: Int, lastPage: Int) {
         logDebug("Checking the rest of the pages to be updated ... ")
-        for (i in numPage until lastPage) {
+        for (i in numPage until lastPage+1) {
             if (i == numPage) {
                 logDebug("Update the page with the participant removed")
                 updatePageWithChange(numPage, position)
