@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -10,9 +11,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
+import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.isAllowedTitle
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import nz.mega.sdk.MegaChatRoom
@@ -82,7 +86,12 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         }
         binding.typeMeetingEditText.let {
             it.visibility = View.VISIBLE
-            it.hint = viewModel.initHintMeetingName()
+            it.setSelectAllOnFocus(true)
+            it.setEmojiSize(Util.dp2px(Constants.EMOJI_SIZE.toFloat(), outMetrics))
+            val defaultName = viewModel.initHintMeetingName()
+            it.hint = defaultName
+            val maxAllowed = ChatUtil.getMaxAllowed(defaultName)
+            it.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxAllowed))
             showKeyboardDelayed(type_meeting_edit_text)
         }
     }
