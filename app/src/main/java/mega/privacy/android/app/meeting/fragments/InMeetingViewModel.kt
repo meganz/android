@@ -102,7 +102,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     private fun checkReconnectingStatus(currentStatus: Int) {
         if (currentStatus == CALL_STATUS_CONNECTING) {
-            if (previousState == CALL_STATUS_IN_PROGRESS || previousState == CALL_STATUS_JOINING) {
+            if (previousState == CALL_STATUS_IN_PROGRESS || previousState == CALL_STATUS_JOINING || previousState == CALL_STATUS_CONNECTING) {
                 isReconnectingStatus = true
                 return
             }
@@ -927,6 +927,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         for (i in 0 until list.size()) {
             getSession(list[i])?.let { session ->
                 createParticipant(session, status)?.let { participantCreated ->
+                    logDebug("Adding current participant...")
                     participants.value?.add(participantCreated)
                 }
             }
@@ -945,6 +946,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun addParticipant(session: MegaChatSession, status: String): Int? {
         createParticipant(session, status)?.let { participantCreated ->
             participants.value?.add(participantCreated)
+            logDebug("Adding participant...")
             participants.value = participants.value
             logDebug("Num of participants:" + participants.value?.size)
             return participants.value?.indexOf(participantCreated)
@@ -1033,7 +1035,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                             removeVideoOfParticipantRemoved(chat.chatId, it)
                         }
                         list.remove()
-                        logDebug("Removed participant")
+                        logDebug("Removing participant...")
                         participants.value = participants.value
                         logDebug("Num of participants:" + participants.value?.size)
                         return position

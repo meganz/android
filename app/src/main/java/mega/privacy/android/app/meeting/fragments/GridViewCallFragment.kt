@@ -82,7 +82,9 @@ class GridViewCallFragment : MeetingBaseFragment() {
             }
         })
 
-        logDebug("View created and participants added")
+        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.value?.let {
+            participants = it
+        }
         val newData = sliceBy6(participants)
         adapterPager.let {
             it.setNewData(newData)

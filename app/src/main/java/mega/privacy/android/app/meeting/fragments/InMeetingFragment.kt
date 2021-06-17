@@ -226,7 +226,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         }
                         checkMenuItemsVisibility()
                     }
-                    MegaChatCall.CALL_STATUS_JOINING, MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
+                    MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
+                        checkCurrentParticipants()
                         checkMenuItemsVisibility()
                         checkChildFragments()
                         if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
@@ -1112,6 +1113,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    /**
+     * Show reconnecting UI
+     */
     private fun reconnecting() {
         logDebug("Show reconnecting UI")
         removeUI()
@@ -1119,6 +1123,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         checkInfoBanner(TYPE_RECONNECTING)
     }
 
+    /**
+     * Remove fragments
+     */
     private fun removeUI() {
         status = NOT_TYPE
         MegaApplication.getInstance().unregisterProximitySensor()
@@ -1126,21 +1133,25 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         individualCallFragment?.let {
             if (it.isAdded) {
                 removeChildFragment(it)
+                individualCallFragment = null
             }
         }
         floatingWindowFragment?.let {
             if (it.isAdded) {
                 removeChildFragment(it)
+                floatingWindowFragment = null
             }
         }
         speakerViewCallFragment?.let {
             if (it.isAdded) {
                 removeChildFragment(it)
+                speakerViewCallFragment = null
             }
         }
         gridViewCallFragment?.let {
             if (it.isAdded) {
                 removeChildFragment(it)
+                gridViewCallFragment = null
             }
         }
     }
@@ -1219,6 +1230,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     /**
      * Method to display the waiting for connection UI
+     *
+     * @param chatId ID of chat
      */
     private fun waitingForConnection(chatId: Long) {
         if (status == TYPE_WAITING_CONNECTION) return
@@ -1227,18 +1240,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         status = TYPE_WAITING_CONNECTION
         checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
+        floatingWindowFragment?.let {
+            if (it.isAdded) {
+                removeChildFragment(it)
+                floatingWindowFragment = null
+            }
+        }
         individualCallFragment?.let {
             if (it.isAdded) {
                 removeChildFragment(it)
                 individualCallFragment = null
             }
         }
+
         individualCallFragment = IndividualCallFragment.newInstance(
             chatId,
             megaApi.myUserHandleBinary,
             false
         )
-
         individualCallFragment?.let {
             loadChildFragment(
                 R.id.meeting_container,
@@ -1298,10 +1317,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        if (speakerViewCallFragment == null) {
-            speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
+        speakerViewCallFragment?.let {
+            if (it.isAdded) {
+                removeChildFragment(it)
+                speakerViewCallFragment = null
+            }
         }
 
+        speakerViewCallFragment = SpeakerViewCallFragment.newInstance()
         speakerViewCallFragment?.let {
             loadChildFragment(
                 R.id.meeting_container,
@@ -1331,10 +1354,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        if (gridViewCallFragment == null) {
-            gridViewCallFragment = GridViewCallFragment.newInstance()
+        gridViewCallFragment?.let {
+            if (it.isAdded) {
+                removeChildFragment(it)
+                gridViewCallFragment = null
+            }
         }
 
+        gridViewCallFragment = GridViewCallFragment.newInstance()
         gridViewCallFragment?.let {
             loadChildFragment(
                 R.id.meeting_container,
