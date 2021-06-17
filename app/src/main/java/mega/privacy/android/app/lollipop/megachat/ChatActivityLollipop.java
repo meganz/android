@@ -3882,7 +3882,8 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
 
                 MegaChatCall callBanner = megaChatApi.getChatCall(chatIdBanner);
 
-                if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+                if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
+                        callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                     startVideo = false;
                     if (checkPermissionsCall()) {
                         startCall();
