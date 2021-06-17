@@ -186,7 +186,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (inMeetingViewModel.isSameChatRoom(item.chatId)) {
             inMeetingViewModel.getCall()?.let { call ->
                 if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV)) {
+                    if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) && !inMeetingViewModel.isFromReconnectingStatus) {
                         logDebug("Change in my privileges")
                         if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
                             showSnackbar(
