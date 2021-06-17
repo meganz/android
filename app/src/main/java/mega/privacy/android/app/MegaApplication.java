@@ -39,6 +39,7 @@ import android.text.Spanned;
 import javax.inject.Inject;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.di.MegaApiFolder;
@@ -108,6 +109,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static android.media.AudioManager.STREAM_RING;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -1270,8 +1272,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				int loggedState = megaApi.isLoggedIn();
 				logDebug("Login status on " + loggedState);
 				if(loggedState==0){
-					AccountController aC = new AccountController(this);
-					aC.logoutConfirmed(this);
+					AccountController.logoutConfirmed(this);
+					//Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
+					LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).post(true);
 
 					if (isLoggingRunning()) {
 						logDebug("Already in Login Activity, not necessary to launch it again");
