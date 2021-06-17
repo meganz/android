@@ -2,6 +2,7 @@ package mega.privacy.android.app.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -85,10 +86,10 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -120,6 +121,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 
+import static android.content.Context.ACTIVITY_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.google.android.material.textfield.TextInputLayout.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -1494,7 +1496,7 @@ public class Util {
 
 	/**
 	 * Judge if current mode is Dark mode
-	 * @param context
+	 * @param context the Context
 	 * @return true if it is dark mode, false for light mode
 	 */
 	public static boolean isDarkMode(Context context) {
@@ -1608,4 +1610,33 @@ public class Util {
     private static void changeToolBarElevationOnDarkMode(Activity activity, Toolbar tB, float elevation, boolean withElevation) {
         tB.setBackgroundColor(withElevation ? ColorUtils.getColorForElevation(activity, elevation) : android.R.color.transparent);
     }
+
+	/**
+	 * Judge if an activity is on the top of the running app task
+	 * @param className the class name of the activity
+	 * @param context the Context
+	 * @return true if the activity is on the task top, false otherwise
+	 */
+	public static boolean isTopActivity(String className, Context context) {
+		ActivityManager am = (ActivityManager)context.getSystemService(ACTIVITY_SERVICE);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			List<ActivityManager.AppTask> tasks = am.getAppTasks();
+			for (ActivityManager.AppTask task : tasks) {
+				ActivityManager.RecentTaskInfo taskInfo = task.getTaskInfo();
+				if (taskInfo.id != -1) {  // Task is running
+					return taskInfo.topActivity.getClassName().contains(className);
+				}
+			}
+		} else {
+			List<ActivityManager.RunningTaskInfo> runningTaskInfos = am.getRunningTasks(100);
+			for (ActivityManager.RunningTaskInfo info : runningTaskInfos) {
+				if (info.topActivity.getClassName().contains(className)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 }

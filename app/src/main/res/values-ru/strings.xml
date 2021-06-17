@@ -222,8 +222,8 @@
     <string name="tour_privacy_title">MEGA-конфиденциальность</string>
     <!--  -->
     <string name="tour_access_title">MEGA-доступ</string>
-    <!--  -->
-    <string name="tour_space_text">Зарегистрируйтесь сейчас и получите 50 ГБ* свободного места</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">Зарегистрируйтесь сейчас и получите 20+ ГБ свободного места</string>
     <!--  -->
     <string name="tour_speed_text">Быстрая загрузка в облако и обмен файлами с кем угодно</string>
     <!--  -->
@@ -669,13 +669,11 @@
     <string name="upload_to_filesystem_from">Выбрать из</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">загружено</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Обработка файла</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Обработка файла</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="few">Обработка файлов</item>
+        <item quantity="many">Обработка файлов</item>
         <item quantity="other">Обработка файлов</item>
     </plurals>
     <!-- error message when downloading a file -->
@@ -1133,9 +1131,9 @@
     <string name="invalid_email_title">Неверный адрес электронной почты</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Пожалуйста, проверьте свой электронный почтовый ящик и попробуйте заново.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Восстановление пароля</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Введите ключ восстановления ниже</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Ваш пароль был изменен.</string>
@@ -2005,9 +2003,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Приглашайте друзей и получайте награды</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Получите %1$s места на диске и %2$s трафика за каждого, кто примет приглашение</string>
+    <string name="figures_achievements_text_referrals">%1$s места на диске за каждого приведённого пользователя. Действительно 365 дней.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">Получите %1$s места на диске и %2$s трафика</string>
+    <string name="figures_achievements_text">%1$s места на диске. Действительно 365 дней.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Разблокированные награды</string>
     <!-- title of the section for unlocked storage quota -->
@@ -2037,7 +2035,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Как это работает</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Предложите друзьям создать бесплатную учётную запись MEGA. За каждую успешную регистрацию и установку приложения вы получите бонусное место на диске и квоту передач.</string>
+    <string name="first_paragraph_achievement_invite_friends">Приглашайте друзей зарегистрироваться в MEGA и установить мобильное приложение. За каждую регистрацию и установку вы получите бонусное место на диске.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Вы не получите бонус за приглашение тех, кто пользовался MEGA раньше, и вам не будет сообщено об этом. Приглашённые контакты должны установить на своих устройствах мобильное приложение MEGA или приложение для компьютера.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -2051,17 +2049,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Неверный адрес</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Установив MEGAsync, вы получите %1$s бонусного места на диске плюс %2$s квоты передач на 180 дней. Приложение MEGA для компьютера доступно на Windows, macOS и большинстве дистрибутивов Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">Установив настольное приложение MEGA, вы получите %1$s бонусного места на диске на 365 дней. Приложение MEGA для компьютера доступно на Windows, macOS и большинстве дистрибутивов Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Установив мобильное приложение MEGA, вы получите %1$s бонусного места на диске плюс %2$s трафика на 180 дней. Мы предлагаем мобильные приложения для iOS, Android и Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Установив мобильное приложение MEGA, вы получите %1$s бонусного места на диске на 365 дней. Мы предлагаем мобильные приложения для iOS, Android и Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Подтвердив номер телефона, вы получите %1$s в виде бонуса плюс %2$s трафика, оба пакета на 180 дней.</string>
+    <string name="paragraph_info_achievement_add_phone">Подтвердив номер телефона, вы получите %1$s в виде бонуса на 365 дней.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Вы получили %1$s места на диске и %2$s трафика за установку приложения MEGA на компьютере.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Вы получили %1$s места на диске за установку приложения MEGA на компьютер.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Вы получили %1$s места на диске и %2$s квоты трафика за установку мобильного приложения.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Вы получили %1$s места на диске за установку мобильного приложения.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Вы получили %1$s для хранения и %2$s трафика за подтверждение телефонного номера.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Вы получили %1$s места на диске за подтверждение телефонного номера.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">При регистрации вы получаете %1$s места на диске в качестве бонуса.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -3486,7 +3484,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Начните безопасное общение со своими контактами благодаря сквозному шифрованию.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Привет! Веди защищённый разговор со мной в MEGA и получи до 50 ГБ бесплатно. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Привет! Начните зашифрованное общение с помощью MEGA и получите 20+ ГБ места на диске бесплатно. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Нет доступной ссылки на чат</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -4116,4 +4114,12 @@
     <string name="action_keep_empty_old_extension">Без расширения</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Оставить .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">Уже есть файл с таким именем</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">Уже есть элемент с таким именем</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Информация</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Сохранить в галерее</string>
 </resources>

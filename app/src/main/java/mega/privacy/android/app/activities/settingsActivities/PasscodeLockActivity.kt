@@ -21,7 +21,8 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.app.utils.Util.hideKeyboardView
 import java.util.*
 import javax.inject.Inject
 
@@ -519,6 +520,7 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return
         if (attempts < MAX_ATTEMPTS) {
             when (mode) {
                 UNLOCK_MODE -> return

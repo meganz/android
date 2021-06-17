@@ -220,6 +220,7 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
     @Override
     public void onBackPressed() {
         logDebug("onBackPressed");
+        if (psaWebBrowser.consumeBack()) return;
         if(isUserLocked){
             return;
         }

@@ -216,8 +216,8 @@
     <string name="tour_privacy_title">Privasi MEGA</string>
     <!--  -->
     <string name="tour_access_title">Akses MEGA</string>
-    <!--  -->
-    <string name="tour_space_text">Daftarkan sekarang dan dapatkan 50 GB* ruang penyimpanan</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">Register now and get 20 GB+ of free space</string>
     <!--  -->
     <string name="tour_speed_text">Upload cepat. Bagikan file dengan siapapun</string>
     <!--  -->
@@ -642,11 +642,10 @@
     <string name="upload_to_filesystem_from">Pilih dari</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">Berhasil di upload</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Sedang memproses file</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
-        <item quantity="other">Memproses file</item>
+        <item quantity="one">Processing file</item>
+        <item quantity="other">Processing files</item>
     </plurals>
     <!-- error message when downloading a file -->
     <string name="error_temporary_unavaible">Sumber sementara tidak tersedia, harap coba kembali nanti</string>
@@ -1097,9 +1096,9 @@
     <string name="invalid_email_title">Alamat email anda salah</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Harap cek alamat e-mail dan coba kembali</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Reset password</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Masukkan Recovery Key Anda di bawah ini</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Kata sandi anda telah dirubah.</string>
@@ -1130,7 +1129,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Upgrade sekarang</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Tingkatkan kapasitas cloud Anda![A]Dapatkan lebih banyak ruang &amp; kuota transfer  dengan akun PRO!</string>
+    <string name="get_pro_account">Improve your cloud capacity![A]Get more space and transfer quota with a Pro account!</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">Recovery Key telah dicadangkan menjadi: %1s. [A] Sementara file tetap berada di  jalur ini, Anda akan menemukannya di Bagian Saved for Offline. [A]Catatan: Ini akan dihapus jika Anda log out,  tolong simpan itu di tempat yang aman</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -1879,9 +1878,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Undang teman dan dapatkan hadiah</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Dapatkan %1$s penyimpanan dan %2$s transfer untuk setiap  referral</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each referral. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">Dapatkan %1$s penyimpanan dan %2$s transfer</string>
+    <string name="figures_achievements_text">%1$s of storage. Valid for 365 days.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Imbalan diterima</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1911,7 +1910,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cara kerja</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Undang teman Anda untuk membuat akun MEGA gratis dan  pasang aplikasi seluler kami. Untuk setiap pendaftaran sukses dan pemasangan aplikasi, Anda menerima bonus  penyimpanan dan kuota transfer.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Anda tidak akan menerima kredit karena mengundang  seseorang yang telah menggunakan MEGA sebelumnya dan Anda tidak akan diberitahu tentang penolakan semacam itu.  Kontak yang diundang harus menginstal aplikasi seluler MEGA atau aplikasi desktop MEGA di perangkat mereka.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1925,17 +1924,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email salah</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">Ketika Anda menginstal MEGAsync Anda mendapatkan %1$s dari  ruang penyimpanan gratis ditambah %2$s kuota transfer, keduanya berlaku selama 180 hari. Aplikasi desktop MEGA  tersedia untuk Windows, macOS dan sebagian besar distro Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">Saat memasang aplikasi seluler, Anda mendapatkan %1$s  ruang penyimpanan gratis ditambah %2$s kuota transfer, keduanya berlaku selama 180 hari. Kami menyediakan  aplikasi ponsel untuk iOS, Android dan Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">When you install our mobile app you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS, Android and Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Ketika Anda memverifikasi nomor telepon Anda, Anda mendapatkan  %1$s ruang penyimpanan gratis plus %2$s kuota transfer, keduanya berlaku selama 180 hari.</string>
+    <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space, valid for 365 days.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Anda telah menerima ruang penyimpanan %1$s dan  kuota transfer %2$s untuk memasang aplikasi desktop MEGA kami.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA desktop app.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Anda telah menerima ruang penyimpanan %1$s dan  kuota transfer %2$s untuk menginstall mobile app kami.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing our mobile app.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Anda telah menerima ruang penyimpanan %1$s dan kuota  transfer %2$s untuk memverifikasi nomor telepon Anda.</string>
+    <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space for verifying your phone number.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Anda telah menerima ruang penyimpanan %1$s sebagai  bonus pendaftaran gratis Anda.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2163,7 +2162,7 @@
     <!-- Message shown when a link is being processing -->
     <string name="processing_link">Memproses tautan &#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
-    <string name="passwd_weak">Password anda mudah ditebak. Coba untuk membuat password yang lebih panjang. Kombinasikan  huruf besar &amp; huruf kecil. Tambahkan sepcial characters. Jangan gunakan nama atau kata yang dapat ditemukan  di kamus.</string>
+    <string name="passwd_weak">Your password is easily guessed. Try making your password longer. Combine uppercase and lowercase letters. Add special characters. Do not use names or dictionary words.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
     <string name="passwd_medium">Password anda cukup kuat, namun disarankan untuk lebih memperkuat password anda lagi.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a good password -->
@@ -2288,7 +2287,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Buka perangkat Android [A]Pengaturan[/A]</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Buka [A]Aplikasi &amp; notifikasi[/A]</string>
+    <string name="turn_on_notifications_second_step">Open [A]Apps &amp; notifications[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Pilih [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -3258,7 +3257,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Mulai mengobrol dengan aman dengan kontak Anda menggunakan enkripsi  ujung-ke-ujung</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hai! Miliki percakapan aman di MEGA dengan saya dan  dapatkan penyimpanan gratis hingga 50GB. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hi! Have secure conversations on MEGA with me and get up to 20 GB+ free storage. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Tautan obrolan tidak tersedia.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3855,4 +3854,12 @@
     <string name="action_keep_empty_old_extension">Tidak ada ekstensi</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Simpan .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">Sudah ada file dengan nama yang sama</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">Sudah ada item dengan nama yang sama</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Info</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Save to gallery</string>
 </resources>
