@@ -13,13 +13,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/ic_homepage"/>
     <TextView
         android:id="@+id/tv_left_meeting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
-        android:text="@string/left_meeting"
+        android:layout_marginTop="20dp"
+        android:text="@string/more_than_meeting"
         android:textAppearance="?attr/textAppearanceSubtitle1"
         android:textSize="18sp"
         android:textStyle="bold" />
@@ -32,7 +39,8 @@
         android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="@string/keep_track_meeting"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:visibility="gone" />
 
 
     <ImageView
@@ -41,34 +49,98 @@
         android:layout_gravity="center_horizontal"
         android:src="@drawable/il_meeting" />
 
+    <TextView
+        android:id="@+id/tv_left_meetings_title1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text="@string/left_meeting_join_title"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_left_meetings_sub1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:text="@string/left_meeting_join_content"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:textSize="14sp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/grey_012_white_012"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/info_bg" />
+
+    <TextView
+        android:id="@+id/tv_left_meetings_title2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text="@string/left_meeting_bonus_title"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_left_meetings_sub2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:text="@string/left_meeting_bonus_content"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:textSize="14sp" />
+
     <mega.privacy.android.app.components.LeftMeetingItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         app:item_icon="@drawable/ic_meeting_e2e"
         app:subTitle="@string/free_large_group_meeting"
-        app:title="@string/end_to_end_encrypted_call" />
+        app:title="@string/end_to_end_encrypted_call"
+        android:visibility="gone" />
 
     <mega.privacy.android.app.components.LeftMeetingItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:item_icon="@drawable/ic_meeting_link"
         app:subTitle="@string/free_large_group_meeting"
-        app:title="@string/invite_with_a_link" />
+        app:title="@string/invite_with_a_link"
+        android:visibility="gone"/>
 
     <mega.privacy.android.app.components.LeftMeetingItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:item_icon="@drawable/ic_meeting_account"
         app:subTitle="@string/free_large_group_meeting"
-        app:title="@string/join_without_account" />
+        app:title="@string/join_without_account"
+        android:visibility="gone"/>
 
     <mega.privacy.android.app.components.LeftMeetingItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:item_icon="@drawable/ic_meeting_device"
         app:subTitle="@string/free_large_group_meeting"
-        app:title="@string/use_any_device" />
+        app:title="@string/use_any_device"
+        android:visibility="gone"/>
 
     <Button
         android:id="@+id/bt_create_account"
@@ -76,7 +148,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="30dp"
         android:backgroundTint="@color/drawer_upgrade_button_background_selector"
         android:gravity="center"
         android:paddingTop="16dp"
