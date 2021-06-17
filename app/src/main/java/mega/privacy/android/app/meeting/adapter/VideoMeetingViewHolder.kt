@@ -196,12 +196,8 @@ class VideoMeetingViewHolder(
             )
 
             participant.videoListener = vListener
-
             binding.parentTextureView.addView(participant.videoListener!!.textureView)
-
             participant.videoListener!!.localRenderer?.addListener(listenerRenderer)
-
-            inMeetingViewModel.onActivateVideo(participant, isSpeaker)
         } else {
             logDebug("Active video when listener is not null")
             if (binding.parentTextureView.childCount > 0) {
@@ -220,6 +216,7 @@ class VideoMeetingViewHolder(
             participant.videoListener?.width = 0
         }
 
+        inMeetingViewModel.onActivateVideo(participant, isSpeaker)
         binding.parentTextureView.isVisible = true
     }
 
