@@ -4107,4 +4107,11 @@
     <string name="content_tour_five">End-to-End Encrypted conference at MEGA</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Please enter a valid meeting link</string>
+
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">More than just meetings</string>
+    <string name="left_meeting_join_title">Your privacy matters</string>
+    <string name="left_meeting_join_content">Join the largest secure cloud storage and collaboration platform in the world.</string>
+    <string name="left_meeting_bonus_title">Get 20 GB for free</string>
+    <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
 </resources>
