@@ -640,7 +640,7 @@
         </receiver>
 
         <activity
-            android:name=".activities.AskForDsiplayOverActivity"
+            android:name=".activities.AskForDisplayOverActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
             android:launchMode="singleTask"/>
 

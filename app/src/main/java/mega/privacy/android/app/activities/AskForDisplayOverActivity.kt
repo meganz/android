@@ -19,7 +19,8 @@ import mega.privacy.android.app.R
  *
  * @see mega.privacy.android.app.utils.IncomingCallNotification.toSystemSettingNotification
  */
-class AskForDsiplayOverActivity : Activity() {
+@RequiresApi(Build.VERSION_CODES.M)
+class AskForDisplayOverActivity : Activity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +31,7 @@ class AskForDsiplayOverActivity : Activity() {
     /**
      * Close the activity.
      */
-    fun notNow(v: View) {
+    fun notNow() {
         // This will keep showing after the activity is destroyed, so can't use snack bar.
         Toast.makeText(this, R.string.ask_for_display_over_explain, Toast.LENGTH_LONG).show()
         finish()
@@ -39,8 +40,7 @@ class AskForDsiplayOverActivity : Activity() {
     /**
      * Launch system setting page by implicit intent.
      */
-    @RequiresApi(Build.VERSION_CODES.M)
-    fun toSetting(v: View) {
+    fun toSetting() {
         val intent = Intent(
             Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
             Uri.parse("package:$packageName")
@@ -54,5 +54,12 @@ class AskForDsiplayOverActivity : Activity() {
     override fun onDestroy() {
         super.onDestroy()
         DatabaseHandler.getDbHandler(this).dontAskForDisplayOver()
+    }
+
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.btn_not_now -> notNow()
+            R.id.btn_allow -> toSetting()
+        }
     }
 }

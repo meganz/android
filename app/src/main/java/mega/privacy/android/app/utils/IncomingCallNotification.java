@@ -18,7 +18,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import mega.privacy.android.app.activities.AskForDsiplayOverActivity;
+import mega.privacy.android.app.activities.AskForDisplayOverActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -50,7 +50,7 @@ public class IncomingCallNotification {
             }
         }
 
-        Intent intent = new Intent(context, AskForDsiplayOverActivity.class);
+        Intent intent = new Intent(context, AskForDisplayOverActivity.class);
         @NoMeaning int i = 0;
         PendingIntent pendingIntent = PendingIntent.getActivity(context, i, intent, PendingIntent.FLAG_ONE_SHOT);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, INCOMING_CALL_CHANNEL_ID);
