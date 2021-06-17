@@ -219,7 +219,7 @@
     <!--  -->
     <string name="tour_access_title">L’accès MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 20&#160;Go+ d’espace de stockage gratuits</string>
+    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 20&#160;Go+ d’espace de stockage gratuit</string>
     <!--  -->
     <string name="tour_speed_text">Les téléversements sont rapides. Partagez rapidement des fichiers avec tout le monde</string>
     <!--  -->
@@ -651,8 +651,6 @@
     <string name="upload_to_filesystem_from">Choisir de</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">téléversé</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Traitement du fichier</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Traitement du fichier</item>
@@ -1953,7 +1951,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Fonctionnement</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invitez vos amis à créer un compte MEGA gratuit et à installer notre appli mobile. Pour chaque inscription et installation d’appli réussie, vous recevez de l’espace de stockage en prime.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invitez vos amis à créer un compte MEGA gratuit et à installer l’appli MEGA mobile. Pour chaque inscription et installation d’appli réussie, vous recevez de l’espace de stockage en prime.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Vous ne recevrez pas de crédit si vous invitez quelqu’un qui a utilisé MEGA par le passé et un tel refus ne vous sera pas signalé. Les contacts invités doivent installer l’appli MEGA mobile ou l’appli MEGA pour ordinateur sur leurs appareils.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1969,11 +1967,11 @@
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">En installant l’appli MEGA pour ordinateur, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. L’appli MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">En installant notre appli MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. Nos applis mobiles sont proposées pour iOS, Android et Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">En installant l’appli MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. Nos applis mobiles sont proposées pour iOS, Android et Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Quand vous confirmez votre numéro de téléphone, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Vous avez obtenu %1$s d’espace de stockage pour avoir installé notre appli MEGA pour ordinateur.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre appli MEGA pour ordinateur.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre appli mobile.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
@@ -3334,7 +3332,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Commencez à discuter en toute sécurité avec vos contacts grâce au chiffrement de bout en bout</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Bonjour. Conversez avec moi en toute sécurité sur MEGA et obtenez 20&#160;Go+ d’espace de stockage gratuits. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Bonjour. Conversez avec moi en toute sécurité sur MEGA et obtenez 20&#160;Go+ d’espace de stockage gratuit. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Aucun lien de conversation n’est disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3942,4 +3940,12 @@
     <string name="action_keep_empty_old_extension">Pas d’extension</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Conserver .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">Un fichier porte déjà ce nom</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">Un élément porte déjà ce nom</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Renseignements</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Enregistrer dans la galerie</string>
 </resources>

@@ -658,8 +658,6 @@
     <string name="upload_to_filesystem_from">Alege din</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">încărcat</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Se procesează fișierul</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Se procesează fișierul</item>
@@ -4020,4 +4018,12 @@
     <string name="action_keep_empty_old_extension">Fără extensie</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Keep .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">Există deja un fișier cu același nume</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">Există deja un element cu același nume</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Informații</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Save to gallery</string>
 </resources>
