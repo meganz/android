@@ -20,7 +20,7 @@ class MeetingHasEndedDialogFragment(private val clickCallback: ClickCallback) :
         val builder = MaterialAlertDialogBuilder(requireContext())
 
         builder.setMessage(getString(R.string.meeting_has_ended))
-            .setPositiveButton(R.string.general_leave, null)
+            .setPositiveButton(R.string.general_cancel, null)
             .setNegativeButton(R.string.view_meeting_chat, null)
 
         val dialog = builder.create()
