@@ -26,6 +26,7 @@ import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
@@ -172,6 +173,11 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun setCall(chatId: Long) {
         if (isSameChatRoom(chatId)) {
             _callLiveData.value = inMeetingRepository.getMeeting(chatId)
+            _callLiveData.value?.let {
+                if(it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL){
+                    previousState = it.status
+                }
+            }
         }
     }
 
@@ -571,7 +577,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                 _callLiveData.value?.let {
                     if (it.status >= CALL_STATUS_JOINING && !isRequestSent() && amIAloneOnTheCall(
                             currentChatId
-                        ) && it.numParticipants == 1
+                        ) && it.numParticipants == 1 && isOnline(MegaApplication.getInstance().applicationContext)
                     ) {
                         return true
                     }
