@@ -60,6 +60,8 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initRTCAudioManager()
+
         main_bk.visibility = View.VISIBLE
         edit_first_name.visibility = View.VISIBLE
         edit_last_name.visibility = View.VISIBLE

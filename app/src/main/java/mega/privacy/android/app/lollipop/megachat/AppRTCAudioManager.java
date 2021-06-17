@@ -205,7 +205,6 @@ public class AppRTCAudioManager {
 
     private void setAudioManagerValues() {
         logDebug("Updating values of Chat Audio Manager...");
-
         if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING) {
             logDebug("If there was also an incoming call (stop incoming call sound)");
             stopAudioSignals();
@@ -456,12 +455,13 @@ public class AppRTCAudioManager {
     /**
      * Construction.
      */
-   public static AppRTCAudioManager create(Context context, boolean isSpeakerOn, int callStatus) {
-       return new AppRTCAudioManager(context, isSpeakerOn, callStatus);
+   public static AppRTCAudioManager create(Context context, boolean isSpeakerOn, int type) {
+       return new AppRTCAudioManager(context, isSpeakerOn, type);
     }
 
     public void updateSpeakerStatus(boolean speakerStatus, int type) {
         typeAudioManager = type;
+
         if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
             selectAudioDevice(speakerStatus ? AudioDevice.SPEAKER_PHONE : AudioDevice.EARPIECE, false);
         }
@@ -563,7 +563,7 @@ public class AppRTCAudioManager {
         setMicrophoneMute(false);
 
         // Set initial device states.
-        if (typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP || typeAudioManager == AUDIO_MANAGER_CREATING_MEETING) {
+        if (typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP || typeAudioManager == AUDIO_MANAGER_CREATING_JOINING_MEETING) {
             userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
         } else {
             userSelectedAudioDevice = AudioDevice.NONE;

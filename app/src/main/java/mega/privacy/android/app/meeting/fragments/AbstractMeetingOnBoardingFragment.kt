@@ -473,4 +473,11 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
         removeChatVideoListener()
     }
+
+    /**
+     * Method to create the RTC Audio Manager
+     */
+    fun initRTCAudioManager() {
+        sharedModel.initRTCAudioManager()
+    }
 }

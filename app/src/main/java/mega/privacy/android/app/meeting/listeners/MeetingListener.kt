@@ -16,7 +16,7 @@ import nz.mega.sdk.MegaChatSession
 class MeetingListener : MegaChatCallListenerInterface {
 
     override fun onChatCallUpdate(api: MegaChatApiJava?, call: MegaChatCall?) {
-        if (call == null) {
+        if (api == null || call == null) {
             logWarning("Call is null")
             return
         }
@@ -43,7 +43,7 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Call composition has changed (User added or removed from call)
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION) && call.callCompositionChange != 0) {
-            logDebug("""Call composition changed. Call status is ${callStatusToString(call.status)}. Num of participants is ${call.peeridParticipants.size()}""")
+            logDebug("""Call composition changed. Call status is ${callStatusToString(call.status)}. my handle ${api!!.myUserHandle} , Num of participants is ${call.peeridParticipants.size()}""")
             sendCallEvent(EVENT_CALL_COMPOSITION_CHANGE, call)
         }
 

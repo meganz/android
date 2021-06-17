@@ -659,7 +659,7 @@ public class Constants {
     public static final int AUDIO_MANAGER_CALL_RINGING = 1;
     public static final int AUDIO_MANAGER_CALL_IN_PROGRESS = 2;
     public static final int AUDIO_MANAGER_CALL_OUTGOING = 3;
-    public static final int AUDIO_MANAGER_CREATING_MEETING = 4;
+    public static final int AUDIO_MANAGER_CREATING_JOINING_MEETING = 4;
 
     public static final String SEPARATOR = File.separator;
 

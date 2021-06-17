@@ -373,6 +373,13 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     /**
+     * init RTC Audio Manager
+     */
+    fun initRTCAudioManager() {
+        MegaApplication.getInstance()
+            .createOrUpdateAudioManager(true, AUDIO_MANAGER_CREATING_JOINING_MEETING)
+    }
+    /**
      * Response of clicking Speaker Fab
      */
     fun clickSpeaker() {

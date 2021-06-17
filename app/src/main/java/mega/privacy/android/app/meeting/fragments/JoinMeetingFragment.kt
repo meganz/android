@@ -28,6 +28,8 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initRTCAudioManager()
+
         btn_start_join_meeting.setText(R.string.btn_join_meeting)
         type_meeting_edit_text.visibility = View.GONE
     }
