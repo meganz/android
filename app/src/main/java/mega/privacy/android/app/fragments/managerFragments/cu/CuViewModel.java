@@ -566,7 +566,7 @@ class CuViewModel extends BaseRxViewModel {
      * @param position Clicked position in the list.
      * @param card     Clicked month card.
      * @return A day card corresponding to the month of the year clicked, current day. If not exists,
-     * the closest day behind the current.
+     * the closest day to the current.
      */
     public int monthClicked(int position, CUCard card) {
         CUCard monthCard = getClickedCard(position, card.getNode().getHandle(), getMonthCards());
@@ -576,16 +576,30 @@ class CuViewModel extends BaseRxViewModel {
 
         List<CUCard> dayCards = getDayCards();
         LocalDate cardLocalDate = monthCard.getLocalDate();
+        int cardMonth = cardLocalDate.getMonthValue();
+        int cardYear = cardLocalDate.getYear();
         int currentDay = LocalDate.now().getDayOfMonth();
 
         for (int i = 0; i < dayCards.size(); i++) {
-            LocalDate localDate = dayCards.get(i).getLocalDate();
+            LocalDate nextLocalDate = dayCards.get(i).getLocalDate();
+            int nextDay = nextLocalDate.getDayOfMonth();
+            int nextMonth = nextLocalDate.getMonthValue();
+            int nextYear = nextLocalDate.getYear();
 
-            if (localDate.getYear() <= cardLocalDate.getYear()
-                    && localDate.getMonthValue() <= cardLocalDate.getMonthValue()
-                    && localDate.getDayOfMonth() <= currentDay) {
+            if (nextYear == cardYear && nextMonth == cardMonth && nextDay <= currentDay) {
                 //Month of year clicked, current day. If not exists, the closest day behind the current.
-                return i;
+                if (i == 0 || nextDay == currentDay
+                        || dayCards.get(i - 1).getLocalDate().getMonthValue() != cardMonth) {
+                    return i;
+                }
+
+                int previousDay = dayCards.get(i - 1).getLocalDate().getDayOfMonth();
+
+                //The closest day to the current
+                return previousDay - currentDay <= currentDay - nextDay ? i - 1 : i;
+            } else if (nextYear == cardYear && nextMonth < cardMonth) {
+                //No day equal or behind the current found, then return the previous day.
+                return i == 0 ? i : i -1;
             }
         }
 
@@ -598,7 +612,7 @@ class CuViewModel extends BaseRxViewModel {
      * @param position Clicked position in the list.
      * @param card     Clicked year card.
      * @return A month card corresponding to the year clicked, current month. If not exists,
-     * the closest month behind the current.
+     * the closest month to the current.
      */
     public int yearClicked(int position, CUCard card) {
         CUCard yearCard = getClickedCard(position, card.getNode().getHandle(), getYearCards());
@@ -611,15 +625,24 @@ class CuViewModel extends BaseRxViewModel {
         int currentMonth = LocalDate.now().getMonthValue();
 
         for (int i = 0; i < monthCards.size(); i++) {
-            LocalDate localDate = monthCards.get(i).getLocalDate();
+            LocalDate nextLocalDate = monthCards.get(i).getLocalDate();
+            int nextMonth = nextLocalDate.getMonthValue();
 
-            if (localDate.getYear() <= cardYear
-                    && localDate.getMonthValue() <= currentMonth) {
+            if (nextLocalDate.getYear() == cardYear && nextMonth <= currentMonth) {
                 //Year clicked, current month. If not exists, the closest month behind the current.
-                return i;
+                if (i == 0 || nextMonth == currentMonth
+                        || monthCards.get(i -1).getLocalDate().getYear() != cardYear) {
+                    return i;
+                }
+
+                long previousMonth = monthCards.get(i - 1).getLocalDate().getMonthValue();
+
+                //The closest month to the current
+                return previousMonth - currentMonth <= currentMonth - nextMonth ? i - 1 : i;
             }
         }
 
-        return 0;
+        //No month equal or behind the current found, then return the latest month.
+        return monthCards.size() - 1;
     }
 }
