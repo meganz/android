@@ -17,6 +17,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.EventConstants.EVENT_TEXT_FILE_UPLOADED
@@ -47,10 +48,11 @@ import nz.mega.sdk.MegaShare
 class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
     companion object {
-        const val CURSOR_POSITION = "CURSOR_POSITION"
-        const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
-        const val RENAME_SHOWN = "RENAME_SHOWN"
+        private const val CURSOR_POSITION = "CURSOR_POSITION"
+        private const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
+        private const val RENAME_SHOWN = "RENAME_SHOWN"
         const val FROM_HOME_PAGE = "FROM_HOME_PAGE"
+        const val TIME_SHOWING_PAGINATION_BUTTONS = 4000L
     }
 
     private val viewModel by viewModels<TextFileEditorViewModel>()
@@ -383,6 +385,15 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         binding.next.apply {
             hide()
             setOnClickListener { viewModel.nextClicked() }
+        }
+
+        ListenScrollChangesHelper().addViewToListen(
+            binding.fileEditorScrollView
+        ) { _, _, _, _, _ ->
+            binding.fileEditorToolbar.elevation =
+                if (binding.fileEditorScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)) {
+                    dp2px(4F, resources.displayMetrics).toFloat()
+                } else 0F
         }
     }
 
