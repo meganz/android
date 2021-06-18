@@ -272,6 +272,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         viewModel.resetOpenedNode();
         mManagerActivity.updateCUViewTypes(View.VISIBLE);
         setupRecyclerView();
+        setupViewTypes();
         setupOtherViews();
         observeLiveData();
         viewModel.getCards();
@@ -284,6 +285,38 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         this.monthsButton = cuMonthsButton;
         this.daysButton = cuDaysButton;
         this.allButton = cuAllButton;
+
+        setupViewTypes();
+    }
+
+    private void setupViewTypes() {
+        if (allButton != null) {
+            allButton.setOnClickListener(v -> newViewClicked(ALL_VIEW));
+        }
+
+        if (daysButton != null) {
+            daysButton.setOnClickListener(v -> newViewClicked(DAYS_VIEW));
+        }
+
+        if (monthsButton != null) {
+            monthsButton.setOnClickListener(v -> newViewClicked(MONTHS_VIEW));
+        }
+
+        if (yearsButton != null) {
+            yearsButton.setOnClickListener(v -> newViewClicked(YEARS_VIEW));
+        }
+
+        if (context != null
+                && getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
+                && viewTypesLayout != null) {
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) viewTypesLayout.getLayoutParams();
+            params.width = outMetrics.heightPixels;
+            viewTypesLayout.setLayoutParams(params);
+        }
+
+        if (getView() != null) {
+            updateViewSelected();
+        }
     }
 
     /**
@@ -378,31 +411,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.emptyHintText.setText(HtmlCompat.fromHtml(
                 formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.photos_empty)),
                 HtmlCompat.FROM_HTML_MODE_LEGACY));
-
-        if (allButton != null) {
-            allButton.setOnClickListener(v -> newViewClicked(ALL_VIEW));
-        }
-
-        if (daysButton != null) {
-            daysButton.setOnClickListener(v -> newViewClicked(DAYS_VIEW));
-        }
-
-        if (monthsButton != null) {
-            monthsButton.setOnClickListener(v -> newViewClicked(MONTHS_VIEW));
-        }
-
-        if (yearsButton != null) {
-            yearsButton.setOnClickListener(v -> newViewClicked(YEARS_VIEW));
-        }
-
-        updateViewSelected();
-
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE
-                && viewTypesLayout != null) {
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) viewTypesLayout.getLayoutParams();
-            params.width = outMetrics.heightPixels;
-            viewTypesLayout.setLayoutParams(params);
-        }
     }
 
     private void newViewClicked(int selectedView) {
