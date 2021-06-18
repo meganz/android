@@ -11,13 +11,13 @@ import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 import mega.privacy.android.app.R;
 
-abstract class CuViewHolder extends RecyclerView.ViewHolder {
+abstract class CuGridViewHolder extends RecyclerView.ViewHolder {
 
-    public CuViewHolder(@NonNull View itemView) {
+    public CuGridViewHolder(@NonNull View itemView) {
         super(itemView);
     }
 
-    public void bind(int position, CuNode node, CameraUploadsAdapter.Listener listener) {
+    public void bind(int position, CuNode node, CUGridViewAdapter.Listener listener) {
         if (handleClick() && node.getNode() != null) {
             itemView.setOnClickListener(v -> listener.onNodeClicked(position, node));
             itemView.setOnLongClickListener(v -> {

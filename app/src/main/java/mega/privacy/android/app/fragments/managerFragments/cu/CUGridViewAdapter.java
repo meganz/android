@@ -22,7 +22,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 
-public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
+public class CUGridViewAdapter extends RecyclerView.Adapter<CuGridViewHolder>
         implements SectionTitleProvider, DragThumbnailGetter {
 
     private final Listener mListener;
@@ -30,7 +30,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     private final int mSpanCount;
     private final CuItemSizeConfig mItemSizeConfig;
 
-    public CameraUploadsAdapter(Listener listener, int spanCount, CuItemSizeConfig itemSizeConfig) {
+    public CUGridViewAdapter(Listener listener, int spanCount, CuItemSizeConfig itemSizeConfig) {
         mListener = listener;
         mSpanCount = spanCount;
         mItemSizeConfig = itemSizeConfig;
@@ -48,6 +48,12 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
         return INVALID_POSITION;
     }
 
+    public CuNode getNodeAtPosition(int position) {
+        return position >= 0 && position < mNodes.size()
+                ? mNodes.get(position)
+                : null;
+    }
+
     @Nullable
     @Override
     public View getThumbnail(@NonNull RecyclerView.ViewHolder viewHolder) {
@@ -62,7 +68,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
 
     @Override public long getItemId(int position) {
         switch (getItemViewType(position)) {
-            case CuNode.TYPE_TITLE:
+            case CuNode.TYPE_HEADER:
                 return mNodes.get(position).getModifyDate().hashCode();
             case CuNode.TYPE_IMAGE:
             case CuNode.TYPE_VIDEO:
@@ -76,10 +82,10 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
     }
 
     @NonNull @Override
-    public CuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CuGridViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         switch (viewType) {
-            case CuNode.TYPE_TITLE:
+            case CuNode.TYPE_HEADER:
                 return new CuTitleViewHolder(
                         ItemCameraUploadsTitleBinding.inflate(inflater, parent, false));
             case CuNode.TYPE_VIDEO:
@@ -94,7 +100,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
         }
     }
 
-    @Override public void onBindViewHolder(@NonNull CuViewHolder holder, int position) {
+    @Override public void onBindViewHolder(@NonNull CuGridViewHolder holder, int position) {
         holder.bind(position, mNodes.get(position), mListener);
     }
 
@@ -113,7 +119,7 @@ public class CameraUploadsAdapter extends RecyclerView.Adapter<CuViewHolder>
             return 1;
         }
         switch (mNodes.get(position).getType()) {
-            case CuNode.TYPE_TITLE:
+            case CuNode.TYPE_HEADER:
                 return mSpanCount;
             case CuNode.TYPE_IMAGE:
             case CuNode.TYPE_VIDEO:

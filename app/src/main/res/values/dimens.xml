@@ -105,6 +105,9 @@
 
     <dimen name="bottom_navigation_view_height">56dp</dimen>
 
+    <dimen name="cu_view_type_button_height">36dp</dimen>
+    <dimen name="cu_view_type_button_vertical_margin">8dp</dimen>
+
     <!-- Dark mode refactor start -->
 
     <dimen name="btn_padding_vertical">10dp</dimen>
@@ -122,4 +125,8 @@
     <dimen name="btn_21_padding_horizontal">21dp</dimen>
 
     <dimen name="btn_transparent_padding_vertical">8dp</dimen>
+
+    <dimen name="card_margin_portrait">8dp</dimen>
+    <dimen name="card_margin_landscape">3dp</dimen>
+    <dimen name="cu_margin_bottom">50dp</dimen>
 </resources>

@@ -286,11 +286,6 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.SearchByDateActivityLollipop"
-            android:label="@string/action_search_by_date">
-        </activity>
-
-        <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity"
             android:label="@string/settings_passcode_lock"
             android:launchMode="singleInstance"
