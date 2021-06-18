@@ -18,6 +18,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.utils.Constants.*
@@ -36,6 +37,7 @@ import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
+import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
 import java.util.*
 import java.util.concurrent.Callable
@@ -55,11 +57,10 @@ class MediaPlayerServiceViewModel(
 ) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface {
     private val compositeDisposable = CompositeDisposable()
 
-    private val preferences = context.getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE)
-
-    private var backgroundPlayEnabled = preferences.getBoolean(KEY_BACKGROUND_PLAY_ENABLED, true)
-    private var shuffleEnabled = preferences.getBoolean(KEY_SHUFFLE_ENABLED, false)
-    private var repeatMode = preferences.getInt(KEY_REPEAT_MODE, Player.REPEAT_MODE_OFF)
+    private val preferences = context.defaultSharedPreferences
+    private var backgroundPlayEnabled = preferences.getBoolean(KEY_AUDIO_BACKGROUND_PLAY_ENABLED, true)
+    private var shuffleEnabled = preferences.getBoolean(KEY_AUDIO_SHUFFLE_ENABLED, false)
+    private var repeatMode = preferences.getInt(KEY_AUDIO_REPEAT_MODE, Player.REPEAT_MODE_OFF)
 
     private val createThumbnailFinished = PublishSubject.create<Boolean>()
     private val createThumbnailRequest = MegaRequestFinishListener({
@@ -909,7 +910,7 @@ class MediaPlayerServiceViewModel(
     fun toggleBackgroundPlay(): Boolean {
         backgroundPlayEnabled = !backgroundPlayEnabled
         preferences.edit()
-            .putBoolean(KEY_BACKGROUND_PLAY_ENABLED, backgroundPlayEnabled)
+            .putBoolean(KEY_AUDIO_BACKGROUND_PLAY_ENABLED, backgroundPlayEnabled)
             .apply()
 
         return backgroundPlayEnabled
@@ -922,7 +923,7 @@ class MediaPlayerServiceViewModel(
     fun setShuffleEnabled(enabled: Boolean) {
         shuffleEnabled = enabled
         preferences.edit()
-            .putBoolean(KEY_SHUFFLE_ENABLED, shuffleEnabled)
+            .putBoolean(KEY_AUDIO_SHUFFLE_ENABLED, shuffleEnabled)
             .apply()
 
         postPlaylistItems()
@@ -940,7 +941,7 @@ class MediaPlayerServiceViewModel(
     fun setRepeatMode(repeatMode: Int) {
         this.repeatMode = repeatMode
         preferences.edit()
-            .putInt(KEY_REPEAT_MODE, repeatMode)
+            .putInt(KEY_AUDIO_REPEAT_MODE, repeatMode)
             .apply()
     }
 
@@ -989,11 +990,6 @@ class MediaPlayerServiceViewModel(
     override fun onTransferData(api: MegaApiJava, transfer: MegaTransfer, buffer: ByteArray) = false
 
     companion object {
-        private const val SETTINGS_FILE = "audio_player_settings"
-        private const val KEY_BACKGROUND_PLAY_ENABLED = "background_play_enabled"
-        private const val KEY_SHUFFLE_ENABLED = "shuffle_enabled"
-        private const val KEY_REPEAT_MODE = "repeat_mode"
-
         private const val MAX_RETRY = 6
 
         /**
@@ -1003,9 +999,10 @@ class MediaPlayerServiceViewModel(
          */
         @JvmStatic
         fun clearSettings(context: Context) {
-            context.getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE)
-                .edit()
-                .clear()
+            context.defaultSharedPreferences.edit()
+                .remove(KEY_AUDIO_BACKGROUND_PLAY_ENABLED)
+                .remove(KEY_AUDIO_SHUFFLE_ENABLED)
+                .remove(KEY_AUDIO_REPEAT_MODE)
                 .apply()
         }
     }

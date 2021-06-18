@@ -434,7 +434,7 @@
     </style>
 
     <style name="AudioPlayerButton">
-        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:background">?selectableItemBackground</item>
         <item name="android:layout_width">52dp</item>
         <item name="android:layout_height">52dp</item>
     </style>
@@ -549,6 +549,14 @@
     <style name="BottomSheetOption.Red">
         <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Red</item>
         <item name="drawableTint">@color/red_600_red_300</item>
+    </style>
+
+    <style name="Widget.Mega.TimeBar" parent="ExoStyledControls.TimeBar">
+        <item name="bar_height">2dp</item>
+        <item name="buffered_color">@color/grey_300_grey_600</item>
+        <item name="played_color">@color/teal_300_teal_200</item>
+        <item name="scrubber_color">@color/teal_300_teal_200</item>
+        <item name="unplayed_color">@color/grey_alpha_012_white_alpha_023</item>
     </style>
 
     <style name="CuViewTypeButton">

@@ -212,12 +212,6 @@ class MediaPlayerFragment : Fragment() {
             viewHolder.layoutArtwork()
             service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
 
-            // we need setup control buttons again, because reset player would reset
-            // PlayerControlView
-            viewHolder.setupBgPlaySetting(service.viewModel.backgroundPlayEnabled()) {
-                playerService?.viewModel?.toggleBackgroundPlay() ?: false
-            }
-
             viewHolder.setupPlaylistButton(service.viewModel.playlist.value?.first) {
                 findNavController().navigate(R.id.action_player_to_playlist)
             }
@@ -252,19 +246,17 @@ class MediaPlayerFragment : Fragment() {
         playerView.useController = true
         playerView.controllerShowTimeoutMs = 0
 
-        if (videoPlayer) {
-            playerView.controllerHideOnTouch = true
-
-            playerView.setShowShuffleButton(false)
-            playerView.setRepeatToggleModes(RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE)
-        } else {
-            playerView.controllerHideOnTouch = false
-
-            playerView.setShowShuffleButton(true)
-            playerView.setRepeatToggleModes(
+        playerView.setRepeatToggleModes(
+            if (videoPlayer)
+                RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
+            else
                 RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
-            )
-        }
+        )
+
+        playerView.controllerHideOnTouch = videoPlayer
+        playerView.setShowShuffleButton(!videoPlayer)
+        playerView.setShowFastForwardButton(!videoPlayer)
+        playerView.setShowRewindButton(!videoPlayer)
 
         playerView.showController()
 

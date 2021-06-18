@@ -7,14 +7,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.google.android.exoplayer2.Player
 import mega.privacy.android.app.R
+import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.SimpleAnimatorListener
@@ -27,10 +26,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     private val artworkContainer = binding.root.findViewById<CardView>(R.id.artwork_container)
     private val trackName = binding.root.findViewById<TextView>(R.id.track_name)
     private val artistName = binding.root.findViewById<TextView>(R.id.artist_name)
-    private val bgPlay = binding.root.findViewById<ImageButton>(R.id.background_play_toggle)
-    private val bgPlayHint = binding.root.findViewById<TextView>(R.id.background_play_hint)
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
-
     private val shuffle = binding.root.findViewById<ImageView>(R.id.exo_shuffle)
 
     /**
@@ -132,42 +128,6 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
             else R.dimen.audio_player_track_name_margin_bottom_large
         )
         trackName.layoutParams = params
-    }
-
-    /**
-     * Setup background play setting button.
-     *
-     * @param enabled is background play enabled
-     * @param toggleBgPlay a callback when toggle background play, it should return whether
-     * background play is enabled after toggle
-     */
-    fun setupBgPlaySetting(enabled: Boolean, toggleBgPlay: () -> Boolean) {
-        updateBgPlay(bgPlay, bgPlayHint, enabled)
-
-        bgPlay.setOnClickListener {
-            updateBgPlay(bgPlay, bgPlayHint, toggleBgPlay())
-        }
-    }
-
-    private fun updateBgPlay(bgPlay: ImageButton, bgPlayHint: TextView, enabled: Boolean) {
-        bgPlay.setImageResource(
-            if (enabled) R.drawable.audio_player_play_bg_on else R.drawable.audio_player_play_bg_off
-        )
-
-        bgPlayHint.setTextColor(
-            ContextCompat.getColor(
-                binding.root.context,
-                if (enabled) R.color.teal_300_teal_200 else R.color.grey_060_white_060
-            )
-        )
-        bgPlayHint.setText(
-            if (enabled) R.string.background_play_hint else R.string.not_background_play_hint
-        )
-        bgPlayHint.alpha = 1F
-
-        bgPlayHint.animate()
-            .setDuration(Constants.AUDIO_PLAYER_BACKGROUND_PLAY_HINT_FADE_OUT_DURATION_MS)
-            .alpha(0F)
     }
 
     /**

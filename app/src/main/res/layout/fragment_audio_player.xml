@@ -13,10 +13,11 @@
         app:player_layout_id="@layout/audio_player_view"
         app:surface_type="none" />
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/loading"
-        style="?android:attr/progressBarStyleLargeInverse"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:layout_marginTop="54dp"
+        android:indeterminate="true" />
 </FrameLayout>
