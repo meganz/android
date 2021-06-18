@@ -3824,10 +3824,6 @@
     <string name="label_purple">Paars</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Grijs</string>
-    <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">Zal op de achtergrond spelen</string>
-    <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">Zal niet op de achtergrond spelen</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">Nu afspelen</string>
     <!-- Text that indicates the song is now playing, but paused -->

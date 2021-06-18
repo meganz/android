@@ -4172,10 +4172,6 @@
     <string name="label_purple">بنفسجي</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">رصاصي</string>
-    <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">سيتم التشغيل في خلفية التطبيق</string>
-    <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">لن يتم التشغيل في خلفية التطبيق</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">التشغيل الحالي</string>
     <!-- Text that indicates the song is now playing, but paused -->
