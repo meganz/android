@@ -11,8 +11,12 @@ import mega.privacy.android.app.utils.Constants
  */
 class CallAwareControlDispatcher(
     private var currentRepeatMode: Int
-) :
-    DefaultControlDispatcher(0, 0) {
+) : DefaultControlDispatcher(INCREMENT_TIME_IN_MS, INCREMENT_TIME_IN_MS) {
+
+    companion object {
+        private const val INCREMENT_TIME_IN_MS = 15000L
+    }
+
     override fun dispatchSeekTo(player: Player, windowIndex: Int, positionMs: Long): Boolean {
         if (CallUtil.participatingInACall()) {
             return false

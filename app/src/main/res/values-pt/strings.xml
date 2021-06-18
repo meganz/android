@@ -3824,10 +3824,6 @@
     <string name="label_purple">Roxa</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Cinza</string>
-    <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">A reprodução vai continuar em segundo plano</string>
-    <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">A reprodução não vai continuar em segundo plano</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">Reproduzindo agora</string>
     <!-- Text that indicates the song is now playing, but paused -->
