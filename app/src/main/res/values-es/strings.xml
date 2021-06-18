@@ -1919,7 +1919,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invita a tus amigos y gana bonos</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$sde almacenamiento por cada invitación. Válido durante 365 días.</string>
+    <string name="figures_achievements_text_referrals">%1$s de almacenamiento por cada invitación. Válido durante 365 días.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s de almacenamiento. Válido durante 365 días.</string>
     <!-- title of the section for unlocked rewards -->
