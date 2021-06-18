@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        app:layout_behavior=".textFileEditor.HideTopViewOnScrollBehaviour">
+        app:layout_behavior=".textFileEditor.behaviours.HideTopViewOnScrollBehaviour">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/file_editor_toolbar"
@@ -27,16 +27,14 @@
         android:id="@+id/file_editor_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipToPadding="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintTop_toBottomOf="@+id/file_editor_toolbar">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
             android:id="@+id/content_text_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <mega.privacy.android.app.textFileEditor.LineNumberTextView
+            <mega.privacy.android.app.textFileEditor.views.LineNumberTextView
                 android:id="@+id/content_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,7 +45,7 @@
                 android:textAppearance="@style/TextAppearance.Mega.Body2"
                 android:textIsSelectable="true" />
 
-            <mega.privacy.android.app.textFileEditor.LineNumberEditText
+            <mega.privacy.android.app.textFileEditor.views.LineNumberEditText
                 android:id="@+id/content_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,7 +71,7 @@
         android:layout_marginBottom="136dp"
         app:backgroundTint="@color/grey_010_teal_100"
         app:fabSize="mini"
-        app:layout_behavior=".textFileEditor.ShowFABOnScrollBehaviour"
+        app:layout_behavior=".textFileEditor.behaviours.ShowFABOnScrollBehaviour"
         app:srcCompat="@drawable/ic_arrow_previous"
         app:tint="@color/black"
         tools:ignore="ContentDescription" />
@@ -86,16 +84,18 @@
         android:layout_marginBottom="60dp"
         app:backgroundTint="@color/grey_010_teal_100"
         app:fabSize="mini"
-        app:layout_behavior=".textFileEditor.ShowFABOnScrollBehaviour"
+        app:layout_behavior=".textFileEditor.behaviours.ShowFABOnScrollBehaviour"
         app:srcCompat="@drawable/ic_arrow_next"
         app:tint="@color/black"
         tools:ignore="ContentDescription" />
 
     <RelativeLayout
+        android:id="@+id/loading_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="153dp">
+        android:layout_marginTop="153dp"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/loading_image"
@@ -103,7 +103,6 @@
             android:layout_height="96dp"
             android:layout_centerHorizontal="true"
             android:src="@drawable/ic_text_thumbnail"
-            android:visibility="gone"
             tools:ignore="ContentDescription" />
 
         <ProgressBar
@@ -115,8 +114,7 @@
             android:layout_marginStart="44dp"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="44dp"
-            android:indeterminate="true"
-            android:visibility="gone" />
+            android:indeterminate="true" />
 
     </RelativeLayout>
 
@@ -129,7 +127,7 @@
         android:gravity="center_horizontal"
         android:padding="14dp"
         android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Grey87White87"
-        app:layout_behavior=".textFileEditor.HideAlwaysBottomViewOnScrollBehaviour"
+        app:layout_behavior=".textFileEditor.behaviours.HideAlwaysBottomViewOnScrollBehaviour"
         tools:text="Journal01.txt" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -141,7 +139,7 @@
         android:src="@drawable/ic_file_edit"
         app:borderWidth="0dp"
         app:fabSize="normal"
-        app:layout_behavior=".textFileEditor.HideFABOnScrollBehaviour"
+        app:layout_behavior=".textFileEditor.behaviours.HideFABOnScrollBehaviour"
         tools:ignore="ContentDescription" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

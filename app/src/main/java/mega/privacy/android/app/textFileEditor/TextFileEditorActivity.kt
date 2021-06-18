@@ -458,8 +458,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun showLoadingView() {
         binding.fileEditorScrollView.isVisible = false
-        binding.loadingImage.isVisible = true
-        binding.loadingProgressBar.isVisible = true
+        binding.loadingLayout.isVisible = true
     }
 
     /**
@@ -501,8 +500,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         binding.contentEditText.setText(currentContent)
         binding.fileEditorScrollView.isVisible = true
         binding.fileEditorScrollView.smoothScrollTo(0, 0)
-        binding.loadingImage.isVisible = false
-        binding.loadingProgressBar.isVisible = false
+        binding.loadingLayout.isVisible = false
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
         if (viewModel.canShowEditFab()) {

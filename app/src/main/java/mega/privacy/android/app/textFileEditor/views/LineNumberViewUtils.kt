@@ -1,4 +1,4 @@
-package mega.privacy.android.app.textFileEditor
+package mega.privacy.android.app.textFileEditor.views
 
 import android.graphics.Canvas
 import android.graphics.Paint

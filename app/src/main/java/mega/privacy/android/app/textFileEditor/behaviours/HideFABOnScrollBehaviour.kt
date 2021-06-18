@@ -1,14 +1,15 @@
-package mega.privacy.android.app.textFileEditor
+package mega.privacy.android.app.textFileEditor.behaviours
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.ViewCompat
+import androidx.core.view.ViewCompat.SCROLL_AXIS_VERTICAL
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import mega.privacy.android.app.textFileEditor.TextFileEditorActivity.Companion.TIME_SHOWING_PAGINATION_BUTTONS
 
-class ShowFABOnScrollBehaviour(context: Context, attrs: AttributeSet) :
+
+class HideFABOnScrollBehaviour(context: Context, attrs: AttributeSet) :
     FloatingActionButton.Behavior(context, attrs) {
 
     override fun onStartNestedScroll(
@@ -19,7 +20,7 @@ class ShowFABOnScrollBehaviour(context: Context, attrs: AttributeSet) :
         axes: Int,
         type: Int
     ): Boolean {
-        return axes == ViewCompat.SCROLL_AXIS_VERTICAL
+        return axes == SCROLL_AXIS_VERTICAL
     }
 
     override fun onNestedScroll(
@@ -35,7 +36,6 @@ class ShowFABOnScrollBehaviour(context: Context, attrs: AttributeSet) :
     ) {
         if (dyConsumed != 0) {
             child.hide()
-            child.show()
         }
     }
 
@@ -45,6 +45,6 @@ class ShowFABOnScrollBehaviour(context: Context, attrs: AttributeSet) :
         target: View,
         type: Int
     ) {
-        child.postDelayed({ child.hide() }, TIME_SHOWING_PAGINATION_BUTTONS)
+        child.postDelayed({ child.show() }, TIME_SHOWING_PAGINATION_BUTTONS)
     }
 }

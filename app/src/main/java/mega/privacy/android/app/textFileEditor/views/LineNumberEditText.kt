@@ -1,15 +1,15 @@
-package mega.privacy.android.app.textFileEditor
+package mega.privacy.android.app.textFileEditor.views
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatTextView
-import mega.privacy.android.app.textFileEditor.LineNumberViewUtils.addExtraOnDrawBehaviour
-import mega.privacy.android.app.textFileEditor.LineNumberViewUtils.initTextPaint
-import mega.privacy.android.app.textFileEditor.LineNumberViewUtils.updatePaddingsAndView
+import androidx.appcompat.widget.AppCompatEditText
+import mega.privacy.android.app.textFileEditor.views.LineNumberViewUtils.addExtraOnDrawBehaviour
+import mega.privacy.android.app.textFileEditor.views.LineNumberViewUtils.initTextPaint
+import mega.privacy.android.app.textFileEditor.views.LineNumberViewUtils.updatePaddingsAndView
 
-open class LineNumberTextView : AppCompatTextView {
+class LineNumberEditText : AppCompatEditText {
 
     private val textPaint = Paint()
 

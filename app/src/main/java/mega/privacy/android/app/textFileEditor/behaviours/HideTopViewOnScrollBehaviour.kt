@@ -1,4 +1,4 @@
-package mega.privacy.android.app.textFileEditor
+package mega.privacy.android.app.textFileEditor.behaviours
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
