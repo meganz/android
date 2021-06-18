@@ -32,6 +32,7 @@ import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
+import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
@@ -390,10 +391,13 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         ListenScrollChangesHelper().addViewToListen(
             binding.fileEditorScrollView
         ) { _, _, _, _, _ ->
-            binding.fileEditorToolbar.elevation =
-                if (binding.fileEditorScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)) {
-                    dp2px(4F, resources.displayMetrics).toFloat()
-                } else 0F
+            val scrolling = binding.fileEditorScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
+
+            binding.fileEditorToolbar.elevation = if (scrolling) {
+                dp2px(4F, resources.displayMetrics).toFloat()
+            } else 0F
+
+            changeStatusBarColorForElevation(this, scrolling)
         }
     }
 
