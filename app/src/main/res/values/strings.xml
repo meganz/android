@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA is Cloud Storage with Powerful Always-On Privacy.</string>
     <!-- PRO Lite account -->
@@ -218,8 +218,8 @@
     <string name="tour_privacy_title">MEGA Privacy</string>
     <!--  -->
     <string name="tour_access_title">MEGA Access</string>
-    <!--  -->
-    <string name="tour_space_text">Register now and get 50 GB* of free space</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">Register now and get 20 GB+ of free space</string>
     <!--  -->
     <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
     <!--  -->
@@ -651,8 +651,6 @@
     <string name="upload_to_filesystem_from">Pick from</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">uploaded</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">Processing file</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">Processing file</item>
@@ -746,6 +744,10 @@
     <string name="settings_appearance">Appearance</string>
     <!-- settings of the Features section -->
     <string name="settings_features">Features</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">Media</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">Audio files</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="settings_storage">Storage</string>
     <!-- Settings of the Passcode -->
@@ -1109,9 +1111,9 @@
     <string name="invalid_email_title">Invalid email address</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">Please check the email address and try again.</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Password reset</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">Please enter your Recovery Key below</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Your password has been changed.</string>
@@ -1142,7 +1144,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Upgrade now</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Improve your cloud capacity![A]Get more space &amp; transfer quota with a PRO account!</string>
+    <string name="get_pro_account">Improve your cloud capacity![A]Get more space and transfer quota with a Pro account!</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">The Recovery Key has been backed up into: %1s.[A]While the file remains in this path, you will find it at the Saved for Offline Section.[A]Note: It will be deleted if you log out, please store it in a safe place.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -1921,9 +1923,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invite friends and get rewards</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">Get %1$s of storage and %2$s of transfers for each referral</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each referral. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">Get %1$s of storage and %2$s of transfers</string>
+    <string name="figures_achievements_text">%1$s of storage. Valid for 365 days.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Unlocked rewards</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1953,7 +1955,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">How it works</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage and transfer quota.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">You will not receive credit for inviting someone who has used MEGA previously and you will not be notified about such a rejection. Invited contacts must install the MEGA mobile app or MEGA desktop app on their devices.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1967,17 +1969,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email is malformed</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">When you install MEGAsync you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
+    <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">When you install our mobile app you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days. We provide mobiles apps for iOS, Android and Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">When you install our mobile app you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS, Android and Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space plus %2$s of transfer quota, both valid for 180 days.</string>
+    <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space, valid for 365 days.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space and %2$s transfer quota for installing our MEGA desktop app.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA desktop app.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space and %2$s transfer quota for installing our mobile app.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing our mobile app.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space and %2$s transfer quota for verifying your phone number.</string>
+    <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space for verifying your phone number.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">You have received %1$s storage space as your free registration bonus.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2171,8 +2173,6 @@
     <string name="label_set_period">Set period</string>
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]Invite friends to [/B][A]Chat[/A][B] and enjoy our encrypted platform with privacy and security[/B]</string>
-    <!-- Text of the empty screen when there are not elements in Camera Uploads -->
-    <string name="context_empty_camera_uploads">[B]No media on [/B][A]Camera Uploads[/A]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish Bin[/A]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -3334,7 +3334,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Start chatting securely with your contacts using end-to-end encryption</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hi! Have secure conversations on MEGA with me and get up to 50 GB free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hi! Have secure conversations on MEGA with me and get up to 20 GB+ free storage. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">No chat link available.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3826,10 +3826,8 @@
     <string name="label_purple">Purple</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Grey</string>
-    <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">Will play in the background</string>
-    <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">Will not play in the background</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">Playing on the background</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">Now playing</string>
     <!-- Text that indicates the song is now playing, but paused -->
@@ -4114,4 +4112,35 @@
     <string name="left_meeting_join_content">Join the largest secure cloud storage and collaboration platform in the world.</string>
     <string name="left_meeting_bonus_title">Get 20 GB for free</string>
     <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
+
+    <!-- New Photos -->
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">There is already a file with the same name</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">There is already an item with the same name</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Info</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Save to gallery</string>
+    <!-- Text of the empty screen when there are no elements in Photos -->
+    <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="enable_cu_subtitle">Automatically back up your photos and videos to your Cloud Drive.</string>
+    <!-- Text of a button on Camera Uploads section to show all the content of the section-->
+    <string name="all_view_button">All</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
+    <string name="days_view_button">Days</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
+    <string name="months_view_button">Months</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
+    <string name="years_view_button">Years</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
+    <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
+    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
+    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
+    <plurals name="cu_upload_progress">
+        <item quantity="one">Upload in progress, 1 file pending</item>
+        <item quantity="other">Upload in progress, %1$d files pending</item>
+    </plurals>
 </resources>

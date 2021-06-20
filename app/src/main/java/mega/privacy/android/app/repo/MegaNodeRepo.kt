@@ -1,13 +1,10 @@
 package mega.privacy.android.app.repo
 
-import android.content.Context
-import android.text.TextUtils
 import android.util.Pair
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
-import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
@@ -18,85 +15,76 @@ import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 import java.io.File
 import java.time.YearMonth
 import java.util.*
 import java.util.function.Function
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 class MegaNodeRepo @Inject constructor(
-    @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbHandler: DatabaseHandler
 ) {
 
     /**
-     * Get children of CU/MU, with the given order, and filter nodes by date (optional).
+     * Get children of CU/MU, with the given order. All nodes, including folders.
      *
-     * @param type CU_TYPE_CAMERA or CU_TYPE_MEDIA
-     * @param orderBy order
-     * @param filter search filter
-     * filter[0] is the search type:
-     * 1 means search for nodes in one day, then filter[1] is the day in millis.
-     * 2 means search for nodes in last month (filter[2] is 1), or in last year (filter[2] is 2).
-     * 3 means search for nodes between two days, filter[3] and filter[4] are start and end day in
-     * millis.
-     * @return list of pairs, whose first value is index used for
-     * FullscreenImageViewer/AudioVideoPlayer, and second value is the node
+     * @param orderBy Order.
+     * @return List of nodes containing CU/MU children.
      */
-    fun getCuChildren(
-        type: Int,
-        orderBy: Int,
-        filter: LongArray?
-    ): List<Pair<Int, MegaNode>> {
-        var cuHandle: Long = INVALID_HANDLE
+    fun getCuChildren(orderBy: Int): List<MegaNode> {
+        var cuNode: MegaNode? = null
+        var muNode: MegaNode? = null
         val pref = dbHandler.preferences
 
-        if (type == CU_TYPE_CAMERA) {
-            if (pref != null && pref.camSyncHandle != null) {
-                try {
-                    cuHandle = pref.camSyncHandle.toLong()
-                } catch (e: NumberFormatException) {
-                    logError("parse getCamSyncHandle error $e")
-                }
-
-                if (megaApi.getNodeByHandle(cuHandle) == null) {
-                    cuHandle = INVALID_HANDLE
-                }
-            }
-            if (cuHandle == INVALID_HANDLE) {
-                for (node in megaApi.getChildren(megaApi.rootNode)) {
-                    if (node.isFolder && TextUtils.equals(
-                            context.getString(R.string.section_photo_sync),
-                            node.name
-                        )
-                    ) {
-                        cuHandle = node.handle
-                        dbHandler.setCamSyncHandle(cuHandle)
-                        break
-                    }
-                }
-            }
-        } else {
-            if (pref != null && pref.megaHandleSecondaryFolder != null) {
-                try {
-                    cuHandle = pref.megaHandleSecondaryFolder.toLong()
-                } catch (e: NumberFormatException) {
-                    logError("parse MegaHandleSecondaryFolder error $e")
-                }
-
-                if (megaApi.getNodeByHandle(cuHandle) == null) {
-                    cuHandle = INVALID_HANDLE
-                }
+        if (pref?.camSyncHandle != null) {
+            try {
+                val cuHandle = pref.camSyncHandle.toLong()
+                cuNode = megaApi.getNodeByHandle(cuHandle)
+            } catch (e: NumberFormatException) {
+                logError("parse getCamSyncHandle error $e")
             }
         }
 
-        if (cuHandle == INVALID_HANDLE) {
+        if (pref?.megaHandleSecondaryFolder != null) {
+            try {
+                val muHandle = pref.megaHandleSecondaryFolder.toLong()
+                muNode = megaApi.getNodeByHandle(muHandle)
+            } catch (e: NumberFormatException) {
+                logError("parse MegaHandleSecondaryFolder error $e")
+            }
+        }
+
+        if (cuNode == null && muNode == null) {
             return emptyList()
         }
 
-        val children: List<MegaNode> =
-            megaApi.getChildren(megaApi.getNodeByHandle(cuHandle), orderBy)
+        val nodeList = MegaNodeList.createInstance()
+
+        if (cuNode != null) {
+            nodeList.addNode(cuNode)
+        }
+
+        if (muNode != null) {
+            nodeList.addNode(muNode)
+        }
+
+        return megaApi.getChildren(nodeList, orderBy)
+    }
+
+    /**
+     * Get children of CU/MU, with the given order. Only images and reproducible videos.
+     *
+     * @param orderBy Order.
+     * @return List of pairs, whose first value is index used for
+     * FullscreenImageViewer/AudioVideoPlayer, and second value is the node.
+     */
+    fun getFilteredCuChildrenAsPairs(
+        orderBy: Int
+    ): List<Pair<Int, MegaNode>> {
+        val children = getCuChildren(orderBy)
         val nodes = ArrayList<Pair<Int, MegaNode>>()
 
         for ((index, node) in children.withIndex()) {
@@ -112,60 +100,33 @@ class MegaNodeRepo @Inject constructor(
             }
         }
 
-        if (filter == null) {
-            return nodes
-        }
+        return nodes
+    }
 
-        val result = ArrayList<Pair<Int, MegaNode>>()
-        var filterFunction: Function<MegaNode, Boolean>? = null
+    /**
+     * Get children of CU/MU, with the given order. Only images and reproducible videos.
+     *
+     * @param orderBy Order.
+     * @return List of nodes containing CU/MU children.
+     */
+    fun getFilteredCuChildren(
+        orderBy: Int
+    ): List<MegaNode> {
+        val children = getCuChildren(orderBy)
+        val nodes = ArrayList<MegaNode>()
 
-        when (filter[SEARCH_BY_DATE_FILTER_POS_TYPE]) {
-            SEARCH_BY_DATE_FILTER_TYPE_ONE_DAY -> {
-                val date = Util.fromEpoch(filter[SEARCH_BY_DATE_FILTER_POS_THE_DAY] / 1000)
-                filterFunction = Function { node: MegaNode ->
-                    date == Util.fromEpoch(node.modificationTime)
-                }
+        for (node in children) {
+            if (node.isFolder) {
+                continue
             }
-            SEARCH_BY_DATE_FILTER_TYPE_LAST_MONTH_OR_YEAR -> {
-                when (filter[SEARCH_BY_DATE_FILTER_POS_MONTH_OR_YEAR]) {
-                    SEARCH_BY_DATE_FILTER_LAST_MONTH -> {
-                        val lastMonth = YearMonth.now().minusMonths(1)
-                        filterFunction = Function { node: MegaNode ->
-                            lastMonth == YearMonth.from(Util.fromEpoch(node.modificationTime))
-                        }
-                    }
-                    SEARCH_BY_DATE_FILTER_LAST_YEAR -> {
-                        val lastYear = YearMonth.now().year - 1
-                        filterFunction = Function { node: MegaNode ->
-                            Util.fromEpoch(node.modificationTime).year == lastYear
-                        }
-                    }
-                }
-            }
-            SEARCH_BY_DATE_FILTER_TYPE_BETWEEN_TWO_DAYS -> {
-                val from = Util.fromEpoch(filter[SEARCH_BY_DATE_FILTER_POS_START_DAY] / 1000)
-                val to = Util.fromEpoch(filter[SEARCH_BY_DATE_FILTER_POS_END_DAY] / 1000)
-                filterFunction = Function { node: MegaNode ->
-                    val modifyDate = Util.fromEpoch(node.modificationTime)
-                    !modifyDate.isBefore(from) && !modifyDate.isAfter(to)
-                }
+
+            val mime = MimeTypeThumbnail.typeForName(node.name)
+            if (mime.isImage || mime.isVideoReproducible) {
+                nodes.add(node)
             }
         }
 
-        if (filterFunction == null) {
-            return result
-        }
-
-        // when in search mode, index used by viewer is also index in all siblings,
-        // but all siblings are image/video, non image/video nodes are filtered by previous step
-        var indexInSiblings = 0
-        for (node in nodes) {
-            if (filterFunction.apply(node.second)) {
-                result.add(Pair.create(indexInSiblings, node.second))
-                indexInSiblings++
-            }
-        }
-        return result
+        return nodes
     }
 
     fun findOfflineNode(handle: String): MegaOffline? {
@@ -214,7 +175,7 @@ class MegaNodeRepo @Inject constructor(
             }
 
             if (node.name.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT)) &&
-                FileUtil.isFileAvailable(getOfflineFile(context, node))
+                FileUtil.isFileAvailable(getOfflineFile(MegaApplication.getInstance(), node))
             ) {
                 result.add(node)
             }
@@ -229,10 +190,5 @@ class MegaNodeRepo @Inject constructor(
         } else {
             offline.path + File.separator + offline.name + File.separator
         }
-    }
-
-    companion object {
-        const val CU_TYPE_CAMERA = 0
-        const val CU_TYPE_MEDIA = 1
     }
 }

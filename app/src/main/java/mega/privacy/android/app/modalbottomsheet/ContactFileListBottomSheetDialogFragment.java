@@ -112,9 +112,9 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
         int accessLevel = megaApi.getAccess(node);
 
+        optionInfo.setText(R.string.general_info);
         if (node.isFolder()) {
             nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
-            optionInfo.setText(R.string.general_folder_info);
             nodeInfo.setText(getMegaNodeFolderInfo(node));
 
             if (firstLevel || parentHandle == INVALID_HANDLE) {
@@ -140,7 +140,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 nodeIconLayout.setVisibility(View.GONE);
             }
         } else {
-            optionInfo.setText(R.string.general_file_info);
             long nodeSize = node.getSize();
             nodeInfo.setText(getSizeString(nodeSize));
             nodeIconLayout.setVisibility(View.GONE);

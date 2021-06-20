@@ -39,7 +39,7 @@
     <!-- button -->
     <string name="general_share">共有</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="general_leave">残す</string>
+    <string name="general_leave">解除</string>
     <!-- button -->
     <string name="general_decryp">復号化</string>
     <!-- button -->
@@ -216,8 +216,8 @@
     <string name="tour_privacy_title">MEGAプライバシー</string>
     <!--  -->
     <string name="tour_access_title">MEGAアクセス</string>
-    <!--  -->
-    <string name="tour_space_text">今すぐ登録し、50 GB*の空き容量を取得してください</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">今すぐ登録し、20 GB*の空き容量を取得してください</string>
     <!--  -->
     <string name="tour_speed_text">アップロードは高速です。誰とでも素早くファイルを共有できます。</string>
     <!--  -->
@@ -401,9 +401,9 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_get_link_menu">リンクを取得</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_leave_menu">残す</string>
+    <string name="context_leave_menu">解除</string>
     <!-- Title alert before leaving a share. -->
-    <string name="alert_leave_share">共有を残す</string>
+    <string name="alert_leave_share">共有を解除</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">共有を削除</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -642,11 +642,9 @@
     <string name="upload_to_filesystem_from">以下から選択：</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">アップロード済み</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">ファイルを処理中</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
-        <item quantity="other">ファイルを処理中</item>
+        <item quantity="other">ファイルの処理中</item>
     </plurals>
     <!-- error message when downloading a file -->
     <string name="error_temporary_unavaible">リソースが一時的に利用できません。後でもう一度やり直してください。</string>
@@ -1097,9 +1095,9 @@
     <string name="invalid_email_title">メールアドレスが無効です</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">メールアドレスをご確認の上、再度お試しください。</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">パスワードをリセット</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">以下にあなたの回復キーを入力してください</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">パスワードを変更しました。</string>
@@ -1489,7 +1487,7 @@
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]さんが入力しています&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]さんたちが入力しています[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">詳細</string>
@@ -1879,9 +1877,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">友人を招待して報酬を獲得</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">ご紹介ごとに%1$sのストレージと%2$sの転送を取得</string>
+    <string name="figures_achievements_text_referrals">各紹介者に対して%1$sストレージ。365日有効。</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">ご紹介ごとに%1$sのストレージと%2$sの転送を取得</string>
+    <string name="figures_achievements_text">%1$sのストレージ。365日有効。</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">ロック解除された報酬</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1911,7 +1909,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">仕組み</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">無料のMEGAアカウントを作成し、当社のモバイルアプリをインストールするようにお友だちをご招待ください。ご登録およびアプリのインストールに成功するたびに、あなたにボーナスストレージと転送容量を贈呈いたします。</string>
+    <string name="first_paragraph_achievement_invite_friends">無料のMEGAアカウントを作成し、当社のモバイルアプリをインストールするようにお友だちをご招待ください。ご登録とアプリのインストールが成功するたびに、あなたはボーナスストレージを受け取ることができます。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">MEGAを以前に使用したことのある人を招待した場合、あなたはそのクレジットを受け取ることはありません。また、そのような拒否について通知されることもありません。ご招待されたご連絡先の方々は、端末にMEGAモバイルアプリまたはMEGAデスクトップアプリをインストールする必要があります。</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1925,17 +1923,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">メールが不正です</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">MEGAsyncをインストールすると、無料のストレージスペース%1$sと転送容量%2$sが得られます。どちらも180日間有効です。MEGAデスクトップアプリは、Windows、macOS、そして大半のLinuxディストリビューションでご利用いただけます。</string>
+    <string name="paragraph_info_achievement_install_desktop">MEGAデスクトップアプリをインストールすると、無料のストレージスペース%1$sが得られます。これは365日間有効です。MEGAデスクトップアプリは、Windows、macOS、そして大半のLinuxディストリビューションでご利用いただけます。</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">当社のモバイルアプリをインストールすると、無料のストレージスペース%1$sと転送容量%2$sが得られます。どちらも180日間有効です。当社は、iOS、Android、Windows Phone用のモバイルアプリをご提供しております。</string>
+    <string name="paragraph_info_achievement_install_mobile_app">当社のモバイルアプリをインストールすると、無料のストレージスペース%1$sが得られます。これは365日間有効です。当社は、iOS、Android、Windows Phone用のモバイルアプリをご提供しております。</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">お使いの電話番号を検証すると、無料のストレージスペース%1$sと転送容量%2$sが得られます。どちらも180日間有効です。</string>
+    <string name="paragraph_info_achievement_add_phone">お使いの電話番号を検証すると、無料のストレージスペース%1$sが得られます。これは365日間有効です。</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">あなたは当社のMEGAデスクトップアプリのインストールに対して、%1$sのストレージスペースと%2$sの転送容量を受け取りました。</string>
+    <string name="result_paragraph_info_achievement_install_desktop">あなたは当社のMEGAデスクトップアプリのインストールに対して、%1$sのストレージスペースを受け取りました。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">あなたは当社のモバイルアプリのインストールに対して、%1$sのストレージスペースと%2$sの転送容量を受け取りました。</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">あなたは当社のモバイルアプリのインストールに対して、%1$sのストレージスペースを受け取りました。</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">あなたはお使いの電話番号の検証に対して、%1$sのストレージスペースと%2$sの転送容量を受け取りました。</string>
+    <string name="result_paragraph_info_achievement_add_phone">あなたはお使いの電話番号の検証に対して、%1$sのストレージスペースを受け取りました。</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">あなたは無料登録ボーナスとして%1$sのストレージスペースを受け取りました。</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -3258,7 +3256,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">エンドツーエンドの暗号化を使用して、ご連絡先と安全にチャットを開始してください</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">こんにちは！　私とMEGAでセキュアな会話をして、最大50GBの無料ストレージを獲得しましょう。%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">こんにちは！　私とMEGAで安全に会話をして、最大20GBの無料ストレージを獲得しましょう。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">利用できるチャットリンクはありません。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3739,10 +3737,6 @@
     <string name="label_purple">紫</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">灰色</string>
-    <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">バックグラウンドで再生</string>
-    <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">バックグラウンドで再生しない</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">再生中</string>
     <!-- Text that indicates the song is now playing, but paused -->
@@ -3835,4 +3829,32 @@
     <string name="file_update_failed">ファイルの更新に失敗しました。もう一度お試しください。</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">ファイルのサイズが大きすぎて、開くこともプレビューすることもできません。</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">ファイルに拡張子（%1$s）がありません</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">続行するには、ファイルの拡張子を入力する必要があります。</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">ファイル拡張子の変更</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">「.%1$s」から「.%2$s」に変更すると、このファイルにアクセスできなくなる可能性があります。</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">拡張子「.%1$s」を追加すると、このファイルにアクセスできなくなることがあります。</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">拡張子「.%1$s」を削除すると、このファイルにアクセスできなくなることがあります。</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">拡張子を削除</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">.%1$sを使う</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">拡張子なし</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">.%1$sにしておく</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">同じ名前のファイルがすでにあります</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">同じ名前の項目がすでに存在します</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">情報</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">ギャラリーに保存</string>
 </resources>

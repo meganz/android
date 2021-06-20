@@ -176,15 +176,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_search_by_date"
-        android:icon="@drawable/ic_menu_search"
-        android:orderInCategory="115"
-        android:title="@string/action_search_by_date"
-        android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_grid"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="120"

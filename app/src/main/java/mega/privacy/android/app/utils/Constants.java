@@ -38,7 +38,6 @@ public class Constants {
     public static final int REQUEST_SEND_CONTACTS = 1021;
     public static final int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
     public static final int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
-    public static final int ACTION_SEARCH_BY_DATE = 1024;
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;
     public static final int REQUEST_CODE_GET_CONTACTS = 1026;
     public static final int REQUEST_CODE_FILE_INFO = 1027;
@@ -872,6 +871,8 @@ public class Constants {
     public static final String EVENT_PRIVILEGES_CHANGE = "privileges_in_char_change";
     public static final String EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change";
 
+    public static final String EVENT_PSA = "EVENT_PSA";
+
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";
     public static final String EVENT_DRAG_TO_EXIT_SCROLL = "drag_to_exit_scroll";
@@ -895,4 +896,6 @@ public class Constants {
 
     /** The param type returned by checkChatLink denoting the link is for a meeting room */
     public final static int LINK_IS_FOR_MEETING = 1;
+
+    public static final long ANIMATION_DURATION = 400;
 }

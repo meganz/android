@@ -1958,7 +1958,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else{
                     if(error.getErrorCode() != MegaError.API_EBLOCKED) {
-                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                        //It will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
+                        logWarning("Suspended account - Reason: " + request.getNumber());
+                        return;
                     }
                 }
 

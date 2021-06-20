@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users” confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA通过网页浏览器以及移动客户端App提供用户控制的加密云存储服务。不同于其他云存储供应商，您的数据仅由用户客户端设备进行加密与解密，而不通过MEGA进行。\n\n您可以通过手机或平板电脑上传您的文件，随时随地从任何设备上进行搜索，存储，下载，流式传输，查看，分享，重命名或删除文件。您还可以轻松与您的联系人分享文件夹并随时查看其更新。此加密方式意味着我们无法访问或重置您的密码，因此您务必要牢记您的密码（除非已备份恢复密钥），否则您将无法访问您的数据。\n\n自2016年起，我们一直通过浏览器提供端到端用户加密的MEGA视频聊天，为用户提供了完全的隐私保护。它已扩展至我们的移动客户端App并可通过多个设备访问您的聊天记录。您还可以轻松地将云盘中地文件添加至聊天会话中。\n\n注册用户只要参与成就奖励即可获得50GB的免费存储空间，也可付费获取更多配额：\n\n\nPro精简版订阅：每月€4.99或每年€49.99，可享有每月400GB的存储空间和1TB的传输流量。\nPro I订阅：每月€9.99或每年€99.99，可享有每月2TB的存储空间和2TB的传输流量。\nPro II订阅：每月€19.99或每年€199.99，可享有每月8TB的存储空间和8TB的传输流量。\nPro III订阅：每月€29.99或每年€299.99，可享有每月16TB的存储空间和16TB的传输流量。\n\n此订阅将自动更新续订，续订内容将与您初始订阅时间与价格一致。如需管理您的订阅，请点击您手机上的Play商店图标，登录您的Google帐户（如果您还没有这样做），然后点击MEGA App，您可以在那里管理您的订阅。\n\n应用程序权限：\nWRITE_EXTERNAL_STORAGE - &gt;将文件从MEGA下载至您的设备，并将文件从您的设备上传至MEGA\nCAMERA - &gt;拍照并将照片上传至MEGA\nREAD_CONTACTS - &gt;从您的设备中添加联系人作为MEGA联系人\nRECORD_AUDIO和CAPTURE_VIDEO_OUTPUT（麦克风和摄像头） - &gt; MEGA提供端到端加密语音/视频通话\n\n\n为增强用户对MEGA系统的信赖，所有的客户端代码均已发布，若您对此感兴趣，您可以评估我们的加密过程。我们的移动客户端App代码位于：https://github.com/meganz/android \n\n若了解更多内容，请查看我们的网站：\nhttps://mega.nz/terms \n\n\n桌面客户端 - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA是全面专注隐私保护的云端存储平台。</string>
     <!-- PRO Lite account -->
@@ -216,8 +216,8 @@
     <string name="tour_privacy_title">MEGA 隐私保护</string>
     <!--  -->
     <string name="tour_access_title">随时随地访问 MEGA</string>
-    <!--  -->
-    <string name="tour_space_text">立即注册并获取50GB*免费存储空间</string>
+    <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
+    <string name="tour_space_text">立即注册即可获得20GB+免费存储空间</string>
     <!--  -->
     <string name="tour_speed_text">上传速度很快。立即分享给身边的朋友吧</string>
     <!--  -->
@@ -642,8 +642,6 @@
     <string name="upload_to_filesystem_from">选择从</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">已上传</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">文件处理中</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="other">文件处理中</item>
@@ -1097,9 +1095,9 @@
     <string name="invalid_email_title">无效的邮箱地址</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_text">请核对您的邮箱地址然后再试一次。</string>
-    <!-- Title of the dialog to write MK after opening the recovery link -->
+    <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">密码重置</string>
-    <!-- Text of the dialog to write MK after opening the recovery link -->
+    <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="text_dialog_insert_MK">请在下面输入您的恢复密钥</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">您的密码已被更改。</string>
@@ -1489,7 +1487,7 @@
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]正在输入&#8230;[/A]</item>
     </plurals>
-    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing&#8230; -->
+    <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
     <string name="more_users_typing">%1$s [A]和其他人正在输入&#8230;[/A]</string>
     <!-- More button in contact info page -->
     <string name="label_more">更多</string>
@@ -1879,9 +1877,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">邀请朋友，并获得奖励</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">每当推荐成功便能获取%1$s的存储空间和%2$s的流量</string>
+    <string name="figures_achievements_text_referrals">单次邀请奖励为%1$s存储空间。有效期为365天。</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">获取%1$s的存储空间和%2$s的流量</string>
+    <string name="figures_achievements_text">%1$s存储空间。有效期为365天。</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">解锁奖励</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1911,7 +1909,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">如何使用</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">邀请您的朋友创建一个免费的MEGA账户并安装我们的手机应用程序。每一个成功注册和安装应用的用户都会收到额外的存储空间和传输配额。</string>
+    <string name="first_paragraph_achievement_invite_friends">邀请您的好友创建一个免费MEGA帐户并安装我们的手机App。每有一位用户成功注册并安装后，您将获得额外存储空间奖励。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">邀请曾经的MEGA用户不会获得奖励，您也不会对此收到通知。受邀的联系人必须在其设备上安装MEGA手机应用程序或MEGA桌面应用程序。</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1925,17 +1923,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">电子邮件格式错误</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">当您安装MEGAsync时，您将获得%1$s的免费存储空间以及%2$s的传输配额，两者的有效期为180天。MEGA桌面应用程序可用于Windows，MacOS和大多数Linux发行版。</string>
+    <string name="paragraph_info_achievement_install_desktop">安装MEGA桌面App后，您会获得%1$s免费存储空间，有效期为365天。MEGA桌面App适用于Windows，macOS和大多数Linux发行版。</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">当您安装我们的手机应用程序时，您可以获得%1$s的存储空间与%2$s的流量配额，两者都有效期为180天。 我们为iOS系统，安卓系统和Windows系统手机提供手机应用。</string>
+    <string name="paragraph_info_achievement_install_mobile_app">安装MEGA手机App后，您会获得%1$s免费存储空间，有效期为365天。MEGA手机App适用于iOS，Android和Windows Phone。</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">验证手机号后，您将获得%1$s的免费存储空间和%2$s的传输流量，有效期为180天。</string>
+    <string name="paragraph_info_achievement_add_phone">验证手机号后，您会获得%1$s免费存储空间，有效期为365天。</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">您已安装我们的MEGA桌面应用程序，并且获得了%1$s的存储空间和%2$s的流量配额。</string>
+    <string name="result_paragraph_info_achievement_install_desktop">您已通过安装MEGA桌面App获得了%1$s存储空间。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">您已成功安装我们的移动应用，并且收到了%1$s的存储空间和%2$s的传输配额</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">您已通过安装MEGA手机App获得了%1$s存储空间。</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">您已通过验证手机号获得%1$s的存储空间和%2$s的传输流量。</string>
+    <string name="result_paragraph_info_achievement_add_phone">您已通过验证手机号获得了%1$s存储空间。</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已经收到%1$s的存储空间作为免费注册奖励。</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2454,7 +2452,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">您在下次登录账户时，系统会要求您输入验证程序中提供的6位验证码。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">If you lose access to your account after enabling 2FA and you have not backed up your Recovery Key, MEGA can’t help you gain access to it again.\n &lt;b&gt;备份您的恢复密钥&lt;/b&gt;</string>
+    <string name="recommendation_2fa_enabled">请导出您的<b>恢复密钥</b>，以便在您忘记密码时或禁用双重验证时使用。</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">该码无效</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -3258,7 +3256,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">开始使用端到端加密安全的与您的联系人进行聊天</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">嗨！与我一起使用MEGA，并获得最高50GB的免费存储空间。%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">你好！和我一起使用MEGA，立即获得20GB+免费存储空间。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">无聊天链接可用。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3739,10 +3737,6 @@
     <string name="label_purple">兰紫</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">银灰</string>
-    <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">将在后台播放</string>
-    <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">无法在后台播放</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">正在播放</string>
     <!-- Text that indicates the song is now playing, but paused -->
@@ -3835,4 +3829,32 @@
     <string name="file_update_failed">文件更新失败。请重试。</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">文件太大，无法打开或预览。</string>
+    <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
+    <string name="file_without_extension">文件缺少扩展名（.%1$s）</string>
+    <!-- Error shown when the user writes a file name without extension -->
+    <string name="file_without_extension_warning">请输入一个文件扩展名</string>
+    <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
+    <string name="file_extension_change_title">更改文件扩展名</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
+    <string name="file_extension_change_warning">如果将扩展名由“.%1$s”更改为“.%2$s”，则可能无法访问此文件</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
+    <string name="file_extension_change_warning_old_empty">添加扩展名“.%1$s”后，您可能无法访问此文件</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
+    <string name="file_extension_change_warning_new_empty">删除扩展名“.%1$s”后，您可能无法访问此文件</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
+    <string name="action_use_empty_new_extension">删除扩展名</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
+    <string name="action_use_new_extension">使用.%1$s</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
+    <string name="action_keep_empty_old_extension">无扩展名</string>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
+    <string name="action_keep_old_extension">保留.%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">已有一个相同的文件名</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">已有一个相同的项目名</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">信息</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">保存到图库</string>
 </resources>

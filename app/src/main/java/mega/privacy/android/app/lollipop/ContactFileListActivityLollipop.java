@@ -83,6 +83,7 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
@@ -708,7 +709,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			ProgressDialog temp = null;
 			try {
 				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.upload_prepare));
+				temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
 				temp.show();
 			} catch (Exception e) {
 				return;
@@ -850,6 +851,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Override
 	public void onBackPressed() {
+		if (psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		if (cflF != null && cflF.isVisible() && cflF.onBackPressed() == 0) {

@@ -440,6 +440,7 @@ class GetLinkActivity : PasscodeActivity(), GetLinkInterface, SnackbarShower {
     }
 
     override fun onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return
         if (visibleFragment == DECRYPTION_KEY_FRAGMENT || visibleFragment == PASSWORD_FRAGMENT) {
             if (visibleFragment == PASSWORD_FRAGMENT) {
                 passwordFragment.resetView()

@@ -295,7 +295,6 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:text">@string/title_achievement_invite_friends</item>
         <item name="android:layout_marginTop">24dp</item>
-        <item name="android:layout_marginBottom">24dp</item>
         <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Variant</item>
         <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:textColor">@color/dark_blue_500_200</item>
@@ -304,6 +303,7 @@
     <style name="how_works_first_p">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">24dp</item>
         <item name="android:layout_marginBottom">16dp</item>
         <item name="android:layout_marginLeft">24dp</item>
         <item name="android:layout_marginRight">24dp</item>
@@ -437,7 +437,7 @@
     </style>
 
     <style name="AudioPlayerButton">
-        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:background">?selectableItemBackground</item>
         <item name="android:layout_width">52dp</item>
         <item name="android:layout_height">52dp</item>
     </style>
@@ -543,6 +543,9 @@
         <item name="android:paddingStart">18dp</item>
         <item name="android:paddingEnd">18dp</item>
         <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
         <item name="drawableTint">?android:attr/textColorSecondary</item>
     </style>
 
@@ -605,6 +608,35 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="Widget.Mega.TimeBar" parent="ExoStyledControls.TimeBar">
+        <item name="bar_height">2dp</item>
+        <item name="buffered_color">@color/grey_300_grey_600</item>
+        <item name="played_color">@color/teal_300_teal_200</item>
+        <item name="scrubber_color">@color/teal_300_teal_200</item>
+        <item name="unplayed_color">@color/grey_alpha_012_white_alpha_023</item>
+    </style>
+
+    <style name="CuViewTypeButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">@dimen/cu_view_type_button_height</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:background">@drawable/background_18dp_rounded_unselected_button</item>
+        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87</item>
+    </style>
+
+    <style name="CUProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">4dp</item>
+        <item name="minHeight">4dp</item>
+        <item name="maxHeight">4dp</item>
     </style>
 
 </resources>
