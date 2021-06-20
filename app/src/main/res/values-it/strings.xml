@@ -651,8 +651,6 @@
     <string name="upload_to_filesystem_from">Prendi da</string>
     <!-- Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded -->
     <string name="upload_uploaded">caricato</string>
-    <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 1 file -->
-    <string name="upload_prepare">File in elaborazione</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
         <item quantity="one">File in elaborazione</item>
@@ -3826,10 +3824,6 @@
     <string name="label_purple">Viola</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Grigio</string>
-    <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">Verrà riprodotto in background</string>
-    <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">Non verrà riprodotto in background</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">Adesso in riproduzione</string>
     <!-- Text that indicates the song is now playing, but paused -->
@@ -3942,4 +3936,12 @@
     <string name="action_keep_empty_old_extension">Nessuna estensione</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Mantieni .%1$s</string>
+    <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
+    <string name="same_file_name_warning">È già presente un file con lo stesso nome</string>
+    <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
+    <string name="same_item_name_warning">È già presente un oggetto con lo stesso nome</string>
+    <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
+    <string name="general_info">Info</string>
+    <!-- Item menu option upon right click on one image or video to save it to device gallery -->
+    <string name="general_save_to_gallery">Salva nella galleria</string>
 </resources>

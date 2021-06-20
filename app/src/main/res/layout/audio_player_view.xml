@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_020_grey_800">
+    android:background="@drawable/gradient_audio_player">
 
     <!-- the artwork's size & position will be adjusted in code -->
     <androidx.cardview.widget.CardView

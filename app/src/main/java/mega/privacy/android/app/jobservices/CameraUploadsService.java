@@ -1631,6 +1631,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             } else {
                 logDebug("No pending videos, finish");
                 onQueueComplete();
+                sendBroadcast(new Intent(ACTION_UPDATE_CU)
+                        .putExtra(PROGRESS, 100)
+                        .putExtra(PENDING_TRANSFERS, 0));
             }
         }
     }
@@ -1863,6 +1866,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             } else {
                 inProgress = totalTransfers - pendingTransfers + 1;
             }
+
+            sendBroadcast(new Intent(ACTION_UPDATE_CU)
+                    .putExtra(PROGRESS, progressPercent)
+                    .putExtra(PENDING_TRANSFERS, inProgress));
 
             if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
                 message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalTransfers, inProgress, totalTransfers);
