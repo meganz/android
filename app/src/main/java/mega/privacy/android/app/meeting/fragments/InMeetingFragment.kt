@@ -2257,8 +2257,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         inMeetingViewModel.checkAnotherCallsInProgress(chatId)
 
         if (args.action == MEETING_ACTION_GUEST) {
-            inMeetingViewModel.registerConnectionUpdateListener(args.chatId) {
+            if (CallUtil.isStatusConnected(context, args.chatId)) {
                 answerCallAfterJoin()
+            } else {
+                inMeetingViewModel.registerConnectionUpdateListener(args.chatId) {
+                    answerCallAfterJoin()
+                }
             }
         } else {
             answerCallAfterJoin()
