@@ -37,6 +37,9 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
         if (users == null || users.isEmpty()) return;
 
+        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
+        megaApplication.sendBroadcast(intent);
+
         for (MegaUser user : users) {
             if (user == null) {
                 continue;
@@ -113,7 +116,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
         intent.setAction(ACTION_ON_ACCOUNT_UPDATE);
-        MegaApplication.getInstance().sendBroadcast(intent);
+        megaApplication.sendBroadcast(intent);
 
         api.getPaymentMethods(null);
         api.getAccountDetails(null);
@@ -131,7 +134,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
         notifyNotificationCountChange(api);
 
         Intent intent = new Intent(BROADCAST_ACTION_REQUEST_UPDATE);
-        MegaApplication.getInstance().sendBroadcast(intent);
+        megaApplication.sendBroadcast(intent);
 
         for (int i = 0; i < requests.size(); i++) {
             MegaContactRequest cr = requests.get(i);
