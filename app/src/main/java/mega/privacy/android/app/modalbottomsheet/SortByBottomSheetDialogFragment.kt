@@ -180,7 +180,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 sortOrderManagement.setOrderCamera(order)
 
                 if (requireActivity() is ManagerActivityLollipop) {
-                    (requireActivity() as ManagerActivityLollipop).refreshCameraOrder(order)
+                    (requireActivity() as ManagerActivityLollipop).refreshCUNodes()
                 }
             }
             ORDER_OTHERS -> {

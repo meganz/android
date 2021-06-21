@@ -59,6 +59,7 @@
     <color name="grey_alpha_016">#29000000</color>
     <color name="grey_alpha_020">#33000000</color>
     <color name="grey_alpha_026">#42000000</color>
+    <color name="grey_alpha_032">#52000000</color>
     <color name="grey_alpha_033">#54000000</color>
     <color name="grey_alpha_038">#61000000</color>
     <color name="grey_alpha_045">#73000000</color>
@@ -428,4 +429,11 @@
 
     <!--  SnackBar Button text  -->
     <color name="teal_200_teal_300">@color/teal_200</color>
+
+    <!--  ExoPlayer Time Bar Unplayed  -->
+    <color name="grey_alpha_012_white_alpha_023">@color/grey_alpha_012</color>
+
+    <color name="grey_054_white_060">@color/grey_alpha_054</color>
+    <color name="grey_012_white_020">@color/grey_alpha_012</color>
+
 </resources>

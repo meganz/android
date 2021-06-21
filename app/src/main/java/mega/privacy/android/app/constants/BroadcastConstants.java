@@ -62,6 +62,7 @@ public class BroadcastConstants {
     public static final String ACTION_UPDATE_RB_SCHEDULER = "ACTION_UPDATE_RB_SCHEDULER";
     public static final String ACTION_UPDATE_FILE_VERSIONS = "ACTION_UPDATE_FILE_VERSIONS";
     public static final String ACTION_UPDATE_RETENTION_TIME = "ACTION_UPDATE_RETENTION_TIME";
+    public static final String ACTION_UPDATE_CU = "ACTION_UPDATE_CU";
 
     //    Broadcasts' extras
     public static final String EVENT_TEXT = "EVENT_TEXT";
@@ -100,4 +101,6 @@ public class BroadcastConstants {
     public static final String RETENTION_TIME = "RETENTION_TIME";
     public static final String PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID";
     public static final String ERROR_MESSAGE_TEXT = "ERROR_MESSAGE_TEXT";
+    public static final String PROGRESS = "PROGRESS";
+    public static final String PENDING_TRANSFERS = "PENDING_TRANSFERS";
 }

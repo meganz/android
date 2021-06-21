@@ -50,7 +50,8 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_mega_round"
         android:theme="@style/Theme.Mega"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:screenOrientation="fullUser">
 
         <meta-data
             android:name="fontProviderRequests"
@@ -282,11 +283,6 @@
             android:name="mega.privacy.android.app.activities.GetLinkActivity"
             android:configChanges="screenSize|orientation"
             android:label="@string/context_get_link_menu">
-        </activity>
-
-        <activity
-            android:name="mega.privacy.android.app.lollipop.SearchByDateActivityLollipop"
-            android:label="@string/action_search_by_date">
         </activity>
 
         <activity
