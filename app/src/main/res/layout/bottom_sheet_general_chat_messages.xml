@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_sheet"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -46,7 +47,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -81,7 +83,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -116,7 +119,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -151,7 +155,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -186,7 +191,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -221,7 +227,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -256,7 +263,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -283,7 +291,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -318,7 +327,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -345,7 +355,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -380,7 +391,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -407,7 +419,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         style="@style/dialogActionButton"
@@ -428,6 +441,16 @@
                         android:text="@string/general_save_to_device"
                         android:textAppearance="?attr/textAppearanceSubtitle1" />
                 </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/gallery_option"
+                    style="@style/BottomSheetOption"
+                    android:drawablePadding="26dp"
+                    android:paddingStart="22dp"
+                    android:text="@string/general_save_to_gallery"
+                    android:visibility="gone"
+                    app:drawableStartCompat="@drawable/ic_save_gallery"
+                    tools:visibility="visible" />
 
                 <LinearLayout
                     android:id="@+id/option_save_offline_layout"
@@ -479,7 +502,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_gravity="start"
-                    android:visibility="gone">
+                    android:visibility="gone"
+                    tools:visibility="visible">
 
                     <ImageView
                         android:id="@+id/delete_image"

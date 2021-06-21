@@ -135,6 +135,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 //      optionLabel
         LinearLayout optionLabel = contentView.findViewById(R.id.option_label_layout);
         TextView optionLabelCurrent = contentView.findViewById(R.id.option_label_current);
+//      optionGallery
+        TextView optionGallery = contentView.findViewById(R.id.gallery_option);
 //      counterSave
         TextView optionDownload = contentView.findViewById(R.id.download_option);
         LinearLayout optionOffline = contentView.findViewById(R.id.option_offline_layout);
@@ -161,6 +163,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         optionEdit.setOnClickListener(this);
         optionLabel.setOnClickListener(this);
+        optionGallery.setOnClickListener(this);
         optionFavourite.setOnClickListener(this);
         optionDownload.setOnClickListener(this);
         optionOffline.setOnClickListener(this);
@@ -211,8 +214,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         if (node == null) return;
 
-        if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isVideo() || MimeTypeList.typeForName(node.getName()).isAudio()
-                || MimeTypeList.typeForName(node.getName()).isImage() || MimeTypeList.typeForName(node.getName()).isPdf()) {
+        MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
+        if (nodeMime.isVideoReproducible() || nodeMime.isVideo() || nodeMime.isAudio()
+                || nodeMime.isImage() || nodeMime.isPdf()) {
             optionOpenWith.setVisibility(View.VISIBLE);
         } else {
             counterOpen--;
@@ -260,12 +264,13 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             mapDrawerItemToMode(drawerItem);
         }
 
+        optionInfo.setText(R.string.general_info);
+
         switch (mMode) {
             case MODE1:
                 logDebug("show Cloud bottom sheet");
 
                 if (node.isFolder()) {
-                    optionInfo.setText(R.string.general_folder_info);
                     optionShareFolder.setVisibility(View.VISIBLE);
                     if (isOutShare(node)) {
                         optionShareFolder.setText(R.string.manage_share);
@@ -280,7 +285,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionEdit.setVisibility(View.VISIBLE);
                     }
 
-                    optionInfo.setText(R.string.general_file_info);
                     counterShares--;
                     optionShareFolder.setVisibility(View.GONE);
                     counterShares--;
@@ -309,6 +313,12 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionLabel.setVisibility(View.VISIBLE);
                 optionFavourite.setVisibility(View.VISIBLE);
 
+                if (node.isFile() && (nodeMime.isImage() || nodeMime.isVideo())) {
+                    optionGallery.setVisibility(View.VISIBLE);
+                } else {
+                    optionGallery.setVisibility(View.GONE);
+                }
+
                 //Hide
                 optionRemove.setVisibility(View.GONE);
                 optionLeaveShares.setVisibility(View.GONE);
@@ -320,11 +330,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case MODE2:
                 logDebug("show Rubbish bottom sheet");
-                if (node.isFolder()) {
-                    optionInfo.setText(R.string.general_folder_info);
-                } else {
-                    optionInfo.setText(R.string.general_file_info);
-                }
 
                 long restoreHandle = node.getRestoreHandle();
                 if (restoreHandle != INVALID_HANDLE) {
@@ -370,6 +375,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionOpenFolder.setVisibility(View.GONE);
                 counterSave--;
                 optionDownload.setVisibility(View.GONE);
+                optionGallery.setVisibility(View.GONE);
                 counterSave--;
                 optionOffline.setVisibility(View.GONE);
                 counterShares--;
@@ -378,14 +384,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case MODE3:
 
-                if (node.isFolder()) {
-                    optionInfo.setText(R.string.general_folder_info);
-                } else {
+                if (!node.isFolder()) {
                     if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
                         optionEdit.setVisibility(View.VISIBLE);
                     }
-
-                    optionInfo.setText(R.string.general_file_info);
                 }
 
                 if (node.isExported()) {
@@ -431,7 +433,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     logDebug("showOptionsPanelIncoming");
 
                     if (node.isFolder()) {
-                        optionInfo.setText(R.string.general_folder_info);
                         counterShares--;
                         optionSendChat.setVisibility(View.GONE);
                     } else {
@@ -440,7 +441,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             optionEdit.setVisibility(View.VISIBLE);
                         }
 
-                        optionInfo.setText(R.string.general_file_info);
                         optionSendChat.setVisibility(View.VISIBLE);
                     }
 
@@ -545,7 +545,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     logDebug("showOptionsPanelOutgoing");
 
                     if (node.isFolder()) {
-                        optionInfo.setText(R.string.general_folder_info);
                         optionShareFolder.setVisibility(View.VISIBLE);
                         optionShareFolder.setText(R.string.manage_share);
                     } else {
@@ -553,7 +552,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             optionEdit.setVisibility(View.VISIBLE);
                         }
 
-                        optionInfo.setText(R.string.general_file_info);
                         counterShares--;
                         optionShareFolder.setVisibility(View.GONE);
                     }
@@ -603,7 +601,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionOpenFolder.setVisibility(View.GONE);
                 } else if (tabSelected == 2) {
                     if (node.isFolder()) {
-                        optionInfo.setText(R.string.general_folder_info);
                         optionShareFolder.setVisibility(View.VISIBLE);
                         if (isOutShare(node)) {
                             optionShareFolder.setText(R.string.manage_share);
@@ -615,7 +612,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             optionEdit.setVisibility(View.VISIBLE);
                         }
 
-                        optionInfo.setText(R.string.general_file_info);
                         counterShares--;
                         optionShareFolder.setVisibility(View.GONE);
                     }
@@ -664,12 +660,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case MODE5:
                 if (megaApi.isInRubbish(node)) {
-                    if (node.isFolder()) {
-                        optionInfo.setText(R.string.general_folder_info);
-                    } else {
-                        optionInfo.setText(R.string.general_file_info);
-                    }
-
                     MegaNode restoreNode = megaApi.getNodeByHandle(node.getRestoreHandle());
 
                     if (!megaApi.isInRubbish(node) || restoreNode == null || megaApi.isInRubbish(restoreNode)) {
@@ -709,6 +699,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionOpenFolder.setVisibility(View.GONE);
                     counterSave--;
                     optionDownload.setVisibility(View.GONE);
+                    optionGallery.setVisibility(View.GONE);
                     counterSave--;
                     optionOffline.setVisibility(View.GONE);
                     counterShares--;
@@ -718,7 +709,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 }
 
                 if (node.isFolder()) {
-                    optionInfo.setText(R.string.general_folder_info);
                     optionShareFolder.setVisibility(View.VISIBLE);
                 } else {
                     if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
@@ -726,7 +716,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionEdit.setVisibility(View.VISIBLE);
                     }
 
-                    optionInfo.setText(R.string.general_file_info);
                     counterShares--;
                     optionShareFolder.setVisibility(View.GONE);
                 }
@@ -735,11 +724,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 if (nC.nodeComesFromIncoming(node)) {
                     logDebug("dBT: " + dBT);
                     if (node.isFolder()) {
-                        optionInfo.setText(R.string.general_folder_info);
                         counterShares--;
                         optionSendChat.setVisibility(View.GONE);
                     } else {
-                        optionInfo.setText(R.string.general_file_info);
                         optionSendChat.setVisibility(View.VISIBLE);
                     }
 
@@ -887,7 +874,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionEdit.setVisibility(View.VISIBLE);
                 }
 
-                optionInfo.setText(R.string.general_file_info);
                 counterShares--;
                 optionShareFolder.setVisibility(View.GONE);
                 nodeIconLayout.setVisibility(View.GONE);
@@ -1011,6 +997,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
             case R.id.option_label_layout:
                 ((ManagerActivityLollipop) context).showNodeLabelsPanel(node);
+                break;
+
+            case R.id.gallery_option:
+                ((ManagerActivityLollipop) context).saveNodesToGallery(Collections.singletonList(node));
                 break;
 
             case R.id.file_properties_switch:

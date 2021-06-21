@@ -28,6 +28,7 @@ import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
@@ -105,6 +106,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -277,6 +279,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -1630,6 +1633,20 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		super.onCreate(savedInstanceState);
 		logDebug("onCreate after call super");
 
+		// This block for solving the issue below:
+		// Android is installed for the first time. Press the “Open” button on the system installation dialog, press the home button to switch the app to background,
+		// and then switch the app to foreground, causing the app to create a new instantiation.
+		if (!isTaskRoot()) {
+			Intent intent = getIntent();
+			if (intent != null) {
+				String action = intent.getAction();
+				if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && Intent.ACTION_MAIN.equals(action)) {
+					finish();
+					return;
+				}
+			}
+		}
+
 		boolean selectDrawerItemPending = true;
 		//upload from device, progress dialog should show when screen orientation changes.
         if (shouldShowDialog) {
@@ -2429,9 +2446,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			initGooglePlayPayments();
 
 			megaApi.addGlobalListener(this);
-
-			megaApi.shouldShowRichLinkWarning(this);
-			megaApi.isRichPreviewsEnabled(this);
 			megaApi.isGeolocationEnabled(this);
 
 			if(savedInstanceState==null) {
@@ -4174,7 +4188,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		dbH.removeSentPendingMessages();
 
-    	if (megaApi.getRootNode() != null){
+    	if (megaApi != null && megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
     		megaApi.removeTransferListener(this);
     		megaApi.removeRequestListener(this);
@@ -4352,7 +4366,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private void observePsa() {
         psaViewHolder = new PsaViewHolder(findViewById(R.id.psa_layout), PsaManager.INSTANCE);
 
-		PsaManager.INSTANCE.getPsa().observe(this, this::showPsa);
+		LiveEventBus.get(EVENT_PSA, Psa.class).observe(this, psa -> {
+			if (psa.getUrl() == null) {
+				showPsa(psa);
+			}
+		});
     }
 
 	/**
@@ -7513,13 +7531,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void onBackPressed() {
 		logDebug("onBackPressed");
 
-		// If there is a displaying PSA, we should only close it, and not navigate back anymore,
-		// e.g. when we are at chat tab, and there is a displaying PSA, when we press back, if we
-		// keep executing the remaining logic, we would go back to cloud drive tab after close
-		// the PSA browser.
-		if (closeDisplayingPsa()) {
-			return;
-		}
+		// Let the PSA web browser fragment(if visible) to consume the back key event
+		if (psaWebBrowser.consumeBack()) return;
 
 		retryConnectionsAndSignalPresence();
 
@@ -7660,7 +7673,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             if(fragment != null && fragment.isFabExpanded()) {
                 fragment.collapseFab();
             } else {
-                super.onBackPressed();
+            	// The Psa requires the activity to load the new PSA even though the app
+				// is on the background. So don't call super.onBackPressed() since it will destroy
+				// this activity and its embedded web browser fragment.
+				moveTaskToBack(false);
             }
         } else {
 			handleBackPressIfFullscreenOfflineFragmentOpened();
@@ -8904,6 +8920,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	/**
+	 * Save nodes to gallery.
+	 *
+	 * @param nodes nodes to save
+	 */
+	public void saveNodesToGallery(List<MegaNode> nodes) {
+		nodeSaver.saveNodes(nodes, false, false, false, true, true);
+	}
+
+	/**
 	 * Save nodes to device.
 	 *
 	 * @param handles handles of nodes to save
@@ -9890,7 +9915,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				ProgressDialog temp = null;
 				try{
 					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.upload_prepare));
+					temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
 					temp.show();
 				}
 				catch(Exception e){
