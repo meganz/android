@@ -1566,7 +1566,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						if (videoNode != null){
 							if(!videoNode.hasThumbnail()){
                                 logDebug("The video has not thumb");
-								ThumbnailUtilsLollipop.createThumbnailVideo(this, transfer.getPath(), megaApi, transfer.getNodeHandle());
+								ThumbnailUtilsLollipop.createThumbnailVideo(this, path, megaApi, transfer.getNodeHandle());
 							}
 						}
 						else{
@@ -1577,7 +1577,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						logDebug("NOT video!");
 					}
 
-					sendBroadcastToUpdateGallery(this, new File(path));
+					if (!isTextEmpty(path)) {
+						sendBroadcastToUpdateGallery(this, new File(path));
+					}
 
 					if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
 						logDebug("Now copy the file to the SD Card");
@@ -1587,7 +1589,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						alterDocument(tranfersUri, node.getName());
 					}
 
-					if(transfer.getPath().contains(OFFLINE_DIR)){
+					if(!isTextEmpty(path) && path.contains(OFFLINE_DIR)){
 						logDebug("It is Offline file");
 						dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 						offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());

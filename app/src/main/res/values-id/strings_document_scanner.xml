@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<resources>
+  <!-- Screen title for cropping current scan (Document scanner) -->
+  <string name="scan_title_crop">Potong</string>
+  <!-- Screen title for saving current scan (Document scanner) -->
+  <string name="scan_title_save_scan">Simpan pindaian</string>
+  <!-- Label of the button to add a new page to the current document scan -->
+  <string name="scan_action_add">Tambah</string>
+  <!-- Action of a button to save something -->
+  <string name="scan_action_save">Simpan</string>
+  <!-- Action text to retake current scan picture (Document scanner) -->
+  <string name="scan_action_retake">Ambil kembali</string>
+  <!-- Document scanner file name -->
+  <string name="scan_file_name">Nama file</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_file_type">Jenis file</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_quality">Kualitas</string>
+  <!-- Input field description in the document save screen (Document scanner) -->
+  <string name="scan_destination">Tujuan</string>
+  <!-- Document scanner high quality option -->
+  <string name="scan_quality_high">Tinggi</string>
+  <!-- Document scanner medium quality option -->
+  <string name="scan_quality_medium">Menengah</string>
+  <!-- Document scanner low quality option -->
+  <string name="scan_quality_low">Rendah</string>
+  <!-- Title text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_title">Hapus pindaian?</string>
+  <!-- Body text shown on document scanner dialog to discard scan -->
+  <string name="scan_dialog_discard_body">Pemindaian saat ini akan hilang</string>
+  <!-- Title text shown on document scanner dialog to discard scan all scans -->
+  <string name="scan_dialog_discard_all_title">Hapus semua pindaian?</string>
+  <!-- Body text shown on document scanner dialog to discard all scans -->
+  <string name="scan_dialog_discard_all_body">Dokumen saat ini akan hilang</string>
+  <!-- Action text shown on document scanner dialog to discard scans -->
+  <string name="scan_dialog_discard_action">Buang</string>
+  <!-- Body text shown on document scanner dialog to delete current scan -->
+  <string name="scan_dialog_delete_body">Hapus pindaian saat ini?</string>
+  <!-- Message shown when users deny camera permissions to scan documents -->
+  <string name="scan_requires_permission">Izin Kamera diperlukan untuk memindai dokumen</string>
+  <!-- Error text for incorrect name -->
+  <string name="scan_incorrect_name">Nama salah</string>
+  <!-- Error text for invalid characters -->
+  <string name="scan_invalid_characters">Karakter salah</string>
+  <!-- Snackbar text for incorrect name -->
+  <string name="scan_snackbar_incorrect_name">Perbaiki nama file anda sebelum melanjutkan</string>
+  <!-- Dialog message showing file progress -->
+  <string name="scan_dialog_progress">Menyiapkan %1$s. Harap tunggu&#8230;</string>
+  <!-- Error shown when the user writes a character not allowed -->
+  <string name="scan_snackbar_invalid_characters">Karakter berikut tidak diperbolehkan: ” * / : &lt; &gt; ? \ |</string>
+</resources>

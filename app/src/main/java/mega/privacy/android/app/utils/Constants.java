@@ -38,7 +38,6 @@ public class Constants {
     public static final int REQUEST_SEND_CONTACTS = 1021;
     public static final int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
     public static final int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
-    public static final int ACTION_SEARCH_BY_DATE = 1024;
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;
     public static final int REQUEST_CODE_GET_CONTACTS = 1026;
     public static final int REQUEST_CODE_FILE_INFO = 1027;
@@ -113,6 +112,7 @@ public class Constants {
     public static final int CANCEL_ACCOUNT_2FA = 4000;
     public static final int CHANGE_MAIL_2FA = 4001;
     public static final int DISABLE_2FA = 4002;
+    public static final int CHANGE_PASSWORD_2FA = 4003;
 
     public static final int MY_ACCOUNT_FRAGMENT = 5000;
     public static final int UPGRADE_ACCOUNT_FRAGMENT = 5001;
@@ -323,6 +323,7 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FIRST_LEVEL = "firstLevel";
     public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
     public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
+    public static final String INTENT_EXTRA_KEY_ENABLED = "enabled";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -820,6 +821,7 @@ public class Constants {
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
     public static final String EVENT_NOT_ALLOW_PLAY = "NOT_ALLOW_PLAY";
+    public static final String EVENT_PSA = "EVENT_PSA";
 
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";
@@ -841,4 +843,6 @@ public class Constants {
     public static final int ORDER_CONTACTS = 1;
     public static final int ORDER_OTHERS = 2;
     public static final int ORDER_CAMERA = 3;
+
+    public static final long ANIMATION_DURATION = 400;
 }

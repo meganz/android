@@ -264,6 +264,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 	private RelativeLayout callInProgressLayout;
 	private Chronometer callInProgressChrono;
 	private TextView callInProgressText;
+	private LinearLayout microOffLayout;
+	private LinearLayout videoOnLayout;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -308,9 +310,9 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			if (intent == null || intent.getAction() == null)
 				return;
 
-			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, MEGACHAT_INVALID_HANDLE);
+			long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, INVALID_HANDLE);
 
+			if (intent.getAction().equals(ACTION_CALL_STATUS_UPDATE)) {
 				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
 					return;
 
@@ -330,11 +332,17 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			}
 
 			if (intent.getAction().equals(ACTION_CHANGE_CALL_ON_HOLD)) {
-				long chatIdReceived = intent.getLongExtra(UPDATE_CHAT_CALL_ID, INVALID_HANDLE);
 				if (chatIdReceived == MEGACHAT_INVALID_HANDLE)
 					return;
 
 				checkScreenRotationToShowCall();
+			}
+
+			if (intent.getAction().equals(ACTION_CHANGE_LOCAL_AVFLAGS)) {
+				MegaChatCall callInProgress = getCallInProgress();
+				if (callInProgress != null && callInProgress.getChatid() == chatIdReceived) {
+					showHideMicroAndVideoIcons(callInProgress, microOffLayout, videoOnLayout);
+				}
 			}
 		}
 	};
@@ -525,6 +533,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			callInProgressLayout.setOnClickListener(this);
 			callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
 			callInProgressText = findViewById(R.id.call_in_progress_text);
+			microOffLayout = findViewById(R.id.micro_off_layout);
+			videoOnLayout = findViewById(R.id.video_on_layout);
 			callInProgressLayout.setVisibility(View.GONE);
 
 			//OPTIONS LAYOUT
@@ -719,6 +729,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 		IntentFilter filterCall = new IntentFilter(ACTION_CALL_STATUS_UPDATE);
 		filterCall.addAction(ACTION_CHANGE_CALL_ON_HOLD);
+		filterCall.addAction(ACTION_CHANGE_LOCAL_AVFLAGS);
 		registerReceiver(chatCallUpdateReceiver, filterCall);
 
 		registerReceiver(chatSessionUpdateReceiver,
@@ -2204,6 +2215,10 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 		}
 
 		showCallLayout(this, callInProgressLayout, callInProgressChrono, callInProgressText);
+		MegaChatCall callInProgress = getCallInProgress();
+		if (callInProgress != null) {
+			showHideMicroAndVideoIcons(callInProgress, microOffLayout, videoOnLayout);
+		}
 	}
 
 	@Override

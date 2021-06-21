@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
@@ -63,6 +64,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -90,16 +92,18 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class FullScreenImageViewerLollipop extends PasscodeActivity
 		implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface,
-		SnackbarShower {
+		SnackbarShower, MegaFullScreenImageAdapterLollipop.FullScreenCallback {
 
 	int placeholderCount;
 
@@ -913,7 +917,8 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 					logDebug("Handle: " + hash);
 					imageHandles.add(hash);
 
-					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
+					adapterMega = new MegaFullScreenImageAdapterLollipop(this,
+							fullScreenImageViewer, imageHandles, megaApi, this);
 					viewPager.setAdapter(adapterMega);
 					viewPager.setCurrentItem(positionG);
 					viewPager.addOnPageChangeListener(this);
@@ -1020,19 +1025,18 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			}
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,
+					imageHandles, megaApi, this);
 		} else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
 			// TODO: use constants
 			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE), savedInstanceState);
+		} else if (adapterType == PHOTO_SYNC_ADAPTER) {
+			getImageHandles(new MegaNodeRepo(megaApi, dbH).getCuChildren(orderGetChildren), savedInstanceState, true);
 		} else {
 			if (parentNodeHandle == INVALID_HANDLE){
 				switch(adapterType){
-					case FILE_BROWSER_ADAPTER:{
-						parentNode = megaApi.getRootNode();
-						break;
-					}
 					case RUBBISH_BIN_ADAPTER:{
 						parentNode = megaApi.getRubbishNode();
 						break;
@@ -1092,11 +1096,33 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		}
 	}
 
-	private void getImageHandles(ArrayList<MegaNode> nodes, Bundle savedInstanceState) {
+	/**
+	 * Gets all the image handles to preview.
+	 *
+	 * @param nodes				 List of all nodes where search.
+	 * @param savedInstanceState Saved instance state if exists, null otherwise.
+	 */
+	private void getImageHandles(List<MegaNode> nodes, Bundle savedInstanceState) {
+		getImageHandles(nodes, savedInstanceState, false);
+	}
+
+	/**
+	 * Gets all the handles to preview.
+	 *
+	 * @param nodes				 List of all nodes where search.
+	 * @param savedInstanceState Saved instance state if exists, null otherwise.
+	 * @param includeVideos		 True if should get video and image handles, false otherwise.
+	 */
+	private void getImageHandles(List<MegaNode> nodes, Bundle savedInstanceState, boolean includeVideos) {
 		int imageNumber = 0;
 		for (int i = 0; i < nodes.size(); i++) {
 			MegaNode n = nodes.get(i);
-			if (MimeTypeList.typeForName(n.getName()).isImage()) {
+			MimeTypeList mime = MimeTypeList.typeForName(n.getName());
+			boolean isImageHandle = includeVideos
+					? mime.isImage() || mime.isVideoReproducible()
+					: mime.isImage();
+
+			if (isImageHandle) {
 				imageHandles.add(n.getHandle());
 				if (i == positionG && savedInstanceState == null) {
 					positionG = imageNumber;
@@ -1111,7 +1137,8 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 
 		fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
-		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
+		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,
+				imageHandles, megaApi, this);
 	}
 
 	private BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
@@ -1514,12 +1541,59 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
 
-	public void touchImage() {
-		logDebug("touchImage");
-		if(aB.isShowing()){
+	@Override
+	public void onTouchImage() {
+		if (aB.isShowing()) {
 			hideActionBar();
-		}else{
+		} else {
 			showActionBar();
+		}
+	}
+
+	@Override
+	public void onPlayVideo() {
+		MegaNode video = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
+		Intent mediaIntent;
+		if (MimeTypeList.typeForName(video.getName()).isVideoNotSupported()) {
+			mediaIntent = new Intent(Intent.ACTION_VIEW);
+		} else {
+			mediaIntent = getMediaIntent(this, node.getName());
+		}
+
+		mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, video.getHandle())
+				.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER)
+				.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
+
+		mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
+
+		boolean paramsSetSuccessfully;
+		String localPath = null;
+
+		try {
+			localPath = findVideoLocalPath(this, node);
+		} catch (Exception e) {
+			logWarning(e.getMessage());
+		}
+
+		if (localPath != null && checkFingerprint(megaApi, node, localPath)) {
+			paramsSetSuccessfully = setLocalIntentParams(this, node, mediaIntent, localPath,
+					false, this);
+		} else {
+			paramsSetSuccessfully = setStreamingIntentParams(this, node, megaApi,
+					mediaIntent, this);
+		}
+
+		if (!isIntentAvailable(this, mediaIntent)) {
+			showSnackbar(SNACKBAR_TYPE,
+					StringResourcesUtils.getString(R.string.intent_not_available), MEGACHAT_INVALID_HANDLE);
+
+			paramsSetSuccessfully = false;
+		}
+
+		if (paramsSetSuccessfully) {
+			startActivity(mediaIntent);
+			overridePendingTransition(0, 0);
 		}
 	}
 
@@ -1528,14 +1602,14 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
-				tB.animate().translationY(-220).setDuration(400L)
+				tB.animate().translationY(-220).setDuration(ANIMATION_DURATION)
 						.withEndAction(new Runnable() {
 							@Override
 							public void run() {
 								aB.hide();
 							}
 						}).start();
-				bottomLayout.animate().translationY(220).setDuration(400L).start();
+				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
 			} else {
 				aB.hide();
 			}
@@ -1547,8 +1621,8 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		if (aB != null && !aB.isShowing()) {
 			aB.show();
 			if(tB != null) {
-				tB.animate().translationY(0).setDuration(400L).start();
-				bottomLayout.animate().translationY(0).setDuration(400L).start();
+				tB.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+				bottomLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
 			}
 		}
 	}

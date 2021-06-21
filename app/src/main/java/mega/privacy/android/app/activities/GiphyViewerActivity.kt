@@ -126,6 +126,7 @@ class GiphyViewerActivity : PasscodeActivity() {
     }
 
     override fun onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return
         if (picking) {
             setResult(RESULT_CANCELED)
         }

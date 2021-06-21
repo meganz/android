@@ -2,7 +2,9 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,8 +18,8 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.SwitchPreferenceCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.IBinder;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +46,10 @@ import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.TwoFactorAuthenticationActivity;
+import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity;
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder;
 import mega.privacy.android.app.utils.ThemeHelper;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
@@ -90,10 +96,23 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private Preference aboutKarere;
     private Preference aboutApp;
     private Preference cancelAccount;
+    private MediaPlayerService playerService;
 
     private DisplayMetrics outMetrics;
     private boolean bEvaluateAppDialogShow = false;
     private AlertDialog evaluateAppDialog;
+
+    private final ServiceConnection mediaServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service)    {
+            playerService = ((MediaPlayerServiceBinder) service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            playerService = null;
+        }
+    };
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -149,6 +168,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         cancelAccount.setOnPreferenceClickListener(this);
         findPreference(KEY_ABOUT_COOKIE_POLICY).setOnPreferenceClickListener(this);
         findPreference(KEY_COOKIE_SETTINGS).setOnPreferenceClickListener(this);
+        findPreference(KEY_AUDIO_BACKGROUND_PLAY_ENABLED).setOnPreferenceClickListener(this);
 
         updateCancelAccountSetting();
 
@@ -253,7 +273,15 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
         setOnlineOptions(isOnline(context) && megaApi != null && megaApi.getRootNode() != null);
+        Intent playerServiceIntent = new Intent(requireContext(), AudioPlayerService.class);
+        requireContext().bindService(playerServiceIntent, mediaServiceConnection, 0);
         return v;
+    }
+
+    @Override
+    public void onDestroyView() {
+        requireContext().unbindService(mediaServiceConnection);
+        super.onDestroyView();
     }
 
     @Override
@@ -303,7 +331,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_2FA:
                 if (((ManagerActivityLollipop) context).is2FAEnabled()) {
                     twoFASwitch.setChecked(true);
-                    ((ManagerActivityLollipop) context).showVerifyPin2FA(DISABLE_2FA);
+                    Intent intent = new Intent(context, VerifyTwoFactorActivity.class);
+                    intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, DISABLE_2FA);
+
+                    context.startActivity(intent);
                 } else {
                     twoFASwitch.setChecked(false);
                     Intent intent = new Intent(context, TwoFactorAuthenticationActivity.class);
@@ -408,6 +439,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             case KEY_COOKIE_SETTINGS:
                 startActivity(new Intent(context, CookiePreferencesActivity.class));
                 break;
+
+            case KEY_AUDIO_BACKGROUND_PLAY_ENABLED:
+                if (playerService != null) {
+                    playerService.getViewModel().toggleBackgroundPlay();
+                }
+                break;
         }
 
         if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) != 0) {
@@ -497,6 +534,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
         if (megaApi != null) {
             if (megaApi.multiFactorAuthAvailable()) {
+                twoFASwitch.setEnabled(false);
                 twoFASwitch.setVisible(true);
                 megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), (ManagerActivityLollipop) context);
             } else {
@@ -594,6 +632,13 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             }
         });
 
+    }
+
+    /**
+     * Re-enable 'twoFASwitch' after 'multiFactorAuthCheck' finished.
+     */
+    public void reEnable2faSwitch() {
+        twoFASwitch.setEnabled(true);
     }
 
     public void hidePreferencesChat() {

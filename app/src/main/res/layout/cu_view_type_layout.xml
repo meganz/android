@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/years_button"
+        style="@style/CuViewTypeButton"
+        android:text="@string/years_view_button" />
+
+    <TextView
+        android:id="@+id/months_button"
+        style="@style/CuViewTypeButton"
+        android:text="@string/months_view_button" />
+
+    <TextView
+        android:id="@+id/days_button"
+        style="@style/CuViewTypeButton"
+        android:text="@string/days_view_button" />
+
+    <TextView
+        android:id="@+id/all_button"
+        style="@style/CuViewTypeButton"
+        android:text="@string/all_view_button"
+        tools:background="@drawable/background_18dp_rounded_selected_button"
+        tools:textAppearance="@style/TextAppearance.Mega.Subtitle2.Medium.WhiteGrey87" />
+
+</LinearLayout>

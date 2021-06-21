@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
+import android.graphics.PixelFormat
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -51,8 +52,8 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
@@ -166,7 +167,6 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             rootLayout = binding.rootLayout
             toolbar = binding.toolbar
 
-            toolbar.setBackgroundColor(Color.TRANSPARENT)
             toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white_alpha_087))
 
             MediaPlayerService.pauseAudioPlayer(this)
@@ -174,6 +174,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             dragToExit.viewerFrom = intent.getIntExtra(INTENT_EXTRA_KEY_VIEWER_FROM, INVALID_VALUE)
             dragToExit.observeThumbnailLocation(this)
         }
+
+        toolbar.setBackgroundColor(Color.TRANSPARENT)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -246,6 +248,14 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         refreshMenuOptionsVisibility()
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        if (isAudioPlayer()) {
+            window.setFormat(PixelFormat.RGBA_8888) // Needed to fix bg gradient banding
+        }
+    }
+
     abstract fun isAudioPlayer(): Boolean
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -273,6 +283,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     override fun onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return
         if (!navController.navigateUp()) {
             finish()
         }
@@ -289,10 +300,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 )
 
                 window.statusBarColor = color
-                toolbar.setBackgroundColor(color)
             } else {
                 window.statusBarColor = Color.BLACK
-                toolbar.setBackgroundColor(Color.TRANSPARENT)
             }
 
             when (dest.id) {

@@ -251,12 +251,11 @@ public class CallUtil {
             callInProgressLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.orange_400));
             callInProgressText.setText(context.getString(R.string.reconnecting_message));
         } else {
-
             callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
             callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(context,R.attr.colorSecondary));
 
             if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                activateChrono(true, callInProgressChrono, call);
+                activateChrono(true, callInProgressChrono, call, true);
             } else {
                 activateChrono(false, callInProgressChrono, null);
             }
@@ -270,6 +269,38 @@ public class CallUtil {
         }
         if (context instanceof ContactInfoActivityLollipop) {
             ((ContactInfoActivityLollipop) context).changeToolbarLayoutElevation();
+        }
+    }
+
+    /**
+     * Method to get the current call in progress.
+     *
+     * @return The MegaChatCall.
+     */
+    public static MegaChatCall getCallInProgress() {
+        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        long chatIdInProgress = getChatCallInProgress();
+        MegaChatCall call = megaChatApi.getChatCall(chatIdInProgress);
+        if (call == null || !MegaApplication.getCallLayoutStatus(chatIdInProgress))
+            return null;
+
+        return call;
+    }
+
+    /**
+     * Method to hide or show the icons (video on and audio off) of the current call banner.
+     *
+     * @param call     The current call
+     * @param microOff Layout relating to the micro off
+     * @param videoOn  Layout relating to the video on
+     */
+    public static void showHideMicroAndVideoIcons(MegaChatCall call, final LinearLayout microOff, final LinearLayout videoOn) {
+        if (call.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING) {
+            microOff.setVisibility(call.hasLocalAudio() ? View.GONE : View.VISIBLE);
+            videoOn.setVisibility(call.hasLocalVideo() ? View.VISIBLE : View.GONE);
+        } else {
+            videoOn.setVisibility(View.GONE);
+            microOff.setVisibility(View.GONE);
         }
     }
 
@@ -450,13 +481,25 @@ public class CallUtil {
     }
 
     /**
+     * Method to activate or deactivate the chronometer of a call without displaying the chronometer separator.
+     *
+     * @param activateChrono True, if it must be activated. False, if it must be deactivated
+     * @param chronometer    The chronometer
+     * @param call           The MegaChatCall
+     */
+    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall call) {
+        activateChrono(activateChrono, chronometer, call, false);
+    }
+
+    /**
      * Method to activate or deactivate the chronometer of a call.
      *
      * @param activateChrono True, if it must be activated. False, if it must be deactivated.
-     * @param chronometer    The cronometer.
-     * @param call           The call.
+     * @param chronometer  The chronometer
+     * @param call The MegaChatCall
+     * @param isNecessaryToShowChronoSeparator True, if the chronometer separator needs to be shown. False, otherwise
      */
-    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall call) {
+    public static void activateChrono(boolean activateChrono, final Chronometer chronometer, MegaChatCall call, boolean isNecessaryToShowChronoSeparator) {
         if (chronometer == null)
             return;
 
@@ -470,7 +513,7 @@ public class CallUtil {
             chronometer.setVisibility(View.VISIBLE);
             chronometer.setBase(SystemClock.elapsedRealtime() - (call.getDuration()* 1000));
             chronometer.start();
-            chronometer.setFormat(" %s");
+            chronometer.setFormat(isNecessaryToShowChronoSeparator ? "· %s" : "%s");
         }
     }
 

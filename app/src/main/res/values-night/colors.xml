@@ -225,9 +225,6 @@
     <!-- Date picker background color -->
     <color name="white_grey_800">@color/grey_800</color>
 
-    <!-- My QR code fragment background color -->
-    <color name="white_grey_700">@color/grey_700</color>
-
     <!--    For disabled alert dialog borderless button-->
     <color name="teal_300_038_teal_200_038">@color/teal_200_alpha_038</color>
 
@@ -252,6 +249,25 @@
     <!-- Error text highlight color (selection background), import to MEGA screen-->
     <color name="teal_100_teal_500">@color/teal_500</color>
 
+    <!-- QR code page background color -->
+    <color name="white_grey_700">@color/grey_700</color>
+
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/grey_alpha_080</color>
+
+    <!--  SnackBar background  -->
+    <color name="grey_alpha_087_white">@color/white</color>
+
+    <!--  SnackBar text  -->
+    <color name="white_alpha_087_grey_alpha_087">@color/grey_alpha_087</color>
+
+    <!--  SnackBar Button text  -->
+    <color name="teal_200_teal_300">@color/teal_300</color>
+
+    <!--  ExoPlayer Time Bar Unplayed  -->
+    <color name="grey_alpha_012_white_alpha_023">@color/white_alpha_023</color>
+
+    <color name="grey_054_white_060">@color/white_alpha_060</color>
+    <color name="grey_012_white_020">@color/white_alpha_020</color>
+
 </resources>

@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -27,6 +28,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageEditTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -77,14 +79,13 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         TextView nodeInfo = contentView.findViewById(R.id.contact_file_list_info_text);
         RelativeLayout nodeIconLayout = contentView.findViewById(R.id.contact_file_list_relative_layout_icon);
         ImageView nodeIcon = contentView.findViewById(R.id.contact_file_list_icon);
-        LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
-        LinearLayout optionInfo = contentView.findViewById(R.id.option_properties_layout);
-        TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
-        LinearLayout optionLeave = contentView.findViewById(R.id.option_leave_layout);
-        LinearLayout optionCopy = contentView.findViewById(R.id.option_copy_layout);
-        LinearLayout optionMove = contentView.findViewById(R.id.option_move_layout);
-        LinearLayout  optionRename = contentView.findViewById(R.id.option_rename_layout);
-        LinearLayout optionRubbish = contentView.findViewById(R.id.option_rubbish_bin_layout);
+        TextView optionDownload = contentView.findViewById(R.id.download_option);
+        TextView optionInfo = contentView.findViewById(R.id.properties_option);
+        TextView optionLeave = contentView.findViewById(R.id.leave_option);
+        TextView optionCopy = contentView.findViewById(R.id.copy_option);
+        TextView optionMove = contentView.findViewById(R.id.move_option);
+        TextView  optionRename = contentView.findViewById(R.id.rename_option);
+        TextView optionRubbish = contentView.findViewById(R.id.rubbish_bin_option);
 
         optionDownload.setOnClickListener(this);
         optionInfo.setOnClickListener(this);
@@ -111,9 +112,9 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
 
         int accessLevel = megaApi.getAccess(node);
 
+        optionInfo.setText(R.string.general_info);
         if (node.isFolder()) {
             nodeThumb.setImageResource(R.drawable.ic_folder_incoming);
-            optionInfoText.setText(R.string.general_folder_info);
             nodeInfo.setText(getMegaNodeFolderInfo(node));
 
             if (firstLevel || parentHandle == INVALID_HANDLE) {
@@ -139,12 +140,18 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 nodeIconLayout.setVisibility(View.GONE);
             }
         } else {
-            optionInfoText.setText(R.string.general_file_info);
             long nodeSize = node.getSize();
             nodeInfo.setText(getSizeString(nodeSize));
             nodeIconLayout.setVisibility(View.GONE);
             setNodeThumbnail(context, node, nodeThumb);
             optionLeave.setVisibility(View.GONE);
+
+            if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())
+                    && accessLevel >= MegaShare.ACCESS_READWRITE) {
+                LinearLayout optionEdit = contentView.findViewById(R.id.edit_file_option);
+                optionEdit.setVisibility(View.VISIBLE);
+                optionEdit.setOnClickListener(this);
+            }
         }
 
         switch (accessLevel) {
@@ -210,7 +217,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         handleList.add(node.getHandle());
 
         switch (v.getId()) {
-            case R.id.option_download_layout:
+            case R.id.download_option:
                 if (context instanceof ContactFileListActivityLollipop) {
                     contactFileListActivity.downloadFile(Collections.singletonList(node));
                 } else if (context instanceof ContactInfoActivityLollipop) {
@@ -218,7 +225,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 }
                 break;
 
-            case R.id.option_properties_layout:
+            case R.id.properties_option:
                 Intent i = new Intent(context, FileInfoActivityLollipop.class);
                 i.putExtra(HANDLE, node.getHandle());
                 i.putExtra("from", FROM_INCOMING_SHARES);
@@ -228,17 +235,17 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 context.startActivity(i);
                 break;
 
-            case R.id.option_leave_layout:
+            case R.id.leave_option:
                 showConfirmationLeaveIncomingShare(requireActivity(),
                         (SnackbarShower) requireActivity(), node);
                 break;
 
-            case R.id.option_rename_layout:
+            case R.id.rename_option:
                 showRenameNodeDialog(context, node, (SnackbarShower) getActivity(),
                         (ActionNodeCallback) getActivity());
                 break;
 
-            case R.id.option_move_layout:
+            case R.id.move_option:
                 if (context instanceof ContactFileListActivityLollipop) {
                     contactFileListActivity.showMoveLollipop(handleList);
                 } else if (context instanceof ContactInfoActivityLollipop) {
@@ -246,7 +253,7 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 }
                 break;
 
-            case R.id.option_copy_layout:
+            case R.id.copy_option:
                 if (context instanceof ContactFileListActivityLollipop) {
                     contactFileListActivity.showCopyLollipop(handleList);
                 } else if (context instanceof ContactInfoActivityLollipop) {
@@ -254,12 +261,16 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
                 }
                 break;
 
-            case R.id.option_rubbish_bin_layout:
+            case R.id.rubbish_bin_option:
                 if (context instanceof ContactFileListActivityLollipop) {
                     contactFileListActivity.askConfirmationMoveToRubbish(handleList);
                 } else if (context instanceof ContactInfoActivityLollipop) {
                     contactInfoActivity.askConfirmationMoveToRubbish(handleList);
                 }
+                break;
+
+            case R.id.edit_file_option:
+                manageEditTextFileIntent(context, node, CONTACT_FILE_ADAPTER);
                 break;
         }
 

@@ -198,6 +198,7 @@ import static mega.privacy.android.app.utils.LinksUtil.isMEGALinkAndRequiresTran
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -414,6 +415,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     private long chatIdBanner;
     private TextView callInProgressText;
     private Chronometer callInProgressChrono;
+    private LinearLayout microOffLayout;
+    private LinearLayout videoOnLayout;
     private boolean startVideo = false;
 
     private EmojiEditText textChat;
@@ -1086,6 +1089,8 @@ public class ChatActivityLollipop extends PasscodeActivity
         callInProgressText = findViewById(R.id.call_in_progress_text);
         callInProgressChrono = findViewById(R.id.call_in_progress_chrono);
         callInProgressChrono.setVisibility(View.GONE);
+        microOffLayout = findViewById(R.id.micro_off_layout);
+        videoOnLayout = findViewById(R.id.video_on_layout);
 
         returnCallOnHoldButton = findViewById(R.id.call_on_hold_layout);
         returnCallOnHoldButtonIcon = findViewById(R.id.call_on_hold_icon);
@@ -1621,7 +1626,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void updateUserNameInChat() {
-        if (chatRoom.isGroup()) {
+        if (chatRoom != null && chatRoom.isGroup()) {
             setChatSubtitle();
         }
         if (adapter != null) {
@@ -2460,7 +2465,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         inviteMenuItem.setVisible(false);
                     }
 
-                    contactInfoMenuItem.setTitle(getString(R.string.group_chat_info_label));
+                    contactInfoMenuItem.setTitle(getString(R.string.general_info));
                     contactInfoMenuItem.setVisible(true);
                 }
                 else {
@@ -2472,7 +2477,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         videoMenuItem.setVisible(false);
                     } else {
                         clearHistoryMenuItem.setVisible(true);
-                        contactInfoMenuItem.setTitle(getString(R.string.contact_properties_activity));
+                        contactInfoMenuItem.setTitle(getString(R.string.general_info));
                         contactInfoMenuItem.setVisible(true);
                     }
                     leaveMenuItem.setVisible(false);
@@ -3334,7 +3339,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             ProgressDialog temp = null;
             try{
                 temp = new ProgressDialog(this);
-                temp.setMessage(getString(R.string.upload_prepare));
+                temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
                 temp.show();
             }
             catch(Exception e){
@@ -3694,6 +3699,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     @Override
     public void onBackPressed() {
         logDebug("onBackPressed");
+        if (psaWebBrowser.consumeBack()) return;
+
         retryConnectionsAndSignalPresence();
         if (emojiKeyboard != null && emojiKeyboard.getEmojiKeyboardShown()) {
             emojiKeyboard.hideBothKeyboard(this);
@@ -4726,6 +4733,10 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void downloadNodeList(MegaNodeList nodeList) {
         nodeSaver.saveNodeLists(Collections.singletonList(nodeList), false, false, false, true,
                 false);
+    }
+
+    public void saveNodesToGallery(List<MegaNode> nodes) {
+        nodeSaver.saveNodes(nodes, false, false, false, true, true);
     }
 
     public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messages, final MegaChatRoom chat){
@@ -8801,6 +8812,8 @@ public class ChatActivityLollipop extends PasscodeActivity
             callInProgressText.setText(text);
         }
 
+        showHideMicroAndVideoIcons(call, microOffLayout, videoOnLayout);
+
         if (shouldChronoShown) {
             startChronometers(call);
         } else {
@@ -8826,7 +8839,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             return;
         }
 
-        activateChrono(true, callInProgressChrono, call);
+        activateChrono(true, callInProgressChrono, call, true);
         callInProgressChrono.setOnChronometerTickListener(chronometer -> {
             if (subtitleChronoCall == null) {
                 return;

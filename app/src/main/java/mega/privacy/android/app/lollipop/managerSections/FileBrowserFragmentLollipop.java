@@ -282,6 +282,12 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				case R.id.cab_menu_remove_share:
 					((ManagerActivityLollipop) context).showConfirmationRemoveAllSharingContacts(documents);
 					break;
+
+				case R.id.cab_menu_save_gallery:
+					((ManagerActivityLollipop) context).saveNodesToGallery(adapter.getArrayListSelectedNodes());
+					clearSelections();
+					hideMultipleSelect();
+					break;
 			}
 			return true;
 		}
@@ -342,10 +348,16 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			boolean showShareFolder = true;
 			boolean showTrash = true;
 			boolean showRemoveShare = true;
+			int mediaCounter = 0;
 
 			for (MegaNode node : selected) {
 				if (!node.isFile()) {
 					showSendToChat = false;
+				} else {
+					MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
+					if (nodeMime.isImage() || nodeMime.isVideo()) {
+						mediaCounter++;
+					}
 				}
 				if (!node.isFolder() || (MegaNodeUtil.isOutShare(node) && selected.size() > 1)) {
 					showShareFolder = false;
@@ -374,10 +386,17 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				control.removeShare().setVisible(true);
 			}
 
+			if (mediaCounter == selected.size()) {
+				control.saveToGallery().setVisible(true)
+						.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			} else {
+				control.saveToGallery().setVisible(false);
+			}
+
 			control.trash().setVisible(showTrash);
 
 			control.shareOut().setVisible(true)
-					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
 			control.move().setVisible(true);
 			control.copy().setVisible(true);
@@ -954,83 +973,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	}
 
 	public void setFolderInfoNavigation(MegaNode n){
-		logDebug("Node Handle: " + n.getHandle());
-		String cameraSyncHandle = null;
-        //Check if the item is the Camera Uploads folder
-        if (dbH.getPreferences() != null) {
-            prefs = dbH.getPreferences();
-            if (prefs.getCamSyncHandle() != null) {
-                cameraSyncHandle = prefs.getCamSyncHandle();
-            } else {
-                cameraSyncHandle = null;
-            }
-        } else {
-            prefs = null;
-        }
-        
-        if (cameraSyncHandle != null) {
-            if (!(cameraSyncHandle.equals(""))) {
-                if ((n.getHandle() == Long.parseLong(cameraSyncHandle))) {
-                    ((ManagerActivityLollipop)context).cameraUploadsClicked();
-                    return;
-                }
-            } else {
-                if (n.getName().equals(context.getString(R.string.section_photo_sync))) {
-                    if (prefs != null) {
-                        prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
-                    }
-                    dbH.setCamSyncHandle(n.getHandle());
-					logDebug("FOUND Camera Uploads!!----> " + n.getHandle());
-                    ((ManagerActivityLollipop)context).cameraUploadsClicked();
-                    return;
-                }
-            }
-            
-        } else {
-            if (n.getName().equals(context.getString(R.string.section_photo_sync))) {
-                
-                if (prefs != null) {
-                    prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
-                }
-                dbH.setCamSyncHandle(n.getHandle());
-				logDebug("FOUND Camera Uploads!!: " + n.getHandle());
-                ((ManagerActivityLollipop)context).cameraUploadsClicked();
-                return;
-            }
-        }
-        
-        //Check if the item is the Media Uploads folder
-        
-        String secondaryMediaHandle = null;
-        
-        if (prefs != null) {
-            if (prefs.getMegaHandleSecondaryFolder() != null) {
-                secondaryMediaHandle = prefs.getMegaHandleSecondaryFolder();
-            } else {
-                secondaryMediaHandle = null;
-            }
-        }
-        
-        if (secondaryMediaHandle != null) {
-            if (!(secondaryMediaHandle.equals(""))) {
-                if ((n.getHandle() == Long.parseLong(secondaryMediaHandle))) {
-					logDebug("Click on Media Uploads");
-                    ((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
-                    return;
-                }
-            }
-        } else {
-            if (n.getName().equals(context.getString(R.string.section_secondary_media_uploads))) {
-                if (prefs != null) {
-                    prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
-                }
-                dbH.setSecondaryFolderHandle(n.getHandle());
-				logDebug("FOUND Media Uploads!!: " + n.getHandle());
-                ((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
-                return;
-            }
-        }
-        
         ((ManagerActivityLollipop)context).setParentHandleBrowser(n.getHandle());
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
         ((ManagerActivityLollipop)context).setToolbarTitle();

@@ -122,131 +122,64 @@
             android:orientation="vertical"
             android:id="@+id/items_layout_bottom_sheet_node">
 
-            <!-- Options -->
             <LinearLayout
-                android:id="@+id/option_properties_layout"
+                android:id="@+id/edit_file_option"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_properties_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/info_ic"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/option_properties_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    style="@style/BottomSheetOption"
+                    android:text="@string/title_edit_profile_info"
+                    app:drawableStartCompat="@drawable/ic_file_edit"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="72dp"
+                    android:background="@color/grey_012_white_012" />
+
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/view_in_folder_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                tools:visibility="visible">
+            <TextView
+                android:id="@+id/properties_option"
+                style="@style/BottomSheetOption"
+                app:drawableStartCompat="@drawable/info_ic"/>
 
-                <ImageView
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:layout_marginStart="5dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_upload_pick_file"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+            <TextView
+                android:id="@+id/view_in_folder_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/view_in_folder_label"
+                app:drawableStartCompat="@drawable/ic_upload_pick_file"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/view_in_folder_label"
-                    android:layout_marginStart="18dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_favourite_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <ImageView
-                    android:id="@+id/option_favourite_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/ic_add_favourite"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_favourite_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/file_properties_favourite"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/favorite_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/file_properties_favourite"
+                app:drawableStartCompat="@drawable/ic_add_favourite"/>
 
             <LinearLayout
                 android:id="@+id/option_label_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:background="?selectableItemBackground"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:visibility="gone"
                 tools:visibility="visible">
 
-                <ImageView
-                    android:id="@+id/option_label_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:src="@drawable/ic_label"
-                    app:tint="?android:attr/textColorSecondary" />
-
                 <TextView
-                    android:id="@+id/option_label_text"
+                    android:id="@+id/label_option"
+                    style="@style/BottomSheetOption"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="5"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
+                    android:background="@null"
                     android:text="@string/file_properties_label"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    app:drawableStartCompat="@drawable/ic_label" />
 
                 <TextView
                     android:id="@+id/option_label_current"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:layout_weight="1"
@@ -258,6 +191,7 @@
                     tools:drawableRight="@drawable/ic_circle_label"
                     tools:text="@string/label_red"
                     tools:textColor="@color/salmon_400_salmon_300" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -265,65 +199,18 @@
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
                 android:background="@color/grey_012_white_012" />
-            <LinearLayout
-                android:id="@+id/option_open_with_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
 
-                <ImageView
-                    android:id="@+id/option_open_with_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_open_with"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+            <TextView
+                android:id="@+id/open_with_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/external_play"
+                app:drawableStartCompat="@drawable/ic_open_with"/>
 
-                <TextView
-                    android:id="@+id/option_open_with_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/external_play"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_open_folder_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_open_folder_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_upload_pick_file"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_open_folder_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/search_open_location"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/open_folder_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/search_open_location"
+                app:drawableStartCompat="@drawable/ic_upload_pick_file"/>
 
             <LinearLayout
                 android:id="@+id/separator_open_options"
@@ -333,35 +220,19 @@
                 android:orientation="vertical"
                 android:background="@color/grey_012_white_012" />
 
-            <LinearLayout
-                android:id="@+id/option_download_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/download_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_save_to_device"
+                app:drawableStartCompat="@drawable/ic_save_to_device"/>
 
-                <ImageView
-                    android:id="@+id/option_download_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:layout_marginStart="5dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_save_to_device"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_download_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:text="@string/general_save_to_device"
-                    android:layout_marginStart="18dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/gallery_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_save_to_gallery"
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_save_gallery"
+                tools:visibility="visible" />
 
             <LinearLayout
                 android:id="@+id/option_offline_layout"
@@ -370,28 +241,12 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
-                <ImageView
-                    android:id="@+id/option_offline_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:layout_marginStart="5dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_save_offline"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
                 <TextView
-                    android:id="@+id/option_offline_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_weight="5"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
+                    android:id="@+id/offline_option"
+                    style="@style/BottomSheetOption"
+                    android:layout_width="wrap_content"
                     android:text="@string/file_properties_available_offline"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    app:drawableStartCompat="@drawable/ic_save_offline"/>
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/file_properties_switch"
@@ -399,6 +254,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginEnd="16dp"
                     android:layout_weight="1" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -409,185 +265,41 @@
                 android:orientation="vertical"
                 android:background="@color/grey_012_white_012" />
 
-            <LinearLayout
-                android:id="@+id/option_link_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/link_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_get_link_menu"
+                app:drawableStartCompat="@drawable/link_ic"/>
 
-                <ImageView
-                    android:id="@+id/option_link_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/link_ic"
-                    app:tint="?android:attr/textColorSecondary"
-                    android:visibility="visible" />
+            <TextView
+                android:id="@+id/remove_link_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_remove_link_menu"
+                app:drawableStartCompat="@drawable/ic_remove_link"/>
 
-                <TextView
-                    android:id="@+id/option_link_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/context_get_link_menu"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/share_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_share"
+                app:drawableStartCompat="@drawable/ic_social_share_white"/>
 
-            <LinearLayout
-                android:id="@+id/option_remove_link_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/share_folder_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_share_folder"
+                app:drawableStartCompat="@drawable/ic_share"/>
 
-                <ImageView
-                    android:id="@+id/option_remove_link_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_remove_link"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
+            <TextView
+                android:id="@+id/send_chat_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_send_file_to_chat"
+                app:drawableStartCompat="@drawable/ic_send_to_contact"/>
 
-                <TextView
-                    android:id="@+id/option_remove_link_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/context_remove_link_menu"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_share_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_share_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_social_share_white"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_share_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/general_share"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_share_folder_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_share_folder_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_share"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_share_folder_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
-                    android:text="@string/context_share_folder"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_send_chat_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/send_chat_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_send_to_contact"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/send_chat_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/context_send_file_to_chat"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_clear_share_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_clear_share_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:tint="?android:attr/textColorSecondary"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_remove_share"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/option_clear_share_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/context_clean_shares_menu"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/clear_share_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_clean_shares_menu"
+                app:drawableStartCompat="@drawable/ic_remove_share"/>
 
             <LinearLayout
                 android:id="@+id/separator_share_options"
@@ -597,125 +309,29 @@
                 android:orientation="vertical"
                 android:background="@color/grey_012_white_012" />
 
-            <LinearLayout
-                android:id="@+id/option_rename_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/rename_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_rename"
+                app:drawableStartCompat="@drawable/ic_rename"/>
 
-                <ImageView
-                    android:id="@+id/option_rename_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:tint="?android:attr/textColorSecondary"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_rename"
-                    android:visibility="visible" />
+            <TextView
+                android:id="@+id/move_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_move_to"
+                app:drawableStartCompat="@drawable/ic_move"/>
 
-                <TextView
-                    android:id="@+id/option_rename_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/context_rename"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/copy_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_copy"
+                app:drawableStartCompat="@drawable/ic_menu_copy"/>
 
-            <LinearLayout
-                android:id="@+id/option_move_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_move_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_move"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_move_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/general_move_to"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_copy_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_copy_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_menu_copy"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_copy_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/context_copy"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_restore_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_restore_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_restore"
-                    android:visibility="visible"
-                    app:tint="?android:attr/textColorSecondary" />
-
-                <TextView
-                    android:id="@+id/option_restore_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/context_restore"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/restore_option"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_restore"
+                app:drawableStartCompat="@drawable/ic_restore"/>
 
             <LinearLayout
                 android:id="@+id/separator_modify_options"
@@ -725,96 +341,26 @@
                 android:orientation="vertical"
                 android:background="@color/grey_012_white_012" />
 
-            <LinearLayout
-                android:id="@+id/option_leave_share_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/leave_share_option"
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/alert_leave_share"
+                app:drawableStartCompat="@drawable/leave_share_ic"/>
 
-                <ImageView
-                    android:id="@+id/option_leave_share_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    app:tint="@color/red_600_red_300"
-                    android:src="@drawable/leave_share_ic"
-                    android:visibility="visible" />
+            <TextView
+                android:id="@+id/rubbish_bin_option"
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/context_move_to_trash"
+                app:drawableStartCompat="@drawable/ic_rubbish_bin"/>
 
-                <TextView
-                    android:id="@+id/option_leave_share_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/alert_leave_share"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_rubbish_bin_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_rubbish_bin_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    app:tint="@color/red_600_red_300"
-                    android:src="@drawable/ic_rubbish_bin"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/option_rubbish_bin_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/context_move_to_trash"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/option_remove_layout"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/option_remove_image"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    app:tint="@color/red_600_red_300"
-                    android:src="@drawable/ic_remove"
-                    android:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/option_remove_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:layout_marginStart="18dp"
-                    android:text="@string/context_remove"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/remove_option"
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/context_remove"
+                app:drawableStartCompat="@drawable/ic_remove"/>
 
         </LinearLayout>
+
     </androidx.core.widget.NestedScrollView>
+
 </LinearLayout>
