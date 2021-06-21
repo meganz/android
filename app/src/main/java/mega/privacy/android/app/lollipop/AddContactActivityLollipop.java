@@ -7,12 +7,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,12 +19,14 @@ import android.provider.ContactsContract;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.appcompat.app.ActionBar;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -88,6 +88,7 @@ import mega.privacy.android.app.lollipop.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.HighLightHintHelper;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -261,6 +262,13 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
     private boolean onlyCreateGroup;
     private boolean waitingForPhoneContacts;
+
+
+    private static final String SP_KEY_IS_HINT_SHOWN = "is_hint_shown_start_conversation";
+    private static final String KEY_HINT_IS_SHOWING = "hint_is_showing";
+    private boolean isHintShowing;
+
+    private HighLightHintHelper highLightHintHelper;
 
     @Override
     public List<ShareContactInfo> getAdapterData() {
@@ -1441,6 +1449,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         outState.putBoolean("isEKREnabled", isEKREnabled);
         outState.putBoolean("newGroup", newGroup);
         outState.putBoolean("onlyCreateGroup", onlyCreateGroup);
+        outState.putBoolean(KEY_HINT_IS_SHOWING, isHintShowing);
 
         saveContactsAdded(outState);
     }
@@ -1529,6 +1538,8 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         if(megaApi != null) {
             megaApi.removeGlobalListener(this);
         }
+
+        highLightHintHelper.dismissPopupWindow();
     }
 
     @Override
@@ -1802,6 +1813,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             isEKREnabled = savedInstanceState.getBoolean("isEKREnabled", false);
             ekrSwitch.setChecked(isEKREnabled);
             onlyCreateGroup = savedInstanceState.getBoolean("onlyCreateGroup", false);
+            isHintShowing = savedInstanceState.getBoolean(KEY_HINT_IS_SHOWING, false);
 
             if (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH) {
                 savedaddedContacts = savedInstanceState.getStringArrayList("savedaddedContacts");
@@ -1898,6 +1910,32 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             createNewChatLink = true;
             newGroup();
         }
+
+        highLightHintHelper = new HighLightHintHelper(this);
+
+        // Workaround: wait for R.id.new_meeting_tv initialized.
+        new Handler().postDelayed(() -> {
+            if ((shouldShowMeetingHint() && newMeetingButton.getVisibility() == View.VISIBLE) || isHintShowing) {
+                highLightHintHelper.showHintForMeetingText(R.id.new_meeting_tv, () -> {
+                    hintShown();
+                    highLightHintHelper.dismissPopupWindow();
+                    isHintShowing = false;
+                    return null;
+                });
+
+                isHintShowing = true;
+            }
+        }, 300);
+    }
+
+    private boolean shouldShowMeetingHint() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        return !sharedPreferences.getBoolean(SP_KEY_IS_HINT_SHOWN, false);
+    }
+
+    private void hintShown() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        sharedPreferences.edit().putBoolean(SP_KEY_IS_HINT_SHOWN, true).apply();
     }
 
     private void setEmptyStateVisibility (boolean visible) {

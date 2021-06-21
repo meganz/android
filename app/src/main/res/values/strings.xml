@@ -4088,6 +4088,10 @@
     <string name="error_invalid_guest_name">Please input first and last name</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">Invite more participants to the \nmeeting. Swipe up to invite.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">Tap to create a new meeting</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">Quickly set up a MEGA Meeting with our new encrypted meeting feature</string>
     <!-- the content of snack bar when the user send the invitation to others-->
     <string name="invitation_send">Invitation sent.\nSee status on Sent Requests Tab.</string>
     <!-- the content of snack bar when the user be the new moderator-->
