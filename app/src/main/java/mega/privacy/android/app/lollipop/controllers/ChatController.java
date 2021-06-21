@@ -89,21 +89,15 @@ public class ChatController {
         }
     }
 
-    public void selectChatsToAttachContact(MegaUser contact){
+    public static Intent getSelectChatsToAttachContactIntent(Context context, MegaUser contact) {
         logDebug("selectChatsToAttachContact");
 
         long[] longArray = new long[1];
         longArray[0] = contact.getHandle();
 
-        Intent i = new Intent(context, ChatExplorerActivity.class);
-        i.putExtra(USER_HANDLES, longArray);
-
-        if(context instanceof ManagerActivityLollipop){
-            ((ManagerActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
-        }
-        else if(context instanceof ContactInfoActivityLollipop){
-            ((ContactInfoActivityLollipop) context).startActivityForResult(i, REQUEST_CODE_SELECT_CHAT);
-        }
+        Intent intent = new Intent(context, ChatExplorerActivity.class);
+        intent.putExtra(USER_HANDLES, longArray);
+        return intent;
     }
 
     public void selectChatsToAttachContacts (ArrayList<MegaUser> contacts) {

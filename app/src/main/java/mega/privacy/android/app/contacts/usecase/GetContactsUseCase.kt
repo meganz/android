@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.data.ContactItem
@@ -28,6 +29,7 @@ import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import java.io.File
 import java.util.*
@@ -175,6 +177,9 @@ class GetContactsUseCase @Inject constructor(
                 megaChatApi.removeChatListener(chatListener)
             })
         }, BackpressureStrategy.LATEST)
+
+    fun getMegaUser(userEmail: String): Single<MegaUser> =
+        Single.fromCallable { megaApi.getContact(userEmail) }
 
     private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
         TextDrawable.builder()

@@ -11,7 +11,7 @@ import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
 class ContactListAdapter(
     private val itemCallback: (String) -> Unit,
-    private val itemInfoCallback: (String) -> Unit
+    private val itemInfoCallback: (Long) -> Unit
 ) : ListAdapter<ContactItem, RecyclerView.ViewHolder>(ContactItem.DiffCallback()) {
 
     companion object {
@@ -43,8 +43,8 @@ class ContactListAdapter(
                     }
                     binding.btnMore.setOnClickListener {
                         if (isValidPosition(bindingAdapterPosition)) {
-                            val email = (getItem(bindingAdapterPosition) as ContactItem.Data).email
-                            itemInfoCallback.invoke(email)
+                            val handle = (getItem(bindingAdapterPosition) as ContactItem.Data).handle
+                            itemInfoCallback.invoke(handle)
                         }
                     }
                 }

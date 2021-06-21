@@ -13,10 +13,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.ActivityContactsBinding
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 
 @AndroidEntryPoint
-class ContactsActivity : PasscodeActivity() {
+class ContactsActivity : PasscodeActivity(), SnackbarShower {
 
     companion object {
         private const val EXTRA_SHOW_GROUPS = "EXTRA_SHOW_GROUPS"
@@ -83,8 +85,7 @@ class ContactsActivity : PasscodeActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean =
-        getNavController().navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
+        getNavController().navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
 
     private fun setupNavigation(overrideNavGraph: Boolean) {
         val navController = getNavController()
@@ -102,6 +103,10 @@ class ContactsActivity : PasscodeActivity() {
         }
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
+    }
+
+    override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+        showSnackbar(type, binding.root, content, chatId)
     }
 
     private fun getNavController(): NavController =

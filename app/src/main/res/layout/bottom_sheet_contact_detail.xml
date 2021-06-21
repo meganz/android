@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:minHeight="72dp">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/img_thumbnail"
+            android:layout_width="@dimen/image_contact_size"
+            android:layout_height="@dimen/image_contact_size"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:roundAsCircle="true"
+            tools:placeholderImage="@android:drawable/ic_menu_camera" />
+
+        <mega.privacy.android.app.components.twemoji.EmojiTextView
+            android:id="@+id/txt_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Mega.Body1"
+            app:emojiSize="14sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/img_thumbnail"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@tools:sample/full_names" />
+
+        <ImageView
+            android:id="@+id/img_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@null"
+            android:src="@drawable/ic_contact_status"
+            app:layout_constraintBottom_toBottomOf="@id/txt_name"
+            app:layout_constraintStart_toEndOf="@id/txt_name"
+            app:layout_constraintTop_toTopOf="@id/txt_name" />
+
+        <mega.privacy.android.app.components.MarqueeTextView
+            android:id="@+id/txt_last_seen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@id/txt_name"
+            app:layout_constraintTop_toBottomOf="@id/txt_name"
+            tools:text="Last seen Yesterday at 11:45" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/divider_header"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/grey_012_white_012" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:id="@+id/layout_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/option_info"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_info"
+                app:drawableStartCompat="@drawable/info_ic" />
+
+            <View
+                android:id="@+id/divider_info"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/option_call"
+                style="@style/BottomSheetOption"
+                android:text="@string/call_button"
+                app:drawableStartCompat="@drawable/ic_call_fille" />
+
+            <TextView
+                android:id="@+id/option_send_message"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_send_message"
+                app:drawableStartCompat="@drawable/ic_chat" />
+
+            <TextView
+                android:id="@+id/option_send_file"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_send_file"
+                app:drawableStartCompat="@drawable/ic_send_to_contact" />
+
+            <TextView
+                android:id="@+id/option_share_contact"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_send_contact"
+                app:drawableStartCompat="@drawable/ic_share_to_contact" />
+
+            <TextView
+                android:id="@+id/option_share_folder"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_share_folder"
+                app:drawableStartCompat="@drawable/ic_share" />
+
+            <View
+                android:id="@+id/divider_share"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/option_remove"
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/context_remove"
+                app:drawableStartCompat="@drawable/ic_remove" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

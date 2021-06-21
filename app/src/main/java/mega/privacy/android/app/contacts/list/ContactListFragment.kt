@@ -16,9 +16,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.contacts.list.adapter.ContactActionsListAdapter
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
+import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.InviteContactActivity
-import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
@@ -120,9 +120,9 @@ class ContactListFragment : Fragment() {
         ContactUtil.openContactInfoActivity(context, userEmail)
     }
 
-    private fun onContactMoreInfoClick(userEmail: String) {
-        ContactsBottomSheetDialogFragment.newInstance(userEmail)
-            .show(childFragmentManager, userEmail)
+    private fun onContactMoreInfoClick(userHandle: Long) {
+        ContactBottomSheetDialogFragment.newInstance(userHandle)
+            .show(childFragmentManager, userHandle.toString())
     }
 
     private fun onRequestsClick() {

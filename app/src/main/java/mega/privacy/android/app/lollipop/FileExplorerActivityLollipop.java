@@ -136,6 +136,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
     public static final String EXTRA_SHARE_ACTION = "share_action";
     public static final String EXTRA_SHARE_TYPE = "share_type";
     public static final String EXTRA_PARENT_HANDLE = "parent_handle";
+    public static final String EXTRA_SELECTED_FOLDER = "selected_folder";
 
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -1929,7 +1930,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			if(selectFile)
 			{
 				Intent intent = new Intent();
-				intent.putExtra("SELECT", handle);
+				intent.putExtra(EXTRA_SELECTED_FOLDER, handle);
 				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
@@ -1942,7 +1943,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				}
 
 				Intent intent = new Intent();
-				intent.putExtra("SELECT", parentNode.getHandle());
+				intent.putExtra(EXTRA_SELECTED_FOLDER, parentNode.getHandle());
 				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();

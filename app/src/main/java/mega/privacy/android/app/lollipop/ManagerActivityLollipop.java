@@ -199,7 +199,6 @@ import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
 import mega.privacy.android.app.middlelayer.iab.MegaSku;
-import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.MyAccountBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -8934,21 +8933,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		Intent intent = new Intent(this, OfflineFileInfoActivity.class);
 		intent.putExtra(HANDLE, node.getHandle());
 		startActivity(intent);
-	}
-
-	public void showContactOptionsPanel(MegaContactAdapter user){
-		logDebug("showContactOptionsPanel");
-
-		if(!isOnline(this)){
-			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
-			return;
-		}
-
-		if (user == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
-		selectedUser = user;
-		bottomSheetDialogFragment = new ContactsBottomSheetDialogFragment();
-		bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
 	}
 
 	public void showMyAccountOptionsPanel() {

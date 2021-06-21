@@ -994,9 +994,14 @@ public class CallUtil {
      */
     public static void startCallWithChatOnline(Activity activity, MegaChatRoom chatRoom) {
         if (checkPermissionsCall(activity, START_CALL_PERMISSIONS)) {
+            MegaChatRequestListenerInterface listener = null;
+            if (activity instanceof MegaChatRequestListenerInterface) {
+                listener = (MegaChatRequestListenerInterface) activity;
+            }
+
             MegaApplication.setCallLayoutStatus(chatRoom.getChatId(), false);
             MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
-            MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, (MegaChatRequestListenerInterface) activity);
+            MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, listener);
             MegaApplication.setIsWaitingForCall(false);
         }
     }
