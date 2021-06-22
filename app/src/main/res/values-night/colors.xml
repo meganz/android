@@ -95,6 +95,8 @@
 
     <!-- The underline color of TextInputLayout when unfocused -->
     <color name="grey_012_white_012">@color/white_alpha_012</color>
+    <!-- Simulate the background color when a dialog show -->
+    <color name="grey_012_transparent">@android:color/transparent</color>
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/white_alpha_038</color>
 
