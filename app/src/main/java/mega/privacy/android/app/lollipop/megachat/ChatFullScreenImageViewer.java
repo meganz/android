@@ -88,7 +88,6 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPageChangeListener,
 		MegaRequestListenerInterface, MegaGlobalListenerInterface,SnackbarShower {
 
-	private static final long ANIMATION_DURATION = 400L;
 	boolean fromChatSavedInstance = false;
 	RelativeLayout relativeImageViewerLayout;
 	private Handler handler;

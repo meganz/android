@@ -1919,7 +1919,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invita a tus amigos y gana bonos</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$sde almacenamiento por cada invitación. Válido durante 365 días.</string>
+    <string name="figures_achievements_text_referrals">%1$s de almacenamiento por cada invitación. Válido durante 365 días.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s de almacenamiento. Válido durante 365 días.</string>
     <!-- title of the section for unlocked rewards -->
@@ -3824,10 +3824,6 @@
     <string name="label_purple">Púrpura</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Gris</string>
-    <!-- Text that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="background_play_hint">Se reproducirá en segundo plano</string>
-    <!-- Text that indicates the audio will not be played in background -->
-    <string name="not_background_play_hint">No se reproducirá en segundo plano</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">Reproduciendo</string>
     <!-- Text that indicates the song is now playing, but paused -->
