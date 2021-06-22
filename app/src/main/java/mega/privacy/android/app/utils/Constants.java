@@ -38,7 +38,6 @@ public class Constants {
     public static final int REQUEST_SEND_CONTACTS = 1021;
     public static final int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
     public static final int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
-    public static final int ACTION_SEARCH_BY_DATE = 1024;
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;
     public static final int REQUEST_CODE_GET_CONTACTS = 1026;
     public static final int REQUEST_CODE_FILE_INFO = 1027;
@@ -844,4 +843,6 @@ public class Constants {
     public static final int ORDER_CONTACTS = 1;
     public static final int ORDER_OTHERS = 2;
     public static final int ORDER_CAMERA = 3;
+
+    public static final long ANIMATION_DURATION = 400;
 }
