@@ -544,8 +544,6 @@
         <item name="android:paddingEnd">18dp</item>
         <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
         <item name="android:background">?selectableItemBackground</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
         <item name="drawableTint">?android:attr/textColorSecondary</item>
     </style>
 

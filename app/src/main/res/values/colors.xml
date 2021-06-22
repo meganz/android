@@ -164,6 +164,8 @@
     <!-- The list item divider; Stroke color (Grid item border color);
          The underline color of TextInputLayout when unfocused -->
     <color name="grey_012_white_012">@color/grey_alpha_012</color>
+    <!-- Simulate the background color when a dialog show -->
+    <color name="grey_012_transparent">@color/grey_alpha_012</color>
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/grey_alpha_012</color>
 

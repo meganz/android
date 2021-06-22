@@ -242,7 +242,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.psa_web_browser_container, psaWebBrowser)
-                    .commitNow();
+                    .commitNowAllowingStateLoss();
         });
     }
 
