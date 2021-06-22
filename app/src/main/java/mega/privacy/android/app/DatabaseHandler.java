@@ -42,7 +42,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 61;
+	private static final int DATABASE_VERSION = 62;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -135,7 +135,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_USE_HTTPS_ONLY = "usehttpsonly";
 	private static final String KEY_SHOW_COPYRIGHT = "showcopyright";
 	private static final String KEY_SHOW_NOTIF_OFF = "shownotifoff";
-	private static final String KEY_STAGING = "staging";
 
 	private static final String KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp";
 	private static final String KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp";
@@ -402,13 +401,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_USE_HTTPS_ONLY + " TEXT, "                                                                                            //12
 				+ KEY_SHOW_COPYRIGHT + " TEXT, "                                                                                            //13
 				+ KEY_SHOW_NOTIF_OFF + " TEXT, "                                                                                            //14
-				+ KEY_STAGING + " TEXT, "                                                                                                   //15
-				+ KEY_LAST_PUBLIC_HANDLE + " TEXT, "                                                                                        //16
-				+ KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT, "                                                                              //17
-				+ KEY_STORAGE_STATE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "',"              //18
-				+ KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "', "  //19
-				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "', " 		//20
-				+ KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN DEFAULT '" + encrypt("false") + "'"											//21				//22
+				+ KEY_LAST_PUBLIC_HANDLE + " TEXT, "                                                                                        //15
+				+ KEY_LAST_PUBLIC_HANDLE_TIMESTAMP + " TEXT, "                                                                              //16
+				+ KEY_STORAGE_STATE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.STORAGE_STATE_UNKNOWN)) + "',"              //17
+				+ KEY_LAST_PUBLIC_HANDLE_TYPE + " INTEGER DEFAULT '" + encrypt(String.valueOf(MegaApiJava.AFFILIATE_TYPE_INVALID)) + "', "  //18
+				+ KEY_MY_CHAT_FILES_FOLDER_HANDLE + " TEXT DEFAULT '" + encrypt(String.valueOf(MegaApiJava.INVALID_HANDLE)) + "', " 		//19
+				+ KEY_TRANSFER_QUEUE_STATUS + " BOOLEAN DEFAULT '" + encrypt("false") + "'"                                          //20 - True if the queue is paused, false otherwise
 				+ ")";
 		db.execSQL(CREATE_ATTRIBUTES_TABLE);
 
@@ -790,11 +788,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SMALL_GRID_CAMERA + " = '" + encrypt("false") + "';");
 		}
 
-		if (oldVersion <= 40){
-			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_STAGING + " TEXT;");
-			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_STAGING + " = '" + encrypt("false") + "';");
-		}
-
 		if (oldVersion <= 41){
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_LAST_PUBLIC_HANDLE + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_LAST_PUBLIC_HANDLE + " = '" + encrypt("-1") + "';");
@@ -922,6 +915,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PASSCODE_LOCK_REQUIRE_TIME
 					+ " = '" + encrypt("" + (isPasscodeLockEnabled(db) ? REQUIRE_PASSCODE_IMMEDIATE : REQUIRE_PASSCODE_INVALID)) + "';");
+		}
+
+		if (oldVersion <= 61) {
+			MegaAttributes attr = getAttributesFromDBv61(db);
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
+			onCreate(db);
+			setAttributes(db, attr);
 		}
 	}
 
@@ -2088,13 +2088,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return result;
 	}
 
+	/**
+	 * Saves attributes in DB.
+	 *
+	 * @param attr Attributes to save.
+	 */
 	public void setAttributes (MegaAttributes attr){
-        logDebug("setAttributes");
-        ContentValues values = new ContentValues();
-        values.put(KEY_ATTR_ONLINE, encrypt(attr.getOnline()));
-        values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
-        values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.getAskSizeDownload()));
-        values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.getAskNoAppDownload()));
+		setAttributes(db, attr);
+	}
+
+	/**
+	 * Saves attributes in DB.
+	 *
+	 * @param db   DB object to save the attributes.
+	 * @param attr Attributes to save.
+	 */
+	private void setAttributes (SQLiteDatabase db, MegaAttributes attr) {
+		logDebug("setAttributes");
+		ContentValues values = new ContentValues();
+		values.put(KEY_ATTR_ONLINE, encrypt(attr.getOnline()));
+		values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
+		values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.getAskSizeDownload()));
+		values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.getAskNoAppDownload()));
 		values.put(KEY_FILE_LOGGER_SDK, encrypt(attr.getFileLoggerSDK()));
 		values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.getAccountDetailsTimeStamp()));
 		values.put(KEY_PAYMENT_METHODS_TIMESTAMP, encrypt(attr.getPaymentMethodsTimeStamp()));
@@ -2106,7 +2121,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_USE_HTTPS_ONLY, encrypt(attr.getUseHttpsOnly()));
 		values.put(KEY_SHOW_COPYRIGHT, encrypt(attr.getShowCopyright()));
 		values.put(KEY_SHOW_NOTIF_OFF, encrypt(attr.getShowNotifOff()));
-		values.put(KEY_STAGING, encrypt(attr.getStaging()));
 		values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(Long.toString(attr.getLastPublicHandle())));
 		values.put(KEY_LAST_PUBLIC_HANDLE_TIMESTAMP, encrypt(Long.toString(attr.getLastPublicHandleTimeStamp())));
 		values.put(KEY_STORAGE_STATE, encrypt(Integer.toString(attr.getStorageState())));
@@ -2116,7 +2130,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 
-	public MegaAttributes getAttributes(){
+	/**
+	 * Gets attributes from the DB v61 (previous to remove the value to enable/disable staging).
+	 * KEY_STAGING has been removed in DB v62.
+	 *
+	 * @return Attributes.
+	 */
+	private MegaAttributes getAttributesFromDBv61(SQLiteDatabase db) {
 		MegaAttributes attr = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
@@ -2150,7 +2170,51 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp,
 						paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp,
 						invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff,
-						staging, lastPublicHandle, lastPublicHandleTimeStamp,
+						lastPublicHandle, lastPublicHandleTimeStamp,
+						lastPublicHandleType != null && !lastPublicHandleType.isEmpty() ? Integer.parseInt(lastPublicHandleType) : MegaApiJava.AFFILIATE_TYPE_INVALID,
+						storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN,
+						myChatFilesFolderHandle, transferQueueStatus);
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
+		return attr;
+	}
+
+	public MegaAttributes getAttributes(){
+		MegaAttributes attr = null;
+
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				int id = Integer.parseInt(cursor.getString(0));
+				String online = decrypt(cursor.getString(1));
+				String intents = decrypt(cursor.getString(2));
+				String askSizeDownload = decrypt(cursor.getString(3));
+				String askNoAppDownload = decrypt(cursor.getString(4));
+				String fileLoggerSDK = decrypt(cursor.getString(5));
+				String accountDetailsTimeStamp = decrypt(cursor.getString(6));
+				String paymentMethodsTimeStamp = decrypt(cursor.getString(7));
+				String pricingTimeStamp = decrypt(cursor.getString(8));
+				String extendedAccountDetailsTimeStamp = decrypt(cursor.getString(9));
+				String invalidateSdkCache = decrypt(cursor.getString(10));
+				String fileLoggerKarere = decrypt(cursor.getString(11));
+				String useHttpsOnly = decrypt(cursor.getString(12));
+				String showCopyright = decrypt(cursor.getString(13));
+				String showNotifOff = decrypt(cursor.getString(14));
+				String lastPublicHandle = decrypt(cursor.getString(15));
+				String lastPublicHandleTimeStamp = decrypt(cursor.getString(16));
+				String storageState = decrypt(cursor.getString(17));
+				String lastPublicHandleType = decrypt(cursor.getString(18));
+				String myChatFilesFolderHandle = decrypt(cursor.getString(19));
+				String transferQueueStatus = decrypt(cursor.getString(20));
+
+				attr = new MegaAttributes(online,
+						intents != null && !intents.isEmpty() ? Integer.parseInt(intents) : 0,
+						askSizeDownload, askNoAppDownload, fileLoggerSDK, accountDetailsTimeStamp,
+						paymentMethodsTimeStamp, pricingTimeStamp, extendedAccountDetailsTimeStamp,
+						invalidateSdkCache, fileLoggerKarere, useHttpsOnly, showCopyright, showNotifOff,
+						lastPublicHandle, lastPublicHandleTimeStamp,
 						lastPublicHandleType != null && !lastPublicHandleType.isEmpty() ? Integer.parseInt(lastPublicHandleType) : MegaApiJava.AFFILIATE_TYPE_INVALID,
 						storageState != null && !storageState.isEmpty() ? Integer.parseInt(storageState) : MegaApiJava.STORAGE_STATE_UNKNOWN,
 						myChatFilesFolderHandle, transferQueueStatus);

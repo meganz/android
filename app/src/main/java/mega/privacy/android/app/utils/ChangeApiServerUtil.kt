@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 object ChangeApiServerUtil {
 
-    const val API_SERVER_PREFERENCES = "API_SERVER_PREFERENCES";
+    const val API_SERVER_PREFERENCES = "API_SERVER_PREFERENCES"
     const val API_SERVER = "API_SERVER"
     const val API_SERVER_CHECKED = "API_SERVER_CHECKED"
 
@@ -133,7 +133,7 @@ object ChangeApiServerUtil {
 
         if (currentApiServerValue == SANDBOX3_SERVER_VALUE) {
             megaApi.setPublicKeyPinning(true)
-        } else if (newApiServerValue != SANDBOX3_SERVER_VALUE) {
+        } else if (newApiServerValue == SANDBOX3_SERVER_VALUE) {
             megaApi.setPublicKeyPinning(false)
         }
 
