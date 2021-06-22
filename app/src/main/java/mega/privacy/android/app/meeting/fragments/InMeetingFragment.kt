@@ -191,7 +191,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
                             showSnackbar(
                                 SNACKBAR_TYPE,
-                                getString(R.string.be_new_moderator),
+                                StringResourcesUtils.getString(R.string.be_new_moderator),
                                 MEGACHAT_INVALID_HANDLE
                             )
                         }
@@ -2072,7 +2072,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             requireContext(),
             R.style.ThemeOverlay_Mega_MaterialAlertDialog
         ).apply {
-            setMessage(getString(R.string.title_end_meeting))
+            setMessage(StringResourcesUtils.getString(R.string.title_end_meeting))
             setPositiveButton(R.string.general_ok) { _, _ -> leaveMeeting() }
             setNegativeButton(R.string.general_cancel, null)
             show()
@@ -2149,7 +2149,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 putExtra("contactType", CONTACT_TYPE_MEGA)
                 putExtra("chat", true)
                 putExtra("chatId", 123L)
-                putExtra("aBtitle", getString(R.string.invite_participants))
+                putExtra("aBtitle", StringResourcesUtils.getString(R.string.invite_participants))
             }
         meetingActivity.startActivityForResult(
             inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS

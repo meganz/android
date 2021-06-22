@@ -151,7 +151,7 @@ public class CallService extends Service{
         PendingIntent intentCall = null;
 
         if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && call.isRinging()) {
-            contentText = getString(R.string.title_notification_incoming_call);
+            contentText = StringResourcesUtils.getString(R.string.title_notification_incoming_call);
             intentCall = getPendingIntentMeetingRinging(this, currentChatId, notificationId + 1);
         } else if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
             if(call.isOnHold()) {
@@ -205,7 +205,7 @@ public class CallService extends Service{
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setAutoCancel(false)
                     // Only use the action as indicator.
-                    .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), null)
+                    .addAction(R.drawable.ic_phone_white, StringResourcesUtils.getString(R.string.button_notification_call_in_progress), null)
                     .setOngoing(false)
                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
 
@@ -234,8 +234,8 @@ public class CallService extends Service{
                 mBuilderCompatO.setContentTitle(title);
                 updateNotificationContent();
             } else {
-                mBuilderCompatO.setContentTitle(getString(R.string.title_notification_call_in_progress));
-                mBuilderCompatO.setContentText(getString(R.string.action_notification_call_in_progress));
+                mBuilderCompatO.setContentTitle(StringResourcesUtils.getString(R.string.title_notification_call_in_progress));
+                mBuilderCompatO.setContentText(StringResourcesUtils.getString(R.string.action_notification_call_in_progress));
                 startForeground(notificationId, mBuilderCompatO.build());
             }
         } else {
@@ -245,7 +245,7 @@ public class CallService extends Service{
             mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setAutoCancel(false)
-                    .addAction(R.drawable.ic_phone_white, getString(R.string.button_notification_call_in_progress), null)
+                    .addAction(R.drawable.ic_phone_white, StringResourcesUtils.getString(R.string.button_notification_call_in_progress), null)
                     .setOngoing(false);
 
             mBuilderCompat.setColor(ContextCompat.getColor(this, R.color.red_600_red_300));
@@ -274,8 +274,8 @@ public class CallService extends Service{
                 mBuilderCompat.setContentTitle(title);
                 updateNotificationContent();
             } else {
-                mBuilderCompat.setContentTitle(getString(R.string.title_notification_call_in_progress));
-                mBuilderCompat.setContentText(getString(R.string.action_notification_call_in_progress));
+                mBuilderCompat.setContentTitle(StringResourcesUtils.getString(R.string.title_notification_call_in_progress));
+                mBuilderCompat.setContentText(StringResourcesUtils.getString(R.string.action_notification_call_in_progress));
                 startForeground(notificationId, mBuilderCompat.build());
             }
         }

@@ -15,21 +15,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_paste_meeting_link_guest.*
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.listeners.ChatBaseListener
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage
-import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.showSnackbar
-import nz.mega.sdk.MegaChatApi
-import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatRequest
 
 class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
 
@@ -61,7 +52,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
         })
 
         builder.setTitle(R.string.paste_meeting_link_guest_dialog_title)
-            .setMessage(getString(R.string.paste_meeting_link_guest_instruction))
+            .setMessage(StringResourcesUtils.getString(R.string.paste_meeting_link_guest_instruction))
             .setView(view)
             .setPositiveButton(R.string.general_ok, null)
             .setNegativeButton(R.string.general_cancel, null)
@@ -107,7 +98,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
     private fun showError(errorStringId: Int) {
         setErrorAwareInputAppearance(linkEdit, true)
         errorLayout.visibility = View.VISIBLE
-        errorText.text = getString(errorStringId)
+        errorText.text = StringResourcesUtils.getString(errorStringId)
     }
 
     private fun hideError() {

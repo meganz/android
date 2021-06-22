@@ -30,11 +30,8 @@ import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
 
 class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
@@ -65,9 +62,9 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
         inMeetingViewModel.participants.observe(this) { participants ->
             binding.participantSize.text =
-                getString(R.string.info_participants_number, participants.size + 1)
+                StringResourcesUtils.getString(R.string.info_participants_number, participants.size + 1)
             binding.moderatorName.text =
-                getString(R.string.info_moderator_name, getModeratorList(participants))
+                StringResourcesUtils.getString(R.string.info_moderator_name, getModeratorList(participants))
         }
 
         shareViewModel.meetingLinkLiveData.observe(this) { link ->
@@ -135,9 +132,9 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Copied Text", chatLink)
             clipboard.setPrimaryClip(clip)
-            showSnackbar(requireContext(), getString(R.string.copied_meeting_link))
+            showSnackbar(requireContext(), StringResourcesUtils.getString(R.string.copied_meeting_link))
         } else {
-            showSnackbar(requireContext(), getString(R.string.general_text_error))
+            showSnackbar(requireContext(), StringResourcesUtils.getString(R.string.general_text_error))
         }
     }
 
@@ -183,9 +180,9 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
             false
         }
-        input.setImeActionLabel(getString(R.string.change_meeting_name), EditorInfo.IME_ACTION_DONE)
+        input.setImeActionLabel(StringResourcesUtils.getString(R.string.change_meeting_name), EditorInfo.IME_ACTION_DONE)
         builder.setTitle(R.string.change_meeting_name)
-            .setPositiveButton(getString(R.string.change_pass), null)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.change_pass), null)
             .setNegativeButton(android.R.string.cancel, null)
             .setView(layout)
             .setOnDismissListener {
@@ -206,11 +203,11 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val title = input.text.toString()
         if (title == "" || title.isEmpty() || title.trim { it <= ' ' }.isEmpty()) {
             LogUtil.logWarning("Input is empty")
-            input.error = getString(R.string.invalid_string)
+            input.error = StringResourcesUtils.getString(R.string.invalid_string)
             input.requestFocus()
         } else if (!ChatUtil.isAllowedTitle(title)) {
             LogUtil.logWarning("Title is too long")
-            input.error = getString(R.string.title_long)
+            input.error = StringResourcesUtils.getString(R.string.title_long)
             input.requestFocus()
         } else {
             LogUtil.logDebug("Positive button pressed - change title")

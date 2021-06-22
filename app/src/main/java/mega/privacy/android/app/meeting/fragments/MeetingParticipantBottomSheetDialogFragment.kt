@@ -21,6 +21,7 @@ import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.*
 
 /**
@@ -174,7 +175,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
             R.style.ThemeOverlay_Mega_MaterialAlertDialog
         ).apply {
             setMessage(
-                resources.getString(
+                StringResourcesUtils.getString(
                     R.string.confirmation_remove_chat_contact,
                     participantItem.name
                 )

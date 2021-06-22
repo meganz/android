@@ -1946,9 +1946,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     fun getGuestLinkTitle(): String = if (isModeratorOfPrivateRoom()) {
-        MegaApplication.getInstance().applicationContext.getString(R.string.invite_participants)
+        StringResourcesUtils.getString(R.string.invite_participants)
     } else {
-        MegaApplication.getInstance().applicationContext.getString(R.string.context_get_link)
+        StringResourcesUtils.getString(R.string.context_get_link)
     }
 
     fun isModeratorOfPrivateRoom(): Boolean =

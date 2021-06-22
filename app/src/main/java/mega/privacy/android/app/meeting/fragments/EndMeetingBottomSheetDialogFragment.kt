@@ -15,6 +15,7 @@ import mega.privacy.android.app.meeting.fragments.EndMeetingBottomSheetDialogVie
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiJava
 
 class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
@@ -84,8 +85,8 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         LogUtil.logDebug("askConfirmationEndMeeting")
 
         MaterialAlertDialogBuilder(requireContext()).apply {
-            setTitle(getString(R.string.end_meeting_for_all_dialog_title))
-            setMessage(getString(R.string.end_meeting_dialog_message))
+            setTitle(StringResourcesUtils.getString(R.string.end_meeting_for_all_dialog_title))
+            setMessage(StringResourcesUtils.getString(R.string.end_meeting_dialog_message))
             setPositiveButton(R.string.general_ok) { dialog, _ ->
                 run {
                     dialog.dismiss()

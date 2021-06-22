@@ -14,6 +14,7 @@ import mega.privacy.android.app.meeting.adapter.AssignParticipantsAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.utils.StringResourcesUtils
 
 /**
  * AssignModerator page allow moderator assign other users moderator when they are leaving the meeting
@@ -110,12 +111,12 @@ class AssignModeratorBottomFragment(
     private fun updateSelectedParticipant() {
         if (selectedParticipants.size > 0) {
             binding.toolbar.subtitle =
-                resources.getString(R.string.selected_items, selectedParticipants.size)
+                StringResourcesUtils.getString(R.string.selected_items, selectedParticipants.size)
             binding.moderatorAddsContainer.isVisible = true
         } else {
             binding.moderatorAddsContainer.isVisible = false
             binding.toolbar.subtitle =
-                resources.getString(R.string.pick_new_moderator_message)
+                StringResourcesUtils.getString(R.string.pick_new_moderator_message)
         }
         binding.moderatorAddsContainer.isVisible = selectedParticipants.size > 0
         selectedParticipantsAdapter.submitList(selectedParticipants.toMutableList())

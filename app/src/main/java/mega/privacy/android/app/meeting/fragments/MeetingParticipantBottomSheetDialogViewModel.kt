@@ -1,7 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.content.Context
-import android.util.Log
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.ViewModel
@@ -112,9 +111,9 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
      */
     fun getContactItemText(): String? {
         return if (participant?.isMe == true) {
-            context?.getString(R.string.group_chat_edit_profile_label)
+            StringResourcesUtils.getString(R.string.group_chat_edit_profile_label)
         } else {
-            context?.getString(R.string.contact_properties_activity)
+            StringResourcesUtils.getString(R.string.contact_properties_activity)
         }
     }
 

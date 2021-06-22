@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava
@@ -28,7 +29,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         }
 
         if (!isGuestNameValid()) {
-            Util.showToast(requireContext(), getString(R.string.error_invalid_guest_name))
+            Util.showToast(requireContext(), StringResourcesUtils.getString(R.string.error_invalid_guest_name))
             return
         }
 
