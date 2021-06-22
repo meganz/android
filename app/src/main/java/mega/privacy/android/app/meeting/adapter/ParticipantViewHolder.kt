@@ -38,10 +38,13 @@ class ParticipantViewHolder(
         binding.name.text = participant.name
 
         if (participant.isModerator) {
+            val drawable = ContextCompat.getDrawable(binding.name.context, R.drawable.ic_moderator)
+            drawable?.setTint(ContextCompat.getColor(binding.name.context, R.color.teal_300_teal_200))
+
             binding.name.setCompoundDrawablesWithIntrinsicBounds(
                 null,
                 null,
-                ContextCompat.getDrawable(binding.name.context, R.drawable.ic_moderator),
+                drawable,
                 null
             )
         } else {

@@ -29,6 +29,7 @@
         style="@style/BottomSheetInfoItem"
         android:text="meeting"
         app:drawableStartCompat="@drawable/ic_moderator"
+        app:drawableTint="?attr/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/meeting_name" />
@@ -38,6 +39,7 @@
         style="@style/BottomSheetInfoItem"
         android:text="meeting"
         app:drawableStartCompat="@drawable/ic_participants"
+        app:drawableTint="?attr/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/moderator_name" />
@@ -49,6 +51,7 @@
         android:text="meeting"
         android:visibility="gone"
         app:drawableStartCompat="@drawable/ic_copy"
+        app:drawableTint="?attr/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/participant_size" />
@@ -73,7 +76,7 @@
             android:text="@string/context_get_link"
             android:textAllCaps="false"
             android:textColor="@color/grey_600_white"
-            app:drawableTint="@color/teal_300_teal_200" />
+            app:drawableTint="?attr/colorSecondary" />
 
         <Button
             android:id="@+id/invite"
@@ -86,7 +89,8 @@
             android:stateListAnimator="@null"
             android:text="@string/invite_participants"
             android:textAllCaps="false"
-            android:textColor="@color/grey_600_white" />
+            android:textColor="@color/grey_600_white"
+            app:drawableTint="?attr/colorSecondary" />
     </LinearLayout>
 
 

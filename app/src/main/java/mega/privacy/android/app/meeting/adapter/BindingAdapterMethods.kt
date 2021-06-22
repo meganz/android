@@ -18,10 +18,12 @@ object BindingAdapterMethods {
     @BindingAdapter("android:showModeratorIcon")
     fun showModeratorIcon(view: TextView, moderator: Boolean) {
         if (moderator) {
+            val drawable = ContextCompat.getDrawable(view.context, R.drawable.ic_moderator)
+            drawable?.setTint(ContextCompat.getColor(view.context, R.color.teal_300_teal_200))
             view.setCompoundDrawablesWithIntrinsicBounds(
                 null,
                 null,
-                ContextCompat.getDrawable(view.context, R.drawable.ic_moderator),
+                drawable,
                 null
             )
         } else {

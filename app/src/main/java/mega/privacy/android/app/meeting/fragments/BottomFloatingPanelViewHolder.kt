@@ -81,8 +81,13 @@ class BottomFloatingPanelViewHolder(
         binding.root.addOnLayoutChangeListener(layoutListener)
     }
 
+    /**
+     * Remove listener and dismiss the pop window when activity is destroyed
+     *
+     */
     fun onDestroy(){
         binding.root.removeOnLayoutChangeListener(layoutListener)
+        popWindow?.dismiss()
     }
 
     /**
@@ -132,7 +137,7 @@ class BottomFloatingPanelViewHolder(
         val view: View = LayoutInflater.from(context)
             .inflate(R.layout.view_tip_meeting_bottom_panel, null, false)
 
-        if (popWindow != null && popWindow?.isShowing == true){
+        if (isPopWindowShowing()){
             popWindow?.dismiss()
         }
 
@@ -401,7 +406,6 @@ class BottomFloatingPanelViewHolder(
                             grad.setColor(background)
                             grad
                         }
-
                 }
             })
 

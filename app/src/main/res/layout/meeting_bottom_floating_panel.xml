@@ -198,7 +198,7 @@
         android:textAllCaps="false"
         android:textColor="@color/grey_600_white"
         android:visibility="gone"
-        app:drawableTint="@color/teal_300_teal_200"
+        app:drawableTint="?attr/colorSecondary"
         app:layout_constraintEnd_toStartOf="@id/invite"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
@@ -217,6 +217,7 @@
         android:textAllCaps="false"
         android:textColor="@color/grey_600_white"
         android:visibility="gone"
+        app:drawableTint="?attr/colorSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toEndOf="@id/share_link"
@@ -241,7 +242,7 @@
         android:drawableLeft="@drawable/ic_social_share_white"
         android:text="@string/context_get_link"
         android:textAllCaps="false"
-        app:drawableTint="@color/teal_300_teal_200"
+        app:drawableTint="?attr/colorSecondary"
         app:layout_constraintBottom_toBottomOf="@id/participants_num"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread"
@@ -257,22 +258,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/participants_num" />
-
-
-    <!--    <RelativeLayout-->
-    <!--        android:descendantFocusability="blocksDescendants"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="0dp"-->
-    <!--        android:layout_marginTop="21dp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/participants_num">-->
-
-    <!--        <androidx.recyclerview.widget.RecyclerView-->
-    <!--            android:id="@+id/participants"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="match_parent" />-->
-    <!--    </RelativeLayout>-->
-
 </androidx.constraintlayout.widget.ConstraintLayout>
