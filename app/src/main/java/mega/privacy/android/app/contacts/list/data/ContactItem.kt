@@ -11,8 +11,7 @@ sealed class ContactItem(val id: Long) {
     data class Data constructor(
         val handle: Long,
         val email: String,
-        val firstName: String? = null,
-        val lastName: String? = null,
+        val fullName: String? = null,
         val alias: String? = null,
         val status: Int? = null,
         @ColorRes val statusColor: Int? = null,
@@ -24,19 +23,18 @@ sealed class ContactItem(val id: Long) {
 
         fun getTitle(): String =
             when {
-                firstName.isNullOrBlank() -> email
-                lastName.isNullOrBlank() && !firstName.isNullOrBlank() -> firstName
-                else -> "$firstName $lastName"
+                !alias.isNullOrBlank() -> alias
+                !fullName.isNullOrBlank() -> fullName
+                else -> email
             }
 
         fun getFirstCharacter(): String =
             getTitle().first().toString().toUpperCase(Locale.getDefault())
 
         fun matches(queryString: String): Boolean =
-            firstName?.contains(queryString, true) == true ||
-                    lastName?.contains(queryString, true) == true ||
-                    alias?.contains(queryString, true) == true ||
-                    email.contains(queryString, true)
+            fullName?.contains(queryString, true) == true ||
+                    email.contains(queryString, true) ||
+                    alias?.contains(queryString, true) == true
     }
 
     data class Header(val title: String) : ContactItem(title.hashCode().toLong())

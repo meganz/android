@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -60,6 +61,9 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         contentView = binding.root
         mainLinearLayout = binding.layoutRoot
         items_layout = binding.layoutItems
+
+        binding.header.btnMore.isVisible = false
+        binding.header.divider.isVisible = false
         return binding.root
     }
 
@@ -74,13 +78,13 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun showContactInfo(contact: ContactItem.Data?) {
         requireNotNull(contact) { "Contact not found" }
 
-        binding.txtName.text = contact.getTitle()
-        binding.txtLastSeen.text = contact.lastSeen
-        binding.imgThumbnail.hierarchy.setPlaceholderImage(contact.placeholder)
-        binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(contact.avatarUri))
-        binding.imgThumbnail.invalidate()
+        binding.header.txtName.text = contact.getTitle()
+        binding.header.txtLastSeen.text = contact.lastSeen
+        binding.header.txtLastSeen.isVisible = !contact.lastSeen.isNullOrBlank()
+        binding.header.imgThumbnail.hierarchy.setPlaceholderImage(contact.placeholder)
+        binding.header.imgThumbnail.setImageRequest(ImageRequest.fromUri(contact.avatarUri))
         contact.statusColor?.let { color ->
-            binding.imgState.setColorFilter(ContextCompat.getColor(requireContext(), color))
+            binding.header.imgState.setColorFilter(ContextCompat.getColor(requireContext(), color))
         }
     }
 

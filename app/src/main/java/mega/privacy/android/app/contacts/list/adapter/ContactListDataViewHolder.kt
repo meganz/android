@@ -14,6 +14,7 @@ class ContactListDataViewHolder(
     fun bind(item: ContactItem.Data) {
         binding.txtName.text = item.getTitle()
         binding.txtLastSeen.text = item.lastSeen
+        binding.txtLastSeen.isVisible = !item.lastSeen.isNullOrBlank()
         binding.chipNew.isVisible = item.isNew
         binding.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
         binding.imgThumbnail.setImageRequest(ImageRequest.fromUri(item.avatarUri))

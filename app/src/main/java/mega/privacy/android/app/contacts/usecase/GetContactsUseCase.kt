@@ -50,11 +50,10 @@ class GetContactsUseCase @Inject constructor(
             val contacts = megaApi.contacts
                 .filter { it.visibility == VISIBILITY_VISIBLE }
                 .map { megaUser ->
-                    val firstName = megaChatApi.getUserFirstnameFromCache(megaUser.handle)
-                    val lastName = megaChatApi.getUserLastnameFromCache(megaUser.handle)
+                    val fullName = megaChatApi.getUserFullnameFromCache(megaUser.handle)
                     val userStatus = megaChatApi.getUserOnlineStatus(megaUser.handle)
                     val userImageColor = megaApi.getUserAvatarColor(megaUser).toColorInt()
-                    val placeholder = getImagePlaceholder(firstName ?: megaUser.email, userImageColor)
+                    val placeholder = getImagePlaceholder(fullName ?: megaUser.email, userImageColor)
                     val userAvatarFile = getUserAvatarFile(context, megaUser.email)
                     val userAvatar = if (userAvatarFile?.exists() == true) {
                         userAvatarFile.toUri()
@@ -65,8 +64,7 @@ class GetContactsUseCase @Inject constructor(
                     ContactItem.Data(
                         handle = megaUser.handle,
                         email = megaUser.email,
-                        firstName = firstName,
-                        lastName = lastName,
+                        fullName = fullName,
                         status = userStatus,
                         statusColor = getUserStatusColor(userStatus),
                         avatarUri = userAvatar,
@@ -92,13 +90,9 @@ class GetContactsUseCase @Inject constructor(
                                     contacts[index] = currentContact.copy(
                                         avatarUri = File(request.file).toUri()
                                     )
-                                USER_ATTR_FIRSTNAME ->
+                                USER_ATTR_FIRSTNAME, USER_ATTR_LASTNAME ->
                                     contacts[index] = currentContact.copy(
-                                        firstName = request.text
-                                    )
-                                USER_ATTR_LASTNAME ->
-                                    contacts[index] = currentContact.copy(
-                                        lastName = request.text
+                                        fullName = megaChatApi.getUserFullnameFromCache(currentContact.handle)
                                     )
                                 USER_ATTR_ALIAS ->
                                     contacts[index] = currentContact.copy(
@@ -106,7 +100,7 @@ class GetContactsUseCase @Inject constructor(
                                     )
                             }
 
-                            emitter.onNext(contacts.sortedBy { it.firstName ?: it.email })
+                            emitter.onNext(contacts.sortedBy { it.fullName ?: it.email })
                         }
                     } else {
                         logError(error.toThrowable().stackTraceToString())
@@ -160,10 +154,8 @@ class GetContactsUseCase @Inject constructor(
                     val userAvatarFile = getUserAvatarFile(context, contact.email)?.absolutePath
                     megaApi.getUserAvatar(contact.email, userAvatarFile, userAttrsListener)
                 }
-                if (contact.firstName.isNullOrBlank()) {
+                if (contact.fullName.isNullOrBlank()) {
                     megaApi.getUserAttribute(contact.email, USER_ATTR_FIRSTNAME, userAttrsListener)
-                }
-                if (contact.lastName.isNullOrBlank()) {
                     megaApi.getUserAttribute(contact.email, USER_ATTR_LASTNAME, userAttrsListener)
                 }
                 megaApi.getUserAttribute(contact.email, USER_ATTR_ALIAS, userAttrsListener)
