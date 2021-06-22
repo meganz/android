@@ -109,39 +109,6 @@
         android:textAppearance="?attr/textAppearanceSubtitle1"
         android:textSize="14sp" />
 
-    <mega.privacy.android.app.components.LeftMeetingItem
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:item_icon="@drawable/ic_meeting_e2e"
-        app:subTitle="@string/free_large_group_meeting"
-        app:title="@string/end_to_end_encrypted_call"
-        android:visibility="gone" />
-
-    <mega.privacy.android.app.components.LeftMeetingItem
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:item_icon="@drawable/ic_meeting_link"
-        app:subTitle="@string/free_large_group_meeting"
-        app:title="@string/invite_with_a_link"
-        android:visibility="gone"/>
-
-    <mega.privacy.android.app.components.LeftMeetingItem
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:item_icon="@drawable/ic_meeting_account"
-        app:subTitle="@string/free_large_group_meeting"
-        app:title="@string/join_without_account"
-        android:visibility="gone"/>
-
-    <mega.privacy.android.app.components.LeftMeetingItem
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:item_icon="@drawable/ic_meeting_device"
-        app:subTitle="@string/free_large_group_meeting"
-        app:title="@string/use_any_device"
-        android:visibility="gone"/>
-
     <Button
         android:id="@+id/bt_create_account"
         style="?attr/materialButtonStyle"

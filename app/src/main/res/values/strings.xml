@@ -4071,16 +4071,8 @@
     <string name="left_meeting">You have left MEGA meeting</string>
     <!-- Ask the guest for keeping track MEGA meeting when left meeting-->
     <string name="keep_track_meeting">Do you want to keep track of your MEGA meeting?</string>
-    <!-- the title of e2e encrypted call on left meeting page-->
-    <string name="end_to_end_encrypted_call">End-to-End Encrypted call</string>
-    <!-- the title of e2e encrypted call on left meeting page-->
-    <string name="invite_with_a_link">Invite with a link</string>
-    <!-- the title of join without account on left meeting page-->
-    <string name="join_without_account">Join without an account</string>
     <!-- the title of use any device on left meeting page-->
     <string name="use_any_device">Use any device</string>
-    <!-- the subtitle on left meeting page-->
-    <string name="free_large_group_meeting">Free large group meeting</string>
 
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">View meeting chat</string>
@@ -4112,9 +4104,13 @@
 
     <!-- Guest leave call-->
     <string name="more_than_meeting">More than just meetings</string>
+    <!-- the title of join without account on left meeting page-->
     <string name="left_meeting_join_title">Your privacy matters</string>
+    <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">Join the largest secure cloud storage and collaboration platform in the world.</string>
+    <!-- the bonus title of join without account on left meeting page-->
     <string name="left_meeting_bonus_title">Get 20 GB for free</string>
+    <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
 
     <!-- New Photos -->
