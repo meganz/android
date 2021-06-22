@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -8,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -81,8 +84,13 @@ import nz.mega.sdk.MegaUser;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.view.MotionEvent.ACTION_CANCEL;
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MOVE;
+import static android.view.MotionEvent.ACTION_UP;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -94,11 +102,13 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
+    private static final long LONG_CLICK_DELAY = 5000;
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
     private AlertDialog insertMKDialog;
     private AlertDialog changeApiServerDialog;
 
+    private Rect loginTitleBoundaries;
     private TextView loginTitle;
     private TextView newToMega;
     private TextInputLayout et_userLayout;
@@ -209,6 +219,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         logDebug("onCreateView");
@@ -251,9 +262,39 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginTitle.setText(R.string.login_to_mega);
         loginTitle.setOnClickListener(this);
-        loginTitle.setOnLongClickListener(v12 -> {
-            changeApiServerDialog
-                    = showChangeApiServerDialog((LoginActivityLollipop) context, megaApi);
+
+        Runnable onLongPress = () -> {
+            if (!isAlertDialogShown(changeApiServerDialog)) {
+                changeApiServerDialog = showChangeApiServerDialog((LoginActivityLollipop) context, megaApi);
+            }
+        };
+
+        Runnable onTap = () ->
+                handler.postDelayed(onLongPress, LONG_CLICK_DELAY - ViewConfiguration.getTapTimeout());
+
+        loginTitle.setOnTouchListener((view, event) -> {
+            switch (event.getAction()) {
+                case ACTION_DOWN:
+                    loginTitleBoundaries = new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+                    handler.postDelayed(onTap, ViewConfiguration.getTapTimeout());
+                    break;
+
+                case ACTION_UP:
+                case ACTION_CANCEL:
+                    handler.removeCallbacks(onLongPress);
+                    handler.removeCallbacks(onTap);
+                    break;
+
+                case ACTION_MOVE:
+                    if (loginTitleBoundaries != null && loginTitleBoundaries.contains(
+                            view.getLeft() + (int) event.getX(),
+                            view.getTop() + (int) event.getY())) {
+                        handler.removeCallbacks(onLongPress);
+                        handler.removeCallbacks(onTap);
+                    }
+                    break;
+            }
+
             return true;
         });
 
