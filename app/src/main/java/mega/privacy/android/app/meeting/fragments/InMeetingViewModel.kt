@@ -54,7 +54,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     private var waitingForMeetingLink: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
     // Meeting
-    private val _callLiveData: MutableLiveData<MegaChatCall?> = MutableLiveData<MegaChatCall?>()
+    private val _callLiveData = MutableLiveData<MegaChatCall?>(null)
+    val callLiveData: LiveData<MegaChatCall?> = _callLiveData
 
     // Chat title
     private val _chatTitle: MutableLiveData<String> =
