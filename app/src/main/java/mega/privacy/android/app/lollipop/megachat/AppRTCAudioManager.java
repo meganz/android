@@ -132,21 +132,25 @@ public class AppRTCAudioManager {
         this.proximitySensorListener = proximitySensorListener;
     }
 
-    public void registerProximitySensor() {
+    public boolean registerProximitySensor() {
         // Create and initialize the proximity sensor.
         // Note that, the sensor will not be active until start() has been called.
         //This method will be called each time a state change is detected.
-        if (proximitySensor != null) return;
+        if (proximitySensor != null) return false;
+
         proximitySensor = AppRTCProximitySensor.create(apprtcContext, new Runnable() {
             public void run() {
                 onProximitySensorChangedState();
             }
         });
+
+        return true;
     }
 
     public void startProximitySensor() {
-        registerProximitySensor();
-        proximitySensor.start();
+        if (registerProximitySensor()) {
+            proximitySensor.start();
+        }
     }
 
     /**

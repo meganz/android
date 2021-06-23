@@ -102,6 +102,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var meetinglink: String = ""
     private var inTemporaryState = false
     private var isManualModeView = false
+    private var isWaitingForAnswerCall = false
 
     // Children fragments
     private var individualCallFragment: IndividualCallFragment? = null
@@ -781,6 +782,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     logDebug("Meeting name has changed")
                     inMeetingViewModel.setTitleChat(it)
                 }
+            }
+        }
+
+        inMeetingViewModel.callLiveData.observe(viewLifecycleOwner){
+            if(it != null && isWaitingForAnswerCall){
+                answerCallAfterJoin()
             }
         }
 
@@ -2255,7 +2262,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         inMeetingViewModel.checkAnotherCallsInProgress(chatId)
-
         if (args.action == MEETING_ACTION_GUEST) {
             if (CallUtil.isStatusConnected(context, args.chatId)) {
                 answerCallAfterJoin()
@@ -2270,7 +2276,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun answerCallAfterJoin() {
-        inMeetingViewModel.getCall()?.let {
+        val call = inMeetingViewModel.getCall()
+        if(call == null){
+            logDebug("Call is null")
+            isWaitingForAnswerCall = true
+        }else{
+            isWaitingForAnswerCall = false
             logDebug("Joined to chat, answer call")
             inMeetingViewModel.answerChatCall(
                 camIsEnable,
