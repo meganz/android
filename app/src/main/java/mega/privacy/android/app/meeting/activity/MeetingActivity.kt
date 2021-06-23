@@ -118,8 +118,6 @@ class MeetingActivity : PasscodeActivity() {
         when (meetingAction) {
             MEETING_ACTION_CREATE -> {
                 actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
-                // Toolbar should be set to TRANSPARENT in "Create Meeting"
-                actionBar.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             }
             MEETING_ACTION_JOIN, MEETING_ACTION_GUEST
             -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
