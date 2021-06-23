@@ -1683,7 +1683,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			removeRTCAudioManagerRingIn();
 			MegaApplication.isSpeakerOn = isSpeakerOn;
 			rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, type);
-			startProximitySensor();
+			if (type != AUDIO_MANAGER_CREATING_JOINING_MEETING && type != AUDIO_MANAGER_CALL_OUTGOING) {
+				startProximitySensor();
+			}
 		}
 	}
 
