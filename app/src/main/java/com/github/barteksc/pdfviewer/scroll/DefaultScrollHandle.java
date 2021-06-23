@@ -1,11 +1,14 @@
 package com.github.barteksc.pdfviewer.scroll;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
-import androidx.core.view.MotionEventCompat;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.Util;
@@ -13,7 +16,8 @@ import com.github.barteksc.pdfviewer.util.Util;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.Util.dp2px;
 
 public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle {
 
@@ -24,19 +28,14 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
 
     private float relativeHandlerMiddle = 0f;
 
-//    protected TextView textViewBubble;
+    protected TextView textViewBubble;
     protected TextView textViewHandle;
     protected Context context;
-    private boolean inverted;
     private PDFView pdfView;
     private float currentPos;
-    private Handler handler = new Handler();
-    private Runnable hidePageScrollerRunnable = new Runnable() {
-        @Override
-        public void run() {
-            hide();
-        }
-    };
+    private final Handler handler = new Handler();
+    private final Runnable hidePageScrollerRunnable = this::hide;
+    private int totalPages = 0;
 
     public DefaultScrollHandle(Context context) {
         this(context, false);
@@ -46,13 +45,12 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
         super(context);
         logDebug("DefaultScrollHandle");
         this.context = context;
-        this.inverted = inverted;
         textViewHandle = new TextView(context);
-//        textViewBubble = new TextView(context);
+        textViewBubble = new TextView(context);
 
         setVisibility(INVISIBLE);
-//        setTextColor(Color.WHITE);
-//        setTextSize(DEFAULT_TEXT_SIZE);
+        setTextColor(ContextCompat.getColor(context, R.color.scroll_bubble_text_color));
+        setTextSize(DEFAULT_TEXT_SIZE);
     }
 
     @Override
@@ -66,16 +64,18 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
         textViewHandle.setPadding(Util.getDP(context, 10), Util.getDP(context, 10), Util.getDP(context, 10), Util.getDP(context, 10));
         addView(textViewHandle, tvHlp);
 
-//        RelativeLayout.LayoutParams tvBlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-//        textViewBubble.setBackgroundResource(R.drawable.fastscroll__default_bubble);
-//        tvBlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-//        textViewBubble.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-//        textViewBubble.setPadding(Util.getDP(context, 10), Util.getDP(context, 5), Util.getDP(context, 10), Util.getDP(context, 5));
-//        tvBlp.setMargins(0, 0, Util.getDP(context, 30), 0);
-//        addView(textViewBubble, tvBlp);
+        RelativeLayout.LayoutParams tvBlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        textViewBubble.setBackgroundResource(R.drawable.fastscroll__pdf_bubble);
+        textViewBubble.setElevation(dp2px(4));
+        tvBlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        tvBlp.addRule(RelativeLayout.CENTER_VERTICAL);
+        textViewBubble.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+        textViewBubble.setTextColor(ContextCompat.getColor(context, R.color.scroll_bubble_text_color));
+        textViewBubble.setPadding(Util.getDP(context, 10), Util.getDP(context, 5), Util.getDP(context, 10), Util.getDP(context, 5));
+        tvBlp.setMargins(0, 0, Util.getDP(context, 35), 0);
+        addView(textViewBubble, tvBlp);
 
-
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(Util.getDP(context, 40), RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         pdfView.addView(this, lp);
 
@@ -154,10 +154,12 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
     public void setPageNum(int pageNum) {
         logDebug("setPageNum");
 
-        String text = String.valueOf(pageNum);
-//        if (!textViewBubble.getText().equals(text)) {
-//            textViewBubble.setText(text);
-//        }
+        String strCurrentPages = String.valueOf(pageNum);
+        String strTotalPages = String.valueOf(totalPages);
+        String text = strCurrentPages + " / " + strTotalPages;
+        if (!textViewBubble.getText().equals(text)) {
+            textViewBubble.setText(text);
+        }
     }
 
     @Override
@@ -170,48 +172,39 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
     public void show() {
         logDebug("shown");
         setVisibility(VISIBLE);
-        animate().translationX(0).setDuration(200L).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                hideDelayed();
-            }
-        }).start();
+        animate().translationX(0).setDuration(200L).withEndAction(this::hideDelayed).start();
     }
 
     @Override
     public void hide() {
         logDebug("hide");
-        animate().translationX(200).setDuration(200L).withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                setVisibility(INVISIBLE);
-            }
-        }).start();
+        animate().translationX(200).setDuration(200L).withEndAction(() -> setVisibility(INVISIBLE)).start();
     }
 
-//    public void setTextColor(int color) {
-//        log("setTextColor");
-//        textViewBubble.setTextColor(color);
-//    }
+    public void setTextColor(int color) {
+        logDebug("setTextColor");
+        textViewBubble.setTextColor(color);
+    }
 
-//    /**
-//     * @param size text size in sp
-//     */
-//    public void setTextSize(int size) {
-//        log("setTextSize");
-//        textViewBubble.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
-//    }
+    /**
+     * @param size text size in sp
+     */
+    public void setTextSize(int size) {
+        logDebug("setTextSize");
+        textViewBubble.setTextSize(TypedValue.COMPLEX_UNIT_SP, size);
+    }
 
     private boolean isPDFViewReady() {
         logDebug("isPDFViewReady");
         return pdfView != null && pdfView.getPageCount() > 0 && !pdfView.documentFitsView();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         logDebug("onTouchEvent");
 
-        final int action = MotionEventCompat.getActionMasked(event);
+        final int action = event.getActionMasked();
 
         switch (action) {
             case MotionEvent.ACTION_DOWN:
@@ -223,7 +216,7 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
                 break;
             case MotionEvent.ACTION_MOVE: {
                 float newMotionY = event.getRawY();
-                if (Math.abs(motionYOrigin - newMotionY) > 5 && ((PdfViewerActivityLollipop) context).isToolbarVisible()){
+                if (Math.abs(motionYOrigin - newMotionY) > 5 && ((PdfViewerActivityLollipop) context).isToolbarVisible()) {
                     ((PdfViewerActivityLollipop) context).setToolbarVisibilityHide(200L);
                 }
             }
@@ -261,5 +254,9 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
         }
 
         return super.onTouchEvent(event);
+    }
+
+    public void setTotalPages(int nbPages) {
+        totalPages = nbPages;
     }
 }
