@@ -31,7 +31,7 @@ class ContactGroupsViewModel @ViewModelInject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { items ->
-                    groups.value = items
+                    groups.value = items.toList()
                 },
                 onError = { error ->
                     Log.e(TAG, error.stackTraceToString())

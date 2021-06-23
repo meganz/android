@@ -12,13 +12,16 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
+import mega.privacy.android.app.contacts.group.data.ContactGroupUser
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.MegaUserUtils
 import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava.*
+import nz.mega.sdk.MegaRequest.TYPE_GET_USER_EMAIL
 import java.io.File
 import javax.inject.Inject
 
@@ -41,61 +44,79 @@ class GetContactGroupsUseCase @Inject constructor(
                     if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
 
                     if (error.errorCode == MegaError.API_OK) {
-                        val index = groups.indexOfFirst { request.email in it.firstUserEmail..it.lastUserEmail }
+                        val index = groups.indexOfFirst {
+                            request.nodeHandle in it.firstUser.handle..it.lastUser.handle
+                                    || request.email == it.firstUser.email || request.email == it.lastUser.email
+                        }
+
                         if (index != NOT_FOUND) {
-                            val imageFile = File(request.file).toUri()
                             val currentGroup = groups[index]
-                            if (request.email == currentGroup.firstUserEmail) {
-                                groups[index] = currentGroup.copy(firstUserAvatar = imageFile)
-                            } else {
-                                groups[index] = currentGroup.copy(lastUserAvatar = imageFile)
+                            when (request.paramType) {
+                                TYPE_GET_USER_EMAIL -> {
+                                    groups[index] =
+                                        if (request.nodeHandle == currentGroup.firstUser.handle) {
+                                            currentGroup.copy(
+                                                firstUser = currentGroup.firstUser.copy(email = request.text)
+                                            )
+                                        } else {
+                                            currentGroup.copy(
+                                                lastUser = currentGroup.lastUser.copy(email = request.text)
+                                            )
+                                        }
+                                }
+                                USER_ATTR_FIRSTNAME -> {
+                                    val isFirstUser = request.nodeHandle == currentGroup.firstUser.handle
+                                    val user = if (isFirstUser) currentGroup.firstUser else currentGroup.lastUser
+
+                                    val newFirstname = request.text
+                                    val newPlaceholder = getImagePlaceholder(newFirstname, user.avatarColor)
+                                    val newUser = user.copy(
+                                        firstName = newFirstname,
+                                        placeholder = newPlaceholder
+                                    )
+
+                                    groups[index] = if (isFirstUser) {
+                                        currentGroup.copy(firstUser = newUser)
+                                    } else {
+                                        currentGroup.copy(lastUser = newUser)
+                                    }
+                                }
+                                USER_ATTR_AVATAR -> {
+                                    groups[index] =
+                                        if (request.email == currentGroup.firstUser.email) {
+                                            currentGroup.copy(
+                                                firstUser = currentGroup.firstUser.copy(avatar = File(request.file).toUri())
+                                            )
+                                        } else {
+                                            currentGroup.copy(
+                                                lastUser = currentGroup.lastUser.copy(avatar = File(request.file).toUri())
+                                            )
+                                        }
+                                }
                             }
 
                             emitter.onNext(groups)
                         }
                     } else {
-                        LogUtil.logError(error.toThrowable().stackTraceToString())
+                        logError(error.toThrowable().stackTraceToString())
                     }
                 },
                 onRequestTemporaryError = { _, error ->
-                    LogUtil.logError(error.toThrowable().stackTraceToString())
+                    logError(error.toThrowable().stackTraceToString())
                 }
             )
 
             megaChatApi.chatRooms.sortedByDescending { it.creationTs }.forEach { chatRoom ->
                 if (chatRoom.isGroup && chatRoom.peerCount > 0) {
                     val firstUserHandle = chatRoom.getPeerHandle(0)
-                    val firstUserEmail = megaChatApi.getContactEmail(firstUserHandle)
-                    val firstUserName = megaChatApi.getUserFirstnameFromCache(firstUserHandle)
-                    val firstUserColor = megaApi.getUserAvatarColor(firstUserHandle.toString()).toColorInt()
-                    val firstUserPlaceholder = getImagePlaceholder(firstUserName ?: firstUserEmail, firstUserColor)
-                    var firstImage = MegaUserUtils.getUserAvatarFile(context, firstUserEmail)
-                    if (firstImage?.exists() == false) {
-                        megaApi.getUserAvatar(firstUserEmail, firstImage.absolutePath, userAttrsListener)
-                        firstImage = null
-                    }
-
                     val lastUserHandle = chatRoom.getPeerHandle(chatRoom.peerCount - 1)
-                    val lastUserEmail = megaChatApi.getContactEmail(lastUserHandle)
-                    val lastUserName = megaChatApi.getUserFirstnameFromCache(lastUserHandle)
-                    val lastUserColor = megaApi.getUserAvatarColor(lastUserHandle.toString()).toColorInt()
-                    val lastUserPlaceholder = getImagePlaceholder(lastUserName ?: lastUserEmail, lastUserColor)
-                    var secondImage = MegaUserUtils.getUserAvatarFile(context, lastUserEmail)
-                    if (secondImage?.exists() == false) {
-                        megaApi.getUserAvatar(lastUserEmail, secondImage.absolutePath, userAttrsListener)
-                        secondImage = null
-                    }
 
                     groups.add(
                         ContactGroupItem(
                             chatId = chatRoom.chatId,
                             title = chatRoom.title,
-                            firstUserAvatar = firstImage?.toUri(),
-                            firstUserEmail = firstUserEmail,
-                            firstUserPlaceholder = firstUserPlaceholder,
-                            lastUserEmail = lastUserEmail,
-                            lastUserAvatar = secondImage?.toUri(),
-                            lastUserPlaceholder = lastUserPlaceholder,
+                            firstUser = getGroupUserFromHandle(firstUserHandle, userAttrsListener),
+                            lastUser = getGroupUserFromHandle(lastUserHandle, userAttrsListener),
                             isPublic = chatRoom.isPublic
                         )
                     )
@@ -103,7 +124,45 @@ class GetContactGroupsUseCase @Inject constructor(
             }
 
             emitter.onNext(groups)
-        }, BackpressureStrategy.BUFFER)
+        }, BackpressureStrategy.LATEST)
+
+    private fun getGroupUserFromHandle(
+        userHandle: Long,
+        listener: OptionalMegaRequestListenerInterface
+    ): ContactGroupUser {
+        var userAvatar: File? = null
+        val userName = megaChatApi.getUserFirstnameFromCache(userHandle)
+        val userEmail = megaChatApi.getUserEmailFromCache(userHandle)
+        val userAvatarColor = megaApi.getUserAvatarColor(userHandle.toString()).toColorInt()
+        val userPlaceholder = getImagePlaceholder(
+            userName ?: userEmail ?: userHandle.toString(),
+            userAvatarColor
+        )
+
+        if (userName.isNullOrBlank()) {
+            megaApi.getUserAttribute(userHandle.toString(), USER_ATTR_FIRSTNAME, listener)
+        }
+
+        if (userEmail.isNullOrBlank()) {
+            megaApi.getUserEmail(userHandle, listener)
+        } else {
+            val avatarFile = MegaUserUtils.getUserAvatarFile(context, userEmail)
+            if (avatarFile?.exists() == true) {
+                userAvatar = avatarFile
+            } else {
+                megaApi.getUserAvatar(userEmail, avatarFile?.absolutePath, listener)
+            }
+        }
+
+        return ContactGroupUser(
+            handle = userHandle,
+            email = userEmail,
+            firstName = userName,
+            avatar = userAvatar?.toUri(),
+            avatarColor = userAvatarColor,
+            placeholder = userPlaceholder
+        )
+    }
 
     private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
         TextDrawable.builder()
