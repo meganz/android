@@ -2169,8 +2169,6 @@
     <string name="label_set_period">Periode instellen</string>
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]Nodig vrienden uit bij [/B][A]Gesprek[/A][B] en geniet van uw gecodeerde platform met privacy en veiligheid[/B]</string>
-    <!-- Text of the empty screen when there are not elements in Camera Uploads -->
-    <string name="context_empty_camera_uploads">[B]Geen media op [/B][A]Camera Uploads[/A]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Lege[/B][A]Prullenbak[/A]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -3944,4 +3942,31 @@
     <string name="general_info">Informatie</string>
     <!-- Item menu option upon right click on one image or video to save it to device gallery -->
     <string name="general_save_to_gallery">Opslaan in gallerij</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">Media</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">Audio bestanden</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">Afspelen op de achtergrond</string>
+    <!-- Text of the empty screen when there are no elements in Photos -->
+    <string name="photos_empty">[B]Geen[/B] [A]Foto’s[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="enable_cu_subtitle">Automatisch een backup maken van uw foto’s en video’s in uw Cloud Schijf.</string>
+    <!-- Text of a button on Camera Uploads section to show all the content of the section-->
+    <string name="all_view_button">Alle</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
+    <string name="days_view_button">Dagen</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
+    <string name="months_view_button">Maanden</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
+    <string name="years_view_button">Jaren</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
+    <string name="cu_month_year_date">[B]%1$s[/B]%2$s</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
+    <string name="cu_day_month_year_date">[B]%1$s%2$s[/B]%3$s</string>
+    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
+    <plurals name="cu_upload_progress">
+        <item quantity="one">Upload in behandeling, 1 bestand wachtend</item>
+        <item quantity="other">Upload in behandeling, %1$d bestanden wachtend</item>
+    </plurals>
 </resources>

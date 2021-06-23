@@ -2124,8 +2124,6 @@
     <string name="label_set_period">设定期限</string>
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]邀请朋友加入[/B][A]聊天[/A][B]享受我们私密安全的加密服务[/B]</string>
-    <!-- Text of the empty screen when there are not elements in Camera Uploads -->
-    <string name="context_empty_camera_uploads">[A]相机上传[/A]中[B]无文件[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]垃圾桶[/A]中[B]无文件[/B]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -3857,4 +3855,30 @@
     <string name="general_info">信息</string>
     <!-- Item menu option upon right click on one image or video to save it to device gallery -->
     <string name="general_save_to_gallery">保存到图库</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">媒体</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">音频文件</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">后台播放</string>
+    <!-- Text of the empty screen when there are no elements in Photos -->
+    <string name="photos_empty">[B]无[/B][A]照片[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="enable_cu_subtitle">自动备份您的照片和视频到您的云盘。</string>
+    <!-- Text of a button on Camera Uploads section to show all the content of the section-->
+    <string name="all_view_button">全部</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
+    <string name="days_view_button">天</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
+    <string name="months_view_button">月</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
+    <string name="years_view_button">年</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
+    <string name="cu_month_year_date">[B]%1$s[/B]%2$s</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
+    <string name="cu_day_month_year_date">[B]%1$s%2$s[/B]%3$s</string>
+    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
+    <plurals name="cu_upload_progress">
+        <item quantity="other">正在上传，%1$d个文件待上传</item>
+    </plurals>
 </resources>

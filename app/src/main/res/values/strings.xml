@@ -744,10 +744,6 @@
     <string name="settings_appearance">Appearance</string>
     <!-- settings of the Features section -->
     <string name="settings_features">Features</string>
-    <!-- settings of the Media section -->
-    <string name="settings_media">Media</string>
-    <!-- settings title of the Media section -->
-    <string name="settings_media_audio_files">Audio files</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="settings_storage">Storage</string>
     <!-- Settings of the Passcode -->
@@ -3826,8 +3822,6 @@
     <string name="label_purple">Purple</string>
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Grey</string>
-    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
-    <string name="settings_background_play_hint">Playing on the background</string>
     <!-- Text that indicates the song is now playing -->
     <string name="audio_player_now_playing">Now playing</string>
     <!-- Text that indicates the song is now playing, but paused -->
@@ -3948,6 +3942,12 @@
     <string name="general_info">Info</string>
     <!-- Item menu option upon right click on one image or video to save it to device gallery -->
     <string name="general_save_to_gallery">Save to gallery</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">Media</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">Audio files</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">Playing on the background</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
     <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
