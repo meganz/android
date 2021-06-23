@@ -49,9 +49,6 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     protected var chatId: Long = MEGACHAT_INVALID_HANDLE
     protected var meetingLink = ""
 
-    // Views
-    lateinit var toolbar: MaterialToolbar
-
     var mRootViewHeight: Int = 0
 
     // Soft keyboard open and close listener

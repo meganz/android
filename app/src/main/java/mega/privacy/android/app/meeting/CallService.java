@@ -164,6 +164,9 @@ public class CallService extends Service{
             if(!isInMeeting) {
                 boolean isGuest = megaApi.isEphemeralPlusPlus();
                 intentCall = getPendingIntentMeetingInProgress(this, currentChatId, notificationId + 1, isGuest);
+            } else {
+                // An empty PendingIntent, tapping it can collapse status bar.
+                intentCall = PendingIntent.getBroadcast(this, 0, new Intent(""),PendingIntent.FLAG_UPDATE_CURRENT);
             }
         }
 

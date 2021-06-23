@@ -1,13 +1,19 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.annotation.SuppressLint
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.InputFilter
+import android.view.LayoutInflater
 import android.view.MotionEvent.ACTION_DOWN
 import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
@@ -56,6 +62,22 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
     fun releaseVideoAndHideKeyboard() {
         hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
         releaseVideoDeviceAndRemoveChatVideoListener()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        // Toolbar should be set to TRANSPARENT in "Create Meeting"
+        activity?.toolbar?.background = ColorDrawable(Color.TRANSPARENT)
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Reset the toolbar background to the default value
+        activity?.toolbar?.background = ContextCompat.getDrawable(requireContext(), R.drawable.gradient_shape_callschat)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
