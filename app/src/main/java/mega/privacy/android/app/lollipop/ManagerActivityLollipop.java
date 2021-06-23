@@ -776,6 +776,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     drawerLayout.closeDrawer(Gravity.LEFT);
                 }
                 refreshAddPhoneNumberButton();
+				app.askForAccountDetails();
             }
         }
     };
