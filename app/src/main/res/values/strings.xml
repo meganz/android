@@ -4053,7 +4053,7 @@
 
     <!-- meeting permission-->
     <!-- Warning show to the user when the app needs permissions to start a meeting.-->
-    <string name="meeting_permission_info">Please allow MEGA access permission</string>
+    <string name="meeting_permission_info">Please allow MEGA access permissions</string>
     <!-- Message of a dialog to show user the permissions that needed-->
     <string name="meeting_permission_info_message">For the best meeting experience, MEGA may ask you to access your microphone and camera.</string>
     <!-- Button to confirm the action of restarting one transfer-->
