@@ -111,7 +111,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -7518,8 +7517,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					backToDrawerItem(-1);
 					break;
 			}
-		} else if (drawerItem == DrawerItem.CHAT) {
-			backToDrawerItem(-1);
+        } else if (drawerItem == DrawerItem.CHAT) {
+            RecentChatsFragmentLollipop fragment = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+            if (fragment != null&& isFabExpanded) {
+                collapseFab();
+            } else {
+                backToDrawerItem(-1);
+            }
 		} else if (drawerItem == DrawerItem.CONTACTS) {
 			switch (getTabItemContacts()) {
 				case CONTACTS_TAB:
