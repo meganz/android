@@ -286,7 +286,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     break;
 
                 case ACTION_MOVE:
-                    if (loginTitleBoundaries != null && loginTitleBoundaries.contains(
+                    if (loginTitleBoundaries != null && !loginTitleBoundaries.contains(
                             view.getLeft() + (int) event.getX(),
                             view.getTop() + (int) event.getY())) {
                         handler.removeCallbacks(onLongPress);
@@ -295,7 +295,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     break;
             }
 
-            return true;
+            return false;
         });
 
         et_userLayout = v.findViewById(R.id.login_email_text_layout);
