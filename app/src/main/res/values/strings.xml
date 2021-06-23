@@ -4028,10 +4028,6 @@
 
     <!-- The literal meeting link text-->
     <string name="meeting_link">Meeting link</string>
-    <!-- Tell the user to paste the meeting link in the edit box-->
-    <string name="paste_meeting_link_instruction">Back to the link and tap it again or paste your meeting link to join</string>
-    <!-- The title of the paste meeting link dialog for guest-->
-    <string name="invite_to_meeting_dialog_title">You are invited to a meeting</string>
     <!-- Subtitle of the meeting screen-->
     <string name="duration_meeting">Duration</string>
 
@@ -4044,7 +4040,7 @@
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">You are invited to a meeting</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
-    <string name="paste_meeting_link_guest_instruction">Back to the link and tap it again or paste your meeting link to join</string>
+    <string name="paste_meeting_link_guest_instruction">Paste your link here or click the link sent to you.</string>
     <!-- Banner text to indicate poor network quality-->
     <string name="slow_connection_meeting">You are in slow connection</string>
     <!-- Banner text to indicate you are moderator-->
@@ -4059,7 +4055,7 @@
     <!-- Warning show to the user when the app needs permissions to start a meeting.-->
     <string name="meeting_permission_info">Please allow MEGA access permission</string>
     <!-- Message of a dialog to show user the permissions that needed-->
-    <string name="meeting_permission_info_message">For the best meeting experience, MEGA may ask to access to your microphone, camera, and storage.</string>
+    <string name="meeting_permission_info_message">For the best meeting experience, MEGA may ask you to access your microphone and camera.</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">Got it</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
@@ -4096,9 +4092,9 @@
     <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
     <string name="join_meeting_layout_in_group_call">%s started a meeting. Tap to join.</string>
     <!-- Title of fifth tour screen -->
-    <string name="title_tour_five">MEGA encrypted meeting</string>
+    <string name="title_tour_five">MEGA Meeting</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">End-to-End Encrypted conference at MEGA</string>
+    <string name="content_tour_five">End-to-end encrypted video meeting</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Please enter a valid meeting link</string>
 
