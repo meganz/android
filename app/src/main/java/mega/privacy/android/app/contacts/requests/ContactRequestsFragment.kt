@@ -1,20 +1,17 @@
 package mega.privacy.android.app.contacts.requests
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.tabs.TabLayoutMediator
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs
 import mega.privacy.android.app.databinding.FragmentContactRequestsBinding
+import mega.privacy.android.app.utils.Constants.EVENT_CONTACT_REQUESTS_UPDATE
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 
@@ -29,13 +26,6 @@ class ContactRequestsFragment : Fragment() {
 
     private val isOutgoing by extraNotNull(EXTRA_IS_OUTGOING, false)
     private val viewModel by viewModels<ContactRequestsViewModel>()
-    private val receiver: BroadcastReceiver by lazy {
-        object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                viewModel.updateRequests()
-            }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,12 +39,7 @@ class ContactRequestsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
-        setupReceivers()
-    }
-
-    override fun onDestroyView() {
-        activity?.unregisterReceiver(receiver)
-        super.onDestroyView()
+        setupObservers()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -84,8 +69,9 @@ class ContactRequestsFragment : Fragment() {
         }
     }
 
-    private fun setupReceivers() {
-        val intentFilter = IntentFilter(BroadcastConstants.BROADCAST_ACTION_REQUEST_UPDATE)
-        activity?.registerReceiver(receiver, intentFilter)
+    private fun setupObservers() {
+        LiveEventBus.get(EVENT_CONTACT_REQUESTS_UPDATE).observe(viewLifecycleOwner) {
+            viewModel.updateRequests()
+        }
     }
 }

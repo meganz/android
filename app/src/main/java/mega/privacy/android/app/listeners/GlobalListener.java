@@ -17,10 +17,19 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE;
+import static mega.privacy.android.app.constants.BroadcastConstants.EVENT_NUMBER;
+import static mega.privacy.android.app.constants.BroadcastConstants.EVENT_TEXT;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
+import static mega.privacy.android.app.utils.Constants.EVENT_CONTACT_REQUESTS_UPDATE;
+import static mega.privacy.android.app.utils.Constants.EVENT_CONTACT_UPDATE;
+import static mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE;
+import static mega.privacy.android.app.utils.Constants.EXTRA_STORAGE_STATE;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
 public class GlobalListener implements MegaGlobalListenerInterface {
@@ -37,8 +46,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
         if (users == null || users.isEmpty()) return;
 
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE);
-        megaApplication.sendBroadcast(intent);
+        boolean shouldUpdateContacts = false;
 
         for (MegaUser user : users) {
             if (user == null) {
@@ -46,6 +54,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             }
 
             boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
+
+            if (!isMyChange && !user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)) {
+                shouldUpdateContacts = true;
+            }
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && isMyChange) {
                 MegaApplication.getPushNotificationSettingManagement().updateMegaPushNotificationSetting();
@@ -77,6 +89,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 api.getFileVersionsOption(new GetAttrUserListener(megaApplication));
                 break;
             }
+        }
+
+        if (shouldUpdateContacts) {
+            LiveEventBus.get(EVENT_CONTACT_UPDATE).post(null);
         }
     }
 
@@ -133,8 +149,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
         notifyNotificationCountChange(api);
 
-        Intent intent = new Intent(BROADCAST_ACTION_REQUEST_UPDATE);
-        megaApplication.sendBroadcast(intent);
+        LiveEventBus.get(EVENT_CONTACT_REQUESTS_UPDATE).post(null);
 
         for (int i = 0; i < requests.size(); i++) {
             MegaContactRequest cr = requests.get(i);

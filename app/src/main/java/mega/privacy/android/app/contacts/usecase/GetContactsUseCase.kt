@@ -50,10 +50,16 @@ class GetContactsUseCase @Inject constructor(
             val contacts = megaApi.contacts
                 .filter { it.visibility == VISIBILITY_VISIBLE }
                 .map { megaUser ->
+                    val alias = megaChatApi.getUserAliasFromCache(megaUser.handle)
                     val fullName = megaChatApi.getUserFullnameFromCache(megaUser.handle)
                     val userStatus = megaChatApi.getUserOnlineStatus(megaUser.handle)
                     val userImageColor = megaApi.getUserAvatarColor(megaUser).toColorInt()
-                    val placeholder = getImagePlaceholder(fullName ?: megaUser.email, userImageColor)
+                    val title = when {
+                        !alias.isNullOrBlank() -> alias
+                        !fullName.isNullOrBlank() -> fullName
+                        else -> megaUser.email
+                    }
+                    val placeholder = getImagePlaceholder(title, userImageColor)
                     val userAvatarFile = getUserAvatarFile(context, megaUser.email)
                     val userAvatar = if (userAvatarFile?.exists() == true) {
                         userAvatarFile.toUri()
@@ -64,6 +70,7 @@ class GetContactsUseCase @Inject constructor(
                     ContactItem.Data(
                         handle = megaUser.handle,
                         email = megaUser.email,
+                        alias = alias,
                         fullName = fullName,
                         status = userStatus,
                         statusColor = getUserStatusColor(userStatus),
@@ -74,7 +81,7 @@ class GetContactsUseCase @Inject constructor(
                 }
                 .toMutableList()
 
-            emitter.onNext(contacts.sortedBy(ContactItem.Data::getTitle))
+            emitter.onNext(contacts.sortedAlphabetically())
 
             val userAttrsListener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
@@ -100,7 +107,7 @@ class GetContactsUseCase @Inject constructor(
                                     )
                             }
 
-                            emitter.onNext(contacts.sortedBy { it.fullName ?: it.email })
+                            emitter.onNext(contacts.sortedAlphabetically())
                         }
                     } else {
                         logError(error.toThrowable().stackTraceToString())
@@ -129,7 +136,7 @@ class GetContactsUseCase @Inject constructor(
                             }
                         )
 
-                        emitter.onNext(contacts.sortedBy(ContactItem.Data::getTitle))
+                        emitter.onNext(contacts.sortedAlphabetically())
                     }
                 },
                 onChatPresenceLastGreen = { userHandle, lastGreen ->
@@ -142,7 +149,7 @@ class GetContactsUseCase @Inject constructor(
                             lastSeen = TimeUtils.unformattedLastGreenDate(context, lastGreen)
                         )
 
-                        emitter.onNext(contacts.sortedBy(ContactItem.Data::getTitle))
+                        emitter.onNext(contacts.sortedAlphabetically())
                     }
                 }
             )
@@ -158,8 +165,9 @@ class GetContactsUseCase @Inject constructor(
                     megaApi.getUserAttribute(contact.email, USER_ATTR_FIRSTNAME, userAttrsListener)
                     megaApi.getUserAttribute(contact.email, USER_ATTR_LASTNAME, userAttrsListener)
                 }
-                megaApi.getUserAttribute(contact.email, USER_ATTR_ALIAS, userAttrsListener)
-
+                if (contact.alias.isNullOrBlank()) {
+                    megaApi.getUserAttribute(contact.email, USER_ATTR_ALIAS, userAttrsListener)
+                }
                 if (contact.status != STATUS_ONLINE) {
                     megaChatApi.requestLastGreen(contact.handle, null)
                 }
@@ -184,4 +192,7 @@ class GetContactsUseCase @Inject constructor(
             .toUpperCase()
             .endConfig()
             .buildRound(title.first().toString(), color)
+
+    private fun MutableList<ContactItem.Data>.sortedAlphabetically(): List<ContactItem.Data> =
+        sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, ContactItem.Data::getTitle))
 }

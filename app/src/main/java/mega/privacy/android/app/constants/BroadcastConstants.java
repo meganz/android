@@ -25,7 +25,6 @@ public class BroadcastConstants {
     public static final String BROADCAST_ACTION_COOKIE_SETTINGS_SAVED = "BROADCAST_ACTION_COOKIE_SETTINGS_SAVED";
     public static final String BROADCAST_ACTION_ERROR_COPYING_NODES = "INTENT_ERROR_COPYING_NODES";
     public static final String BROADCAST_ACTION_RETRY_PENDING_MESSAGE = "INTENT_RETRY_PENDING_MESSAGE";
-    public static final String BROADCAST_ACTION_REQUEST_UPDATE = "BROADCAST_ACTION_REQUEST_UPDATE";
 
     //    Broadcasts' actions
     public static final String ACTION_ON_ACCOUNT_UPDATE = "ACTION_ON_ACCOUNT_UPDATE";
