@@ -959,7 +959,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
     /**
      * Set the language code used by the app.
      * Language code is from current system setting.
-     * Need to distinguish simplified and tranditional Chinese.
+     * Need to distinguish simplified and traditional Chinese.
      */
     private void setSDKLanguage() {
         Locale locale = Locale.getDefault();
