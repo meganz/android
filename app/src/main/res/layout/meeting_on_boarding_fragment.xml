@@ -87,7 +87,7 @@
             android:scaleType="fitCenter"
             app:border_color="@color/dark_grey_border_color"
             app:border_width="4dp"
-            app:corner_radius="60dp"
+            app:corner_radius="100dp"
             app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
