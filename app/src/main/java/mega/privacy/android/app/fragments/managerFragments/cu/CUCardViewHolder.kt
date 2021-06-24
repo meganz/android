@@ -66,11 +66,10 @@ class CUCardViewHolder(
             binding.dateText.text = date?.toSpannedHtmlText()
         }
 
-        val numItems = card.numItems?.minus(1)
-        if (numItems != null) {
-            binding.numberItemsText.isVisible = viewType == DAYS_VIEW && numItems > 0
-            binding.numberItemsText.text = "+${numItems}"
-        }
+        val numItems = card.numItems
+
+        binding.numberItemsText.isVisible = viewType == DAYS_VIEW && numItems > 0
+        binding.numberItemsText.text = "+${numItems}"
 
         val preview = card.preview
 
