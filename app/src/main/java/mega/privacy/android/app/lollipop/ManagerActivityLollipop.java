@@ -1081,9 +1081,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	};
 
-	private final Observer<MegaChatCall> callOnHoldObserver = call -> {
-		updateVisibleCallElements(call.getChatid());
-	};
+	private final Observer<MegaChatCall> callOnHoldObserver = call -> updateVisibleCallElements(call.getChatid());
 
 	private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> {
 		MegaChatCall call = megaChatApi.getChatCallByCallId((long) sessionAndCall.first);
@@ -8309,8 +8307,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		drawerItem = DrawerItem.CHAT;
 		selectDrawerItemLollipop(drawerItem);
 	}
-
-
 
 	/**
 	 * Initializes the variables to join chat by default.

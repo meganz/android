@@ -34,7 +34,10 @@ class MeetingActivityRepository @Inject constructor(
      */
     suspend fun getDefaultAvatar(): Bitmap = withContext(Dispatchers.IO) {
         AvatarUtil.getDefaultAvatar(
-            AvatarUtil.getColorAvatar(megaApi.myUser), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
+            AvatarUtil.getColorAvatar(megaApi.myUser),
+            megaChatApi.myFullname,
+            Constants.AVATAR_SIZE,
+            true
         )
     }
 
@@ -62,11 +65,15 @@ class MeetingActivityRepository @Inject constructor(
      * Enable or disable Mic
      *
      * @param chatId Chat ID
-     * @param bOn enable / disable
+     * @param shouldAudioBeEnabled True, If the audio is to be enabled. False, otherwise
      * @param listener receive information about requests
      */
-    fun switchMic(chatId: Long, bOn: Boolean, listener: MegaChatRequestListenerInterface) {
-        if (bOn) {
+    fun switchMic(
+        chatId: Long,
+        shouldAudioBeEnabled: Boolean,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        if (shouldAudioBeEnabled) {
             logDebug("Enable local audio")
             megaChatApi.enableAudio(chatId, listener)
         } else {
@@ -78,11 +85,14 @@ class MeetingActivityRepository @Inject constructor(
     /**
      * Enable or disable Camera before starting a meeting.
      *
-     * @param bOn enable / disable
+     * @param shouldVideoBeEnabled True, If the video is to be enabled. False, otherwise
      * @param listener receive information about requests
      */
-    fun switchCameraBeforeStartMeeting(bOn: Boolean, listener: MegaChatRequestListenerInterface) {
-        if (bOn) {
+    fun switchCameraBeforeStartMeeting(
+        shouldVideoBeEnabled: Boolean,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        if (shouldVideoBeEnabled) {
             logDebug("Open video device")
             megaChatApi.openVideoDevice(listener)
         } else {
@@ -95,15 +105,19 @@ class MeetingActivityRepository @Inject constructor(
      * Enable or disable Camera during a meeting.
      *
      * @param chatId Chat ID
-     * @param bOn enable / disable
+     * @param shouldVideoBeEnabled True, If the video is to be enabled. False, otherwise
      * @param listener receive information about requests
      */
-    fun switchCamera(chatId: Long, bOn: Boolean, listener: MegaChatRequestListenerInterface) {
+    fun switchCamera(
+        chatId: Long,
+        shouldVideoBeEnabled: Boolean,
+        listener: MegaChatRequestListenerInterface
+    ) {
         megaChatApi.getChatCall(chatId)?.let {
-            if (bOn && !it.hasLocalVideo()) {
+            if (shouldVideoBeEnabled && !it.hasLocalVideo()) {
                 logDebug("Enable local video")
                 megaChatApi.enableVideo(chatId, listener)
-            } else if (!bOn && it.hasLocalVideo()) {
+            } else if (!shouldVideoBeEnabled && it.hasLocalVideo()) {
                 logDebug("Disable local video")
                 megaChatApi.disableVideo(chatId, listener)
             }
@@ -183,12 +197,8 @@ class MeetingActivityRepository @Inject constructor(
      */
     fun getChatRoom(chatId: Long): MegaChatRoom? {
         return when (chatId) {
-            MEGACHAT_INVALID_HANDLE -> {
-                null
-            }
-            else -> {
-                megaChatApi.getChatRoom(chatId)
-            }
+            MEGACHAT_INVALID_HANDLE -> null
+            else -> megaChatApi.getChatRoom(chatId)
         }
     }
 

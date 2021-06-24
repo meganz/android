@@ -63,11 +63,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
     // Permissions
     private val _cameraGranted = MutableLiveData(false)
-    val cameraGranted :LiveData<Boolean> = _cameraGranted
+    val cameraGranted: LiveData<Boolean> = _cameraGranted
     private val _cameraPermissionCheck: MutableLiveData<Boolean> = MutableLiveData<Boolean>(false)
     val cameraPermissionCheck: LiveData<Boolean> = _cameraPermissionCheck
     private val _recordAudioGranted = MutableLiveData(false)
-    val recordAudioGranted :LiveData<Boolean> = _recordAudioGranted
+    val recordAudioGranted: LiveData<Boolean> = _recordAudioGranted
     private val _recordAudioPermissionCheck: MutableLiveData<Boolean> =
         MutableLiveData<Boolean>(false)
     val recordAudioPermissionCheck: LiveData<Boolean> = _recordAudioPermissionCheck
@@ -82,7 +82,8 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         _notificationNetworkState.value = it
     }
 
-    private val _currentChatId: MutableLiveData<Long> = MutableLiveData<Long>(MEGACHAT_INVALID_HANDLE)
+    private val _currentChatId: MutableLiveData<Long> =
+        MutableLiveData<Long>(MEGACHAT_INVALID_HANDLE)
     val currentChatId: LiveData<Long> = _currentChatId
 
     // Name of meeting
@@ -102,15 +103,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             if (_speakerLiveData.value != it) {
                 _speakerLiveData.value = it
                 when (it) {
-                    AppRTCAudioManager.AudioDevice.EARPIECE -> {
-                        tips.value = getString(R.string.general_speaker_off)
-                    }
-                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
-                        tips.value = getString(R.string.general_speaker_on)
-                    }
-                    else -> {
-                        tips.value = getString(R.string.general_headphone_on)
-                    }
+                    AppRTCAudioManager.AudioDevice.EARPIECE -> tips.value =
+                        getString(R.string.general_speaker_off)
+                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> tips.value =
+                        getString(R.string.general_speaker_on)
+                    else -> tips.value = getString(R.string.general_headphone_on)
                 }
             }
         }
@@ -122,8 +119,8 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         }
 
     private val linkRecoveredObserver =
-    Observer<android.util.Pair<Long, String>> { chatAndLink ->
-        _currentChatId.value?.let {
+        Observer<android.util.Pair<Long, String>> { chatAndLink ->
+            _currentChatId.value?.let {
                 if (chatAndLink.first == it) {
                     if (!chatAndLink.second.isNullOrEmpty()) {
                         _meetingLinkLiveData.value = chatAndLink.second
@@ -215,7 +212,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      */
     fun createChatLink(chatId: Long, isModerator: Boolean = true) {
         //The chat doesn't exist
-        if (isModerator){
+        if (isModerator) {
             meetingActivityRepository.createChatLink(
                 chatId,
                 CreateGroupChatWithPublicLink()
@@ -242,15 +239,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      *
      * @return True, if it exists. False, otherwise
      */
-    fun isChatCreated(): Boolean {
-        _currentChatId.value?.let {
-            if(it != MEGACHAT_INVALID_HANDLE){
-                logDebug("Chat exists")
-                return true
-            }
-        }
-        return false
-    }
+    fun isChatCreated(): Boolean = _currentChatId.value != MEGACHAT_INVALID_HANDLE
 
     /**
      * Method to initiate the call with the microphone on
@@ -301,28 +290,25 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             return
         }
 
-        _currentChatId.value?.let {
-            if(it != MEGACHAT_INVALID_HANDLE){
-                meetingActivityRepository.switchMic(
-                    it,
-                    bOn,
-                    DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
+        if (isChatCreated()) {
+            meetingActivityRepository.switchMic(
+                _currentChatId.value!!,
+                bOn,
+                DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
+            )
+        } else {
+            //The chat is not yet created or the call is not yet established
+            _micLiveData.value = bOn
+            logDebug("open Mic: $bOn")
+            tips.value = when (bOn) {
+                true -> getString(
+                    R.string.general_mic_unmute
                 )
-                return
+                false -> getString(
+                    R.string.general_mic_mute,
+                    "mute"
+                )
             }
-        }
-
-        //The chat is not yet created or the call is not yet established
-        _micLiveData.value = bOn
-        logDebug("open Mic: $bOn")
-        tips.value = when (bOn) {
-            true -> getString(
-                R.string.general_mic_unmute
-            )
-            false -> getString(
-                R.string.general_mic_mute,
-                "mute"
-            )
         }
     }
 
@@ -341,31 +327,28 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             return
         }
 
-        _currentChatId.value?.let {
-            if(it != MEGACHAT_INVALID_HANDLE){
-                logDebug("Clicked cam with chat")
-                meetingActivityRepository.switchCamera(
-                    it,
-                    bOn,
-                    DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
-                )
-                return
-            }
+        if (isChatCreated()) {
+            logDebug("Clicked cam with chat")
+            meetingActivityRepository.switchCamera(
+                _currentChatId.value!!,
+                bOn,
+                DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
+            )
+        } else {
+            logDebug("Clicked cam without chat")
+            //The chat is not yet created or the call is not yet established
+            meetingActivityRepository.switchCameraBeforeStartMeeting(
+                bOn,
+                OpenVideoDeviceListener(MegaApplication.getInstance(), this)
+            )
         }
-
-        logDebug("Clicked cam without chat")
-        //The chat is not yet created or the call is not yet established
-        meetingActivityRepository.switchCameraBeforeStartMeeting(
-            bOn,
-            OpenVideoDeviceListener(MegaApplication.getInstance(), this)
-        )
     }
 
     /**
-     * Method to release the local video device
+     * Method to release the local video device because of the chat is not yet created
+     * or the call is not yet established
      */
     fun releaseVideoDevice() {
-        //The chat is not yet created or the call is not yet established
         meetingActivityRepository.switchCameraBeforeStartMeeting(
             false,
             OpenVideoDeviceListener(MegaApplication.getInstance())
@@ -379,6 +362,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         MegaApplication.getInstance()
             .createOrUpdateAudioManager(true, AUDIO_MANAGER_CREATING_JOINING_MEETING)
     }
+
     /**
      * Response of clicking Speaker Fab
      */
@@ -515,7 +499,8 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             .removeObserver(meetingCreatedObserver)
 
         @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_LINK_RECOVERED).removeObserver(linkRecoveredObserver as Observer<Any>)
+        LiveEventBus.get(EVENT_LINK_RECOVERED)
+            .removeObserver(linkRecoveredObserver as Observer<Any>)
     }
 
     fun inviteToChat(context: Context, requestCode: Int, resultCode: Int, intent: Intent?) {

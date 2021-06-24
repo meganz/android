@@ -224,7 +224,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
         SnackbarShower, AttachNodeToChatListener, StartChatCallListener.OnCallStartedCallback,
         HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback,
-SetCallOnHoldListener.OnCallOnHoldCallback{
+        SetCallOnHoldListener.OnCallOnHoldCallback {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -596,14 +596,9 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
         }
     };
 
-    private final Observer<MegaChatCall> callOnHoldObserver = call -> {
-        updateCallBanner();
-    };
+    private final Observer<MegaChatCall> callOnHoldObserver = call -> updateCallBanner();
 
-    private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> {
-        updateCallBanner();
-    };
-
+    private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> updateCallBanner();
 
     /**
      * Method for finding out if the selected message is deleted.
@@ -662,11 +657,10 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
     public void onErrorAnsweredCall(int errorCode) {
         callInProgressLayout.setEnabled(true);
 
-        if (errorCode == MegaChatError.ERROR_TOOMANY) {
-            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error_too_many_participants), -1);
-        } else {
-            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), -1);
-        }
+        showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(errorCode == MegaChatError.ERROR_TOOMANY
+                ? R.string.call_error_too_many_participants
+                : R.string.call_error
+        ), MEGACHAT_INVALID_HANDLE);
     }
 
     @Override
@@ -9039,14 +9033,13 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                 } else {
                     hideCallBar(megaChatApi.getChatCall(idChat));
                 }
-                return;
+                break;
 
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                if(MegaApplication.getInstance().isRequestSent(callInThisChat.getCallId())){
+                if(MegaApplication.isRequestSent(callInThisChat.getCallId())){
                     break;
                 }
-                if (!MegaApplication.isRequestSent(callInThisChat.getCallId()) &&
-                        (callInThisChat.isOnHold() || isSessionOnHold(callInThisChat.getChatid()))) {
+                if (callInThisChat.isOnHold() || isSessionOnHold(callInThisChat.getChatid())) {
                     if (anotherActiveCall != null || anotherOnHoldCall != null) {
                         updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
                                 getString(R.string.call_in_progress_layout));
@@ -9057,7 +9050,7 @@ SetCallOnHoldListener.OnCallOnHoldCallback{
                         updateCallInProgressLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                         returnCallOnHoldButton.setVisibility(View.GONE);
                     }
-                    return;
+                    break;
                 }
         }
 

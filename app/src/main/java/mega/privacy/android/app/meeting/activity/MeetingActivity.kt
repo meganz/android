@@ -259,9 +259,7 @@ class MeetingActivity : PasscodeActivity() {
 
         if (currentFragment !is InMeetingFragment) {
             finish()
-        } else {
-            if (!isGuest) finish()
-        }
+        } else if (!isGuest) finish()
     }
 
     private fun sendQuitCallEvent() = LiveEventBus.get(
@@ -270,8 +268,7 @@ class MeetingActivity : PasscodeActivity() {
     ).post(false)
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        val keyCode = event.keyCode
-        return when (keyCode) {
+        return when (event.keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP -> {
                 if (app.isAnIncomingCallRinging) {
                     app.muteOrUnmute(false)

@@ -189,11 +189,14 @@ public class AppRTCAudioManager {
 
     public void setTypeAudioManager(int type) {
         this.typeAudioManager = type;
-        if(typeAudioManager == AUDIO_MANAGER_CALL_IN_PROGRESS){
+
+        if (typeAudioManager == AUDIO_MANAGER_CALL_IN_PROGRESS) {
             stopAudioSignals();
         }
+
         setValues();
     }
+
     public int getTypeAudioManager() {
         return typeAudioManager;
     }

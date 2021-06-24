@@ -227,12 +227,11 @@ class GridViewPagerAdapter(
      */
     private fun checkPagesToUpdate(position: Int, numPage: Int, lastPage: Int) {
         logDebug("Checking the rest of the pages to be updated ... ")
-        for (i in numPage until lastPage+1) {
+        for (i in numPage until lastPage + 1) {
             if (i == numPage) {
                 logDebug("Update the page with the participant removed")
                 updatePageWithChange(numPage, position)
-            } else {
-                if (data.isNotEmpty() && data.size > i) {
+            } else if (data.isNotEmpty() && data.size > i) {
                     val participantsForPage = data[i]
                     if (adapterList.isNotEmpty() && adapterList.size > i) {
                         adapterList[i]?.let {
@@ -243,7 +242,6 @@ class GridViewPagerAdapter(
                         }
                     }
                 }
-            }
         }
     }
 
@@ -520,24 +518,28 @@ class GridViewPagerAdapter(
         recyclerView: CustomizedGridCallRecyclerView
     ) {
         val layoutParams = recyclerView.layoutParams as RecyclerView.LayoutParams
-        when (orientation) {
+        val leftRightMargin = when (orientation) {
             Configuration.ORIENTATION_LANDSCAPE -> {
-                if (position == 0) {
-                    if (data.size == 4) {
-                        layoutParams.setMargins(maxWidth / 4, 0, maxWidth / 4, 0)
-                    } else if (data.size > 4) {
-                        layoutParams.setMargins(maxWidth / 8, 0, maxWidth / 8, 0)
-                    }
+                if (position == 0 && data.size == 4) {
+                    maxWidth / 4
                 } else {
-                    layoutParams.setMargins(maxWidth / 8, 0, maxWidth / 8, 0)
+                    maxWidth / 8
                 }
             }
-            else -> {
-                layoutParams.setMargins(0, 0, 0, 0)
-            }
+            else -> 0
         }
+
+        layoutParams.setMargins(leftRightMargin, 0, leftRightMargin, 0)
     }
 
+    /**
+     * Method to get the correct column width
+     *
+     * @param position Position of the participant
+     * @param gridView The Recycler view
+     * @param size Number of participants on a given page
+     * @param orientation The orientation of the device
+     */
     private fun setColumnWidth(
         position: Int,
         gridView: CustomizedGridCallRecyclerView,
@@ -548,8 +550,7 @@ class GridViewPagerAdapter(
             if (position == 0) {
                 gridView.setColumnWidth(
                     when (size) {
-                        1 -> maxWidth
-                        2 -> maxWidth
+                        1, 2 -> maxWidth
                         3 -> (maxWidth * 0.8).toInt()
                         else -> maxWidth / 2
                     }

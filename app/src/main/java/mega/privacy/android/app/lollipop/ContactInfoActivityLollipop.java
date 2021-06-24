@@ -316,13 +316,9 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 		}
 	};
 
-	private final Observer<MegaChatCall> callOnHoldObserver = call -> {
-		checkScreenRotationToShowCall();
-	};
+	private final Observer<MegaChatCall> callOnHoldObserver = call -> checkScreenRotationToShowCall();
 
-	private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> {
-		checkScreenRotationToShowCall();
-	};
+	private final Observer<Pair> sessionOnHoldObserver = sessionAndCall -> checkScreenRotationToShowCall();
 
 	private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
 		@Override
