@@ -38,7 +38,7 @@ class VideoGridViewAdapter(
         )
     }
 
-    fun getHolder(position: Int): VideoMeetingViewHolder? {
+    private fun getHolderAtPosition(position: Int): VideoMeetingViewHolder? {
         gridView.let { recyclerview ->
             recyclerview.findViewHolderForAdapterPosition(position)?.let {
                 return it as VideoMeetingViewHolder
@@ -51,14 +51,14 @@ class VideoGridViewAdapter(
     /**
      * Update participant privileges
      *
-     * @param participant
+     * @param participant Participant to update
      */
     fun updateParticipantPrivileges(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return
 
-        getHolder(position)?.let {
+        getHolderAtPosition(position)?.let {
             it.updatePrivilegeIcon(participant)
             return
         }
@@ -69,14 +69,14 @@ class VideoGridViewAdapter(
     /**
      * Update participant name
      *
-     * @param participant
+     * @param participant Participant to update
      */
     fun updateParticipantName(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return
 
-        getHolder(position)?.let {
+        getHolderAtPosition(position)?.let {
             it.updateName(participant)
             return
         }
@@ -88,23 +88,15 @@ class VideoGridViewAdapter(
      * Method to activate or stop a participant's video whether it is visible or not
      *
      * @param shouldActivate True, if video should be activated. False, otherwise.
-     * @param participant
+     * @param participant Participant to update
      */
     fun updateVideoWhenScroll(shouldActivate: Boolean, participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return
 
-        getHolder(position)?.let {
-            when {
-                shouldActivate -> {
-                    it.checkVideoOn(participant)
-                }
-                else -> {
-                    it.closeVideo(participant)
-                }
-            }
-
+        getHolderAtPosition(position)?.let {
+            if (shouldActivate) it.checkVideoOn(participant) else it.closeVideo(participant)
             return
         }
 
@@ -115,14 +107,14 @@ class VideoGridViewAdapter(
      * Update participant audio or video flags
      *
      * @param typeChange TYPE_VIDEO or TYPE_AUDIO
-     * @param participant
+     * @param participant Participant to update
      */
     fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return
 
-        getHolder(position)?.let {
+        getHolderAtPosition(position)?.let {
             when (typeChange) {
                 TYPE_VIDEO -> {
                     it.checkVideoOn(participant)
@@ -141,15 +133,15 @@ class VideoGridViewAdapter(
     /**
      * Update participant on hold session
      *
-     * @param participant
-     * @param isOnHold True, it it's. False, otherwise.
+     * @param participant Participant to update
+     * @param isOnHold True, if is on hold. False, otherwise.
      */
     fun updateSessionOnHold(participant: Participant, isOnHold: Boolean) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return
 
-        getHolder(position)?.let {
+        getHolderAtPosition(position)?.let {
             it.updateSessionOnHold(participant, isOnHold)
             return
         }
@@ -160,15 +152,15 @@ class VideoGridViewAdapter(
     /**
      * Update participant when call is on hold
      *
-     * @param participant
-     * @param isOnHold True, it it's. False, otherwise.
+     * @param participant Participant to update
+     * @param isOnHold True, if is on hold. False, otherwise.
      */
     fun updateCallOnHold(participant: Participant, isOnHold: Boolean) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return
 
-        getHolder(position)?.let {
+        getHolderAtPosition(position)?.let {
             it.updateCallOnHold(participant, isOnHold)
             return
         }
@@ -179,21 +171,17 @@ class VideoGridViewAdapter(
     /**
      * Resets the parameters of the participant video.
      *
-     * @param participant
+     * @param participant Participant to update
      */
     fun removeTextureView(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return
 
-        getHolder(position)?.let { holder ->
+        getHolderAtPosition(position)?.let { holder ->
             holder.removeTextureView(participant)
             return
         }
-    }
-
-    companion object {
-        private var INVALID_POSITION = -1
     }
 }
 
