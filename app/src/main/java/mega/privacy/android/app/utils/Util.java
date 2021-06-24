@@ -1638,4 +1638,15 @@ public class Util {
 
 		return false;
 	}
+
+	/**
+	 * Checks if the current device has a navigation bar available on screen.
+	 *
+	 * @param resources Application resources.
+	 * @return True if has a navigation bar, false otherwise.
+	 */
+	public static boolean hasNavigationBar(Resources resources) {
+		int id = resources.getIdentifier("config_showNavigationBar", "bool", "android");
+		return id > 0 && resources.getBoolean(id);
+	}
 }

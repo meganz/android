@@ -264,6 +264,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
@@ -13623,10 +13624,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			params.setMargins(0, 0, 0,
 					getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
 
-			int navigationBarId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-			int translationY = navigationBarId > 0
-					? getResources().getDimensionPixelSize(navigationBarId)
-					: bNV.getHeight();
+			int navigationHeightId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+			int translationY = hasNavigationBar(getResources()) && navigationHeightId > 0
+					&& getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT
+					? getResources().getDimensionPixelSize(navigationHeightId)
+					: 0;
 
 			bottomView.animate().translationY(translationY).setDuration(ANIMATION_DURATION)
 					.withStartAction(() -> bottomView.setVisibility(View.VISIBLE))

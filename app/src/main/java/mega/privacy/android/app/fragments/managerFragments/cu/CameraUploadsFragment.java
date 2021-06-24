@@ -45,6 +45,7 @@ import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
@@ -67,6 +68,7 @@ import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.getStatusBarHeight;
+import static mega.privacy.android.app.utils.Util.hasNavigationBar;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
@@ -342,7 +344,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private void setGridView() {
         boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
-        boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+        boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
         int spanCount = getSpanCount(isPortrait, smallGrid);
         layoutManager = new GridLayoutManager(context, spanCount);
         binding.cuList.setLayoutManager(layoutManager);
@@ -500,12 +502,12 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
                 mActionMode.setTitle(String.valueOf(viewModel.getSelectedNodesCount()));
                 mActionMode.invalidate();
-                animateUI(true);
             } else if (mActionMode != null) {
                 mActionMode.finish();
                 mActionMode = null;
-                animateUI(false);
             }
+
+            animateUI(visible);
         });
 
         viewModel.camSyncEnabled().observe(getViewLifecycleOwner(), this::updateEnableCUButtons);
@@ -528,7 +530,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         mManagerActivity.setDrawerLockMode(hide);
         checkScroll();
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (hasNavigationBar(getResources())
+                && getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
             new Handler().postDelayed(() -> {
                 binding.cuContainer.setPadding(0, hide ? getStatusBarHeight() : 0, 0, 0);
                 addTranslucentNavigationBar(hide);
