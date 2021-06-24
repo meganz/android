@@ -8252,7 +8252,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			Fragment fragment = getSupportFragmentManager()
 					.findFragmentByTag(MeetingBottomSheetDialogFragment.TAG);
 			if (fragment != null) {
-				builder.setTitle(R.string.paste_meeting_link_dialog_title);
+				builder.setTitle(R.string.paste_meeting_link_guest_dialog_title)
+						.setMessage(StringResourcesUtils.getString(
+								R.string.paste_meeting_link_guest_instruction));
 				openLinkText.setHint(R.string.meeting_link);
 				chatLinkDialogType = LINK_DIALOG_MEETING;
 			} else {
