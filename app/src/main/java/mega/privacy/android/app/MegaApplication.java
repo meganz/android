@@ -604,6 +604,15 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	};
 
+	private final
+	Observer<MegaChatCall> callCompositionObserver = call -> {
+		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
+		if (chatRoom != null && chatRoom.isMeeting() && call.getCallCompositionChange() == 1 && call.getNumParticipants() > 1) {
+			logDebug("Stop sound");
+			removeRTCAudioManagerRingIn();
+		}
+	};
+
 	private final Observer<MegaChatCall> callRingingStatusObserver = call -> {
 		int callStatus = call.getStatus();
 		boolean isRinging = call.isRinging();
@@ -825,6 +834,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
 		LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observeForever(callRingingStatusObserver);
 		LiveEventBus.get(EVENT_SESSION_STATUS_CHANGE, Pair.class).observeForever(sessionStatusObserver);
+		LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).observeForever(callCompositionObserver);
 
 		logoutReceiver = new BroadcastReceiver() {
             @Override
