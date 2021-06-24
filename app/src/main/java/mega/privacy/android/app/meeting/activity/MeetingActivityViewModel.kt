@@ -278,9 +278,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     /**
      * Response of clicking mic fab
      *
-     * @param bOn true: turn on; false: turn off
+     * @param shouldAudioBeEnabled True, if audio should be enabled. False, otherwise
      */
-    fun clickMic(bOn: Boolean) {
+    fun clickMic(shouldAudioBeEnabled: Boolean) {
         /**
          * check audio permission
          * if haven't been granted, ask for the permission and return
@@ -293,14 +293,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         if (isChatCreated()) {
             meetingActivityRepository.switchMic(
                 _currentChatId.value!!,
-                bOn,
+                shouldAudioBeEnabled,
                 DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
             )
         } else {
             //The chat is not yet created or the call is not yet established
-            _micLiveData.value = bOn
-            logDebug("open Mic: $bOn")
-            tips.value = when (bOn) {
+            _micLiveData.value = shouldAudioBeEnabled
+            logDebug("open Mic: $shouldAudioBeEnabled")
+            tips.value = when (shouldAudioBeEnabled) {
                 true -> getString(
                     R.string.general_mic_unmute
                 )
@@ -315,9 +315,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     /**
      * Response of clicking camera Fab
      *
-     * @param bOn true: turn on; off: turn off
+     * @param shouldVideoBeEnabled True, if video should be enabled. False, otherwise
      */
-    fun clickCamera(bOn: Boolean) {
+    fun clickCamera(shouldVideoBeEnabled: Boolean) {
         /**
          * check camera permission
          * if haven't been granted, ask for the permission and return
@@ -331,14 +331,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             logDebug("Clicked cam with chat")
             meetingActivityRepository.switchCamera(
                 _currentChatId.value!!,
-                bOn,
+                shouldVideoBeEnabled,
                 DisableAudioVideoCallListener(MegaApplication.getInstance(), this)
             )
         } else {
             logDebug("Clicked cam without chat")
             //The chat is not yet created or the call is not yet established
             meetingActivityRepository.switchCameraBeforeStartMeeting(
-                bOn,
+                shouldVideoBeEnabled,
                 OpenVideoDeviceListener(MegaApplication.getInstance(), this)
             )
         }
