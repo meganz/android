@@ -4,7 +4,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.annotation.ColorRes
 import androidx.recyclerview.widget.DiffUtil
-import java.util.*
+import mega.privacy.android.app.utils.AvatarUtil
 
 sealed class ContactItem(val id: Long) {
 
@@ -29,7 +29,7 @@ sealed class ContactItem(val id: Long) {
             }
 
         fun getFirstCharacter(): String =
-            getTitle().first().toString().toUpperCase(Locale.getDefault())
+            AvatarUtil.getFirstLetter(getTitle())
 
         fun matches(queryString: String): Boolean =
             fullName?.contains(queryString, true) == true ||

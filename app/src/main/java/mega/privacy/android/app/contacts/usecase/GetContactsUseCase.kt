@@ -17,6 +17,7 @@ import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaChatListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaUserUtils.getUserAvatarFile
@@ -191,7 +192,7 @@ class GetContactsUseCase @Inject constructor(
             .bold()
             .toUpperCase()
             .endConfig()
-            .buildRound(title.first().toString(), color)
+            .buildRound(AvatarUtil.getFirstLetter(title), color)
 
     private fun MutableList<ContactItem.Data>.sortedAlphabetically(): List<ContactItem.Data> =
         sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, ContactItem.Data::getTitle))

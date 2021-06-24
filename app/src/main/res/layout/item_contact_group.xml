@@ -32,7 +32,7 @@
         app:roundingBorderWidth="@dimen/image_group_border_size"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
-    <mega.privacy.android.app.components.twemoji.EmojiTextView
+    <androidx.emoji.widget.EmojiAppCompatTextView
         android:id="@+id/txt_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,7 +41,6 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.Mega.Body1"
-        app:emojiSize="14sp"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/img_private"

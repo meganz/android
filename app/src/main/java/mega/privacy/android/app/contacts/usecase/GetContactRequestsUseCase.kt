@@ -17,6 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaUserUtils.getUserAvatarFile
@@ -124,5 +125,5 @@ class GetContactRequestsUseCase @Inject constructor(
             .bold()
             .toUpperCase()
             .endConfig()
-            .buildRound(title.first().toString(), color)
+            .buildRound(AvatarUtil.getFirstLetter(title), color)
 }
