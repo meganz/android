@@ -49,6 +49,8 @@ import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA;
+import static mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark;
 import static mega.privacy.android.app.utils.Constants.ANIMATION_DURATION;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
@@ -410,6 +412,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private void setupOtherViews() {
         binding.emptyEnableCuButton.setOnClickListener(v -> enableCUClick());
+        setImageViewAlphaIfDark(context, binding.emptyHintImage, DARK_IMAGE_ALPHA);
         binding.emptyHintText.setText(HtmlCompat.fromHtml(
                 formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.photos_empty)),
                 HtmlCompat.FROM_HTML_MODE_LEGACY));
