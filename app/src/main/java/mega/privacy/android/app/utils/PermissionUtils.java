@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.Settings;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -76,7 +78,13 @@ public class PermissionUtils {
 
         if (context != null && permissions != null) {
             for (String permission : permissions) {
-                if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                        (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                                permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE))) {
+                    if (!Environment.isExternalStorageManager()) {
+                        return false;
+                    }
+                } else if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                     return false;
                 }
             }

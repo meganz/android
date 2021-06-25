@@ -23,12 +23,12 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.lifecycle.Observer;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
@@ -93,6 +93,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -105,7 +106,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -264,6 +264,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
@@ -1442,7 +1443,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
                 break;
 
-			case PermissionsFragment.PERMISSIONS_FRAGMENT: {
+			case PERMISSIONS_FRAGMENT: {
 				pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
 				if (pF != null) {
 					pF.setNextPermission();
@@ -10300,8 +10301,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             } else {
                 logWarning("cancel subscribe");
             }
-        }
-		else{
+        } else if (requestCode == PERMISSIONS_FRAGMENT) {
+        	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        		if (!Environment.isExternalStorageManager()) {
+        			Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT).show();
+        		}
+
+        		pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
+        		if (pF != null) {
+        			pF.setNextPermission();
+        		}
+        	}
+        } else {
 			logWarning("No requestcode");
 			super.onActivityResult(requestCode, resultCode, intent);
 		}
