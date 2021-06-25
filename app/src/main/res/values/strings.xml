@@ -3963,15 +3963,15 @@
     <!-- General label for microphone -->
     <string name="general_mic">Mic</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Your microphone is mute</string>
+    <string name="general_mic_mute">Your microphone is muted</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Your microphone is unmuted</string>
     <!-- General label for camera -->
     <string name="general_camera">Camera</string>
     <!-- General label for camera enable -->
-    <string name="general_camera_enable">Your camera is enable</string>
+    <string name="general_camera_enable">Your camera is enabled</string>
     <!-- General label for camera disable -->
-    <string name="general_camera_disable">Your camera is disable</string>
+    <string name="general_camera_disable">Your camera is disabled</string>
     <!-- Label for hold meeting -->
     <string name="meeting_hold">Hold</string>
     <!-- General label for speaker -->
