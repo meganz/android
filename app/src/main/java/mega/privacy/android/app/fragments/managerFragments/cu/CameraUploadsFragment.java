@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -46,12 +45,10 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
-import static android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA;
 import static mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark;
-import static mega.privacy.android.app.utils.Constants.ANIMATION_DURATION;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
@@ -69,8 +66,6 @@ import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
-import static mega.privacy.android.app.utils.Util.getStatusBarHeight;
-import static mega.privacy.android.app.utils.Util.hasNavigationBar;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
@@ -532,24 +527,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         mManagerActivity.animateBottomView(hide);
         mManagerActivity.setDrawerLockMode(hide);
         checkScroll();
-
-        if (hasNavigationBar(getResources())
-                && getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT) {
-            new Handler().postDelayed(() -> {
-                binding.cuContainer.setPadding(0, hide ? getStatusBarHeight() : 0, 0, 0);
-                addTranslucentNavigationBar(hide);
-            }, ANIMATION_DURATION);
-        }
-    }
-
-    private void addTranslucentNavigationBar(boolean add) {
-        Window window = mManagerActivity.getWindow();
-
-        if (add) {
-            window.addFlags(FLAG_TRANSLUCENT_NAVIGATION);
-        } else {
-            window.clearFlags(FLAG_TRANSLUCENT_NAVIGATION);
-        }
     }
 
     /**

@@ -13617,22 +13617,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fragmentLayout.getLayoutParams();
 
 		if (hide && bottomView.getVisibility() == View.VISIBLE) {
-			params.setMargins(0, 0, 0, 0);
 			bottomView.animate().translationY(bottomView.getHeight()).setDuration(ANIMATION_DURATION)
+					.withStartAction(() -> params.bottomMargin = 0)
 					.withEndAction(() -> bottomView.setVisibility(View.GONE)).start();
 		} else if (!hide && bottomView.getVisibility() == View.GONE) {
-			params.setMargins(0, 0, 0,
-					getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
+			int bottomMargin = getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height);
 
-			int navigationHeightId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-			int translationY = hasNavigationBar(getResources()) && navigationHeightId > 0
-					&& getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT
-					? getResources().getDimensionPixelSize(navigationHeightId)
-					: 0;
-
-			bottomView.animate().translationY(translationY).setDuration(ANIMATION_DURATION)
+			bottomView.animate().translationY(0).setDuration(ANIMATION_DURATION)
 					.withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
-					.withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
+					.withEndAction(() -> params.bottomMargin = bottomMargin)
+					.start();
 		}
 	}
 
