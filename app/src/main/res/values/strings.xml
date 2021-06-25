@@ -3940,8 +3940,6 @@
     <string name="action_keep_empty_old_extension">No extension</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Keep .%1$s</string>
-
-    <!-- Meeting -->
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">You are the only one here</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -3960,7 +3958,6 @@
     <string name="btn_join_meeting_as_guest">Join as a guest</string>
     <!-- Hint shown to guide user on meeting name -->
     <string name="type_meeting_name">%s’s meeting</string>
-
     <!-- General label for reject the call. -->
     <string name="general_reject">Hang up</string>
     <!-- General label for microphone -->
@@ -4025,18 +4022,14 @@
     <string name="info_participants_number">Participants : %d</string>
     <!-- The name of moderators in the meeting on meeting info page-->
     <string name="info_moderator_name">Moderator : %s</string>
-
     <!-- The literal meeting link text-->
     <string name="meeting_link">Meeting link</string>
     <!-- Subtitle of the meeting screen-->
     <string name="duration_meeting">Duration</string>
-
     <!-- The question in on-boarding screen asking if the user don’t have a mega account-->
     <string name="onboarding_no_mega_account">Don’t have a MEGA account?</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Join meeting as guest?</string>
-
-    <string name="paste_meeting_link_dialog_title">Please paste your meeting link to join</string>
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">You are invited to a meeting</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
@@ -4045,13 +4038,10 @@
     <string name="slow_connection_meeting">You are in slow connection</string>
     <!-- Banner text to indicate you are moderator-->
     <string name="your_are_moderator">You are chosen to be moderator</string>
-
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Meeting has ended</string>
     <!-- error message shown when a meeting link is not well formed-->
     <string name="invalid_meeting_link_args">Invalid meeting link</string>
-
-    <!-- meeting permission-->
     <!-- Warning show to the user when the app needs permissions to start a meeting.-->
     <string name="meeting_permission_info">Please allow MEGA access permissions</string>
     <!-- Message of a dialog to show user the permissions that needed-->
@@ -4062,14 +4052,12 @@
     <string name="meeting_required_permissions_warning">MEGA needs your permission in order to get the best meeting experience.</string>
     <!-- Message on the EditText of meeting name-->
     <string name="error_meeting_name_error">Please input the meeting name.</string>
-
     <!-- Alert the guest you have left MEGA meeting when left meeting-->
     <string name="left_meeting">You have left MEGA meeting</string>
     <!-- Ask the guest for keeping track MEGA meeting when left meeting-->
     <string name="keep_track_meeting">Do you want to keep track of your MEGA meeting?</string>
     <!-- the title of use any device on left meeting page-->
     <string name="use_any_device">Use any device</string>
-
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">View meeting chat</string>
     <!-- Error message when user clicks join meeting as guest with empty first and last names-->
@@ -4086,7 +4074,6 @@
     <string name="be_new_moderator">You are the new meeting moderator now!</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Copied meeting link.</string>
-
     <!-- Message on the paste link dialog if there were any error loading the meeting link without logging-->
     <string name="error_meeting_link_init_error">Error initialising meeting when loading the meeting link.</string>
     <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
@@ -4097,7 +4084,6 @@
     <string name="content_tour_five">End-to-end encrypted video meeting</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Please enter a valid meeting link</string>
-
     <!-- Guest leave call-->
     <string name="more_than_meeting">More than just meetings</string>
     <!-- the title of join without account on left meeting page-->
@@ -4108,8 +4094,6 @@
     <string name="left_meeting_bonus_title">Get 20 GB for free</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
-
-    <!-- New Photos -->
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">There is already a file with the same name</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
