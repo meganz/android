@@ -23,6 +23,10 @@ import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 @AndroidEntryPoint
 class ContactGroupsFragment : Fragment() {
 
+    companion object {
+        private const val SCROLLER_MIN_SIZE = 20
+    }
+
     private lateinit var binding: FragmentContactGroupsBinding
 
     private val viewModel by viewModels<ContactGroupsViewModel>()
@@ -58,6 +62,7 @@ class ContactGroupsFragment : Fragment() {
                 setDrawable(ResourcesCompat.getDrawable(resources, R.drawable.contact_list_divider, null)!!)
             }
         )
+        binding.listScroller.setRecyclerView(binding.list)
 
         binding.btnCreateGroup.setOnClickListener {
             startActivity(Intent(requireContext(), AddContactActivityLollipop::class.java).apply {
@@ -77,6 +82,7 @@ class ContactGroupsFragment : Fragment() {
     }
 
     private fun showGroups(items: List<ContactGroupItem>) {
+        binding.listScroller.isVisible = items.size >= SCROLLER_MIN_SIZE
         binding.viewEmpty.isVisible = items.isNullOrEmpty()
         groupsAdapter.submitList(items)
     }

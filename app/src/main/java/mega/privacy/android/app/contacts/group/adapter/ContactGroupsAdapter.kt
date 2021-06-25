@@ -3,13 +3,16 @@ package mega.privacy.android.app.contacts.group.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.ItemContactGroupBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
+import mega.privacy.android.app.utils.AvatarUtil
 
 class ContactGroupsAdapter constructor(
     private val itemCallback: (Long) -> Unit
-) : ListAdapter<ContactGroupItem, ContactGroupsViewHolder>(ContactGroupItem.DiffCallback()) {
+) : ListAdapter<ContactGroupItem, ContactGroupsViewHolder>(ContactGroupItem.DiffCallback()),
+    SectionTitleProvider {
 
     init {
         setHasStableIds(true)
@@ -33,4 +36,7 @@ class ContactGroupsAdapter constructor(
 
     override fun getItemId(position: Int): Long =
         getItem(position).chatId
+
+    override fun getSectionTitle(position: Int): String =
+        AvatarUtil.getFirstLetter(getItem(position).title)
 }

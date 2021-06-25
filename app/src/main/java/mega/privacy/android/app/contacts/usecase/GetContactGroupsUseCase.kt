@@ -96,7 +96,7 @@ class GetContactGroupsUseCase @Inject constructor(
                                 }
                             }
 
-                            emitter.onNext(groups)
+                            emitter.onNext(groups.sortedAlphabetically())
                         }
                     } else {
                         logError(error.toThrowable().stackTraceToString())
@@ -107,7 +107,7 @@ class GetContactGroupsUseCase @Inject constructor(
                 }
             )
 
-            megaChatApi.chatRooms.sortedByDescending { it.creationTs }.forEach { chatRoom ->
+            megaChatApi.chatRooms.forEach { chatRoom ->
                 if (chatRoom.isGroup && chatRoom.peerCount > 0) {
                     val firstUserHandle = chatRoom.getPeerHandle(0)
                     val lastUserHandle = chatRoom.getPeerHandle(chatRoom.peerCount - 1)
@@ -124,7 +124,7 @@ class GetContactGroupsUseCase @Inject constructor(
                 }
             }
 
-            emitter.onNext(groups)
+            emitter.onNext(groups.sortedAlphabetically())
         }, BackpressureStrategy.LATEST)
 
     private fun getGroupUserFromHandle(
@@ -177,4 +177,7 @@ class GetContactGroupsUseCase @Inject constructor(
             .toUpperCase()
             .endConfig()
             .buildRound(AvatarUtil.getFirstLetter(title), color)
+
+    private fun MutableList<ContactGroupItem>.sortedAlphabetically(): List<ContactGroupItem> =
+        sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, ContactGroupItem::title))
 }
