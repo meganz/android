@@ -155,7 +155,7 @@ public class Util {
 	public final static int SHOW_IM_DELAY = 150;
 
     /**
-     * Simplified Chinese.
+     * Language tag for simplified Chinese.
      */
     public static final String HANS = "Hans";
 

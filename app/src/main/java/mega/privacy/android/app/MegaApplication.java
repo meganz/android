@@ -966,17 +966,20 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
         // If it's Chinese
         if (Locale.CHINESE.toLanguageTag().equals(locale.getLanguage())) {
-            if (isSimplifiedChinese()) {
-                megaApi.setLanguage(Locale.SIMPLIFIED_CHINESE.toLanguageTag());
-            } else {
-                megaApi.setLanguage(Locale.TRADITIONAL_CHINESE.toLanguageTag());
-            }
+            String zhLanguageCode = isSimplifiedChinese() ?
+                    Locale.SIMPLIFIED_CHINESE.toLanguageTag() :
+                    Locale.TRADITIONAL_CHINESE.toLanguageTag();
+
+            boolean result = megaApi.setLanguage(zhLanguageCode);
+
+            logDebug("Result: " + result + " Language: " + zhLanguageCode);
         } else {
             String language = locale.toString();
             boolean result = megaApi.setLanguage(language);
             logDebug("Result: " + result + " Language: " + language);
+
             if (!result) {
-                language = Locale.getDefault().getLanguage();
+                language = locale.getLanguage();
                 result = megaApi.setLanguage(language);
                 logDebug("Result: " + result + " Language: " + language);
             }
