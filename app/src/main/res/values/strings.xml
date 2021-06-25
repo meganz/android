@@ -4049,9 +4049,7 @@
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">Got it</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_required_permissions_warning">MEGA needs your permission in order to get the best meeting experience.</string>
-    <!-- Message on the EditText of meeting name-->
-    <string name="error_meeting_name_error">Please input the meeting name.</string>
+    <string name="meeting_required_permissions_warning">Go to settings to allow MEGA to access your camera and microphone.</string>
     <!-- Alert the guest you have left MEGA meeting when left meeting-->
     <string name="left_meeting">You have left MEGA meeting</string>
     <!-- Ask the guest for keeping track MEGA meeting when left meeting-->
@@ -4094,6 +4092,10 @@
     <string name="left_meeting_bonus_title">Get 20 GB for free</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">You cannot make another call. Please end your first call before making another.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">New meeting name</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">There is already a file with the same name</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
