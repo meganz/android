@@ -16,16 +16,13 @@ import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
 @AndroidEntryPoint
 class ContactGroupsFragment : Fragment() {
-
-    companion object {
-        private const val SCROLLER_MIN_SIZE = 20
-    }
 
     private lateinit var binding: FragmentContactGroupsBinding
 
@@ -82,7 +79,7 @@ class ContactGroupsFragment : Fragment() {
     }
 
     private fun showGroups(items: List<ContactGroupItem>) {
-        binding.listScroller.isVisible = items.size >= SCROLLER_MIN_SIZE
+        binding.listScroller.isVisible = items.size >= MIN_ITEMS_SCROLLBAR
         binding.viewEmpty.isVisible = items.isNullOrEmpty()
         groupsAdapter.submitList(items)
     }

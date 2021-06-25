@@ -8,6 +8,8 @@ import mega.privacy.android.app.utils.AvatarUtil
 
 sealed class ContactItem(val id: Long) {
 
+    abstract fun getSection(): String
+
     data class Data constructor(
         val handle: Long,
         val email: String,
@@ -28,6 +30,9 @@ sealed class ContactItem(val id: Long) {
                 else -> email
             }
 
+        override fun getSection(): String =
+            AvatarUtil.getFirstLetter(getTitle())
+
         fun getFirstCharacter(): String =
             AvatarUtil.getFirstLetter(getTitle())
 
@@ -37,7 +42,11 @@ sealed class ContactItem(val id: Long) {
                     alias?.contains(queryString, true) == true
     }
 
-    data class Header(val title: String) : ContactItem(title.hashCode().toLong())
+    data class Header constructor(val title: String) : ContactItem(title.hashCode().toLong()) {
+
+        override fun getSection(): String =
+            AvatarUtil.getFirstLetter(title)
+    }
 
     class DiffCallback : DiffUtil.ItemCallback<ContactItem>() {
         override fun areItemsTheSame(oldItem: ContactItem, newItem: ContactItem): Boolean =

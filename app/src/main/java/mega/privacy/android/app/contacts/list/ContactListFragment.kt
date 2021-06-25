@@ -17,6 +17,7 @@ import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFra
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.InviteContactActivity
 import mega.privacy.android.app.utils.Constants.EVENT_CONTACT_UPDATE
+import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
@@ -64,6 +65,7 @@ class ContactListFragment : Fragment() {
         val adapterConfig = ConcatAdapter.Config.Builder().setStableIdMode(ConcatAdapter.Config.StableIdMode.ISOLATED_STABLE_IDS).build()
         binding.list.adapter = ConcatAdapter(adapterConfig, actionsAdapter, recentlyAddedAdapter, contactsAdapter)
         binding.list.setHasFixedSize(true)
+        binding.listScroller.setRecyclerView(binding.list)
 
         binding.btnAddContact.setOnClickListener {
             startActivity(Intent(requireContext(), InviteContactActivity::class.java))
@@ -85,6 +87,7 @@ class ContactListFragment : Fragment() {
         }
 
         viewModel.getContactsWithHeaders().observe(viewLifecycleOwner) { items ->
+            binding.listScroller.isVisible = items.size >= MIN_ITEMS_SCROLLBAR
             binding.viewEmpty.isVisible = items.isNullOrEmpty()
             contactsAdapter.submitList(items)
         }

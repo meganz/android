@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.ItemContactDataBinding
 import mega.privacy.android.app.databinding.ItemContactHeaderBinding
@@ -12,7 +13,8 @@ import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 class ContactListAdapter(
     private val itemCallback: (String) -> Unit,
     private val itemInfoCallback: (Long) -> Unit
-) : ListAdapter<ContactItem, RecyclerView.ViewHolder>(ContactItem.DiffCallback()) {
+) : ListAdapter<ContactItem, RecyclerView.ViewHolder>(ContactItem.DiffCallback()),
+    SectionTitleProvider {
 
     companion object {
         private const val VIEW_TYPE_HEADER = 0
@@ -67,4 +69,7 @@ class ContactListAdapter(
             is ContactItem.Header -> VIEW_TYPE_HEADER
             is ContactItem.Data -> VIEW_TYPE_DATA
         }
+
+    override fun getSectionTitle(position: Int): String =
+        getItem(position).getSection()
 }
