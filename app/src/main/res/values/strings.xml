@@ -3994,22 +3994,12 @@
     <string name="pin_to_speaker">Pin to Speaker View</string>
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">Make moderator</string>
-    <!-- Remove the participant from meeting-->
-    <string name="remove_participant">Remove participant</string>
     <!-- The title of dialog for end meeting confirmation-->
     <string name="title_end_meeting">Leave meeting now?</string>
-    <!-- Leave meeting option for the moderator-->
-    <string name="leave_meeting">Leave meeting</string>
-    <!-- End meeting for all option for the moderator-->
-    <string name="end_meeting_for_all">End meeting for all</string>
-    <!-- The title of end meeting for all option for the moderator-->
-    <string name="end_meeting_for_all_dialog_title">End meeting for all?</string>
-    <!-- The message of the end meeting dialog-->
-    <string name="end_meeting_dialog_message">Once you(moderator) end the meeting for all, the meeting will end for all participants.</string>
     <!-- no moderator when the moderator leave meeting-->
     <string name="no_moderator">No moderator</string>
     <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign (a) new moderator(s) in order to keep the meeting structure</string>
+    <string name="assign_moderator_message">Before leaving, please assign (a) new moderator(s) in order to keep the meeting structure.</string>
     <!-- assign moderator option when the moderator leave meeting-->
     <string name="assign_moderator">Assign moderator</string>
     <!-- leave anyway option when the moderator leave meeting-->
@@ -4036,8 +4026,6 @@
     <string name="paste_meeting_link_guest_instruction">Paste your link here or click the link sent to you.</string>
     <!-- Banner text to indicate poor network quality-->
     <string name="slow_connection_meeting">You are in slow connection</string>
-    <!-- Banner text to indicate you are moderator-->
-    <string name="your_are_moderator">You are chosen to be moderator</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Meeting has ended</string>
     <!-- error message shown when a meeting link is not well formed-->
