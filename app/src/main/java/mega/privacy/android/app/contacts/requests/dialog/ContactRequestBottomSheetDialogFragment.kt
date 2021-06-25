@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.requests.dialog
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,8 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.facebook.imagepipeline.request.ImageRequest
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.contacts.requests.ContactRequestsViewModel
@@ -40,6 +43,11 @@ class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
         binding = BottomSheetContactRequestBinding.inflate(inflater, container, false)
         return binding.root
     }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+        (super.onCreateDialog(savedInstanceState) as BottomSheetDialog).apply {
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

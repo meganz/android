@@ -20,6 +20,7 @@ class ContactRequestsFragment : Fragment() {
 
     companion object {
         const val EXTRA_IS_OUTGOING = "isOutgoing"
+        const val STATE_PAGER_POSITION = "STATE_PAGER_POSITION"
     }
 
     private lateinit var binding: FragmentContactRequestsBinding
@@ -38,8 +39,13 @@ class ContactRequestsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupView()
+        setupView(savedInstanceState)
         setupObservers()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(STATE_PAGER_POSITION, binding.pager.currentItem)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -49,9 +55,8 @@ class ContactRequestsFragment : Fragment() {
         }
     }
 
-    private fun setupView() {
+    private fun setupView(savedInstanceState: Bundle?) {
         binding.pager.adapter = ContactRequestPageAdapter(this)
-
         TabLayoutMediator(binding.tabs, binding.pager) { tab, position ->
             tab.text = if (position == Tabs.INCOMING.ordinal) {
                 getString(R.string.tab_received_requests)
@@ -61,11 +66,14 @@ class ContactRequestsFragment : Fragment() {
         }.attach()
 
         binding.pager.post {
-            binding.pager.currentItem = if (isOutgoing) {
+            val defaultPosition = if (isOutgoing) {
                 Tabs.OUTGOING.ordinal
             } else {
                 Tabs.INCOMING.ordinal
             }
+
+            binding.pager.currentItem = savedInstanceState?.getInt(STATE_PAGER_POSITION, defaultPosition)
+                ?: defaultPosition
         }
     }
 
