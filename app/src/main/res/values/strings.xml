@@ -4026,10 +4026,8 @@
     <string name="meeting_link">Meeting link</string>
     <!-- Subtitle of the meeting screen-->
     <string name="duration_meeting">Duration</string>
-    <!-- The question in on-boarding screen asking if the user don’t have a mega account-->
-    <string name="onboarding_no_mega_account">Don’t have a MEGA account?</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
-    <string name="join_meeting_as_guest">Join meeting as guest?</string>
+    <string name="join_meeting_as_guest">Join meeting as guest</string>
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">You are invited to a meeting</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
@@ -4058,8 +4056,6 @@
     <string name="use_any_device">Use any device</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">View meeting chat</string>
-    <!-- Error message when user clicks join meeting as guest with empty first and last names-->
-    <string name="error_invalid_guest_name">Please input first and last name</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">Invite more participants to the \nmeeting. Swipe up to invite.</string>
     <!-- the content of tips when the user enters recent chat page first time-->
