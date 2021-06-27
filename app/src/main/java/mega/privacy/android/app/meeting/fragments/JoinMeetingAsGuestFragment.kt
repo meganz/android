@@ -1,6 +1,9 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
@@ -28,11 +31,6 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
             return
         }
 
-        if (!isGuestNameValid()) {
-            Util.showToast(requireContext(), StringResourcesUtils.getString(R.string.error_invalid_guest_name))
-            return
-        }
-
         releaseVideoAndHideKeyboard()
         val action = JoinMeetingFragmentDirections
             .actionGlobalInMeeting(
@@ -51,11 +49,22 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         releaseVideoDeviceAndRemoveChatVideoListener()
     }
 
-    private fun isGuestNameValid(): Boolean {
-        firstName = edit_first_name.text.toString()
-        lastName = edit_last_name.text.toString()
+    private fun watchChangeOfGuestName() {
+        btn_start_join_meeting.isEnabled = false
 
-        return !TextUtil.isTextEmpty(firstName) && !TextUtil.isTextEmpty(lastName)
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                btn_start_join_meeting.isEnabled = !TextUtils.isEmpty(edit_first_name.text)
+                        && !TextUtils.isEmpty(edit_last_name.text)
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        }
+
+        edit_first_name.addTextChangedListener(textWatcher)
+        edit_last_name.addTextChangedListener(textWatcher)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,6 +79,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         Util.showKeyboardDelayed(edit_first_name)
         reLayoutCameraPreviewView()
         type_meeting_edit_text.visibility = View.GONE
+        watchChangeOfGuestName()
     }
 
     override fun setProfileAvatar() {

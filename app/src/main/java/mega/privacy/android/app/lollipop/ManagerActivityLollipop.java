@@ -8855,7 +8855,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	@Override
 	public void onCreateMeeting() {
-		openMeetingToCreate(this);
+		if(CallUtil.participatingInACall()){
+			showConfirmationInACall();
+		} else {
+			openMeetingToCreate(this);
+		}
 	}
 
 	public void addContactFromPhone() {
@@ -8864,20 +8868,27 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
 	}
 
+	public void showConfirmationInACall() {
+		logDebug("showConfirmationInACall");
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+		};
+
+		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+		String message = getResources().getString(R.string.ongoing_call_content);
+		builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener).show();
+	}
+
 	public void showConfirmationRemoveContact(final MegaUser c){
 		logDebug("showConfirmationRemoveContact");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						cC.removeContact(c);
-						break;
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+			switch (which){
+				case DialogInterface.BUTTON_POSITIVE:
+					cC.removeContact(c);
+					break;
 
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
+				case DialogInterface.BUTTON_NEGATIVE:
+					//No button clicked
+					break;
 			}
 		};
 
@@ -8892,18 +8903,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void showConfirmationRemoveContacts(final ArrayList<MegaUser> c){
 		logDebug("showConfirmationRemoveContacts");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						cC.removeMultipleContacts(c);
-						break;
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+			switch (which) {
+				case DialogInterface.BUTTON_POSITIVE:
+					cC.removeMultipleContacts(c);
+					break;
 
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
+				case DialogInterface.BUTTON_NEGATIVE:
+					//No button clicked
+					break;
 			}
 		};
 
@@ -8918,18 +8926,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void showConfirmationRemoveContactRequest(final MegaContactRequest r){
 		logDebug("showConfirmationRemoveContactRequest");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						cC.removeInvitationContact(r);
-						break;
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+			switch (which){
+				case DialogInterface.BUTTON_POSITIVE:
+					cC.removeInvitationContact(r);
+					break;
 
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
+				case DialogInterface.BUTTON_NEGATIVE:
+					//No button clicked
+					break;
 			}
 		};
 
@@ -8942,18 +8947,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void showConfirmationRemoveContactRequests(final List<MegaContactRequest> r){
 		logDebug("showConfirmationRemoveContactRequests");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						cC.deleteMultipleSentRequestContacts(r);
-						break;
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+			switch (which){
+				case DialogInterface.BUTTON_POSITIVE:
+					cC.deleteMultipleSentRequestContacts(r);
+					break;
 
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
+				case DialogInterface.BUTTON_NEGATIVE:
+					//No button clicked
+					break;
 			}
 		};
 

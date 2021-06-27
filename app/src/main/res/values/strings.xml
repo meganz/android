@@ -3963,15 +3963,15 @@
     <!-- General label for microphone -->
     <string name="general_mic">Mic</string>
     <!-- General label for microphone muted -->
-    <string name="general_mic_mute">Your microphone is mute</string>
+    <string name="general_mic_mute">Your microphone is muted</string>
     <!-- General label for microphone unmuted -->
     <string name="general_mic_unmute">Your microphone is unmuted</string>
     <!-- General label for camera -->
     <string name="general_camera">Camera</string>
     <!-- General label for camera enable -->
-    <string name="general_camera_enable">Your camera is enable</string>
+    <string name="general_camera_enable">Your camera is enabled</string>
     <!-- General label for camera disable -->
-    <string name="general_camera_disable">Your camera is disable</string>
+    <string name="general_camera_disable">Your camera is disabled</string>
     <!-- Label for hold meeting -->
     <string name="meeting_hold">Hold</string>
     <!-- General label for speaker -->
@@ -4016,10 +4016,8 @@
     <string name="meeting_link">Meeting link</string>
     <!-- Subtitle of the meeting screen-->
     <string name="duration_meeting">Duration</string>
-    <!-- The question in on-boarding screen asking if the user don’t have a mega account-->
-    <string name="onboarding_no_mega_account">Don’t have a MEGA account?</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
-    <string name="join_meeting_as_guest">Join meeting as guest?</string>
+    <string name="join_meeting_as_guest">Join meeting as guest</string>
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">You are invited to a meeting</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
@@ -4037,9 +4035,7 @@
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">Got it</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_required_permissions_warning">MEGA needs your permission in order to get the best meeting experience.</string>
-    <!-- Message on the EditText of meeting name-->
-    <string name="error_meeting_name_error">Please input the meeting name.</string>
+    <string name="meeting_required_permissions_warning">Go to settings to allow MEGA to access your camera and microphone.</string>
     <!-- Alert the guest you have left MEGA meeting when left meeting-->
     <string name="left_meeting">You have left MEGA meeting</string>
     <!-- Ask the guest for keeping track MEGA meeting when left meeting-->
@@ -4048,8 +4044,6 @@
     <string name="use_any_device">Use any device</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">View meeting chat</string>
-    <!-- Error message when user clicks join meeting as guest with empty first and last names-->
-    <string name="error_invalid_guest_name">Please input first and last name</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">Invite more participants to the \nmeeting. Swipe up to invite.</string>
     <!-- the content of tips when the user enters recent chat page first time-->
@@ -4082,6 +4076,10 @@
     <string name="left_meeting_bonus_title">Get 20 GB for free</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">You cannot make another call. Please end your first call before making another.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">New meeting name</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">There is already a file with the same name</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->

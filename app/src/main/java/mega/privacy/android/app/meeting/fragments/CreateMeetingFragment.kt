@@ -21,7 +21,6 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.isAllowedTitle
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
@@ -39,8 +38,8 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
     override fun onMeetingButtonClick() {
         if (!isAllowedTitle(meetingName)) {
-            type_meeting_edit_text.error =
-                StringResourcesUtils.getString(R.string.error_meeting_name_error)
+            type_meeting_edit_text.error = getString(R.string.title_long)
+            type_meeting_edit_text.requestFocus()
             return
         }
 
