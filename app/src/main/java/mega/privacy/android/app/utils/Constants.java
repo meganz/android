@@ -647,6 +647,10 @@ public class Constants {
     public static final int ICON_SIZE_DP = 48;
     public static final int ICON_MARGIN_DP = 12;
 
+    // Thumbnail dimens for Browse file page
+    public static final int THUMBNAIL_SIZE_DP = 36;
+    public static final int THUMBNAIL_MARGIN_DP = 18;
+
     public static final String SEPARATOR = File.separator;
 
     public static final String[] MEGA_REGEXS = {

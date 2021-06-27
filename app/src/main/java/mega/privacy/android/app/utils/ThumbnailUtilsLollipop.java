@@ -1217,8 +1217,8 @@ public class ThumbnailUtilsLollipop {
 
 		if (bitmap != null) {
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-			params.height = params.width = dp2px(36);
-			int margin = dp2px(18);
+			params.height = params.width = dp2px(Constants.THUMBNAIL_SIZE_DP);
+			int margin = dp2px(Constants.THUMBNAIL_MARGIN_DP);
 			params.setMargins(margin, 0, margin, 0);
 			holder.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
 			return;

@@ -160,7 +160,7 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 
     /**
      * Reset the imageview's params
-     * @param imageView
+     * @param imageView the imageview shows the icon and the thumbnail
      */
     public void resetImageView(ImageView imageView) {
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
