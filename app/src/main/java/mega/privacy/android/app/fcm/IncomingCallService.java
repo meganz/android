@@ -43,7 +43,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     DatabaseHandler dbH;
     MegaChatApiAndroid megaChatApi;
     ChatSettings chatSettings;
-    boolean isLoggingIn = false;
     boolean showMessageNotificationAfterPush = false;
     boolean beep = false;
     WifiManager.WifiLock lock;
@@ -164,10 +163,9 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     }
 
     public void performLoginProccess(String gSession) {
-        isLoggingIn = MegaApplication.isLoggingIn();
-        if (!isLoggingIn) {
-            isLoggingIn = true;
-            MegaApplication.setLoggingIn(isLoggingIn);
+        if (!MegaApplication.isLoggingIn()) {
+            // Make sure login in background goes immediately.
+            megaApi.fastLogin(gSession, this);
 
             if (megaChatApi == null) {
                 megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
@@ -189,8 +187,6 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                     logDebug("Chat correctly initialized");
                 }
             }
-
-            megaApi.fastLogin(gSession, this);
         }
     }
 
@@ -215,13 +211,8 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                 megaApi.fetchNodes(this);
             } else {
                 logError("ERROR: " + e.getErrorString());
-                isLoggingIn = false;
-                MegaApplication.setLoggingIn(isLoggingIn);
-                return;
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
-            isLoggingIn = false;
-            MegaApplication.setLoggingIn(isLoggingIn);
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("OK fetch nodes");
                 logDebug("Chat --> connectInBackground");
