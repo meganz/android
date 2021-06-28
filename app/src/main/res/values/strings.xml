@@ -4021,7 +4021,7 @@
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Paste your link here or click the link sent to you.</string>
     <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">You are in slow connection</string>
+    <string name="slow_connection_meeting">You have a weak connection</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Meeting has ended</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -4037,7 +4037,7 @@
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">View meeting chat</string>
     <!-- the content of tips when the user uses the meeting first time-->
-    <string name="tip_invite_more_participants">Invite more participants to the \nmeeting. Swipe up to invite.</string>
+    <string name="tip_invite_more_participants">Invite more participants to the meeting. Swipe up to invite.</string>
     <!-- the content of tips when the user enters recent chat page first time-->
     <string name="tip_create_meeting">Tap to create a new meeting</string>
     <!-- the content of tips when the user enters start conversation page first time-->
