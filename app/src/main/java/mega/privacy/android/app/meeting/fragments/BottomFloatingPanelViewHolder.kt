@@ -29,12 +29,13 @@ import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
 
-
 /**
  * Bottom Panel view holder package the view and logic code of floating panel
  *
- * @property binding InMeetingFragmentBinding, get views from this binding
+ * @property inMeetingViewModel InMeetingViewModel, get some values and do some logic actions
+ * @property binding  InMeetingFragmentBinding, get views from this binding
  * @property listener listen to the actions of all buttons
+ * @property isGroup determine if the current chat is group
  */
 class BottomFloatingPanelViewHolder(
     private val inMeetingViewModel: InMeetingViewModel,
@@ -83,9 +84,8 @@ class BottomFloatingPanelViewHolder(
 
     /**
      * Remove listener and dismiss the pop window when activity is destroyed
-     *
      */
-    fun onDestroy(){
+    fun onDestroy() {
         binding.root.removeOnLayoutChangeListener(layoutListener)
         popWindow?.dismiss()
     }
@@ -136,15 +136,16 @@ class BottomFloatingPanelViewHolder(
     fun initPopWindow(anchor: View) {
         val view: View = LayoutInflater.from(context)
             .inflate(R.layout.view_tip_meeting_bottom_panel, null, false)
+        view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
 
-        if (isPopWindowShowing()){
+        if (isPopWindowShowing()) {
             popWindow?.dismiss()
         }
 
         popWindow = PopupWindow(
             view,
-            context.resources.getDimension(R.dimen.bottom_sheet_tip_width).toInt(),
-            context.resources.getDimension(R.dimen.bottom_sheet_tip_height).toInt(),
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
             true
         ).apply {
             isFocusable = false
@@ -164,8 +165,8 @@ class BottomFloatingPanelViewHolder(
             it.showAtLocation(
                 anchor,
                 Gravity.NO_GRAVITY,
-                (location[0] + anchor.width / 2) - it.width / 2,
-                location[1] - it.height
+                (location[0] + anchor.width / 2) - view.measuredWidth / 2,
+                location[1] - view.measuredHeight
             )
         }
     }
@@ -641,11 +642,11 @@ class BottomFloatingPanelViewHolder(
         return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
     }
 
-    fun updateMicPermissionWaring(isGranted: Boolean){
+    fun updateMicPermissionWaring(isGranted: Boolean) {
         floatingPanelView.micWarning.isVisible = !isGranted
     }
 
-    fun updateCamPermissionWaring(isGranted: Boolean){
+    fun updateCamPermissionWaring(isGranted: Boolean) {
         floatingPanelView.camWarning.isVisible = !isGranted
     }
 
