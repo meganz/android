@@ -134,6 +134,10 @@ class BottomFloatingPanelViewHolder(
      * @param anchor the anchor view, the tips widow should show base on it's location
      */
     fun initPopWindow(anchor: View) {
+        if (inMeetingViewModel.isOneToOneCall()) {
+            return
+        }
+
         val view: View = LayoutInflater.from(context)
             .inflate(R.layout.view_tip_meeting_bottom_panel, null, false)
         view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
