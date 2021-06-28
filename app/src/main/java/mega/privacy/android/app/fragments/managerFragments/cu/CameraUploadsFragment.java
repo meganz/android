@@ -682,7 +682,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 newViewClicked(ALL_VIEW);
                 int cuNodePosition = gridAdapter.getNodePosition(card.getNode().getHandle());
                 openNode(cuNodePosition, gridAdapter.getNodeAtPosition(cuNodePosition));
-                mManagerActivity.showBottomView();
                 layoutManager.scrollToPosition(cuNodePosition);
                 break;
 
@@ -696,6 +695,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 layoutManager.scrollToPosition(viewModel.yearClicked(position, card));
                 break;
         }
+
+        mManagerActivity.showBottomView();
     }
 
     public void updateProgress(int visibility, int pending) {
