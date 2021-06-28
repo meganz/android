@@ -30,7 +30,7 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
         initRTCAudioManager()
 
-        btn_start_join_meeting.setText(R.string.btn_join_meeting)
+        btn_start_join_meeting.setText(R.string.join_meeting)
         type_meeting_edit_text.visibility = View.GONE
     }
 }
