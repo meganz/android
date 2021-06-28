@@ -518,18 +518,19 @@ class GridViewPagerAdapter(
         recyclerView: CustomizedGridCallRecyclerView
     ) {
         val layoutParams = recyclerView.layoutParams as RecyclerView.LayoutParams
-        val leftRightMargin = when (orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> {
-                if (position == 0 && data.size == 4) {
-                    maxWidth / 4
-                } else {
-                    maxWidth / 8
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (position == 0) {
+                if (data.size == 4) {
+                    layoutParams.setMargins(maxWidth / 4, 0, maxWidth / 4, 0)
+                } else if (data.size > 4) {
+                    layoutParams.setMargins(maxWidth / 8, 0, maxWidth / 8, 0)
                 }
+            } else {
+                layoutParams.setMargins(maxWidth / 8, 0, maxWidth / 8, 0)
             }
-            else -> 0
+        } else {
+            layoutParams.setMargins(0, 0, 0, 0)
         }
-
-        layoutParams.setMargins(leftRightMargin, 0, leftRightMargin, 0)
     }
 
     /**
