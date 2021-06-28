@@ -33,7 +33,7 @@
     <color name="grey_038_white_038">@color/white_alpha_038</color>
 
     <!-- AudioPlayer playlist position and duration  -->
-    <color name="grey_038_white">@color/white</color>
+    <color name="grey_038_white_alpha_038">@color/white_alpha_038</color>
 
     <!-- Bottom navigation menu disabled tint color  -->
     <color name="grey_016_white_016">@color/white_alpha_016</color>
