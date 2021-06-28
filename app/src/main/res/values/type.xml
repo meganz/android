@@ -461,7 +461,7 @@
 
     <!-- Regular, 12sp, 0px, AudioPlayer playlist position and duration -->
     <style name="TextAppearance.Mega.Caption.Variant4">
-        <item name="android:textColor">@color/grey_038_white</item>
+        <item name="android:textColor">@color/grey_038_white_alpha_038</item>
     </style>
 
     <!-- Regular, 12sp, 0.25px -->
