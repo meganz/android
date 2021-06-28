@@ -261,8 +261,7 @@ class MediaPlayerServiceViewModel(
                             LINKS_ADAPTER,
                             INCOMING_SHARES_ADAPTER,
                             OUTGOING_SHARES_ADAPTER,
-                            CONTACT_FILE_ADAPTER,
-                            PHOTO_SYNC_ADAPTER -> {
+                            CONTACT_FILE_ADAPTER -> {
                                 val parentHandle = intent.getLongExtra(
                                     INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                                     INVALID_HANDLE
@@ -475,7 +474,8 @@ class MediaPlayerServiceViewModel(
             AUDIO_BROWSE_ADAPTER,
             VIDEO_BROWSE_ADAPTER,
             FROM_CHAT,
-            FILE_LINK_ADAPTER -> {
+            FILE_LINK_ADAPTER,
+            PHOTO_SYNC_ADAPTER -> {
                 return oldType == type
             }
             FILE_BROWSER_ADAPTER,
@@ -485,8 +485,7 @@ class MediaPlayerServiceViewModel(
             INCOMING_SHARES_ADAPTER,
             OUTGOING_SHARES_ADAPTER,
             CONTACT_FILE_ADAPTER,
-            FOLDER_LINK_ADAPTER,
-            PHOTO_SYNC_ADAPTER -> {
+            FOLDER_LINK_ADAPTER -> {
                 val oldParentHandle = oldIntent.getLongExtra(
                     INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                     INVALID_HANDLE

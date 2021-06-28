@@ -95,6 +95,8 @@
 
     <!-- The underline color of TextInputLayout when unfocused -->
     <color name="grey_012_white_012">@color/white_alpha_012</color>
+    <!-- Simulate the background color when a dialog show -->
+    <color name="grey_012_transparent">@android:color/transparent</color>
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/white_alpha_038</color>
 
@@ -266,6 +268,9 @@
 
     <!--  ExoPlayer Time Bar Unplayed  -->
     <color name="grey_alpha_012_white_alpha_023">@color/white_alpha_023</color>
+
+    <color name="grey_054_white_060">@color/white_alpha_060</color>
+    <color name="grey_012_white_020">@color/white_alpha_020</color>
 
     <color name="grey_010_teal_100">@color/teal_100</color>
 
