@@ -870,6 +870,7 @@ public class Constants {
 
     public static final String EVENT_PRIVILEGES_CHANGE = "privileges_in_char_change";
     public static final String EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change";
+    public static final String EVENT_CHAT_CONNECTION_STATUS = "chat_connection_status_change";
 
     public static final String EVENT_PSA = "EVENT_PSA";
 

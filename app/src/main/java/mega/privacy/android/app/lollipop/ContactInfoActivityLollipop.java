@@ -2073,9 +2073,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
 		MegaChatRoom chatRoom = api.getChatRoom(chatid);
-
-		if (MegaApplication.isWaitingForCall() && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
-				&& chatRoom != null && chatRoom.getPeerHandle(0) == user.getHandle()) {
+		if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
 			startCallWithChatOnline(api.getChatRoom(chatid));
 		}
 	}
