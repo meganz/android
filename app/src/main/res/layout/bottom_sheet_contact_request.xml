@@ -1,53 +1,24 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/img_thumbnail"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+    <include
+        android:id="@+id/header"
+        layout="@layout/item_contact_request"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:roundAsCircle="true"
-        tools:placeholderImage="@android:drawable/ic_menu_camera" />
-
-    <mega.privacy.android.app.components.twemoji.EmojiTextView
-        android:id="@+id/txt_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:maxLines="1"
-        android:textAppearance="@style/TextAppearance.Mega.Body1"
-        app:emojiSize="14sp"
-        app:layout_constraintStart_toEndOf="@id/img_thumbnail"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="@tools:sample/full_names" />
-
-    <mega.privacy.android.app.components.MarqueeTextView
-        android:id="@+id/txt_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
-        app:layout_constraintStart_toStartOf="@id/txt_title"
-        app:layout_constraintTop_toBottomOf="@id/txt_title"
-        tools:text="Last seen Yesterday at 11:45" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/divider_header"
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:background="@color/grey_alpha_012"
+        android:background="@color/grey_012_white_012"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_subtitle" />
+        app:layout_constraintTop_toBottomOf="@id/header" />
 
     <TextView
         android:id="@+id/btn_accept"
@@ -73,7 +44,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="72dp"
-        android:background="@color/grey_alpha_012"
+        android:background="@color/grey_012_white_012"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_accept" />
@@ -102,7 +73,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="72dp"
-        android:background="@color/grey_alpha_012"
+        android:background="@color/grey_012_white_012"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_ignore" />
@@ -157,7 +128,7 @@
         android:layout_width="0dp"
         android:layout_height="1dp"
         android:layout_marginStart="72dp"
-        android:background="@color/grey_alpha_012"
+        android:background="@color/grey_012_white_012"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_reinvite" />

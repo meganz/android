@@ -27,6 +27,7 @@ class ContactRequestsFragment : Fragment() {
 
     private val isOutgoing by extraNotNull(EXTRA_IS_OUTGOING, false)
     private val viewModel by viewModels<ContactRequestsViewModel>()
+    private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,5 +82,9 @@ class ContactRequestsFragment : Fragment() {
         LiveEventBus.get(EVENT_CONTACT_REQUESTS_UPDATE).observe(viewLifecycleOwner) {
             viewModel.updateRequests()
         }
+    }
+
+    fun showElevation(show: Boolean) {
+        binding.tabs.elevation = if (show) toolbarElevation else 0F
     }
 }

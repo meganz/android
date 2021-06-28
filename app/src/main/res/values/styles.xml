@@ -162,7 +162,7 @@
     </style>
 
     <!-- Tab layout -->
-    <style name="Widget.Mega.TabLayout" parent="Widget.Design.TabLayout">
+    <style name="Widget.Mega.TabLayout" parent="Widget.MaterialComponents.TabLayout">
         <item name="tabIndicatorColor">@color/red_600_red_300</item>
         <item name="tabIndicatorHeight">2dp</item>
         <item name="tabSelectedTextColor">@color/red_600_red_300</item>

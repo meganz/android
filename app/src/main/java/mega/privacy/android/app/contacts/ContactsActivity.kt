@@ -66,6 +66,7 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     private val showGroups by extraNotNull(EXTRA_SHOW_GROUPS, false)
     private val showSentRequests by extraNotNull(EXTRA_SHOW_SENT_REQUESTS, false)
     private val showReceivedRequests by extraNotNull(EXTRA_SHOW_RECEIVED_REQUESTS, false)
+    private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val appBarConfiguration by lazy {
         AppBarConfiguration(
             topLevelDestinationIds = setOf(),
@@ -107,6 +108,10 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.root, content, chatId)
+    }
+
+    fun showElevation(show: Boolean) {
+        binding.toolbar.elevation = if (show) toolbarElevation else 0F
     }
 
     private fun getNavController(): NavController =

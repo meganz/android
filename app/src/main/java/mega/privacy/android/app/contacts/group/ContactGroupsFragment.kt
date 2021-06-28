@@ -8,8 +8,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.group.adapter.ContactGroupsAdapter
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.FragmentContactGroupsBinding
@@ -51,6 +53,11 @@ class ContactGroupsFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        binding.list.clearOnScrollListeners()
+        super.onDestroyView()
+    }
+
     private fun setupView() {
         binding.list.adapter = groupsAdapter
         binding.list.setHasFixedSize(true)
@@ -59,6 +66,14 @@ class ContactGroupsFragment : Fragment() {
                 setDrawable(ResourcesCompat.getDrawable(resources, R.drawable.contact_list_divider, null)!!)
             }
         )
+        binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val showElevation = recyclerView.canScrollVertically(RecyclerView.NO_POSITION)
+                (activity as ContactsActivity?)?.showElevation(showElevation)
+            }
+        })
         binding.listScroller.setRecyclerView(binding.list)
 
         binding.btnCreateGroup.setOnClickListener {

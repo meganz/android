@@ -8,9 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.list.adapter.ContactActionsListAdapter
 import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFragment
@@ -61,10 +63,23 @@ class ContactListFragment : Fragment() {
         }
     }
 
+    override fun onDestroyView() {
+        binding.list.clearOnScrollListeners()
+        super.onDestroyView()
+    }
+
     private fun setupView() {
         val adapterConfig = ConcatAdapter.Config.Builder().setStableIdMode(ConcatAdapter.Config.StableIdMode.ISOLATED_STABLE_IDS).build()
         binding.list.adapter = ConcatAdapter(adapterConfig, actionsAdapter, recentlyAddedAdapter, contactsAdapter)
         binding.list.setHasFixedSize(true)
+        binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val showElevation = recyclerView.canScrollVertically(RecyclerView.NO_POSITION)
+                (activity as ContactsActivity?)?.showElevation(showElevation)
+            }
+        })
         binding.listScroller.setRecyclerView(binding.list)
 
         binding.btnAddContact.setOnClickListener {
