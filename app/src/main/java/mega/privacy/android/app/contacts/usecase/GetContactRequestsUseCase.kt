@@ -20,7 +20,6 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MegaUserUtils.getUserAvatarFile
 import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.*
@@ -56,7 +55,7 @@ class GetContactRequestsUseCase @Inject constructor(
                 val userName = megaChatApi.getUserFirstnameFromCache(request.handle)
                 val userImageColor = megaApi.getUserAvatarColor(request.handle.toString()).toColorInt()
                 val placeholder = getImagePlaceholder(userName ?: userEmail, userImageColor)
-                val userImageFile = getUserAvatarFile(context, userEmail)
+                val userImageFile = AvatarUtil.getUserAvatarFile(context, userEmail)
                 if (userImageFile?.exists() == true) {
                     userImageUri = userImageFile.toUri()
                 }
@@ -106,7 +105,7 @@ class GetContactRequestsUseCase @Inject constructor(
             )
 
             contacts.forEach { request ->
-                val userImageFile = getUserAvatarFile(context, request.email!!)?.absolutePath
+                val userImageFile = AvatarUtil.getUserAvatarFile(context, request.email!!)?.absolutePath
                 megaApi.getUserAvatar(request.email, userImageFile, userAttrsListener)
                 megaApi.getUserAttribute(request.email, USER_ATTR_FIRSTNAME, userAttrsListener)
             }

@@ -3080,7 +3080,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     }
 
 	private void openContactLink(long handle) {
-		if (handle == -1) {
+		if (handle == INVALID_HANDLE) {
 			logWarning("Not valid contact handle");
 			return;
 		}
@@ -3158,7 +3158,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								break;
 						}
 					}
-					showSnackbar(SNACKBAR_TYPE, snackbarMessage, -1);
+					showSnackbar(SNACKBAR_TYPE, snackbarMessage, INVALID_HANDLE);
 				});
 	}
 

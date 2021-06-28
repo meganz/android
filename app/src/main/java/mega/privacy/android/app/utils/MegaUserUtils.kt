@@ -1,11 +1,9 @@
 package mega.privacy.android.app.utils
 
-import android.content.Context
 import androidx.annotation.ColorRes
 import mega.privacy.android.app.R
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaUser
-import java.io.File
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -24,10 +22,6 @@ object MegaUserUtils {
             MegaChatApi.STATUS_BUSY -> R.color.salmon_700
             else -> R.color.grey_700
         }
-
-    @JvmStatic
-    fun getUserAvatarFile(context: Context, userEmail: String): File? =
-        CacheFolderManager.buildAvatarFile(context, "$userEmail.jpg")
 
     @JvmStatic
     fun MegaUser.wasRecentlyAdded(): Boolean {

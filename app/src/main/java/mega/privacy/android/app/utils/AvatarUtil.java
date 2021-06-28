@@ -415,4 +415,9 @@ public class AvatarUtil {
             return bitmap.getHeight() / 2;
         }
     }
+
+    @Nullable
+    public static File getUserAvatarFile(Context context, String userEmail) {
+        return CacheFolderManager.buildAvatarFile(context, userEmail + ".jpg");
+    }
 }

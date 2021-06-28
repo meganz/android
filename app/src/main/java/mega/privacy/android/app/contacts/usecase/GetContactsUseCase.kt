@@ -20,7 +20,6 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MegaUserUtils.getUserAvatarFile
 import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
 import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
 import mega.privacy.android.app.utils.TimeUtils
@@ -61,7 +60,7 @@ class GetContactsUseCase @Inject constructor(
                         else -> megaUser.email
                     }
                     val placeholder = getImagePlaceholder(title, userImageColor)
-                    val userAvatarFile = getUserAvatarFile(context, megaUser.email)
+                    val userAvatarFile = AvatarUtil.getUserAvatarFile(context, megaUser.email)
                     val userAvatar = if (userAvatarFile?.exists() == true) {
                         userAvatarFile.toUri()
                     } else {
@@ -159,7 +158,7 @@ class GetContactsUseCase @Inject constructor(
 
             contacts.forEach { contact ->
                 if (contact.avatarUri == null) {
-                    val userAvatarFile = getUserAvatarFile(context, contact.email)?.absolutePath
+                    val userAvatarFile = AvatarUtil.getUserAvatarFile(context, contact.email)?.absolutePath
                     megaApi.getUserAvatar(contact.email, userAvatarFile, userAttrsListener)
                 }
                 if (contact.fullName.isNullOrBlank()) {

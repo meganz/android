@@ -19,7 +19,6 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.*
-import mega.privacy.android.app.utils.MegaUserUtils
 import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
@@ -148,7 +147,7 @@ class GetContactGroupsUseCase @Inject constructor(
         if (userEmail.isNullOrBlank()) {
             megaApi.getUserEmail(userHandle, listener)
         } else {
-            val avatarFile = MegaUserUtils.getUserAvatarFile(context, userEmail)
+            val avatarFile = AvatarUtil.getUserAvatarFile(context, userEmail)
             if (avatarFile?.exists() == true) {
                 userAvatar = avatarFile
             } else {
