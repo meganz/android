@@ -1,17 +1,22 @@
 package mega.privacy.android.app.textFileEditor
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewPropertyAnimator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
+import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,7 +58,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         private const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
         private const val RENAME_SHOWN = "RENAME_SHOWN"
         const val FROM_HOME_PAGE = "FROM_HOME_PAGE"
-        const val TIME_SHOWING_PAGINATION_BUTTONS = 4000L
+        const val TIME_SHOWING_PAGINATION_UI = 4000L
+        private const val STATE_SHOWN = 0
+        private const val STATE_HIDDEN = 1
     }
 
     private val viewModel by viewModels<TextFileEditorViewModel>()
@@ -65,6 +72,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private var discardChangesDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var errorReadingContentDialog: AlertDialog? = null
+
+    private var currentUIState = STATE_SHOWN
+    private var animator: ViewPropertyAnimator? = null
+    private var countDownTimer: CountDownTimer? = null
 
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
@@ -366,7 +377,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             setLineNumberEnabled(viewModel.shouldShowLineNumbers())
         }
 
-        binding.contentText.setLineNumberEnabled(viewModel.shouldShowLineNumbers())
+        binding.contentText.apply {
+            setLineNumberEnabled(viewModel.shouldShowLineNumbers())
+            setOnClickListener { if (viewModel.isViewMode()) animateUI() }
+        }
 
         binding.editFab.apply {
             hide()
@@ -397,6 +411,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 dp2px(4F, resources.displayMetrics).toFloat()
             } else 0F
 
+            hideUI()
+            animatePaginationUI()
             changeStatusBarColorForElevation(this, scrolling)
         }
     }
@@ -440,7 +456,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 text = binding.contentEditText.text
             }
 
-            if (viewModel.canShowEditFab()) {
+            if (viewModel.canShowEditFab() && currentUIState == STATE_SHOWN) {
                 binding.editFab.show()
             }
         } else {
@@ -500,6 +516,12 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
+        if (binding.contentEditText.text?.isNotEmpty() == true) {
+            countDownTimer?.cancel()
+            countDownTimer = null
+            animatePaginationUI()
+        }
+
         binding.contentText.text = currentContent
         binding.contentEditText.setText(currentContent)
         binding.fileEditorScrollView.isVisible = true
@@ -507,20 +529,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         binding.loadingLayout.isVisible = false
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-        if (viewModel.canShowEditFab()) {
+        if (viewModel.canShowEditFab() && currentUIState == STATE_SHOWN) {
             binding.editFab.show()
-        }
-
-        checkPaginationUI(content)
-    }
-
-    /**
-     * Checks if should show or not previous/next pagination buttons.
-     */
-    private fun  checkPaginationUI(pagination: Pagination) {
-        if (viewModel.isViewMode()) {
-            binding.previous.apply { if (pagination.shouldShowPrevious()) show() else hide() }
-            binding.next.apply { if (pagination.shouldShowNext()) show() else hide() }
         }
     }
 
@@ -546,8 +556,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 hide()
                 show()
             }
-
-            checkPaginationUI(viewModel.getPagination())
         }
 
         showSnackbar(
@@ -659,6 +667,130 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun isErrorReadingContentDialogShown(): Boolean =
         errorReadingContentDialog?.isShowing ?: false
+
+    /**
+     * Hides some UI elements: Toolbar, bottom view and edit button.
+     */
+    private fun hideUI() {
+        if (currentUIState == STATE_HIDDEN || !viewModel.isViewMode()) {
+            return
+        }
+
+        animateUI()
+    }
+
+    /**
+     * Shows or hides some UI elements: Toolbar, bottom view and edit button.
+     * The action depends on the current UI state:
+     *  - STATE_SHOWN: Hides de UI.
+     *  - STATE_HIDDEN: Shows the UI.
+     */
+    private fun animateUI() {
+        if (isFinishing || animator != null) {
+            return
+        }
+
+        if (currentUIState == STATE_SHOWN) {
+            currentUIState = STATE_HIDDEN
+            binding.editFab.hide()
+            animateToolbar(false)
+            animateBottom(false)
+        } else {
+            currentUIState = STATE_SHOWN
+            binding.editFab.show()
+            animateToolbar(true)
+            animateBottom(true)
+        }
+    }
+
+    /**
+     * Shows or hides toolbar with animation.
+     *
+     * @param show True if should show it, false if should hide it.
+     */
+    private fun animateToolbar(show: Boolean) {
+        animator = binding.appBar
+            .animate()
+            .translationY(if (show) 0F else -binding.fileEditorToolbar.height.toFloat())
+            .setInterpolator(FAST_OUT_LINEAR_IN_INTERPOLATOR)
+            .setDuration(ANIMATION_DURATION)
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    animator = null
+                }
+            })
+
+        if (show) {
+            animator?.withStartAction { binding.appBar.isVisible = true }
+        } else {
+            animator?.withEndAction { binding.appBar.isVisible = false }
+        }
+    }
+
+    /**
+     * Shows or hides bottom view with animation.
+     *
+     * @param show True if should show it, false if should hide it.
+     */
+    private fun animateBottom(show: Boolean) {
+        val animator = binding.nameText
+            .animate()
+            .translationY(if (show) 0F else binding.nameText.height.toFloat())
+            .setInterpolator(FAST_OUT_LINEAR_IN_INTERPOLATOR)
+            .setDuration(ANIMATION_DURATION)
+
+        if (show) {
+            animator.withStartAction { binding.nameText.isVisible = true }
+        } else {
+            animator.withEndAction { binding.nameText.isVisible = false }
+        }
+    }
+
+    /**
+     * Shows pagination UI elements and leaves them visible for TIME_SHOWING_PAGINATION_UI.
+     */
+    private fun animatePaginationUI() {
+        if (!viewModel.isViewMode() || countDownTimer != null) {
+            return
+        }
+
+        val pagination = viewModel.getPagination()
+
+        if (pagination == null || pagination.size() <= 1) {
+            return
+        }
+
+        binding.paginationIndicator.apply {
+            text = StringResourcesUtils.getString(
+                R.string.pagination_progress,
+                pagination.getCurrentPage() + 1,
+                pagination.size()
+            )
+
+            isVisible = true
+        }
+
+        if (pagination.shouldShowNext()) {
+            binding.next.show()
+        }
+
+        if (pagination.shouldShowPrevious()) {
+            binding.previous.show()
+        }
+
+        countDownTimer = object :
+            CountDownTimer(TIME_SHOWING_PAGINATION_UI, TIME_SHOWING_PAGINATION_UI) {
+            override fun onTick(millisUntilFinished: Long) {
+            }
+
+            override fun onFinish() {
+                binding.paginationIndicator.isVisible = false
+                binding.next.hide()
+                binding.previous.hide()
+                countDownTimer = null
+            }
+        }.start()
+    }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.textFileEditorContainer, content, chatId)

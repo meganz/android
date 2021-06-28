@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/text_file_editor_container"
@@ -8,10 +8,11 @@
     app:layout_behavior="com.google.android.material.behaviour.HideBottomViewOnScrollBehavior">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        app:layout_behavior=".textFileEditor.behaviours.HideTopViewOnScrollBehaviour">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/file_editor_toolbar"
@@ -27,7 +28,7 @@
         android:id="@+id/file_editor_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_constraintTop_toBottomOf="@+id/app_bar">
 
         <RelativeLayout
             android:id="@+id/content_text_layout"
@@ -63,15 +64,35 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <TextView
+        android:id="@+id/pagination_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/pagination_indicator"
+        android:elevation="6dp"
+        android:paddingStart="10dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="4dp"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Black13sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/file_editor_scroll_view"
+        tools:text="1/52" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/previous"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="136dp"
-        app:backgroundTint="@color/grey_010_teal_100"
+        app:backgroundTint="@color/white_teal_100"
         app:fabSize="mini"
-        app:layout_behavior=".textFileEditor.behaviours.ShowFABOnScrollBehaviour"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_arrow_previous"
         app:tint="@color/black"
         tools:ignore="ContentDescription" />
@@ -81,10 +102,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="60dp"
-        app:backgroundTint="@color/grey_010_teal_100"
+        android:layout_marginBottom="64dp"
+        app:backgroundTint="@color/white_teal_100"
         app:fabSize="mini"
-        app:layout_behavior=".textFileEditor.behaviours.ShowFABOnScrollBehaviour"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_arrow_next"
         app:tint="@color/black"
         tools:ignore="ContentDescription" />
@@ -95,7 +118,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="153dp"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/loading_image"
@@ -127,7 +153,7 @@
         android:gravity="center_horizontal"
         android:padding="14dp"
         android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Grey87White87"
-        app:layout_behavior=".textFileEditor.behaviours.HideAlwaysBottomViewOnScrollBehaviour"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="Journal01.txt" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -139,7 +165,8 @@
         android:src="@drawable/ic_file_edit"
         app:borderWidth="0dp"
         app:fabSize="normal"
-        app:layout_behavior=".textFileEditor.behaviours.HideFABOnScrollBehaviour"
+        app:layout_constraintBottom_toTopOf="@id/name_text"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="ContentDescription" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -272,6 +272,6 @@
     <color name="grey_054_white_060">@color/white_alpha_060</color>
     <color name="grey_012_white_020">@color/white_alpha_020</color>
 
-    <color name="grey_010_teal_100">@color/teal_100</color>
+    <color name="white_teal_100">@color/teal_100</color>
 
 </resources>

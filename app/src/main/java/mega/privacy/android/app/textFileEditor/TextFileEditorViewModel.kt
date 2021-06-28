@@ -89,7 +89,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun onContentTextRead(): LiveData<Pagination> = pagination
 
-    fun getPagination(): Pagination = pagination.value!!
+    fun getPagination(): Pagination? = pagination.value
 
     fun getNode(): MegaNode? = textFileEditorData.value?.node
 
