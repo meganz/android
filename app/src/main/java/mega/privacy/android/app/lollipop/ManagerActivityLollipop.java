@@ -5512,6 +5512,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (item != DrawerItem.CAMERA_UPLOADS) {
 			cuLayout.setVisibility(View.GONE);
 			cuViewTypes.setVisibility(View.GONE);
+			enableHideBottomViewOnScroll(false);
+			showBottomView();
 		}
 
 		if (item != DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
