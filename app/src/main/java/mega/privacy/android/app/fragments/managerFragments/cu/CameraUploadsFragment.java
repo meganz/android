@@ -703,4 +703,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.uploadProgress.setText(StringResourcesUtils
                 .getQuantityString(R.plurals.cu_upload_progress, pending, pending));
     }
+
+    public void setDefaultView() {
+        newViewClicked(ALL_VIEW);
+    }
 }

@@ -5486,6 +5486,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		});
 	}
 
+	/**
+	 * Hides all views only related to CU section and sets the CU default view.
+	 */
+	private void resetCUFragment() {
+		cuLayout.setVisibility(View.GONE);
+		cuViewTypes.setVisibility(View.GONE);
+
+		if (getCameraUploadFragment() != null) {
+			cuFragment.setDefaultView();
+			showBottomView();
+		}
+	}
+
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item) {
     	if (item == null) {
@@ -5510,10 +5523,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		if (item != DrawerItem.CAMERA_UPLOADS) {
-			cuLayout.setVisibility(View.GONE);
-			cuViewTypes.setVisibility(View.GONE);
-			enableHideBottomViewOnScroll(false);
-			showBottomView();
+			resetCUFragment();
 		}
 
 		if (item != DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
