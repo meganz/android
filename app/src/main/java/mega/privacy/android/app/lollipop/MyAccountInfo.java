@@ -1,7 +1,11 @@
 package mega.privacy.android.app.lollipop;
 
 import android.content.Context;
+import android.util.Base64;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -94,6 +98,26 @@ public class MyAccountInfo {
         if (dbH == null){
             dbH = app.getDbH();
         }
+    }
+
+    /**
+     * Generate an obfuscated account Id.
+     * The obfuscated account id can be passed to 'BillingFlowParams' for fraud prevention.
+     *
+     * @return A one-way hash based on the unique userHandleBinary.
+     */
+    public String generateObfuscatedAccountId() {
+        long userHandleBinary = megaApi.getMyUserHandleBinary();
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(Long.toString(userHandleBinary).getBytes(StandardCharsets.UTF_8));
+            return Base64.encodeToString(encodedhash, Base64.DEFAULT);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            logError("Generate obfuscated account Id failed.", e);
+        }
+
+        return null;
     }
 
     public void setAccountDetails(int numDetails){

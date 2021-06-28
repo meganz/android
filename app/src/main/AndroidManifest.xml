@@ -639,6 +639,11 @@
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name=".activities.AskForDisplayOverActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:launchMode="singleTask"/>
+
     </application>
 
 </manifest>
