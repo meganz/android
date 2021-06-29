@@ -157,7 +157,7 @@ public class Util {
     /**
      * Language tag for simplified Chinese.
      */
-    public static final String HANS = "Hans";
+    private static final String HANS = "Hans";
 
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();

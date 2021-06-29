@@ -963,27 +963,25 @@ public class MegaApplication extends MultiDexApplication implements Application.
      */
     private void setSDKLanguage() {
         Locale locale = Locale.getDefault();
+        String langCode;
 
         // If it's Chinese
         if (Locale.CHINESE.toLanguageTag().equals(locale.getLanguage())) {
-            String zhLanguageCode = isSimplifiedChinese() ?
+            langCode = isSimplifiedChinese() ?
                     Locale.SIMPLIFIED_CHINESE.toLanguageTag() :
                     Locale.TRADITIONAL_CHINESE.toLanguageTag();
-
-            boolean result = megaApi.setLanguage(zhLanguageCode);
-
-            logDebug("Result: " + result + " Language: " + zhLanguageCode);
         } else {
-            String language = locale.toString();
-            boolean result = megaApi.setLanguage(language);
-            logDebug("Result: " + result + " Language: " + language);
-
-            if (!result) {
-                language = locale.getLanguage();
-                result = megaApi.setLanguage(language);
-                logDebug("Result: " + result + " Language: " + language);
-            }
+            langCode = locale.toString();
         }
+
+        boolean result = megaApi.setLanguage(langCode);
+
+        if (!result) {
+            langCode = locale.getLanguage();
+            result = megaApi.setLanguage(langCode);
+        }
+
+        logDebug("Result: " + result + " Language: " + langCode);
     }
 
 	/**
