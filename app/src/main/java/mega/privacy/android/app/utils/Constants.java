@@ -41,7 +41,7 @@ public class Constants {
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;
     public static final int REQUEST_CODE_GET_CONTACTS = 1026;
     public static final int REQUEST_CODE_FILE_INFO = 1027;
-    public static final int REQUEST_CODE_REFRESH_STAGING = 1028;
+    public static final int REQUEST_CODE_REFRESH_API_SERVER = 1028;
     public static final int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
     public static final int REQUEST_CODE_SEND_LOCATION = 1030;
     public static final int REQUEST_CODE_COUNTRY_PICKER = 1031;
@@ -53,7 +53,7 @@ public class Constants {
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
-    public static final String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
+    public static final String ACTION_REFRESH_API_SERVER = "ACTION_REFRESH_API_SERVER";
     public static final String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
