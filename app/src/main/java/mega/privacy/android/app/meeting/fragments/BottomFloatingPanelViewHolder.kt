@@ -214,6 +214,12 @@ class BottomFloatingPanelViewHolder(
         floatingPanelView.guestShareLink.apply {
             isVisible = inMeetingViewModel.isGuestLinkVisible()
             text = inMeetingViewModel.getGuestLinkTitle()
+            setCompoundDrawablesRelativeWithIntrinsicBounds(
+                if (inMeetingViewModel.isModeratorOfPrivateRoom()) R.drawable.ic_invite_contact else R.drawable.ic_social_share_white,
+                0,
+                0,
+                0
+            )
         }
     }
 

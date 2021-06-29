@@ -299,7 +299,10 @@ class InMeetingRepository @Inject constructor(
      * @param peerId
      * @return The name
      */
-    fun participantName(peerId: Long): String {
+    fun participantName(peerId: Long): String? {
+        if(peerId == MEGACHAT_INVALID_HANDLE){
+            return null
+        }
         return ChatController(context).getParticipantFullName(peerId)
     }
 

@@ -2051,24 +2051,21 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Will show bottom sheet fragment for the moderator
      */
     override fun onEndMeeting() {
-        when {
-            inMeetingViewModel.isOneToOneCall() -> {
-                logDebug("End the one to one call")
-                inMeetingViewModel.leaveMeeting()
-                checkIfAnotherCallShouldBeShown()
-            }
-            inMeetingViewModel.shouldAssignModerator() -> {
-                EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId())
-                    .run {
-                        setAssignCallBack(showAssignModeratorFragment)
-                        show(
-                            this@InMeetingFragment.childFragmentManager,
-                            tag
-                        )
-                    }
-            }
-            else ->
-                askConfirmationEndMeetingForUser()
+        if (inMeetingViewModel.isOneToOneCall() || inMeetingViewModel.isGroupCall()) {
+            logDebug("End the one to one or group call")
+            inMeetingViewModel.leaveMeeting()
+            checkIfAnotherCallShouldBeShown()
+        } else if (inMeetingViewModel.shouldAssignModerator()) {
+            EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId())
+                .run {
+                    setAssignCallBack(showAssignModeratorFragment)
+                    show(
+                        this@InMeetingFragment.childFragmentManager,
+                        tag
+                    )
+                }
+        } else {
+            askConfirmationEndMeetingForUser()
         }
     }
 

@@ -346,7 +346,20 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun isOneToOneCall(): Boolean {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            return !it.isGroup
+            return (!it.isGroup && !it.isMeeting)
+        }
+
+        return false
+    }
+
+    /**
+     *  Method to know if it is a traditional group chat call
+     *
+     *  @return True, if it is a traditional group chat call. False, otherwise
+     */
+    fun isGroupCall(): Boolean {
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            return (it.isGroup && !it.isMeeting)
         }
 
         return false
@@ -1113,7 +1126,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return the name
      */
     private fun getParticipantName(peerId: Long): String {
-        return inMeetingRepository.participantName(peerId)
+        return inMeetingRepository.participantName(peerId) ?: return " "
     }
 
     /**
