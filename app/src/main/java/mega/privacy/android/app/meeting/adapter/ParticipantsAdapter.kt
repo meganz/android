@@ -29,14 +29,15 @@ class ParticipantsAdapter(
     /**
      * Update the my mic and cam icon
      *
-     * @param icon
-     * @param state
+     * @param icon the icon flag for mic or cam
+     * @param state the new state of mic or cam
      */
     fun updateIcon(icon: Int, state: Boolean) {
         val localList = this.currentList
         if (localList.isNullOrEmpty()) {
             return
         }
+
         val myParticipant = this.currentList.filter { it.isMe }
         if (myParticipant.isNullOrEmpty()) {
             return
@@ -47,6 +48,7 @@ class ParticipantsAdapter(
         if (index < 0 || me == null) {
             return
         }
+
         when (icon) {
             MIC -> me.isAudioOn = state
             CAM -> me.isVideoOn = state
@@ -57,11 +59,18 @@ class ParticipantsAdapter(
     }
 
 
+    /**
+     * Update the icon when the state of other participant's mic or cam changing
+     *
+     * @param peerId the peerId of the client
+     * @param clientId the clientId of the client
+     */
     fun updateParticipantAudioVideo(peerId: Long, clientId: Long) {
         val localList = this.currentList
         if (localList.isNullOrEmpty()) {
             return
         }
+
         val participants =
             this.currentList.filter { participant -> participant.peerId == peerId && participant.clientId == clientId }
         if (participants.isNullOrEmpty()) {
@@ -74,11 +83,18 @@ class ParticipantsAdapter(
         notifyItemChanged(index, participant)
     }
 
+    /**
+     * Update the permission for participant when the permission is changing
+     *
+     * @param peerId the peerId of the client
+     * @param clientId the clientId of the client
+     */
     fun updateParticipantPermission(peerId: Long, clientId: Long){
         val localList = this.currentList
         if (localList.isNullOrEmpty()) {
             return
         }
+
         val participants =
             this.currentList.filter { participant -> participant.peerId == peerId && participant.clientId == clientId }
         if (participants.isNullOrEmpty()) {
