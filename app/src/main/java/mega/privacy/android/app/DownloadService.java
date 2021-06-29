@@ -51,7 +51,7 @@ import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
-import mega.privacy.android.app.utils.RatingUtil;
+import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.SDCardOperator;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -157,6 +157,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private final CompositeDisposable rxSubscriptions = new CompositeDisposable();
 	private final Handler uiHandler = new Handler(Looper.getMainLooper());
+
+	// the flag to determine the rating dialog is showed for this download action
 	private boolean isRatingShowed = false;
 
 	@SuppressLint("NewApi")
@@ -1436,14 +1438,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	/**
 	 * Determine if should show the rating page to users
 	 *
-	 * @param context
+	 * @param context the context
 	 * @param total the total size of uploading file
 	 * @param currentDownloadSpeed current downloading speed
 	 */
 	private void showRating(Context context, long total, int currentDownloadSpeed) {
 		if (!isRatingShowed) {
-			new RatingUtil()
-					.showReviewDialogBaseOnCondition(context, total, currentDownloadSpeed, () -> isRatingShowed = true);
+			new RatingHandlerImpl(context)
+					.showRatingBaseOnSpeedAndSize(total, currentDownloadSpeed, () -> isRatingShowed = true);
 		}
 	}
 
