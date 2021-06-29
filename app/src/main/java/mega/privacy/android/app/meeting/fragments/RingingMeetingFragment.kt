@@ -245,6 +245,13 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
             avatar.setImageBitmap(bitmap)
         }
 
+        LiveEventBus.get(Constants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
+            .observe(this) {
+                if (chatId == it) {
+                    requireActivity().finish()
+                }
+            }
+
         // Caller cancelled the call.
         LiveEventBus.get(Constants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observeSticky(this) {

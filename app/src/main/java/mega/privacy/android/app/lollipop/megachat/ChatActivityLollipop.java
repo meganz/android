@@ -579,20 +579,26 @@ public class ChatActivityLollipop extends PasscodeActivity
         switch (call.getStatus()) {
             case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
-                updateCallBanner();
-                break;
-
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                updateCallBanner();
-                cancelRecording();
-                break;
-
             case MegaChatCall.CALL_STATUS_DESTROYED:
                 updateCallBanner();
-                if (dialogCall != null) {
+                if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+                    cancelRecording();
+                } else if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED && dialogCall != null) {
                     dialogCall.dismiss();
                 }
                 break;
+        }
+    };
+
+    private final Observer<MegaChatCall> callCompositionChangeObserver = call -> {
+        if (call.getChatid() != getCurrentChatid() && call.getCallCompositionChange() == 0) {
+            logDebug("Different chat or no changes");
+            return;
+        }
+
+        if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+            updateCallBanner();
         }
     };
 
@@ -979,6 +985,8 @@ public class ChatActivityLollipop extends PasscodeActivity
         registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observe(this, callStatusObserver);
+        LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).observe(this, callCompositionChangeObserver);
+
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observe(this, callOnHoldObserver);
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observe(this, sessionOnHoldObserver);
 
@@ -3880,7 +3888,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                     break;
 
                 MegaChatCall callBanner = megaChatApi.getChatCall(chatIdBanner);
-
                 if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                         callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                     startVideo = false;
@@ -9008,7 +9015,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         MegaChatCall callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
 
         if (callInThisChat == null || !isStatusConnected(this, idChat)) {
-            /*No call in this chatRoom*/
+            //No call in this chatRoom
             if (anotherActiveCall != null || anotherOnHoldCall != null) {
                 updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
                         getString(R.string.call_in_progress_layout));
@@ -9019,7 +9026,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             return;
         }
 
-        /*Call in this chatRoom*/
+        //Call in this chatRoom
         int callStatus = callInThisChat.getStatus();
         logDebug("The call status in this chatRoom is "+callStatusToString(callStatus));
 
@@ -9085,14 +9092,18 @@ public class ChatActivityLollipop extends PasscodeActivity
                     }
                 }else{
                     if (anotherActiveCall == null && anotherOnHoldCall == null) {
+                        if(callInThisChat.getNumParticipants()>1){
+                            hideCallBar(callInThisChat);
+                            break;
+                        }
                         String textLayout = getString((callInThisChat.isRinging() || !megaApi.isChatNotifiable(idChat)) ?
                                 R.string.call_in_progress_layout :
                                 R.string.join_call_layout);
                         tapToReturnLayout(callInThisChat, textLayout);
-                    } else {
-                        updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
-                                getString(R.string.call_in_progress_layout));
+                        break;
                     }
+                    updateCallInProgressLayout(anotherActiveCall != null ? anotherActiveCall : anotherOnHoldCall,
+                                getString(R.string.call_in_progress_layout));
                 }
                 break;
 

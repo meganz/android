@@ -607,9 +607,15 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private final
 	Observer<MegaChatCall> callCompositionObserver = call -> {
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
-		if (chatRoom != null && chatRoom.isMeeting() && call.getCallCompositionChange() == 1 && call.getNumParticipants() > 1) {
+		if (chatRoom != null && call.getCallCompositionChange() == 1 && call.getNumParticipants() > 1) {
 			logDebug("Stop sound");
-			removeRTCAudioManagerRingIn();
+			if (chatRoom.isMeeting()) {
+				removeRTCAudioManagerRingIn();
+			} else if (megaChatApi.getMyUserHandle() == call.getPeeridCallCompositionChange()) {
+				stopService(new Intent(getInstance(), IncomingCallService.class));
+				removeRTCAudioManagerRingIn();
+				LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
+			}
 		}
 	};
 

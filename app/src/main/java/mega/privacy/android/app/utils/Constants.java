@@ -858,6 +858,7 @@ public class Constants {
     public static final String EVENT_NOT_OUTGOING_CALL = "not_outgoing_call";
     public static final String EVENT_PROXIMITY_SENSOR_CHANGE = "proximity_sensor_change";
     public static final String EVENT_ENTER_IN_MEETING = "enter_in_meeting";
+    public static final String EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT = "call_answered_in_another_client";
 
     /** Event Keys related to sessions*/
     public static final String EVENT_SESSION_STATUS_CHANGE = "session_status_change";
