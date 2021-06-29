@@ -52,6 +52,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
         private const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
         private const val RENAME_SHOWN = "RENAME_SHOWN"
         const val TIME_SHOWING_PAGINATION_UI = 4000L
+        private const val STATE = "STATE"
         private const val STATE_SHOWN = 0
         private const val STATE_HIDDEN = 1
     }
@@ -117,6 +118,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(STATE, currentUIState)
         outState.putInt(CURSOR_POSITION, binding.contentEditText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
@@ -347,21 +349,33 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
                 viewModel.setEditedText(editable?.toString())
             }
 
-            if (savedInstanceState != null && viewModel.thereIsNoErrorSettingContent()) {
-                if (viewModel.needsReadOrIsReadingContent()) {
-                    return@apply
-                }
-
-                setText(viewModel.getEditedText())
-                setSelection(savedInstanceState.getInt(CURSOR_POSITION))
-            }
-
             setLineNumberEnabled(viewModel.shouldShowLineNumbers())
         }
 
         binding.contentText.apply {
             setLineNumberEnabled(viewModel.shouldShowLineNumbers())
             setOnClickListener { if (viewModel.isViewMode()) animateUI() }
+        }
+
+        if (savedInstanceState != null && viewModel.thereIsNoErrorSettingContent()
+            && !viewModel.needsReadOrIsReadingContent()
+        ) {
+            currentUIState = savedInstanceState.getInt(STATE, STATE_SHOWN)
+
+            if (currentUIState == STATE_HIDDEN) {
+                animateToolbar(false, 0)
+                animateBottom(false, 0)
+            }
+
+            val text = viewModel.getCurrentText()
+            val firstLineNumber = viewModel.getPagination()?.getFirstLineNumber() ?: 1
+
+            binding.contentEditText.apply {
+                setText(text, firstLineNumber)
+                setSelection(savedInstanceState.getInt(CURSOR_POSITION))
+            }
+
+            binding.contentText.setText(text, firstLineNumber)
         }
 
         binding.editFab.apply {
@@ -623,27 +637,28 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
         if (currentUIState == STATE_SHOWN) {
             currentUIState = STATE_HIDDEN
             binding.editFab.hide()
-            animateToolbar(false)
-            animateBottom(false)
+            animateToolbar(false, ANIMATION_DURATION)
+            animateBottom(false, ANIMATION_DURATION)
         } else {
             currentUIState = STATE_SHOWN
             binding.editFab.show()
-            animateToolbar(true)
-            animateBottom(true)
+            animateToolbar(true, ANIMATION_DURATION)
+            animateBottom(true, ANIMATION_DURATION)
         }
     }
 
     /**
      * Shows or hides toolbar with animation.
      *
-     * @param show True if should show it, false if should hide it.
+     * @param show     True if should show it, false if should hide it.
+     * @param duration Animation duration.
      */
-    private fun animateToolbar(show: Boolean) {
+    private fun animateToolbar(show: Boolean, duration: Long) {
         animator = binding.appBar
             .animate()
             .translationY(if (show) 0F else -binding.fileEditorToolbar.height.toFloat())
             .setInterpolator(FAST_OUT_LINEAR_IN_INTERPOLATOR)
-            .setDuration(ANIMATION_DURATION)
+            .setDuration(duration)
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     animator = null
@@ -660,14 +675,15 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
     /**
      * Shows or hides bottom view with animation.
      *
-     * @param show True if should show it, false if should hide it.
+     * @param show     True if should show it, false if should hide it.
+     * @param duration Animation duration.
      */
-    private fun animateBottom(show: Boolean) {
+    private fun animateBottom(show: Boolean, duration: Long) {
         val animator = binding.nameText
             .animate()
             .translationY(if (show) 0F else binding.nameText.height.toFloat())
             .setInterpolator(FAST_OUT_LINEAR_IN_INTERPOLATOR)
-            .setDuration(ANIMATION_DURATION)
+            .setDuration(duration)
 
         if (show) {
             animator.withStartAction { binding.nameText.isVisible = true }

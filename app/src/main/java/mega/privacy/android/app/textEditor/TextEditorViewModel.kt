@@ -126,7 +126,7 @@ class TextEditorViewModel @ViewModelInject constructor(
         mode.value = EDIT_MODE
     }
 
-    fun getEditedText(): String? = pagination.value?.getCurrentPageText()
+    fun getCurrentText(): String? = pagination.value?.getCurrentPageText()
 
     fun setEditedText(text: String?) {
         pagination.value?.updatePage(text)
