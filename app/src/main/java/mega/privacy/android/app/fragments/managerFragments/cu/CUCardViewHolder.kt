@@ -74,9 +74,14 @@ class CUCardViewHolder(
         val preview = card.preview
 
         if (preview != null) {
-            binding.preview.setImageURI(Uri.fromFile(preview))
+            binding.progressBar.isVisible = false
+            binding.preview.apply {
+                isVisible = true
+                setImageURI(Uri.fromFile(preview))
+            }
         } else {
-            binding.preview.setActualImageResource(R.drawable.ic_image_thumbnail)
+            binding.progressBar.isVisible = true
+            binding.preview.isVisible = false
         }
     }
 }
