@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting.adapter
 
 import android.graphics.Bitmap
+import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import java.io.Serializable
 
@@ -21,3 +22,16 @@ data class Participant(
     var isChosenForAssign: Boolean = false,
     var isGuest: Boolean = false
 ) : Serializable
+
+
+/**
+ * Diff Call back for assign participant recyclerview
+ *
+ */
+class AssignParticipantDiffCallback : DiffUtil.ItemCallback<Participant>() {
+    override fun areItemsTheSame(oldItem: Participant, newItem: Participant): Boolean =
+        (oldItem.peerId == newItem.peerId) && (oldItem.isChosenForAssign == newItem.isChosenForAssign)
+
+    override fun areContentsTheSame(oldItem: Participant, newItem: Participant): Boolean =
+        oldItem == newItem
+}

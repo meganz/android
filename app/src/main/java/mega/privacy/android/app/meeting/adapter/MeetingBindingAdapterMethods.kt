@@ -9,10 +9,13 @@ import mega.privacy.android.app.R
 /**
  * Binding Adapter method for Meeting Participant Bottom Sheet page
  */
-object BindingAdapterMethods {
+object MeetingBindingAdapterMethods {
 
     /**
      * Determine if the item should show moderator icon on the participant item
+     *
+     * @param view the target view
+     * @param moderator whether the view should show the moderator icon
      */
     @JvmStatic
     @BindingAdapter("android:showModeratorIcon")
@@ -33,6 +36,9 @@ object BindingAdapterMethods {
 
     /**
      * Determine if the item should visible
+     *
+     * @param view the target viw
+     * @param show whether the view should be shown
      */
     @JvmStatic
     @BindingAdapter("android:show")
@@ -41,7 +47,10 @@ object BindingAdapterMethods {
     }
 
     /**
-     * Determine if the item should visible
+     * Determine if the item should be hidden
+     *
+     * @param view the target view
+     * @param hide whether the view should be hidden
      */
     @JvmStatic
     @BindingAdapter("android:hide")
