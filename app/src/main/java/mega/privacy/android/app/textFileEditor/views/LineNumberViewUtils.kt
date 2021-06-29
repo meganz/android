@@ -2,6 +2,7 @@ package mega.privacy.android.app.textFileEditor.views
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.view.View
 import android.widget.TextView
@@ -41,16 +42,19 @@ object LineNumberViewUtils {
     ) {
         if (lineNumberEnabled) {
             val padding = resources.getDimensionPixelSize(R.dimen.line_number_padding)
-            var baseline = baseline
             var lineNumber = firstLineNumber
             var endOfLine = true
 
             for (i in 0 until lineCount) {
-                val lineNumberStringLength = paint.measureText(lineNumber.toString())
+                val textNumber = lineNumber.toString()
+                val lineNumberStringLength = paint.measureText(textNumber)
                 val start = paddingStart - lineNumberStringLength - padding
+                val lineNumberRect = Rect()
+                paint.getTextBounds(textNumber, 0, textNumber.length, lineNumberRect)
+                val top = layout.getLineBottom(i) + (lineNumberRect.height() / 2)
 
                 if (endOfLine) {
-                    canvas.drawText("$lineNumber", start, baseline.toFloat(), paint)
+                    canvas.drawText("$lineNumber", start, top.toFloat(), paint)
                     lineNumber++
                     endOfLine = false
                 }
@@ -58,8 +62,6 @@ object LineNumberViewUtils {
                 if (text.substring(layout.getLineStart(i), layout.getLineEnd(i)).endsWith(LINE_BREAK)) {
                     endOfLine = true
                 }
-
-                baseline += lineHeight
             }
         }
     }
