@@ -1,5 +1,6 @@
 package mega.privacy.android.app.globalmanagement
 
+import android.util.Base64
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.Product
@@ -15,6 +16,9 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TimeUtils.getDateString
 import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.*
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -363,4 +367,26 @@ class MyAccountInfo @Inject constructor(
     }
 
     fun wasNotBusinessAlertShownYet(): Boolean = !wasBusinessAlertAlreadyShown
+
+    /**
+     * Generate an obfuscated account Id.
+     * The obfuscated account id can be passed to 'BillingFlowParams' for fraud prevention.
+     *
+     * @return A one-way hash based on the unique userHandleBinary.
+     */
+    fun generateObfuscatedAccountId(): String? {
+        try {
+            val digest = MessageDigest.getInstance("SHA-256")
+            val encodeHash = digest.digest(
+                megaApi.myUserHandleBinary.toString().toByteArray(StandardCharsets.UTF_8)
+            )
+
+            return Base64.encodeToString(encodeHash, Base64.DEFAULT)
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace();
+            logError("Generate obfuscated account Id failed.", e);
+        }
+
+        return null
+    }
 }

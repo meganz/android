@@ -48,7 +48,6 @@ class MyAccountViewModel @ViewModelInject constructor(
 
     private var fragment = MY_ACCOUNT_FRAGMENT
     private var numOfClicksLastSession = 0
-    private var staging = false
 
     fun onUpdateVersionsInfoFinished(): LiveData<MegaError> = versionsInfo
     fun onGetAvatarFinished(): LiveData<MegaError> = avatar
@@ -173,43 +172,14 @@ class MyAccountViewModel @ViewModelInject constructor(
         }
     }
 
-    fun incrementLastSessionClick(context: Context): Boolean {
+    fun incrementLastSessionClick(): Boolean {
         numOfClicksLastSession++
 
         if (numOfClicksLastSession < CLICKS_TO_STAGING)
             return false
 
         numOfClicksLastSession = 0
-        staging = false
-
-        val attrs = dbH.attributes
-
-        if (attrs != null && attrs.staging != null) {
-            staging = try {
-                java.lang.Boolean.parseBoolean(attrs.staging)
-            } catch (e: Exception) {
-                false
-            }
-        }
-
-        if (staging) {
-            setStaging(context, false)
-            return false
-        }
-
         return true
-    }
-
-    fun setStaging(context: Context, set: Boolean) {
-        staging = set
-        megaApi.changeApiUrl(if (set) STAGING_URL else PRODUCTION_URL)
-        dbH.setStaging(set)
-
-        val intent = Intent(context, LoginActivityLollipop::class.java)
-        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-        intent.action = ACTION_REFRESH_STAGING
-        (context as ManagerActivityLollipop)
-            .startActivityForResult(intent, REQUEST_CODE_REFRESH_STAGING)
     }
 
     private fun isBusinessPaymentAttentionNeeded(): Boolean {

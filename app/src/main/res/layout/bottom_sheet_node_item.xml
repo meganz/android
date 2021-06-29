@@ -163,6 +163,7 @@
                 android:id="@+id/option_label_layout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:background="?selectableItemBackground"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:visibility="gone"
@@ -172,6 +173,7 @@
                     android:id="@+id/label_option"
                     style="@style/BottomSheetOption"
                     android:layout_width="wrap_content"
+                    android:background="@null"
                     android:text="@string/file_properties_label"
                     app:drawableStartCompat="@drawable/ic_label" />
 

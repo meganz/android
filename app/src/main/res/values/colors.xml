@@ -59,6 +59,7 @@
     <color name="grey_alpha_016">#29000000</color>
     <color name="grey_alpha_020">#33000000</color>
     <color name="grey_alpha_026">#42000000</color>
+    <color name="grey_alpha_032">#52000000</color>
     <color name="grey_alpha_033">#54000000</color>
     <color name="grey_alpha_038">#61000000</color>
     <color name="grey_alpha_045">#73000000</color>
@@ -159,6 +160,8 @@
     <!-- The list item divider; Stroke color (Grid item border color);
          The underline color of TextInputLayout when unfocused -->
     <color name="grey_012_white_012">@color/grey_alpha_012</color>
+    <!-- Simulate the background color when a dialog show -->
+    <color name="grey_012_transparent">@color/grey_alpha_012</color>
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/grey_alpha_012</color>
 
@@ -433,11 +436,16 @@
     <!--  SnackBar Button text  -->
     <color name="teal_200_teal_300">@color/teal_200</color>
 
+    <!--  ExoPlayer Time Bar Unplayed  -->
+    <color name="grey_alpha_012_white_alpha_023">@color/grey_alpha_012</color>
+
+    <color name="grey_054_white_060">@color/grey_alpha_054</color>
+    <color name="grey_012_white_020">@color/grey_alpha_012</color>
+
     <!--   my account -->
     <color name="grey_020_black">@color/grey_020</color>
     <color name="grey_050_grey_700">@color/grey_050</color>
     <color name="grey_050_grey_900">@color/grey_050</color>
-    <color name="grey_054_white_060">@color/grey_alpha_054</color>
     <color name="white_087_white">@color/white_alpha_087</color>
     <color name="orange_600_orange_300">@color/orange_600</color>
     <color name="red_300_red_200">@color/red_300</color>

@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.SMSVerificationActivity
@@ -37,6 +36,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showRemoveOrModifyPhoneN
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
+import mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
@@ -79,6 +79,7 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
 
     private var isModify = false
     private var removeOrModifyPhoneNumberDialog: AlertDialog? = null
+    private var changeApiServerDialog: AlertDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -455,22 +456,8 @@ class MyAccountFragment : BaseFragment(), Scrollable, PhoneNumberCallback {
 
     private fun setUpLastSession() {
         binding.lastSessionLayout.setOnClickListener {
-            if (viewModel.incrementLastSessionClick(context)) {
-                val builder = MaterialAlertDialogBuilder(
-                    context,
-                    R.style.ThemeOverlay_Mega_MaterialAlertDialog
-                )
-
-                builder.setTitle(StringResourcesUtils.getString(R.string.staging_api_url_title))
-                    .setMessage(StringResourcesUtils.getString(R.string.staging_api_url_text))
-                    .setPositiveButton(
-                        StringResourcesUtils.getString(R.string.general_yes)
-                    ) { _, _ ->
-                        viewModel.setStaging(context, true)
-                    }.setNegativeButton(
-                        StringResourcesUtils.getString(R.string.general_cancel),
-                        null
-                    ).show()
+            if (viewModel.incrementLastSessionClick()) {
+                changeApiServerDialog = showChangeApiServerDialog(requireActivity(), megaApi)
             }
         }
     }

@@ -4,16 +4,15 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.qualifiers.ActivityContext
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
+import mega.privacy.android.app.utils.AlertsAndWarnings.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
@@ -138,6 +137,7 @@ class PasscodeUtil @Inject constructor(
         ) { dialog: DialogInterface, item: Int ->
             itemClicked.set(item)
             enableOrDisableDialogButton(
+                context,
                 initialRequiredTime != item,
                 (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE)
             )
@@ -157,27 +157,12 @@ class PasscodeUtil @Inject constructor(
         requirePasscodeDialog.show()
 
         enableOrDisableDialogButton(
+            context,
             itemChecked != INVALID_POSITION && itemChecked != initialRequiredTime,
             requirePasscodeDialog.getButton(AlertDialog.BUTTON_POSITIVE)
         )
 
         return requirePasscodeDialog
-    }
-
-    /**
-     * Enables or disabled a dialog button in a customized way.
-     *
-     * @param enable True if should enable, false if should disable.
-     * @param button The button to enable or disable.
-     */
-    private fun enableOrDisableDialogButton(enable: Boolean, button: Button) {
-        button.isEnabled = enable
-        button.setTextColor(
-            if (enable) ColorUtils.getThemeColor(
-                context,
-                R.attr.colorSecondary
-            ) else ContextCompat.getColor(context, R.color.teal_300_alpha_038)
-        )
     }
 
     /**

@@ -18,6 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
         android:layout_toEndOf="@id/file_explorer_thumbnail"
+        android:layout_toStartOf="@id/file_explorer_permissions"
         android:overScrollMode="never"
         android:scrollbars="none">
 
@@ -39,6 +40,7 @@
         android:layout_below="@+id/scroll_view_filename"
         android:layout_marginEnd="12dp"
         android:layout_toEndOf="@id/file_explorer_thumbnail"
+        android:layout_alignStart="@id/scroll_view_filename"
         android:ellipsize="end"
         android:maxLines="1"
         android:singleLine="true"

@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.widget.Toast;
 
@@ -14,7 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.R;
 
-@TargetApi(IncomingCallNotification.ANDROID_10_Q)
+@TargetApi(Build.VERSION_CODES.Q)
 public class AskForDisplayOverDialog {
 
     private AlertDialog dialog;

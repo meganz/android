@@ -8,8 +8,8 @@
         android:id="@+id/cam_sync_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        android:paddingBottom="52dp">
+        android:paddingBottom="52dp"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linearLayout"
@@ -21,86 +21,125 @@
                 android:id="@+id/imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="43dp"
+                android:layout_marginTop="24dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/camera_upload"
+                android:src="@drawable/il_cu"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="ContentDescription" />
 
             <TextView
-                android:id="@+id/textView"
-                android:layout_width="0dp"
+                android:id="@+id/enable_cu_title"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="32dp"
-                android:text="@string/camera_uploads_upload_videos"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toStartOf="@+id/upload_videos_switch"
+                android:layout_marginTop="8dp"
+                android:text="@string/settings_camera_upload_on"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey87White87.18sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/upload_videos_switch"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:layout_marginEnd="18dp"
-                android:gravity="end"
-                app:layout_constraintBottom_toBottomOf="@id/textView"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/textView" />
-
             <TextView
-                android:id="@+id/textView2"
-                android:layout_width="0dp"
+                android:id="@+id/enable_cu_subtitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:text="@string/camera_uploads_cellular_connection"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="@+id/textView"
-                app:layout_constraintTop_toBottomOf="@+id/textView" />
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:text="@string/enable_cu_subtitle"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey54White60.15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/enable_cu_title" />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/cellular_connection_switch"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/settings_container"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                app:layout_constraintEnd_toEndOf="@+id/upload_videos_switch"
-                app:layout_constraintStart_toStartOf="@+id/upload_videos_switch"
-                app:layout_constraintTop_toBottomOf="@+id/upload_videos_switch" />
+                android:layout_marginTop="35.5dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/background_rounded_8dp_rectangle"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/enable_cu_subtitle">
+
+                <RelativeLayout
+                    android:id="@+id/upload_videos_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="25.5dp"
+                        android:layout_toStartOf="@+id/upload_videos_switch"
+                        android:text="@string/camera_uploads_upload_videos"
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey87White87" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/upload_videos_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_margin="19dp"
+                        android:gravity="end" />
+
+                </RelativeLayout>
+
+                <View
+                    android:id="@+id/settings_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16.5dp"
+                    android:layout_marginEnd="16.5dp"
+                    android:background="@color/grey_012_white_020" />
+
+                <RelativeLayout
+                    android:id="@+id/data_connection_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="25.5dp"
+                        android:layout_toStartOf="@id/cellular_connection_switch"
+                        android:text="@string/camera_uploads_cellular_connection"
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey87White87" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/cellular_connection_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_margin="19dp" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
 
-    <LinearLayout
-        android:id="@+id/buttons_layout"
+    <Button
+        android:id="@+id/enable_button"
+        style="?attr/materialButtonStyle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:orientation="horizontal"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/cam_sync_scroll_view">
-
-        <Button
-            android:id="@+id/cam_sync_button_skip"
-            style="?attr/materialButtonStyle"
-            android:layout_marginEnd="8dp"
-            android:backgroundTint="@color/white"
-            android:text="@string/general_skip"
-            android:textColor="@color/dark_grey" />
-
-        <Button
-            android:id="@+id/cam_sync_button_ok"
-            style="?attr/materialButtonStyle"
-            android:layout_marginEnd="16dp"
-            android:text="@string/general_ok" />
-
-    </LinearLayout>
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/general_enable"
+        app:layout_constraintBottom_toBottomOf="@+id/cam_sync_scroll_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

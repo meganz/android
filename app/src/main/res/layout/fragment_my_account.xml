@@ -141,7 +141,7 @@
                         android:layout_marginBottom="10dp"
                         android:layout_toStartOf="@+id/upgrade_button"
                         android:layout_toEndOf="@+id/account_type_icon"
-                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.White"
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.WhiteBlack"
                         tools:text="Free" />
 
                     <Button
