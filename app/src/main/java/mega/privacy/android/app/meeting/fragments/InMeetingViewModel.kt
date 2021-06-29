@@ -770,12 +770,21 @@ class InMeetingViewModel @ViewModelInject constructor(
     ) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             logDebug("The chat exists")
-            inMeetingRepository.startCall(
-                it.chatId,
-                videoEnable,
-                audioEnable,
-                listener
-            )
+            if (CallUtil.isStatusConnected(
+                    MegaApplication.getInstance().applicationContext,
+                    it.chatId
+                )
+            ) {
+                logDebug("Chat status is connected")
+                inMeetingRepository.startCall(
+                    it.chatId,
+                    videoEnable,
+                    audioEnable,
+                    listener
+                )
+
+                MegaApplication.setIsWaitingForCall(false)
+            }
             return
         }
 
@@ -2036,3 +2045,4 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
     }
 }
+

@@ -3952,8 +3952,6 @@
     <string name="join_meeting">Join meeting</string>
     <!-- Button that create a meeting -->
     <string name="btn_start_meeting">Start meeting</string>
-    <!-- Button that join a meeting -->
-    <string name="btn_join_meeting">Join meeting</string>
     <!-- Button that join a meeting as guest -->
     <string name="btn_join_meeting_as_guest">Join as a guest</string>
     <!-- Hint shown to guide user on meeting name -->
@@ -4023,7 +4021,7 @@
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Paste your link here or click the link sent to you.</string>
     <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">You are in slow connection</string>
+    <string name="slow_connection_meeting">You have a weak connection</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Meeting has ended</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -4036,16 +4034,10 @@
     <string name="button_permission_info">Got it</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_required_permissions_warning">Go to settings to allow MEGA to access your camera and microphone.</string>
-    <!-- Alert the guest you have left MEGA meeting when left meeting-->
-    <string name="left_meeting">You have left MEGA meeting</string>
-    <!-- Ask the guest for keeping track MEGA meeting when left meeting-->
-    <string name="keep_track_meeting">Do you want to keep track of your MEGA meeting?</string>
-    <!-- the title of use any device on left meeting page-->
-    <string name="use_any_device">Use any device</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">View meeting chat</string>
     <!-- the content of tips when the user uses the meeting first time-->
-    <string name="tip_invite_more_participants">Invite more participants to the \nmeeting. Swipe up to invite.</string>
+    <string name="tip_invite_more_participants">Invite more participants to the meeting. Swipe up to invite.</string>
     <!-- the content of tips when the user enters recent chat page first time-->
     <string name="tip_create_meeting">Tap to create a new meeting</string>
     <!-- the content of tips when the user enters start conversation page first time-->
@@ -4056,8 +4048,6 @@
     <string name="be_new_moderator">You are the new meeting moderator now!</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Copied meeting link.</string>
-    <!-- Message on the paste link dialog if there were any error loading the meeting link without logging-->
-    <string name="error_meeting_link_init_error">Error initialising meeting when loading the meeting link.</string>
     <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
     <string name="join_meeting_layout_in_group_call">%s started a meeting. Tap to join.</string>
     <!-- Title of fifth tour screen -->

@@ -1,49 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="@dimen/bottom_sheet_tip_width"
-    android:layout_height="@dimen/bottom_sheet_tip_height"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_gravity="center">
 
-    <RelativeLayout
-        android:id="@+id/rl_title"
-        android:layout_width="match_parent"
-        android:layout_height="99dp"
-        android:paddingHorizontal="16dp"
+    <LinearLayout
+        android:id="@+id/ll_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@drawable/background_button_corner_without_border"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/tv_tip"
-            android:layout_width="wrap_content"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
             android:text="@string/tip_invite_more_participants"
             android:textAppearance="?attr/textAppearanceSubtitle2"
-            android:textColor="@color/grey_alpha_054" />
-
+            android:textColor="@color/grey_alpha_054"/>
 
         <Button
             android:id="@+id/bt_ok"
             style="?attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
+            android:layout_gravity="right"
             android:text="@string/button_permission_info" />
-
-    </RelativeLayout>
+    </LinearLayout>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/background_meeting_hint"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/rl_title"
-        android:background="@drawable/background_meeting_hint" />
+        app:layout_constraintTop_toBottomOf="@id/ll_title" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

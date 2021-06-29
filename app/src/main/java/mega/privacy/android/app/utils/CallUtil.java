@@ -1116,4 +1116,17 @@ public class CallUtil {
         String notificationCallId = MegaApiAndroid.userHandleToBase64(callId);
         return notificationCallId.hashCode() + NOTIFICATION_CALL_IN_PROGRESS;
     }
+
+    /**
+     * Method to check if the chat is online
+     *
+     * @param newState The state of chat
+     * @param chatRoom The MegaChatRoom
+     * @return True, if the chat is connected and a call can be started. False, otherwise
+     */
+    public static boolean isChatConnectedInOrderToInitiateACall(int newState, MegaChatRoom chatRoom) {
+        return MegaApplication.isWaitingForCall() && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
+                && chatRoom != null && chatRoom.getPeerHandle(0) != MEGACHAT_INVALID_HANDLE &&
+                chatRoom.getPeerHandle(0) == MegaApplication.getUserWaitingForCall();
+    }
 }

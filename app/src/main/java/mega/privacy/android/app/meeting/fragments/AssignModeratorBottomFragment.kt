@@ -47,7 +47,6 @@ class AssignModeratorBottomFragment(
                 .toMutableList())
         }
 
-
         dialog.setContentView(binding.root)
     }
 
@@ -104,7 +103,11 @@ class AssignModeratorBottomFragment(
         updateParticipantList(position)
 
         val participant = participants[position]
-        selectedParticipants.add(participant)
+        if (participant.isChosenForAssign) {
+            selectedParticipants.add(participant)
+        } else {
+            selectedParticipants.remove(participant)
+        }
         updateSelectedParticipant()
     }
 
@@ -113,10 +116,12 @@ class AssignModeratorBottomFragment(
             binding.toolbar.subtitle =
                 StringResourcesUtils.getString(R.string.selected_items, selectedParticipants.size)
             binding.moderatorAddsContainer.isVisible = true
+            binding.btOk.isEnabled = true
         } else {
             binding.moderatorAddsContainer.isVisible = false
             binding.toolbar.subtitle =
                 StringResourcesUtils.getString(R.string.pick_new_moderator_message)
+            binding.btOk.isEnabled = false
         }
         binding.moderatorAddsContainer.isVisible = selectedParticipants.size > 0
         selectedParticipantsAdapter.submitList(selectedParticipants.toMutableList())

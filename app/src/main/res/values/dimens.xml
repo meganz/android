@@ -132,9 +132,6 @@
     <dimen name="bottom_sheet_item_divider_margin_start">72dp</dimen>
     <dimen name="bottom_sheet_landscape_width">360dp</dimen>
 
-    <dimen name="bottom_sheet_tip_width">225dp</dimen>
-    <dimen name="bottom_sheet_tip_height">115dp</dimen>
-
     <dimen name="card_margin_portrait">8dp</dimen>
     <dimen name="card_margin_landscape">3dp</dimen>
     <dimen name="cu_margin_bottom">50dp</dimen>

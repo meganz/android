@@ -115,6 +115,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     private val meetingCreatedObserver =
         Observer<Long> {
             updateChatRoomId(it)
+            MegaApplication.setIsWaitingForCall(true)
             createChatLink(it)
         }
 

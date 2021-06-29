@@ -384,6 +384,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+    private val chatConnectionStatusObserver =
+        Observer<Pair<Long, Int>> { chatAndState ->
+            if (inMeetingViewModel.isSameChatRoom(chatAndState.first) && MegaApplication.isWaitingForCall()) {
+                inMeetingViewModel.startMeeting(
+                    camIsEnable,
+                    micIsEnable,
+                    StartChatCallListener(meetingActivity, this, this)
+                )
+            }
+        }
+
     private val sessionLowResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             if (inMeetingViewModel.isSameCall(callAndSession.first)) {
@@ -693,6 +704,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_LOWRES_CHANGE)
             .observe(this, sessionLowResObserver as Observer<Any>)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_CHAT_CONNECTION_STATUS)
+            .observe(this, chatConnectionStatusObserver as Observer<Any>)
     }
 
     private fun initToolbar() {
@@ -760,13 +774,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 !it.isNullOrEmpty() -> {
                     logDebug("Link has changed")
                     meetinglink = it
-                    if (inMeetingViewModel.getCall() == null) {
-                        inMeetingViewModel.startMeeting(
-                            camIsEnable,
-                            micIsEnable,
-                            StartChatCallListener(meetingActivity, this, this)
-                        )
-                    } else {
+                    inMeetingViewModel.getCall()?.let {
                         if (inMeetingViewModel.isWaitingForLink()) {
                             inMeetingViewModel.setWaitingForLink(false)
                             shareLink()
@@ -1431,8 +1439,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 inMeetingViewModel.startMeeting(
                     camIsEnable,
                     micIsEnable,
-                    StartChatCallListener(requireContext(), this, this)
-                )
+                    StartChatCallListener(requireContext(), this, this))
             }
         }
     }

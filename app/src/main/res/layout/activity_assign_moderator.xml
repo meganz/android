@@ -28,10 +28,10 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/selected_participant_list"
-            android:nestedScrollingEnabled="false"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
+            android:nestedScrollingEnabled="false"
             android:orientation="horizontal" />
 
     </RelativeLayout>
@@ -76,10 +76,10 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="25dp"
         android:layout_marginBottom="32dp"
+        android:enabled="false"
         android:text="@string/general_ok"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/participant_list" />
+        app:layout_constraintRight_toRightOf="parent" />
 
 
     <Button
@@ -92,8 +92,7 @@
         android:textColor="@color/teal_300"
         app:layout_constraintBaseline_toBaselineOf="@id/bt_ok"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/bt_ok"
-        app:layout_constraintTop_toBottomOf="@id/participant_list" />
+        app:layout_constraintRight_toLeftOf="@id/bt_ok" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
