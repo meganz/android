@@ -522,8 +522,9 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             animatePaginationUI()
         }
 
-        binding.contentText.text = currentContent
-        binding.contentEditText.setText(currentContent)
+        val firstLineNumber = content.getFirstLineNumber()
+        binding.contentText.setText(currentContent, firstLineNumber)
+        binding.contentEditText.setText(currentContent, firstLineNumber)
         binding.fileEditorScrollView.isVisible = true
         binding.fileEditorScrollView.smoothScrollTo(0, 0)
         binding.loadingLayout.isVisible = false

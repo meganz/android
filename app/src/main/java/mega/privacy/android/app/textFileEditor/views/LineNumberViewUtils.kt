@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.view.View
 import android.widget.TextView
 import mega.privacy.android.app.R
+import mega.privacy.android.app.textFileEditor.Pagination.Companion.LINE_BREAK
 import mega.privacy.android.app.utils.ColorUtils
 
 object LineNumberViewUtils {
@@ -28,14 +29,20 @@ object LineNumberViewUtils {
      * Draws line numbers if are enabled.
      *
      * @param lineNumberEnabled True if line numbers are enabled, false otherwise.
+     * @param firstLineNumber   Number to show as first line number.
      * @param canvas            Canvas in which line numbers have to be drawn.
      * @param paint             Text paint with which line numbers have to be painted.
      */
-    fun TextView.addExtraOnDrawBehaviour(lineNumberEnabled: Boolean, canvas: Canvas, paint: Paint) {
+    fun TextView.addExtraOnDrawBehaviour(
+        lineNumberEnabled: Boolean,
+        firstLineNumber: Int,
+        canvas: Canvas,
+        paint: Paint
+    ) {
         if (lineNumberEnabled) {
             val padding = resources.getDimensionPixelSize(R.dimen.line_number_padding)
             var baseline = baseline
-            var lineNumber = 1
+            var lineNumber = firstLineNumber
             var endOfLine = true
 
             for (i in 0 until lineCount) {
@@ -48,7 +55,7 @@ object LineNumberViewUtils {
                     endOfLine = false
                 }
 
-                if (text.substring(layout.getLineStart(i), layout.getLineEnd(i)).endsWith("\n")) {
+                if (text.substring(layout.getLineStart(i), layout.getLineEnd(i)).endsWith(LINE_BREAK)) {
                     endOfLine = true
                 }
 
