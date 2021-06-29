@@ -28,8 +28,13 @@ data class CUCard(
     val year: String?,
     val date: String,
     val localDate: LocalDate,
-    var numItems: Long? = null
+    var numItems: Long = 0
 ) {
+
+    fun incrementNumItems() {
+        numItems++
+    }
+
     class DiffCallback : DiffUtil.ItemCallback<CUCard>() {
         override fun areItemsTheSame(oldItem: CUCard, newItem: CUCard) =
             oldItem.node.handle == newItem.node.handle

@@ -1869,7 +1869,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
             sendBroadcast(new Intent(ACTION_UPDATE_CU)
                     .putExtra(PROGRESS, progressPercent)
-                    .putExtra(PENDING_TRANSFERS, inProgress));
+                    .putExtra(PENDING_TRANSFERS, pendingTransfers));
 
             if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
                 message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalTransfers, inProgress, totalTransfers);
