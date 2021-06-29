@@ -25,7 +25,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.constants.EventConstants.EVENT_TEXT_FILE_UPLOADED
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -57,7 +56,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         private const val CURSOR_POSITION = "CURSOR_POSITION"
         private const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
         private const val RENAME_SHOWN = "RENAME_SHOWN"
-        const val FROM_HOME_PAGE = "FROM_HOME_PAGE"
         const val TIME_SHOWING_PAGINATION_UI = 4000L
         private const val STATE_SHOWN = 0
         private const val STATE_HIDDEN = 1
@@ -83,19 +81,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
     }
 
-    private val completedEditionObserver = Observer<Long> { completedTransferId ->
-        val result = viewModel.finishCreationOrEdition(completedTransferId)
-
-        if (result != NON_UPDATE_FINISH_ACTION) {
-            showCreationOrEditionResult(result)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long::class.java)
-            .observeForever(completedEditionObserver)
 
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -164,9 +151,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             errorReadingContentDialog?.dismiss()
         }
 
-        LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long::class.java)
-            .removeObserver(completedEditionObserver)
-
         super.onDestroy()
     }
 
@@ -177,7 +161,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             showDiscardChangesConfirmationDialog()
         } else {
             if (viewModel.isCreateMode()) {
-                viewModel.saveFile(this)
+                viewModel.saveFile(this, intent.getBooleanExtra(FROM_HOME_PAGE, false))
             } else if (viewModel.isReadingContent()) {
                 viewModel.checkIfNeedsStopHttpServer()
             }
@@ -189,7 +173,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
-            R.id.action_save -> viewModel.saveFile(this)
+            R.id.action_save -> viewModel.saveFile(
+                this,
+                intent.getBooleanExtra(FROM_HOME_PAGE, false)
+            )
             R.id.action_download -> viewModel.downloadFile(nodeSaver)
             R.id.action_get_link, R.id.action_remove_link -> viewModel.manageLink(this)
             R.id.action_send_to_chat -> nodeAttacher.attachNode(viewModel.getNode()!!)
@@ -421,7 +408,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         viewModel.onTextFileEditorDataUpdate().observe(this) { refreshMenuOptionsVisibility() }
         viewModel.getFileName().observe(this, ::showFileName)
         viewModel.getMode().observe(this, ::showMode)
-        viewModel.onSavingMode().observe(this, ::showSavingMode)
         viewModel.onContentTextRead().observe(this, ::showContentRead)
     }
 
@@ -482,17 +468,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     /**
-     * Updates the UI by setting the saving mode.
-     *
-     * @param savingMode The pre-saving mode.
-     */
-    private fun showSavingMode(savingMode: String?) {
-        if (savingMode != null) {
-            binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
-        }
-    }
-
-    /**
      * Shows the file name.
      *
      * @param name File name.
@@ -533,47 +508,6 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         if (viewModel.canShowEditFab() && currentUIState == STATE_SHOWN) {
             binding.editFab.show()
         }
-    }
-
-    /**
-     * Shows the result of a create or edit action.
-     *
-     * @param success SUCCESS_FINISH_ACTION if the action finished with success,
-     *  ERROR_FINISH_ACTION otherwise.
-     */
-    private fun showCreationOrEditionResult(success: Int) {
-        refreshMenuOptionsVisibility()
-
-        val successful = success == SUCCESS_FINISH_ACTION
-
-        if (successful) {
-            binding.nameText.apply {
-                isVisible = true
-                text = viewModel.getNameOfFile()
-            }
-
-            binding.editFab.apply {
-                //Necessary to call hide first to avoid not being shown because the view doesn't exist yet
-                hide()
-                show()
-            }
-        }
-
-        showSnackbar(
-            when {
-                viewModel.isSavingModeEdit() -> StringResourcesUtils.getString(if (successful) R.string.file_updated else R.string.file_update_failed)
-                intent.getBooleanExtra(
-                    FROM_HOME_PAGE,
-                    false
-                ) -> StringResourcesUtils.getString(
-                    if (successful) R.string.file_saved_to else R.string.file_saved_to_failed,
-                    StringResourcesUtils.getString(R.string.section_cloud_drive)
-                )
-                else -> StringResourcesUtils.getString(if (successful) R.string.file_created else R.string.file_creation_failed)
-            }
-        )
-
-        viewModel.resetSavingMode()
     }
 
     /**

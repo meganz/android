@@ -26,7 +26,6 @@ import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
-import mega.privacy.android.app.textFileEditor.TextFileEditorActivity.Companion.FROM_HOME_PAGE
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.CREATE_MODE
 import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance

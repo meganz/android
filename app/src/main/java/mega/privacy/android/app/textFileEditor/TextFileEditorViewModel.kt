@@ -68,7 +68,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private val textFileEditorData: MutableLiveData<TextFileEditorData> =
         MutableLiveData(TextFileEditorData())
     private val mode: MutableLiveData<String> = MutableLiveData()
-    private val savingMode: MutableLiveData<String> = MutableLiveData()
     private val fileName: MutableLiveData<String> = MutableLiveData()
     private val pagination: MutableLiveData<Pagination> = MutableLiveData()
 
@@ -82,8 +81,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private lateinit var preferences: SharedPreferences
 
     fun onTextFileEditorDataUpdate(): LiveData<TextFileEditorData> = textFileEditorData
-
-    fun onSavingMode(): LiveData<String> = savingMode
 
     fun getFileName(): LiveData<String> = fileName
 
@@ -130,14 +127,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         mode.value = EDIT_MODE
     }
 
-    private fun isSaving(): Boolean = savingMode.value != null
-
-    fun isSavingModeEdit(): Boolean = savingMode.value == EDIT_MODE
-
-    fun resetSavingMode() {
-        savingMode.value = null
-    }
-
     fun getEditedText(): String? = pagination.value?.getCurrentPageText()
 
     fun setEditedText(text: String?) {
@@ -170,8 +159,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     fun shouldShowLineNumbers(): Boolean = showLineNumbers
 
     fun canShowEditFab(): Boolean =
-        isViewMode() && isEditableAdapter() && !isSaving()
-                && !needsReadOrIsReadingContent() && thereIsNoErrorSettingContent()
+        isViewMode() && isEditableAdapter() && !needsReadOrIsReadingContent()
+                && thereIsNoErrorSettingContent()
 
     /**
      * Checks if the file can be editable depending on the current adapter.
@@ -387,18 +376,18 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      * Starts the save file content action by creating a temp file, setting the new or modified text,
      * and then uploading it to the Cloud.
      *
-     * @param context Current context.
+     * @param activity Current activity.
+     * @param fromHome True if is creating file from Home page, false otherwise.
      */
-    fun saveFile(context: Context) {
+    fun saveFile(activity: Activity, fromHome: Boolean) {
         if (!isFileEdited() && !isCreateMode()) {
             setViewMode()
             return
         }
 
-        val tempFile = buildTempFile(context, fileName.value)
+        val tempFile = buildTempFile(activity, fileName.value)
         if (tempFile == null) {
             logError("Cannot get temporal file.")
-
             return
         }
 
@@ -412,8 +401,9 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             return
         }
 
-        val uploadIntent = Intent(context, UploadService::class.java)
-            .putExtra(UploadService.EXTRA_UPLOAD_TXT, true)
+        val uploadIntent = Intent(activity, UploadService::class.java)
+            .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
+            .putExtra(FROM_HOME_PAGE, fromHome)
             .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
             .putExtra(UploadService.EXTRA_NAME, fileName.value)
             .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
@@ -428,9 +418,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 }
             )
 
-        context.startService(uploadIntent)
-        savingMode.value = mode.value
-        setViewMode()
+        activity.startService(uploadIntent)
+        activity.finish()
     }
 
     /**
@@ -516,41 +505,6 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         return completedTransfer.fileName == fileName.value
                 && completedTransfer.parentHandle == fileParentHandle
-    }
-
-    /**
-     * Finishes the create or edit action if the received completed transfer makes reference to
-     * the current opened file.
-     *
-     * @param completedTransferId The completed transfer identifier.
-     */
-    fun finishCreationOrEdition(completedTransferId: Long): Int {
-        if (completedTransferId == INVALID_ID.toLong()) {
-            LogUtil.logWarning("Invalid completedTransferId")
-            return NON_UPDATE_FINISH_ACTION
-        }
-
-        val completedTransfer = dbH.getcompletedTransfer(completedTransferId)
-        if (completedTransfer == null) {
-            LogUtil.logWarning("Invalid completedTransfer")
-            return NON_UPDATE_FINISH_ACTION
-        }
-
-        if (!isSameNode(completedTransfer)) {
-            LogUtil.logWarning("Not the same file, no update needed.")
-            return NON_UPDATE_FINISH_ACTION
-        }
-
-        if (completedTransfer.state != MegaTransfer.STATE_COMPLETED) {
-            return ERROR_FINISH_ACTION
-        }
-
-        pagination.value?.editionFinished()
-
-        textFileEditorData.value?.node =
-            megaApi.getNodeByHandle(completedTransfer.nodeHandle.toLong())
-
-        return SUCCESS_FINISH_ACTION
     }
 
     /**
