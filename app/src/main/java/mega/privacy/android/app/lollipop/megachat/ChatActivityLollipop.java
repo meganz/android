@@ -207,6 +207,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.GiphyUtil.getGiphySrc;
 import static mega.privacy.android.app.utils.LinksUtil.isMEGALinkAndRequiresTransferSession;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
@@ -936,6 +937,9 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     public void showGroupInfoActivity(){
         logDebug("showGroupInfoActivity");
+        if (chatRoom == null)
+            return;
+
         Intent i = new Intent(this,
                 chatRoom.isGroup() ? GroupChatInfoActivityLollipop.class : ContactInfoActivityLollipop.class);
         i.putExtra(HANDLE, chatRoom.getChatId());
@@ -1484,12 +1488,10 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
-
         if (newIntent != null){
             logDebug("Intent is not null");
             intentAction = newIntent.getAction();
             if (intentAction != null){
-
                 if (intentAction.equals(ACTION_OPEN_CHAT_LINK) || intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)){
                     String link = newIntent.getDataString();
 
@@ -1509,14 +1511,17 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                             if (request.getParamType() == LINK_IS_FOR_MEETING) {
                                 logDebug("It's a meeting");
-
                                 if (request.getFlag()) {
                                     boolean isAlreadyJoined = e.getErrorCode() == MegaChatError.ERROR_EXIST;
                                     MegaHandleList list = request.getMegaHandleList();
 
                                     if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-                                        logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
+                                        if(CallUtil.participatingInACall()){
+                                            showConfirmationInACall(context);
+                                            return;
+                                        }
 
+                                        logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
                                         if(isAlreadyJoined) {
                                             // Open the ongoing meeting.
                                             MegaChatCall call = api.getChatCall(chatId);
@@ -1555,7 +1560,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                                     api.openChatPreview(link, this);
                                 }
                             } else {
-                                // Normal Chat Link
+                                logDebug("It's a chat");
+                                        // Normal Chat Link
                                 openChatPreview(link);
                             }
                         }
@@ -1563,7 +1569,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 } else {
                     long newIdChat = newIntent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 
-                    if(idChat != newIdChat){
+                    if(idChat != newIdChat && newIdChat != MEGACHAT_INVALID_HANDLE){
                         megaChatApi.closeChatRoom(idChat, this);
                         idChat = newIdChat;
                     }
@@ -5070,11 +5076,14 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void itemClick(int positionInAdapter, int [] screenPosition) {
+        if(messages == null || messages.isEmpty()){
+            logError("Messages null or empty");
+            return;
+        }
         int positionInMessages = positionInAdapter-1;
 
         if(positionInMessages < messages.size()){
             AndroidMegaChatMessage m = messages.get(positionInMessages);
-
             if (adapter.isMultipleSelect()) {
                 logDebug("isMultipleSelect");
                 if (!m.isUploading()) {
@@ -7727,7 +7736,6 @@ public class ChatActivityLollipop extends PasscodeActivity
         if(dialog!=null){
             dialog.dismiss();
         }
-
         this.messages = messages;
         //Create adapter
         if (adapter == null) {
@@ -8184,8 +8192,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                     return;
                 }else{
                     long newidChat = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-                    if(intent.getAction().equals(ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(ACTION_OPEN_CHAT_LINK) || idChat != newidChat) {
-                        cleanBuffers();
+                    if(intent.getAction().equals(ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(ACTION_OPEN_CHAT_LINK) || (idChat != newidChat && newidChat != MEGACHAT_INVALID_HANDLE)) {
+                        if (newidChat != MEGACHAT_INVALID_HANDLE) {
+                            cleanBuffers();
+                        }
                         pendingMessagesLoaded = false;
                     }
                     if (messagesPlaying != null && !messagesPlaying.isEmpty()) {
@@ -8195,9 +8205,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                         }
                         messagesPlaying.clear();
                     }
-
-                    closeChat(false);
-                    MegaApplication.setOpenChatId(-1);
+                    if(newidChat != MEGACHAT_INVALID_HANDLE){
+                        closeChat(false);
+                        MegaApplication.setOpenChatId(-1);
+                    }
                     initAfterIntent(intent, null);
                 }
 
@@ -8459,7 +8470,6 @@ public class ChatActivityLollipop extends PasscodeActivity
 
    @Override
     public void onResume(){
-        logDebug("onResume");
         super.onResume();
        stopService(new Intent(this, KeepAliveService.class));
         if(idChat!=-1 && chatRoom!=null) {

@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.SystemClock;
-import android.util.TypedValue;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Chronometer;
@@ -444,7 +443,10 @@ public class CallUtil {
         int callStatus = call.getStatus();
         layoutCallMenuItem.setBackground(ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message));
 
-        if (chronometerMenuItem != null && (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
+        if(chronometerMenuItem == null)
+            return;
+
+        if (callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING) {
             if (chronometerMenuItem.getVisibility() == View.VISIBLE) return;
             chronometerMenuItem.setVisibility(View.VISIBLE);
             chronometerMenuItem.setBase(SystemClock.elapsedRealtime() - (call.getDuration() * 1000));
@@ -668,13 +670,11 @@ public class CallUtil {
     }
 
     public static long isNecessaryDisableLocalCamera() {
-        long noVideo = MEGACHAT_INVALID_HANDLE;
-
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         long chatIdCallInProgress = getChatCallInProgress();
         MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
         if (callInProgress == null || !callInProgress.hasLocalVideo()) {
-            return noVideo;
+            return MEGACHAT_INVALID_HANDLE;
         }
 
         return chatIdCallInProgress;
@@ -701,12 +701,16 @@ public class CallUtil {
                         ((ChatActivityLollipop) activity).controlCamera();
                     }
                     if (activity instanceof ManagerActivityLollipop) {
-                        if (action.equals(ACTION_OPEN_QR)) {
-                            ((ManagerActivityLollipop) activity).openQR(openScanQR);
-                        } else if (action.equals(ACTION_TAKE_PICTURE)) {
-                            takePicture(activity, TAKE_PHOTO_CODE);
-                        } else if (action.equals(ACTION_TAKE_PROFILE_PICTURE)) {
-                            takePicture(activity, TAKE_PICTURE_PROFILE_CODE);
+                        switch (action) {
+                            case ACTION_OPEN_QR:
+                                ((ManagerActivityLollipop) activity).openQR(openScanQR);
+                                break;
+                            case ACTION_TAKE_PICTURE:
+                                takePicture(activity, TAKE_PHOTO_CODE);
+                                break;
+                            case ACTION_TAKE_PROFILE_PICTURE:
+                                takePicture(activity, TAKE_PICTURE_PROFILE_CODE);
+                                break;
                         }
                     }
                     if (activity instanceof AddContactActivityLollipop && action.equals(ACTION_OPEN_QR)) {
@@ -856,24 +860,6 @@ public class CallUtil {
     }
 
     /**
-     * Method for obtaining the height of the action bar.
-     *
-     * @return The height of actionbar.
-     */
-    public static int getActionBarHeight(Context context) {
-        int actionBarHeight = 0;
-
-        if (actionBarHeight == 0) {
-            final TypedValue tv = new TypedValue();
-            if (context.getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-                actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
-            }
-        }
-
-        return actionBarHeight;
-    }
-
-    /**
      * Method to retrieve the chat ID with an active call.
      *
      * @param currentChatId The chat ID with call.
@@ -972,8 +958,10 @@ public class CallUtil {
             CreateChatListener listener = new CreateChatListener(
                     CreateChatListener.START_AUDIO_CALL, chats, usersNoChat, activity,
                     snackbarShower);
-            peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
-            megaChatApi.createChat(false, peers, listener);
+            if (peers != null) {
+                peers.addPeer(user.getHandle(), MegaChatPeerList.PRIV_STANDARD);
+                megaChatApi.createChat(false, peers, listener);
+            }
         } else if (megaChatApi.getChatCall(chat.getChatId()) != null) {
             openMeetingInProgress(activity, chat.getChatId(), true);
         } else if (isStatusConnected(activity, chat.getChatId())) {
@@ -1100,7 +1088,8 @@ public class CallUtil {
 
         try {
             NotificationManager notificationManager = (NotificationManager) MegaApplication.getInstance().getBaseContext().getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.cancel(getCallNotificationId(callIdIncomingCall));
+            if (notificationManager != null)
+                notificationManager.cancel(getCallNotificationId(callIdIncomingCall));
         } catch (Exception e) {
             logError("EXCEPTION", e);
         }
@@ -1128,5 +1117,17 @@ public class CallUtil {
         return MegaApplication.isWaitingForCall() && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
                 && chatRoom != null && chatRoom.getPeerHandle(0) != MEGACHAT_INVALID_HANDLE &&
                 chatRoom.getPeerHandle(0) == MegaApplication.getUserWaitingForCall();
+    }
+
+    /**
+     * Method to display a dialogue informing the user that he/she cannot start or join a meeting while on a call in progress.
+     */
+    public static void showConfirmationInACall(Context context) {
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+        };
+
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
+        String message = context.getResources().getString(R.string.ongoing_call_content);
+        builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener).show();
     }
 }

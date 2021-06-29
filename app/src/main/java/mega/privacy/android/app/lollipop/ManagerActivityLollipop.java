@@ -8849,7 +8849,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onJoinMeeting() {
 		if(CallUtil.participatingInACall()){
-			showConfirmationInACall();
+			showConfirmationInACall(this);
 		} else {
 			showOpenLinkDialog();
 		}
@@ -8858,7 +8858,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onCreateMeeting() {
 		if(CallUtil.participatingInACall()){
-			showConfirmationInACall();
+			showConfirmationInACall(this);
 		} else {
 			openMeetingToCreate(this);
 		}
@@ -8868,16 +8868,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		Intent in = new Intent(this, InviteContactActivity.class);
 		in.putExtra("contactType", CONTACT_TYPE_DEVICE);
 		startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
-	}
-
-	public void showConfirmationInACall() {
-		logDebug("showConfirmationInACall");
-		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		String message = getResources().getString(R.string.ongoing_call_content);
-		builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener).show();
 	}
 
 	public void showConfirmationRemoveContact(final MegaUser c){
