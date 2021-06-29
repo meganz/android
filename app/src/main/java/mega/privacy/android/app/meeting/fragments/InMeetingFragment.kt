@@ -1142,6 +1142,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Remove fragments
      */
     private fun removeUI() {
+        if(status == NOT_TYPE)
+            return
+
         status = NOT_TYPE
         MegaApplication.getInstance().unregisterProximitySensor()
 
