@@ -1,13 +1,13 @@
-package mega.privacy.android.app.textFileEditor.views
+package mega.privacy.android.app.textEditor.views
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
-import mega.privacy.android.app.textFileEditor.views.LineNumberViewUtils.addExtraOnDrawBehaviour
-import mega.privacy.android.app.textFileEditor.views.LineNumberViewUtils.initTextPaint
-import mega.privacy.android.app.textFileEditor.views.LineNumberViewUtils.updatePaddingsAndView
+import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.addExtraOnDrawBehaviour
+import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.initTextPaint
+import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.updatePaddingsAndView
 
 class LineNumberEditText : AppCompatEditText {
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.textFileEditor
+package mega.privacy.android.app.textEditor
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -14,11 +14,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -28,12 +26,9 @@ import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.NON_UPDATE_FINISH_ACTION
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.SUCCESS_FINISH_ACTION
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.VIEW_MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
@@ -50,7 +45,7 @@ import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
 
 @AndroidEntryPoint
-class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
+class TextEditorActivity : PasscodeActivity(), SnackbarShower {
 
     companion object {
         private const val CURSOR_POSITION = "CURSOR_POSITION"
@@ -61,7 +56,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         private const val STATE_HIDDEN = 1
     }
 
-    private val viewModel by viewModels<TextFileEditorViewModel>()
+    private val viewModel by viewModels<TextEditorViewModel>()
 
     private lateinit var binding: ActivityTextFileEditorBinding
 

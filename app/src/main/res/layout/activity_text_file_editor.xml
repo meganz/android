@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <mega.privacy.android.app.textFileEditor.views.LineNumberTextView
+            <mega.privacy.android.app.textEditor.views.LineNumberTextView
                 android:id="@+id/content_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
                 android:textAppearance="@style/TextAppearance.Mega.Body2"
                 android:textIsSelectable="true" />
 
-            <mega.privacy.android.app.textFileEditor.views.LineNumberEditText
+            <mega.privacy.android.app.textEditor.views.LineNumberEditText
                 android:id="@+id/content_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

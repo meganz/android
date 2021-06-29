@@ -53,7 +53,7 @@ import static mega.privacy.android.app.components.transferWidget.TransfersManage
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
-import static mega.privacy.android.app.textFileEditor.TextEditorUtil.getCreationOrEditorText;
+import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;

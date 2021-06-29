@@ -1,4 +1,4 @@
-package mega.privacy.android.app.textFileEditor
+package mega.privacy.android.app.textEditor
 
 import java.util.regex.Pattern
 import kotlin.collections.ArrayList

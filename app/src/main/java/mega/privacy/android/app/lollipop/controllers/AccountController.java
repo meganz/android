@@ -25,7 +25,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -58,7 +57,7 @@ import nz.mega.sdk.MegaError;
 
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
-import static mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.SHOW_LINE_NUMBERS;
+import static mega.privacy.android.app.textEditor.TextEditorViewModel.SHOW_LINE_NUMBERS;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate;

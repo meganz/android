@@ -1,4 +1,4 @@
-package mega.privacy.android.app.textFileEditor.views
+package mega.privacy.android.app.textEditor.views
 
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -7,7 +7,7 @@ import android.graphics.Typeface
 import android.view.View
 import android.widget.TextView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.textFileEditor.Pagination.Companion.LINE_BREAK
+import mega.privacy.android.app.textEditor.Pagination.Companion.LINE_BREAK
 import mega.privacy.android.app.utils.ColorUtils
 
 object LineNumberViewUtils {

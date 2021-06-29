@@ -1,7 +1,7 @@
-package mega.privacy.android.app.textFileEditor
+package mega.privacy.android.app.textEditor
 
 import mega.privacy.android.app.R
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.EDIT_MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.utils.Constants.APP_DATA_INDICATOR
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaError

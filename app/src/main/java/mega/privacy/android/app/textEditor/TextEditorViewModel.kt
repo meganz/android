@@ -1,4 +1,4 @@
-package mega.privacy.android.app.textFileEditor
+package mega.privacy.android.app.textEditor
 
 import android.app.Activity
 import android.app.ActivityManager
@@ -47,7 +47,7 @@ import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 
-class TextFileEditorViewModel @ViewModelInject constructor(
+class TextEditorViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
@@ -65,8 +65,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
     }
 
-    private val textFileEditorData: MutableLiveData<TextFileEditorData> =
-        MutableLiveData(TextFileEditorData())
+    private val textEditorData: MutableLiveData<TextEditorData> = MutableLiveData(TextEditorData())
     private val mode: MutableLiveData<String> = MutableLiveData()
     private val fileName: MutableLiveData<String> = MutableLiveData()
     private val pagination: MutableLiveData<Pagination> = MutableLiveData()
@@ -80,7 +79,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     private lateinit var preferences: SharedPreferences
 
-    fun onTextFileEditorDataUpdate(): LiveData<TextFileEditorData> = textFileEditorData
+    fun onTextFileEditorDataUpdate(): LiveData<TextEditorData> = textEditorData
 
     fun getFileName(): LiveData<String> = fileName
 
@@ -88,28 +87,28 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun getPagination(): Pagination? = pagination.value
 
-    fun getNode(): MegaNode? = textFileEditorData.value?.node
+    fun getNode(): MegaNode? = textEditorData.value?.node
 
     fun getNodeAccess(): Int = megaApi.getAccess(getNode())
 
     fun updateNode() {
-        val node = textFileEditorData.value?.node ?: return
+        val node = textEditorData.value?.node ?: return
 
-        textFileEditorData.value?.node = megaApi.getNodeByHandle(node.handle)
-        textFileEditorData.notifyObserver()
+        textEditorData.value?.node = megaApi.getNodeByHandle(node.handle)
+        textEditorData.notifyObserver()
     }
 
-    private fun getFileUri(): Uri? = textFileEditorData.value?.fileUri
+    private fun getFileUri(): Uri? = textEditorData.value?.fileUri
 
-    private fun getFileSize(): Long? = textFileEditorData.value?.fileSize
+    private fun getFileSize(): Long? = textEditorData.value?.fileSize
 
-    fun getAdapterType(): Int = textFileEditorData.value?.adapterType ?: INVALID_VALUE
+    fun getAdapterType(): Int = textEditorData.value?.adapterType ?: INVALID_VALUE
 
-    fun isEditableAdapter(): Boolean = textFileEditorData.value?.editableAdapter ?: false
+    fun isEditableAdapter(): Boolean = textEditorData.value?.editableAdapter ?: false
 
-    fun getMsgChat(): MegaChatMessage? = textFileEditorData.value?.msgChat
+    fun getMsgChat(): MegaChatMessage? = textEditorData.value?.msgChat
 
-    fun getChatRoom(): MegaChatRoom? = textFileEditorData.value?.chatRoom
+    fun getChatRoom(): MegaChatRoom? = textEditorData.value?.chatRoom
 
     fun getMode(): LiveData<String> = mode
 
@@ -166,7 +165,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      * Checks if the file can be editable depending on the current adapter.
      */
     private fun setEditableAdapter() {
-        textFileEditorData.value?.editableAdapter =
+        textEditorData.value?.editableAdapter =
             if (isCreateMode()) true
             else getAdapterType() != OFFLINE_ADAPTER
                     && getAdapterType() != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(getNode())
@@ -191,7 +190,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         preferences: SharedPreferences
     ) {
         val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
-        textFileEditorData.value?.adapterType = adapterType
+        textEditorData.value?.adapterType = adapterType
 
         when (adapterType) {
             FROM_CHAT -> {
@@ -199,7 +198,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 val chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
 
                 if (msgId != MEGACHAT_INVALID_HANDLE && chatId != MEGACHAT_INVALID_HANDLE) {
-                    textFileEditorData.value?.chatRoom = megaChatApi.getChatRoom(chatId)
+                    textEditorData.value?.chatRoom = megaChatApi.getChatRoom(chatId)
                     var msgChat = megaChatApi.getMessage(chatId, msgId)
 
                     if (msgChat == null) {
@@ -207,9 +206,9 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                     }
 
                     if (msgChat != null) {
-                        textFileEditorData.value?.msgChat = msgChat
+                        textEditorData.value?.msgChat = msgChat
 
-                        textFileEditorData.value?.node = authorizeNodeIfPreview(
+                        textEditorData.value?.node = authorizeNodeIfPreview(
                             msgChat.megaNodeList.get(0),
                             megaChatApi,
                             megaApi,
@@ -222,12 +221,12 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 val filePath = intent.getStringExtra(INTENT_EXTRA_KEY_PATH)
 
                 if (filePath != null) {
-                    textFileEditorData.value?.fileUri = filePath.toUri()
-                    textFileEditorData.value?.fileSize = File(filePath).length()
+                    textEditorData.value?.fileUri = filePath.toUri()
+                    textEditorData.value?.fileSize = File(filePath).length()
                 }
             }
             FILE_LINK_ADAPTER -> {
-                textFileEditorData.value?.node =
+                textEditorData.value?.node =
                     MegaNode.unserialize(intent.getStringExtra(EXTRA_SERIALIZE_STRING))
             }
             FOLDER_LINK_ADAPTER -> {
@@ -238,10 +237,10 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                     )
                 )
 
-                textFileEditorData.value?.node = megaApiFolder.authorizeNode(node)
+                textEditorData.value?.node = megaApiFolder.authorizeNode(node)
             }
             else -> {
-                textFileEditorData.value?.node = megaApi.getNodeByHandle(
+                textEditorData.value?.node = megaApi.getNodeByHandle(
                     intent.getLongExtra(
                         INTENT_EXTRA_KEY_HANDLE,
                         INVALID_HANDLE
@@ -250,7 +249,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             }
         }
 
-        textFileEditorData.value?.api =
+        textEditorData.value?.api =
             if (adapterType == FOLDER_LINK_ADAPTER) megaApiFolder else megaApi
 
         mode.value = intent.getStringExtra(MODE) ?: VIEW_MODE
@@ -280,11 +279,11 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             else getLocalFile(null, getNode()?.name, getNode()?.size!!)
 
         if (isTextEmpty(localFileUri)) {
-            val api = textFileEditorData.value?.api ?: return
+            val api = textEditorData.value?.api ?: return
 
             if (api.httpServerIsRunning() == 0) {
                 api.httpServerStart()
-                textFileEditorData.value?.needStopHttpServer = true
+                textEditorData.value?.needStopHttpServer = true
             }
 
             api.httpServerSetMaxBufferSize(
@@ -426,9 +425,9 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      * Stops the http server if has been started before.
      */
     fun checkIfNeedsStopHttpServer() {
-        if (textFileEditorData.value?.needStopHttpServer == true) {
-            textFileEditorData.value?.api?.httpServerStop()
-            textFileEditorData.value?.needStopHttpServer = false
+        if (textEditorData.value?.needStopHttpServer == true) {
+            textEditorData.value?.api?.httpServerStop()
+            textEditorData.value?.needStopHttpServer = false
         }
     }
 
