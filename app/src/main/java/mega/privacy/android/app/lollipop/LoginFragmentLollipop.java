@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,9 +57,11 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -1065,7 +1065,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
 
             disableLoginButton();
+
+            // Primitive type directly set value, atomic operation. Don't allow background login.
+            PushMessageHanlder.allowBackgroundLogin = false;
+            IncomingCallService.allowBackgroundLogin = false;
+
             megaApi.fastLogin(gSession, this);
+
             if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_REFRESH_STAGING))  {
                 logDebug("megaChatApi.refreshUrl()");
                 megaChatApi.refreshUrl();
@@ -1759,6 +1765,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         logDebug("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
+            PushMessageHanlder.allowBackgroundLogin = true;
+            IncomingCallService.allowBackgroundLogin = true;
+
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
                 logWarning("Terminate login process when login");

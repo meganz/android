@@ -55,6 +55,11 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
 
     private static String token;
 
+    /**
+     * Flag for controlling if allows the app to do login in background upon receiving a push message.
+     */
+    public static volatile boolean allowBackgroundLogin = true;
+
     public PushMessageHanlder() {
         app = MegaApplication.getInstance();
         megaApi = app.getMegaApi();
@@ -213,8 +218,17 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
      */
     private void performLoginProccess(String gSession) {
         if (!MegaApplication.isLoggingIn()) {
-            // Make sure login in background goes immediately.
-            megaApi.fastLogin(gSession, this);
+            /*
+                Two locks and synchronized block prevent background login executes after login process is launched in `LoginFragment`.
+                Otherwise the login process in foreground will failed with `-11` and cause logout.
+             */
+            if (allowBackgroundLogin) {
+                synchronized (MegaApplication.getInstance()) {
+                    if (allowBackgroundLogin) {
+                        megaApi.fastLogin(gSession, this);
+                    }
+                }
+            }
 
             if (megaChatApi == null) {
                 megaChatApi = app.getMegaChatApi();
@@ -256,6 +270,8 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
         logDebug("onRequestStart: " + request.getRequestString());
+        // Avoid duplicate login.
+        allowBackgroundLogin = false;
     }
 
     @Override
@@ -267,6 +283,8 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("onRequestFinish: " + request.getRequestString());
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
+            allowBackgroundLogin = true;
+
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("Fast login OK");
                 logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
