@@ -13,8 +13,6 @@ import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava
 
@@ -32,6 +30,9 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         }
 
         releaseVideoAndHideKeyboard()
+        firstName = edit_first_name.text.toString()
+        lastName = edit_last_name.text.toString()
+
         val action = JoinMeetingFragmentDirections
             .actionGlobalInMeeting(
                 MeetingActivity.MEETING_ACTION_GUEST,

@@ -2314,11 +2314,13 @@ public class ChatActivityLollipop extends PasscodeActivity
      * @param handleList    list of the participants' handles
      */
     public void updateCustomSubtitle(long chatId, MegaHandleList handleList) {
-        if (handleList == null || handleList.size() == 0
-                || chatId != chatRoom.getChatId() || megaChatApi.getChatRoom(chatId) == null)
+        if (handleList == null || handleList.size() == 0 || (chatRoom != null && chatId != chatRoom.getChatId()))
             return;
 
         chatRoom = megaChatApi.getChatRoom(chatId);
+
+        if (chatRoom == null)
+            return;
 
         for (int i = 0; i < handleList.size(); i++) {
             chatC.setNonContactAttributesInDB(handleList.get(i));
