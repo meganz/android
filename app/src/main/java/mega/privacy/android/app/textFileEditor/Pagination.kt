@@ -2,14 +2,13 @@ package mega.privacy.android.app.textFileEditor
 
 import kotlin.collections.ArrayList
 
-class Pagination(private val text: String, initialPage: Int) {
+class Pagination(private var text: String, initialPage: Int) {
 
     companion object {
         private const val CHARS_FOR_PAGE = 20000
     }
 
     private var pages: MutableList<String?> = ArrayList()
-    private var editedPages: MutableList<String?> = ArrayList()
     private var currentPage = initialPage
 
     init {
@@ -20,15 +19,20 @@ class Pagination(private val text: String, initialPage: Int) {
         while (i < text.length) {
             to = i + CHARS_FOR_PAGE
             nextIndexOfReturn = text.indexOf("\n", to)
-            if (nextIndexOfReturn > to) to = nextIndexOfReturn
-            if (to > text.length) to = text.length
+
+            if (nextIndexOfReturn > to) {
+                to = nextIndexOfReturn + 1
+            }
+
+            if (to > text.length) {
+                to = text.length
+            }
+
             pages.add(text.substring(i, to))
             i = to
         }
 
         if (i == 0) pages.add("")
-
-        editedPages = pages
     }
 
     fun size(): Int = pages.size
@@ -37,14 +41,14 @@ class Pagination(private val text: String, initialPage: Int) {
 
     fun getCurrentPage(): Int = currentPage
 
-    fun getCurrentPageText(): String? = editedPages[currentPage]
+    fun getCurrentPageText(): String? = pages[currentPage]
 
     fun updatePage(text: String?) {
-        editedPages[currentPage] = text
+        pages[currentPage] = text
     }
 
     fun editionFinished() {
-        pages = editedPages
+        text = getEditedText()
     }
 
     fun isEdited(): Boolean = text != getEditedText()
@@ -52,7 +56,7 @@ class Pagination(private val text: String, initialPage: Int) {
     fun getEditedText(): String {
         var editedText = ""
 
-        for (page in editedPages) {
+        for (page in pages) {
             editedText += page
         }
 
