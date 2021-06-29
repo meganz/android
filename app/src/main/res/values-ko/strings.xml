@@ -3864,7 +3864,7 @@
     <!-- Text of the empty screen when there are no elements in Photos -->
     <string name="photos_empty">[A]사진[/A] [B]없음[/B]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">자동으로 사진과 동영상을 클라우드 드라이브에 백업하세요.</string>
+    <string name="enable_cu_subtitle">클라우드 드라이브에 자동으로 사진과 동영상을 백업하세요.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">모두</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->

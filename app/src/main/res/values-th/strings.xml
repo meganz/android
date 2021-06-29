@@ -87,7 +87,7 @@
     <!-- Error getting the root node -->
     <string name="error_general_nodes">ผิดพลาด กรุณาลองใหม่อีกครั้ง</string>
     <!-- File name (without extension) of file exported with the recovery key -->
-    <string name="general_rk">MEGA-RECOVERYKEY</string>
+    <string name="general_rk">MEGA-คีย์การกู้คืน</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">ไม่มีโฟลเดอร์มีเดียสำรองอยู่ กรุณาเลือกโฟลเดอร์ใหม่</string>
     <!-- when no external card exists -->

@@ -4125,7 +4125,7 @@
     <!-- Text of the empty screen when there are no elements in Photos -->
     <string name="photos_empty">[B]Нет[/B] [A]фотографий[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Автоматическое резервное копирование фотографий и видео на облачный диск.</string>
+    <string name="enable_cu_subtitle">Автоматически загружать фото и видео на облачный диск.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Все</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->

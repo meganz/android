@@ -87,7 +87,7 @@
     <!-- Error getting the root node -->
     <string name="error_general_nodes">Erro. Por favor, tente novamente.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
-    <string name="general_rk">MEGA-RECOVERYKEY</string>
+    <string name="general_rk">MEGA-CHAVEDERECUPERACAO</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">A pasta secundária de mídia não existe. Por favor, selecione uma pasta nova.</string>
     <!-- when no external card exists -->
@@ -3951,7 +3951,7 @@
     <!-- Text of the empty screen when there are no elements in Photos -->
     <string name="photos_empty">[B]Não há [/B][A]Fotos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Faça o backup automático das suas fotos e vídeos na sua Nuvem de arquivos.</string>
+    <string name="enable_cu_subtitle">Faça o backup automático de fotos e vídeos na sua Nuvem.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Todas</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->

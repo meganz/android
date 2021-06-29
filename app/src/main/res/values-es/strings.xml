@@ -3945,13 +3945,13 @@
     <!-- settings of the Media section -->
     <string name="settings_media">Medios</string>
     <!-- settings title of the Media section -->
-    <string name="settings_media_audio_files">Audio files</string>
+    <string name="settings_media_audio_files">Archivos de audio</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Reproducción en segundo plano</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]No hay[/B][A]fotos[/A]</string>
+    <string name="photos_empty">[B]No hay[/B] [A]fotos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Realiza una copia de seguridad automática de tus fotos y vídeos en tu Nube.</string>
+    <string name="enable_cu_subtitle">Realiza una copia de seguridad automática de tus fotos y videos en tu Nube.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Todas</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -3966,7 +3966,7 @@
     <string name="cu_day_month_year_date">[B]%1$s de %2$s [/B]de %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
-        <item quantity="one">Upload in progress, 1 file pending</item>
-        <item quantity="other">Upload in progress, %1$d files pending</item>
+        <item quantity="one">Subida en curso, 1 archivo pendiente</item>
+        <item quantity="other">Subida en curso, %1$d archivos pendientes</item>
     </plurals>
 </resources>

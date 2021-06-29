@@ -3951,7 +3951,7 @@
     <!-- Text of the empty screen when there are no elements in Photos -->
     <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Automatically back up your photos and videos to your Cloud Drive.</string>
+    <string name="enable_cu_subtitle">Automatisches Backup Ihrer Fotos und Videos in Ihr Cloud Drive.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Alle</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
