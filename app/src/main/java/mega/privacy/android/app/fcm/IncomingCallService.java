@@ -43,11 +43,15 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     DatabaseHandler dbH;
     MegaChatApiAndroid megaChatApi;
     ChatSettings chatSettings;
-    boolean isLoggingIn = false;
     boolean showMessageNotificationAfterPush = false;
     boolean beep = false;
     WifiManager.WifiLock lock;
     PowerManager.WakeLock wl;
+
+    /**
+     * Flag for controlling if allows the app to do login in background upon receiving a push message.
+     */
+    public static volatile boolean allowBackgroundLogin = true;
 
     @Override
     public void onCreate() {
@@ -164,10 +168,18 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
     }
 
     public void performLoginProccess(String gSession) {
-        isLoggingIn = MegaApplication.isLoggingIn();
-        if (!isLoggingIn) {
-            isLoggingIn = true;
-            MegaApplication.setLoggingIn(isLoggingIn);
+        if (!MegaApplication.isLoggingIn()) {
+            /*
+                Two locks and synchronized block prevent background login executes after login process is launched in `LoginFragment`.
+                Otherwise the login process in foreground will failed with `-11` and cause logout.
+             */
+            if (allowBackgroundLogin) {
+                synchronized (MegaApplication.getInstance()) {
+                    if (allowBackgroundLogin) {
+                        megaApi.fastLogin(gSession, this);
+                    }
+                }
+            }
 
             if (megaChatApi == null) {
                 megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
@@ -189,14 +201,13 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
                     logDebug("Chat correctly initialized");
                 }
             }
-
-            megaApi.fastLogin(gSession, this);
         }
     }
 
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
         logDebug("onRequestStart: " + request.getRequestString());
+        allowBackgroundLogin = false;
     }
 
     @Override
@@ -209,19 +220,16 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
         logDebug("onRequestFinish: " + request.getRequestString());
 
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
+            allowBackgroundLogin = true;
+
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("Fast login OK");
                 logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
                 megaApi.fetchNodes(this);
             } else {
                 logError("ERROR: " + e.getErrorString());
-                isLoggingIn = false;
-                MegaApplication.setLoggingIn(isLoggingIn);
-                return;
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
-            isLoggingIn = false;
-            MegaApplication.setLoggingIn(isLoggingIn);
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("OK fetch nodes");
                 logDebug("Chat --> connectInBackground");
