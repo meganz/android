@@ -8848,9 +8848,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	@Override
 	public void onJoinMeeting() {
-//		PasteMeetingLinkGuestFragment dialog = new PasteMeetingLinkGuestFragment();
-//		dialog.show(getSupportFragmentManager(), PasteMeetingLinkGuestFragment.TAG);
-		showOpenLinkDialog();
+		if(CallUtil.participatingInACall()){
+			showConfirmationInACall();
+		} else {
+			showOpenLinkDialog();
+		}
 	}
 
 	@Override
