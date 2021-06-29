@@ -29,6 +29,7 @@ import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
@@ -264,6 +265,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
@@ -1127,6 +1129,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	};
 
+	private final Observer<Boolean> finishObserver = finish -> {
+		if (finish) finish();
+	};
+
     public void launchPayment(String productId) {
         //start purchase/subscription flow
         MegaSku skuDetails = getSkuDetails(mSkuDetailsList, productId);
@@ -1788,7 +1794,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
-        registerReceiver(cuUpdateReceiver, new IntentFilter(ACTION_UPDATE_CU));
+		registerReceiver(cuUpdateReceiver, new IntentFilter(ACTION_UPDATE_CU));
+
+		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).observeForever(finishObserver);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -2720,7 +2728,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						markNotificationsSeen(true);
 						openContactLink(getIntent().getLongExtra(CONTACT_HANDLE, -1));
 					}
-					else if (getIntent().getAction().equals(ACTION_REFRESH_STAGING)){
+					else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
 						update2FASetting();
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
@@ -3672,7 +3680,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						ac.copyMK(false);
 					}
 				}
-				else if (getIntent().getAction().equals(ACTION_REFRESH_STAGING)){
+				else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
 					update2FASetting();
 				}
 				else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
@@ -4215,8 +4223,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(transferOverQuotaUpdateReceiver);
 		unregisterReceiver(transferFinishReceiver);
         unregisterReceiver(cameraUploadLauncherReceiver);
-        unregisterReceiver(updateCUSettingsReceiver);
+		unregisterReceiver(updateCUSettingsReceiver);
 		unregisterReceiver(cuUpdateReceiver);
+		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
 
 		if (mBillingManager != null) {
 			mBillingManager.destroy();
@@ -10100,7 +10109,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				refreshIncomingShares();
 			}
 		}
-		else if (requestCode == REQUEST_CODE_REFRESH_STAGING && resultCode == RESULT_OK) {
+		else if (requestCode == REQUEST_CODE_REFRESH_API_SERVER && resultCode == RESULT_OK) {
 			logDebug("Resfresh DONE");
 
 			if (intent == null) {
