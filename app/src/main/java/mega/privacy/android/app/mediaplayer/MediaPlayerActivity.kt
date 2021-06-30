@@ -881,9 +881,10 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         // This is the actual color when using Util.changeToolBarElevation, but video player
         // use different toolbar theme (to force dark theme), which breaks
         // Util.changeToolBarElevation, so we just use the actual color here.
-        val darkElevationColor = Color.parseColor("#282828")
 
         if (!isAudioPlayer() || Util.isDarkMode(this)) {
+            val darkElevationColor = ContextCompat.getColor(this, R.color.action_mode_background)
+
             toolbar.setBackgroundColor(
                 when {
                     withElevation -> darkElevationColor
@@ -896,6 +897,12 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 window.statusBarColor = if (withElevation) darkElevationColor else Color.BLACK
             }
         } else {
+            toolbar.setBackgroundColor(
+                when {
+                    withElevation -> Color.WHITE
+                    else -> Color.TRANSPARENT
+                }
+            )
             toolbar.elevation =
                 if (withElevation) resources.getDimension(R.dimen.toolbar_elevation) else 0F
         }
