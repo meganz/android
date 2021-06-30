@@ -7516,8 +7516,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 			}
         } else if (drawerItem == DrawerItem.CHAT) {
-            RecentChatsFragmentLollipop fragment = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-            if (fragment != null&& isFabExpanded) {
+			if (getChatsFragment() != null && isFabExpanded) {
                 collapseFab();
             } else {
                 backToDrawerItem(-1);
@@ -8714,24 +8713,24 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		fabMaskLayout.setOnClickListener(l-> fabMainClickCallback());
 
-		fabMaskLayout.findViewById(R.id.fab_chat).setOnClickListener(l->{
+		fabMaskLayout.findViewById(R.id.fab_chat).setOnClickListener(l -> {
 			fabMainClickCallback();
-			handler.postDelayed(()->chooseAddContactDialog(true),FAB_MASK_OUT_DELAY);
+			handler.postDelayed(() -> chooseAddContactDialog(true), FAB_MASK_OUT_DELAY);
 		});
 
-		fabMaskLayout.findViewById(R.id.text_chat).setOnClickListener(l-> {
+		fabMaskLayout.findViewById(R.id.text_chat).setOnClickListener(l -> {
 			fabMainClickCallback();
-			handler.postDelayed(()->chooseAddContactDialog(true),FAB_MASK_OUT_DELAY);
+			handler.postDelayed(() -> chooseAddContactDialog(true), FAB_MASK_OUT_DELAY);
 		});
 
-		fabMaskLayout.findViewById(R.id.fab_meeting).setOnClickListener(l-> {
+		fabMaskLayout.findViewById(R.id.fab_meeting).setOnClickListener(l -> {
 			fabMainClickCallback();
-			handler.postDelayed(()->showMeetingOptionsPanel(),FAB_MASK_OUT_DELAY);
+			handler.postDelayed(this::showMeetingOptionsPanel, FAB_MASK_OUT_DELAY);
 		});
 
-		fabMaskLayout.findViewById(R.id.text_meeting).setOnClickListener(l-> {
+		fabMaskLayout.findViewById(R.id.text_meeting).setOnClickListener(l -> {
 			fabMainClickCallback();
-			handler.postDelayed(()->showMeetingOptionsPanel(),FAB_MASK_OUT_DELAY);
+			handler.postDelayed(this::showMeetingOptionsPanel, FAB_MASK_OUT_DELAY);
 		});
 
 		if (isFabExpanded) {
@@ -8743,13 +8742,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         rotateFab(false);
         showOut(fabs);
         // After animation completed, then remove mask.
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				removeMask();
-				fabButton.setVisibility(View.VISIBLE);
-				isFabExpanded = false;
-			}
+		handler.postDelayed(() -> {
+			removeMask();
+			fabButton.setVisibility(View.VISIBLE);
+			isFabExpanded = false;
 		}, FAB_MASK_OUT_DELAY);
     }
 
@@ -8757,15 +8753,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         fabButton.setVisibility(View.GONE);
         addMask();
         // Need to do so, otherwise, fabMaskMain.background is null.
-		handler.post(new Runnable() {
-			@Override
-			public void run() {
-				rotateFab(true);
-				showIn(fabs);
-				isFabExpanded = true;
-			}
+		handler.post(() -> {
+			rotateFab(true);
+			showIn(fabs);
+			isFabExpanded = true;
 		});
     }
+
 	/**
 	 * Showing the full screen mask by adding the mask layout to the window content
 	 */
@@ -8812,7 +8806,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Hide the expanded FABs with animated transition
 	 */
 	private void showOut(ArrayList<View> fabs) {
-		for (int i = 0; i< fabs.size(); i++) {
+		for (int i = 0; i < fabs.size(); i++) {
 			View fab = fabs.get(i);
 			fab.animate()
 					.setDuration(FAB_ANIM_DURATION)
@@ -8827,11 +8821,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					.start();
 		}
 	}
+
 	/**
 	 * Present the expanded FABs with animated transition
 	 */
 	private void showIn(ArrayList<View> fabs) {
-		for (int i = 0; i<fabs.size(); i++) {
+		for (int i = 0; i < fabs.size(); i++) {
 			View fab = fabs.get(i);
 			fab.setVisibility(View.VISIBLE);
 			fab.setAlpha(ALPHA_TRANSPARENT);
@@ -8840,8 +8835,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			fab.animate()
 					.setDuration(FAB_ANIM_DURATION)
 					.translationY(0f)
-					.setListener(new AnimatorListenerAdapter(){})
-                	.alpha(ALPHA_OPAQUE)
+					.setListener(new AnimatorListenerAdapter() {
+					})
+					.alpha(ALPHA_OPAQUE)
 					.start();
 		}
 	}

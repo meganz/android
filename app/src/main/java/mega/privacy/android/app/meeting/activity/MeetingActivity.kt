@@ -28,7 +28,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 class MeetingActivity : PasscodeActivity() {
 
     companion object {
-        /** Tne name of actions denoting set
+        /** The name of actions denoting set
         JOIN/CREATE/JOIN AS GUEST/In-meeting screen as the initial screen */
         const val MEETING_ACTION_JOIN = "join_meeting"
         const val MEETING_ACTION_CREATE = "create_meeting"
@@ -55,7 +55,6 @@ class MeetingActivity : PasscodeActivity() {
 
     private var isGuest = false
 
-    // TODO: Move to a more common place
     private fun View.setMarginTop(marginTop: Int) {
         val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
         menuLayoutParams.setMargins(0, marginTop, 0, 0)
@@ -116,11 +115,9 @@ class MeetingActivity : PasscodeActivity() {
         actionBar.title = ""
 
         when (meetingAction) {
-            MEETING_ACTION_CREATE -> {
+            MEETING_ACTION_CREATE, MEETING_ACTION_JOIN, MEETING_ACTION_GUEST -> {
                 actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             }
-            MEETING_ACTION_JOIN, MEETING_ACTION_GUEST
-            -> actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             MEETING_ACTION_IN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         }
     }
@@ -257,9 +254,9 @@ class MeetingActivity : PasscodeActivity() {
             }
         }
 
-        if (currentFragment !is InMeetingFragment) {
+        if (currentFragment !is InMeetingFragment || !isGuest) {
             finish()
-        } else if (!isGuest) finish()
+        }
     }
 
     private fun sendQuitCallEvent() = LiveEventBus.get(

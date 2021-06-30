@@ -102,12 +102,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         Observer<AppRTCAudioManager.AudioDevice> {
             if (_speakerLiveData.value != it) {
                 _speakerLiveData.value = it
-                when (it) {
-                    AppRTCAudioManager.AudioDevice.EARPIECE -> tips.value =
-                        getString(R.string.general_speaker_off)
-                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> tips.value =
-                        getString(R.string.general_speaker_on)
-                    else -> tips.value = getString(R.string.general_headphone_on)
+                tips.value = when (it) {
+                    AppRTCAudioManager.AudioDevice.EARPIECE -> getString(R.string.general_speaker_off)
+                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> getString(R.string.general_speaker_on)
+                    else -> getString(R.string.general_headphone_on)
                 }
             }
         }
@@ -282,10 +280,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param shouldAudioBeEnabled True, if audio should be enabled. False, otherwise
      */
     fun clickMic(shouldAudioBeEnabled: Boolean) {
-        /**
-         * check audio permission
-         * if haven't been granted, ask for the permission and return
-         */
+        // Check audio permission. If haven't been granted, ask for the permission and return
         if (_recordAudioGranted.value == false) {
             _recordAudioPermissionCheck.value = true
             return
@@ -319,10 +314,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * @param shouldVideoBeEnabled True, if video should be enabled. False, otherwise
      */
     fun clickCamera(shouldVideoBeEnabled: Boolean) {
-        /**
-         * check camera permission
-         * if haven't been granted, ask for the permission and return
-         */
+        //Check camera permission. If haven't been granted, ask for the permission and return
         if (_cameraGranted.value == false) {
             _cameraPermissionCheck.value = true
             return
@@ -439,10 +431,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         }
     }
 
-    override fun onVideoDeviceOpened(isVideoOn: Boolean) {
-        logDebug("onVideoDeviceOpened:: isEnable = $isVideoOn")
+    /**
+     * Method to update the status of the local camera and display the corresponding tips
+     *
+     * @param isVideoOn True, if the video is ON. False, otherwise
+     */
+    private fun updateCameraValueAndTips(isVideoOn: Boolean) {
         _cameraLiveData.value = isVideoOn
-        logDebug("open video: $_cameraLiveData.value")
+        logDebug("Open video: ${_cameraLiveData.value}")
         tips.value = when (isVideoOn) {
             true -> getString(
                 R.string.general_camera_enable
@@ -451,6 +447,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
                 R.string.general_camera_disable
             )
         }
+    }
+
+    override fun onVideoDeviceOpened(isVideoOn: Boolean) {
+        updateCameraValueAndTips(isVideoOn)
     }
 
     override fun onDisableAudioVideo(chatId: Long, typeChange: Int, isEnable: Boolean) {
@@ -468,16 +468,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
                 }
             }
             MegaChatRequest.VIDEO -> {
-                _cameraLiveData.value = isEnable
-                logDebug("open video: $_cameraLiveData.value")
-                tips.value = when (isEnable) {
-                    true -> getString(
-                        R.string.general_camera_enable
-                    )
-                    false -> getString(
-                        R.string.general_camera_disable
-                    )
-                }
+                updateCameraValueAndTips(isEnable)
             }
         }
     }

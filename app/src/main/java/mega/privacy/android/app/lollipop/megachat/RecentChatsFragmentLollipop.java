@@ -169,8 +169,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     private AskForDisplayOverDialog askForDisplayOverDialog;
 
-    private static final String SP_KEY_IS_HINT_SHOWN = "is_hint_shown_recent_chats";
-    private static final String KEY_HINT_IS_SHOWING = "hint_is_showing";
+    private static final String SP_KEY_IS_HINT_SHOWN_RECENT_CHATS = "is_hint_shown_recent_chats";
     private boolean isHintShowing;
 
     private HighLightHintHelper highLightHintHelper;
@@ -437,9 +436,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         // Workaround: wait for R.id.action_menu_open_meeting initialized.
         new Handler().postDelayed(() -> {
-            if (shouldShowMeetingHint() || isHintShowing) {
+            if (shouldShowMeetingHint(context, SP_KEY_IS_HINT_SHOWN_RECENT_CHATS) || isHintShowing) {
                 highLightHintHelper.showHintForMeetingIcon(R.id.action_menu_open_meeting, () -> {
-                    hintShown();
+                    hintShown(context, SP_KEY_IS_HINT_SHOWN_RECENT_CHATS);
                     highLightHintHelper.dismissPopupWindow();
                     isHintShowing = false;
                     askForDisplayOver();
@@ -459,16 +458,6 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
-    }
-
-    private boolean shouldShowMeetingHint() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return !sharedPreferences.getBoolean(SP_KEY_IS_HINT_SHOWN, false);
-    }
-
-    private void hintShown() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        sharedPreferences.edit().putBoolean(SP_KEY_IS_HINT_SHOWN, true).apply();
     }
 
     private boolean showInviteBanner() {

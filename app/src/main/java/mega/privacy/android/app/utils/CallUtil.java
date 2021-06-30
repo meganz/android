@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -1129,5 +1131,15 @@ public class CallUtil {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
         String message = context.getResources().getString(R.string.ongoing_call_content);
         builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener).show();
+    }
+
+    public static boolean shouldShowMeetingHint(Context context, String value) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return !sharedPreferences.getBoolean(value, false);
+    }
+
+    public static void hintShown(Context context, String value) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        sharedPreferences.edit().putBoolean(value, true).apply();
     }
 }

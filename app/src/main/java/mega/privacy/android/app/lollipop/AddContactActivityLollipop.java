@@ -263,9 +263,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
     private boolean onlyCreateGroup;
     private boolean waitingForPhoneContacts;
 
-
-    private static final String SP_KEY_IS_HINT_SHOWN = "is_hint_shown_start_conversation";
-    private static final String KEY_HINT_IS_SHOWING = "hint_is_showing";
+    private static final String SP_KEY_IS_HINT_SHOWN_START_CONVERSATION = "is_hint_shown_start_conversation";
     private boolean isHintShowing;
 
     private HighLightHintHelper highLightHintHelper;
@@ -1915,9 +1913,9 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
         // Workaround: wait for R.id.new_meeting_tv initialized.
         new Handler().postDelayed(() -> {
-            if ((shouldShowMeetingHint() && newMeetingButton.getVisibility() == View.VISIBLE) || isHintShowing) {
+            if ((shouldShowMeetingHint(getApplicationContext(), SP_KEY_IS_HINT_SHOWN_START_CONVERSATION) && newMeetingButton.getVisibility() == View.VISIBLE) || isHintShowing) {
                 highLightHintHelper.showHintForMeetingText(R.id.new_meeting_tv, () -> {
-                    hintShown();
+                    hintShown(getApplicationContext(), SP_KEY_IS_HINT_SHOWN_START_CONVERSATION);
                     highLightHintHelper.dismissPopupWindow();
                     isHintShowing = false;
                     return null;
@@ -1926,16 +1924,6 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                 isHintShowing = true;
             }
         }, 300);
-    }
-
-    private boolean shouldShowMeetingHint() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        return !sharedPreferences.getBoolean(SP_KEY_IS_HINT_SHOWN, false);
-    }
-
-    private void hintShown() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        sharedPreferences.edit().putBoolean(SP_KEY_IS_HINT_SHOWN, true).apply();
     }
 
     private void setEmptyStateVisibility (boolean visible) {

@@ -14,6 +14,7 @@ import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -56,7 +57,7 @@ class MeetingActivityRepository @Inject constructor(
     suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
-            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
+            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION).absolutePath,
             listener
         )
     }
@@ -200,15 +201,5 @@ class MeetingActivityRepository @Inject constructor(
             MEGACHAT_INVALID_HANDLE -> null
             else -> megaChatApi.getChatRoom(chatId)
         }
-    }
-
-    /**
-     * Create a meeting
-     *
-     * @param meetingName Meeting's name
-     * @param listener MegaChatRequestListenerInterface
-     */
-    fun createMeeting(meetingName: String, listener: MegaChatRequestListenerInterface) {
-        megaChatApi.createMeeting(meetingName, listener)
     }
 }
