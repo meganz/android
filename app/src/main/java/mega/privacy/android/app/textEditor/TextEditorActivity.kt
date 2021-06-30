@@ -14,15 +14,18 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.constants.EventConstants.EVENT_PERFORM_SCROLL
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -48,6 +51,7 @@ import nz.mega.sdk.MegaShare
 class TextEditorActivity : PasscodeActivity(), SnackbarShower {
 
     companion object {
+        private const val SCROLL_TEXT = "SCROLL_TEXT"
         private const val CURSOR_POSITION = "CURSOR_POSITION"
         private const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
         private const val RENAME_SHOWN = "RENAME_SHOWN"
@@ -75,6 +79,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
 
     private val nodeSaver by lazy {
         NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
+    }
+
+    private val performScrollObserver = Observer<Int> { scrollY ->
+        binding.fileEditorScrollView.scrollY = scrollY
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,6 +126,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(SCROLL_TEXT, binding.contentText.getScrollText(binding.fileEditorScrollView.scrollY))
         outState.putInt(STATE, currentUIState)
         outState.putInt(CURSOR_POSITION, binding.contentEditText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
@@ -136,6 +145,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onDestroy() {
+        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java).removeObserver(performScrollObserver)
+
         if (isDiscardChangesConfirmationDialogShown()) {
             discardChangesDialog?.dismiss()
         }
@@ -375,7 +386,10 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
                 setSelection(savedInstanceState.getInt(CURSOR_POSITION))
             }
 
-            binding.contentText.setText(text, firstLineNumber)
+            binding.contentText.apply {
+                setText(text, firstLineNumber)
+                getScrollToText(savedInstanceState.getString(SCROLL_TEXT))
+            }
         }
 
         binding.editFab.apply {
@@ -418,6 +432,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
         viewModel.getFileName().observe(this, ::showFileName)
         viewModel.getMode().observe(this, ::showMode)
         viewModel.onContentTextRead().observe(this, ::showContentRead)
+        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java).observeForever(performScrollObserver)
     }
 
     /**
