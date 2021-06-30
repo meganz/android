@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Rect
 import android.os.Bundle
@@ -50,6 +51,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     protected var meetingLink = ""
 
     var mRootViewHeight: Int = 0
+    protected var toast: Toast? = null
 
     // Soft keyboard open and close listener
     private var keyboardLayoutListener: OnGlobalLayoutListener? = OnGlobalLayoutListener {
@@ -167,6 +169,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 .setOnPermissionDenied { l -> onPermissionDenied(l) }
                 .setOnRequiresPermission { l ->
                     run {
+                        toast?.cancel()
+
                         onRequiresPermission(l)
                         onMeetingButtonClick()
                     }
@@ -304,6 +308,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * @param message The text to show
      * @param duration How long to display the message.
      */
+    @SuppressLint("ShowToast")
     private fun showToast(v: View, message: String, duration: Int) {
         var xOffset = 0
         var yOffset = 0
@@ -326,9 +331,12 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 xOffset = parentCenterX - halfWidth
             }
         }
-        val toast = Toast.makeText(requireContext(), message, duration)
-        toast.setGravity(Gravity.CENTER, xOffset, yOffset)
-        toast.show()
+        toast?.cancel()
+        toast = Toast.makeText(requireContext(), message, duration)
+        toast?.let {
+            it.setGravity(Gravity.CENTER, xOffset, yOffset)
+            it.show()
+        }
     }
 
     /**
@@ -390,8 +398,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 localSurfaceView,
                 outMetrics,
                 MEGACHAT_INVALID_HANDLE,
-                false,
-                true
+                isFloatingWindow = false,
+                isOneToOneCall = true
             )
 
             sharedModel.addLocalVideo(MEGACHAT_INVALID_HANDLE, videoListener)
