@@ -328,7 +328,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         outState.putInt("numItems", numItems);
         outState.putInt("currentPermission", currentPermission);
         outState.putIntArray("items", items);
-        outState.putBoolean("microphoneGranted", ((ManagerActivityLollipop) context).checkPermission(Manifest.permission.RECORD_AUDIO));
+        outState.putBoolean("microphoneGranted", hasPermissions((ManagerActivityLollipop) context, Manifest.permission.RECORD_AUDIO));
     }
 
     @Override

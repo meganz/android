@@ -78,6 +78,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -437,17 +438,12 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private void queryIfHasReadContactsPermissions() {
         logDebug("queryIfHasReadContactsPermissions");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
-            if (hasReadContactsPermission) {
-                isPermissionGranted = true;
-                prepareToGetContacts();
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, Constants.REQUEST_READ_CONTACTS);
-            }
-        } else {
+        boolean hasReadContactsPermission = hasPermissions(this, Manifest.permission.READ_CONTACTS);
+        if (hasReadContactsPermission) {
             isPermissionGranted = true;
             prepareToGetContacts();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, Constants.REQUEST_READ_CONTACTS);
         }
     }
 

@@ -37,7 +37,7 @@ public class PermissionUtils {
     /**
      * Provide an OnClickListener for snackbar's action.
      *
-     * @param context Contex.
+     * @param context Context.
      * @return an OnClickListener, which leads to the APP info page, in where, users can grant MEGA permissions.
      */
     public static View.OnClickListener toAppInfo(Context context) {
@@ -56,7 +56,7 @@ public class PermissionUtils {
                 context.startActivity(intent);
             } catch (Exception e) {
                 if (context instanceof ManagerActivityLollipop) {
-                    // in case few devices cannot hanle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
+                    // in case few devices cannot handle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
                     Util.showSnackbar(context, context.getString(R.string.on_permanently_denied));
                 } else {
                     logError("Exception opening device settings", e);

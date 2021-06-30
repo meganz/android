@@ -1318,7 +1318,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (typesCameraPermission == TAKE_PICTURE_OPTION) {
 					logDebug("TAKE_PICTURE_OPTION");
 		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-		        		if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+		        		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
 		        			ActivityCompat.requestPermissions(this,
 					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 									REQUEST_WRITE_STORAGE);
@@ -1331,7 +1331,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	} else if (typesCameraPermission == TAKE_PROFILE_PICTURE) {
 					logDebug("TAKE_PROFILE_PICTURE");
 					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-						if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+						if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
 							ActivityCompat.requestPermissions(this,
 									new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
 									REQUEST_WRITE_STORAGE);
@@ -1360,7 +1360,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        		if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 						if (typesCameraPermission==TAKE_PICTURE_OPTION){
 							logDebug("TAKE_PICTURE_OPTION");
-							if (!checkPermission(Manifest.permission.CAMERA)){
+							if (!hasPermissions(this, Manifest.permission.CAMERA)){
 								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
 							}
 							else{
@@ -1372,7 +1372,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 						else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
 							logDebug("TAKE_PROFILE_PICTURE");
-							if (!checkPermission(Manifest.permission.CAMERA)){
+							if (!hasPermissions(this, Manifest.permission.CAMERA)){
 								ActivityCompat.requestPermissions(this,
 										new String[]{Manifest.permission.CAMERA},
 										REQUEST_CAMERA);
@@ -1389,7 +1389,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	else{
 					if (typesCameraPermission==TAKE_PICTURE_OPTION){
 						logDebug("TAKE_PICTURE_OPTION");
-						if (!checkPermission(Manifest.permission.CAMERA)){
+						if (!hasPermissions(this, Manifest.permission.CAMERA)){
 							ActivityCompat.requestPermissions(this,
 									new String[]{Manifest.permission.CAMERA},
 									REQUEST_CAMERA);
@@ -1401,7 +1401,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
 						logDebug("TAKE_PROFILE_PICTURE");
-						if (!checkPermission(Manifest.permission.CAMERA)){
+						if (!hasPermissions(this, Manifest.permission.CAMERA)){
 							ActivityCompat.requestPermissions(this,
 									new String[]{Manifest.permission.CAMERA},
 									REQUEST_CAMERA);
@@ -3183,11 +3183,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("Mobile only portrait mode");
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
-    	boolean writeStorageGranted = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-		boolean readStorageGranted = checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-    	boolean cameraGranted = checkPermission(Manifest.permission.CAMERA);
-		boolean microphoneGranted = checkPermission(Manifest.permission.RECORD_AUDIO);
-//		boolean writeCallsGranted = checkPermission(Manifest.permission.WRITE_CALL_LOG);
+    	boolean writeStorageGranted = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		boolean readStorageGranted = hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+    	boolean cameraGranted = hasPermissions(this, Manifest.permission.CAMERA);
+		boolean microphoneGranted = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
+//		boolean writeCallsGranted = hasPermissions(this, Manifest.permission.WRITE_CALL_LOG);
 
 		if (!writeStorageGranted || !readStorageGranted || !cameraGranted || !microphoneGranted/* || !writeCallsGranted*/) {
 			deleteCurrentFragment();
@@ -6757,28 +6757,23 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		    case R.id.action_take_picture:{
 		    	typesCameraPermission = TAKE_PICTURE_OPTION;
 
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					boolean hasStoragePermission = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-					if (!hasStoragePermission) {
-						ActivityCompat.requestPermissions(this,
-				                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								REQUEST_WRITE_STORAGE);
-					}
-
-					boolean hasCameraPermission = checkPermission(Manifest.permission.CAMERA);
-					if (!hasCameraPermission) {
-						ActivityCompat.requestPermissions(this,
-				                new String[]{Manifest.permission.CAMERA},
-								REQUEST_CAMERA);
-					}
-
-					if (hasStoragePermission && hasCameraPermission){
-						checkTakePicture(this, TAKE_PHOTO_CODE);
-					}
+				boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+				if (!hasStoragePermission) {
+					ActivityCompat.requestPermissions(this,
+							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+							REQUEST_WRITE_STORAGE);
 				}
-		    	else{
+
+				boolean hasCameraPermission = hasPermissions(this, Manifest.permission.CAMERA);
+				if (!hasCameraPermission) {
+					ActivityCompat.requestPermissions(this,
+							new String[]{Manifest.permission.CAMERA},
+							REQUEST_CAMERA);
+				}
+
+				if (hasStoragePermission && hasCameraPermission) {
 					checkTakePicture(this, TAKE_PHOTO_CODE);
-		    	}
+				}
 
 		    	return true;
 		    }
@@ -6849,13 +6844,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	return true;
 	        }
 	        case R.id.action_add:{
-	        	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-	    			if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-	    				ActivityCompat.requestPermissions(this,
-	    		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-								REQUEST_WRITE_STORAGE);
-	    			}
-	    		}
+				if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+					ActivityCompat.requestPermissions(this,
+							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+							REQUEST_WRITE_STORAGE);
+				}
 
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
 	        		if (viewPagerShares.getCurrentItem()==0){
@@ -8293,26 +8286,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void checkPermissions(){
 		typesCameraPermission = TAKE_PROFILE_PICTURE;
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
-
-			boolean hasCameraPermission = checkPermission(Manifest.permission.CAMERA);
-			if (!hasCameraPermission) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.CAMERA},
-						REQUEST_CAMERA);
-			}
-
-			if (hasStoragePermission && hasCameraPermission){
-				this.takeProfilePicture();
-			}
+		boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		if (!hasStoragePermission) {
+			ActivityCompat.requestPermissions(this,
+					new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+					REQUEST_WRITE_STORAGE);
 		}
-		else{
+
+		boolean hasCameraPermission = hasPermissions(this, Manifest.permission.CAMERA);
+		if (!hasCameraPermission) {
+			ActivityCompat.requestPermissions(this,
+					new String[]{Manifest.permission.CAMERA},
+					REQUEST_CAMERA);
+		}
+
+		if (hasStoragePermission && hasCameraPermission) {
 			this.takeProfilePicture();
 		}
 	}
@@ -9921,12 +9909,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				if (!checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-					ActivityCompat.requestPermissions(this,
-			                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-							REQUEST_WRITE_STORAGE);
-				}
+			if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+				ActivityCompat.requestPermissions(this,
+						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+						REQUEST_WRITE_STORAGE);
 			}
 
 			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
@@ -11217,17 +11203,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void requestContactsPermissions(ShareInfo info, MegaNode parentNode){
 		logDebug("requestContactsPermissions");
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (!checkPermission(Manifest.permission.READ_CONTACTS)) {
-				logWarning("No read contacts permission");
-				infoManager = info;
-				parentNodeManager = parentNode;
-				ActivityCompat.requestPermissions(this,	new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_UPLOAD_CONTACT);
-			} else {
-				uploadContactInfo(info, parentNode);
-			}
-		}
-		else{
+		if (!hasPermissions(this, Manifest.permission.READ_CONTACTS)) {
+			logWarning("No read contacts permission");
+			infoManager = info;
+			parentNodeManager = parentNode;
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_UPLOAD_CONTACT);
+		} else {
 			uploadContactInfo(info, parentNode);
 		}
 	}
@@ -13729,19 +13710,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		searchView.setIconified(false);
-	}
-
-	public boolean checkPermission(String permission) {
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-			return true;
-		}
-
-		try {
-			return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
-		} catch (IllegalArgumentException ex) {
-			logWarning("IllegalArgument Exception is thrown");
-			return false;
-		}
 	}
 
 	public boolean isValidSearchQuery() {

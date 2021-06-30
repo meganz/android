@@ -96,6 +96,7 @@ import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiSe
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
@@ -1949,7 +1950,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 if (receivedIntent != null) {
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivityLollipop.EXTRA_SHARE_INFOS);
                     if (shareInfos != null && shareInfos.size() > 0) {
-                        boolean canRead = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                        boolean canRead = hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
                         if (canRead) {
                             toSharePage();
                         } else {

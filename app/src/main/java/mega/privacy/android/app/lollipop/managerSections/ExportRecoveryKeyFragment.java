@@ -28,6 +28,7 @@ import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickListener{
@@ -116,12 +117,10 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
     }
 
     private boolean checkStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-                return false;
-            }
+        boolean hasStoragePermission = hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (!hasStoragePermission) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+            return false;
         }
         return true;
     }

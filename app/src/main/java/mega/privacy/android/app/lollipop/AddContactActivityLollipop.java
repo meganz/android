@@ -111,6 +111,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -1031,7 +1032,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                 emptyTextView.setText(R.string.no_contacts_permissions);
             }
             logDebug("PhoneContactsTask: Phone contacts null");
-            boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
+            boolean hasReadContactsPermission = hasPermissions(getApplicationContext(), Manifest.permission.READ_CONTACTS);
             if (!hasReadContactsPermission) {
                 logWarning("PhoneContactsTask: No read contacts permission");
             }
@@ -1923,16 +1924,14 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
     }
 
     private void queryIfHasReadContactsPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasReadContactsPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
-            if (!hasReadContactsPermission) {
-                logWarning("No read contacts permission");
-                ActivityCompat.requestPermissions((AddContactActivityLollipop) this,
-                        new String[]{Manifest.permission.READ_CONTACTS},
-                        REQUEST_READ_CONTACTS);
-                if (contactType == CONTACT_TYPE_DEVICE) {
-                    return;
-                }
+        boolean hasReadContactsPermission = hasPermissions(this, Manifest.permission.READ_CONTACTS);
+        if (!hasReadContactsPermission) {
+            logWarning("No read contacts permission");
+            ActivityCompat.requestPermissions((AddContactActivityLollipop) this,
+                    new String[]{Manifest.permission.READ_CONTACTS},
+                    REQUEST_READ_CONTACTS);
+            if (contactType == CONTACT_TYPE_DEVICE) {
+                return;
             }
         }
 
@@ -3363,7 +3362,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             case REQUEST_READ_CONTACTS: {
                 logDebug("REQUEST_READ_CONTACTS");
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    boolean hasReadContactsPermissions = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED);
+                    boolean hasReadContactsPermissions = hasPermissions(this, Manifest.permission.READ_CONTACTS);
                     if (hasReadContactsPermissions && contactType == CONTACT_TYPE_DEVICE) {
                         filteredContactsPhone.clear();
                         setEmptyStateVisibility(true);
@@ -3380,10 +3379,10 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                     }
                 }
                 else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    boolean hasReadContactsPermissions = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_DENIED);
+                    boolean hasReadContactsPermissions = hasPermissions(this, Manifest.permission.READ_CONTACTS);
                     queryPermissions = false;
                     supportInvalidateOptionsMenu();
-                    if (hasReadContactsPermissions && contactType == CONTACT_TYPE_DEVICE) {
+                    if (!hasReadContactsPermissions && contactType == CONTACT_TYPE_DEVICE) {
                         logWarning("Permission denied");
                         setTitleAB();
                         filteredContactsPhone.clear();
