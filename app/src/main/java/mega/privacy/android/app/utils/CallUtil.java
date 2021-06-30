@@ -285,6 +285,15 @@ public class CallUtil {
             }
         }
 
+        MegaHandleList listCallsConnecting = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_CONNECTING);
+        if (listCallsConnecting != null && listCallsConnecting.size() > 0) {
+            for (int i = 0; i < listCallsConnecting.size(); i++) {
+                if (listCallsConnecting.get(i) != currentChatId) {
+                    return listCallsConnecting.get(i);
+                }
+            }
+        }
+
         return MEGACHAT_INVALID_HANDLE;
     }
 

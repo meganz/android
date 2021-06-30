@@ -1517,7 +1517,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                                     MegaHandleList list = request.getMegaHandleList();
 
                                     if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-                                        if(CallUtil.participatingInACall()){
+                                        long anotherCallInProgress = CallUtil.getAnotherCallParticipating(chatId);
+                                        if(anotherCallInProgress != MEGACHAT_INVALID_HANDLE){
                                             showConfirmationInACall(context);
                                             return;
                                         }
@@ -5417,7 +5418,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                                 }
                             } else if(m.getMessage().getType() == MegaChatMessage.TYPE_NORMAL ){
                                 AndroidMegaRichLinkMessage richLinkMessage = m.getRichLinkMessage();
-
                                 if(richLinkMessage != null){
                                     String url = richLinkMessage.getUrl();
                                     if (richLinkMessage.isChat()) {
