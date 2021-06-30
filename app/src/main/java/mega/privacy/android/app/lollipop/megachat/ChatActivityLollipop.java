@@ -1512,8 +1512,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                             if (request.getParamType() == LINK_IS_FOR_MEETING) {
                                 logDebug("It's a meeting");
                                 if (request.getFlag()) {
-                                    // I'm previewing the chat room, means I haven't joined.
-                                    boolean isAlreadyJoined = !api.getChatRoom(chatId).isPreview();
+                                    boolean isAlreadyJoined = MegaApplication.getChatManagement().isAlreadyJoining(chatId);
                                     MegaHandleList list = request.getMegaHandleList();
 
                                     if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
