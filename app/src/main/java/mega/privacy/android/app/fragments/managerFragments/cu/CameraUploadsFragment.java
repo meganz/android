@@ -538,8 +538,10 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     private void updateEnableCUButtons(boolean cuEnabled) {
         boolean emptyAdapter = gridAdapter == null || gridAdapter.getItemCount() <= 0;
         binding.emptyEnableCuButton.setVisibility(!cuEnabled && emptyAdapter ? View.VISIBLE : View.GONE);
-        mManagerActivity.updateEnableCUButton(!cuEnabled && !emptyAdapter && mActionMode == null
-                ? View.VISIBLE : View.GONE);
+        mManagerActivity.updateEnableCUButton(selectedView == ALL_VIEW && !cuEnabled
+                && !emptyAdapter && mActionMode == null
+                ? View.VISIBLE
+                : View.GONE);
 
         if (!cuEnabled) {
             mManagerActivity.hideCUProgress();
