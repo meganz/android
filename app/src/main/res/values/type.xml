@@ -188,6 +188,10 @@
         <item name="android:textColor">@color/grey_087_white_087</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Grey87White87.20sp">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <!-- Bold, 18sp, 0px, textColorPrimary -->
     <style name="TextAppearance.Mega.Subtitle1.Bold">
         <item name="android:textSize">18sp</item>
@@ -461,7 +465,7 @@
 
     <!-- Regular, 12sp, 0px, AudioPlayer playlist position and duration -->
     <style name="TextAppearance.Mega.Caption.Variant4">
-        <item name="android:textColor">@color/grey_038_white</item>
+        <item name="android:textColor">@color/grey_038_white_alpha_038</item>
     </style>
 
     <!-- Regular, 12sp, 0.25px -->
