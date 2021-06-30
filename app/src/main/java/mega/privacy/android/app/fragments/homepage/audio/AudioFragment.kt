@@ -28,6 +28,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.*
@@ -57,6 +58,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private lateinit var listAdapter: NodeListAdapter
     private lateinit var gridAdapter: NodeGridAdapter
     private lateinit var itemDecoration: PositionDividerItemDecoration
+    private lateinit var audioPlayerController: MiniAudioPlayerController
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
@@ -88,6 +90,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
+        setupMiniAudioPlayer()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
@@ -98,6 +101,13 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
+    }
+
+    private fun setupMiniAudioPlayer() {
+        audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
+            shouldVisible = true
+        }
+        lifecycle.addObserver(audioPlayerController)
     }
 
     private fun setupEmptyHint() {

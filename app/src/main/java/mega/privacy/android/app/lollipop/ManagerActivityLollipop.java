@@ -1943,6 +1943,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 					return Unit.INSTANCE;
 				});
+		getLifecycle().addObserver(miniAudioPlayerController);
 
         //Set navigation view
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -3300,10 +3301,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		checkTransferOverQuotaOnResume();
-
-		if (miniAudioPlayerController != null) {
-			miniAudioPlayerController.onResume();
-		}
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -4238,11 +4235,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         if (newTextFileDialog != null) {
         	newTextFileDialog.dismiss();
-		}
-
-        if (miniAudioPlayerController != null) {
-			miniAudioPlayerController.onDestroy();
-			miniAudioPlayerController = null;
 		}
 
 		nodeSaver.destroy();
