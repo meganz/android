@@ -1512,7 +1512,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                             if (request.getParamType() == LINK_IS_FOR_MEETING) {
                                 logDebug("It's a meeting");
                                 if (request.getFlag()) {
-                                    boolean isAlreadyJoined = e.getErrorCode() == MegaChatError.ERROR_EXIST;
+                                    // I'm previewing the chat room, means I haven't joined.
+                                    boolean isAlreadyJoined = !api.getChatRoom(chatId).isPreview();
                                     MegaHandleList list = request.getMegaHandleList();
 
                                     if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
@@ -1561,7 +1562,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                 }
                             } else {
                                 logDebug("It's a chat");
-                                        // Normal Chat Link
+                                // Normal Chat Link
                                 openChatPreview(link);
                             }
                         }

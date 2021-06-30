@@ -11632,7 +11632,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
                     // Open chat preview finished, request.getFlag() is true.
                     if (request.getFlag()) {
-                        boolean isAlreadyJoined = e.getErrorCode() == MegaChatError.ERROR_EXIST;
+                        // I'm previewing the chat room, means I haven't joined.
+                        boolean isAlreadyJoined = !api.getChatRoom(chatId).isPreview();
 
                         MegaHandleList list = request.getMegaHandleList();
 

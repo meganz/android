@@ -462,12 +462,12 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
     }
 
     private boolean shouldShowMeetingHint() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity().getApplicationContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return !sharedPreferences.getBoolean(SP_KEY_IS_HINT_SHOWN, false);
     }
 
     private void hintShown() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireActivity().getApplicationContext());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         sharedPreferences.edit().putBoolean(SP_KEY_IS_HINT_SHOWN, true).apply();
     }
 
