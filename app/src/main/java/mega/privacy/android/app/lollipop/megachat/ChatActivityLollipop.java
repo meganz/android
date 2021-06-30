@@ -8193,10 +8193,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                     return;
                 }else{
                     long newidChat = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-                    if(intent.getAction().equals(ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(ACTION_OPEN_CHAT_LINK) || (idChat != newidChat && newidChat != MEGACHAT_INVALID_HANDLE)) {
-                        if (newidChat != MEGACHAT_INVALID_HANDLE) {
-                            cleanBuffers();
-                        }
+                    if(intent.getAction().equals(ACTION_CHAT_SHOW_MESSAGES) || intent.getAction().equals(ACTION_OPEN_CHAT_LINK) || idChat != newidChat) {
+                        cleanBuffers();
                         pendingMessagesLoaded = false;
                     }
                     if (messagesPlaying != null && !messagesPlaying.isEmpty()) {
@@ -8206,10 +8204,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                         }
                         messagesPlaying.clear();
                     }
-                    if(newidChat != MEGACHAT_INVALID_HANDLE){
-                        closeChat(false);
-                        MegaApplication.setOpenChatId(-1);
-                    }
+
+                    closeChat(false);
+                    MegaApplication.setOpenChatId(-1);
+
                     initAfterIntent(intent, null);
                 }
 
