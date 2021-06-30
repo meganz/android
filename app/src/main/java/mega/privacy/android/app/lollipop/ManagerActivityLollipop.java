@@ -12913,6 +12913,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 //work around - SDK does not return over quota error for folder upload,
                 //so need to be notified from global listener
                 if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+                	if (transfer.isForeignOverquota()) {
+                		return;
+					}
+
 					logDebug("Over quota");
                     Intent intent = new Intent(this,UploadService.class);
                     intent.setAction(ACTION_OVERQUOTA_STORAGE);
