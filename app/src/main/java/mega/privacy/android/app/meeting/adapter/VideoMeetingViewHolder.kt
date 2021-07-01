@@ -444,6 +444,7 @@ class VideoMeetingViewHolder(
 
     /**
      * Method for controlling the UI in landscape mode
+     *
      * @param isFirstPage True, if it's page 0. False, otherwise
      * @param itemCount num of participants
      */
@@ -495,6 +496,12 @@ class VideoMeetingViewHolder(
         layoutParams.height = h
     }
 
+    /**
+     * Method for controlling the UI in portrait mode
+     *
+     * @param isFirstPage True, if it's page 0. False, otherwise
+     * @param itemCount num of participants
+     */
     private fun portraitLayout(isFirstPage: Boolean, itemCount: Int) {
         if (!isGrid) return
 
@@ -560,6 +567,13 @@ class VideoMeetingViewHolder(
         layoutParams.height = h
     }
 
+    /**
+     * Method for check margins for 4 or 6 participants
+     *
+     * @param layoutParams the params of the layout
+     * @param verticalMargin value of vertical margin
+     * @return width and height
+     */
     private fun layout46(
         layoutParams: GridLayoutManager.LayoutParams,
         verticalMargin: Int
@@ -576,6 +590,10 @@ class VideoMeetingViewHolder(
         return Pair(w, w)
     }
 
+    /**
+     * Method to control UI when scrolling in speaker view.
+     * The participant being visible is checked.
+     */
     fun onRecycle() {
         if (isGrid) return
 
@@ -590,6 +608,12 @@ class VideoMeetingViewHolder(
         }
     }
 
+    /**
+     * Method indicating whether the participant received is the same as the current participant
+     *
+     * @param participant The participant to be compared
+     * @return If the compared participants are different. False, if they are the same
+     */
     private fun isInvalid(participant: Participant) =
         (participant.peerId != peerId || participant.clientId != clientId)
 

@@ -13,6 +13,7 @@ import mega.privacy.android.app.utils.AvatarUtil.getCircleAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import nz.mega.sdk.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -52,7 +53,7 @@ class AbstractMeetingOnBoardingRepository @Inject constructor(
     suspend fun createAvatar(listener: BaseListener) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
-            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + ".jpg").absolutePath,
+            CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION).absolutePath,
             listener
         )
     }

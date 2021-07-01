@@ -498,7 +498,6 @@ class BottomFloatingPanelViewHolder(
 
     /**
      * Expand the bottom sheet
-     *
      */
     fun expand() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -509,7 +508,7 @@ class BottomFloatingPanelViewHolder(
     /**
      * Update the mic icon, also update the own item's mic icon
      *
-     * @param micOn
+     * @param micOn True, if the audio is on. False, if the audio is off
      */
     fun updateMicIcon(micOn: Boolean) {
         savedMicState = micOn
@@ -520,7 +519,7 @@ class BottomFloatingPanelViewHolder(
     /**
      * Update the cam icon, also update the own item's cam icon
      *
-     * @param camOn
+     * @param camOn True, if the video is on. False, if the video is off
      */
     fun updateCamIcon(camOn: Boolean) {
         savedCamState = camOn
@@ -528,11 +527,22 @@ class BottomFloatingPanelViewHolder(
         participantsAdapter.updateIcon(ParticipantsAdapter.CAM, camOn)
     }
 
+    /**
+     * Enabling or disabling the on hold button
+     *
+     * @param isEnabled True, if enabled. False, if disabled
+     * @param isHold True, if it is an on hold button. False, if it is switch call button
+     */
     fun enableHoldIcon(isEnabled: Boolean, isHold: Boolean) {
         floatingPanelView.fabHold.enable = isEnabled
         updateHoldIcon(isHold)
     }
 
+    /**
+     * Method to control when to switch the button from on hold to switch call
+     *
+     * @param isAnotherCallOnHold True, if another call is in progress. False, if not
+     */
     fun changeOnHoldIcon(isAnotherCallOnHold: Boolean) {
         if (isAnotherCallOnHold) {
             changeOnHoldIconDrawable(true)
@@ -543,25 +553,34 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
+    /**
+     * Method of changing the on hold button icon appropriately
+     *
+     * @param existsAnotherCallOnHold True, if another call is in progress. False, if not.
+     */
     fun changeOnHoldIconDrawable(existsAnotherCallOnHold: Boolean) {
-        if (existsAnotherCallOnHold) {
-            floatingPanelView.fabHold.setOnIcon(R.drawable.ic_call_swap)
-        } else {
-            floatingPanelView.fabHold.setOnIcon(R.drawable.ic_transfers_pause)
-        }
+        floatingPanelView.fabHold.setOnIcon(
+            if (existsAnotherCallOnHold) R.drawable.ic_call_swap
+            else R.drawable.ic_transfers_pause
+        )
     }
 
+    /**
+     * Method that enables or disables the mic and camera buttons when the call on hold status is changed
+     *
+     * @param isHold True, if the call is on hold. False, otherwise
+     */
     fun updateHoldIcon(isHold: Boolean) {
         floatingPanelView.fabHold.isOn = !isHold
-
-        floatingPanelView.fabMic.apply {
-            enable = !isHold
-        }
-        floatingPanelView.fabCam.apply {
-            enable = !isHold
-        }
+        floatingPanelView.fabMic.enable = !isHold
+        floatingPanelView.fabCam.enable = !isHold
     }
 
+    /**
+     * Method that updates the speaker icon according to the selected AudioDevice
+     *
+     * @param device Current device selected
+     */
     fun updateSpeakerIcon(device: AppRTCAudioManager.AudioDevice) {
         when (device) {
             AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
@@ -617,6 +636,11 @@ class BottomFloatingPanelViewHolder(
         participantsAdapter.updateParticipantAudioVideo(session.peerid, session.clientid)
     }
 
+    /**
+     * Check changes in remote chat privileges
+     *
+     * @param updateParticipantsPrivileges List of participants to be updated
+     */
     fun updateRemotePrivileges(updateParticipantsPrivileges: MutableSet<Participant>) {
         updateParticipantsPrivileges.forEach { participant ->
             participantsAdapter.updateParticipantPermission(

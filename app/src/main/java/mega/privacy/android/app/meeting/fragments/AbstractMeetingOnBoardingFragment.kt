@@ -359,12 +359,12 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     /**
      * Switch Camera
      *
-     * @param bOn true: turn on; off: turn off
+     * @param shouldVideoBeEnabled True, If the video is to be enabled. False, otherwise
      */
-    fun switchCamera(bOn: Boolean) {
-        fab_cam.isOn = bOn
+    fun switchCamera(shouldVideoBeEnabled: Boolean) {
+        fab_cam.isOn = shouldVideoBeEnabled
         setViewEnable(fab_cam, false)
-        when (bOn) {
+        when (shouldVideoBeEnabled) {
             true -> {
                 // Always try to start the video using the front camera
                 mask.visibility = View.VISIBLE
@@ -451,6 +451,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             setViewEnable(fab_cam, true)
             return
         }
+
         logDebug("Removing surface view")
         localSurfaceView.visibility = View.GONE
         removeChatVideoListener()
