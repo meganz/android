@@ -46,6 +46,7 @@ import mega.privacy.android.app.utils.Util.*
 import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class TextEditorActivity : PasscodeActivity(), SnackbarShower {
@@ -126,7 +127,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(SCROLL_TEXT, binding.contentText.getScrollText(binding.fileEditorScrollView.scrollY))
+        outState.putFloat(SCROLL_TEXT, getScrollSpot())
         outState.putInt(STATE, currentUIState)
         outState.putInt(CURSOR_POSITION, binding.contentEditText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
@@ -386,9 +387,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
                 setSelection(savedInstanceState.getInt(CURSOR_POSITION))
             }
 
-            binding.contentText.apply {
-                setText(text, firstLineNumber)
-                getScrollToText(savedInstanceState.getString(SCROLL_TEXT))
+            binding.contentText.setText(text, firstLineNumber)
+
+            val scrollSpot = savedInstanceState.getFloat(SCROLL_TEXT, INVALID_VALUE.toFloat())
+            if (scrollSpot != INVALID_VALUE.toFloat()) {
+                binding.fileEditorScrollView.post { setScrollSpot(scrollSpot) }
             }
         }
 
@@ -751,6 +754,40 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
                 countDownTimer = null
             }
         }.start()
+    }
+
+    /**
+     * Gets the scroll spot to restore it after rotate the screen.
+     *
+     * @return The scroll spot.
+     */
+    private fun getScrollSpot(): Float {
+        val y = binding.fileEditorScrollView.scrollY
+        val layout = binding.contentText.layout
+        val topPadding = -layout.topPadding
+
+        if (y <= topPadding) {
+            return (topPadding - y).toFloat() / binding.contentText.lineHeight
+        }
+
+        val line = layout.getLineForVertical(y - 1) + 1
+        val offset = layout.getLineStart(line)
+        val above = layout.getLineTop(line) - y
+        return offset + above.toFloat() / binding.contentText.lineHeight
+    }
+
+    /**
+     * Sets the scroll spot to restore it after rotate the screen.
+     *
+     * @param spot The scroll spot.
+     */
+    private fun setScrollSpot(spot: Float) {
+        val offset = spot.roundToInt()
+        val above = ((spot - offset) * binding.contentText.lineHeight).roundToInt()
+        val layout = binding.contentText.layout
+        val line = layout.getLineForOffset(offset)
+        val y = (if (line == 0) -layout.topPadding else layout.getLineTop(line)) - above
+        binding.fileEditorScrollView.scrollTo(0, y)
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
