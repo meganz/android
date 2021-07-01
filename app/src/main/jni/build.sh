@@ -453,7 +453,7 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
         patch -p0 ${CURL}/ares/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}
     fi
 
-    if [ "$OSTYPE" == "darwin"* ]; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
         TOOLCHAIN="${NDK_ROOT}/toolchains/llvm/prebuilt/darwin-x86_64"
     else
         TOOLCHAIN="${NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64"
