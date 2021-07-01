@@ -518,7 +518,6 @@ echo "* Setting up libwebsockets"
 if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
     downloadAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS}
     ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
-    LWS_REF_PATH="${PWD}"
 
     for ABI in ${BUILD_ARCHS}; do
         echo "* Prebuilding libwebsockets for ${ABI}"
