@@ -137,7 +137,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
-import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
+import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
@@ -325,7 +325,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
 		BillingUpdatesListener, ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-		MeetingBottomSheetDialogActionListener {
+		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -2626,7 +2626,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						drawerItem=DrawerItem.CHAT;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
-						megaChatApi.checkChatLink(getIntent().getDataString(), this);
+						megaChatApi.checkChatLink(getIntent().getDataString(), new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
 						getIntent().setAction(null);
 						setIntent(null);
 					}
@@ -2635,7 +2635,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						joiningToChatLink = true;
 
 						if (connected) {
-							megaChatApi.checkChatLink(linkJoinToChatLink, this);
+							megaChatApi.checkChatLink(linkJoinToChatLink, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
 						}
 
 						getIntent().setAction(null);
@@ -8161,10 +8161,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 switch (linkType) {
                     case CHAT_LINK: {
 						logDebug("Open chat link: correct chat link");
-//                        showChatLink(link)
 						// Identify the link is a meeting or normal chat link
-						megaChatApi.checkChatLink(link, managerActivity);
-                        dismissOpenLinkDialog();
+						megaChatApi.checkChatLink(link, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
+						dismissOpenLinkDialog();
                         break;
                     }
                     case CONTACT_LINK: {
@@ -8198,7 +8197,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             }
 		}
 		else if (drawerItem == DrawerItem.CHAT) {
-			megaChatApi.checkChatLink(link, managerActivity);
+			megaChatApi.checkChatLink(link, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
 		}
 	}
 
@@ -11525,7 +11524,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				connected = true;
 
 				if (joiningToChatLink && !isTextEmpty(linkJoinToChatLink)) {
-					megaChatApi.checkChatLink(linkJoinToChatLink, this);
+					megaChatApi.checkChatLink(linkJoinToChatLink, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
 				}
 
 				if(drawerItem == DrawerItem.CHAT){
@@ -11608,84 +11607,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				else{
 					logError("ERROR WHEN UNARCHIVING CHAT " + e.getErrorString());
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_unarchive_chat, chatTitle), -1);
-				}
-			}
-		}
-		else if(request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW){
-			if(e.getErrorCode()==MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST){
-			    long chatId = request.getChatHandle();
-
-				if (joiningToChatLink && isTextEmpty(request.getLink()) && chatId == MEGACHAT_INVALID_HANDLE) {
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), MEGACHAT_INVALID_HANDLE);
-					resetJoiningChatLink();
-					return;
-				}
-
-                String link = request.getLink();
-
-				if (request.getParamType() == LINK_IS_FOR_MEETING) {
-					logDebug("It's a meeting");
-
-                    // Open chat preview finished, request.getFlag() is true.
-                    if (request.getFlag()) {
-                        boolean isAlreadyJoined = MegaApplication.getChatManagement().isAlreadyJoining(chatId);
-
-                        MegaHandleList list = request.getMegaHandleList();
-
-                        if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-                            logDebug("It's a meeting, open join call");
-                            if (isAlreadyJoined) {
-                                // Open the ongoing meeting.
-                                MegaChatCall call = api.getChatCall(chatId);
-
-                                // Haven't joined the call, start it.
-                                if (call == null || call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-                                    CallUtil.openMeetingToStart(this, chatId);
-                                } else {
-                                    returnCall(this, chatId);
-                                }
-                            } else {
-                                logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
-                                CallUtil.openMeetingToJoin(this, chatId, request.getText(), link);
-                            }
-                        } else {
-                            if (isAlreadyJoined) {
-                                // Meeting has ended, open the chat room.
-                                showChatLink(link);
-                            } else {
-                                logDebug("It's a meeting, open dialog: Meeting has ended");
-                                new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-                                    @Override
-                                    public void onViewMeetingChat() {
-                                        showChatLink(link);
-                                    }
-
-                                    @Override
-                                    public void onLeave() {
-                                    }
-                                }).show(getSupportFragmentManager(),
-                                        MeetingHasEndedDialogFragment.TAG);
-                            }
-                        }
-                    } else {
-                        // Check chat link finished, request.getFlag() is false.
-						logDebug("Check chat link finished and it's a meeting, open chat preview.");
-						api.openChatPreview(link, this);
-					}
-				} else {
-					logDebug("It's a chat");
-					showChatLink(link);
-				}
-
-                dismissOpenLinkDialog();
-			}
-			else {
-				if(e.getErrorCode()==MegaChatError.ERROR_NOENT){
-					dismissOpenLinkDialog();
-					showAlert(this, getString(R.string.invalid_chat_link), getString(R.string.title_alert_chat_link_error));
-				}
-				else {
-					showOpenLinkError(true, 0);
 				}
 			}
 		}
@@ -14408,5 +14329,63 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void actionConfirmed() {
 		//No update needed
+	}
+
+	@Override
+	public void onPreviewLoaded(@NotNull MegaChatApiJava api, long chatId, String titleChat, MegaHandleList list, int paramType, String link, boolean isFromOpenChatPreview) {
+		if (joiningToChatLink && isTextEmpty(link) && chatId == MEGACHAT_INVALID_HANDLE) {
+			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), MEGACHAT_INVALID_HANDLE);
+			resetJoiningChatLink();
+			return;
+		}
+
+		if (paramType == LINK_IS_FOR_MEETING) {
+			logDebug("It's a meeting");
+			// Open chat preview finished, request.getFlag() is true.
+			if (isFromOpenChatPreview) {
+				boolean isAlreadyJoined = MegaApplication.getChatManagement().isAlreadyJoining(chatId);
+
+				if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
+					checkAMeetingLink(ManagerActivityLollipop.this, chatId, titleChat, list, link);
+				} else {
+					if (isAlreadyJoined) {
+						// Meeting has ended, open the chat room.
+						showChatLink(link);
+					} else {
+						logDebug("It's a meeting, open dialog: Meeting has ended");
+						new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+							@Override
+							public void onViewMeetingChat() {
+								showChatLink(link);
+							}
+
+							@Override
+							public void onLeave() {
+							}
+						}).show(getSupportFragmentManager(),
+								MeetingHasEndedDialogFragment.TAG);
+					}
+				}
+			} else {
+				// Check chat link finished, request.getFlag() is false.
+				logDebug("Check chat link finished and it's a meeting, open chat preview.");
+				api.openChatPreview(link, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_MEETING_LINK));
+			}
+		} else {
+			logDebug("It's a chat");
+			showChatLink(link);
+		}
+
+		dismissOpenLinkDialog();
+	}
+
+	@Override
+	public void onErrorLoadingPreview(int errorCode) {
+		if (errorCode == MegaChatError.ERROR_NOENT) {
+			dismissOpenLinkDialog();
+			showAlert(this, getString(R.string.invalid_chat_link), getString(R.string.title_alert_chat_link_error));
+		} else {
+			showOpenLinkError(true, 0);
+		}
 	}
 }

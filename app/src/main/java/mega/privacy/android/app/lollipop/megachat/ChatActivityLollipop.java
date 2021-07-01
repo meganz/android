@@ -72,7 +72,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -88,12 +87,11 @@ import mega.privacy.android.app.BuildConfig;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
-import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.listeners.CreateChatListener;
+import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
@@ -154,7 +152,6 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMes
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
-import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -225,7 +222,8 @@ public class ChatActivityLollipop extends PasscodeActivity
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
         SnackbarShower, AttachNodeToChatListener, StartChatCallListener.OnCallStartedCallback,
         HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback,
-        SetCallOnHoldListener.OnCallOnHoldCallback {
+        SetCallOnHoldListener.OnCallOnHoldCallback, LoadPreviewListener.OnPreviewLoadedCallback,
+        LoadPreviewListener.OnChatPreviewLoadedCallback {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -690,6 +688,122 @@ public class ChatActivityLollipop extends PasscodeActivity
         }
     }
 
+    @Override
+    public void onPreviewLoaded(@NotNull MegaChatApiJava api, long chatId, String titleChat, MegaHandleList list, int paramType, String link, boolean isFromOpenChatPreview) {
+        if (paramType == LINK_IS_FOR_MEETING) {
+            boolean linkInvalid = TextUtil.isTextEmpty(link) && chatId == MEGACHAT_INVALID_HANDLE;
+            if (linkInvalid) {
+                logError("Invalid link");
+                return;
+            }
+
+            logDebug("It's a meeting");
+            if (isFromOpenChatPreview) {
+                if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
+                    checkAMeetingLink(ChatActivityLollipop.this, chatId, titleChat, list, link);
+                } else {
+                    // Open a already joined and ended meeting's chatroom.
+                    if (MegaApplication.getChatManagement().isAlreadyJoining(chatId)) {
+                        loadChatLink(link);
+                    } else {
+                        logDebug("It's a meeting, open dialog: Meeting has ended");
+                        new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+                            @Override
+                            public void onViewMeetingChat() {
+                                loadChatLink(link);
+                            }
+
+                            @Override
+                            public void onLeave() {
+                            }
+                        }).show(getSupportFragmentManager(),
+                                MeetingHasEndedDialogFragment.TAG);
+                    }
+                }
+            } else {
+                logDebug("It's a meeting, open chat preview");
+                api.openChatPreview(link, new LoadPreviewListener(ChatActivityLollipop.this, ChatActivityLollipop.this, CHECK_LINK_TYPE_MEETING_LINK));
+            }
+        } else {
+            logDebug("Chat link");
+            loadChatLink(link);
+        }
+    }
+
+    @Override
+    public void onErrorLoadingPreview(int errorCode) {
+
+    }
+
+    @Override
+    public void onPreviewLoaded(@NotNull MegaChatApiJava api, long chatId, int error, long userHandle) {
+        if (error == MegaChatError.ERROR_OK || error == MegaChatError.ERROR_EXIST) {
+            if (idChat != MEGACHAT_INVALID_HANDLE && megaChatApi.getChatRoom(idChat) != null) {
+                logDebug("Close previous chat");
+                megaChatApi.closeChatRoom(idChat, ChatActivityLollipop.this);
+            }
+
+            idChat = chatId;
+            megaChatApi.addChatListener(ChatActivityLollipop.this);
+
+            if (idChat != MEGACHAT_INVALID_HANDLE) {
+                dbH.setLastPublicHandle(idChat);
+                dbH.setLastPublicHandleTimeStamp();
+                dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CHAT);
+            }
+
+            MegaApplication.setOpenChatId(idChat);
+
+            if (error == MegaChatError.ERROR_OK && openingAndJoining) {
+                if (!isAlreadyJoining(idChat)) {
+                    megaChatApi.autojoinPublicChat(idChat, ChatActivityLollipop.this);
+                }
+
+                openingAndJoining = false;
+            } else if (error == MegaChatError.ERROR_EXIST) {
+                if (megaChatApi.getChatRoom(idChat).isActive()) {
+                    //I'm already participant
+                    joiningOrLeaving = false;
+                    openingAndJoining = false;
+                } else if (initChat()) {
+                    //Chat successfully initialized, now can rejoin
+                    setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
+                    titleToolbar.setText(getTitleChat(chatRoom));
+                    groupalSubtitleToolbar.setText(null);
+                    setGroupalSubtitleToolbarVisibility(false);
+
+                    if (adapter == null) {
+                        createAdapter();
+                    } else {
+                        adapter.updateChatRoom(chatRoom);
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    if (!isAlreadyJoining(idChat)
+                            && !isAlreadyJoining(userHandle)) {
+                        megaChatApi.autorejoinPublicChat(idChat, userHandle, ChatActivityLollipop.this);
+                    }
+                } else {
+                    logWarning("Error opening chat before rejoin");
+                }
+                return;
+            }
+
+            initAndShowChat(null);
+            supportInvalidateOptionsMenu();
+        } else {
+            String text;
+            if (error == MegaChatError.ERROR_NOENT) {
+                text = getString(R.string.invalid_chat_link);
+            } else {
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
+                text = getString(R.string.error_chat_link);
+            }
+
+            emptyScreen(text);
+        }
+    }
+
     private class UserTyping {
         MegaChatParticipant participantTyping;
         long timeStampTyping;
@@ -951,7 +1065,6 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-
         if (megaApi == null) {
             megaApi = MegaApplication.getInstance().getMegaApi();
         }
@@ -1478,15 +1591,6 @@ public class ChatActivityLollipop extends PasscodeActivity
         setStatusIcon();
     }
 
-    private void openChatPreview(String link) {
-        megaChatApi.openChatPreview(link, this);
-
-        if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
-            openingAndJoining = true;
-            setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
-        }
-    }
-
     public void initAfterIntent(Intent newIntent, Bundle savedInstanceState){
         if (newIntent != null){
             logDebug("Intent is not null");
@@ -1494,79 +1598,12 @@ public class ChatActivityLollipop extends PasscodeActivity
             if (intentAction != null){
                 if (intentAction.equals(ACTION_OPEN_CHAT_LINK) || intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)){
                     String link = newIntent.getDataString();
+                    megaChatApi.openChatPreview(link, new LoadPreviewListener(ChatActivityLollipop.this, ChatActivityLollipop.this, ChatActivityLollipop.this, CHECK_LINK_TYPE_CHAT_LINK));
 
-                    megaChatApi.checkChatLink(link, new ChatBaseListener(this) {
-
-                        @Override
-                        public void onRequestFinish(@NotNull MegaChatApiJava api, @NotNull MegaChatRequest request, @NotNull MegaChatError e) {
-                            long chatId = request.getChatHandle();
-                            int errorCode = e.getErrorCode();
-                            boolean codeError = errorCode != MegaChatError.ERROR_OK && errorCode != MegaChatError.ERROR_EXIST;
-                            boolean linkInvalid = TextUtil.isTextEmpty(request.getLink()) && chatId == MEGACHAT_INVALID_HANDLE;
-                            logDebug("Chat id: " + request.getChatHandle() + ", type: " + request.getParamType() + ", flag: " + request.getFlag());
-
-                            if (codeError || linkInvalid) {
-                                return;
-                            }
-
-                            if (request.getParamType() == LINK_IS_FOR_MEETING) {
-                                logDebug("It's a meeting");
-                                if (request.getFlag()) {
-                                    boolean isAlreadyJoined = MegaApplication.getChatManagement().isAlreadyJoining(chatId);
-                                    MegaHandleList list = request.getMegaHandleList();
-
-                                    if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-                                        long anotherCallInProgress = CallUtil.getAnotherCallParticipating(chatId);
-                                        if(anotherCallInProgress != MEGACHAT_INVALID_HANDLE){
-                                            showConfirmationInACall(context);
-                                            return;
-                                        }
-
-                                        logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
-                                        if(isAlreadyJoined) {
-                                            // Open the ongoing meeting.
-                                            MegaChatCall call = api.getChatCall(chatId);
-
-                                            // Haven't joined the call, start it.
-                                            if (call == null || call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-                                                CallUtil.openMeetingToStart(ChatActivityLollipop.this, chatId);
-                                            } else {
-                                                returnCall(ChatActivityLollipop.this, chatId);
-                                            }
-                                        } else {
-                                            CallUtil.openMeetingToJoin(
-                                                    ChatActivityLollipop.this, request.getChatHandle(), request.getText(), link);
-                                        }
-                                    } else {
-                                        // Open a already joined and ended meeting's chatroom.
-                                        if (isAlreadyJoined) {
-                                            openChatPreview(link);
-                                        } else {
-                                            logDebug("It's a meeting, open dialog: Meeting has ended");
-                                            new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-                                                @Override
-                                                public void onViewMeetingChat() {
-                                                    openChatPreview(link);
-                                                }
-
-                                                @Override
-                                                public void onLeave() {
-                                                }
-                                            }).show(getSupportFragmentManager(),
-                                                    MeetingHasEndedDialogFragment.TAG);
-                                        }
-                                    }
-                                } else {
-                                    logDebug("It's a meeting, open chat preview");
-                                    api.openChatPreview(link, this);
-                                }
-                            } else {
-                                logDebug("It's a chat");
-                                // Normal Chat Link
-                                openChatPreview(link);
-                            }
-                        }
-                    });
+                    if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
+                        openingAndJoining = true;
+                        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
+                    }
                 } else {
                     long newIdChat = newIntent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
 
@@ -5420,7 +5457,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                                 if(richLinkMessage != null){
                                     String url = richLinkMessage.getUrl();
                                     if (richLinkMessage.isChat()) {
-                                        loadChatLink(url);
+                                        logDebug("Link clicked");
+                                        megaChatApi.checkChatLink(url, new LoadPreviewListener(ChatActivityLollipop.this, ChatActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
                                     } else {
                                         openMegaLink(url, richLinkMessage.getNode() != null ? richLinkMessage.getNode().isFile() : richLinkMessage.isFile());
                                     }
@@ -5437,6 +5475,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void loadChatLink(String link){
+        logDebug("Open new chat room");
         Intent intentOpenChat = new Intent(this, ChatActivityLollipop.class);
         intentOpenChat.setAction(ACTION_OPEN_CHAT_LINK);
         intentOpenChat.setData(Uri.parse(link));
@@ -7826,74 +7865,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 logError("ERROR WHEN CREATING CHAT " + e.getErrorString());
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.create_chat_error), -1);
             }
-        } else if (request.getType() == MegaChatRequest.TYPE_LOAD_PREVIEW) {
-            if (e.getErrorCode() == MegaChatError.ERROR_OK || e.getErrorCode() == MegaChatError.ERROR_EXIST) {
-                if (idChat != MEGACHAT_INVALID_HANDLE && megaChatApi.getChatRoom(idChat) != null) {
-                    logDebug("Close previous chat");
-                    megaChatApi.closeChatRoom(idChat, this);
-                }
 
-                idChat = request.getChatHandle();
-                megaChatApi.addChatListener(this);
-
-                if (idChat != MEGACHAT_INVALID_HANDLE) {
-                    dbH.setLastPublicHandle(idChat);
-                    dbH.setLastPublicHandleTimeStamp();
-                    dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CHAT);
-                }
-
-                MegaApplication.setOpenChatId(idChat);
-
-                if (e.getErrorCode() == MegaChatError.ERROR_OK && openingAndJoining) {
-                    if (!isAlreadyJoining(idChat)) {
-                        megaChatApi.autojoinPublicChat(idChat, this);
-                    }
-
-                    openingAndJoining = false;
-                } else if (e.getErrorCode() == MegaChatError.ERROR_EXIST) {
-                    if (megaChatApi.getChatRoom(idChat).isActive()) {
-                        //I'm already participant
-                        joiningOrLeaving = false;
-                        openingAndJoining = false;
-                    } else {
-                        if (initChat()) {
-                            //Chat successfully initialized, now can rejoin
-                            setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
-                            titleToolbar.setText(getTitleChat(chatRoom));
-                            groupalSubtitleToolbar.setText(null);
-                            setGroupalSubtitleToolbarVisibility(false);
-
-                            if (adapter == null) {
-                                createAdapter();
-                            } else {
-                                adapter.updateChatRoom(chatRoom);
-                                adapter.notifyDataSetChanged();
-                            }
-
-                            if (!isAlreadyJoining(idChat)
-                                    && !isAlreadyJoining(request.getUserHandle())) {
-                                megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
-                            }
-                        } else {
-                            logWarning("Error opening chat before rejoin");
-                        }
-                        return;
-                    }
-                }
-
-                initAndShowChat(null);
-                supportInvalidateOptionsMenu();
-            } else {
-                String text;
-                if (e.getErrorCode() == MegaChatError.ERROR_NOENT) {
-                    text = getString(R.string.invalid_chat_link);
-                } else {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
-                    text = getString(R.string.error_chat_link);
-                }
-
-                emptyScreen(text);
-            }
         } else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
             joiningOrLeaving = false;
 

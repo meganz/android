@@ -502,8 +502,12 @@ class InMeetingRepository @Inject constructor(
     fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
         megaChatApi.openChatPreview(link, listener)
 
-    fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
-        megaChatApi.autojoinPublicChat(chatId, listener)
+    fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) {
+        if (!MegaApplication.getChatManagement().isAlreadyJoining(chatId)) {
+            MegaApplication.getChatManagement().addJoiningChatId(chatId)
+            megaChatApi.autojoinPublicChat(chatId, listener)
+        }
+    }
 
     fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =
         megaChatApi.addChatListener(ChatConnectionListener(chatId, callback))

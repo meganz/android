@@ -660,6 +660,10 @@ public class Constants {
     public static final int AUDIO_MANAGER_CALL_OUTGOING = 3;
     public static final int AUDIO_MANAGER_CREATING_JOINING_MEETING = 4;
 
+    public static final int CHECK_LINK_TYPE_UNKNOWN_LINK = 0;
+    public static final int CHECK_LINK_TYPE_CHAT_LINK = 1;
+    public static final int CHECK_LINK_TYPE_MEETING_LINK = 2;
+
     public static final String SEPARATOR = File.separator;
 
     public static final String[] MEGA_REGEXS = {

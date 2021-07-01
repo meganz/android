@@ -1151,4 +1151,36 @@ public class CallUtil {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         sharedPreferences.edit().putBoolean(value, true).apply();
     }
+
+    /**
+     * Method for processing a meeting link
+     *
+     * @param context   The Activity context
+     * @param chatId    The Chat ID
+     * @param titleChat The title of the chat room
+     * @param list      The list of mega handle
+     * @param link      The meeting link
+     */
+    public static void checkAMeetingLink(Context context, long chatId, String titleChat, MegaHandleList list, String link) {
+        long anotherCallInProgress = CallUtil.getAnotherCallParticipating(chatId);
+        if (anotherCallInProgress != MEGACHAT_INVALID_HANDLE) {
+            logDebug("Exists another call in progress");
+            showConfirmationInACall(context);
+            return;
+        }
+
+        if (MegaApplication.getChatManagement().isAlreadyJoining(chatId)) {
+            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+            if (call == null || call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+                logDebug("Call id: " + list.get(0) + ". It's a meeting, open to start");
+                CallUtil.openMeetingToStart(context, chatId);
+            } else {
+                logDebug("Call id: " + list.get(0) + ". Return to call");
+                returnCall(context, chatId);
+            }
+        } else {
+            logDebug("Call id: " + list.get(0) + ". It's a meeting, open join call");
+            CallUtil.openMeetingToJoin(context, chatId, titleChat, link);
+        }
+    }
 }

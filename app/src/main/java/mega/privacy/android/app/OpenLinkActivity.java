@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
-import mega.privacy.android.app.listeners.ChatBaseListener;
 import mega.privacy.android.app.listeners.ConnectListener;
+import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
 import mega.privacy.android.app.lollipop.FolderLinkActivityLollipop;
@@ -44,7 +44,7 @@ import static mega.privacy.android.app.utils.Util.decodeURL;
 import static mega.privacy.android.app.utils.Util.matchRegexs;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class OpenLinkActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener {
+public class OpenLinkActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener, LoadPreviewListener.OnPreviewLoadedCallback {
 
 	private DatabaseHandler dbH = null;
 
@@ -421,55 +421,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	public void finishAfterConnect() {
-		megaChatApi.checkChatLink(url, new ChatBaseListener(OpenLinkActivity.this) {
-
-			@Override
-			public void onRequestFinish(@NotNull MegaChatApiJava api, @NotNull MegaChatRequest request, @NotNull MegaChatError e) {
-				int errorCode = e.getErrorCode();
-				boolean codeError = errorCode != MegaChatError.ERROR_OK && errorCode != MegaChatError.ERROR_EXIST;
-				boolean linkInvalid = TextUtil.isTextEmpty(request.getLink()) && request.getChatHandle() == MEGACHAT_INVALID_HANDLE;
-				logDebug("Chat id: " + request.getChatHandle() + ", type: " + request.getParamType() + ", flag: " + request.getFlag());
-
-				if (codeError || linkInvalid) {
-					setError(getString(R.string.invalid_link));   // TODO: More appropriate error message
-					return;
-				}
-
-				if (request.getParamType() == LINK_IS_FOR_MEETING) {
-					logDebug("It's a meeting link");
-
-					if (request.getFlag()) {
-						MegaHandleList list = request.getMegaHandleList();
-
-						if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-							logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
-							goToMeetingActivity(request.getChatHandle(), request.getText());
-						} else {
-							logDebug("It's a meeting, open dialog: Meeting has ended");
-							new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-								@Override
-								public void onViewMeetingChat() {
-									goToChatActivity();
-								}
-
-								@Override
-								public void onLeave() {
-									goToGuestLeaveMeetingActivity();
-								}
-							}).show(getSupportFragmentManager(),
-									MeetingHasEndedDialogFragment.TAG);
-						}
-					} else {
-						logDebug("It's a meeting, open chat preview");
-						api.openChatPreview(url, this);
-					}
-				} else {
-					// Normal Chat Link
-					logDebug("It's a chat link");
-					goToChatActivity();
-				}
-			}
-		});
+		megaChatApi.checkChatLink(url, new LoadPreviewListener(this, OpenLinkActivity.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
 	}
 
 	private void goToChatActivity() {
@@ -574,5 +526,52 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void onPreviewLoaded(@NotNull MegaChatApiJava api, long chatId, String titleChat, MegaHandleList list, int paramType, String link, boolean isFromOpenChatPreview) {
+		boolean linkInvalid = TextUtil.isTextEmpty(link) && chatId == MEGACHAT_INVALID_HANDLE;
+		logDebug("Chat id: " + chatId + ", type: " + paramType + ", flag: " + isFromOpenChatPreview);
+
+		if (linkInvalid) {
+			setError(getString(R.string.invalid_link));
+			return;
+		}
+
+		if (paramType == LINK_IS_FOR_MEETING) {
+			logDebug("It's a meeting link");
+			if (isFromOpenChatPreview) {
+				if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
+					logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
+					goToMeetingActivity(chatId, titleChat);
+				} else {
+					logDebug("It's a meeting, open dialog: Meeting has ended");
+					new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+						@Override
+						public void onViewMeetingChat() {
+							goToChatActivity();
+						}
+
+						@Override
+						public void onLeave() {
+							goToGuestLeaveMeetingActivity();
+						}
+					}).show(getSupportFragmentManager(),
+							MeetingHasEndedDialogFragment.TAG);
+				}
+			} else {
+				logDebug("It's a meeting, open chat preview");
+				api.openChatPreview(url, new LoadPreviewListener(this, OpenLinkActivity.this, CHECK_LINK_TYPE_MEETING_LINK));
+
+			}
+		} else {
+			logDebug("It's a chat link");
+			goToChatActivity();
+		}
+	}
+
+	@Override
+	public void onErrorLoadingPreview(int errorCode) {
+		setError(getString(R.string.invalid_link));
 	}
 }
