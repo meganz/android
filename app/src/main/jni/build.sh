@@ -35,9 +35,9 @@ if [ ! -d "${JAVA_HOME}" ]; then
 fi
 
 NDK_BUILD=${NDK_ROOT}/ndk-build
-JNI_PATH=`pwd`
-LIBDIR=${JNI_PATH}/../obj/local/armeabi
-JAVA_OUTPUT_PATH=${JNI_PATH}/../java
+BASE_PATH=`pwd`
+LIBDIR=${BASE_PATH}/../obj/local/armeabi
+JAVA_OUTPUT_PATH=${BASE_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
 LOG_FILE=/dev/null
 
@@ -60,7 +60,7 @@ SQLITE_SHA1="ff9b4e140fe0764bc7bc802facf5ac164443f517"
 CURL=curl
 CURL_VERSION=7.67.0
 C_ARES_VERSION=1.15.0
-CURL_EXTRA="--disable-smb --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smtp --disable-gopher --disable-sspi"
+CURL_EXTRA="--disable-dict --disable-file --disable-ftp --disable-gopher --disable-imap --disable-ldap --disable-ldaps --disable-mime --disable-netrc --disable-pop3 --disable-proxy --disable-rtsp --disable-smb --disable-smtp --disable-telnet --disable-tftp --disable-manual"
 CURL_SOURCE_FILE=curl-${CURL_VERSION}.tar.gz
 CURL_SOURCE_FOLDER=curl-${CURL_VERSION}
 CURL_DOWNLOAD_URL=http://curl.haxx.se/download/${CURL_SOURCE_FILE}
@@ -414,35 +414,6 @@ if [ ! -f ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}.ready ]; then
 fi
 echo "* MediaInfo is ready"
 
-echo "* Setting up cURL with c-ares"
-if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
-    echo "* Setting up cURL"
-    downloadCheckAndUnpack ${CURL_DOWNLOAD_URL} ${CURL}/${CURL_SOURCE_FILE} ${CURL_SHA1} ${CURL}
-    ln -sf ${CURL_SOURCE_FOLDER} ${CURL}/${CURL}
-    echo "* cURL is ready"
-
-    echo "* Setting up c-ares"
-    downloadCheckAndUnpack ${ARES_DOWNLOAD_URL} ${CURL}/${ARES_SOURCE_FILE} ${ARES_SHA1} ${CURL}
-    ln -sf ${ARES_SOURCE_FOLDER} ${CURL}/ares
-    ln -sf ../${ARES_SOURCE_FOLDER} ${CURL}/${CURL_SOURCE_FOLDER}/ares
-    echo "* c-ares is ready"
-    touch ${CURL}/${CURL_SOURCE_FILE}.ready
-fi
-echo "* cURL with c-ares is ready"
-
-echo "* Setting up crashlytics"
-if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
-    wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE} &>> ${LOG_FILE}
-    wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O  ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C} &>> ${LOG_FILE}
-
-    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/ares_android.c < curl/ares_android_c.patch &>> ${LOG_FILE}; then
-        patch -p0 ${CURL}/ares/ares_android.c < curl/ares_android_c.patch &>> ${LOG_FILE}
-    fi
-
-    touch ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready
-fi
-echo "* crashlytics is ready"
-
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
     WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
@@ -458,6 +429,91 @@ else
     echo "* WebRTC is not needed"
 fi
 
+echo "* Setting up crashlytics"
+if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
+    wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE} &>> ${LOG_FILE}
+    wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O  ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C} &>> ${LOG_FILE}
+
+    touch ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready
+fi
+echo "* crashlytics is ready"
+
+echo "* Setting up cURL with c-ares"
+if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
+    echo "* Setting up cURL"
+    downloadCheckAndUnpack ${CURL_DOWNLOAD_URL} ${CURL}/${CURL_SOURCE_FILE} ${CURL_SHA1} ${CURL}
+    ln -sf ${CURL_SOURCE_FOLDER} ${CURL}/${CURL}
+
+    echo "* Setting up c-ares"
+    downloadCheckAndUnpack ${ARES_DOWNLOAD_URL} ${CURL}/${ARES_SOURCE_FILE} ${ARES_SHA1} ${CURL}
+    ln -sf ${ARES_SOURCE_FOLDER} ${CURL}/ares
+
+    echo "* Patching c-ares to include crashlytics"
+    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}; then
+        patch -p0 ${CURL}/ares/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}
+    fi
+
+    if [ "$OSTYPE" == "darwin"* ]; then
+        TOOLCHAIN="${NDK_ROOT}/toolchains/llvm/prebuilt/darwin-x86_64"
+    else
+        TOOLCHAIN="${NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64"
+    fi
+    export AR=$TOOLCHAIN/bin/llvm-ar
+    export LD=$TOOLCHAIN/bin/ld
+    export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+    export STRIP=$TOOLCHAIN/bin/llvm-strip
+
+    API_LEVEL=`echo ${APP_PLATFORM} | cut -d'-' -f2`
+
+    for ABI in ${BUILD_ARCHS}; do
+        echo "* Prebuilding cURL with c-ares for ${ABI}"
+        if [ "${ABI}" == "armeabi-v7a" ]; then
+            TARGET="armv7a-linux-androideabi"
+            WEBRTC_SUFFIX="arm"
+        elif [ "${ABI}" == "arm64-v8a" ]; then
+            TARGET="aarch64-linux-android"
+            WEBRTC_SUFFIX="arm64"
+        elif [ "${ABI}" == "x86" ]; then
+            TARGET="i686-linux-android"
+            WEBRTC_SUFFIX=${ABI}
+        elif [ "${ABI}" == "x86_64" ]; then
+            TARGET="x86_64-linux-android"
+            WEBRTC_SUFFIX=${ABI}
+        fi
+        export CC=$TOOLCHAIN/bin/${TARGET}${API_LEVEL}-clang
+        export AS=$CC
+        export CXX=$TOOLCHAIN/bin/${TARGET}${API_LEVEL}-clang++
+
+        pushd ${CURL}/ares &>> ${LOG_FILE}
+        ./configure --host "${TARGET}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} &>> ${LOG_FILE}
+        make clean &>> ${LOG_FILE}
+        make &>> ${LOG_FILE}
+        make install &>> ${LOG_FILE}
+        popd &>> ${LOG_FILE}
+
+        pushd ${CURL}/${CURL} &>> ${LOG_FILE}
+        rm -r boringssl &>> ${LOG_FILE} || :
+        mkdir -p boringssl/lib
+        ln -s ${BASE_PATH}/megachat/webrtc/include/third_party/boringssl/src/include/ boringssl/include
+        ln -s ${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a boringssl/lib/libcrypto.a
+        ln -s ${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a boringssl/lib/libssl.a
+
+        LIBS=-lc++ ./configure --host "${TARGET}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}/${CURL}"/curl-android-${ABI} --with-ssl="${PWD}"/boringssl/ \
+        --enable-ares="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} ${CURL_EXTRA} &>> ${LOG_FILE}
+        make clean &>> ${LOG_FILE}
+        make &>> ${LOG_FILE}
+        make install &>> ${LOG_FILE}
+        popd &>> ${LOG_FILE}
+    done
+
+    # clean env
+    unset AR; unset LD; unset RANLIB; unset STRIP; unset CC; unset AS; unset CXX
+
+    echo "* cURL with cares is ready"
+    touch ${CURL}/${CURL_SOURCE_FILE}.ready
+fi
+echo "* cURL with c-ares is ready"
+
 echo "* Setting up libwebsockets"
 if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
     downloadAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS}
@@ -467,27 +523,27 @@ if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
     for ABI in ${BUILD_ARCHS}; do
         echo "* Prebuilding libwebsockets for ${ABI}"
         if [ "${ABI}" == "armeabi-v7a" ]; then
-            TARGET="arm"
+            WEBRTC_SUFFIX="arm"
             EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-implicit-int-conversion"
         elif [ "${ABI}" == "arm64-v8a" ]; then
-            TARGET="arm64"
+            WEBRTC_SUFFIX="arm64"
             EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-shorten-64-to-32"
         elif [ "${ABI}" == "x86" ]; then
-            TARGET=${ABI}
+            WEBRTC_SUFFIX=${ABI}
             EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-implicit-int-conversion"
         elif [ "${ABI}" == "x86_64" ]; then
-            TARGET=${ABI}
+            WEBRTC_SUFFIX=${ABI}
             EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-shorten-64-to-32"
         fi
 
         rm -r ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE} ||:
         mkdir -p ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
         pushd ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
-        cmake -DCMAKE_INSTALL_PREFIX="${LWS_REF_PATH}/${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/libwebsockets-android-${ABI}" -DANDROID_ABI=${ABI} -DANDROID_PLATFORM=${APP_PLATFORM} \
+        cmake -DCMAKE_INSTALL_PREFIX="${BASE_PATH}/${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/libwebsockets-android-${ABI}" -DANDROID_ABI=${ABI} -DANDROID_PLATFORM=${APP_PLATFORM} \
         -DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake -DLWS_WITH_SHARED=OFF -DLWS_WITH_STATIC=ON -DLWS_WITHOUT_TESTAPPS=ON \
         -DLWS_WITHOUT_SERVER=ON -DLWS_IPV6=ON -DLWS_STATIC_PIC=ON -DLWS_WITH_HTTP2=0 -DLWS_WITH_BORINGSSL=ON -DLWS_SSL_CLIENT_USE_OS_CA_CERTS=0 \
-        -DLWS_OPENSSL_INCLUDE_DIRS="${LWS_REF_PATH}/megachat/webrtc/include/third_party/boringssl/src/include" -DLWS_OPENSSL_LIBRARIES="${LWS_REF_PATH}/megachat/webrtc/libwebrtc_${TARGET}.a" \
-        -DLWS_WITH_LIBUV=1 -DLWS_LIBUV_INCLUDE_DIRS="${LWS_REF_PATH}/libuv/libuv/include" -DLWS_LIBUV_LIBRARIES="${LWS_REF_PATH}/libuv/libuv/libuv.a" "${EXTRA_FLAGS}" \
+        -DLWS_OPENSSL_INCLUDE_DIRS="${BASE_PATH}/megachat/webrtc/include/third_party/boringssl/src/include" -DLWS_OPENSSL_LIBRARIES="${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a" \
+        -DLWS_WITH_LIBUV=1 -DLWS_LIBUV_INCLUDE_DIRS="${BASE_PATH}/libuv/libuv/include" -DLWS_LIBUV_LIBRARIES="${BASE_PATH}/libuv/libuv/libuv.a" "${EXTRA_FLAGS}" \
         ../ &>> ${LOG_FILE}
 
         cmake --build . &>> ${LOG_FILE}
