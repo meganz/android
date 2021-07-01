@@ -6,10 +6,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 
 import androidx.appcompat.app.AlertDialog;
@@ -26,6 +28,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -46,6 +49,7 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -727,6 +731,20 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     public void hideAB(){
         if (aB != null){
             aB.hide();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
+
+        if (requestCode == REQUEST_WRITE_STORAGE_FOR_LOGS) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                super.onRequestWriteStorageForLogs(Environment.isExternalStorageManager());
+            }
+        } else {
+            logWarning("No request code processed");
+            super.onActivityResult(requestCode, resultCode, intent);
         }
     }
 }

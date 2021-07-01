@@ -93,9 +93,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private boolean delaySignalPresence = false;
 
     //Indicates if app is requesting the required permissions to enable the SDK logger
-    private boolean permissionLoggerSDK = false;
+    protected boolean permissionLoggerSDK = false;
     //Indicates if app is requesting the required permissions to enable the Karere logger
-    private boolean permissionLoggerKarere = false;
+    protected boolean permissionLoggerKarere = false;
 
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
@@ -1028,20 +1028,30 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         logDebug("Request Code: " + requestCode);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_WRITE_STORAGE_FOR_LOGS) {
-            if (permissionLoggerKarere) {
-                permissionLoggerKarere = false;
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setStatusLoggerKarere(baseActivity, true);
-                } else {
-                    Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
-                }
-            } else if (permissionLoggerSDK) {
-                permissionLoggerSDK = false;
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setStatusLoggerSDK(baseActivity, true);
-                } else {
-                    Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
-                }
+            onRequestWriteStorageForLogs(grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED);
+        }
+    }
+
+    /**
+     * Method to enable logs if the required permission has been granted after request it
+     *
+     * @param permissionGranted Flag to indicate if the permission has been granted or not
+     */
+    protected void onRequestWriteStorageForLogs(boolean permissionGranted) {
+        if (permissionLoggerKarere) {
+            permissionLoggerKarere = false;
+            if (permissionGranted) {
+                setStatusLoggerKarere(baseActivity, true);
+            } else {
+                Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
+            }
+        } else if (permissionLoggerSDK) {
+            permissionLoggerSDK = false;
+            if (permissionGranted) {
+                setStatusLoggerSDK(baseActivity, true);
+            } else {
+                Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
             }
         }
     }

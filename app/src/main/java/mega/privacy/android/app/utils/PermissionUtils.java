@@ -15,9 +15,11 @@ import androidx.core.content.ContextCompat;
 import android.view.View;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE_FOR_LOGS;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 
 @TargetApi(Build.VERSION_CODES.M)
@@ -122,19 +124,25 @@ public class PermissionUtils {
 
     /**
      * Ask for the MANAGE_EXTERNAL_STORAGE special permission required by the app since Android 11
+     *
      * @param context Context
      */
     @TargetApi(Build.VERSION_CODES.R)
     public static void requestManageExternalStoragePermission(Context context) {
+        Intent intent = null;
         try {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
             intent.addCategory("android.intent.category.DEFAULT");
             intent.setData(Uri.parse(String.format("package:%s", context.getPackageName())));
-            ((ManagerActivityLollipop) context).startActivityForResult(intent, PERMISSIONS_FRAGMENT);
         } catch (Exception e) {
-            Intent intent = new Intent();
+            intent = new Intent();
             intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-            ((ManagerActivityLollipop) context).startActivityForResult(intent, PERMISSIONS_FRAGMENT);
+        } finally {
+            if (context instanceof ManagerActivityLollipop) {
+                ((ManagerActivityLollipop) context).startActivityForResult(intent, PERMISSIONS_FRAGMENT);
+            } else if (context instanceof LoginActivityLollipop) {
+                ((LoginActivityLollipop) context).startActivityForResult(intent, REQUEST_WRITE_STORAGE_FOR_LOGS);
+            }
         }
     }
  }
