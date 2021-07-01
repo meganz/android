@@ -59,7 +59,7 @@ class VideoListViewAdapter(
     /**
      * Update participant privileges
      *
-     * @param participant
+     * @param participant Participant to update
      */
     fun updateParticipantPrivileges(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
@@ -74,7 +74,7 @@ class VideoListViewAdapter(
     /**
      * Update participant when the name is changed
      *
-     * @param participant
+     * @param participant Participant to update
      */
     fun updateName(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
@@ -89,7 +89,7 @@ class VideoListViewAdapter(
     /**
      * Update participant that is speaking
      *
-     * @param participant
+     * @param participant Participant to update
      */
     fun updatePeerSelected(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
@@ -104,7 +104,7 @@ class VideoListViewAdapter(
     /**
      * Update participant audio or video flags
      *
-     * @param participant
+     * @param participant Participant to update
      */
     fun updateParticipantAudioVideo(typeChange: Int, participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
@@ -122,7 +122,7 @@ class VideoListViewAdapter(
     /**
      * Update participant on hold session
      *
-     * @param participant
+     * @param participant Participant to update
      * @param isOnHold True, it it's. False, otherwise.
      */
     fun updateSessionOnHold(participant: Participant, isOnHold: Boolean) {
@@ -138,7 +138,7 @@ class VideoListViewAdapter(
     /**
      * Update participant when call is on hold
      *
-     * @param participant
+     * @param participant Participant to update
      * @param isOnHold True, it it's. False, otherwise.
      */
     fun updateCallOnHold(participant: Participant, isOnHold: Boolean) {
@@ -158,7 +158,7 @@ class VideoListViewAdapter(
     /**
      * Remove the texture view of a participant
      *
-     * @param participant   Participant
+     * @param participant Participant to update
      */
     fun removeTextureView(participant: Participant) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)

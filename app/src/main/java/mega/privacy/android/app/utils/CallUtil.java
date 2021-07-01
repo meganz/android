@@ -1142,11 +1142,24 @@ public class CallUtil {
         builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener).show();
     }
 
+    /**
+     * Method to know if the meeting hint should be shown
+     *
+     * @param context The Activity context
+     * @param value   The identifier of that preference
+     * @return True, if it must be shown. False, if not
+     */
     public static boolean shouldShowMeetingHint(Context context, String value) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return !sharedPreferences.getBoolean(value, false);
     }
 
+    /**
+     * Set the hint to be shown
+     *
+     * @param context The Activity context
+     * @param value   The identifier of that preference
+     */
     public static void hintShown(Context context, String value) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         sharedPreferences.edit().putBoolean(value, true).apply();

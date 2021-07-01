@@ -35,7 +35,5 @@ class AssignParticipantsAdapter(
             submitList(newList)
         }
     }
-
-
 }
 

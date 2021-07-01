@@ -232,16 +232,16 @@ class GridViewPagerAdapter(
                 logDebug("Update the page with the participant removed")
                 updatePageWithChange(numPage, position)
             } else if (data.isNotEmpty() && data.size > i) {
-                    val participantsForPage = data[i]
-                    if (adapterList.isNotEmpty() && adapterList.size > i) {
-                        adapterList[i]?.let {
-                            logDebug("Completely update the page $i")
-                            it.submitList(participantsForPage) {
-                                it.notifyDataSetChanged()
-                            }
+                val participantsForPage = data[i]
+                if (adapterList.isNotEmpty() && adapterList.size > i) {
+                    adapterList[i]?.let {
+                        logDebug("Completely update the page $i")
+                        it.submitList(participantsForPage) {
+                            it.notifyDataSetChanged()
                         }
                     }
                 }
+            }
         }
     }
 
