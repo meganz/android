@@ -56,19 +56,10 @@ class HighLightHintHelper(private val activity: Activity) {
 
         val contentView = getContentView()
 
-        @SuppressLint("InflateParams")
-        val hint: View = LayoutInflater.from(activity)
-            .inflate(R.layout.highlight_hint_meeting, null)
-        hint.findViewById<TextView>(R.id.tv_tip).text =
-            StringResourcesUtils.getString(R.string.tip_create_meeting)
-        hint.findViewById<View>(R.id.bt_ok).setOnClickListener {
-            onDismissCallback.invoke()
-        }
-
         // Add cover, it's the highlight view covers on the target view.
         contentView.addView(getIconCover(), getIconCoverLayoutParams())
         contentView.addView(getArrow(), getIconArrowLayoutParams())
-        contentView.addView(hint, getIconHintLayoutParams())
+        contentView.addView(getHintView(onDismissCallback, R.string.tip_create_meeting), getIconHintLayoutParams())
 
         popupWindow = PopupWindow(
             contentView,
@@ -87,6 +78,16 @@ class HighLightHintHelper(private val activity: Activity) {
         // Mask color
         setBackgroundColor(getMaskColor())
     }
+
+    @SuppressLint("InflateParams")
+    private fun getHintView(onDismissCallback: () -> Unit, hintTextId: Int) =
+        LayoutInflater.from(activity).inflate(R.layout.highlight_hint_meeting, null).apply {
+                findViewById<TextView>(R.id.tv_tip).text =
+                    StringResourcesUtils.getString(hintTextId)
+                findViewById<View>(R.id.bt_ok).setOnClickListener {
+                    onDismissCallback.invoke()
+                }
+            }
 
     @SuppressLint("InflateParams")
     private fun getIconCover() = LayoutInflater.from(activity)
@@ -147,7 +148,7 @@ class HighLightHintHelper(private val activity: Activity) {
             // Exceeds screen end. (screenWidth - arrowLeft - arrowSize) / 4 is a bit of offset.
             arrowLeft - exceedsPart - (screenWidth - arrowLeft - arrowSize) / 4
         } else {
-            // arrowLeft / 4 is a bit of offset.
+            // arrowLeft / 6 is a bit of offset.
             arrowLeft / 6
         }
 
@@ -182,24 +183,14 @@ class HighLightHintHelper(private val activity: Activity) {
         }
 
         targetLocation = getLocationInParent(
-//            activity.findViewById(Window.ID_ANDROID_CONTENT),
             activity.contentView!!,
             target
         )
 
-        @SuppressLint("InflateParams")
-        val hint: View = LayoutInflater.from(activity)
-            .inflate(R.layout.highlight_hint_meeting, null)
-        hint.findViewById<TextView>(R.id.tv_tip).text =
-            StringResourcesUtils.getString(R.string.tip_setup_meeting)
-        hint.findViewById<View>(R.id.bt_ok).setOnClickListener {
-            onDismissCallback.invoke()
-        }
-
         val contentView = getContentView()
         contentView.addView(getTextCover(), getTextCoverLayoutParams())
         contentView.addView(getArrow(), getTextArrowLayoutParams())
-        contentView.addView(hint, getTextHintLayoutParams())
+        contentView.addView(getHintView(onDismissCallback, R.string.tip_setup_meeting), getTextHintLayoutParams())
 
         popupWindow = PopupWindow(
             contentView,
@@ -260,7 +251,7 @@ class HighLightHintHelper(private val activity: Activity) {
 
         const val ARROW_SIZE_DP = 16f
         const val HINT_LAYOUT_WIDTH_DP = 290f
-        const val HINT_LAYOUT_HEIGHT_DP = 85f
+        const val HINT_LAYOUT_HEIGHT_DP = 75f
         const val TEXT_COVER_HEIGHT_DP = 56f
     }
 }
