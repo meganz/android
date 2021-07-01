@@ -17,6 +17,7 @@ import android.view.View;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 
+import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 
 @TargetApi(Build.VERSION_CODES.M)
@@ -100,8 +101,40 @@ public class PermissionUtils {
      * @param permissions requested permissions
      */
     public static void requestPermission(Activity activity, int requestCode, String... permissions) {
-        ActivityCompat.requestPermissions(activity,
-                permissions,
-                requestCode);
+        if (permissions != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                for (String permission : permissions) {
+                    if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                            permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        if (!Environment.isExternalStorageManager()) {
+                            requestManageExternalStoragePermission(activity);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            ActivityCompat.requestPermissions(activity,
+                    permissions,
+                    requestCode);
+        }
+    }
+
+    /**
+     * Ask for the MANAGE_EXTERNAL_STORAGE special permission required by the app since Android 11
+     * @param context Context
+     */
+    @TargetApi(Build.VERSION_CODES.R)
+    public static void requestManageExternalStoragePermission(Context context) {
+        try {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            intent.addCategory("android.intent.category.DEFAULT");
+            intent.setData(Uri.parse(String.format("package:%s", context.getPackageName())));
+            ((ManagerActivityLollipop) context).startActivityForResult(intent, PERMISSIONS_FRAGMENT);
+        } catch (Exception e) {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+            ((ManagerActivityLollipop) context).startActivityForResult(intent, PERMISSIONS_FRAGMENT);
+        }
     }
  }

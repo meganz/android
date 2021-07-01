@@ -244,16 +244,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     void askForMediaPermissions () {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
-                try {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                    intent.addCategory("android.intent.category.DEFAULT");
-                    intent.setData(Uri.parse(String.format("package:%s", context.getPackageName())));
-                    ((ManagerActivityLollipop) context).startActivityForResult(intent, PERMISSIONS_FRAGMENT);
-                } catch (Exception e) {
-                    Intent intent = new Intent();
-                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                    ((ManagerActivityLollipop) context).startActivityForResult(intent, PERMISSIONS_FRAGMENT);
-                }
+                requestManageExternalStoragePermission(context);
             }
         } else {
             if (!readGranted && !writeGranted) {
