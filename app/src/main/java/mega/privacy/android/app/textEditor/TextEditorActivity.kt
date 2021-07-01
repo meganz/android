@@ -165,7 +165,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
 
     override fun onBackPressed() {
         if (psaWebBrowser.consumeBack()) return
-        if (viewModel.isFileEdited()) {
+        if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
             binding.contentEditText.hideKeyboard()
             showDiscardChangesConfirmationDialog()
         } else {

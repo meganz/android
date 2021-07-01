@@ -57,13 +57,13 @@ class Pagination(private var text: String, initialPage: Int) {
     fun isEdited(): Boolean = text != getEditedText()
 
     fun getEditedText(): String {
-        var editedText = ""
+        val editedText = StringBuilder()
 
         for (page in pages) {
-            editedText += page
+            editedText.append(page)
         }
 
-        return editedText
+        return editedText.toString()
     }
 
     fun previousPage() {
