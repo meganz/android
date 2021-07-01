@@ -10,9 +10,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -950,16 +947,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		megaApi.addGlobalListener(new GlobalListener());
 
-		String language = Locale.getDefault().toString();
-		boolean languageString = megaApi.setLanguage(language);
-		logDebug("Result: " + languageString + " Language: " + language);
-		if (!languageString) {
-			language = Locale.getDefault().getLanguage();
-			languageString = megaApi.setLanguage(language);
-			logDebug("Result: " + languageString + " Language: " + language);
-		}
+        setSDKLanguage();
 
-		// Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
+        // Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
 		final int DESIRABLE_R_LIMIT = 20000; // SDK team recommended value
 		int currentLimit = megaApi.platformGetRLimitNumFile();
 		logDebug("Current resource limit is set to " + currentLimit);
@@ -974,6 +964,34 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			logDebug("Resource limit is set to " + megaApi.platformGetRLimitNumFile());
 		}
 	}
+
+    /**
+     * Set the language code used by the app.
+     * Language code is from current system setting.
+     * Need to distinguish simplified and traditional Chinese.
+     */
+    private void setSDKLanguage() {
+        Locale locale = Locale.getDefault();
+        String langCode;
+
+        // If it's Chinese
+        if (Locale.CHINESE.toLanguageTag().equals(locale.getLanguage())) {
+            langCode = isSimplifiedChinese() ?
+                    Locale.SIMPLIFIED_CHINESE.toLanguageTag() :
+                    Locale.TRADITIONAL_CHINESE.toLanguageTag();
+        } else {
+            langCode = locale.toString();
+        }
+
+        boolean result = megaApi.setLanguage(langCode);
+
+        if (!result) {
+            langCode = locale.getLanguage();
+            result = megaApi.setLanguage(langCode);
+        }
+
+        logDebug("Result: " + result + " Language: " + langCode);
+    }
 
 	/**
 	 * Setup the MegaApiAndroid instance for folder link.
