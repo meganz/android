@@ -2,9 +2,14 @@ package mega.privacy.android.app.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.res.Configuration
 import android.graphics.Rect
+import android.os.Build
 import android.util.DisplayMetrics
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.Surface
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupWindow
@@ -20,6 +25,7 @@ class HighLightHintHelper(private val activity: Activity) {
     private lateinit var targetLocation: Rect
 
     private var statusBarHeight = 0
+    private var navigationBarHeight = 0
 
     private val hintLayoutWidth: Int
     private val hintLayoutHeight: Int
@@ -30,6 +36,12 @@ class HighLightHintHelper(private val activity: Activity) {
 
     init {
         statusBarHeight = getStatusBarHeight(activity)
+        navigationBarHeight =
+            if (activity.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && navigationBarOnLeft()) {
+                getNavigationBarHeight(activity)
+            } else {
+                0
+            }
 
         hintLayoutWidth = Util.dp2px(HINT_LAYOUT_WIDTH_DP)
         hintLayoutHeight = Util.dp2px(HINT_LAYOUT_HEIGHT_DP)
@@ -40,6 +52,37 @@ class HighLightHintHelper(private val activity: Activity) {
         activity.windowManager.defaultDisplay.getMetrics(metrics)
         screenWidth = metrics.widthPixels
         screenHeight = metrics.heightPixels
+    }
+
+    private fun navigationBarOnLeft(): Boolean {
+        val windowManager = activity.windowManager
+
+        // On Android 8 and below, navigation bar is always at right side.
+        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) return false
+
+        if (!hasNavigationBar()) return false
+
+        // Rotate to right, navigation bar will stay at the left of the screen.
+        return windowManager.defaultDisplay.rotation == Surface.ROTATION_270
+    }
+
+    private fun getMetrics(): Pair<DisplayMetrics, DisplayMetrics> {
+        val display = activity.windowManager.defaultDisplay
+
+        val realDisplayMetrics = DisplayMetrics()
+        display.getRealMetrics(realDisplayMetrics)
+
+        val displayMetrics = DisplayMetrics()
+        display.getMetrics(displayMetrics)
+
+        return Pair(realDisplayMetrics, displayMetrics)
+    }
+
+    private fun hasNavigationBar(): Boolean {
+        val realWidth = getMetrics().first.widthPixels
+        val width = getMetrics().second.widthPixels
+
+        return realWidth != width + statusBarHeight
     }
 
     fun showHintForMeetingIcon(targetViewId: Int, onDismissCallback: () -> Unit) {
@@ -59,7 +102,10 @@ class HighLightHintHelper(private val activity: Activity) {
         // Add cover, it's the highlight view covers on the target view.
         contentView.addView(getIconCover(), getIconCoverLayoutParams())
         contentView.addView(getArrow(), getIconArrowLayoutParams())
-        contentView.addView(getHintView(onDismissCallback, R.string.tip_create_meeting), getIconHintLayoutParams())
+        contentView.addView(
+            getHintView(onDismissCallback, R.string.tip_create_meeting),
+            getIconHintLayoutParams()
+        )
 
         popupWindow = PopupWindow(
             contentView,
@@ -82,12 +128,12 @@ class HighLightHintHelper(private val activity: Activity) {
     @SuppressLint("InflateParams")
     private fun getHintView(onDismissCallback: () -> Unit, hintTextId: Int) =
         LayoutInflater.from(activity).inflate(R.layout.highlight_hint_meeting, null).apply {
-                findViewById<TextView>(R.id.tv_tip).text =
-                    StringResourcesUtils.getString(hintTextId)
-                findViewById<View>(R.id.bt_ok).setOnClickListener {
-                    onDismissCallback.invoke()
-                }
+            findViewById<TextView>(R.id.tv_tip).text =
+                StringResourcesUtils.getString(hintTextId)
+            findViewById<View>(R.id.bt_ok).setOnClickListener {
+                onDismissCallback.invoke()
             }
+        }
 
     @SuppressLint("InflateParams")
     private fun getIconCover() = LayoutInflater.from(activity)
@@ -150,7 +196,7 @@ class HighLightHintHelper(private val activity: Activity) {
         } else {
             // arrowLeft / 6 is a bit of offset.
             arrowLeft / 6
-        }
+        } + navigationBarHeight
 
         topMargin =
             targetLocation.bottom + statusBarHeight + arrowSize + (textCoverHeight - (targetLocation.bottom - targetLocation.top)) / 2
@@ -187,10 +233,16 @@ class HighLightHintHelper(private val activity: Activity) {
             target
         )
 
+        targetLocation.left = targetLocation.left + navigationBarHeight
+        targetLocation.right = targetLocation.right + navigationBarHeight
+
         val contentView = getContentView()
         contentView.addView(getTextCover(), getTextCoverLayoutParams())
         contentView.addView(getArrow(), getTextArrowLayoutParams())
-        contentView.addView(getHintView(onDismissCallback, R.string.tip_setup_meeting), getTextHintLayoutParams())
+        contentView.addView(
+            getHintView(onDismissCallback, R.string.tip_setup_meeting),
+            getTextHintLayoutParams()
+        )
 
         popupWindow = PopupWindow(
             contentView,
@@ -207,11 +259,16 @@ class HighLightHintHelper(private val activity: Activity) {
     private fun getTextCover() = LayoutInflater.from(activity)
         .inflate(R.layout.highlight_cover_text, null)
 
-    private fun getStatusBarHeight(activity: Activity): Int {
-        val resource = activity.applicationContext.resources
-        val resId = resource.getIdentifier("status_bar_height", "dimen", "android")
-        return resource.getDimensionPixelSize(resId)
+    private fun getStatusBarHeight(activity: Activity) =
+        getSystemBarHeight(activity, "status_bar_height")
 
+    private fun getNavigationBarHeight(activity: Activity) =
+        getSystemBarHeight(activity, "navigation_bar_height")
+
+    private fun getSystemBarHeight(activity: Activity, name: String): Int {
+        val resource = activity.applicationContext.resources
+        val resId = resource.getIdentifier(name, "dimen", "android")
+        return resource.getDimensionPixelSize(resId)
     }
 
     private fun getLocationInParent(parent: View, child: View): Rect {
