@@ -97,11 +97,11 @@ public class PermissionUtils {
      * Ask permissions
      * @param activity The activity
      * @param requestCode request code of permission asking
-     * @param permission requested permissions
+     * @param permissions requested permissions
      */
-    public static void requestPermission(Activity activity, int requestCode, String... permission) {
+    public static void requestPermission(Activity activity, int requestCode, String... permissions) {
         ActivityCompat.requestPermissions(activity,
-                permission,
+                permissions,
                 requestCode);
     }
  }

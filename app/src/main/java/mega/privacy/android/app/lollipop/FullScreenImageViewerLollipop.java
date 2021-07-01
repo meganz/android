@@ -97,7 +97,7 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrR
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -1441,9 +1441,9 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 			boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
+				requestPermission(this,
+						REQUEST_WRITE_STORAGE,
+						Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			}
 
 			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {

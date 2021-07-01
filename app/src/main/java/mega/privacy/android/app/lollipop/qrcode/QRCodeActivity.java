@@ -48,7 +48,7 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 
 public class QRCodeActivity extends PasscodeActivity implements MegaRequestListenerInterface{
 
@@ -129,7 +129,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
         viewPagerQRCode = (ViewPager) findViewById(R.id.qr_code_tabs_pager);
 
         if (!hasPermissions(this, Manifest.permission.CAMERA)) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+            requestPermission(this, MY_PERMISSIONS_REQUEST_CAMERA, Manifest.permission.CAMERA);
         }else {
             initActivity();
         }
@@ -304,7 +304,7 @@ public class QRCodeActivity extends PasscodeActivity implements MegaRequestListe
                     if (qrFile.exists()) {
                         boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                         if (!hasStoragePermission) {
-                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+                            requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                         }
 
                         double availableFreeSpace = Double.MAX_VALUE;

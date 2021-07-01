@@ -258,19 +258,19 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
         } else {
             if (!readGranted && !writeGranted) {
                 logDebug("WRITE_EXTERNAL_STORAGE and READ_EXTERNAL_STORAGE");
-                ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                        PERMISSIONS_FRAGMENT);
+                requestPermission((ManagerActivityLollipop) context,
+                        PERMISSIONS_FRAGMENT,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
             } else if (!writeGranted) {
                 logDebug("WRITE_EXTERNAL_STORAGE");
-                ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        PERMISSIONS_FRAGMENT);
+                requestPermission((ManagerActivityLollipop) context,
+                        PERMISSIONS_FRAGMENT,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE);
             } else if (!readGranted) {
                 logDebug("READ_EXTERNAL_STORAGE");
-                ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        PERMISSIONS_FRAGMENT);
+                requestPermission((ManagerActivityLollipop) context,
+                        PERMISSIONS_FRAGMENT,
+                        Manifest.permission.READ_EXTERNAL_STORAGE);
             }
         }
     }
@@ -278,23 +278,23 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     void askForCameraPermission() {
         if (!cameraGranted) {
             logDebug("CAMERA");
-            ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_FRAGMENT);
+            requestPermission((ManagerActivityLollipop) context, PERMISSIONS_FRAGMENT, Manifest.permission.CAMERA);
         }
     }
 
     void askForCallsPermissions() {
         if (!microphoneGranted) {
             logDebug("RECORD_AUDIO");
-            ActivityCompat.requestPermissions((ManagerActivityLollipop) context,
-                    new String[]{Manifest.permission.RECORD_AUDIO},
-                    PERMISSIONS_FRAGMENT);
+            requestPermission((ManagerActivityLollipop) context,
+                    PERMISSIONS_FRAGMENT,
+                    Manifest.permission.RECORD_AUDIO);
         }
     }
 
     void askForContactsPermissions() {
         if (!contactsGranted) {
             logDebug("Ask for CONTACT permission");
-            ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSIONS_FRAGMENT);
+            requestPermission((ManagerActivityLollipop) context, PERMISSIONS_FRAGMENT, Manifest.permission.READ_CONTACTS);
         }
     }
 

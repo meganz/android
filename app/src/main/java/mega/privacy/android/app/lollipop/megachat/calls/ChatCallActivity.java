@@ -78,7 +78,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -1359,13 +1359,13 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private boolean checkPermissions() {
         boolean hasCameraPermission = hasPermissions(this, Manifest.permission.CAMERA);
         if (!hasCameraPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+            requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
             return false;
         }
 
         boolean hasRecordAudioPermission = hasPermissions(this, Manifest.permission.RECORD_AUDIO);
         if (!hasRecordAudioPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
+            requestPermission(this, REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
             return false;
         }
 

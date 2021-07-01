@@ -1319,9 +1319,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					logDebug("TAKE_PICTURE_OPTION");
 		        	if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 		        		if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-		        			ActivityCompat.requestPermissions(this,
-					                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-									REQUEST_WRITE_STORAGE);
+		        			requestPermission(this,
+									REQUEST_WRITE_STORAGE,
+									Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		        		}
 		        		else{
 							checkTakePicture(this, TAKE_PHOTO_CODE);
@@ -1332,9 +1332,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					logDebug("TAKE_PROFILE_PICTURE");
 					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 						if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-							ActivityCompat.requestPermissions(this,
-									new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-									REQUEST_WRITE_STORAGE);
+							requestPermission(this,
+									REQUEST_WRITE_STORAGE,
+									Manifest.permission.WRITE_EXTERNAL_STORAGE);
 						}
 						else{
 							this.takeProfilePicture();
@@ -1361,7 +1361,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						if (typesCameraPermission==TAKE_PICTURE_OPTION){
 							logDebug("TAKE_PICTURE_OPTION");
 							if (!hasPermissions(this, Manifest.permission.CAMERA)){
-								ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+								requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
 							}
 							else{
 								checkTakePicture(this, TAKE_PHOTO_CODE);
@@ -1373,9 +1373,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
 							logDebug("TAKE_PROFILE_PICTURE");
 							if (!hasPermissions(this, Manifest.permission.CAMERA)){
-								ActivityCompat.requestPermissions(this,
-										new String[]{Manifest.permission.CAMERA},
-										REQUEST_CAMERA);
+								requestPermission(this,
+										REQUEST_CAMERA,
+										Manifest.permission.CAMERA);
 							}
 							else{
 								this.takeProfilePicture();
@@ -1390,9 +1390,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if (typesCameraPermission==TAKE_PICTURE_OPTION){
 						logDebug("TAKE_PICTURE_OPTION");
 						if (!hasPermissions(this, Manifest.permission.CAMERA)){
-							ActivityCompat.requestPermissions(this,
-									new String[]{Manifest.permission.CAMERA},
-									REQUEST_CAMERA);
+							requestPermission(this,
+									REQUEST_CAMERA,
+									Manifest.permission.CAMERA);
 						}
 						else{
 							checkTakePicture(this, TAKE_PHOTO_CODE);
@@ -1402,9 +1402,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
 						logDebug("TAKE_PROFILE_PICTURE");
 						if (!hasPermissions(this, Manifest.permission.CAMERA)){
-							ActivityCompat.requestPermissions(this,
-									new String[]{Manifest.permission.CAMERA},
-									REQUEST_CAMERA);
+							requestPermission(this,
+									REQUEST_CAMERA,
+									Manifest.permission.CAMERA);
 						}
 						else{
 							this.takeProfilePicture();
@@ -6759,16 +6759,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 				if (!hasStoragePermission) {
-					ActivityCompat.requestPermissions(this,
-							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-							REQUEST_WRITE_STORAGE);
+					requestPermission(this,
+							REQUEST_WRITE_STORAGE,
+							Manifest.permission.WRITE_EXTERNAL_STORAGE);
 				}
 
 				boolean hasCameraPermission = hasPermissions(this, Manifest.permission.CAMERA);
 				if (!hasCameraPermission) {
-					ActivityCompat.requestPermissions(this,
-							new String[]{Manifest.permission.CAMERA},
-							REQUEST_CAMERA);
+					requestPermission(this,
+							REQUEST_CAMERA,
+							Manifest.permission.CAMERA);
 				}
 
 				if (hasStoragePermission && hasCameraPermission) {
@@ -6845,9 +6845,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        }
 	        case R.id.action_add:{
 				if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-					ActivityCompat.requestPermissions(this,
-							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-							REQUEST_WRITE_STORAGE);
+					requestPermission(this,
+							REQUEST_WRITE_STORAGE,
+							Manifest.permission.WRITE_EXTERNAL_STORAGE);
 				}
 
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
@@ -8288,16 +8288,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		if (!hasStoragePermission) {
-			ActivityCompat.requestPermissions(this,
-					new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-					REQUEST_WRITE_STORAGE);
+			requestPermission(this,
+					REQUEST_WRITE_STORAGE,
+					Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		}
 
 		boolean hasCameraPermission = hasPermissions(this, Manifest.permission.CAMERA);
 		if (!hasCameraPermission) {
-			ActivityCompat.requestPermissions(this,
-					new String[]{Manifest.permission.CAMERA},
-					REQUEST_CAMERA);
+			requestPermission(this,
+					REQUEST_CAMERA,
+					Manifest.permission.CAMERA);
 		}
 
 		if (hasStoragePermission && hasCameraPermission) {
@@ -9910,9 +9910,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
+				requestPermission(this,
+						REQUEST_WRITE_STORAGE,
+						Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			}
 
 			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
@@ -11207,7 +11207,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logWarning("No read contacts permission");
 			infoManager = info;
 			parentNodeManager = parentNode;
-			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_UPLOAD_CONTACT);
+			requestPermission(this, REQUEST_UPLOAD_CONTACT, Manifest.permission.READ_CONTACTS);
 		} else {
 			uploadContactInfo(info, parentNode);
 		}

@@ -111,7 +111,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -1927,9 +1927,9 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         boolean hasReadContactsPermission = hasPermissions(this, Manifest.permission.READ_CONTACTS);
         if (!hasReadContactsPermission) {
             logWarning("No read contacts permission");
-            ActivityCompat.requestPermissions((AddContactActivityLollipop) this,
-                    new String[]{Manifest.permission.READ_CONTACTS},
-                    REQUEST_READ_CONTACTS);
+            requestPermission((AddContactActivityLollipop) this,
+                    REQUEST_READ_CONTACTS,
+                    Manifest.permission.READ_CONTACTS);
             if (contactType == CONTACT_TYPE_DEVICE) {
                 return;
             }

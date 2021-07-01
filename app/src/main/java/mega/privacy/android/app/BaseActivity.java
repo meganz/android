@@ -1122,6 +1122,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     public void askPermissions(@NotNull String[] permissions, int requestCode) {
-        ActivityCompat.requestPermissions(this, permissions, requestCode);
+        requestPermission(this, requestCode, permissions);
     }
 }

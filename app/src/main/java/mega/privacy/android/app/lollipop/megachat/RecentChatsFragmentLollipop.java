@@ -1559,13 +1559,13 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         boolean hasCameraPermission = hasPermissions(((ManagerActivityLollipop) context), Manifest.permission.CAMERA);
         if (!hasCameraPermission) {
-            ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+            requestPermission(((ManagerActivityLollipop) context), REQUEST_CAMERA, Manifest.permission.CAMERA);
             return false;
         }
 
         boolean hasRecordAudioPermission = hasPermissions(((ManagerActivityLollipop) context), Manifest.permission.RECORD_AUDIO);
         if (!hasRecordAudioPermission) {
-            ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
+            requestPermission(((ManagerActivityLollipop) context), REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
             return false;
         }
 

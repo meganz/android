@@ -30,8 +30,7 @@ import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.PermissionUtils
-import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
-import mega.privacy.android.app.utils.PermissionUtils.requestPermission
+import mega.privacy.android.app.utils.PermissionUtils.*
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import java.io.File

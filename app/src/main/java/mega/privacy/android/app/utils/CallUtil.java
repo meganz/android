@@ -53,7 +53,7 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -1018,7 +1018,7 @@ public class CallUtil {
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
+            requestPermission(activity, REQUEST_CAMERA, Manifest.permission.CAMERA);
             return false;
         }
 
@@ -1030,7 +1030,7 @@ public class CallUtil {
             if (activity instanceof ManagerActivityLollipop) {
                 ((ManagerActivityLollipop) activity).setTypesCameraPermission(typePermission);
             }
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
+            requestPermission(activity, REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
             return false;
         }
 
