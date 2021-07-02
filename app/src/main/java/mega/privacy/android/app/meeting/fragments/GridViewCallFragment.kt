@@ -337,6 +337,12 @@ class GridViewCallFragment : MeetingBaseFragment() {
         super.onDestroyView()
     }
 
+    /**
+     * Method for grouping participants 6 by 6
+     *
+     * @param data mutable list with all participants
+     * @return mutable list with participants grouped
+     */
     private fun sliceBy6(data: MutableList<Participant>): MutableList<List<Participant>> {
         val result = mutableListOf<List<Participant>>()
         val sliceCount =
