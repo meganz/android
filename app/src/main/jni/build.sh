@@ -509,7 +509,6 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
     # clean env
     unset AR; unset LD; unset RANLIB; unset STRIP; unset CC; unset AS; unset CXX
 
-    echo "* cURL with cares is ready"
     touch ${CURL}/${CURL_SOURCE_FILE}.ready
 fi
 echo "* cURL with c-ares is ready"
