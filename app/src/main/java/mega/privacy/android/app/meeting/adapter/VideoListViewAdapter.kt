@@ -42,7 +42,8 @@ class VideoListViewAdapter(
             0,
             1,
             false,
-            listenerRenderer
+            listenerRenderer,
+            null
         )
     }
 

@@ -60,9 +60,9 @@ class GridViewCallFragment : MeetingBaseFragment() {
         adapterPager = GridViewPagerAdapter(
             viewPagerData,
             (parentFragment as InMeetingFragment).inMeetingViewModel,
-            parentFragment,
             maxWidth,
             maxHeight,
+            (parentFragment as InMeetingFragment)::onPageClick
         )
 
         viewDataBinding.gridViewPager.offscreenPageLimit = 1

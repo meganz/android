@@ -33,6 +33,7 @@ class VideoMeetingViewHolder(
     private val orientation: Int,
     private val isGrid: Boolean,
     private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?,
+    private val onPageClickedCallback: (() -> Unit)?
 ) : RecyclerView.ViewHolder(binding.root) {
 
     @Inject
@@ -74,7 +75,9 @@ class VideoMeetingViewHolder(
             } else {
                 landscapeLayout(isFirstPage, itemCount)
             }
-            binding.root.setOnClickListener(null)
+            binding.root.setOnClickListener {
+                onPageClickedCallback?.invoke()
+            }
 
             binding.name.text = participant.name
         } else {

@@ -16,6 +16,7 @@ class VideoGridViewAdapter(
     private val screenHeight: Int,
     private var pagePosition: Int,
     private val orientation: Int,
+    private val onPageClickedCallback: () -> Unit
 ) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
@@ -34,7 +35,8 @@ class VideoGridViewAdapter(
             screenHeight,
             orientation,
             true,
-            null
+            null,
+            onPageClickedCallback
         )
     }
 

@@ -5,22 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.get
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
-import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.LogUtil.logDebug
 
 class GridViewPagerAdapter(
     var data: List<List<Participant>>,
     private val inMeetingViewModel: InMeetingViewModel,
-    private val fragment: Fragment?,
     private var maxWidth: Int,
     private var maxHeight: Int,
+    private val onPageClickedCallback: () -> Unit
 ) : RecyclerView.Adapter<GridViewPagerAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -55,7 +53,7 @@ class GridViewPagerAdapter(
                     adapter = null
                     itemAnimator = DefaultItemAnimator()
                     setOnTouchCallback {
-                        (fragment as InMeetingFragment).onPageClick()
+                        onPageClickedCallback.invoke()
                     }
                     clipToPadding = true
                     setHasFixedSize(true)
@@ -71,6 +69,7 @@ class GridViewPagerAdapter(
                 maxHeight,
                 position,
                 orientation,
+                onPageClickedCallback
             )
 
             adapter.submitList(null)
