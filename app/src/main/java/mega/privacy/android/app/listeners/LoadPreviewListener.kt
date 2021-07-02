@@ -3,6 +3,7 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.*
 
 class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
@@ -42,12 +43,13 @@ class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
                     api,
                     request.chatHandle,
                     e.errorCode,
-                    request.userHandle
+                    request.userHandle,
+                    request.paramType
                 )
             }
             else -> {
                 if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_EEXIST) {
-                    LogUtil.logDebug("Preview loaded")
+                    logDebug("Preview loaded")
                     callback?.onPreviewLoaded(
                         api,
                         request.chatHandle,
@@ -84,7 +86,8 @@ class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
             api: MegaChatApiJava,
             chatId: Long,
             error: Int,
-            userHandle: Long
+            userHandle: Long,
+            paramType: Int
         )
     }
 }

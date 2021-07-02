@@ -18,6 +18,7 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil
@@ -234,11 +235,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Method to know if the chat exists
+     * Method to know if the chat exists, I am joined to the chat and the call
      *
      * @return True, if it exists. False, otherwise
      */
-    fun isChatCreated(): Boolean = _currentChatId.value != MEGACHAT_INVALID_HANDLE
+    fun isChatCreatedAndIParticipating(): Boolean =
+        (_currentChatId.value != MEGACHAT_INVALID_HANDLE &&
+                MegaApplication.getChatManagement().amIParticipatingInAChat(_currentChatId.value!!) &&
+                CallUtil.amIParticipatingInThisMeeting(_currentChatId.value!!))
 
     /**
      * Method to initiate the call with the microphone on
@@ -286,7 +290,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             return
         }
 
-        if (isChatCreated()) {
+        if (isChatCreatedAndIParticipating()) {
             meetingActivityRepository.switchMic(
                 _currentChatId.value!!,
                 shouldAudioBeEnabled,
@@ -320,7 +324,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             return
         }
 
-        if (isChatCreated()) {
+        if (isChatCreatedAndIParticipating()) {
             logDebug("Clicked cam with chat")
             meetingActivityRepository.switchCamera(
                 _currentChatId.value!!,

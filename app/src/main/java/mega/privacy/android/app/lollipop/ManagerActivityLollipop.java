@@ -239,6 +239,7 @@ import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.LinksUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.TimeUtils;
@@ -14341,35 +14342,27 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if (paramType == LINK_IS_FOR_MEETING) {
 			logDebug("It's a meeting");
-			// Open chat preview finished, request.getFlag() is true.
-			if (isFromOpenChatPreview) {
-				boolean isAlreadyJoined = MegaApplication.getChatManagement().isAlreadyJoining(chatId);
+			boolean linkInvalid = TextUtil.isTextEmpty(link) && chatId == MEGACHAT_INVALID_HANDLE;
+			if (linkInvalid) {
+				logError("Invalid link");
+				return;
+			}
 
-				if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-					checkAMeetingLink(ManagerActivityLollipop.this, chatId, titleChat, list, link);
-				} else {
-					if (isAlreadyJoined) {
-						// Meeting has ended, open the chat room.
+			if (isMeetingEnded(list)) {
+				logDebug("It's a meeting, open dialog: Meeting has ended");
+				new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+					@Override
+					public void onViewMeetingChat() {
 						showChatLink(link);
-					} else {
-						logDebug("It's a meeting, open dialog: Meeting has ended");
-						new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-							@Override
-							public void onViewMeetingChat() {
-								showChatLink(link);
-							}
-
-							@Override
-							public void onLeave() {
-							}
-						}).show(getSupportFragmentManager(),
-								MeetingHasEndedDialogFragment.TAG);
 					}
-				}
+
+					@Override
+					public void onLeave() {
+					}
+				}).show(getSupportFragmentManager(),
+						MeetingHasEndedDialogFragment.TAG);
 			} else {
-				// Check chat link finished, request.getFlag() is false.
-				logDebug("Check chat link finished and it's a meeting, open chat preview.");
-				api.openChatPreview(link, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_MEETING_LINK));
+				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, list, titleChat);
 			}
 		} else {
 			logDebug("It's a chat");

@@ -504,6 +504,7 @@ class InMeetingRepository @Inject constructor(
 
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) {
         if (!MegaApplication.getChatManagement().isAlreadyJoining(chatId)) {
+            logDebug("Joining to public chat with ID $chatId")
             MegaApplication.getChatManagement().addJoiningChatId(chatId)
             megaChatApi.autojoinPublicChat(chatId, listener)
         }

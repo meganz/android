@@ -31,6 +31,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
+import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -84,7 +85,7 @@ public class CallUtil {
      * @param link        Meeting's link
      */
     public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link) {
-        logDebug("Open join a meeting screen");
+        logDebug("Open join a meeting screen:: chatId = "+chatId);
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         MegaApplication.setOpeningMeetingLink(chatId, true);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
@@ -1166,34 +1167,68 @@ public class CallUtil {
     }
 
     /**
-     * Method for processing a meeting link
+     * Method to know if a meeting has ended
      *
-     * @param context   The Activity context
-     * @param chatId    The Chat ID
-     * @param titleChat The title of the chat room
-     * @param list      The list of mega handle
-     * @param link      The meeting link
+     * @param list MegaHandleList with the call ID
+     * @return True, if the meeting is finished. False, if not.
      */
-    public static void checkAMeetingLink(Context context, long chatId, String titleChat, MegaHandleList list, String link) {
-        long anotherCallInProgress = CallUtil.getAnotherCallParticipating(chatId);
-        if (anotherCallInProgress != MEGACHAT_INVALID_HANDLE) {
-            logDebug("Exists another call in progress");
-            showConfirmationInACall(context);
-            return;
-        }
+    public static boolean isMeetingEnded(MegaHandleList list) {
+        return list == null || list.get(0) == MEGACHAT_INVALID_HANDLE;
+    }
 
-        if (MegaApplication.getChatManagement().isAlreadyJoining(chatId)) {
+    /**
+     * Method to know if I am participating in this meeting
+     *
+     * @param chatId Chat ID of the meeting
+     * @return True, f I am participating in this meeting. False, if not.
+     */
+    public static boolean amIParticipatingInThisMeeting(long chatId) {
+        MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+        return call != null && call.getStatus() != MegaChatCall.CALL_STATUS_DESTROYED &&
+                call.getStatus() != MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION &&
+                call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
+    }
+
+    /**
+     * Method to know if I am participating in another call
+     *
+     * @param chatId Chat ID of the current call
+     * @return True, f I am participating in another call. False, if not.
+     */
+    public static boolean amIParticipatingInAnotherCall(long chatId) {
+        return CallUtil.getAnotherCallParticipating(chatId) != MEGACHAT_INVALID_HANDLE;
+    }
+
+    /**
+     * Method for processing a meeting link when meeting is in progress
+     *
+     * @param context               The context of Activity
+     * @param activity              The Activity
+     * @param chatId                the Chat Id of the meeting link
+     * @param isFromOpenChatPreview True, if I come from doing openChatPreview. False, if I came from doing checkChatLink.
+     * @param link                  The meeting link
+     * @param list                  The MegaHandleList with the call ID
+     * @param titleChat             The title of the chat
+     */
+    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, MegaHandleList list, String titleChat) {
+        if (amIParticipatingInThisMeeting(chatId)) {
+            logDebug("I am participating in the meeting of this meeting link");
+            returnCall(context, chatId);
+        } else if (amIParticipatingInAnotherCall(chatId)) {
+            logDebug("I am participating in another call");
+            showConfirmationInACall(context);
+        } else if (isFromOpenChatPreview) {
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
             if (call == null || call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-                logDebug("Call id: " + list.get(0) + ". It's a meeting, open to start");
-                CallUtil.openMeetingToStart(context, chatId);
+                logDebug("Call id: " + list.get(0) + ". It's a meeting, open to join");
+                CallUtil.openMeetingToJoin(context, chatId, titleChat, link);
             } else {
                 logDebug("Call id: " + list.get(0) + ". Return to call");
                 returnCall(context, chatId);
             }
         } else {
-            logDebug("Call id: " + list.get(0) + ". It's a meeting, open join call");
-            CallUtil.openMeetingToJoin(context, chatId, titleChat, link);
+            logDebug("Open chat preview");
+            MegaApplication.getInstance().getMegaChatApi().openChatPreview(link, new LoadPreviewListener(context, activity, CHECK_LINK_TYPE_MEETING_LINK));
         }
     }
 }

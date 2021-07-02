@@ -27,13 +27,13 @@ class AutoJoinPublicChatListener(context: Context?) : ChatBaseListener(context) 
             LogUtil.logDebug("Joined chat correctly")
             callback?.onJoinedChat(request.chatHandle, request.userHandle)
         } else {
-            LogUtil.logError("Error Joining the chat = e.errorCode " + e.errorCode)
-            callback?.onErrorJoinedChat(request.chatHandle)
+            LogUtil.logError("Error Joining the chat, e.errorCode " + e.errorCode)
+            callback?.onErrorJoinedChat(request.chatHandle, e.errorCode)
         }
     }
 
     interface OnJoinedChatCallback {
         fun onJoinedChat(chatId: Long, userHandle: Long)
-        fun onErrorJoinedChat(chatId: Long)
+        fun onErrorJoinedChat(chatId: Long, error:Int)
     }
 }

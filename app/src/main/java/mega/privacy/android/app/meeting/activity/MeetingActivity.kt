@@ -194,7 +194,7 @@ class MeetingActivity : PasscodeActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                if (!meetingViewModel.isChatCreated()) {
+                if (!meetingViewModel.isChatCreatedAndIParticipating()) {
                     MegaApplication.getInstance().removeRTCAudioManager()
                 }
 

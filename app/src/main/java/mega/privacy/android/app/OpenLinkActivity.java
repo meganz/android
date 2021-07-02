@@ -540,29 +540,26 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 
 		if (paramType == LINK_IS_FOR_MEETING) {
 			logDebug("It's a meeting link");
-			if (isFromOpenChatPreview) {
-				if (list != null && list.get(0) != MEGACHAT_INVALID_HANDLE) {
-					logDebug("Call id: " + list.get(0) + ", It's a meeting, open join call");
-					goToMeetingActivity(chatId, titleChat);
-				} else {
-					logDebug("It's a meeting, open dialog: Meeting has ended");
-					new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
-						@Override
-						public void onViewMeetingChat() {
-							goToChatActivity();
-						}
+			if (CallUtil.isMeetingEnded(list)) {
+				logDebug("Meeting has ended, open dialog");
+				new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
+					@Override
+					public void onViewMeetingChat() {
+						goToChatActivity();
+					}
 
-						@Override
-						public void onLeave() {
-							goToGuestLeaveMeetingActivity();
-						}
-					}).show(getSupportFragmentManager(),
-							MeetingHasEndedDialogFragment.TAG);
-				}
+					@Override
+					public void onLeave() {
+						goToGuestLeaveMeetingActivity();
+					}
+				}).show(getSupportFragmentManager(),
+						MeetingHasEndedDialogFragment.TAG);
+			} else if (isFromOpenChatPreview) {
+				logDebug("Meeting is in progress, open join meeting");
+				goToMeetingActivity(chatId, titleChat);
 			} else {
 				logDebug("It's a meeting, open chat preview");
 				api.openChatPreview(url, new LoadPreviewListener(this, OpenLinkActivity.this, CHECK_LINK_TYPE_MEETING_LINK));
-
 			}
 		} else {
 			logDebug("It's a chat link");

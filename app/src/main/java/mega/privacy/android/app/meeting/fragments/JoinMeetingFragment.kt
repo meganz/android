@@ -5,8 +5,10 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
@@ -21,13 +23,16 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
         releaseVideoDeviceAndRemoveChatVideoListener()
         val action = JoinMeetingFragmentDirections
-            .actionGlobalInMeeting(MEETING_ACTION_JOIN, chatId, meetingName, meetingLink)
+            .actionGlobalInMeeting(
+                if (MegaApplication.getChatManagement().amIParticipatingInAChat(chatId))
+                    MEETING_ACTION_START
+                else MEETING_ACTION_JOIN, chatId, meetingName, meetingLink
+            )
         findNavController().navigate(action)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initRTCAudioManager()
 
         btn_start_join_meeting.setText(R.string.join_meeting)

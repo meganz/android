@@ -455,8 +455,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         initFloatingWindowContainerDragListener(view)
         initFloatingPanel()
 
-        val chatId: Long? =
+        var chatId: Long? =
             arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+
+        if(chatId == MEGACHAT_INVALID_HANDLE){
+            sharedModel.currentChatId.value?.let {
+                chatId = it
+            }
+        }
 
         chatId?.let {
             if (it != MEGACHAT_INVALID_HANDLE) {
@@ -533,14 +539,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         when (args.action) {
             MEETING_ACTION_CREATE -> {
                 logDebug("Action create")
-                camIsEnable = sharedModel.cameraLiveData.value!!
-                bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
+                updateMicAndCam()
                 initStartMeeting()
             }
             MEETING_ACTION_JOIN -> {
                 logDebug("Action join")
-                camIsEnable = sharedModel.cameraLiveData.value!!
-                bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
+                updateMicAndCam()
+
                 inMeetingViewModel.joinPublicChat(
                     args.chatId,
                     AutoJoinPublicChatListener(requireContext(), this)
@@ -593,12 +598,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 sharedModel.micInitiallyOn()
             }
             MEETING_ACTION_START -> {
-                onJoinedChat(
-                    arguments?.getLong(
-                        MeetingActivity.MEETING_CHAT_ID,
-                        MEGACHAT_INVALID_HANDLE
-                    )!!, MEGACHAT_INVALID_HANDLE
-                )
+                logDebug("Action need answer call")
+                updateMicAndCam()
+                controlWhenJoinedAChat(inMeetingViewModel.currentChatId)
             }
         }
     }
@@ -2261,7 +2263,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         finishActivity()
     }
 
-    override fun onJoinedChat(chatId: Long, userHandle: Long) {
+    /**
+     * Method that updates the microphone and camera values
+     */
+    private fun updateMicAndCam() {
+        camIsEnable = sharedModel.cameraLiveData.value!!
+        micIsEnable = sharedModel.micLiveData.value!!
+        bottomFloatingPanelViewHolder.updateCamIcon(camIsEnable)
+        bottomFloatingPanelViewHolder.updateMicIcon(micIsEnable)
+    }
+
+    /**
+     * Method to control what to do when I have joined the chatroom
+     *
+     * @param chatId The chat ID
+     */
+    private fun controlWhenJoinedAChat(chatId: Long) {
         if (chatId != MEGACHAT_INVALID_HANDLE) {
             logDebug("Update chat id $chatId")
             sharedModel.updateChatRoomId(chatId)
@@ -2282,6 +2299,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    override fun onJoinedChat(chatId: Long, userHandle: Long) {
+       controlWhenJoinedAChat(chatId)
+    }
+
     private fun answerCallAfterJoin() {
         val call = inMeetingViewModel.getCall()
         if(call == null){
@@ -2298,7 +2319,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    override fun onErrorJoinedChat(chatId: Long) {
+    override fun onErrorJoinedChat(chatId: Long, error:Int) {
         logDebug("Error joining the meeting so close it")
         finishActivity()
     }
@@ -2316,9 +2337,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     /**
      * Perform the necessary actions when the call is over.
+     * Check if exists another call in progress or on hold
      */
     private fun checkIfAnotherCallShouldBeShown() {
-        //Check if exists another call in progress or on hold
         val anotherCall = inMeetingViewModel.getAnotherCall()
         if (anotherCall == null) {
             logDebug("Finish current call")

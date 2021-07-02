@@ -123,7 +123,10 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             args.getString(MeetingActivity.MEETING_LINK)?.let {
                 meetingLink = it
             }
-            chatId = args.getLong(MeetingActivity.MEETING_CHAT_ID)
+            args.getLong(MeetingActivity.MEETING_CHAT_ID)?.let {
+                chatId = it
+                sharedModel.updateChatRoomId(chatId)
+            }
         }
     }
 
