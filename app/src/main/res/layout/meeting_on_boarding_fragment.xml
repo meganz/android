@@ -53,46 +53,50 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <mega.privacy.android.app.components.twemoji.EmojiEditText
-            android:id="@+id/type_meeting_edit_text"
+        <RelativeLayout
+            android:id="@+id/meeting_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:background="@android:color/transparent"
-            android:backgroundTint="?attr/colorSurface"
-            android:gravity="center"
-            android:hint="@string/type_meeting_name"
-            android:inputType="text"
-            android:maxLength="100"
-            android:maxLines="1"
-            android:minWidth="100dp"
-            android:singleLine="true"
-            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant"
-            android:text="@={createviewmodel.meetingName}"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textColorHint="#9B9B9B"
-            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" >
+            <mega.privacy.android.app.components.twemoji.EmojiEditText
+                android:id="@+id/type_meeting_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@android:color/transparent"
+                android:backgroundTint="?attr/colorSurface"
+                android:gravity="center"
+                android:hint="@string/type_meeting_name"
+                android:inputType="text"
+                android:maxLength="100"
+                android:maxLines="1"
+                android:minWidth="100dp"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant"
+                android:text="@={createviewmodel.meetingName}"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textColorHint="#9B9B9B"
+                android:visibility="visible" />
 
-        <mega.privacy.android.app.components.RoundedImageView
-            android:id="@+id/meeting_thumbnail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:scaleType="fitCenter"
-            app:border_color="@color/dark_grey_border_color"
-            app:border_width="4dp"
-            app:corner_radius="100dp"
-            app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline"
-            app:layout_constraintVertical_bias="0.2" />
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/meeting_thumbnail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_below="@id/type_meeting_edit_text"
+                android:layout_centerHorizontal="true"
+                android:scaleType="fitCenter"
+                app:border_color="@color/dark_grey_border_color"
+                app:border_width="4dp"
+                app:corner_radius="100dp" />
+        </RelativeLayout>
+
 
         <View
             android:id="@+id/fab_tip_location"
@@ -102,7 +106,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/meeting_thumbnail"
+            app:layout_constraintTop_toBottomOf="@id/meeting_info"
             app:layout_constraintVertical_bias="0.5" />
 
         <include
@@ -170,13 +174,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_begin="100dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline2"

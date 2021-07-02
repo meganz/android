@@ -3,6 +3,7 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Point
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
@@ -10,7 +11,6 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.appbar.MaterialToolbar
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
@@ -53,12 +53,23 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     var mRootViewHeight: Int = 0
     protected var toast: Toast? = null
 
+    protected var bCameraOpen = false
+    protected var bKeyBoardExtend = false
+    private var preFabTop = 0
+
     // Soft keyboard open and close listener
     private var keyboardLayoutListener: OnGlobalLayoutListener? = OnGlobalLayoutListener {
         val r = Rect()
         val decorView: View = requireActivity().window.decorView
         decorView.getWindowVisibleDisplayFrame(r)
         val visibleHeight = r.height()
+
+        val avatarRect = Rect()
+        meeting_thumbnail.getGlobalVisibleRect(avatarRect)
+
+        val fabRect = Rect()
+        fab_cam.getGlobalVisibleRect(fabRect)
+
         if (mRootViewHeight == 0) {
             // save height of root view
             mRootViewHeight = visibleHeight
@@ -67,11 +78,18 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         if (mRootViewHeight == visibleHeight) {
             // set bottom margin to 40dp
             setMarginBottomOfMeetingButton(40f)
+            bKeyBoardExtend = false
+            triggerAvatar(View.VISIBLE)
             return@OnGlobalLayoutListener
         }
         if (mRootViewHeight - visibleHeight > 200) {
             // layout changing (keyboard popup), set bottom margin to 10dp
             setMarginBottomOfMeetingButton(10f)
+            bKeyBoardExtend = true
+            if ((preFabTop == fabRect.top) && (fabRect.top - avatarRect.bottom < 10)) {
+                triggerAvatar(View.GONE)
+            }
+            preFabTop = fabRect.top
             return@OnGlobalLayoutListener
         }
     }
@@ -137,9 +155,9 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     }
 
     private fun setMarginTopOfMeetingName(marginTop: Int) {
-        val menuLayoutParams = type_meeting_edit_text.layoutParams as ViewGroup.MarginLayoutParams
+        val menuLayoutParams = meeting_info.layoutParams as ViewGroup.MarginLayoutParams
         menuLayoutParams.setMargins(0, marginTop, 0, 0)
-        type_meeting_edit_text.layoutParams = menuLayoutParams
+        meeting_info.layoutParams = menuLayoutParams
     }
 
     protected fun setMarginBottomOfMeetingButton(marginBottom: Float) {
@@ -368,18 +386,39 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             true -> {
                 // Always try to start the video using the front camera
                 mask.visibility = View.VISIBLE
-
+                bCameraOpen = true
                 sharedModel.setChatVideoInDevice(null)
+
                 // Hide avatar when camera open
-                meeting_thumbnail.visibility = View.INVISIBLE
+                triggerAvatar(View.GONE)
                 activateVideo()
             }
             false -> {
                 mask.visibility = View.GONE
+                bCameraOpen = false
 
                 // Show avatar when camera close
-                meeting_thumbnail.visibility = View.VISIBLE
+                triggerAvatar(View.VISIBLE)
                 deactivateVideo()
+            }
+        }
+    }
+
+    private fun triggerAvatar(visivility: Int) {
+        logDebug("triggerAvatar bCameraOpen: $bCameraOpen & bKeyBoardExtend: $bKeyBoardExtend")
+        if (bCameraOpen) {
+            if (meeting_thumbnail.visibility == View.GONE)
+                return
+            meeting_thumbnail.visibility = View.GONE
+        } else {
+            if (!bKeyBoardExtend) {
+                if (meeting_thumbnail.visibility == View.VISIBLE)
+                    return
+                meeting_thumbnail.visibility = View.VISIBLE
+            } else {
+                if (meeting_thumbnail.visibility == visivility)
+                    return
+                meeting_thumbnail.visibility = visivility
             }
         }
     }

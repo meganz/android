@@ -391,12 +391,7 @@ public class AvatarUtil {
         paint.setShader(shader);
 
         Canvas canvas = new Canvas(circleBitmap);
-        int radius;
-        if (bitmap.getWidth() < bitmap.getHeight()) {
-            radius = bitmap.getWidth() / 2;
-        } else {
-            radius = bitmap.getHeight() / 2;
-        }
+        int radius = getRadius(bitmap);
 
         canvas.drawCircle(bitmap.getWidth() / 2F, bitmap.getHeight() / 2F, radius, paint);
         return Pair.create(true, circleBitmap);
