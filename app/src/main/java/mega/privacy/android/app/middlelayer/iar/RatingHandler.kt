@@ -81,7 +81,7 @@ abstract class RatingHandler(val context: Context) {
             return false
         }
 
-        val app = MegaApplication.getInstance();
+        val app = MegaApplication.getInstance()
         if (app != null && app.megaApi != null) {
             val totalNum = app.megaApi.numNodes
             return totalNum >= 20

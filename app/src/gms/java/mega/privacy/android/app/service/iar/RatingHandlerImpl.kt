@@ -1,7 +1,6 @@
 package mega.privacy.android.app.service.iar
 
 import android.content.Context
-import android.widget.Toast
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
