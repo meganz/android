@@ -12,15 +12,17 @@ class CreateMeetingViewModel @ViewModelInject constructor(
     var meetingName: MutableLiveData<String> = MutableLiveData<String>()
 
     /**
-     * set the default value of meetingName
+     * Sets the default value of meetingName
      */
     fun initMeetingName() {
         meetingName.value = "";
     }
 
     /**
-     * set the default value of hint
+     * Sets the default value of hint
+     *
      * @return the string of default meetingName
+
      */
     fun initHintMeetingName(): String {
         return StringResourcesUtils.getString(

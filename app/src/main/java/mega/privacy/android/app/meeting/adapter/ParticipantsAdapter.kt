@@ -62,8 +62,8 @@ class ParticipantsAdapter(
     /**
      * Update the icon when the state of other participant's mic or cam changing
      *
-     * @param peerId the peerId of the client
-     * @param clientId the clientId of the client
+     * @param peerId   User handle of the participant
+     * @param clientId Client identifier of the participant
      */
     fun updateParticipantAudioVideo(peerId: Long, clientId: Long) {
         val localList = this.currentList
@@ -86,8 +86,8 @@ class ParticipantsAdapter(
     /**
      * Update the permission for participant when the permission is changing
      *
-     * @param peerId the peerId of the client
-     * @param clientId the clientId of the client
+     * @param peerId   User handle of the participant
+     * @param clientId Client identifier of the participant
      */
     fun updateParticipantPermission(peerId: Long, clientId: Long){
         val localList = this.currentList

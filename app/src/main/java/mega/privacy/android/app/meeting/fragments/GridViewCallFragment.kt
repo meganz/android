@@ -185,14 +185,15 @@ class GridViewCallFragment : MeetingBaseFragment() {
     /**
      * Updating the participant who joined or left the call
      *
-     * @param isAdded
-     * @param position
+     * @param isAdded True, if the participant has been added. False, if the participant has left.
+     * @param position The participant's position in the list
      */
     fun peerAddedOrRemoved(
         isAdded: Boolean,
         position: Int,
     ) {
         val newData = sliceBy6(participants)
+
         adapterPager.let {
             adapterPager.setNewData(newData)
             if (isAdded) {
@@ -203,6 +204,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
                 it.participantRemoved(viewPagerData, newData, position)
             }
         }
+
         viewPagerData = newData
         updateVisibleParticipantsGrid(newData)
     }
@@ -309,9 +311,9 @@ class GridViewCallFragment : MeetingBaseFragment() {
     /**
      * Update layout base on the new orientation
      *
-     * @param newOrientation
-     * @param widthPixels
-     * @param heightPixels
+     * @param newOrientation New orientation, Portrait or Landscape
+     * @param widthPixels The screen width
+     * @param heightPixels The screen height
      */
     fun updateLayout(newOrientation: Int, widthPixels: Int, heightPixels: Int) {
         adapterPager.updateOrientation(newOrientation, widthPixels, heightPixels)
