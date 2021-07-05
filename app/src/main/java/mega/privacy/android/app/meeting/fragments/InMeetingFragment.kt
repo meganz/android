@@ -838,7 +838,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
             if (it) {
                 permissionsBuilder(
-                    kotlin.arrayOf(android.Manifest.permission.RECORD_AUDIO).toCollection(
+                    arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(
                         ArrayList()
                     )
                 )
