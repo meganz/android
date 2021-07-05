@@ -147,8 +147,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val errorStatingCallObserver = Observer<Long> {
         if (inMeetingViewModel.isSameChatRoom(it)) {
             logError("Error starting a call")
-            MegaApplication.getInstance().removeRTCAudioManager()
-            finishActivity()
+            showMeetingFailedDialog()
         }
     }
 
@@ -832,25 +831,23 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
         sharedModel.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
-            if (it) { it ->
-                {
-                    permissionsBuilder(
-                        kotlin.arrayOf(android.Manifest.permission.RECORD_AUDIO).toCollection(
-                            ArrayList()
-                        )
+            if (it) {
+                permissionsBuilder(
+                    kotlin.arrayOf(android.Manifest.permission.RECORD_AUDIO).toCollection(
+                        ArrayList()
                     )
-                        .setOnRequiresPermission { l ->
-                            run {
-                                onRequiresAudioPermission(l)
-                                // Continue expected action after granted
-                                sharedModel.clickMic(true)
-                                bottomFloatingPanelViewHolder.updateMicPermissionWaring(true)
-                            }
+                )
+                    .setOnRequiresPermission { l ->
+                        run {
+                            onRequiresAudioPermission(l)
+                            // Continue expected action after granted
+                            sharedModel.clickMic(true)
+                            bottomFloatingPanelViewHolder.updateMicPermissionWaring(true)
                         }
-                        .setOnShowRationale { l -> onShowRationale(l) }
-                        .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
-                        .build().launch(false)
-                }
+                    }
+                    .setOnShowRationale { l -> onShowRationale(l) }
+                    .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
+                    .build().launch(false)
             }
         }
 
@@ -2130,10 +2127,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         val inviteParticipantIntent =
             Intent(meetingActivity, AddContactActivityLollipop::class.java).apply {
-                putExtra("contactType", CONTACT_TYPE_MEGA)
-                putExtra("chat", true)
-                putExtra("chatId", 123L)
-                putExtra("aBtitle", StringResourcesUtils.getString(R.string.invite_participants))
+                putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.currentChatId)
+                putExtra(INTENT_EXTRA_KEY_TOOL_BAR_TITLE, StringResourcesUtils.getString(R.string.invite_participants))
             }
         meetingActivity.startActivityForResult(
             inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
@@ -2316,6 +2313,25 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             logDebug("Show another call")
             CallUtil.openMeetingInProgress(requireContext(), anotherCall.chatid, false)
             finishActivity()
+        }
+    }
+
+    /**
+     * The dialog for alerting the meeting is failed to created
+     *
+     */
+    private fun showMeetingFailedDialog() {
+        MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        ).apply {
+            setMessage(StringResourcesUtils.getString(R.string.meeting_is_failed_content))
+            setCancelable(false)
+            setPositiveButton(R.string.general_ok){ _, _ ->
+                MegaApplication.getInstance().removeRTCAudioManager()
+                finishActivity()
+            }
+            show()
         }
     }
 

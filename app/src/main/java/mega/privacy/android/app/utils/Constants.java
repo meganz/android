@@ -324,6 +324,9 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
     public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
     public static final String INTENT_EXTRA_KEY_ENABLED = "enabled";
+    public static final String INTENT_EXTRA_KEY_CONTACT_TYPE = "contactType";
+    public static final String INTENT_EXTRA_KEY_CHAT = "chat";
+    public static final String INTENT_EXTRA_KEY_TOOL_BAR_TITLE = "aBtitle";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -484,6 +487,7 @@ public class Constants {
     public static int TYPE_VIDEO = 4;
     public static int TYPE_RECONNECTING = 5;
     public static int TYPE_SINGLE_PARTICIPANT = 6;
+    public static int TYPE_NO_CONNECTION = 7;
 
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";

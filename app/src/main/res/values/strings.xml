@@ -4068,6 +4068,8 @@
     <string name="ongoing_call_content">You cannot make another call. Please end your first call before making another.</string>
     <!-- The hint text when changing meeting name-->
     <string name="new_meeting_name">New meeting name</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">Failed to create meeting.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">There is already a file with the same name</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->

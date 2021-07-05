@@ -570,7 +570,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun shouldShowFixedBanner(type: Int): Boolean {
         when (type) {
-            TYPE_RECONNECTING -> {
+           TYPE_RECONNECTING -> {
                 _callLiveData.value?.let {
                     if (isReconnectingStatus) {
                         return true
@@ -616,6 +616,15 @@ class InMeetingViewModel @ViewModelInject constructor(
         type: Int
     ) {
         when (type) {
+            TYPE_NO_CONNECTION ->
+                updateFixedBanner(
+                    bannerText,
+                    ContextCompat.getColor(
+                        MegaApplication.getInstance().applicationContext,
+                        R.color.amber_700_amber_300
+                    ),
+                    StringResourcesUtils.getString(R.string.error_server_connection_problem)
+                )
             TYPE_JOIN ->
                 updateFixedBanner(
                     bannerText,
@@ -2057,5 +2066,12 @@ class InMeetingViewModel @ViewModelInject constructor(
             }
         }
     }
+
+    /**
+     * Determine if this call is creating
+     *
+     * @return if creating, return true, else false
+     */
+    fun isCallInitial(): Boolean = previousState == CALL_STATUS_INITIAL
 }
 
