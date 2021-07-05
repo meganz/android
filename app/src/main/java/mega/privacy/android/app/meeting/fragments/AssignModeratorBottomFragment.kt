@@ -18,7 +18,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 
 /**
  * AssignModerator page allow moderator assign other users moderator when they are leaving the meeting
- *
  */
 class AssignModeratorBottomFragment(
     private val leaveMeeting: () -> Unit
@@ -52,29 +51,27 @@ class AssignModeratorBottomFragment(
 
     override fun onStart() {
         super.onStart()
-        val dialog = dialog
-        if (dialog != null) {
-            val bottomSheet: View = dialog.findViewById(R.id.design_bottom_sheet)
-            bottomSheet.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+        val dialog = dialog ?: return
 
-            BottomSheetBehavior.from(bottomSheet).apply {
-                state = BottomSheetBehavior.STATE_EXPANDED
-                isFitToContents = false
-                skipCollapsed = true
-                isHideable = true
-                addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-                    override fun onStateChanged(bottomSheet: View, newState: Int) {
-                        if (newState == BottomSheetBehavior.STATE_DRAGGING) {
-                            state = BottomSheetBehavior.STATE_EXPANDED
-                        }
+        val bottomSheet: View = dialog.findViewById(R.id.design_bottom_sheet)
+        bottomSheet.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+
+        BottomSheetBehavior.from(bottomSheet).apply {
+            state = BottomSheetBehavior.STATE_EXPANDED
+            isFitToContents = false
+            skipCollapsed = true
+            isHideable = true
+            addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    if (newState == BottomSheetBehavior.STATE_DRAGGING) {
+                        state = BottomSheetBehavior.STATE_EXPANDED
                     }
+                }
 
-                    override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-                })
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            })
 
-            }
         }
-
     }
 
     private fun initRecyclerview() {
@@ -99,18 +96,26 @@ class AssignModeratorBottomFragment(
         participantsAdapter.submitList(participants.toList())
     }
 
+    /**
+     * The call back function when users select participants, will update the selected list and participant list
+     */
     private val selectCallback = fun(position: Int) {
         updateParticipantList(position)
 
         val participant = participants[position]
+
         if (participant.isChosenForAssign) {
             selectedParticipants.add(participant)
         } else {
             selectedParticipants.remove(participant)
         }
+
         updateSelectedParticipant()
     }
 
+    /**
+     * Update the selected participant list when user choose or delete the participant
+     */
     private fun updateSelectedParticipant() {
         if (selectedParticipants.size > 0) {
             binding.toolbar.subtitle =
@@ -123,10 +128,15 @@ class AssignModeratorBottomFragment(
                 StringResourcesUtils.getString(R.string.pick_new_moderator_message)
             binding.btOk.isEnabled = false
         }
+
         binding.moderatorAddsContainer.isVisible = selectedParticipants.size > 0
+
         selectedParticipantsAdapter.submitList(selectedParticipants.toMutableList())
     }
 
+    /**
+     * The call back function when users delete participants, will update the selected list and participant list
+     */
     private val deleteCallback = fun(participant: Participant) {
         val position = participants.indexOf(participant)
 
@@ -135,6 +145,9 @@ class AssignModeratorBottomFragment(
         updateParticipantList(position)
     }
 
+    /**
+     * Update the participant list when user choose or delete the participant
+     */
     private fun updateParticipantList(position: Int) {
         val participant = participants[position]
         participant.isChosenForAssign = !participant.isChosenForAssign
@@ -143,7 +156,11 @@ class AssignModeratorBottomFragment(
         participantsAdapter.notifyItemChanged(position)
     }
 
-
+    /**
+     * Update the participant list and selected list when someone leave this meeting
+     *
+     * @param data new participant list
+     */
     fun update(data: MutableList<Participant>) {
         // Get the current selected id
         participants = data
@@ -169,7 +186,9 @@ class AssignModeratorBottomFragment(
         selectedParticipantsAdapter.submitList(selectedParticipants.toMutableList())
     }
 
-
+    /**
+     * Make selected participants to moderator
+     */
     private fun makeModerators() {
         // Get the list and assign the user in the list to moderator
         selectedParticipants.forEach {
@@ -180,6 +199,9 @@ class AssignModeratorBottomFragment(
         dismiss()
     }
 
+    /**
+     * Cancel this action and close this page
+     */
     fun cancel() {
         dismiss()
     }

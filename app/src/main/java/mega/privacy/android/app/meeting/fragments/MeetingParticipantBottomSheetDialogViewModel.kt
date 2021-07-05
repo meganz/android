@@ -2,14 +2,11 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.content.Context
 import android.widget.TextView
-import androidx.core.text.HtmlCompat
 import androidx.lifecycle.ViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
-import java.util.*
 
 /**
  * ViewModel for [MeetingParticipantBottomSheetDialogFragment]
@@ -44,21 +41,7 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
     } ?: ""
 
     fun setShowingName(name: TextView) {
-        name.text =  if (participant?.isMe == true) {
-            context?.let {
-                HtmlCompat.fromHtml(
-                    "${participant?.name} <font color='${
-                        ColorUtils.getColorHexString(it, R.color.grey_600)
-                    }'>(${
-                        StringResourcesUtils.getString(R.string.bucket_word_me)
-                            .toLowerCase(Locale.ROOT)
-                    })</font>",
-                    HtmlCompat.FROM_HTML_MODE_LEGACY
-                )
-            }
-        } else {
-            participant?.name
-        }
+        name.text = participant?.getDisplayName(name.context)
     }
 
     fun isParticipantGuest(): Boolean = participant?.isGuest == true

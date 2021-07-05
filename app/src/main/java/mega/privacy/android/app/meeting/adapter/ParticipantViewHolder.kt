@@ -2,14 +2,10 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.graphics.PorterDuff
 import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemMeetingParticipantBinding
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
-import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import java.util.*
 
 /**
  * When use DataBinding here, when user fling the RecyclerView, the bottom sheet will have
@@ -51,16 +47,7 @@ class ParticipantViewHolder(
             binding.name.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
         }
 
-        if (participant.isMe) {
-            binding.name.text = HtmlCompat.fromHtml(
-                "${participant.name} <font color='${
-                    getColorHexString(binding.name.context, R.color.grey_600)
-                }'>(${getString(R.string.bucket_word_me).toLowerCase(Locale.ROOT)})</font>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-            )
-        } else {
-            binding.name.text = participant.name
-        }
+        binding.name.text = participant.getDisplayName(binding.name.context)
 
         if (participant.isAudioOn) {
             binding.audioStatus.setImageResource(R.drawable.ic_mic_on)
