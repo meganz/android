@@ -234,9 +234,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private fun updatePanelAndToolbar(chat: MegaChatCall?) {
+    /**
+     * Method that updates the Bottom panel and toolbar depending the call status
+     *
+     * @param call The current call
+     */
+    private fun updatePanelAndToolbar(call: MegaChatCall?) {
         toolbar.setOnClickListener {
-            if (chat?.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+            if (call?.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                 showMeetingInfoFragment()
             }
         }
@@ -863,24 +868,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.RECORD_AUDIO -> {
-                    showRequestPermissionSnackBar()
-                }
-            }
+        if(permissions.contains(Manifest.permission.RECORD_AUDIO)) {
+            logDebug("user denies the RECORD_AUDIO permissions")
+            showRequestPermissionSnackBar()
         }
     }
 
     private fun onCameraNeverAskAgain(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    showRequestPermissionSnackBar()
-                }
-            }
+        if(permissions.contains(Manifest.permission.CAMERA)) {
+            logDebug("user denies the CAMERA permission")
+            showRequestPermissionSnackBar()
         }
     }
 
@@ -944,6 +941,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         lastTouch = System.currentTimeMillis()
     }
 
+    /**
+     * Method to control the position of the floating window in relation to the toolbar
+     */
     private fun checkRelativePositionWithToolbar() {
         val maxTop = if (bannerMuteLayout.isVisible) bannerMuteLayout.bottom else toolbar.bottom
 
@@ -958,6 +958,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    /**
+     * Method to control the position of the floating window in relation to the bottom sheet panel
+     */
     private fun checkRelativePositionWithBottomSheet() {
         val bottom = floatingWindowContainer.y + floatingWindowContainer.height
         val top = floatingBottomSheet.top
