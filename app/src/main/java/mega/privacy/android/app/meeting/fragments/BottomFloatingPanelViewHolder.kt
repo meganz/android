@@ -165,14 +165,12 @@ class BottomFloatingPanelViewHolder(
         val location = intArrayOf(0, 0)
         anchor.getLocationInWindow(location)
 
-        popWindow?.let {
-            it.showAtLocation(
-                anchor,
-                Gravity.NO_GRAVITY,
-                (location[0] + anchor.width / 2) - view.measuredWidth / 2,
-                location[1] - view.measuredHeight
-            )
-        }
+        popWindow?.showAtLocation(
+            anchor,
+            Gravity.NO_GRAVITY,
+            (location[0] + anchor.width / 2) - view.measuredWidth / 2,
+            location[1] - view.measuredHeight
+        )
     }
 
     /**
