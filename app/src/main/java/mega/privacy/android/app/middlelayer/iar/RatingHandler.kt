@@ -28,7 +28,8 @@ abstract class RatingHandler(val context: Context) {
     }
 
     /**
-     * Determine if match the moment 1 that When a user that uploaded or downloaded a file of >= 10 MB with an average speed of >= 2 MB/s
+     * Determine if match the moment 1 that When a user that uploaded or downloaded a file is great than size limitation
+     * with an average speed is great than speed limitation
      *
      * @param size the size of downloading or uploading files
      * @param speed current downloading or uploading speed
@@ -39,7 +40,7 @@ abstract class RatingHandler(val context: Context) {
         speed: Long,
         listener: OnCompleteListener
     ) {
-        if (!baseCondition() || size <= 0 || speed <= 0) return
+        if (!meetBaseCondition() || size <= 0 || speed <= 0) return
 
         val condition = byteToMb(size) >= SIZE_LIMIT && byteToMb(speed) >= SPEED_LIMIT
 
@@ -56,7 +57,7 @@ abstract class RatingHandler(val context: Context) {
      *
      */
     fun showRatingBaseOnSharing() {
-        if (!baseCondition()) return
+        if (!meetBaseCondition()) return
 
         val app = MegaApplication.getInstance()
         val condition = if (app != null && app.megaApi != null) {
@@ -76,15 +77,15 @@ abstract class RatingHandler(val context: Context) {
      *
      * @return if ture, it matches the base condition
      */
-    private fun baseCondition(): Boolean {
-        if (!isShowedRating()) {
+    private fun meetBaseCondition(): Boolean {
+        if (isShowedRating()) {
             return false
         }
 
         val app = MegaApplication.getInstance()
         if (app != null && app.megaApi != null) {
             val totalNum = app.megaApi.numNodes
-            return totalNum >= 20
+            return totalNum >= FILES_NUM_LIMIT
         }
 
         return false
@@ -100,7 +101,7 @@ abstract class RatingHandler(val context: Context) {
         if (key.isNullOrEmpty()) return false
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        return !sharedPreferences.getBoolean(key, false)
+        return sharedPreferences.getBoolean(key, false)
     }
 
     /**
@@ -132,7 +133,9 @@ abstract class RatingHandler(val context: Context) {
     }
 
     companion object {
+        // The size limitation, 10 Mb
         const val SIZE_LIMIT = 10
+        // The speed limitation, 2 Mb
         const val SPEED_LIMIT = 2
 
         const val FILES_NUM_LIMIT = 20
@@ -147,7 +150,7 @@ abstract class RatingHandler(val context: Context) {
      * @param bytes the size in bytes
      * @return mbs the size in mbs
      */
-    private fun byteToMb(bytes: Long): Long = bytes / 1024 / 1024
+    private fun byteToMb(bytes: Long) = bytes / 1024 / 1024
 }
 
 /**

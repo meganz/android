@@ -129,7 +129,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private CompositeDisposable rxSubscriptions = new CompositeDisposable();
 
     // the flag to determine the rating dialog is showed for this upload action
-    private boolean isRatingShowed = false;
+    private boolean isRatingShowed;
 
     @SuppressLint("NewApi")
 	@Override
@@ -683,7 +683,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             inProgressTemp = inProgress * 100;
             progressPercent = (int)(inProgressTemp / total);
 
-            showRating(this, total, megaApi.getCurrentUploadSpeed());
+            showRating(total, megaApi.getCurrentUploadSpeed());
         }
 
         String message = getMessageForProgressNotification(inProgress,isFolderTransfer);
@@ -702,13 +702,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     /**
      * Determine if should show the rating page to users
      *
-     * @param context the context
      * @param total the total size of uploading file
      * @param currentUploadSpeed current uploading speed
      */
-    private void showRating(Context context, long total, int currentUploadSpeed) {
+    private void showRating(long total, int currentUploadSpeed) {
         if (!isRatingShowed) {
-            new RatingHandlerImpl(context)
+            new RatingHandlerImpl(this)
                     .showRatingBaseOnSpeedAndSize(total, currentUploadSpeed, () -> isRatingShowed = true);
         }
     }

@@ -159,7 +159,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private final Handler uiHandler = new Handler(Looper.getMainLooper());
 
 	// the flag to determine the rating dialog is showed for this download action
-	private boolean isRatingShowed = false;
+	private boolean isRatingShowed;
 
 	@SuppressLint("NewApi")
 	@Override
@@ -1321,7 +1321,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			int progressPercent = (int) Math.round((double) totalSizeTransferred / totalSizePendingTransfer * 100);
 			logDebug("Progress: " + progressPercent + "%");
 
-			showRating(this, totalSizePendingTransfer, megaApi.getCurrentDownloadSpeed());
+			showRating(totalSizePendingTransfer, megaApi.getCurrentDownloadSpeed());
 
 			String message = "";
 			if (totalTransfers == 0){
@@ -1438,13 +1438,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	/**
 	 * Determine if should show the rating page to users
 	 *
-	 * @param context the context
 	 * @param total the total size of uploading file
 	 * @param currentDownloadSpeed current downloading speed
 	 */
-	private void showRating(Context context, long total, int currentDownloadSpeed) {
+	private void showRating(long total, int currentDownloadSpeed) {
 		if (!isRatingShowed) {
-			new RatingHandlerImpl(context)
+			new RatingHandlerImpl(this)
 					.showRatingBaseOnSpeedAndSize(total, currentDownloadSpeed, () -> isRatingShowed = true);
 		}
 	}

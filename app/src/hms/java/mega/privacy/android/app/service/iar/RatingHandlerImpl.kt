@@ -1,6 +1,7 @@
 package mega.privacy.android.app.service.iar
 
 import android.content.Context
+import mega.privacy.android.app.middlelayer.iar.OnCompleteListener
 import mega.privacy.android.app.middlelayer.iar.RatingHandler
 import mega.privacy.android.app.utils.LogUtil
 /**
