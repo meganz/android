@@ -512,7 +512,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             if (contactsData != null) {
                 currentChatId.value?.let {
                     InviteToChatRoomListener(context).inviteToChat(it, contactsData)
-                    _snackBarLiveData.value = getString(R.string.invitation_send)
+                    _snackBarLiveData.value = getString(R.string.invite_sent)
                 }
             }
         } else {
