@@ -2,13 +2,13 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
-import androidx.core.content.ContextCompat
+import androidx.annotation.StringRes
+import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
+import mega.privacy.android.app.utils.ColorUtils.getColorHexString
+import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import java.io.Serializable
 
@@ -38,14 +38,22 @@ data class Participant(
      */
     fun getDisplayName(context: Context): CharSequence {
         return if (isMe) {
-            val spannableString = SpannableString(StringResourcesUtils.getString(R.string.chat_me_text_bracket, name))
-            spannableString.setSpan(
-                ForegroundColorSpan(ContextCompat.getColor(context, R.color.grey_600)),
-                name.length,
-                spannableString.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            var displayName = StringResourcesUtils.getString(R.string.meeting_me_text_bracket, name)
+
+            try {
+                displayName = displayName.replace(
+                    "[A]", "<font color='"
+                            + getColorHexString(context, R.color.grey_600) + "'>"
+                )
+                displayName = displayName.replace("[/A]", "</font>")
+            } catch (e: Exception) {
+                LogUtil.logWarning("Exception formatting string", e)
+            }
+
+            HtmlCompat.fromHtml(
+                displayName,
+                HtmlCompat.FROM_HTML_MODE_LEGACY
             )
-            spannableString
         } else {
             name
         }
