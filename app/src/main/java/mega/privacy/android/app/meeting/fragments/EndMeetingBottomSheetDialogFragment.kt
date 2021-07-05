@@ -23,20 +23,16 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             chatId = it.getLong(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
         }
 
-        when (chatId) {
-            MegaChatApiJava.MEGACHAT_INVALID_HANDLE -> {
-                LogUtil.logError("Error. Chat doesn't exist")
-                return
-            }
-            else -> {
-                chatId?.let { sharedViewModel.setChatId(it) }
-                when {
-                    sharedViewModel.getCall() == null -> {
-                        LogUtil.logError("Error. Call doesn't exist")
-                        return
-                    }
-                }
-            }
+        if (chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+            LogUtil.logError("Error. Chat doesn't exist")
+            return
+        }
+
+        chatId?.let { sharedViewModel.setChatId(it) }
+        
+        if (sharedViewModel.getCall() == null) {
+            LogUtil.logError("Error. Call doesn't exist")
+            return
         }
     }
 
