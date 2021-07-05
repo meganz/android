@@ -4070,6 +4070,8 @@
     <string name="new_meeting_name">New meeting name</string>
     <!-- The content of dialog when failed for creating meeting-->
     <string name="meeting_is_failed_content">Failed to create meeting.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](me)[/A]</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">There is already a file with the same name</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
