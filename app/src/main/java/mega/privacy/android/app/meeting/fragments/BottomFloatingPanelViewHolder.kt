@@ -481,7 +481,6 @@ class BottomFloatingPanelViewHolder(
 
     /**
      * Collapse the bottom sheet
-     *
      */
     fun collapse() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
