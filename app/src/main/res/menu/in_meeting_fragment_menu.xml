@@ -15,7 +15,7 @@
         android:enabled="true"
         android:icon="@drawable/ic_grid_view"
         android:orderInCategory="110"
-        android:title="Grid view"
+        android:title="@string/action_grid"
         android:visible="false"
         app:iconTint="@color/white"
         app:showAsAction="ifRoom" />
@@ -24,7 +24,7 @@
         android:enabled="true"
         android:icon="@drawable/ic_speaker_view"
         android:orderInCategory="120"
-        android:title="Speaker view"
+        android:title="@string/main_view"
         android:visible="true"
         app:iconTint="@color/white"
         app:showAsAction="ifRoom" />

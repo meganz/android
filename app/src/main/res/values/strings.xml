@@ -3941,7 +3941,7 @@
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Keep .%1$s</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">You are the only participant.</string>
+    <string name="banner_alone_on_the_call">You are the only one here</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Meeting</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -4072,6 +4072,8 @@
     <string name="meeting_is_failed_content">Failed to create meeting.</string>
     <!-- Word next to own user’s name on participant list -->
     <string name="meeting_me_text_bracket">%1s [A](me)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">Main view</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">There is already a file with the same name</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
