@@ -3985,11 +3985,11 @@
     <!-- Label for end meeting-->
     <string name="meeting_end">End</string>
     <!-- Invite contacts as participants of the meeting-->
-    <string name="invite_participants">Invite other participants</string>
+    <string name="invite_participants">Invite participants</string>
     <!-- The number of participants in the meeting-->
     <string name="participants_number">Participants (%d)</string>
     <!-- Pin the participant to speaker view in the meeting-->
-    <string name="pin_to_speaker">Pin to speaker view</string>
+    <string name="pin_to_speaker">Display in main view</string>
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">Make moderator</string>
     <!-- The title of dialog for end meeting confirmation-->
@@ -3999,7 +3999,7 @@
     <!-- assign moderator message when the moderator leave meeting-->
     <string name="assign_moderator_message">Before leaving, please assign one or more new moderators for the meeting.</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Assign moderator</string>
+    <string name="assign_moderator">Make moderator</string>
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">Leave anyway</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
@@ -4021,7 +4021,7 @@
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Tap the Meeting link sent to you or paste it here</string>
     <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">Your connection quality is poor.</string>
+    <string name="slow_connection_meeting">Poor connection</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Meeting has ended</string>
     <!-- error message shown when a meeting link is not well formed-->
