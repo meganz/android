@@ -34,6 +34,9 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util.showSnackbar
 
+/**
+ * Fragment shows the basic information of meeting
+ */
 class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var binding: FragmentMeetingInfoBinding
     private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
@@ -55,6 +58,9 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         initView()
     }
 
+    /**
+     * Init views
+     */
     private fun initView() {
         inMeetingViewModel.chatTitle.observe(this) {
             chatTitle = it
@@ -86,12 +92,18 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         initAction()
     }
 
+    /**
+     * Update views when the meeting is ready
+     */
     fun updateView() {
         binding.edit.isVisible = inMeetingViewModel.isModerator()
         binding.shareLink.isVisible = inMeetingViewModel.isChatRoomPublic()
         binding.invite.isVisible = inMeetingViewModel.isModerator()
     }
 
+    /**
+     * Init the click listener for buttons
+     */
     fun initAction() {
         listenAction(binding.shareLink) {
             (parentFragment as InMeetingFragment).onShareLink(true)
@@ -111,6 +123,12 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Get the moderator list and return the list string
+     *
+     * @param participants the current participant list
+     * @return the string of moderators' name
+     */
     fun getModeratorList(participants: MutableList<Participant>): String {
         var nameList =
             if (inMeetingViewModel.isModerator()) ChatController(context).myFullName else ""
@@ -125,6 +143,9 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         return nameList
     }
 
+    /**
+     * Copy link
+     */
     fun copyLink() {
         LogUtil.logDebug("copyLink")
         if (chatLink.isNotEmpty()) {
@@ -138,6 +159,9 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Show dialog for changing the meeting name, only for moderator
+     */
     fun showRenameGroupDialog() {
         val activity = requireActivity()
         val layout = LinearLayout(requireActivity())
@@ -162,6 +186,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         layout.addView(input, params)
         input.setOnLongClickListener { false }
         input.setSingleLine()
+        input.setHint(R.string.new_meeting_name)
         input.setSelectAllOnFocus(true)
         input.setTextColor(getThemeColor(requireActivity(), android.R.attr.textColorSecondary))
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -199,21 +224,31 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Show the incorrect information when users change meeting name
+     *
+     * @param input the edit view
+     */
     private fun changeTitle(input: EmojiEditText) {
         val title = input.text.toString()
-        if (title == "" || title.isEmpty() || title.trim { it <= ' ' }.isEmpty()) {
-            LogUtil.logWarning("Input is empty")
-            input.error = StringResourcesUtils.getString(R.string.invalid_string)
-            input.requestFocus()
-        } else if (!ChatUtil.isAllowedTitle(title)) {
-            LogUtil.logWarning("Title is too long")
-            input.error = StringResourcesUtils.getString(R.string.title_long)
-            input.requestFocus()
-        } else {
-            LogUtil.logDebug("Positive button pressed - change title")
-            inMeetingViewModel.setTitleChat(title)
-            changeTitleDialog?.dismiss()
+        when {
+            TextUtil.isTextEmpty(title) -> {
+                LogUtil.logWarning("Input is empty")
+                input.error = StringResourcesUtils.getString(R.string.invalid_string)
+                input.requestFocus()
+            }
+            !ChatUtil.isAllowedTitle(title) -> {
+                LogUtil.logWarning("Title is too long")
+                input.error = StringResourcesUtils.getString(R.string.title_long)
+                input.requestFocus()
+            }
+            else -> {
+                LogUtil.logDebug("Positive button pressed - change title")
+                inMeetingViewModel.setTitleChat(title)
+                changeTitleDialog?.dismiss()
+            }
         }
+
     }
 
 

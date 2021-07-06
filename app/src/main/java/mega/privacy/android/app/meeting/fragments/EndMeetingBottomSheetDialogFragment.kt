@@ -11,6 +11,9 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaChatApiJava
 
+/**
+ * The fragment shows two options for moderator when the moderator leave the meeting
+ */
 class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetEndMeetingBinding
     private val sharedViewModel:InMeetingViewModel by activityViewModels()
@@ -23,20 +26,16 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             chatId = it.getLong(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
         }
 
-        when (chatId) {
-            MegaChatApiJava.MEGACHAT_INVALID_HANDLE -> {
-                LogUtil.logError("Error. Chat doesn't exist")
-                return
-            }
-            else -> {
-                chatId?.let { sharedViewModel.setChatId(it) }
-                when {
-                    sharedViewModel.getCall() == null -> {
-                        LogUtil.logError("Error. Call doesn't exist")
-                        return
-                    }
-                }
-            }
+        if (chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE){
+            LogUtil.logError("Error. Chat doesn't exist")
+            return
+        }
+
+        chatId?.let { sharedViewModel.setChatId(it) }
+
+        if (sharedViewModel.getCall() == null){
+            LogUtil.logError("Error. Call doesn't exist")
+            return
         }
     }
 
@@ -54,16 +53,27 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         dialog.setContentView(binding.root)
     }
 
+    /**
+     * Assign moderator listener will close the page and open assign moderator activity
+     */
     private fun assignModerator() {
         dismiss()
         callBack?.invoke()
     }
 
+    /**
+     * Leave anyway listener, will leave meeting directly
+     */
     private fun leaveAnyway() {
         sharedViewModel.leaveMeeting()
         requireActivity().finish()
     }
 
+    /**
+     * Set the call back for clicking assign moderator option
+     *
+     * @param showAssignModeratorFragment call back
+     */
     fun setAssignCallBack(showAssignModeratorFragment: () -> Unit) {
         callBack = showAssignModeratorFragment
     }

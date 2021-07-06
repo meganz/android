@@ -66,6 +66,9 @@ class BottomFloatingPanelViewHolder(
 
     private var currentHeight = 0
 
+    /**
+     * Observer the change of layout
+     */
     val layoutListener = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
         initTipsAndRatio()
     }
@@ -113,7 +116,6 @@ class BottomFloatingPanelViewHolder(
             bottomSheetBehavior.halfExpandedRatio = ratio
         }
     }
-
 
     /**
      * Determine if the tips is showing
@@ -165,19 +167,19 @@ class BottomFloatingPanelViewHolder(
         val location = intArrayOf(0, 0)
         anchor.getLocationInWindow(location)
 
-        popWindow?.let {
-            it.showAtLocation(
-                anchor,
-                Gravity.NO_GRAVITY,
-                (location[0] + anchor.width / 2) - view.measuredWidth / 2,
-                location[1] - view.measuredHeight
-            )
-        }
+        popWindow?.showAtLocation(
+            anchor,
+            Gravity.NO_GRAVITY,
+            (location[0] + anchor.width / 2) - view.measuredWidth / 2,
+            location[1] - view.measuredHeight
+        )
     }
 
     /**
      * Expanded bottom sheet when the meeting is group chat
      * If the meeting is one-to-one chat, just show the control button, and would not let user drag the bottom panel
+     *
+     * @param shouldExpand determine if should expand panel when update
      */
     private fun updatePanel(shouldExpand: Boolean = true) {
         if (shouldExpand) {
@@ -189,16 +191,25 @@ class BottomFloatingPanelViewHolder(
     }
 
 
-    fun genCheckedDrawable(background: Int): Drawable {
-        val roundRect = GradientDrawable()
-        roundRect.shape = GradientDrawable.RECTANGLE
-        roundRect.cornerRadius = context.resources.getDimension(R.dimen.elevation_upgrade_low)
-        roundRect.setColor(background)
+    /**
+     * Get the drawable for background for dark mode
+     *
+     * @param background the color for background
+     * @return
+     */
+    fun getCheckedDrawable(background: Int): Drawable {
+        val roundRect = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = context.resources.getDimension(R.dimen.elevation_upgrade_low)
+            setColor(background)
+        }
 
-        val round2 = GradientDrawable()
-        round2.shape = GradientDrawable.RECTANGLE
-        round2.setColor(ContextCompat.getColor(context, R.color.white_alpha_007))
-        round2.cornerRadius = context.resources.getDimension(R.dimen.elevation_upgrade_low)
+        val round2 = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            setColor(ContextCompat.getColor(context, R.color.white_alpha_007))
+            cornerRadius = context.resources.getDimension(R.dimen.elevation_upgrade_low)
+        }
+
         val insetLayer2 = InsetDrawable(round2, 0, 0, 0, 0)
 
         return LayerDrawable(arrayOf(roundRect, insetLayer2))
@@ -206,7 +217,6 @@ class BottomFloatingPanelViewHolder(
 
     /**
      * Init the visibility of `ShareLink` & `Invite` Button
-     *
      */
     fun updateShareAndInviteButton() {
         floatingPanelView.shareLink.isVisible = inMeetingViewModel.isLinkVisible()
@@ -239,6 +249,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun setParticipants(participants: MutableList<Participant>, myOwnInfo: Participant) {
         participants.add(myOwnInfo)
+
         participantsAdapter.submitList(
             participants.sortedWith(
                 compareBy(
@@ -247,6 +258,7 @@ class BottomFloatingPanelViewHolder(
                     { it.name })
             ).toMutableList()
         )
+
         floatingPanelView.participantsNum.text = getString(
             R.string.participants_number, participants.size
         )
@@ -254,7 +266,6 @@ class BottomFloatingPanelViewHolder(
 
     /**
      * Set the listener for bottom sheet behavior and property list
-     *
      */
     private fun setupBottomSheet() {
         bottomSheetBehavior.addBottomSheetCallback(object :
@@ -298,6 +309,7 @@ class BottomFloatingPanelViewHolder(
                 savedMicState = it
                 listener.onChangeMicState(binding.bottomFloatingPanel.fabMic.isOn)
             }
+
             fabMic.setOnChangeCallback {
                 updateBottomFloatingPanelIfNeeded()
             }
@@ -374,17 +386,25 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
+    /**
+     * Update the icstyle if bottom panel is expanded after some click actions
+     */
     private fun updateBottomFloatingPanelIfNeeded() {
         if (bottomFloatingPanelExpanded) {
-            onBottomFloatingPanelSlide(1F)
+            onBottomFloatingPanelSlide(BOTTOM_PANEL_EXPAND_OFFSET)
         }
     }
 
+    /**
+     * Update all the views base on the slide offset of panel
+     *
+     * @param slideOffset panel offset distance
+     */
     private fun onBottomFloatingPanelSlide(slideOffset: Float) {
         val ratio = if (slideOffset < BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD) {
             slideOffset / BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD
         } else {
-            1F
+            BOTTOM_PANEL_EXPAND_OFFSET
         }
 
         for (updater in propertyUpdaters) {
@@ -392,11 +412,14 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
+    /**
+     * Init views those should update their background base on the slide offset of panel
+     */
     private fun initUpdaters() {
         propertyUpdaters.add(
             propertyUpdater(
                 binding.bottomFloatingPanel.backgroundMask,
-                BOTTOM_PANEL_MIN_ALPHA, 1F
+                BOTTOM_PANEL_MIN_ALPHA, BOTTOM_PANEL_EXPAND_OFFSET
             ) { view, value ->
                 run {
                     val argbEvaluator = ArgbEvaluator()
@@ -411,7 +434,7 @@ class BottomFloatingPanelViewHolder(
 
                     view.background =
                         if (Util.isDarkMode(context)) {
-                            genCheckedDrawable(background)
+                            getCheckedDrawable(background)
                         } else {
                             val grad: GradientDrawable = view.background as GradientDrawable
                             grad.setColor(background)
@@ -420,11 +443,9 @@ class BottomFloatingPanelViewHolder(
                 }
             })
 
-        val indicatorColorStart = 0x4F
-        val indicatorColorEnd = 0xBD
         propertyUpdaters.add(
             propertyUpdater(
-                binding.bottomFloatingPanel.indicator, indicatorColorStart, indicatorColorEnd
+                binding.bottomFloatingPanel.indicator, INDICATOR_COLOR_START, INDICATOR_COLOR_END
             ) { view, value ->
                 view.backgroundTintList = ColorStateList.valueOf(composeColor(value))
             })
@@ -433,6 +454,9 @@ class BottomFloatingPanelViewHolder(
         setupFabLabelUpdater()
     }
 
+    /**
+     * Add fab label views into the update list and set up the color of background
+     */
     private fun setupFabLabelUpdater() {
         setupFabLabelUpdater(binding.bottomFloatingPanel.fabMicLabel)
         setupFabLabelUpdater(binding.bottomFloatingPanel.fabCamLabel)
@@ -441,10 +465,15 @@ class BottomFloatingPanelViewHolder(
         setupFabLabelUpdater(binding.bottomFloatingPanel.fabEndLabel)
     }
 
+    /**
+     * Set up the background color for updating when panel is sliding
+     *
+     * @param label the target textview
+     */
     private fun setupFabLabelUpdater(label: TextView) {
         val isDarkMode = Util.isDarkMode(context)
-        val fabLabelColorStart = if (isDarkMode) 0xE2 else 0xFF
-        val fabLabelColorEnd = if (isDarkMode) 0xE2 else 0x21
+        val fabLabelColorStart = if (isDarkMode) FAB_LABEL_COLOR_DARK_MODE else FAB_LABEL_COLOR_START_LIGHT_MODE
+        val fabLabelColorEnd = if (isDarkMode) FAB_LABEL_COLOR_DARK_MODE else FAB_LABEL_COLOR_END_LIGHT_MODE
 
         propertyUpdaters.add(
             propertyUpdater(
@@ -452,6 +481,9 @@ class BottomFloatingPanelViewHolder(
             ) { view, value -> view.setTextColor(composeColor(value)) })
     }
 
+    /**
+     * Add fab icon views into the update list and set up the color of background
+     */
     private fun setupFabUpdater() {
         setupFabBackgroundTintUpdater(binding.bottomFloatingPanel.fabMic)
         setupFabBackgroundTintUpdater(binding.bottomFloatingPanel.fabCam)
@@ -459,10 +491,15 @@ class BottomFloatingPanelViewHolder(
         setupFabBackgroundTintUpdater(binding.bottomFloatingPanel.fabSpeaker)
     }
 
+    /**
+     * Set up the background tint color for updating when panel is sliding
+     *
+     * @param fab the target icon
+     */
     private fun setupFabBackgroundTintUpdater(fab: OnOffFab) {
         propertyUpdaters.add(
             propertyUpdater(
-                fab, 0.0f, 1.0f
+                fab, FAB_TINT_COLOR_START, FAB_TINT_COLOR_END
             ) { view, value ->
                 if (view.isOn || !view.enable) {
                     run {
@@ -481,16 +518,15 @@ class BottomFloatingPanelViewHolder(
 
     /**
      * Collapse the bottom sheet
-     *
      */
     fun collapse() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomFloatingPanelExpanded = false
-        onBottomFloatingPanelSlide(0F)
+        onBottomFloatingPanelSlide(BOTTOM_PANEL_COLLAPSE_OFFSET)
     }
 
     /**
-     * Get current state
+     * Get current state of bottom panel
      */
     fun getState(): Int {
         return bottomSheetBehavior.state
@@ -502,7 +538,7 @@ class BottomFloatingPanelViewHolder(
     fun expand() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomFloatingPanelExpanded = true
-        onBottomFloatingPanelSlide(1F)
+        onBottomFloatingPanelSlide(BOTTOM_PANEL_EXPAND_OFFSET)
     }
 
     /**
@@ -604,6 +640,8 @@ class BottomFloatingPanelViewHolder(
     /**
      * Change the panel's width for landscape and portrait screen
      *
+     * @param orientation the current orientation
+     * @param widthPixels the width of the screen
      */
     fun updateWidth(orientation: Int, widthPixels: Int) {
         val params = floatingPanelView.root.layoutParams
@@ -650,6 +688,16 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
+    /**
+     * The updating function for views
+     *
+     * @param V
+     * @param view the target view
+     * @param startP start int value
+     * @param endP end int value
+     * @param update call back for updating
+     * @return
+     */
     private fun <V : View> propertyUpdater(
         view: V,
         startP: Int,
@@ -661,6 +709,16 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
+    /**
+     * The updating function for views
+     *
+     * @param V
+     * @param view the target view
+     * @param startP start float value
+     * @param endP end float value
+     * @param update call back for updating
+     * @return
+     */
     private fun <V : View> propertyUpdater(
         view: V,
         startP: Float,
@@ -672,14 +730,30 @@ class BottomFloatingPanelViewHolder(
         }
     }
 
+    /**
+     * Calculate the color base on the slide offset value
+     *
+     * @param component the original value
+     * @return the final value
+     */
     private fun composeColor(component: Int): Int {
         return ((component.shl(16) or component.shl(8) or component).toLong() or 0xFF000000).toInt()
     }
 
+    /**
+     * Update the warning icon for mic permission
+     *
+     * @param isGranted if have mic permission, is true, else is false
+     */
     fun updateMicPermissionWaring(isGranted: Boolean) {
         floatingPanelView.micWarning.isVisible = !isGranted
     }
 
+    /**
+     * Update the warning icon for Cam permission
+     *
+     * @param isGranted if have cam permission, is true, else is false
+     */
     fun updateCamPermissionWaring(isGranted: Boolean) {
         floatingPanelView.camWarning.isVisible = !isGranted
     }
@@ -687,6 +761,18 @@ class BottomFloatingPanelViewHolder(
     companion object {
         private const val BOTTOM_PANEL_MIN_ALPHA = 0.32F
         private const val BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD = 0.5F
+
+        private const val BOTTOM_PANEL_EXPAND_OFFSET = 1F
+        private const val BOTTOM_PANEL_COLLAPSE_OFFSET = 0F
+
+        private const val INDICATOR_COLOR_START = 0x4F
+        private const val INDICATOR_COLOR_END = 0xBD
+
+        private const val FAB_LABEL_COLOR_DARK_MODE = 0xE2
+        private const val FAB_LABEL_COLOR_START_LIGHT_MODE = 0xFF
+        private const val FAB_LABEL_COLOR_END_LIGHT_MODE = 0x21
+        private const val FAB_TINT_COLOR_START = 0.0F
+        private const val FAB_TINT_COLOR_END = 1.0F
     }
 }
 
