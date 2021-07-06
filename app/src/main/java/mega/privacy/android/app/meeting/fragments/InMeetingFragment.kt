@@ -141,7 +141,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val proximitySensorChangeObserver = Observer<Boolean> {
         val chatId = inMeetingViewModel.getChatId()
         if (chatId != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null) {
-            val realStatus = MegaApplication.getVideoStatus(chatId)
+            val realStatus = MegaApplication.getChatManagement().getVideoStatus(chatId)
             when {
                 !realStatus -> {
                     inTemporaryState = false
@@ -570,7 +570,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                                 )
                                             }"
                                         )
-                                        MegaApplication.setOpeningMeetingLink(
+                                        MegaApplication.getChatManagement().setOpeningMeetingLink(
                                             request.chatHandle,
                                             true
                                         )
@@ -1849,7 +1849,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         inMeetingViewModel.getCall()?.let {
             val isVideoOn: Boolean = it.hasLocalVideo()
             if (!inTemporaryState) {
-                MegaApplication.setVideoStatus(it.chatid, isVideoOn)
+                MegaApplication.getChatManagement().setVideoStatus(it.chatid, isVideoOn)
             }
         }
 
@@ -2255,7 +2255,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onCallAnswered(chatId: Long, flag: Boolean) {
         if (chatId == inMeetingViewModel.getChatId()) {
             logDebug("Call answered")
-            MegaApplication.setSpeakerStatus(chatId, true)
+            MegaApplication.getChatManagement().setSpeakerStatus(chatId, true)
             checkCallStarted(chatId)
         }
     }

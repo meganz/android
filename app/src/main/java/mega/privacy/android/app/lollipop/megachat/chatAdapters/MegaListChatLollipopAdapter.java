@@ -65,7 +65,6 @@ import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 
-import static mega.privacy.android.app.MegaApplication.isRequestSent;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -1041,7 +1040,7 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
                     case CALL_STATUS_JOINING:
                     case CALL_STATUS_IN_PROGRESS:
                         ((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
-                        ((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(isRequestSent(call.getCallId()) ?
+                        ((ViewHolderNormalChatList) holder).textViewContent.setText(context.getString(MegaApplication.getChatManagement().isRequestSent(call.getCallId()) ?
                                 R.string.outgoing_call_starting :
                                 R.string.call_started_messages));
                         break;

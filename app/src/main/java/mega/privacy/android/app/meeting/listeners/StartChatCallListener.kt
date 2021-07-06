@@ -41,10 +41,10 @@ class StartChatCallListener(context: Context?) : ChatBaseListener(context) {
 
         if (e.errorCode == MegaError.API_OK) {
             logDebug("Call started")
-            MegaApplication.setSpeakerStatus(request.chatHandle, request.flag)
+            MegaApplication.getChatManagement().setSpeakerStatus(request.chatHandle, request.flag)
             val call: MegaChatCall = api.getChatCall(request.chatHandle)
             if(call.isOutgoing){
-                MegaApplication.setRequestSentCall(call.callId, true)
+                MegaApplication.getChatManagement().setRequestSentCall(call.callId, true)
             }
 
             callback?.onCallStarted(request.chatHandle, request.flag, request.paramType)

@@ -9022,7 +9022,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 break;
 
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                if(MegaApplication.isRequestSent(callInThisChat.getCallId())){
+                if(MegaApplication.getChatManagement().isRequestSent(callInThisChat.getCallId())){
                     break;
                 }
                 if (callInThisChat.isOnHold() || isSessionOnHold(callInThisChat.getChatid())) {
@@ -9085,7 +9085,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 break;
 
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
-                if (MegaApplication.isRequestSent(callInThisChat.getCallId())) {
+                if (MegaApplication.getChatManagement().isRequestSent(callInThisChat.getCallId())) {
                     tapToReturnLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                 } else {
                     callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
@@ -9368,8 +9368,8 @@ public class ChatActivityLollipop extends PasscodeActivity
             MegaChatCall call = megaChatApi.getChatCall(chatIdOfCall);
 
             if (call != null && chatIdOfCall != MEGACHAT_INVALID_HANDLE) {
-                if (!MegaApplication.getSpeakerStatus(chatIdOfCall)) {
-                    MegaApplication.setSpeakerStatus(chatIdOfCall, true);
+                if (!MegaApplication.getChatManagement().getSpeakerStatus(chatIdOfCall)) {
+                    MegaApplication.getChatManagement().setSpeakerStatus(chatIdOfCall, true);
                     app.updateSpeakerStatus(true, AUDIO_MANAGER_CALL_IN_PROGRESS);
                 }
             } else {

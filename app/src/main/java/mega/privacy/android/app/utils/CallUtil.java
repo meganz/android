@@ -32,6 +32,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
+import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -87,7 +88,7 @@ public class CallUtil {
     public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link) {
         logDebug("Open join a meeting screen:: chatId = "+chatId);
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-        MegaApplication.setOpeningMeetingLink(chatId, true);
+        MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_JOIN);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
@@ -185,7 +186,7 @@ public class CallUtil {
     public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link) {
         logDebug("Open meeting in guest mode");
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
-        MegaApplication.setOpeningMeetingLink(chatId, true);
+        MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         Intent intent = new Intent(context, MeetingActivity.class);
         intent.setAction(MEETING_ACTION_GUEST);
         if (!isTextEmpty(meetingName)) {
@@ -374,7 +375,7 @@ public class CallUtil {
         callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
         callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 
-        if (MegaApplication.isRequestSent(call.getCallId())) {
+        if (MegaApplication.getChatManagement().isRequestSent(call.getCallId())) {
             activateChrono(false, callInProgressChrono, null);
         } else {
             activateChrono(true, callInProgressChrono, call);
@@ -990,7 +991,7 @@ public class CallUtil {
      */
     public static void startCallWithChatOnline(Activity activity, MegaChatRoom chatRoom) {
         if (checkPermissionsCall(activity, START_CALL_PERMISSIONS)) {
-            MegaApplication.setSpeakerStatus(chatRoom.getChatId(), false);
+            MegaApplication.getChatManagement().setSpeakerStatus(chatRoom.getChatId(), false);
             MegaApplication.getInstance().getMegaChatApi().startChatCall(chatRoom.getChatId(), false, true, new StartChatCallListener(activity));
             MegaApplication.setIsWaitingForCall(false);
         }
@@ -1085,7 +1086,7 @@ public class CallUtil {
     }
 
     public static void addChecksForACall(long chatId, boolean speakerStatus) {
-        MegaApplication.setSpeakerStatus(chatId, speakerStatus);
+        MegaApplication.getChatManagement().setSpeakerStatus(chatId, speakerStatus);
     }
 
     /**
@@ -1229,6 +1230,69 @@ public class CallUtil {
         } else {
             logDebug("Open chat preview");
             MegaApplication.getInstance().getMegaChatApi().openChatPreview(link, new LoadPreviewListener(context, activity, CHECK_LINK_TYPE_MEETING_LINK));
+        }
+    }
+
+    /**
+     * Method that performs the necessary actions when there is an incoming call.
+     *
+     * @param listAllCalls List of all current calls
+     * @param chatId       Chat ID
+     * @param callStatus   Call Status
+     */
+    public static void incomingCall(MegaHandleList listAllCalls, long chatId, int callStatus) {
+        if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(chatId))
+            return;
+
+        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        if (chatRoom == null) {
+            logError("The chat does not exist");
+            return;
+        }
+
+        if (!chatRoom.isMeeting() || !MegaApplication.getChatManagement().isOpeningMeetingLink(chatId)) {
+            MegaApplication.getInstance().createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
+            controlNumberOfCalls(listAllCalls, callStatus);
+        }
+    }
+
+    /**
+     * Method that performs the necessary actions when there is an outgoing call or incoming call.
+     *
+     * @param chatId           Chat ID
+     * @param typeAudioManager audio Manager type
+     */
+    public static void ongoingCall(long chatId, int typeAudioManager) {
+        AppRTCAudioManager rtcAudioManager = MegaApplication.getInstance().getAudioManager();
+        if (rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == typeAudioManager)
+            return;
+
+        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        if (chatRoom == null) {
+            logError("The chat does not exist");
+            return;
+        }
+
+        logDebug("Controlling outgoing/in progress call");
+        if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && chatRoom.isMeeting()) {
+            clearIncomingCallNotification(chatId);
+            return;
+        }
+
+        MegaApplication.getInstance().createOrUpdateAudioManager(MegaApplication.getChatManagement().getSpeakerStatus(chatId), typeAudioManager);
+    }
+
+    /**
+     * Method to control whether there is one or more calls.
+     *
+     * @param listAllCalls List of all current calls
+     * @param callStatus   Call Status
+     */
+    private static void controlNumberOfCalls(MegaHandleList listAllCalls, int callStatus) {
+        if (listAllCalls.size() == 1) {
+            MegaApplication.getInstance().checkOneCall(listAllCalls.get(0));
+        } else {
+            MegaApplication.getInstance().checkSeveralCall(listAllCalls, callStatus, true);
         }
     }
 }

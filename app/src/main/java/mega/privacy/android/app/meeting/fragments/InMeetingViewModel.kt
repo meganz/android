@@ -692,7 +692,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun isRequestSent(): Boolean {
         val callId = _callLiveData.value?.callId ?: return false
 
-        return callId != MEGACHAT_INVALID_HANDLE && MegaApplication.isRequestSent(callId)
+        return callId != MEGACHAT_INVALID_HANDLE && MegaApplication.getChatManagement().isRequestSent(callId)
     }
 
     /**

@@ -182,10 +182,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static long openChatId = -1;
 
 	private static boolean closedChat = true;
-	private static HashMap<Long, Boolean> hashMapVideo = new HashMap<>();
-	private static HashMap<Long, Boolean> hashMapSpeaker = new HashMap<>();
-	private static HashMap<Long, Boolean> hashMapOutgoingCall = new HashMap<>();
-	private static HashMap<Long, Boolean> hashOpeningMeetingLink = new HashMap<>();
 
 	private static long openCallChatId = -1;
 
@@ -220,8 +216,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private NetworkStateReceiver networkStateReceiver;
 	private BroadcastReceiver logoutReceiver;
     private AppRTCAudioManager rtcAudioManager = null;
-	private ArrayList<Long> currentActiveGroupChat = new ArrayList<>();
-	private ArrayList<Long> notificationShown = new ArrayList<>();
+
     private AppRTCAudioManager rtcAudioManagerRingInCall;
     private static MegaApplication singleApplicationInstance;
 	private PowerManager.WakeLock wakeLock;
@@ -587,26 +582,26 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
 					logDebug("Is ongoing call");
-					setOpeningMeetingLink(chatId, false);
-					ongoingCall(chatId, (isOutgoing && isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
+					getChatManagement().setOpeningMeetingLink(chatId, false);
+					ongoingCall(chatId, (isOutgoing && getChatManagement().isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
 				}
 				break;
 
 			case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
 				logDebug("The user is no longer participating");
-				setOpeningMeetingLink(chatId, false);
+				getChatManagement().setOpeningMeetingLink(chatId, false);
 				clearIncomingCallNotification(callId);
 				removeValues(chatId);
-				setRequestSentCall(callId, false);
+				getChatManagement().setRequestSentCall(callId, false);
 				break;
 
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 				logDebug("Call has ended");
-				setOpeningMeetingLink(chatId, false);
+				getChatManagement().setOpeningMeetingLink(chatId, false);
 				int termCode = call.getTermCode();
 				boolean isIgnored = call.isIgnored();
 				checkCallDestroyed(chatId, callId, termCode, isIgnored);
-				setRequestSentCall(callId, false);
+				getChatManagement().setRequestSentCall(callId, false);
 				break;
 		}
 	};
@@ -646,68 +641,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
 			logDebug("Session is in progress");
 			long callId = (long) sessionAndCall.first;
-			setRequestSentCall(callId, false);
+			getChatManagement().setRequestSentCall(callId, false);
 			updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
 		}
 	};
-
-	/**
-	 * Method that performs the necessary actions when there is an incoming call.
-	 *
-	 * @param listAllCalls List of all current calls
-	 * @param chatId       Chat ID
-	 * @param callStatus   Call Status
-	 */
-	private void incomingCall(MegaHandleList listAllCalls, long chatId, int callStatus) {
-		if (!megaApi.isChatNotifiable(chatId))
-			return;
-
-		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-		if(chatRoom == null){
-			logError("The chat does not exist");
-		}
-
-		if(!chatRoom.isMeeting() || !isOpeningMeetingLink(chatId)){
-			createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-			controlNumberOfCalls(listAllCalls, chatId, callStatus, true);
-		}
-	}
-
-	/**
-	 * Method that performs the necessary actions when there is an outgoing call or incoming call.
-	 *
-	 * @param chatId           Chat ID
-	 * @param typeAudioManager audio Manager type
-	 */
-	public void ongoingCall(long chatId, int typeAudioManager) {
-		if (rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == typeAudioManager)
-			return;
-
-		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-		logDebug("Controlling outgoing/in progress call");
-		if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && chatRoom != null && chatRoom.isMeeting()) {
-			clearIncomingCallNotification(chatId);
-			return;
-		}
-
-		createOrUpdateAudioManager(getSpeakerStatus(chatId), typeAudioManager);
-	}
-
-	/**
-	 * Method to control whether there is one or more calls.
-	 *
-	 * @param listAllCalls   List of all current calls
-	 * @param chatId         Chat ID
-	 * @param callStatus     Call Status
-	 * @param isIncomingCall If the current call is an incoming call
-	 */
-	private void controlNumberOfCalls(MegaHandleList listAllCalls, long chatId, int callStatus, boolean isIncomingCall) {
-		if (listAllCalls.size() == 1) {
-			checkOneCall(listAllCalls.get(0));
-		} else {
-			checkSeveralCall(listAllCalls, callStatus, isIncomingCall);
-		}
-	}
 
 	/**
 	 * Broadcast for controlling changes in screen.
@@ -1388,56 +1325,28 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	 *
 	 * @param chatId The chat ID of the chat with call.
 	 */
-	private void showGroupCallNotification(long chatId) {
+	public void showGroupCallNotification(long chatId) {
 		logDebug("Show group call notification");
-		notificationShown.add(chatId);
+		getChatManagement().setNotificationShown(chatId);
 		stopService(new Intent(this, IncomingCallService.class));
 		ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 		notificationBuilder.checkOneGroupCall(chatId);
 	}
 
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-		if (!item.isGroup() || notificationShown == null)
+		if (!item.isGroup())
 			return;
 
 		if ((item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV))) {
 			if (item.getOwnPrivilege() != MegaChatRoom.PRIV_RM) {
-				if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(item.getChatId())) {
-					currentActiveGroupChat.add(item.getChatId());
-					MegaChatCall call = api.getChatCall(item.getChatId());
-					if(call == null){
-						logError("call is null");
-						return;
-					}
-
-					if (call.getStatus() == CALL_STATUS_USER_NO_PRESENT && !call.isRinging()) {
-						if (notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
-							MegaChatRoom chatRoom = megaChatApi.getChatRoom(item.getChatId());
-							if (chatRoom != null && (!chatRoom.isMeeting() || !isOpeningMeetingLink(item.getChatId()))) {
-								logDebug("Show notification");
-								notificationShown.add(item.getChatId());
-								createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-								showGroupCallNotification(item.getChatId());
-							}
-						}
-						return;
-					}
-				}
+				getChatManagement().checkActiveGroupChat(item);
 			} else {
-				currentActiveGroupChat.remove(item);
-				notificationShown.remove(item.getChatId());
+				getChatManagement().removeActiveChatAndNotificationShown(item.getChatId());
 			}
 		}
 
 		if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_CLOSED)) {
-			currentActiveGroupChat.remove(item);
-			notificationShown.remove(item.getChatId());
-		}
-	}
-
-	public void addCurrentGroupChat(long chatId){
-		if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(chatId)) {
-			currentActiveGroupChat.add(chatId);
+			getChatManagement().removeActiveChatAndNotificationShown(item.getChatId());
 		}
 	}
 
@@ -1563,7 +1472,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
-	private void checkOneCall(long chatId) {
+	public void checkOneCall(long chatId) {
 		logDebug("One call : Chat Id = " + chatId + ", openCall Chat Id = " + openCallChatId);
 		if (openCallChatId == chatId) {
 			logDebug("The call is already opened");
@@ -1579,7 +1488,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup() && (!chatRoom.isMeeting() || !isOpeningMeetingLink(chatId))) {
+		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup() && (!chatRoom.isMeeting() || !getChatManagement().isOpeningMeetingLink(chatId))) {
 			showGroupCallNotification(chatId);
 			return;
 		}
@@ -1600,7 +1509,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
-	private void checkSeveralCall(MegaHandleList listAllCalls, int callStatus, boolean isRinging) {
+	public void checkSeveralCall(MegaHandleList listAllCalls, int callStatus, boolean isRinging) {
 		logDebug("Several calls = " + listAllCalls.size() + "- Current call Status: " + callStatusToString(callStatus));
 		if (isRinging && participatingInACall()) {
 			logDebug("Several calls: show notification");
@@ -1631,7 +1540,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	private void removeValues(long chatId) {
-		removeStatusVideoAndSpeaker(chatId);
+		getChatManagement().removeStatusVideoAndSpeaker(chatId);
 
         if (!existsAnOngoingOrIncomingCall()) {
             removeRTCAudioManager();
@@ -1668,11 +1577,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		} catch (Exception e) {
 			logError("EXCEPTION when showing missed call notification", e);
 		}
-	}
-
-	private void removeStatusVideoAndSpeaker(long chatId) {
-		hashMapSpeaker.remove(chatId);
-		hashMapVideo.remove(chatId);
 	}
 
 	public AppRTCAudioManager getAudioManager() {
@@ -1902,68 +1806,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public void resetMyAccountInfo() {
     	myAccountInfo = new MyAccountInfo();
-	}
-
-	public static boolean getSpeakerStatus(long chatId) {
-		boolean entryExists = hashMapSpeaker.containsKey(chatId);
-		if (entryExists) {
-			return hashMapSpeaker.get(chatId);
-		}
-
-		setSpeakerStatus(chatId, false);
-		return false;
-	}
-
-	public static void setSpeakerStatus(long chatId, boolean speakerStatus) {
-		hashMapSpeaker.put(chatId, speakerStatus);
-	}
-
-	public static boolean getVideoStatus(long chatId) {
-		boolean entryExists = hashMapVideo.containsKey(chatId);
-		if (entryExists) {
-			return hashMapVideo.get(chatId);
-		}
-		setVideoStatus(chatId, false);
-		return false;
-	}
-
-	public static void setVideoStatus(long chatId, boolean videoStatus) {
-		hashMapVideo.put(chatId, videoStatus);
-	}
-
-	public static boolean isOpeningMeetingLink(long chatId) {
-		if(chatId != MEGACHAT_INVALID_HANDLE) {
-			boolean entryExists = hashOpeningMeetingLink.containsKey(chatId);
-			if (entryExists) {
-				return hashOpeningMeetingLink.get(chatId);
-			}
-		}
-		return false;
-	}
-
-	public static void setOpeningMeetingLink(long chatId, boolean isOpeningMeetingLink) {
-    	if(chatId != MEGACHAT_INVALID_HANDLE){
-			hashOpeningMeetingLink.put(chatId, isOpeningMeetingLink);
-		}
-	}
-
-	public static boolean isRequestSent(long callId) {
-		boolean entryExists = hashMapOutgoingCall.containsKey(callId);
-		if (entryExists) {
-			return hashMapOutgoingCall.get(callId);
-		}
-
-		return false;
-	}
-
-	public static void setRequestSentCall(long callId, boolean isRequestSent) {
-		if(isRequestSent(callId) == isRequestSent)
-    		return;
-
-		hashMapOutgoingCall.put(callId, isRequestSent);
-		if(!isRequestSent){
-			LiveEventBus.get(EVENT_NOT_OUTGOING_CALL, Long.class).post(callId);
-		}
 	}
 
 	public int getStorageState() {

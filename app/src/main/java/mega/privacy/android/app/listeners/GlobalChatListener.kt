@@ -27,7 +27,7 @@ class GlobalChatListener(private val application: MegaApplication) : MegaChatLis
                 val list = it.chatListItems
                 if (!list.isNullOrEmpty()) {
                     for (i in 0 until list.size) {
-                        MegaApplication.getInstance().addCurrentGroupChat(list[i].chatId)
+                        MegaApplication.getChatManagement().addCurrentGroupChat(list[i].chatId)
                     }
                 }
             }
