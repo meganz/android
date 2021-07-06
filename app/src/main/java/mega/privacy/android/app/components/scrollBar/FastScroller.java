@@ -1,25 +1,31 @@
 package mega.privacy.android.app.components.scrollBar;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.core.widget.TextViewCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.widget.TextViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.viewprovider.DefaultScrollerViewProvider;
 import mega.privacy.android.app.components.scrollBar.viewprovider.ScrollerViewProvider;
 
+import static mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE;
+
 /**
  * Credit: https://github.com/FutureMind/recycler-fast-scroll
  */
-public class FastScroller extends LinearLayout{
+public class FastScroller extends LinearLayout {
 
 
     private static final int STYLE_NONE = -1;
@@ -33,7 +39,6 @@ public class FastScroller extends LinearLayout{
     private int bubbleOffset;
     private int bubbleTextAppearance;
     private int scrollerOrientation;
-    private boolean handleVisibility;
 
     private int maxVisibility;
 
@@ -53,9 +58,9 @@ public class FastScroller extends LinearLayout{
     public FastScroller(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         setClipChildren(false);
-        TypedArray style = context.obtainStyledAttributes(attrs, R.styleable.fastscroll__fastScroller, R.attr.fastscroll__style, 0);
+        TypedArray style = context.obtainStyledAttributes(attrs, R.styleable.FastScroller, R.attr.fastscroll__style, 0);
         try {
-            bubbleTextAppearance = style.getResourceId(R.styleable.fastscroll__fastScroller_fastscroll__bubbleTextAppearance, R.style.StyledScrollerTextAppearance);
+            bubbleTextAppearance = style.getResourceId(R.styleable.FastScroller_fastscroll__bubbleTextAppearance, R.style.StyledScrollerTextAppearance);
         } finally {
             style.recycle();
         }
@@ -130,31 +135,30 @@ public class FastScroller extends LinearLayout{
 
     private void setBackgroundTint(View view, int color) {
         final Drawable background = DrawableCompat.wrap(view.getBackground());
-        if (background == null) return;
         DrawableCompat.setTint(background.mutate(), color);
         Utils.setBackground(view, background);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initHandleMovement() {
-        handle.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                requestDisallowInterceptTouchEvent(true);
-                if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
-                    if (titleProvider != null && event.getAction() == MotionEvent.ACTION_DOWN)
-                        viewProvider.onHandleGrabbed();
-                    manuallyChangingPosition = true;
-                    float relativePos = getRelativeTouchPosition(event);
-                    setScrollerPosition(relativePos);
-                    setRecyclerViewPosition(relativePos);
-                    return true;
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    manuallyChangingPosition = false;
-                    if (titleProvider != null) viewProvider.onHandleReleased();
-                    return true;
-                }
-                return false;
+        handle.setOnTouchListener((v, event) -> {
+            requestDisallowInterceptTouchEvent(true);
+            if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
+                if (titleProvider != null && event.getAction() == MotionEvent.ACTION_DOWN)
+                    viewProvider.onHandleGrabbed();
+                manuallyChangingPosition = true;
+                float relativePos = getRelativeTouchPosition(event);
+                setScrollerPosition(relativePos);
+                setRecyclerViewPosition(relativePos);
+                hideFabButton();
+                return true;
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                manuallyChangingPosition = false;
+                if (titleProvider != null) viewProvider.onHandleReleased();
+                showFabButton();
+                return true;
             }
+            return false;
         });
     }
 
@@ -196,11 +200,12 @@ public class FastScroller extends LinearLayout{
 
     private void setRecyclerViewPosition(float relativePos) {
         if (recyclerView == null) return;
+        if (recyclerView.getAdapter() == null) return;
         int itemCount = recyclerView.getAdapter().getItemCount();
-        int targetPos = (int) Utils.getValueInRange(0, itemCount - 1, (int)(relativePos * (float)itemCount));
+        int targetPos = (int) Utils.getValueInRange(0, itemCount - 1, (int) (relativePos * (float) itemCount));
         recyclerView.scrollToPosition(targetPos);
-        if (titleProvider != null && bubbleTextView != null){
-            if(titleProvider.getSectionTitle(targetPos) != null){
+        if (titleProvider != null && bubbleTextView != null) {
+            if (titleProvider.getSectionTitle(targetPos) != null) {
                 bubbleTextView.setText(titleProvider.getSectionTitle(targetPos));
             }
         }
@@ -210,7 +215,7 @@ public class FastScroller extends LinearLayout{
     void setScrollerPosition(float relativePos) {
 
         if (isVertical()) {
-            bubble.setY(Utils.getValueInRange(0, getHeight() - bubble.getHeight(), relativePos * (getHeight() - handle.getHeight())+ bubbleOffset));
+            bubble.setY(Utils.getValueInRange(0, getHeight() - bubble.getHeight(), relativePos * (getHeight() - handle.getHeight()) + bubbleOffset));
             handle.setY(Utils.getValueInRange(0, getHeight() - handle.getHeight(), relativePos * (getHeight() - handle.getHeight())));
         } else {
             bubble.setX(Utils.getValueInRange(0, getWidth() - bubble.getWidth(), relativePos * (getWidth() - handle.getWidth()) + bubbleOffset));
@@ -228,5 +233,19 @@ public class FastScroller extends LinearLayout{
 
     ScrollerViewProvider getViewProvider() {
         return viewProvider;
+    }
+
+    /**
+     * Restore FAB when the scroller disappeared / user stop scrolling.
+     */
+    public void showFabButton() {
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).post(true);
+    }
+
+    /**
+     * Hide FAB when the user is scrolling scroller
+     */
+    public void hideFabButton() {
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).post(false);
     }
 }

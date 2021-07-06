@@ -476,6 +476,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
 	private List<MegaSku> mSkuDetailsList;
+	private Observer<Boolean> fabChangeObserver  = isShow -> {
+		if(isShow){
+			showFabButton();
+		} else {
+			hideFabButton();
+		}
+	};
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
@@ -3298,6 +3305,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (miniAudioPlayerController != null) {
 			miniAudioPlayerController.onResume();
 		}
+
+		LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -4176,6 +4185,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		logDebug("onPause");
     	managerActivity = null;
     	MegaApplication.getTransfersManagement().setIsOnTransfersSection(false);
+		LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
     	super.onPause();
     }
 
