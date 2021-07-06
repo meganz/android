@@ -201,18 +201,22 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun changeTitle(input: EmojiEditText) {
         val title = input.text.toString()
-        if (title == "" || title.isEmpty() || title.trim { it <= ' ' }.isEmpty()) {
-            LogUtil.logWarning("Input is empty")
-            input.error = StringResourcesUtils.getString(R.string.invalid_string)
-            input.requestFocus()
-        } else if (!ChatUtil.isAllowedTitle(title)) {
-            LogUtil.logWarning("Title is too long")
-            input.error = StringResourcesUtils.getString(R.string.title_long)
-            input.requestFocus()
-        } else {
-            LogUtil.logDebug("Positive button pressed - change title")
-            inMeetingViewModel.setTitleChat(title)
-            changeTitleDialog?.dismiss()
+        when {
+            TextUtil.isTextEmpty(title) -> {
+                LogUtil.logWarning("Input is empty")
+                input.error = StringResourcesUtils.getString(R.string.invalid_string)
+                input.requestFocus()
+            }
+            !ChatUtil.isAllowedTitle(title) -> {
+                LogUtil.logWarning("Title is too long")
+                input.error = StringResourcesUtils.getString(R.string.title_long)
+                input.requestFocus()
+            }
+            else -> {
+                LogUtil.logDebug("Positive button pressed - change title")
+                inMeetingViewModel.setTitleChat(title)
+                changeTitleDialog?.dismiss()
+            }
         }
     }
 
