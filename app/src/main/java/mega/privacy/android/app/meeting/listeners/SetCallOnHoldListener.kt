@@ -26,6 +26,13 @@ class SetCallOnHoldListener(context: Context?) : ChatBaseListener(context) {
 
     constructor(
         context: Context?,
+        callback: OnCallOnHoldCallback
+    ) : this(context) {
+        this.callback = callback
+    }
+
+    constructor(
+        context: Context?,
         snackbarShower: SnackbarShower,
         callback: OnCallOnHoldCallback
     ) : this(context) {
@@ -38,17 +45,22 @@ class SetCallOnHoldListener(context: Context?) : ChatBaseListener(context) {
             return
         }
 
-        if (e.errorCode == MegaError.API_OK) {
-            LogUtil.logDebug("Call on hold")
-            callback?.onCallOnHold(request.chatHandle, request.flag)
-        } else {
-            if (e.errorCode == MegaChatError.ERROR_NOENT) {
-                LogUtil.logWarning("Error. No calls in this chat " + e.errorString+", error code "+e.errorCode)
-            } else if (e.errorCode == MegaChatError.ERROR_ACCESS) {
-                LogUtil.logWarning("Error. The call is not in progress " + e.errorString+", error code "+e.errorCode)
+        when (e.errorCode) {
+            MegaError.API_OK -> {
+                LogUtil.logDebug("Call on hold")
+                callback?.onCallOnHold(request.chatHandle, request.flag)
+            }
+            MegaChatError.ERROR_NOENT -> {
+                LogUtil.logWarning("Error. No calls in this chat " + e.errorString + ", error code " + e.errorCode)
+
+            }
+            MegaChatError.ERROR_ACCESS -> {
+                LogUtil.logWarning("Error. The call is not in progress " + e.errorString + ", error code " + e.errorCode)
                 snackbarShower?.showSnackbar(StringResourcesUtils.getString(R.string.call_error_call_on_hold))
-            } else if (e.errorCode == MegaChatError.ERROR_ARGS) {
-                LogUtil.logWarning("Error. The call was already in that state " + e.errorString+", error code "+e.errorCode)
+            }
+            MegaChatError.ERROR_ARGS -> {
+                LogUtil.logWarning("Error. The call was already in that state " + e.errorString + ", error code " + e.errorCode)
+
             }
         }
     }

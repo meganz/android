@@ -105,6 +105,13 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_PROXIMITY_SENSOR_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache;
@@ -1939,7 +1946,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			hashOpeningMeetingLink.put(chatId, isOpeningMeetingLink);
 		}
 	}
-
 
 	public static boolean isRequestSent(long callId) {
 		boolean entryExists = hashMapOutgoingCall.containsKey(callId);

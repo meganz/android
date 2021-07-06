@@ -16,9 +16,9 @@ import kotlinx.android.synthetic.main.activity_meeting.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.fragments.*
-import mega.privacy.android.app.utils.Constants.EVENT_ENTER_IN_MEETING
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 // FIXME: Keep Meeting Activity from implementing this and that listeners

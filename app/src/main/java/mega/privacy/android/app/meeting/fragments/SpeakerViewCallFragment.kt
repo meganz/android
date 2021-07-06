@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.android.synthetic.main.speaker_view_call_fragment.*
 import mega.privacy.android.app.components.RoundedImageView
+import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AUDIO_LEVEL_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.databinding.SpeakerViewCallFragmentBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
@@ -144,10 +146,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
     private fun initLiveEventBus() {
         @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(Constants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
+        LiveEventBus.get(EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
             .observeSticky(this, remoteAudioLevelObserver as Observer<Any>)
 
-        LiveEventBus.get(Constants.EVENT_LOCAL_AUDIO_LEVEL_CHANGE, MegaChatCall::class.java)
+        LiveEventBus.get(EVENT_LOCAL_AUDIO_LEVEL_CHANGE, MegaChatCall::class.java)
             .observeSticky(this, localAudioLevelObserver)
     }
 
@@ -170,9 +172,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 }
 
                 if (speakerUser != null && speakerUser!!.peerId == participantClicked.peerId && speakerUser!!.clientId == participantClicked.clientId) {
-                    if(participantClicked.clientId == MEGACHAT_INVALID_HANDLE){
+                    if (participantClicked.clientId == MEGACHAT_INVALID_HANDLE) {
                         logDebug("Same participant(Me), clientId ${speakerUser!!.clientId}")
-                    }else{
+                    } else {
                         logDebug("Same participant, clientId ${speakerUser!!.clientId}")
                         adapter.updatePeerSelected(speakerUser!!)
                     }
@@ -228,6 +230,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
     /**
      * Method that updates the number of participants visible on the recyclerview
+     *
+     * @param list list of participants
      */
     private fun updateVisibleParticipantsSpeakerView(list: List<Participant>) =
         inMeetingViewModel.updateVisibleParticipants(list)
@@ -235,12 +239,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Method for selecting a new speaker
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a new speaker
+     * @param clientId Client ID of a speaker
      */
     private fun selectSpeaker(peerId: Long, clientId: Long) {
         logDebug("Selected new speaker with clientId $clientId")
-        if(clientId == MEGACHAT_INVALID_HANDLE){
+        if (clientId == MEGACHAT_INVALID_HANDLE) {
             inMeetingViewModel.assignMeAsSpeaker()
         }
         val listParticipants = inMeetingViewModel.updatePeerSelected(peerId, clientId)
@@ -254,7 +258,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Monitor changes when updating the speaker participant
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun updateSpeakerUser(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -275,7 +279,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Check if mute icon should be visible
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun updateAudioIcon(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -287,7 +291,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Show UI when video is off
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun videoOffUI(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -301,7 +305,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Method to show the Avatar
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun showAvatar(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -310,18 +314,20 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         speakerAvatar.isVisible = true
     }
 
-    private fun isSpeakerInvalid(toCheck: Participant): Boolean {
-        if (speakerUser != null) {
-            return toCheck.peerId != speakerUser!!.peerId || toCheck.clientId != speakerUser!!.clientId
-        }
-
-        return true
-    }
+    /**
+     * Method to compare a participant with the current speaker
+     *
+     * @param toCheck Participant to compare
+     * @return True, if different participant. False, if it is the same
+     */
+    private fun isSpeakerInvalid(toCheck: Participant): Boolean =
+        if (speakerUser == null) true
+        else toCheck.peerId != speakerUser!!.peerId || toCheck.clientId != speakerUser!!.clientId
 
     /**
      * Method to close Video
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun closeVideo(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -356,7 +362,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Method to close local video
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun closeLocalVideo(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -371,7 +377,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Method to control the Call/Session on hold icon visibility
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun checkOnHold(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -407,7 +413,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Control when a change is received in the video flag
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun checkVideoOn(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -430,7 +436,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Show UI when video is on
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun videoOnUI(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -443,7 +449,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Method to hide the Avatar
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun hideAvatar(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -457,7 +463,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Method for activating the video
      *
-     * @param speaker
+     * @param speaker The current participant selected as speaker
      */
     private fun activateVideo(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
@@ -529,13 +535,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             logDebug("List updated " + adapter.currentList.size)
             if (isAdded) {
                 logDebug("Participant added in $position")
-                when (position) {
-                    0 -> {
-                        adapter.notifyDataSetChanged()
-                    }
-                    else -> {
-                        adapter.notifyItemInserted(position)
-                    }
+                if (position == 0) {
+                    adapter.notifyDataSetChanged()
+                } else {
+                    adapter.notifyItemInserted(position)
                 }
             } else {
                 logDebug("Participant Removed in $position")
@@ -565,8 +568,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Check changes in resolution
      *
-     * @param isHiRes
-     * @param session MegaChatSession
+     * @param isHiRes True, if it has high resolution. False, if low resolution
+     * @param session MegaChatSession of a participant
      */
     fun updateRemoteResolutionOfSpeaker(isHiRes: Boolean, session: MegaChatSession) {
         if (!isHiRes) {
@@ -588,7 +591,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * Check changes in remote A/V flags
      *
      * @param type type of change, Audio or Video
-     * @param session MegaChatSession
+     * @param session MegaChatSession of a participant
      */
     fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
         //Speaker
@@ -628,15 +631,12 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     fun updateCallOnHold(isCallOnHold: Boolean) {
         //Speaker
         speakerUser?.let { speaker ->
-            when {
-                isCallOnHold -> {
-                    logDebug("Speaker call is on hold")
-                    videoOffUI(speaker)
-                }
-                else -> {
-                    logDebug("Speaker call is in progress")
-                    checkVideoOn(speaker)
-                }
+            if (isCallOnHold) {
+                logDebug("Speaker call is on hold")
+                videoOffUI(speaker)
+            } else {
+                logDebug("Speaker call is in progress")
+                checkVideoOn(speaker)
             }
         }
 
@@ -651,21 +651,18 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Check changes session on hold
      *
-     * @param session MegaChatSession
+     * @param session MegaChatSession of a participant
      */
     fun updateSessionOnHold(session: MegaChatSession) {
         //Speaker
         speakerUser?.let {
             if (it.peerId == session.peerid && it.clientId == session.clientid) {
-                when {
-                    session.isOnHold -> {
-                        logDebug("Speaker session is on hold")
-                        videoOffUI(it)
-                    }
-                    else -> {
-                        logDebug("Speaker session is in progress")
-                        checkVideoOn(it)
-                    }
+                if (session.isOnHold) {
+                    logDebug("Speaker session is on hold")
+                    videoOffUI(it)
+                } else {
+                    logDebug("Speaker session is in progress")
+                    checkVideoOn(it)
                 }
             }
         }
@@ -727,8 +724,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     /**
      * Method for resizing the listener
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      */
     override fun resetSize(peerId: Long, clientId: Long) {
         inMeetingViewModel.getParticipant(

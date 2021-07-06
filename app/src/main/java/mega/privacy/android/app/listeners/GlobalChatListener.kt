@@ -9,6 +9,8 @@ import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApi.INIT_ONLINE_SESSION
 import android.util.Pair
+import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
+import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 
 class GlobalChatListener(private val application: MegaApplication) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {

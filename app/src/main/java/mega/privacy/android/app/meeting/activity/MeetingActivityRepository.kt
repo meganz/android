@@ -128,7 +128,7 @@ class MeetingActivityRepository @Inject constructor(
     /**
      * Method of obtaining the local video
      *
-     * @param chatId chatId
+     * @param chatId Chat ID
      * @param listener MeetingVideoListener
      */
     fun addLocalVideo(chatId: Long, listener: MeetingVideoListener) {
@@ -139,7 +139,7 @@ class MeetingActivityRepository @Inject constructor(
     /**
      * Method of remove the local video
      *
-     * @param chatId chatId
+     * @param chatId Chat ID
      * @param listener MeetingVideoListener
      */
     fun removeLocalVideo(chatId: Long, listener: MeetingVideoListener) {

@@ -34,12 +34,6 @@ open class MeetingBaseFragment : BaseFragment() {
 
     protected lateinit var permissionsRequester: PermissionsRequester
 
-    // The name of the preference to retrieve.
-    protected val KEY_SHOW_EDUCATION = "show_education"
-
-    // SharedPreference file name
-    protected val MEETINGS_PREFERENCE = "meeting_prefrence"
-
     protected val sharedModel: MeetingActivityViewModel by activityViewModels()
 
     // Indicate if permission has been requested. After requested, we should check "shouldShowRequestPermissionRationaleSnackBar"
@@ -229,7 +223,6 @@ open class MeetingBaseFragment : BaseFragment() {
      *
      * @param permissions Array of permissions
      * @param showSnackbar a callback that display SnackBar, notify the client to manually open the permission in system setting, This only needed when {bRequested} is true
-     *
      */
     protected fun checkMeetingPermissions(
         permissions: Array<String>,
@@ -314,7 +307,6 @@ open class MeetingBaseFragment : BaseFragment() {
      * Update the permission state of ViewModel,
      *
      * @param permission One or more permission strings.
-     *
      */
     private fun refreshPermissions(permission: Array<String>) {
         if (bRefreshPermission) {
@@ -358,5 +350,13 @@ open class MeetingBaseFragment : BaseFragment() {
             }
             i++
         }
+    }
+
+    companion object {
+        // The name of the preference to retrieve.
+        protected const val KEY_SHOW_EDUCATION = "show_education"
+
+        // SharedPreference file name
+        protected const val MEETINGS_PREFERENCE = "meeting_prefrence"
     }
 }

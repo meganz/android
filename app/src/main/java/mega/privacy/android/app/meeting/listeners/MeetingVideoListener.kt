@@ -12,6 +12,7 @@ import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatVideoListenerInterface
 import java.nio.ByteBuffer
+import kotlin.math.min
 
 /**
  * A listener for metadata corresponding to video being rendered.
@@ -49,11 +50,8 @@ class MeetingVideoListener(
             return
         }
 
-        /**
-         * viewWidth != surfaceView.width || viewHeight != surfaceView.height
-         * Re-calculate the camera preview ratio when surface view size changed
-         */
-
+        // viewWidth != surfaceView.width || viewHeight != surfaceView.height
+        // Re-calculate the camera preview ratio when surface view size changed
         if (this.width != width || this.height != height
             || viewWidth != surfaceView.width || viewHeight != surfaceView.height) {
             this.width = width
@@ -64,13 +62,16 @@ class MeetingVideoListener(
                 val viewHeight = surfaceView.height
 
                 if (viewWidth != 0 && viewHeight != 0) {
-                    var holderWidth = Math.min(viewWidth, width)
+                    var holderWidth = min(viewWidth, width)
                     var holderHeight = holderWidth * viewHeight / viewWidth
+
                     if (holderHeight > viewHeight) {
                         holderHeight = viewHeight
                         holderWidth = holderHeight * viewWidth / viewHeight
                     }
+
                     bitmap = renderer.createBitmap(width, height)
+
                    if(!isLocal){
                        holder.setFixedSize(holderWidth, holderHeight)
                    }
@@ -92,16 +93,11 @@ class MeetingVideoListener(
     init {
         isLocal = clientId == MEGACHAT_INVALID_HANDLE
 
-        if (isFloatingWindow && isLocal) {
-            this.surfaceView.setZOrderOnTop(true)
-        } else if (!isFloatingWindow) {
-            if (!isLocal) {
-                this.surfaceView.setZOrderOnTop(false)
-            }
-        }
 
-        if(!isOneToOneCall){
+        if ((isFloatingWindow && isLocal) || !isOneToOneCall) {
             this.surfaceView.setZOrderOnTop(true)
+        } else if (!isFloatingWindow && !isLocal) {
+            this.surfaceView.setZOrderOnTop(false)
         }
 
         surfaceHolder = surfaceView.holder

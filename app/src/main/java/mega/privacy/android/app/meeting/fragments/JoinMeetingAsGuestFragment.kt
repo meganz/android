@@ -45,6 +45,9 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
         findNavController().navigate(action)
     }
 
+    /**
+     * Method for releasing the video and hiding the keyboard
+     */
     fun releaseVideoAndHideKeyboard() {
         Util.hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
         releaseVideoDeviceAndRemoveChatVideoListener()

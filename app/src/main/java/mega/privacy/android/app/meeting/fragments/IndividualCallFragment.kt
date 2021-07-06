@@ -18,6 +18,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.individual_call_fragment.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.RoundedImageView
+import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AVFLAGS_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
@@ -143,16 +147,16 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     private fun initLiveEventBus() {
-        LiveEventBus.get(Constants.EVENT_LOCAL_AVFLAGS_CHANGE, MegaChatCall::class.java)
+        LiveEventBus.get(EVENT_LOCAL_AVFLAGS_CHANGE, MegaChatCall::class.java)
             .observeSticky(this, localAVFlagsObserver)
 
-        LiveEventBus.get(Constants.EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
+        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
             .observeSticky(this, callOnHoldObserver)
         @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(Constants.EVENT_REMOTE_AVFLAGS_CHANGE)
+        LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE)
             .observeSticky(this, remoteAVFlagsObserver as Observer<Any>)
         @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(Constants.EVENT_SESSION_ON_HOLD_CHANGE)
+        LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
             .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
     }
 

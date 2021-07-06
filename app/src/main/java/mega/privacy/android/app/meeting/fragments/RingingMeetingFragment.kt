@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -18,10 +19,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_ringing_fragment.*
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnSwipeTouchListener
 import mega.privacy.android.app.components.twemoji.EmojiTextView
+import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT
+import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.databinding.MeetingRingingFragmentBinding
 import mega.privacy.android.app.meeting.AnimationTool.clearAnimationAndGone
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -48,7 +50,8 @@ import java.util.*
 
 
 @AndroidEntryPoint
-class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnCallAnsweredCallback {
+class RingingMeetingFragment : MeetingBaseFragment(),
+    AnswerChatCallListener.OnCallAnsweredCallback {
 
     private val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
@@ -95,6 +98,7 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
     /**
      * Initialize components of UI
      */
+    @SuppressLint("ClickableViewAccessibility")
     private fun initComponent() {
 
         // Always be 'calling'.
@@ -109,7 +113,7 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
         binding.answerAudioFab.setOnClickListener {
             inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
 
-            answerCall(enableVideo = false, enableAudio = true)
+            answerCall(enableVideo = false)
         }
 
         binding.answerVideoFab.setOnTouchListener(object : OnSwipeTouchListener(meetingActivity) {
@@ -161,7 +165,7 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
                     binding.answerVideoFab.hide()
                     inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
 
-                    answerCall(enableVideo = true, enableAudio = true)
+                    answerCall(enableVideo = true)
                 }
             })
         }
@@ -186,11 +190,16 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
         binding.fourthArrowCall.clearAnimationAndGone()
     }
 
-    private fun answerCall(enableVideo: Boolean, enableAudio: Boolean) {
+    /**
+     * Method to answer the call with audio enabled
+     *
+     * @param enableVideo True, if it should be answered with video on. False, if it should be answered with video off
+     */
+    private fun answerCall(enableVideo: Boolean) {
         inMeetingViewModel.getCall()?.let {
             inMeetingViewModel.answerChatCall(
                 enableVideo,
-                enableAudio,
+                true,
                 AnswerChatCallListener(requireContext(), this)
             )
         }
@@ -245,7 +254,7 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
             avatar.setImageBitmap(bitmap)
         }
 
-        LiveEventBus.get(Constants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
+        LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
             .observe(this) {
                 if (chatId == it) {
                     requireActivity().finish()
@@ -253,7 +262,7 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
             }
 
         // Caller cancelled the call.
-        LiveEventBus.get(Constants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
+        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observeSticky(this) {
                 if (it.status == MegaChatCall.CALL_STATUS_DESTROYED) {
                     requireActivity().finish()
@@ -291,7 +300,6 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
         }
     }
 
-    //TODO start: copy from AbstractMeetingOnBoardingFragment
     override fun onAttach(context: Context) {
         super.onAttach(context)
         permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
@@ -304,11 +312,7 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
     }
 
     private fun showSnackBar(message: String) =
-        (activity as BaseActivity).showSnackbar(
-            Constants.SNACKBAR_TYPE,
-            binding.root,
-            message
-        )
+        (activity as BaseActivity).showSnackbar(binding.root, message)
 
     private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
         permissions.forEach {
@@ -336,7 +340,6 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
         RunOnUIThreadUtils.stop()
         super.onDestroy()
     }
-    //TODO end
 
     companion object {
 
@@ -362,12 +365,11 @@ class RingingMeetingFragment : MeetingBaseFragment(), AnswerChatCallListener.OnC
     }
 
     override fun onErrorAnsweredCall(errorCode: Int) {
-        if (errorCode == MegaChatError.ERROR_TOOMANY) {
-            showSnackBar(
-                StringResourcesUtils.getString(R.string.call_error_too_many_participants)
+        showSnackBar(
+            StringResourcesUtils.getString(
+                if (errorCode == MegaChatError.ERROR_TOOMANY) R.string.call_error_too_many_participants
+                else R.string.call_error
             )
-        } else {
-            showSnackBar(StringResourcesUtils.getString(R.string.call_error))
-        }
+        )
     }
 }

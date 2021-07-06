@@ -46,6 +46,8 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     private int surfaceWidth = 0;
     private int surfaceHeight = 0;
     private static int CORNER_RADIUS = 20;
+    private static int VISIBLE = 255;
+
     // the bitmap used for drawing.
     private Bitmap bitmap = null;
     private ByteBuffer byteBuffer = null;
@@ -62,7 +64,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     private TextureView myTexture = null;
     protected List<MegaSurfaceRendererListener> listeners;
 
-    private int alpha = 255;
+    private int alpha = VISIBLE;
 
     public void setAlpha(int alpha) {
         this.alpha = alpha;

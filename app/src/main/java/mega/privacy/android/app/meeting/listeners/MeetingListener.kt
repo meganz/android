@@ -2,9 +2,24 @@ package mega.privacy.android.app.meeting.listeners
 
 import android.util.Pair
 import com.jeremyliao.liveeventbus.LiveEventBus
+import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_SPEAK_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AUDIO_LEVEL_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AVFLAGS_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_LOWRES_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_SPEAK_REQUESTED
+import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.utils.CallUtil.callStatusToString
 import mega.privacy.android.app.utils.CallUtil.sessionStatusToString
-import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import nz.mega.sdk.MegaChatApiJava

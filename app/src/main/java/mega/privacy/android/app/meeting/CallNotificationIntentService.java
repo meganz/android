@@ -14,6 +14,7 @@ import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
@@ -24,8 +25,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class CallNotificationIntentService extends IntentService implements SnackbarShower,
-        HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback, SetCallOnHoldListener.OnCallOnHoldCallback {
+public class CallNotificationIntentService extends IntentService implements HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback, SetCallOnHoldListener.OnCallOnHoldCallback {
 
     public static final String ANSWER = "ANSWER";
     public static final String DECLINE = "DECLINE";
@@ -125,7 +125,7 @@ public class CallNotificationIntentService extends IntentService implements Snac
                     megaChatApi.answerChatCall(chatIdIncomingCall, false, true, new AnswerChatCallListener(this, this));
                 } else {
                     logDebug("Putting the current call on hold...");
-                    megaChatApi.setCallOnHold(chatIdCurrentCall, true, new SetCallOnHoldListener(this, this,this));
+                    megaChatApi.setCallOnHold(chatIdCurrentCall, true, new SetCallOnHoldListener(this, this));
                 }
                 break;
 
@@ -162,11 +162,9 @@ public class CallNotificationIntentService extends IntentService implements Snac
 
     @Override
     public void onErrorAnsweredCall(int errorCode) {
-        if (errorCode == MegaChatError.ERROR_TOOMANY) {
-            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error_too_many_participants), -1);
-        } else {
-            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), -1);
-        }
+        Util.showSnackbar(this, (errorCode == MegaChatError.ERROR_TOOMANY) ?
+                StringResourcesUtils.getString(R.string.call_error_too_many_participants) :
+                StringResourcesUtils.getString(R.string.call_error));
     }
 
     @Override
@@ -176,10 +174,5 @@ public class CallNotificationIntentService extends IntentService implements Snac
             addChecksForACall(chatIdIncomingCall, false);
             megaChatApi.answerChatCall(chatIdIncomingCall, false, true, new AnswerChatCallListener(this, this));
         }
-    }
-
-    @Override
-    public void showSnackbar(int type, @Nullable String content, long chatId) {
-
     }
 }

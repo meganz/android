@@ -850,36 +850,6 @@ public class Constants {
     public static final String EVENT_MEETING_CREATED = "meeting_created";
     public static final String EVENT_LINK_RECOVERED = "meeting_link_recovered";
     public static final String EVENT_CONTACT_NAME_CHANGE = "contact_name_change";
-
-    /** Event Keys related to calls*/
-    public static final String EVENT_ERROR_STARTING_CALL = "error_starting_call";
-    public static final String EVENT_UPDATE_CALL = "update_call";
-    public static final String EVENT_CALL_STATUS_CHANGE = "call_status_change";
-    public static final String EVENT_LOCAL_AVFLAGS_CHANGE = "local_avflags_change";
-    public static final String EVENT_RINGING_STATUS_CHANGE = "ringing_status_change";
-    public static final String EVENT_CALL_COMPOSITION_CHANGE = "call_composition_change";
-    public static final String EVENT_CALL_ON_HOLD_CHANGE = "call_on_hold_change";
-    public static final String EVENT_CALL_SPEAK_CHANGE = "call_speak_change";
-    public static final String EVENT_LOCAL_AUDIO_LEVEL_CHANGE = "local_audio_level_change";
-    public static final String EVENT_LOCAL_NETWORK_QUALITY_CHANGE = "local_network_quality_change";
-    public static final String EVENT_NOT_OUTGOING_CALL = "not_outgoing_call";
-    public static final String EVENT_PROXIMITY_SENSOR_CHANGE = "proximity_sensor_change";
-    public static final String EVENT_ENTER_IN_MEETING = "enter_in_meeting";
-    public static final String EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT = "call_answered_in_another_client";
-
-    /** Event Keys related to sessions*/
-    public static final String EVENT_SESSION_STATUS_CHANGE = "session_status_change";
-    public static final String EVENT_REMOTE_AVFLAGS_CHANGE = "remote_avflags_change";
-    public static final String EVENT_SESSION_SPEAK_REQUESTED = "session_speak_requested_change";
-    public static final String EVENT_SESSION_ON_HIRES_CHANGE = "session_on_hires_change";
-    public static final String EVENT_SESSION_ON_LOWRES_CHANGE = "session_on_lowres_change";
-    public static final String EVENT_REMOTE_AUDIO_LEVEL_CHANGE = "remote_audio_level_change";
-    public static final String EVENT_SESSION_ON_HOLD_CHANGE = "session_on_hold_change";
-
-    public static final String EVENT_PRIVILEGES_CHANGE = "privileges_in_char_change";
-    public static final String EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change";
-    public static final String EVENT_CHAT_CONNECTION_STATUS = "chat_connection_status_change";
-
     public static final String EVENT_PSA = "EVENT_PSA";
 
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
