@@ -300,7 +300,8 @@ class VideoMeetingViewHolder(
         } else {
             logDebug("Hide on hold icon")
             binding.onHoldIcon.isVisible = false
-            binding.avatar.alpha = if (isCallOnHold) AVATAR_WITH_TRANSPARENCY else AVATAR_VIDEO_VISIBLE
+            binding.avatar.alpha =
+                if (isCallOnHold) AVATAR_WITH_TRANSPARENCY else AVATAR_VIDEO_VISIBLE
         }
     }
 
@@ -460,41 +461,47 @@ class VideoMeetingViewHolder(
         val layoutParams: GridLayoutManager.LayoutParams =
             binding.root.layoutParams as GridLayoutManager.LayoutParams
 
+        var marginLeft = 0
+        val marginTop = 0
+        var marginRight = 0
+        var marginBottom = 0
+
         if (isFirstPage) {
             when (itemCount) {
-                1 -> {
-                    w = screenWidth / 2
+                SLOT_NUM_1 -> {
+                    w = screenWidth / TWO_COLUMNS
                     h = screenHeight
-                    layoutParams.setMargins(w / 2, 0, w / 2, 0)
+                    marginLeft = w / 2
+                    marginRight = marginLeft
                 }
-                2 -> {
-                    w = screenWidth / 2
+                SLOT_NUM_2 -> {
+                    w = screenWidth / TWO_COLUMNS
                     h = screenHeight
-                    layoutParams.setMargins(0, 0, 0, 0)
                 }
-                3 -> {
-                    w = (screenWidth / 3)
+                SLOT_NUM_3 -> {
+                    w = (screenWidth / THREE_COLUMNS)
                     h = (screenHeight * 0.6).toInt()
-                    layoutParams.setMargins(0, 0, 0, screenHeight - h)
+                    marginBottom = screenHeight - h
                 }
-                5 -> {
-                    w = screenWidth / 4
-                    h = screenHeight / 2
+                SLOT_NUM_5 -> {
+                    w = screenWidth / FOUR_COLUMNS
+                    h = screenHeight / TWO_FILES
 
                     when (adapterPosition) {
-                        3, 4 -> layoutParams.setMargins(w / 2, 0, 0, 0)
+                        POSITION_3, POSITION_4 -> marginLeft = w / 2
                     }
                 }
-                4, 6 -> {
-                    w = (screenWidth / 4)
-                    h = (screenHeight / 2)
+                SLOT_NUM_4, SLOT_NUM_6 -> {
+                    w = (screenWidth / FOUR_COLUMNS)
+                    h = (screenHeight / TWO_FILES)
                 }
             }
         } else {
-            w = (screenWidth / 4)
-            h = (screenHeight / 2)
+            w = (screenWidth / FOUR_COLUMNS)
+            h = (screenHeight / TWO_FILES)
         }
 
+        layoutParams.setMargins(marginLeft, marginTop, marginRight, marginBottom)
         layoutParams.width = w
         layoutParams.height = h
     }
@@ -514,83 +521,62 @@ class VideoMeetingViewHolder(
         val layoutParams: GridLayoutManager.LayoutParams =
             binding.root.layoutParams as GridLayoutManager.LayoutParams
 
-        val verticalMargin = ((screenHeight - screenWidth / 2 * 3) / 2)
+        var marginLeft = 0
+        var marginTop = 0
+        var marginRight = 0
+        val marginBottom = 0
 
         if (isFirstPage) {
             when (itemCount) {
-                1 -> {
+                SLOT_NUM_1 -> {
                     w = screenWidth
                     h = screenHeight
-                    layoutParams.setMargins(0, 0, 0, 0)
                 }
-                2 -> {
+                SLOT_NUM_2 -> {
                     w = screenWidth
-                    h = screenHeight / 2
-                    layoutParams.setMargins(0, 0, 0, 0)
+                    h = screenHeight / TWO_FILES
                 }
-                3 -> {
+                SLOT_NUM_3 -> {
                     w = (screenWidth * 0.8).toInt()
-                    h = screenHeight / 3
-                    layoutParams.setMargins((screenWidth - w) / 2, 0, (screenWidth - w) / 2, 0)
+                    h = screenHeight / THREE_FILES
+                    marginLeft = (screenWidth - w) / 2
+                    marginRight = marginLeft
                 }
-                5 -> {
-                    w = screenWidth / 2
+                SLOT_NUM_5 -> {
+                    w = screenWidth / TWO_COLUMNS
                     h = w
 
                     when (adapterPosition) {
-                        0, 1 -> {
-                            layoutParams.setMargins(0, verticalMargin, 0, 0)
-                        }
-                        4 -> {
-                            layoutParams.setMargins(
-                                (screenWidth - w) / 2,
-                                0,
-                                (screenWidth - w) / 2,
-                                0
-                            )
-                        }
-                        else -> {
-                            layoutParams.setMargins(0, 0, 0, 0)
+                        POSITION_0, POSITION_1 -> marginTop =
+                            ((screenHeight - screenWidth / 2 * 3) / 2)
+                        POSITION_4 -> {
+                            marginLeft = (screenWidth - w) / 2
+                            marginRight = marginLeft
                         }
                     }
                 }
-                4, 6 -> {
-                    val pair = layout46(layoutParams, verticalMargin)
-                    h = pair.first
-                    w = pair.second
+                SLOT_NUM_4, SLOT_NUM_6 -> {
+                    w = screenWidth / TWO_COLUMNS
+                    h = w
+
+                    when (adapterPosition) {
+                        POSITION_0, POSITION_1 -> marginTop =
+                            ((screenHeight - screenWidth / 2 * 3) / 2)
+                    }
                 }
             }
         } else {
-            val pair = layout46(layoutParams, verticalMargin)
-            h = pair.first
-            w = pair.second
+            w = screenWidth / TWO_COLUMNS
+            h = w
+
+            when (adapterPosition) {
+                POSITION_0, POSITION_1 -> marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
+            }
         }
 
+        layoutParams.setMargins(marginLeft, marginTop, marginRight, marginBottom)
         layoutParams.width = w
         layoutParams.height = h
-    }
-
-    /**
-     * Method for check margins for 4 or 6 participants
-     *
-     * @param layoutParams the params of the layout
-     * @param verticalMargin value of vertical margin
-     * @return width and height
-     */
-    private fun layout46(
-        layoutParams: GridLayoutManager.LayoutParams,
-        verticalMargin: Int
-    ): Pair<Int, Int> {
-        val w = screenWidth / 2
-        when (adapterPosition) {
-            0, 1 -> {
-                layoutParams.setMargins(0, verticalMargin, 0, 0)
-            }
-            else -> {
-                layoutParams.setMargins(0, 0, 0, 0)
-            }
-        }
-        return Pair(w, w)
     }
 
     /**
@@ -630,5 +616,20 @@ class VideoMeetingViewHolder(
         const val PADDING = 1f
         const val ROTATION = 0f
 
+        const val TWO_COLUMNS = 2
+        const val TWO_FILES = 2
+        const val THREE_COLUMNS = 3
+        const val THREE_FILES = 3
+        const val FOUR_COLUMNS = 3
+        const val SLOT_NUM_1 = 1
+        const val SLOT_NUM_2 = 2
+        const val SLOT_NUM_3 = 3
+        const val SLOT_NUM_4 = 4
+        const val SLOT_NUM_5 = 5
+        const val SLOT_NUM_6 = 6
+        const val POSITION_0 = 0
+        const val POSITION_1 = 1
+        const val POSITION_3 = 3
+        const val POSITION_4 = 4
     }
 }

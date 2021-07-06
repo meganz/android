@@ -3,7 +3,6 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Point
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
@@ -33,7 +32,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-
 
 /**
  * The abstract class of Join/JoinAsGuest/Create Meeting Fragments
@@ -123,7 +121,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             args.getString(MeetingActivity.MEETING_LINK)?.let {
                 meetingLink = it
             }
-            args.getLong(MeetingActivity.MEETING_CHAT_ID)?.let {
+            args.getLong(MeetingActivity.MEETING_CHAT_ID).let {
                 chatId = it
                 sharedModel.updateChatRoomId(chatId)
             }
@@ -288,24 +286,16 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     }
 
     private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.RECORD_AUDIO -> {
-                    showSnackBar()
-                }
-            }
+        if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
+            logDebug("user denies the RECORD_AUDIO permission")
+            showSnackBar()
         }
     }
 
     private fun onCameraNeverAskAgain(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    showSnackBar()
-                }
-            }
+        if (permissions.contains(Manifest.permission.CAMERA)) {
+            logDebug("user denies the CAMERA permission")
+            showSnackBar()
         }
     }
 
@@ -334,6 +324,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         var xOffset = 0
         var yOffset = 0
         val gvr = Rect()
+
         if (v.getGlobalVisibleRect(gvr)) {
             val root = v.rootView
             val halfWidth = root.right / 2
@@ -352,6 +343,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 xOffset = parentCenterX - halfWidth
             }
         }
+
         toast?.cancel()
         toast = Toast.makeText(requireContext(), message, duration)
         toast?.let {
@@ -385,44 +377,43 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     fun switchCamera(shouldVideoBeEnabled: Boolean) {
         fab_cam.isOn = shouldVideoBeEnabled
         setViewEnable(fab_cam, false)
-        when (shouldVideoBeEnabled) {
-            true -> {
-                // Always try to start the video using the front camera
-                mask.visibility = View.VISIBLE
-                bCameraOpen = true
-                sharedModel.setChatVideoInDevice(null)
 
-                // Hide avatar when camera open
-                triggerAvatar(View.GONE)
-                activateVideo()
-            }
-            false -> {
-                mask.visibility = View.GONE
-                bCameraOpen = false
+        if(shouldVideoBeEnabled){
+            // Always try to start the video using the front camera
+            mask.visibility = View.VISIBLE
+            bCameraOpen = true
+            sharedModel.setChatVideoInDevice(null)
 
-                // Show avatar when camera close
-                triggerAvatar(View.VISIBLE)
-                deactivateVideo()
-            }
+            // Hide avatar when camera open
+            triggerAvatar(View.GONE)
+            activateVideo()
+        }else{
+            mask.visibility = View.GONE
+            bCameraOpen = false
+
+            // Show avatar when camera close
+            triggerAvatar(View.VISIBLE)
+            deactivateVideo()
         }
     }
 
-    private fun triggerAvatar(visivility: Int) {
+    private fun triggerAvatar(visibility: Int) {
         logDebug("triggerAvatar bCameraOpen: $bCameraOpen & bKeyBoardExtend: $bKeyBoardExtend")
         if (bCameraOpen) {
             if (meeting_thumbnail.visibility == View.GONE)
                 return
+
             meeting_thumbnail.visibility = View.GONE
+        } else if (!bKeyBoardExtend) {
+            if (meeting_thumbnail.visibility == View.VISIBLE)
+                return
+
+            meeting_thumbnail.visibility = View.VISIBLE
         } else {
-            if (!bKeyBoardExtend) {
-                if (meeting_thumbnail.visibility == View.VISIBLE)
-                    return
-                meeting_thumbnail.visibility = View.VISIBLE
-            } else {
-                if (meeting_thumbnail.visibility == visivility)
-                    return
-                meeting_thumbnail.visibility = visivility
-            }
+            if (meeting_thumbnail.visibility == visibility)
+                return
+
+            meeting_thumbnail.visibility = visibility
         }
     }
 
@@ -435,6 +426,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             setViewEnable(fab_cam, true)
             return
         }
+
         if (videoListener == null) {
             videoListener = MeetingVideoListener(
                 localSurfaceView,
@@ -451,6 +443,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 it.width = 0
             }
         }
+
         localSurfaceView.visibility = View.VISIBLE
         setViewEnable(fab_cam, true, bSync = false)
     }
@@ -515,11 +508,11 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Method for release the video device and removing the video listener.
      */
     fun releaseVideoDeviceAndRemoveChatVideoListener() {
+        removeChatVideoListener()
+
         if (sharedModel.cameraLiveData.value == true) {
             sharedModel.releaseVideoDevice()
         }
-
-        removeChatVideoListener()
     }
 
     /**

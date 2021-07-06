@@ -3941,7 +3941,7 @@
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">Keep .%1$s</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
-    <string name="banner_alone_on_the_call">You are the only one here</string>
+    <string name="banner_alone_on_the_call">You are the only participant.</string>
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Meeting</string>
     <!-- Menu option that allows the user to start/join meeting. -->
@@ -3967,17 +3967,17 @@
     <!-- General label for camera -->
     <string name="general_camera">Camera</string>
     <!-- General label for camera enable -->
-    <string name="general_camera_enable">Your camera is enabled</string>
+    <string name="general_camera_enable">Your camera is turned on.</string>
     <!-- General label for camera disable -->
-    <string name="general_camera_disable">Your camera is disabled</string>
+    <string name="general_camera_disable">Your camera is turned off.</string>
     <!-- Label for hold meeting -->
     <string name="meeting_hold">Hold</string>
     <!-- General label for speaker -->
     <string name="general_speaker">Speaker</string>
     <!-- General label for headphone-->
-    <string name="general_headphone">Headphone</string>
+    <string name="general_headphone">Headphones</string>
     <!-- General label for headphone on-->
-    <string name="general_headphone_on">Headphone is on</string>
+    <string name="general_headphone_on">Headphones are active</string>
     <!-- General label for speaker on-->
     <string name="general_speaker_on">Speaker is on</string>
     <!-- General label for speaker off-->
@@ -3985,11 +3985,11 @@
     <!-- Label for end meeting-->
     <string name="meeting_end">End</string>
     <!-- Invite contacts as participants of the meeting-->
-    <string name="invite_participants">Invite Participants</string>
+    <string name="invite_participants">Invite other participants</string>
     <!-- The number of participants in the meeting-->
     <string name="participants_number">Participants (%d)</string>
     <!-- Pin the participant to speaker view in the meeting-->
-    <string name="pin_to_speaker">Pin to Speaker View</string>
+    <string name="pin_to_speaker">Pin to speaker view</string>
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">Make moderator</string>
     <!-- The title of dialog for end meeting confirmation-->
@@ -3997,15 +3997,15 @@
     <!-- no moderator when the moderator leave meeting-->
     <string name="no_moderator">No moderator</string>
     <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Before leaving, please assign (a) new moderator(s) in order to keep the meeting structure.</string>
+    <string name="assign_moderator_message">Before leaving, please assign one or more new moderators for the meeting.</string>
     <!-- assign moderator option when the moderator leave meeting-->
     <string name="assign_moderator">Assign moderator</string>
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">Leave anyway</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Please pick one or more to be new moderator</string>
+    <string name="pick_new_moderator_message">Please assign one or more new moderators.</string>
     <!-- The title of dialog for changing meeting name-->
-    <string name="change_meeting_name">Change meeting name</string>
+    <string name="change_meeting_name">Change the meeting name</string>
     <!-- The number of participants in the meeting on meeting info page-->
     <string name="info_participants_number">Participants : %d</string>
     <!-- The name of moderators in the meeting on meeting info page-->
@@ -4017,19 +4017,19 @@
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Join meeting as guest</string>
     <!-- The title of the paste meeting link dialog for guest-->
-    <string name="paste_meeting_link_guest_dialog_title">You are invited to a meeting</string>
+    <string name="paste_meeting_link_guest_dialog_title">You are invited to a meeting.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
-    <string name="paste_meeting_link_guest_instruction">Paste your link here or click the link sent to you.</string>
+    <string name="paste_meeting_link_guest_instruction">Tap the Meeting link sent to you or paste it here</string>
     <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">You have a weak connection</string>
+    <string name="slow_connection_meeting">Your connection quality is poor.</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Meeting has ended</string>
     <!-- error message shown when a meeting link is not well formed-->
     <string name="invalid_meeting_link_args">Invalid meeting link</string>
     <!-- Warning show to the user when the app needs permissions to start a meeting.-->
-    <string name="meeting_permission_info">Please allow MEGA access permissions</string>
+    <string name="meeting_permission_info">Access permissions needed for MEGA</string>
     <!-- Message of a dialog to show user the permissions that needed-->
-    <string name="meeting_permission_info_message">For the best meeting experience, MEGA may ask you to access your microphone and camera.</string>
+    <string name="meeting_permission_info_message">Please grant MEGA access to your microphone and camera for meetings.</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">Got it</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
@@ -4043,7 +4043,7 @@
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">Quickly set up a MEGA Meeting with our new encrypted meeting feature</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">You are the new meeting moderator now!</string>
+    <string name="be_new_moderator">You are the new meeting moderator.</string>
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">Copied meeting link.</string>
     <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
