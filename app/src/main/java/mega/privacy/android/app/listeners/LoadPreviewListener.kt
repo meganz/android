@@ -39,26 +39,12 @@ class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
 
         when (type) {
             CHECK_LINK_TYPE_CHAT_LINK -> {
-                callbackChatLink?.onPreviewLoaded(
-                    api,
-                    request.chatHandle,
-                    e.errorCode,
-                    request.userHandle,
-                    request.paramType
-                )
+                callbackChatLink?.onPreviewLoaded(request, e.errorCode)
             }
             else -> {
                 if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_EEXIST) {
                     logDebug("Preview loaded")
-                    callback?.onPreviewLoaded(
-                        api,
-                        request.chatHandle,
-                        request.text,
-                        request.megaHandleList,
-                        request.paramType,
-                        request.link,
-                        request.flag
-                    )
+                    callback?.onPreviewLoaded(request)
                 } else {
                     LogUtil.logError("Error loading preview. Error code " + e.errorCode)
                     callback?.onErrorLoadingPreview(e.errorCode)
@@ -68,26 +54,12 @@ class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
     }
 
     interface OnPreviewLoadedCallback {
-        fun onPreviewLoaded(
-            api: MegaChatApiJava,
-            chatId: Long,
-            titleChat: String?,
-            handleList: MegaHandleList?,
-            paramType: Int,
-            link: String?,
-            isFromOpenChatPreview: Boolean
-        )
+        fun onPreviewLoaded(request: MegaChatRequest)
 
         fun onErrorLoadingPreview(errorCode: Int)
     }
 
     interface OnChatPreviewLoadedCallback {
-        fun onPreviewLoaded(
-            api: MegaChatApiJava,
-            chatId: Long,
-            error: Int,
-            userHandle: Long,
-            paramType: Int
-        )
+        fun onPreviewLoaded(request: MegaChatRequest, errorCode: Int)
     }
 }

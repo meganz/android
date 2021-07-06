@@ -529,18 +529,21 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	@Override
-	public void onPreviewLoaded(@NotNull MegaChatApiJava api, long chatId, String titleChat, MegaHandleList list, int paramType, String link, boolean isFromOpenChatPreview) {
-		boolean linkInvalid = TextUtil.isTextEmpty(link) && chatId == MEGACHAT_INVALID_HANDLE;
-		logDebug("Chat id: " + chatId + ", type: " + paramType + ", flag: " + isFromOpenChatPreview);
+	public void onPreviewLoaded(MegaChatRequest request) {
+		long chatId = request.getChatHandle();
+		boolean isFromOpenChatPreview = request.getFlag();
+		int type = request.getParamType();
+		boolean linkInvalid = TextUtil.isTextEmpty(request.getLink()) && chatId == MEGACHAT_INVALID_HANDLE;
+		logDebug("Chat id: " + chatId + ", type: " + type + ", flag: " + isFromOpenChatPreview);
 
 		if (linkInvalid) {
 			setError(getString(R.string.invalid_link));
 			return;
 		}
 
-		if (paramType == LINK_IS_FOR_MEETING) {
+		if (type == LINK_IS_FOR_MEETING) {
 			logDebug("It's a meeting link");
-			if (CallUtil.isMeetingEnded(list)) {
+			if (CallUtil.isMeetingEnded(request.getMegaHandleList())) {
 				logDebug("Meeting has ended, open dialog");
 				new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
 					@Override
@@ -556,10 +559,10 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 						MeetingHasEndedDialogFragment.TAG);
 			} else if (isFromOpenChatPreview) {
 				logDebug("Meeting is in progress, open join meeting");
-				goToMeetingActivity(chatId, titleChat);
+				goToMeetingActivity(chatId, request.getText());
 			} else {
 				logDebug("It's a meeting, open chat preview");
-				api.openChatPreview(url, new LoadPreviewListener(this, OpenLinkActivity.this, CHECK_LINK_TYPE_MEETING_LINK));
+				megaChatApi.openChatPreview(url, new LoadPreviewListener(this, OpenLinkActivity.this, CHECK_LINK_TYPE_MEETING_LINK));
 			}
 		} else {
 			logDebug("It's a chat link");

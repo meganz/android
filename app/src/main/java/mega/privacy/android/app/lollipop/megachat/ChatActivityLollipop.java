@@ -690,8 +690,13 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     @Override
-    public void onPreviewLoaded(@NotNull MegaChatApiJava api, long chatId, String titleChat, MegaHandleList list, int paramType, String link, boolean isFromOpenChatPreview) {
-        if (paramType == LINK_IS_FOR_MEETING) {
+    public void onPreviewLoaded(MegaChatRequest request) {
+        long chatId = request.getChatHandle();
+        boolean isFromOpenChatPreview = request.getFlag();
+        int type = request.getParamType();
+        String link = request.getLink();
+
+        if (type == LINK_IS_FOR_MEETING) {
             logDebug("It's a meeting");
             boolean linkInvalid = TextUtil.isTextEmpty(link) && chatId == MEGACHAT_INVALID_HANDLE;
             if (linkInvalid) {
@@ -699,7 +704,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 return;
             }
 
-            if (isMeetingEnded(list)) {
+            if (isMeetingEnded(request.getMegaHandleList())) {
                 logDebug("It's a meeting, open dialog: Meeting has ended");
                 new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
                     @Override
@@ -714,7 +719,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 }).show(getSupportFragmentManager(),
                         MeetingHasEndedDialogFragment.TAG);
             } else  {
-                CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, list, titleChat);
+                CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText());
             }
         } else {
             logDebug("Chat link");
@@ -726,14 +731,14 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onErrorLoadingPreview(int errorCode) { }
 
     @Override
-    public void onPreviewLoaded(@NotNull MegaChatApiJava api, long chatId, int error, long userHandle, int paramType) {
-        if (error == MegaChatError.ERROR_OK || error == MegaChatError.ERROR_EXIST) {
+    public void onPreviewLoaded(MegaChatRequest request, int errorCode) {
+        if (errorCode == MegaChatError.ERROR_OK || errorCode == MegaChatError.ERROR_EXIST) {
             if (idChat != MEGACHAT_INVALID_HANDLE && megaChatApi.getChatRoom(idChat) != null) {
                 logDebug("Close previous chat");
                 megaChatApi.closeChatRoom(idChat, ChatActivityLollipop.this);
             }
 
-            idChat = chatId;
+            idChat = request.getChatHandle();
             megaChatApi.addChatListener(ChatActivityLollipop.this);
 
             if (idChat != MEGACHAT_INVALID_HANDLE) {
@@ -744,13 +749,13 @@ public class ChatActivityLollipop extends PasscodeActivity
 
             MegaApplication.setOpenChatId(idChat);
 
-            if (error == MegaChatError.ERROR_OK && openingAndJoining) {
+            if (errorCode == MegaChatError.ERROR_OK && openingAndJoining) {
                 if (!isAlreadyJoining(idChat)) {
                     megaChatApi.autojoinPublicChat(idChat, ChatActivityLollipop.this);
                 }
 
                 openingAndJoining = false;
-            } else if (error == MegaChatError.ERROR_EXIST) {
+            } else if (errorCode == MegaChatError.ERROR_EXIST) {
                 if (megaChatApi.getChatRoom(idChat).isActive()) {
                     //I'm already participant
                     joiningOrLeaving = false;
@@ -769,8 +774,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                             adapter.notifyDataSetChanged();
                         }
                         if (!isAlreadyJoining(idChat)
-                                && !isAlreadyJoining(userHandle)) {
-                            megaChatApi.autorejoinPublicChat(idChat, userHandle, this);
+                                && !isAlreadyJoining(request.getUserHandle())) {
+                            megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
                         }
                     } else {
                         logWarning("Error opening chat before rejoin");
@@ -784,7 +789,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             supportInvalidateOptionsMenu();
         } else {
             String text;
-            if (error == MegaChatError.ERROR_NOENT) {
+            if (errorCode == MegaChatError.ERROR_NOENT) {
                 text = getString(R.string.invalid_chat_link);
             } else {
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);

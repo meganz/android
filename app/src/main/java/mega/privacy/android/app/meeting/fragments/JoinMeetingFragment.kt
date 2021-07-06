@@ -5,10 +5,10 @@ import android.view.View
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
+import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
 import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
@@ -24,7 +24,7 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
         releaseVideoDeviceAndRemoveChatVideoListener()
         val action = JoinMeetingFragmentDirections
             .actionGlobalInMeeting(
-                if (MegaApplication.getChatManagement().amIParticipatingInAChat(chatId))
+                if (amIParticipatingInAChat(chatId))
                     MEETING_ACTION_START
                 else MEETING_ACTION_JOIN, chatId, meetingName, meetingLink
             )

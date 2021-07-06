@@ -99,12 +99,9 @@ class InMeetingRepository @Inject constructor(
      * @param chatId chat ID
      * @return MegaChatCall
      */
-    fun getMeeting(chatId: Long): MegaChatCall? {
-        if (chatId == MEGACHAT_INVALID_HANDLE)
-            return null
+    fun getMeeting(chatId: Long): MegaChatCall? =
+        if (chatId == MEGACHAT_INVALID_HANDLE) null else megaChatApi.getChatCall(chatId)
 
-        return megaChatApi.getChatCall(chatId)
-    }
 
     /**
      * Method to know if it's me
@@ -138,12 +135,9 @@ class InMeetingRepository @Inject constructor(
      * @param chatId chat ID
      * @return MegaChatRoom
      */
-    fun getChatRoom(chatId: Long): MegaChatRoom? {
-        if (chatId == MEGACHAT_INVALID_HANDLE)
-            return null
+    fun getChatRoom(chatId: Long): MegaChatRoom? =
+        if (chatId == MEGACHAT_INVALID_HANDLE) null else megaChatApi.getChatRoom(chatId)
 
-        return megaChatApi.getChatRoom(chatId)
-    }
 
     /**
      * Get contact name
@@ -213,9 +207,9 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method for getting a participant's email
      *
-     * @param peerId userHandle
+     * @param peerId user handle of participant
      * @param listener MegaRequestListenerInterface
-     * @return the email
+     * @return the email of the participant
      */
     fun getEmailParticipant(peerId: Long, listener: MegaRequestListenerInterface): String? {
         val email = megaChatApi.getUserEmailFromCache(peerId)
@@ -230,9 +224,9 @@ class InMeetingRepository @Inject constructor(
     /**
      * Get the avatar
      *
-     * @param chat
-     * @param peerId
-     * @return the avatar
+     * @param chat The chat room of a meeting
+     * @param peerId user Handle of a participant
+     * @return the avatar the avatar of a participant
      */
     fun getAvatarBitmap(chat: MegaChatRoom, peerId: Long): Bitmap? {
         var avatar = CallUtil.getImageAvatarCall(chat, peerId)
@@ -249,7 +243,7 @@ class InMeetingRepository @Inject constructor(
     /**
      * Create a participant with my data
      *
-     * @param chat MegaChatRoom
+     * @param chat The chat room of a meeting
      * @return me as a participant
      */
     fun getMeToSpeakerView(chat: MegaChatRoom): Participant {
@@ -283,7 +277,7 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method to know if a user is my contact
      *
-     * @param peerId
+     * @param peerId user handle of a participant
      * @return True, if it's. False, otherwise.
      */
     fun isMyContact(peerId: Long): Boolean {
@@ -296,21 +290,18 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method to get the participant's name
      *
-     * @param peerId
-     * @return The name
+     * @param peerId user handle of a participant
+     * @return The name of a participant
      */
-    fun participantName(peerId: Long): String? {
-        if(peerId == MEGACHAT_INVALID_HANDLE){
-            return null
-        }
-        return ChatController(context).getParticipantFullName(peerId)
-    }
+    fun participantName(peerId: Long): String? =
+        if (peerId == MEGACHAT_INVALID_HANDLE) null
+        else ChatController(context).getParticipantFullName(peerId)
 
     /**
      * Method of obtaining the remote video
      *
-     * @param chatId chatId
-     * @param clientId client ID
+     * @param chatId chat ID
+     * @param clientId client ID of a participant
      * @param hiRes If it's has High resolution
      * @param listener MeetingVideoListener
      */
@@ -327,8 +318,8 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method of remove the remote video
      *
-     * @param chatId chatId
-     * @param clientId client ID
+     * @param chatId chat ID
+     * @param clientId client ID of a participant
      * @param hiRes If it's has High resolution
      * @param listener MeetingVideoListener
      */
@@ -345,8 +336,8 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method of obtaining the remote video
      *
-     * @param chatId chatId
-     * @param clientId client ID
+     * @param chatId chat ID
+     * @param clientId client ID of a participant
      * @param hiRes If it's has High resolution
      * @param listener GroupVideoListener
      */
@@ -363,8 +354,8 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method of remove the remote video
      *
-     * @param chatId chatId
-     * @param clientId client ID
+     * @param chatId chat ID
+     * @param clientId client ID of a participant
      * @param hiRes If it's has High resolution
      * @param listener GroupVideoListener
      */
@@ -381,8 +372,8 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method for requesting the video in high quality
      *
-     * @param chatId chatId
-     * @param clientId client ID
+     * @param chatId chat ID
+     * @param clientId client ID of a participant
      * @param listener MegaChatRequestListenerInterface
      */
     fun requestHiResVideo(
@@ -397,8 +388,8 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method to stop receiving the video in high quality
      *
-     * @param chatId chatId
-     * @param clientId List with clients ID
+     * @param chatId chat ID
+     * @param clientId List with clients ID of participants
      * @param listener MegaChatRequestListenerInterface
      */
     fun stopHiResVideo(
@@ -413,8 +404,8 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method for requesting the video in low quality
      *
-     * @param chatId chatId
-     * @param clientId List with clients ID
+     * @param chatId chat ID
+     * @param clientId List with clients ID of participants
      * @param listener MegaChatRequestListenerInterface
      */
     fun requestLowResVideo(
@@ -429,8 +420,8 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method to stop receiving the video in low quality
      *
-     * @param chatId chatId
-     * @param clientId List with clients ID
+     * @param chatId chat ID
+     * @param clientId List with clients ID of participants
      * @param listener MegaChatRequestListenerInterface
      */
     fun stopLowResVideo(
@@ -445,7 +436,7 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method of obtaining the local video
      *
-     * @param chatId chatId
+     * @param chatId chat ID
      * @param listener GroupVideoListener
      */
     fun addLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener) {
@@ -456,7 +447,7 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method of remove the local video
      *
-     * @param chatId chatId
+     * @param chatId chat ID
      * @param listener GroupVideoListener
      */
     fun removeLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener) {
@@ -467,8 +458,8 @@ class InMeetingRepository @Inject constructor(
     /**
      * Method to get own privileges in a chat
      *
-     * @param chatId
-     * @return the privileges
+     * @param chatId chat ID
+     * @return my privileges
      */
     fun getOwnPrivileges(chatId: Long): Int {
         getChatRoom(chatId)?.let {
@@ -480,12 +471,18 @@ class InMeetingRepository @Inject constructor(
 
     fun chatLogout(listener: MegaChatRequestListenerInterface) = megaChatApi.logout(listener)
 
+    /**
+     * Method to create an ephemera plus plus account
+     *
+     * @param firstName First name of the guest
+     * @param lastName Last name of the guest
+     * @param listener MegaRequestListenerInterface
+     */
     fun createEphemeralAccountPlusPlus(
         firstName: String,
         lastName: String,
         listener: MegaRequestListenerInterface
     ) {
-        // INIT_WAITING_NEW_SESSION    = 1,    /// No \c sid provided at init() --> force a login+fetchnodes
         val initResult = megaChatApi.init(null)
 
         if (initResult == INIT_WAITING_NEW_SESSION) {
@@ -534,6 +531,11 @@ class InMeetingRepository @Inject constructor(
         )
     }
 
+    /**
+     * Method for getting a participant's avatar
+     *
+     * @param peerId user handle of participant
+     */
     fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
         var bitmap: Bitmap?
         val mail = ChatController(context).getParticipantEmail(peerId)
@@ -549,7 +551,7 @@ class InMeetingRepository @Inject constructor(
             )
         }
 
-        if (bitmap == null){
+        if (bitmap == null) {
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
                 peerId
@@ -559,6 +561,11 @@ class InMeetingRepository @Inject constructor(
         return bitmap
     }
 
+    /**
+     * Method for getting a participant's email
+     *
+     * @param peerId user handle of participant
+     */
     fun getParticipantEmail(peerId: Long): String? =
         ChatController(context).getParticipantEmail(peerId)
 

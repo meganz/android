@@ -19,6 +19,7 @@ import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil
@@ -241,7 +242,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      */
     fun isChatCreatedAndIParticipating(): Boolean =
         (_currentChatId.value != MEGACHAT_INVALID_HANDLE &&
-                MegaApplication.getChatManagement().amIParticipatingInAChat(_currentChatId.value!!) &&
+                amIParticipatingInAChat(_currentChatId.value!!) &&
                 CallUtil.amIParticipatingInThisMeeting(_currentChatId.value!!))
 
     /**

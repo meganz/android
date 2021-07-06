@@ -1724,4 +1724,23 @@ public class ChatUtil {
             preferences.edit().clear().apply();
         }
     }
+
+    /**
+     * Method to find out if I am participating in a chat room
+     *
+     * @param chatId The chat ID
+     * @return True, if I am joined to the chat. False, if not
+     */
+    public static boolean amIParticipatingInAChat(long chatId) {
+        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        if (chatRoom == null)
+            return false;
+
+        if (chatRoom.isPreview()) {
+            return false;
+        }
+
+        int myPrivileges = chatRoom.getOwnPrivilege();
+        return myPrivileges == MegaChatRoom.PRIV_RO || myPrivileges == MegaChatRoom.PRIV_STANDARD || myPrivileges == MegaChatRoom.PRIV_MODERATOR;
+    }
 }

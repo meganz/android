@@ -8688,6 +8688,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
+	/**
+	 * Method to make appropriate actions when clicking on the FAB button
+	 */
 	public void fabMainClickCallback() {
 		if (isFabExpanded) {
 			collapseFab();
@@ -8706,12 +8709,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		fabs.add(fabMaskLayout.findViewById(R.id.text_chat));
 		fabs.add(fabMaskLayout.findViewById(R.id.text_meeting));
 
-//		fabButton.setOnClickListener(i-> fabMainClickCallback());
-
-
 		fabMaskButton.setOnClickListener(l-> fabMainClickCallback());
-
-		fabMaskLayout.setOnClickListener(l-> fabMainClickCallback());
 
 		fabMaskLayout.findViewById(R.id.fab_chat).setOnClickListener(l -> {
 			fabMainClickCallback();
@@ -14333,14 +14331,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	@Override
-	public void onPreviewLoaded(@NotNull MegaChatApiJava api, long chatId, String titleChat, MegaHandleList list, int paramType, String link, boolean isFromOpenChatPreview) {
+	public void onPreviewLoaded(MegaChatRequest request) {
+		long chatId = request.getChatHandle();
+		boolean isFromOpenChatPreview = request.getFlag();
+		int type = request.getParamType();
+		String link = request.getLink();
 		if (joiningToChatLink && isTextEmpty(link) && chatId == MEGACHAT_INVALID_HANDLE) {
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_chat_link_init_error), MEGACHAT_INVALID_HANDLE);
 			resetJoiningChatLink();
 			return;
 		}
 
-		if (paramType == LINK_IS_FOR_MEETING) {
+		if (type == LINK_IS_FOR_MEETING) {
 			logDebug("It's a meeting");
 			boolean linkInvalid = TextUtil.isTextEmpty(link) && chatId == MEGACHAT_INVALID_HANDLE;
 			if (linkInvalid) {
@@ -14348,7 +14350,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				return;
 			}
 
-			if (isMeetingEnded(list)) {
+			if (isMeetingEnded(request.getMegaHandleList())) {
 				logDebug("It's a meeting, open dialog: Meeting has ended");
 				new MeetingHasEndedDialogFragment(new MeetingHasEndedDialogFragment.ClickCallback() {
 					@Override
@@ -14362,7 +14364,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}).show(getSupportFragmentManager(),
 						MeetingHasEndedDialogFragment.TAG);
 			} else {
-				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, list, titleChat);
+				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText());
 			}
 		} else {
 			logDebug("It's a chat");

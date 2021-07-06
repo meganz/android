@@ -102,14 +102,9 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param currentStatus Status of the call
      */
     private fun checkReconnectingStatus(currentStatus: Int) {
-        if (currentStatus == CALL_STATUS_CONNECTING) {
-            if (previousState == CALL_STATUS_IN_PROGRESS || previousState == CALL_STATUS_JOINING || previousState == CALL_STATUS_CONNECTING) {
-                isReconnectingStatus = true
-                return
-            }
-        }
-
-        isReconnectingStatus = false
+        isReconnectingStatus = currentStatus == CALL_STATUS_CONNECTING
+                && (previousState == CALL_STATUS_IN_PROGRESS || previousState == CALL_STATUS_JOINING
+                || previousState == CALL_STATUS_CONNECTING)
     }
 
     /**
@@ -128,19 +123,13 @@ class InMeetingViewModel @ViewModelInject constructor(
         isFromReconnectingStatus = false
     }
 
-
     /**
      * Method to know if this chat is public
      *
      * @return True, if it's public. False, otherwise
      */
-    fun isChatRoomPublic(): Boolean {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            return it.isPublic
-        }
-
-        return false
-    }
+    fun isChatRoomPublic(): Boolean =
+        inMeetingRepository.getChatRoom(currentChatId)?.let { return it.isPublic } ?: false
 
     /**
      * Method to know if it is the same chat
@@ -148,9 +137,8 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param chatId chat ID
      * @return True, if it is the same. False, otherwise
      */
-    fun isSameChatRoom(chatId: Long): Boolean {
-        return chatId != MEGACHAT_INVALID_HANDLE && currentChatId == chatId
-    }
+    fun isSameChatRoom(chatId: Long): Boolean =
+        chatId != MEGACHAT_INVALID_HANDLE && currentChatId == chatId
 
     /**
      * Method to know if it is the same call
@@ -158,13 +146,8 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param callId call ID
      * @return True, if it is the same. False, otherwise
      */
-    fun isSameCall(callId: Long): Boolean {
-        _callLiveData.value?.let {
-            return it.callId == callId
-        }
-
-        return false
-    }
+    fun isSameCall(callId: Long): Boolean =
+        _callLiveData.value?.let { it.callId == callId } ?: false
 
     /**
      * Method to set a call
@@ -175,7 +158,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         if (isSameChatRoom(chatId)) {
             _callLiveData.value = inMeetingRepository.getMeeting(chatId)
             _callLiveData.value?.let {
-                if(it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL){
+                if (it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL) {
                     previousState = it.status
                 }
             }
@@ -187,16 +170,10 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return MegaChatCall
      */
-    fun getCall(): MegaChatCall? {
-        if (currentChatId == MEGACHAT_INVALID_HANDLE)
-            return null
-
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            return inMeetingRepository.getMeeting(it.chatId)
-        }
-
-        return null
-    }
+    fun getCall(): MegaChatCall? =
+        if (currentChatId == MEGACHAT_INVALID_HANDLE) null
+        else inMeetingRepository.getChatRoom(currentChatId)
+            ?.let { inMeetingRepository.getMeeting(it.chatId) }
 
     /**
      * If it's just me on the call
@@ -232,9 +209,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return MegaChatRoom
      */
-    fun getChat(): MegaChatRoom? {
-        return inMeetingRepository.getChatRoom(currentChatId)
-    }
+    fun getChat(): MegaChatRoom? = inMeetingRepository.getChatRoom(currentChatId)
 
     /**
      * Method to set a chat
@@ -258,9 +233,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return chat ID
      */
-    fun getChatId(): Long {
-        return currentChatId
-    }
+    fun getChatId(): Long = currentChatId
 
     /**
      * Set speaker selection automatic or manual
@@ -274,43 +247,32 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method to know if it's me
      *
-     * @param peerId The handle
+     * @param peerId User handle of a participant
      * @return True, if it's me. False, otherwise
      */
-    fun isMe(peerId: Long?): Boolean {
-        return inMeetingRepository.isMe(peerId)
-    }
+    fun isMe(peerId: Long?): Boolean = inMeetingRepository.isMe(peerId)
 
     /**
      * Method to know if I have asked for a chat link and I am waiting
+     *
+     * @return True, if I'm waiting for link. False, otherwise
      */
-    fun isWaitingForLink(): Boolean {
-        waitingForMeetingLink.value?.let {
-            return it
-        }
-
-        return false
-    }
+    fun isWaitingForLink(): Boolean = waitingForMeetingLink.value ?: false
 
     /**
      * Get the session of a participant
      *
-     * @param clientId client ID
-     * @return MegaChatSession
+     * @param clientId client ID of a participant
+     * @return MegaChatSession of a participant
      */
-    fun getSession(clientId: Long): MegaChatSession? {
-        if (clientId != MEGACHAT_INVALID_HANDLE) {
-            _callLiveData.value?.let {
-                return it.getMegaChatSession(clientId)
-            }
-        }
-
-        return null
-    }
+    fun getSession(clientId: Long): MegaChatSession? =
+        if (clientId != MEGACHAT_INVALID_HANDLE) _callLiveData.value?.getMegaChatSession(clientId)
+        else null
 
     /**
      * Method to set up if I have requested a chat link and I am waiting
      *
+     * @param isWaiting True, if I'm waiting for a meeting link. False, if not
      */
     fun setWaitingForLink(isWaiting: Boolean) {
         waitingForMeetingLink.value = isWaiting
@@ -323,16 +285,15 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun isAudioCall(): Boolean {
         _callLiveData.value?.let { call ->
-            if (call.isOnHold)
+            if (call.isOnHold) {
                 return true
+            }
 
             val session = getSessionOneToOneCall(call)
             session?.let { sessionParticipant ->
-                return sessionParticipant.isOnHold
-            }
-
-            if (!call.hasLocalVideo() && (session != null && !session.hasVideo())) {
-                return true
+                if (sessionParticipant.isOnHold || (!call.hasLocalVideo() && !sessionParticipant.hasVideo())) {
+                    return true
+                }
             }
         }
 
@@ -344,66 +305,42 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      *  @return True, if it is a one-to-one chat call. False, otherwise
      */
-    fun isOneToOneCall(): Boolean {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            return (!it.isGroup && !it.isMeeting)
-        }
-
-        return false
-    }
+    fun isOneToOneCall(): Boolean =
+        inMeetingRepository.getChatRoom(currentChatId)?.let { (!it.isGroup && !it.isMeeting) }
+            ?: false
 
     /**
      *  Method to know if it is a traditional group chat call
      *
      *  @return True, if it is a traditional group chat call. False, otherwise
      */
-    fun isGroupCall(): Boolean {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            return (it.isGroup && !it.isMeeting)
-        }
-
-        return false
-    }
+    fun isGroupCall(): Boolean =
+        inMeetingRepository.getChatRoom(currentChatId)?.let { (it.isGroup && !it.isMeeting) }
+            ?: false
 
     /**
      * Method to know if a call is on hold
      *
      * @return True, if is on hold. False, otherwise
      */
-    fun isCallOnHold(): Boolean {
-        _callLiveData.value?.let { call ->
-            return call.isOnHold
-        }
-
-        return false
-    }
+    fun isCallOnHold(): Boolean = _callLiveData.value?.isOnHold ?: false
 
     /**
      * Method to know if a call or session is on hold in meeting
      *
      * @return True, if is on hold. False, otherwise
      */
-    fun isCallOrSessionOnHold(clientId: Long): Boolean {
-        if (isCallOnHold())
-            return true
-
-        getSession(clientId)?.let {
-            return it.isOnHold
-        }
-
-        return false
-    }
+    fun isCallOrSessionOnHold(clientId: Long): Boolean =
+        if (isCallOnHold()) true
+        else getSession(clientId)?.isOnHold ?: false
 
     /**
      * Method to know if a call or session is on hold in one to one call
      *
      * @return True, if is on hold. False, otherwise
      */
-    fun isCallOrSessionOnHoldOfOneToOneCall(): Boolean {
-        return if (isCallOnHold()) {
-            true
-        } else isSessionOnHoldOfOneToOneCall()
-    }
+    fun isCallOrSessionOnHoldOfOneToOneCall(): Boolean =
+        if (isCallOnHold()) true else isSessionOnHoldOfOneToOneCall()
 
     /**
      * Method to know if a session is on hold in one to one call
@@ -429,13 +366,8 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param anotherCallChatId chat ID
      * @return True, if is on hold. False, otherwise
      */
-    fun isAnotherCallOneToOneCall(anotherCallChatId: Long): Boolean {
-        inMeetingRepository.getChatRoom(anotherCallChatId)?.let {
-            return !it.isGroup
-        }
-
-        return false
-    }
+    fun isAnotherCallOneToOneCall(anotherCallChatId: Long): Boolean =
+        inMeetingRepository.getChatRoom(anotherCallChatId)?.let { !it.isGroup } ?: false
 
     /**
      * Method to know if a session is on hold in one to one another call
@@ -457,20 +389,16 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method to obtain a specific call
      *
-     * @param chatId
-     * @return MegaChatCall
+     * @param chatId Chat ID
+     * @return MegaChatCall the another call
      */
-    private fun getAnotherCall(chatId: Long): MegaChatCall? {
-        if (chatId == MEGACHAT_INVALID_HANDLE)
-            return null
-
-        return inMeetingRepository.getMeeting(chatId)
-    }
+    private fun getAnotherCall(chatId: Long): MegaChatCall? =
+        if (chatId == MEGACHAT_INVALID_HANDLE) null else inMeetingRepository.getMeeting(chatId)
 
     /**
      * Method to know if exists another call in progress or on hold.
      *
-     * @return MegaChatCall
+     * @return MegaChatCall the another call
      */
     fun getAnotherCall(): MegaChatCall? {
         val anotherCallChatId = CallUtil.getAnotherCallParticipating(currentChatId)
@@ -499,27 +427,22 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param callChat MegaChatCall
      */
-    fun getSessionOneToOneCall(callChat: MegaChatCall?): MegaChatSession? {
-        return callChat?.getMegaChatSession(callChat.sessionsClientid[0])
-    }
+    fun getSessionOneToOneCall(callChat: MegaChatCall?): MegaChatSession? =
+        callChat?.getMegaChatSession(callChat.sessionsClientid[0])
 
     /**
      * Method to obtain the full name of a participant
      *
-     * @param peerId the user handle
-     * @return The name
+     * @param peerId User handle of a participant
+     * @return The name of a participant
      */
-    fun getParticipantFullName(peerId: Long): String {
-        return CallUtil.getUserNameCall(
-            MegaApplication.getInstance().applicationContext,
-            peerId
-        )
-    }
+    fun getParticipantFullName(peerId: Long): String =
+        CallUtil.getUserNameCall(MegaApplication.getInstance().applicationContext, peerId)
 
     /**
      * Method to find out if there is a participant in the call
      *
-     * @param peerId Use handle
+     * @param peerId Use handle of a participant
      * @return list of participants with changes
      */
     fun updateParticipantsName(peerId: Long): MutableSet<Participant> {
@@ -542,22 +465,23 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method to switch a call on hold
      *
-     * @param isOn True, if I am going to put it on hold. False, otherwise
+     * @param isCallOnHold True, if I am going to put it on hold. False, otherwise
      */
-    fun setCallOnHold(isOn: Boolean) {
+    fun setCallOnHold(isCallOnHold: Boolean) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            inMeetingRepository.setCallOnHold(it.chatId, isOn)
+            inMeetingRepository.setCallOnHold(it.chatId, isCallOnHold)
         }
     }
 
     /**
      * Method to switch another call on hold
      *
-     * @param isOn True, if I am going to put it on hold. False, otherwise
+     * @param chatId chat ID
+     * @param isCallOnHold True, if I am going to put it on hold. False, otherwise
      */
-    fun setAnotherCallOnHold(chatId: Long, isOn: Boolean) {
+    fun setAnotherCallOnHold(chatId: Long, isCallOnHold: Boolean) {
         inMeetingRepository.getChatRoom(chatId)?.let {
-            inMeetingRepository.setCallOnHold(it.chatId, isOn)
+            inMeetingRepository.setCallOnHold(it.chatId, isCallOnHold)
         }
     }
 
@@ -566,11 +490,10 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param type type of banner
      * @return True, if should be shown. False, otherwise.
-
      */
     fun shouldShowFixedBanner(type: Int): Boolean {
         when (type) {
-           TYPE_RECONNECTING -> {
+            TYPE_RECONNECTING -> {
                 _callLiveData.value?.let {
                     if (isReconnectingStatus) {
                         return true
@@ -581,7 +504,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             TYPE_NETWORK_QUALITY -> {
                 _callLiveData.value?.let { call ->
                     val quality = call.networkQuality
-                    if (quality == 0){
+                    if (quality == 0) {
                         return true
                     }
                 }
@@ -606,7 +529,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Method to show the appropriate banner
      *
      * @param bannerText the text of the banner to be edited
-     * @param peerId user handle
+     * @param peerId user handle of a participant
      * @param type type of banner
      * @return True, if should be shown. False, otherwise.
      */
@@ -683,6 +606,13 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Method to update the banner
+     *
+     * @param bannerText The textView of the banner
+     * @param color The color of the banner
+     * @param text The text of the banner
+     */
     private fun updateFixedBanner(bannerText: TextView?, color: Int, text: String) {
         bannerText?.let {
             it.setBackgroundColor(color)
@@ -692,19 +622,17 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     /**
      * Method to know if the session of a participants is null
+     *
+     * @param clientId The client ID of a participant
      */
-    fun isSessionOnHold(clientId: Long): Boolean {
-        getSession(clientId)?.let {
-            return it.isOnHold
-        }
-
-        return false
-    }
+    fun isSessionOnHold(clientId: Long): Boolean = getSession(clientId)?.isOnHold ?: false
 
     /**
      * Method for displaying the correct banner: If the call is muted or on hold
      *
-     * @return Banner text
+     * @param bannerIcon The icon of the banner
+     * @param bannerText The textView of the banner
+     * @return The text of the banner
      */
     fun showAppropriateBanner(bannerIcon: ImageView?, bannerText: EmojiTextView?): Boolean {
         //Check call or session on hold
@@ -770,13 +698,9 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return True, if it is. False, if not.
      */
-    fun isNecessaryToShowSwapCameraOption(): Boolean {
-        _callLiveData.value?.let {
-            return it.status != CALL_STATUS_CONNECTING && it.hasLocalVideo() && !it.isOnHold
-        }
-
-        return false
-    }
+    fun isNecessaryToShowSwapCameraOption(): Boolean =
+        _callLiveData.value?.let { it.status != CALL_STATUS_CONNECTING && it.hasLocalVideo() && !it.isOnHold }
+            ?: false
 
     /**
      * Method to start a meeting from create meeting
@@ -822,28 +746,23 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return the privileges
      */
-    fun getOwnPrivileges(): Int {
-        return inMeetingRepository.getOwnPrivileges(currentChatId)
-    }
+    fun getOwnPrivileges(): Int = inMeetingRepository.getOwnPrivileges(currentChatId)
 
     /**
      * Method to know if the participant is a moderator.
+     *
+     * @param peerId User handle of a participant
      */
-    fun isParticipantModerator(peerId: Long): Boolean {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            val privileges = it.getPeerPrivilegeByHandle(peerId)
-            return privileges == MegaChatRoom.PRIV_MODERATOR
-        }
-
-        return false
-    }
+    fun isParticipantModerator(peerId: Long): Boolean =
+        inMeetingRepository.getChatRoom(currentChatId)
+            ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_MODERATOR } ?: false
 
     /**
      * Method to know if the participant is my contact
+     *
+     * @param peerId User handle of a participant
      */
-    private fun isMyContact(peerId: Long): Boolean {
-        return inMeetingRepository.isMyContact(peerId)
-    }
+    private fun isMyContact(peerId: Long): Boolean = inMeetingRepository.isMyContact(peerId)
 
     /**
      * Method to update whether a user is my contact or not
@@ -889,8 +808,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for updating the speaking participant
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      * @return list of participants with changes
      */
     fun updatePeerSelected(peerId: Long, clientId: Long): MutableSet<Participant> {
@@ -902,12 +821,10 @@ class InMeetingViewModel @ViewModelInject constructor(
                 it.isSpeaker = true
                 _speakerParticipant.value = createSpeakerParticipant(it)
                 listWithChanges.add(it)
-            } else {
-                if (it.isSpeaker) {
-                    logDebug("Remove the last speaker ${it.clientId}")
-                    it.isSpeaker = false
-                    listWithChanges.add(it)
-                }
+            } else if (it.isSpeaker) {
+                logDebug("Remove the last speaker ${it.clientId}")
+                it.isSpeaker = false
+                listWithChanges.add(it)
             }
         }
 
@@ -917,36 +834,26 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method that creates the participant speaker
      *
-     * @param participant
+     * @param participant The participant who is to be a speaker
      * @return speaker participant
      */
-    private fun createSpeakerParticipant(participant: Participant): Participant {
-        val peerId = participant.peerId
-        val clientId = participant.clientId
-        val name = participant.name
-        val avatar = participant.avatar
-        val isAudioOn = participant.isAudioOn
-        val isVideoOn = participant.isVideoOn
-        val isChosenForAssign = participant.isChosenForAssign
-        val isGuest = participant.isGuest
-
-        return Participant(
-            peerId,
-            clientId,
-            name,
-            avatar,
+    private fun createSpeakerParticipant(participant: Participant): Participant =
+        Participant(
+            participant.peerId,
+            participant.clientId,
+            participant.name,
+            participant.avatar,
             isMe = false,
             isModerator = false,
-            isAudioOn = isAudioOn,
-            isVideoOn = isVideoOn,
+            isAudioOn = participant.isAudioOn,
+            isVideoOn = participant.isVideoOn,
             isContact = false,
             isSpeaker = true,
             hasHiRes = true,
             videoListener = null,
-            isChosenForAssign,
-            isGuest
+            participant.isChosenForAssign,
+            participant.isGuest
         )
-    }
 
     /**
      * Method for creating participants already on the call
@@ -972,7 +879,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for adding a participant to the list
      *
-     * @param session MegaChatSession
+     * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
     fun addParticipant(session: MegaChatSession, status: String): Int? {
@@ -990,7 +897,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for create a participant
      *
-     * @param session MegaChatSession
+     * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
     private fun createParticipant(session: MegaChatSession, status: String): Participant? {
@@ -1020,7 +927,8 @@ class InMeetingViewModel @ViewModelInject constructor(
                 isGuest = true
             }
 
-            val newParticipant = Participant(
+            logDebug("Participant created")
+            return Participant(
                 session.peerid,
                 session.clientid,
                 name,
@@ -1036,9 +944,6 @@ class InMeetingViewModel @ViewModelInject constructor(
                 false,
                 isGuest
             )
-
-            logDebug("Participant created")
-            return newParticipant
         }
 
         return null
@@ -1047,7 +952,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for removing a participant
      *
-     * @param session MegaChatSession
+     * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
     fun removeParticipant(session: MegaChatSession): Int? {
@@ -1082,8 +987,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method to delete the video of a participant who has left the call and it doesn't have session
      *
-     * @param chatId
-     * @param participant
+     * @param chatId chat ID
+     * @param participant the participant who has been removed
      */
     private fun removeVideoOfParticipantRemoved(chatId: Long, participant: Participant) {
         if (participant.videoListener == null)
@@ -1120,23 +1025,17 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param status if it's grid view or speaker view
      * @return True, if should be high. False, otherwise
      */
-    private fun needHiRes(status: String): Boolean {
-        participants.value?.let {
-            return status != TYPE_IN_SPEAKER_VIEW
-        }
-
-        return false
-    }
+    private fun needHiRes(status: String): Boolean =
+        participants.value?.let { status != TYPE_IN_SPEAKER_VIEW } ?: false
 
     /**
      * Method for get the participant name
      *
      * @param peerId user handle
-     * @return the name
+     * @return the name of a participant
      */
-    private fun getParticipantName(peerId: Long): String {
-        return inMeetingRepository.participantName(peerId) ?: return " "
-    }
+    private fun getParticipantName(peerId: Long): String =
+        inMeetingRepository.participantName(peerId) ?: " "
 
     /**
      * Method for checking which participants need to change their resolution when participant is added or removed
@@ -1173,14 +1072,18 @@ class InMeetingViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Method that marks a participant as a non-speaker
+     *
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
+     */
     fun removeSelected(peerId: Long, clientId: Long) {
         val iterator = participants.value?.iterator()
         iterator?.let { participant ->
             participant.forEach {
-                if (it.peerId == peerId && it.clientId == clientId) {
-                    if (it.isSpeaker) {
-                        it.isSpeaker = false
-                    }
+                if (it.peerId == peerId && it.clientId == clientId && it.isSpeaker) {
+                    it.isSpeaker = false
                 }
             }
         }
@@ -1189,18 +1092,17 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Get the avatar
      *
-     * @param peerId
-     * @return the avatar
+     * @param peerId User handle of a participant
+     * @return the avatar of a participant
      */
-    fun getAvatarBitmap(peerId: Long): Bitmap? {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            return inMeetingRepository.getAvatarBitmap(it, peerId)
-        }
+    fun getAvatarBitmap(peerId: Long): Bitmap? =
+        inMeetingRepository.getChatRoom(currentChatId)
+            ?.let { inMeetingRepository.getAvatarBitmap(it, peerId) }
 
-        return null
-    }
-
-    fun removeSpeakerParticipant(){
+    /**
+     * Delete the video of the participant who has ceased to be a speaker
+     */
+    fun removeSpeakerParticipant() {
         _speakerParticipant.value?.let {
             if (getSession(it.clientId) == null) {
                 logDebug("The participant with clientId ${it.clientId} doesn't have session")
@@ -1215,7 +1117,6 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for assigning me as a speaker.
      * It's necessary to close the previous speaker's video and assign me as the speaker
-     *
      */
     fun assignMeAsSpeaker() {
         logDebug("Assign me as speaker")
@@ -1227,8 +1128,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Get participant from peerId and clientId
      *
-     * @param peerId peer ID
-     * @param clientId client ID
+     * @param peerId peer ID of a participant
+     * @param clientId client ID of a participant
      */
     fun getParticipant(peerId: Long, clientId: Long): Participant? {
         participants.value?.let { list ->
@@ -1247,7 +1148,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for updating participant video
      *
-     * @param session
+     * @param session of a participant
      * @return True, if there have been changes. False, otherwise
      */
     fun changesInRemoteVideoFlag(session: MegaChatSession): Boolean {
@@ -1267,7 +1168,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for updating low resolution
      *
-     * @param session
+     * @param session of a participant
      * @return True, if there have been changes. False, otherwise
      */
     fun changesInLowRes(session: MegaChatSession): Boolean {
@@ -1286,7 +1187,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for updating high resolution
      *
-     * @param session
+     * @param session of a participant
      * @return True, if there have been changes. False, otherwise
      */
     fun changesInHiRes(session: MegaChatSession): Boolean {
@@ -1305,7 +1206,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method for updating participant audio
      *
-     * @param session
+     * @param session of a participant
      * @return True, if there have been changes. False, otherwise
      */
     fun changesInRemoteAudioFlag(session: MegaChatSession): Boolean {
@@ -1368,7 +1269,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method to hang up a specific call
      *
-     * @param callId
+     * @param callId Call ID
      */
     private fun hangUpSpecificCall(callId: Long) {
         inMeetingRepository.leaveMeeting(
@@ -1411,7 +1312,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method of obtaining the video
      *
-     * @param chatId chatId
+     * @param chatId Chat ID
      * @param listener GroupVideoListener
      */
     fun addLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener?) {
@@ -1425,7 +1326,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Method of remove the local video
      *
-     * @param chatId chatId
+     * @param chatId Chat ID
      * @param listener GroupVideoListener
      */
     fun removeLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener?) {
@@ -1439,9 +1340,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Add High Resolution for remote video in a one to one call
      *
-     * @param listener
-     * @param session
-     * @param chatId
+     * @param listener MeetingVideoListener
+     * @param session MegaChatSession of a participant
+     * @param chatId Chat ID
      */
     fun addHiResOneToOneCall(
         listener: MeetingVideoListener,
@@ -1470,9 +1371,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Remove High Resolution for remote video in a one to one call
      *
-     * @param listener
-     * @param session
-     * @param chatId
+     * @param listener MeetingVideoListener
+     * @param session MegaChatSession of a participant
+     * @param chatId Chat ID
      */
     fun removeHiResOneToOneCall(
         listener: MeetingVideoListener,
@@ -1503,9 +1404,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Add High Resolution for remote video in a meeting
      *
-     * @param listener
-     * @param session
-     * @param chatId
+     * @param listener GroupVideoListener
+     * @param session MegaChatSession of a participant
+     * @param chatId Chat ID
      */
     private fun addHiRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
         session?.let { sessionParticipant ->
@@ -1530,9 +1431,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Remove High Resolution for remote video in a meeting
      *
-     * @param listener
-     * @param session
-     * @param chatId
+     * @param listener GroupVideoListener
+     * @param session MegaChatSession of a participant
+     * @param chatId Chat ID
      */
     private fun removeHiRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
         session?.let { sessionParticipant ->
@@ -1559,9 +1460,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Add Low Resolution for remote video in a meeting
      *
-     * @param listener
-     * @param session
-     * @param chatId
+     * @param listener GroupVideoListener
+     * @param session MegaChatSession of a participant
+     * @param chatId Chat ID
      */
     private fun addLowRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
         session?.let { sessionParticipant ->
@@ -1588,9 +1489,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Remove Low Resolution for remote video in a meeting
      *
-     * @param listener
-     * @param session
-     * @param chatId
+     * @param listener GroupVideoListener
+     * @param session MegaChatSession of a participant
+     * @param chatId Chat ID
      */
     private fun removeLowRes(
         listener: GroupVideoListener,
@@ -1621,7 +1522,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Activate Video of participant in a meeting
      *
-     * @param participant
+     * @param participant The participant from whom the video is to be activated
+     * @param isSpeaker If the participant is a speaker
      */
     fun onActivateVideo(participant: Participant, isSpeaker: Boolean) {
         val session = getSession(participant.clientId)
@@ -1670,7 +1572,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Close Video of participant in a meeting
      *
-     * @param participant
+     * @param participant The participant from whom the video is to be closed
      */
     fun onCloseVideo(participant: Participant) {
         if (participant.videoListener == null) return
@@ -1678,21 +1580,18 @@ class InMeetingViewModel @ViewModelInject constructor(
         inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
             getSession(participant.clientId)?.let {
                 logDebug("Close video of ${participant.clientId}")
-                when {
-                    participant.hasHiRes -> {
-                        removeHiRes(
-                            participant.videoListener!!,
-                            it,
-                            chat.chatId
-                        )
-                    }
-                    else -> {
-                        removeLowRes(
-                            participant.videoListener!!,
-                            it,
-                            chat.chatId
-                        )
-                    }
+                if (participant.hasHiRes) {
+                    removeHiRes(
+                        participant.videoListener!!,
+                        it,
+                        chat.chatId
+                    )
+                } else {
+                    removeLowRes(
+                        participant.videoListener!!,
+                        it,
+                        chat.chatId
+                    )
                 }
             }
         }
@@ -1735,7 +1634,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Change video resolution
      *
-     * @param participant
+     * @param participant The participant from which the video resolution is to be updated
      */
     private fun removeSpecificResolution(participant: Participant) {
         if (participant.videoListener == null)
@@ -1763,7 +1662,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Adding visible participant
      *
-     * @param participant
+     * @param participant The participant that is now visible
      */
     fun addParticipantVisible(participant: Participant) {
         if (visibleParticipants.size == 0) {
@@ -1782,7 +1681,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Removing visible participant
      *
-     * @param participant
+     * @param participant The participant that is not now visible
      */
     fun removeParticipantVisible(participant: Participant) {
         if (visibleParticipants.size == 0) {
@@ -1799,7 +1698,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Check if a participant is visible
      *
-     * @param participant
+     * @param participant The participant to be checked whether or not he/she is visible
      * @return True, if it's visible. False, otherwise
      */
     private fun isParticipantVisible(participant: Participant): Boolean {
@@ -1840,7 +1739,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Change video resolution
      *
-     * @param participant
+     * @param participant The participant for whom the resolution is to be updated
      */
     private fun onChangeResolution(participant: Participant) {
         if (participant.videoListener == null)
@@ -1880,7 +1779,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Determine the chat room has only one moderator and the list is not empty and I am moderator
      *
-     * @return
+     * @return True, if you can be assigned as a moderator. False, otherwise.
      */
     fun shouldAssignModerator(): Boolean {
         val hasOneModerator = participants.value?.toList()?.filter { it.isModerator }?.size?.let {
@@ -1894,31 +1793,67 @@ class InMeetingViewModel @ViewModelInject constructor(
         return hasOneModerator && isModerator() && participants.value?.none { isStandardUser(it.peerId) } == false
     }
 
-    // For "join as guest" start
+    /**
+     * Log out of the chat for join as guest action
+     */
     fun chatLogout(listener: MegaChatRequestListenerInterface) =
         inMeetingRepository.chatLogout(listener)
 
+    /**
+     * Method to create an ephemera plus plus account, required before joining the chat room
+     *
+     * @param firstName First name of the guest
+     * @param lastName Last name of the guest
+     * @param listener MegaRequestListenerInterface
+     */
     fun createEphemeralAccountAndJoinChat(
         firstName: String,
         lastName: String,
         listener: MegaRequestListenerInterface
     ) = inMeetingRepository.createEphemeralAccountPlusPlus(firstName, lastName, listener)
 
+    /**
+     * Method to do fetch nodes when joining as a guest
+     *
+     * @param listener MegaRequestListenerInterface
+     */
     fun fetchNodes(listener: MegaRequestListenerInterface) =
         inMeetingRepository.fetchNodes(listener)
 
+    /**
+     * Method to connect the chat when joining as a guest
+     *
+     * @param listener MegaChatRequestListenerInterface
+     */
     fun chatConnect(listener: MegaChatRequestListenerInterface) =
         inMeetingRepository.chatConnect(listener)
 
+    /**
+     * Method to open chat preview when joining as a guest
+     *
+     * @param link The link to the chat room or the meeting
+     * @param listener MegaChatRequestListenerInterface
+     */
     fun openChatPreview(link: String, listener: MegaChatRequestListenerInterface) =
         inMeetingRepository.openChatPreview(link, listener)
 
+    /**
+     * Method to join chat when joining as a guest
+     *
+     * @param chatId Chat ID
+     * @param listener MegaChatRequestListenerInterface
+     */
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
         inMeetingRepository.joinPublicChat(chatId, listener)
 
+    /**
+     * Method to add the chat listener when joining as a guest
+     *
+     * @param chatId Chat ID
+     * @param callback
+     */
     fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =
         inMeetingRepository.registerConnectionUpdateListener(chatId, callback)
-    // For join as guest end
 
     /**
      * Method for answer a call
@@ -1961,15 +1896,15 @@ class InMeetingViewModel @ViewModelInject constructor(
     /**
      * Determine if should hide or show the share link and invite button
      *
-     * @return
+     * @return True, if the link is visible. False, if not.
      */
     fun isLinkVisible(): Boolean =
         isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
 
     /**
-     * Determine if should hide or show the guest share link button
+     * Determine if should hide or show the link button
      *
-     * @return
+     * @return True, if the link should be visible. False, if not.
      */
     fun isGuestLinkVisible(): Boolean = if (isChatRoomPublic()) {
         getOwnPrivileges() != MegaChatRoom.PRIV_MODERATOR
@@ -1977,12 +1912,22 @@ class InMeetingViewModel @ViewModelInject constructor(
         getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
     }
 
+    /**
+     * Method to update the link button depending on the participant's permissions
+     *
+     * @return The appropriate text of the button
+     */
     fun getGuestLinkTitle(): String = if (isModeratorOfPrivateRoom()) {
         StringResourcesUtils.getString(R.string.invite_participants)
     } else {
         StringResourcesUtils.getString(R.string.context_get_link)
     }
 
+    /**
+     * Method to check if I am a chat moderator
+     *
+     * @return True, if I'm moderator. False, if not.
+     */
     fun isModeratorOfPrivateRoom(): Boolean =
         !isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
 
@@ -1991,28 +1936,31 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return True, if I am a guest. False if not
      */
-    fun amIAGuest(): Boolean {
-        return inMeetingRepository.amIAGuest()
-    }
+    fun amIAGuest(): Boolean = inMeetingRepository.amIAGuest()
 
-    fun isStandardUser(peerId: Long): Boolean {
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            val privileges = it.getPeerPrivilegeByHandle(peerId)
-            return privileges == MegaChatRoom.PRIV_STANDARD
-        }
-
-        return false
-    }
+    /**
+     * Determine if the participant has standard privileges
+     *
+     * @param peerId User handle of a participant
+     */
+    fun isStandardUser(peerId: Long): Boolean =
+        inMeetingRepository.getChatRoom(currentChatId)
+            ?.let { it.getPeerPrivilegeByHandle(peerId) == MegaChatRoom.PRIV_STANDARD } ?: false
 
     /**
      * Determine if I am a moderator
      *
-     * @return
+     * @return True, if I am a moderator. False, if not
      */
     fun isModerator(): Boolean =
         getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
 
-
+    /**
+     * Method for updating a participant's permissions
+     *
+     * @param peerId User handle of a participant
+     * @param listener MegaChatRequestListenerInterface
+     */
     fun updateChatPermissions(
         peerId: Long,
         listener: MegaChatRequestListenerInterface? = null
@@ -2020,21 +1968,31 @@ class InMeetingViewModel @ViewModelInject constructor(
         inMeetingRepository.updateChatPermissions(currentChatId, peerId, listener)
     }
 
+    /**
+     * Method for obtaining the bitmap of a participant's avatar
+     *
+     * @param peerId User handle of a participant
+     * @return The bitmap of a participant's avatar
+     */
     fun getAvatarBitmapByPeerId(peerId: Long): Bitmap? {
         return inMeetingRepository.getAvatarBitmapByPeerId(peerId)
     }
 
-    fun shouldShowTips(): Boolean {
-        val sharedPreferences =
-            MegaApplication.getInstance().applicationContext.defaultSharedPreferences
-        return !sharedPreferences.getBoolean(IS_SHOWED_TIPS, false)
-    }
+    /**
+     * Method to check if tips should be displayed
+     *
+     * @return True, if tips must be shown. False, if not.
+     */
+    fun shouldShowTips(): Boolean =
+        !MegaApplication.getInstance().applicationContext.defaultSharedPreferences
+            .getBoolean(IS_SHOWED_TIPS, false)
 
+    /**
+     * Update whether or not to display tips
+     */
     fun updateShowTips() {
-        val sharedPreferences =
-            MegaApplication.getInstance().applicationContext.defaultSharedPreferences
-        val editor = sharedPreferences.edit()
-        editor.putBoolean(IS_SHOWED_TIPS, true).commit()
+        MegaApplication.getInstance().applicationContext.defaultSharedPreferences.edit()
+            .putBoolean(IS_SHOWED_TIPS, true).apply()
     }
 
     companion object {

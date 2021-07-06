@@ -91,7 +91,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         if (inMeetingViewModel.isSameCall(it.callId)) {
             logDebug("Check changes in call on hold")
 
-            if(isAdded) {
+            if (isAdded) {
                 checkChangesInOnHold(it.isOnHold)
             }
         }
@@ -215,10 +215,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
      */
     private fun checkUI() {
         logDebug("Check the current UI status")
-
         inMeetingViewModel.getCall()?.let {
             if (inMeetingViewModel.isMe(peerId)) {
-                if(it.status == CALL_STATUS_IN_PROGRESS && it.hasLocalVideo()){
+                if (it.status == CALL_STATUS_IN_PROGRESS && it.hasLocalVideo()) {
                     logDebug("Check if local video should be on")
                     checkVideoOn(peerId, clientId)
                 } else {
@@ -243,8 +242,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Show UI when video is off
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      */
     fun videoOffUI(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
@@ -259,13 +258,14 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Method to show the Avatar
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      */
     private fun showAvatar(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
 
         logDebug("Show avatar")
+        rootLayout.isVisible = true
         avatarImageView.isVisible = true
     }
 
@@ -278,6 +278,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         if (inMeetingViewModel.isAudioCall()) {
             logDebug("Is only audio call, hide avatar")
             hideAvatar(peerId, clientId)
+            rootLayout.isVisible = false
         } else {
             inMeetingViewModel.getCall()?.let {
                 if (!it.hasLocalVideo()) {
@@ -291,8 +292,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Method to close Video
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      */
     private fun closeVideo(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
@@ -300,7 +301,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         logDebug("Close video of $clientId")
         videoSurfaceView.isVisible = false
 
-        if(isFloatingWindow) {
+        if (isFloatingWindow) {
             rootLayout.background = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.self_feed_floating_window_background
@@ -313,8 +314,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Remove chat video listener
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      */
     private fun removeChatVideoListener(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId) || videoListener == null) return
@@ -329,7 +330,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
         }
 
-        if(videoListener != null){
+        if (videoListener != null) {
             logDebug("Participant $clientId video listener null")
             videoListener = null
         }
@@ -357,8 +358,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Show UI when video is on
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      */
     private fun videoOnUI(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
@@ -373,8 +374,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Control when a change is received in the video flag
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      */
     fun checkVideoOn(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
@@ -397,8 +398,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Method to hide the Avatar
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      */
     private fun hideAvatar(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
@@ -412,17 +413,18 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Method for activating the video
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      */
     private fun activateVideo(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
 
-        if (videoListener != null) {
-            videoListener!!.height = 0
-            videoListener!!.width = 0
-        } else {
-            if (inMeetingViewModel.isMe(peerId)) {
+        when {
+            videoListener != null -> {
+                videoListener!!.height = 0
+                videoListener!!.width = 0
+            }
+            inMeetingViewModel.isMe(peerId) -> {
                 var isOneToOneChat = true
                 if (isFloatingWindow && !inMeetingViewModel.isOneToOneCall()) {
                     isOneToOneChat = false
@@ -437,7 +439,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 )
 
                 sharedModel.addLocalVideo(chatId, videoListener)
-            } else {
+            }
+            else -> {
                 videoListener = MeetingVideoListener(
                     videoSurfaceView,
                     outMetrics,
@@ -452,6 +455,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
         }
 
+        rootLayout.isVisible = true
         videoSurfaceView.isVisible = true
         // Check bottom panel's expanding state, if it's expanded, video should invisible.
         videoListener?.setAlpha(videoAlphaFloating)
@@ -462,8 +466,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Method that controls when we have lost the video in the resolution we were receiving it.
      * Need to close video and activate it again
      *
-     * @param peerId
-     * @param clientId
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
      */
     fun updateResolution(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
@@ -482,13 +486,19 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
     }
 
+    /**
+     * Method compare with current participant
+     *
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
+     */
     private fun isInvalid(peerId: Long, clientId: Long) =
-        (peerId != this.peerId || clientId != this.clientId)
+        peerId != this.peerId || clientId != this.clientId
 
     /**
      * Method to check if there is a call or session on hold
      *
-     * @param isOnHold
+     * @param isOnHold True, if the call or session is on hold. False, if not
      */
     private fun checkChangesInOnHold(isOnHold: Boolean) {
         if (isOnHold) {
@@ -511,7 +521,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Change the layout when the orientation is changing
      *
-     * @param newOrientation the new orientation
+     * @param newOrientation the new orientation, portrait of landscape
      */
     fun updateOrientation(newOrientation: Int) {
         if (!isFloatingWindow) return
@@ -559,8 +569,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
          * this fragment using the provided parameters.
          *
          * @param chatId Chat ID
-         * @param peerId peer ID
-         * @param clientId client ID
+         * @param peerId User handle of a participant
+         * @param clientId Client ID of a participant
          * @return A new instance of fragment MeetingFragment.
          */
         fun newInstance(chatId: Long, peerId: Long, clientId: Long) =
