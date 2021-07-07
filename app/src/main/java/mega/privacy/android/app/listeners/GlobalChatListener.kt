@@ -10,21 +10,35 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApi.INIT_ONLINE_SESSION
 import android.util.Pair
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
+import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 
 class GlobalChatListener(private val application: MegaApplication) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
-        if (item!!.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) || item.hasChanged(
-                MegaChatListItem.CHANGE_TYPE_PARTICIPANTS
-            )
-        ) {
-            LiveEventBus.get(
-                EVENT_PRIVILEGES_CHANGE,
-                MegaChatListItem::class.java
-            ).post(item)
-        }
+        if (item != null) {
+            if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) || item.hasChanged(
+                    MegaChatListItem.CHANGE_TYPE_PARTICIPANTS
+                )
+            ) {
+                LiveEventBus.get(
+                    EVENT_PRIVILEGES_CHANGE,
+                    MegaChatListItem::class.java
+                ).post(item)
+            }
 
-        application.onChatListItemUpdate(api, item)
+            if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE)) {
+                api?.let {
+                    it.getChatRoom(item.chatId)?.let { chat ->
+                        LiveEventBus.get(
+                            EVENT_CHAT_TITLE_CHANGE,
+                            MegaChatRoom::class.java
+                        ).post(chat)
+                    }
+                }
+            }
+
+            application.onChatListItemUpdate(api, item)
+        }
     }
 
     override fun onChatInitStateUpdate(api: MegaChatApiJava?, newState: Int) {
