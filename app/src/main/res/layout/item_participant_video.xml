@@ -4,7 +4,8 @@
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="1dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginEnd="2dp"
     android:background="@color/grey_800">
 
     <RelativeLayout

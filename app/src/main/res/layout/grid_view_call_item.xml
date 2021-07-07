@@ -5,10 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/dark_grey"
     android:clipToPadding="true"
-    android:horizontalSpacing="1dp"
     android:nestedScrollingEnabled="false"
     android:numColumns="auto_fit"
     android:scrollbars="horizontal"
-    android:stretchMode="columnWidth"
-    android:padding="0dp"
-    android:verticalSpacing="1dp" />
+    android:stretchMode="columnWidth"/>
