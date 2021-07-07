@@ -2528,8 +2528,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             callMenuItem.setEnabled(false);
             callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_054_white_054));
             if (chatRoom.isGroup()) {
-                videoMenuItem.setVisible(true);
-                videoMenuItem.setTitle(R.string.context_meeting);
+                videoMenuItem.setVisible(false);
             }else{
                 videoMenuItem.setEnabled(false);
                 videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_054_white_054));
@@ -2542,16 +2541,12 @@ public class ChatActivityLollipop extends PasscodeActivity
                 contactInfoMenuItem.setVisible(false);
                 archiveMenuItem.setVisible(false);
             }else {
-
                 if (megaChatApi != null && (megaChatApi.getNumCalls() <= 0 || (!participatingInACall() && !megaChatApi.hasCallInChatRoom(chatRoom.getChatId())))) {
-                    if (!chatRoom.isGroup() || chatRoom.getPeerCount() > 0) {
-                        callMenuItem.setEnabled(true);
-                        callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_087_white_087));
-                    }
+                    callMenuItem.setEnabled(true);
+                    callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_087_white_087));
 
-                    if (chatRoom.isGroup()) {
-                        videoMenuItem.setVisible(true);
-                        videoMenuItem.setTitle(R.string.context_meeting);
+                    if (chatRoom.isGroup() || chatRoom.isMeeting()) {
+                        videoMenuItem.setVisible(false);
                     } else {
                         videoMenuItem.setEnabled(true);
                         videoMenuItem.setIcon(mutateIcon(this, R.drawable.ic_videocam_white, R.color.grey_087_white_087));
