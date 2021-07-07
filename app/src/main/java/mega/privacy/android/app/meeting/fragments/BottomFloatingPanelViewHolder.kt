@@ -195,7 +195,7 @@ class BottomFloatingPanelViewHolder(
      * Get the drawable for background for dark mode
      *
      * @param background the color for background
-     * @return
+     * @return the final drawable for the background
      */
     fun getCheckedDrawable(background: Int): Drawable {
         val roundRect = GradientDrawable().apply {
@@ -374,7 +374,6 @@ class BottomFloatingPanelViewHolder(
 
     /**
      * Init recyclerview
-     *
      */
     private fun setupRecyclerView() {
         floatingPanelView.participants.apply {
@@ -387,7 +386,7 @@ class BottomFloatingPanelViewHolder(
     }
 
     /**
-     * Update the icstyle if bottom panel is expanded after some click actions
+     * Update the style of views those should be updated if bottom panel is expanded after some click actions
      */
     private fun updateBottomFloatingPanelIfNeeded() {
         if (bottomFloatingPanelExpanded) {
@@ -691,12 +690,11 @@ class BottomFloatingPanelViewHolder(
     /**
      * The updating function for views
      *
-     * @param V
      * @param view the target view
      * @param startP start int value
      * @param endP end int value
      * @param update call back for updating
-     * @return
+     * @return the callback as a function
      */
     private fun <V : View> propertyUpdater(
         view: V,
@@ -712,12 +710,11 @@ class BottomFloatingPanelViewHolder(
     /**
      * The updating function for views
      *
-     * @param V
      * @param view the target view
      * @param startP start float value
      * @param endP end float value
      * @param update call back for updating
-     * @return
+     * @return the callback as a function
      */
     private fun <V : View> propertyUpdater(
         view: V,
