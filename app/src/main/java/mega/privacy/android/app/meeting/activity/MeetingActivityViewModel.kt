@@ -10,6 +10,11 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
+import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
+import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop

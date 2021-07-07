@@ -26,6 +26,8 @@ import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 public class ChatManagement {
 
     private final ChatRoomListener chatRoomListener;
+    private final MegaApplication app;
+
     // List of chat ids to control if a chat is already joining.
     private final List<Long> joiningChatIds = new ArrayList<>();
     // List of chat ids to control if a chat is already leaving.
@@ -47,6 +49,7 @@ public class ChatManagement {
 
     public ChatManagement() {
         chatRoomListener = new ChatRoomListener();
+        app = MegaApplication.getInstance();
     }
 
     /**
@@ -57,7 +60,7 @@ public class ChatManagement {
      */
     public boolean openChatRoom(long chatId) {
         closeChatRoom(chatId);
-        return MegaApplication.getInstance().getMegaChatApi().openChatRoom(chatId, chatRoomListener);
+        return app.getMegaChatApi().openChatRoom(chatId, chatRoomListener);
     }
 
     /**
@@ -66,7 +69,7 @@ public class ChatManagement {
      * @param chatId The chat ID.
      */
     private void closeChatRoom(long chatId) {
-        MegaApplication.getInstance().getMegaChatApi().closeChatRoom(chatId, chatRoomListener);
+        app.getMegaChatApi().closeChatRoom(chatId, chatRoomListener);
     }
 
     public String getPendingJoinLink() {
@@ -87,7 +90,7 @@ public class ChatManagement {
 
     public void removeJoiningChatId(long joiningChatId) {
         if (joiningChatIds.remove(joiningChatId)) {
-            MegaApplication.getInstance().sendBroadcast(new Intent(BROADCAST_ACTION_JOINED_SUCCESSFULLY));
+            app.sendBroadcast(new Intent(BROADCAST_ACTION_JOINED_SUCCESSFULLY));
         }
     }
 
@@ -197,7 +200,7 @@ public class ChatManagement {
     public void checkActiveGroupChat(MegaChatListItem item) {
         if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(item.getChatId())) {
             currentActiveGroupChat.add(item.getChatId());
-            MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(item.getChatId());
+            MegaChatCall call = app.getMegaChatApi().getChatCall(item.getChatId());
             if (call == null) {
                 logError("call is null");
                 return;
@@ -205,11 +208,11 @@ public class ChatManagement {
 
             if (call.getStatus() == CALL_STATUS_USER_NO_PRESENT && !call.isRinging()) {
                 if (notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
-                    MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(item.getChatId());
+                    MegaChatRoom chatRoom = app.getMegaChatApi().getChatRoom(item.getChatId());
                     if (chatRoom != null && (!chatRoom.isMeeting() || !isOpeningMeetingLink(item.getChatId()))) {
                         logDebug("Show notification");
-                        MegaApplication.getInstance().createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-                        MegaApplication.getInstance().showGroupCallNotification(item.getChatId());
+                        app.createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
+                        app.showGroupCallNotification(item.getChatId());
                     }
                 }
             }

@@ -33,6 +33,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
+import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
@@ -333,11 +334,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             if (!inMeetingViewModel.isSameCall(callAndSession.first)) {
                 checkAnotherCall()
-                return@Observer
-            }
-
-            if (inMeetingViewModel.isFromReconnectingStatus) {
-                logDebug("Back from reconnecting")
                 return@Observer
             }
 
@@ -2148,7 +2144,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             shareLink()
     }
 
-    /*
+    /**
      * Method for sharing the meeting link
      */
     fun shareLink() {
@@ -2327,7 +2323,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     override fun onErrorJoinedChat(chatId: Long, error: Int) {
-        logDebug("Error joining the meeting so close it")
+        logDebug("Error joining the meeting so close it, error code is $error")
         finishActivity()
     }
 

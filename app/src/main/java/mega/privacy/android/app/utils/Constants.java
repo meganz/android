@@ -844,12 +844,6 @@ public class Constants {
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";
     public static final String EVENT_HOMEPAGE_VISIBILITY = "homepage_visibility";
     public static final String EVENT_NOT_ALLOW_PLAY = "NOT_ALLOW_PLAY";
-    public static final String EVENT_NETWORK_CHANGE = "network_change";
-    public static final String EVENT_AUDIO_OUTPUT_CHANGE = "audio_output_change";
-    public static final String EVENT_CHAT_TITLE_CHANGE = "chat_title_change";
-    public static final String EVENT_MEETING_CREATED = "meeting_created";
-    public static final String EVENT_LINK_RECOVERED = "meeting_link_recovered";
-    public static final String EVENT_CONTACT_NAME_CHANGE = "contact_name_change";
     public static final String EVENT_PSA = "EVENT_PSA";
 
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";

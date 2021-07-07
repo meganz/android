@@ -23,9 +23,9 @@ import nz.mega.sdk.MegaUser;
 import mega.privacy.android.app.MegaApplication;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE;
 import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_OPEN;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
-import static mega.privacy.android.app.utils.Constants.EVENT_CONTACT_NAME_CHANGE;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
 import static mega.privacy.android.app.utils.Constants.NAME;
 import static mega.privacy.android.app.utils.TextUtil.*;

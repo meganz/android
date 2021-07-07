@@ -42,6 +42,7 @@ import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import static android.media.AudioManager.RINGER_MODE_NORMAL;
 import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static android.media.AudioManager.RINGER_MODE_VIBRATE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;

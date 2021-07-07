@@ -14,10 +14,16 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 
 class GlobalChatListener(private val application: MegaApplication) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
-        LiveEventBus.get(
-            EVENT_PRIVILEGES_CHANGE,
-            MegaChatListItem::class.java
-        ).post(item)
+        if (item!!.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV) || item.hasChanged(
+                MegaChatListItem.CHANGE_TYPE_PARTICIPANTS
+            )
+        ) {
+            LiveEventBus.get(
+                EVENT_PRIVILEGES_CHANGE,
+                MegaChatListItem::class.java
+            ).post(item)
+        }
+
         application.onChatListItemUpdate(api, item)
     }
 

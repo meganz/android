@@ -16,6 +16,8 @@ import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaChatRequestListenerInterface;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 

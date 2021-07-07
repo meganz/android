@@ -93,11 +93,10 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
      * if `isMe` is true, will show `Edit Profile` text
      */
     fun getContactItemText(): String? {
-        return if (participant?.isMe == true) {
-            StringResourcesUtils.getString(R.string.group_chat_edit_profile_label)
-        } else {
-            StringResourcesUtils.getString(R.string.contact_properties_activity)
-        }
+        return StringResourcesUtils.getString(
+            if (participant?.isMe == true) R.string.group_chat_edit_profile_label
+            else R.string.contact_properties_activity
+        )
     }
 
     /**

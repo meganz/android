@@ -132,18 +132,14 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     }
 
     private fun onSendMessage() {
-        startConversation(participantItem.peerId)
-    }
-
-    /**
-     * Start Conversation
-     */
-    fun startConversation(handle: Long) {
+        val handle = participantItem.peerId
         logDebug("Handle: $handle")
-        val chat = megaChatApi.getChatRoomByUser(handle)
+
+        val chat = megaChatApi.getChatRoomByUser(participantItem.peerId)
         val peers = MegaChatPeerList.createInstance()
+
         if (chat == null) {
-            peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD)
+            peers.addPeer(participantItem.peerId, MegaChatPeerList.PRIV_STANDARD)
             megaChatApi.createChat(false, peers, this)
         } else {
             val intentOpenChat = Intent(requireActivity(), ChatActivityLollipop::class.java)

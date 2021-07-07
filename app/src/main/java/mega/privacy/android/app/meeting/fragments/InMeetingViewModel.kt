@@ -868,14 +868,14 @@ class InMeetingViewModel @ViewModelInject constructor(
         for (i in 0 until list.size()) {
             getSession(list[i])?.let { session ->
                 createParticipant(session, status)?.let { participantCreated ->
-                    logDebug("Adding current participant...")
+                    logDebug("Adding current participant... ${participantCreated.clientId}")
                     participants.value?.add(participantCreated)
                 }
             }
         }
 
         participants.value = participants.value
-        logDebug("Num of participants:" + participants.value?.size)
+        logDebug("Num of participants: " + participants.value?.size)
     }
 
     /**
@@ -887,9 +887,9 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun addParticipant(session: MegaChatSession, status: String): Int? {
         createParticipant(session, status)?.let { participantCreated ->
             participants.value?.add(participantCreated)
-            logDebug("Adding participant...")
+            logDebug("Adding participant... ${participantCreated.clientId}")
             participants.value = participants.value
-            logDebug("Num of participants:" + participants.value?.size)
+            logDebug("Num of participants: " + participants.value?.size)
             return participants.value?.indexOf(participantCreated)
         }
 
@@ -970,13 +970,19 @@ class InMeetingViewModel @ViewModelInject constructor(
                         }
 
                         val position = participants.value?.indexOf(it)
+                        val clientId = it.clientId
+
                         if (it.isVideoOn) {
                             removeVideoOfParticipantRemoved(chat.chatId, it)
                         }
-                        list.remove()
-                        logDebug("Removing participant...")
+
+                        if (position != null) {
+                            participants.value?.removeAt(position)
+                            logDebug("Removing participant... $clientId")
+                        }
+
                         participants.value = participants.value
-                        logDebug("Num of participants:" + participants.value?.size)
+                        logDebug("Num of participants: " + participants.value?.size)
                         return position
                     }
                 }

@@ -186,7 +186,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         layout.addView(input, params)
         input.setOnLongClickListener { false }
         input.setSingleLine()
-        input.setHint(R.string.new_meeting_name)
+        input.hint = StringResourcesUtils.getString(R.string.new_meeting_name)
         input.setSelectAllOnFocus(true)
         input.setTextColor(getThemeColor(requireActivity(), android.R.attr.textColorSecondary))
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)

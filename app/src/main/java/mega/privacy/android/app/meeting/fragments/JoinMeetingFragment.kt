@@ -10,6 +10,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
@@ -35,7 +36,7 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
         super.onViewCreated(view, savedInstanceState)
         initRTCAudioManager()
 
-        btn_start_join_meeting.setText(R.string.join_meeting)
+        btn_start_join_meeting.setText(StringResourcesUtils.getString(R.string.join_meeting))
         type_meeting_edit_text.visibility = View.GONE
     }
 }

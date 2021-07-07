@@ -11,7 +11,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatRoomListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.Constants.EVENT_CHAT_TITLE_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static nz.mega.sdk.MegaChatRoom.CHANGE_TYPE_TITLE;
