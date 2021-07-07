@@ -66,10 +66,6 @@ class VideoMeetingViewHolder(
         if (isGrid) {
             avatarSize = BIG_AVATAR
 
-            // Add border for grid mode participant items.
-            val padding = dp2px(PADDING)
-            binding.root.setPadding(padding, padding, padding, padding)
-
             if (orientation == Configuration.ORIENTATION_PORTRAIT) {
                 portraitLayout(isFirstPage, itemCount)
             } else {
@@ -455,6 +451,8 @@ class VideoMeetingViewHolder(
     private fun landscapeLayout(isFirstPage: Boolean, itemCount: Int) {
         if (!isGrid) return
 
+        val borderWidth = dp2px(BORDER_WIDTH)
+
         var w = 0
         var h = 0
 
@@ -471,6 +469,7 @@ class VideoMeetingViewHolder(
                 SLOT_NUM_1 -> {
                     w = screenWidth / TWO_COLUMNS
                     h = screenHeight
+
                     marginLeft = w / 2
                     marginRight = marginLeft
                 }
@@ -483,6 +482,10 @@ class VideoMeetingViewHolder(
                     h = (screenHeight * 0.6).toInt()
                     marginBottom = screenHeight - h
                 }
+                SLOT_NUM_4 -> {
+                    w = (screenWidth / FOUR_COLUMNS)
+                    h = (screenHeight / TWO_FILES)
+                }
                 SLOT_NUM_5 -> {
                     w = screenWidth / FOUR_COLUMNS
                     h = screenHeight / TWO_FILES
@@ -491,7 +494,7 @@ class VideoMeetingViewHolder(
                         POSITION_3, POSITION_4 -> marginLeft = w / 2
                     }
                 }
-                SLOT_NUM_4, SLOT_NUM_6 -> {
+                SLOT_NUM_6 -> {
                     w = (screenWidth / FOUR_COLUMNS)
                     h = (screenHeight / TWO_FILES)
                 }
@@ -515,6 +518,8 @@ class VideoMeetingViewHolder(
     private fun portraitLayout(isFirstPage: Boolean, itemCount: Int) {
         if (!isGrid) return
 
+        val borderWidth = dp2px(BORDER_WIDTH)
+
         var w = 0
         var h = 0
 
@@ -524,7 +529,7 @@ class VideoMeetingViewHolder(
         var marginLeft = 0
         var marginTop = 0
         var marginRight = 0
-        val marginBottom = 0
+        var marginBottom = 0
 
         if (isFirstPage) {
             when (itemCount) {
@@ -535,33 +540,82 @@ class VideoMeetingViewHolder(
                 SLOT_NUM_2 -> {
                     w = screenWidth
                     h = screenHeight / TWO_FILES
+
+                    // The 0 item has a bottom border.
+                    when (adapterPosition) {
+                        POSITION_0 -> marginBottom = borderWidth
+                    }
                 }
                 SLOT_NUM_3 -> {
                     w = (screenWidth * 0.8).toInt()
                     h = screenHeight / THREE_FILES
                     marginLeft = (screenWidth - w) / 2
                     marginRight = marginLeft
+
+                    // The 0, 1 item have a bottom border.
+                    when (adapterPosition) {
+                        POSITION_0, POSITION_1 -> marginBottom = borderWidth
+                    }
+                }
+                SLOT_NUM_4 -> {
+                    w = screenWidth / TWO_COLUMNS
+                    h = w
+
+                    when (adapterPosition) {
+                        POSITION_0, POSITION_1 -> {
+                            marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
+                            marginBottom = borderWidth
+                        }
+                    }
+
+                     when (adapterPosition) {
+                        POSITION_1, POSITION_3 -> marginLeft =borderWidth
+                    }
                 }
                 SLOT_NUM_5 -> {
                     w = screenWidth / TWO_COLUMNS
                     h = w
 
                     when (adapterPosition) {
-                        POSITION_0, POSITION_1 -> marginTop =
-                            ((screenHeight - screenWidth / 2 * 3) / 2)
+                        POSITION_0, POSITION_1 -> {
+                            marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
+                            marginBottom = borderWidth
+                        }
+                        POSITION_2, POSITION_3 -> {
+                            marginTop = 0
+                        }
                         POSITION_4 -> {
+                            marginTop = borderWidth
                             marginLeft = (screenWidth - w) / 2
                             marginRight = marginLeft
                         }
                     }
+
+                     when (adapterPosition) {
+                        POSITION_1, POSITION_3 -> marginLeft =borderWidth
+                    }
                 }
-                SLOT_NUM_4, SLOT_NUM_6 -> {
+                SLOT_NUM_6 -> {
                     w = screenWidth / TWO_COLUMNS
                     h = w
 
                     when (adapterPosition) {
-                        POSITION_0, POSITION_1 -> marginTop =
-                            ((screenHeight - screenWidth / 2 * 3) / 2)
+                        POSITION_0, POSITION_1 -> {
+                            marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
+                            marginBottom = borderWidth
+                        }
+                        POSITION_2, POSITION_3 -> {
+                            marginTop = 0
+                            marginBottom = 0
+                        }
+                        POSITION_4, POSITION_5 -> {
+                            marginTop = borderWidth
+                            marginBottom = 0
+                        }
+                    }
+
+                    when (adapterPosition) {
+                        POSITION_1, POSITION_3, POSITION_5 -> marginLeft = borderWidth
                     }
                 }
             }
@@ -572,11 +626,21 @@ class VideoMeetingViewHolder(
             when (adapterPosition) {
                 POSITION_0, POSITION_1 -> marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
             }
+
+            when (adapterPosition) {
+                POSITION_0, POSITION_1, POSITION_2, POSITION_3 -> marginBottom = borderWidth
+            }
+
+            when (adapterPosition) {
+                POSITION_0, POSITION_2, POSITION_4 -> marginRight = borderWidth
+            }
         }
 
-        layoutParams.setMargins(marginLeft, marginTop, marginRight, marginBottom)
-        layoutParams.width = w
-        layoutParams.height = h
+        layoutParams.apply {
+            setMargins(marginLeft, marginTop, marginRight, marginBottom)
+            width = w
+            height = h
+        }
     }
 
     /**
@@ -613,7 +677,7 @@ class VideoMeetingViewHolder(
         const val SMALL_AVATAR = 60
         const val AVATAR_VIDEO_VISIBLE = 1f
         const val AVATAR_WITH_TRANSPARENCY = 0.5f
-        const val PADDING = 1f
+        const val BORDER_WIDTH = 2f
         const val ROTATION = 0f
 
         const val TWO_COLUMNS = 2
@@ -629,7 +693,9 @@ class VideoMeetingViewHolder(
         const val SLOT_NUM_6 = 6
         const val POSITION_0 = 0
         const val POSITION_1 = 1
+        const val POSITION_2 = 2
         const val POSITION_3 = 3
         const val POSITION_4 = 4
+        const val POSITION_5 = 6
     }
 }

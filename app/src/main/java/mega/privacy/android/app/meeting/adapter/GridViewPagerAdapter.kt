@@ -55,7 +55,6 @@ class GridViewPagerAdapter(
                     setOnTouchCallback {
                         onPageClickedCallback.invoke()
                     }
-                    clipToPadding = true
                     setHasFixedSize(true)
                     setParamsForGridView(position, participantsForPage, this)
                     setColumnWidth(position, this, participantsForPage.size, orientation)
