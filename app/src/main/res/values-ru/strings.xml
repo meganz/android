@@ -411,9 +411,9 @@
     <!-- Warning message -->
     <string name="error_file_size_greater_than_4gb">Большинство устройств не может скачивать файлы больше 4 ГБ. Возможно, скачивание не удастся</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
-    <string name="intent_not_available">На вашем устройстве отсутствует приложение для открытия этого файла.</string>
+    <string name="intent_not_available">На вашем устройстве нет приложений для открытия этого файла</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
-    <string name="intent_not_available_location">На вашем устройстве нет доступных приложений, чтобы открыть эту папку.</string>
+    <string name="intent_not_available_location">На вашем устройстве нет приложений, чтобы открыть эту папку</string>
     <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
     <string name="intent_not_available_file">Возможно, у вас не установлены приложения, поддерживающие этот тип файлов.</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
@@ -433,7 +433,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_remove_link_menu">Удалить ссылку</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
-    <string name="context_remove_link_warning_text">Эта ссылка больше не будет общедоступна.</string>
+    <string name="context_remove_link_warning_text">Эта ссылка больше не будет доступна публично.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
         <item quantity="one">Эта ссылка больше не будет общедоступна.</item>
@@ -508,11 +508,11 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Запрос отправлен повторно</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Запрос успешно отправлен %s. Его состояние доступно во вкладке «Отправленные запросы».</string>
+    <string name="context_contact_request_sent">Запрос успешно отправлен пользователю %s. Его можно посмотреть на вкладке «Отправленные запросы».</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Контакт удалён</string>
     <!-- error message -->
-    <string name="context_contact_not_removed">Ошибка. Контакт не удален</string>
+    <string name="context_contact_not_removed">Ошибка. Контакт не удалён</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">Права изменены</string>
     <!-- error message -->
@@ -4119,7 +4119,7 @@
     <!-- settings of the Media section -->
     <string name="settings_media">Медиа</string>
     <!-- settings title of the Media section -->
-    <string name="settings_media_audio_files">Audio files</string>
+    <string name="settings_media_audio_files">Аудиофайлы</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Воспроизведение в фоновом режиме</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
@@ -4140,7 +4140,13 @@
     <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
-        <item quantity="one">Upload in progress, 1 file pending</item>
-        <item quantity="other">Upload in progress, %1$d files pending</item>
+        <item quantity="one">Загрузка, 1 файл ожидает обработки</item>
+        <item quantity="few">Загрузка, %1$d файла ожидает обработки</item>
+        <item quantity="many">Загрузка, %1$d файлов ожидает обработки</item>
+        <item quantity="other">Загрузка, %1$d файла ожидает обработки</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Производство</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Изменение сервера</string>
 </resources>

@@ -481,7 +481,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Thư mời đã được gửi lại lần nữa</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Lời mời đã được gửi tới %s thành công. Theo dõi tình trạng của lời mời trong tab Yêu Cầu Gửi Đi.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Đã xóa tên liên lạc</string>
     <!-- error message -->
@@ -3881,4 +3881,8 @@
     <plurals name="cu_upload_progress">
         <item quantity="other">Việc tải lên đang được thực hiện, %1$d tệp đang chờ</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Đổi máy chủ</string>
 </resources>

@@ -481,7 +481,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">重新發送邀請</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">邀請已正確發送給%s。您可以在發送邀請的頁面中查看同意狀態。</string>
+    <string name="context_contact_request_sent">邀請已成功發送給%s。可在已發送邀請分頁查看。</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">聯絡人已移除</string>
     <!-- error message -->
@@ -964,9 +964,9 @@
     <!-- category in sort by action -->
     <string name="sortby_name">名稱</string>
     <!-- sort files alphabetically ascending -->
-    <string name="sortby_name_ascending">升序</string>
+    <string name="sortby_name_ascending">升冪</string>
     <!-- sort files alphabetically descending -->
-    <string name="sortby_name_descending">降序</string>
+    <string name="sortby_name_descending">降冪</string>
     <!-- category in sort by action -->
     <string name="sortby_date">日期</string>
     <!-- category in sort by action -->
@@ -3881,4 +3881,8 @@
     <plurals name="cu_upload_progress">
         <item quantity="other">正在上傳，%1$d個待處理檔案</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">生產力</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">變更伺服器</string>
 </resources>

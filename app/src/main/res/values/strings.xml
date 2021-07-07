@@ -490,7 +490,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Request resent</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request successfully sent to %s. The status can be consulted in the Sent Requests tab.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contact removed</string>
     <!-- error message -->

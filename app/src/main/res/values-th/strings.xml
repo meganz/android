@@ -481,7 +481,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">ส่งคำขอใหม่</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">ส่งคำขอให้กับ %s เรียบร้อยแล้ว สถานะสามารถดูได้ในแท็บคำขอที่ส่งแล้ว</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">รายการติดต่อถูกลบออกแล้ว</string>
     <!-- error message -->
@@ -3882,4 +3882,8 @@
         <item quantity="one">Upload in progress, 1 file pending</item>
         <item quantity="other">Upload in progress, %1$d files pending</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">โปรดักชั่น (ใช้งานจริง)</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">เปลี่ยนเซิร์ฟเวอร์</string>
 </resources>

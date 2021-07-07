@@ -481,7 +481,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">요청이 재발송되었습니다</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">%s님께 요청이 성공적으로 전송되었습니다. 상태는 보낸 요청 탭에서 확인할 수 있습니다.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">연락처가 제거되었습니다</string>
     <!-- error message -->
@@ -3881,4 +3881,8 @@
     <plurals name="cu_upload_progress">
         <item quantity="other">업로드 진행 중, 파일 %1$d개 대기 중</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">운영</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">서버 변경</string>
 </resources>
