@@ -1338,9 +1338,9 @@
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
     <string name="clear_history_error">發生錯誤。對話記錄尚未成功清除。</string>
     <!-- Menu item to add participants to a chat -->
-    <string name="add_participants_menu_item">新增成員</string>
+    <string name="add_participants_menu_item">新增與會者</string>
     <!-- Menu item to remove a participants from a chat -->
-    <string name="remove_participant_menu_item">移除成員</string>
+    <string name="remove_participant_menu_item">移除與會者</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_info_empty_screen">使用點對點（用戶控制）加密方式，讓您的對話內容能保有隱私，並提供重要的安全保證：</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1388,7 +1388,7 @@
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
     <string name="title_properties_chat_leave_chat">離開群組</string>
     <!-- Label for participants of a group chat -->
-    <string name="participants_chat_label">參與人</string>
+    <string name="participants_chat_label">與會者</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
     <string name="confirmation_remove_chat_contact">確定要把%s從這個對話中移除？</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
@@ -1406,11 +1406,11 @@
     <!-- title confirmation message before leaving a group chat -->
     <string name="title_confirmation_leave_group_chat">確定要離開對話群組嗎？</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
-    <string name="add_participant_error_already_exists">這個人已經在此對話群組中</string>
+    <string name="add_participant_error_already_exists">此與會者已經在此對話群組中</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">已成功邀請%d個參與人</string>
+    <string name="number_correctly_add_participant">已成功邀請%d個與會者</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">已成功邀請%1$d位參與人，但%2$d位未成功受邀</string>
+    <string name="number_no_add_participant_request">已成功邀請%1$d位與會者，但%2$d位未成功受邀</string>
     <!-- chat message when the permissions for a user has been changed -->
     <string name="message_permissions_changed">[A]%1$s[/A][D]已被[/D][E]%3$s[/E][B]修改為[/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -1769,13 +1769,13 @@
     <!-- Message when an user attribute has been changed successfully -->
     <string name="success_changing_user_attributes">已成功更新您的名字</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
-    <string name="add_participant_success">已新增成員</string>
+    <string name="add_participant_success">已新增與會者</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
-    <string name="add_participant_error">發生錯誤，成員未被新增</string>
+    <string name="add_participant_error">發生錯誤，與會者未被新增</string>
     <!-- Message show when a participant has been successfully removed from a group chat -->
-    <string name="remove_participant_success">已移除成員</string>
+    <string name="remove_participant_success">已移除與會者</string>
     <!-- Message show when a participant hasn’t been successfully removed from a group chat -->
-    <string name="remove_participant_error">發生錯誤，成員未被移除</string>
+    <string name="remove_participant_error">發生錯誤，與會者未被移除</string>
     <!--  -->
     <string name="no_files_selected_warning">未選擇任何檔案</string>
     <!--  -->
@@ -2124,8 +2124,6 @@
     <string name="label_set_period">設定期限</string>
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]邀請朋友[/B][A]對話[/A][B]並享受我們具隱私和安全的加密平台。[/B]</string>
-    <!-- Text of the empty screen when there are not elements in Camera Uploads -->
-    <string name="context_empty_camera_uploads">[A]相機上傳[/A][B]沒有照片與影片[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]空的[/B][A]垃圾筒[/A]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2434,9 +2432,9 @@
     <!-- Button that permits user begin with the process of enable Two-Factor Authentication -->
     <string name="button_setup_2fa">開始設定</string>
     <!-- Text that explain how to do with Two-Factor Authentication QR -->
-    <string name="explain_qr_seed_2fa_1">掃描或複製種子到您的身份驗證應用程式。</string>
+    <string name="explain_qr_seed_2fa_1">掃描或複製種子密鑰到您的身份驗證應用程式。</string>
     <!-- Text that explain how to do with Two-Factor Authentication seed -->
-    <string name="explain_qr_seed_2fa_2">請務必將此種子備份於安全的地方，以防您的裝置遺失。</string>
+    <string name="explain_qr_seed_2fa_2">請務必將此種子密鑰備份於安全的地方，以防您的裝置遺失。</string>
     <!-- Text that explain how to confirm Two-Factor Authentication -->
     <string name="explain_confirm_2fa">請輸入您身份驗證程式所生成的6位數字代碼。</string>
     <!-- Text button -->
@@ -2446,7 +2444,7 @@
     <!-- Text button -->
     <string name="general_previous">先前的</string>
     <!-- Text of the alert dialog to inform the user when an error occurs when try to enable seed or QR of Two-Factor Authentication -->
-    <string name="qr_seed_text_error">生成種子或二維條碼時出錯，請再試一次。</string>
+    <string name="qr_seed_text_error">生成種子密鑰或二維條碼時出錯，請再試一次。</string>
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">已啟用雙重驗證</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
@@ -2742,11 +2740,11 @@
     <!-- Title of the view to inform that a chat is private -->
     <string name="private_chat">加密金鑰輪替已啟用</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="make_chat_private_option_text">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入者將看不到舊的訊息。</string>
+    <string name="make_chat_private_option_text">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入的與會者將看不到舊的訊息。</string>
     <!-- Text of the option to change a public chat to private (enable encrypted key rotation) -->
-    <string name="make_chat_private_not_available_text">與超過100位參與者的對話無法使用加密金鑰輪替功能。</string>
+    <string name="make_chat_private_not_available_text">與超過100位與會者的對話無法使用加密金鑰輪替功能。</string>
     <!-- Warning show to the user when tries to make private a public chat and the chat has more than 100 participants -->
-    <string name="warning_make_chat_private">由於超過參與人數上限，因此無法將此對話轉換為私人的。</string>
+    <string name="warning_make_chat_private">由於超過與會者人數上限，因此無法將此對話轉換為私人的。</string>
     <!-- Text shown when a moderator of a chat create a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_created_chat_link">[A]%1$s[/A][B]建立對話連結。[/B]</string>
     <!-- Text shown when a moderator of a chat delete a chat link. Please keep the placeholder because is to show the moderator’s name in runtime. -->
@@ -2760,7 +2758,7 @@
     <!-- Title of the dialog to confirm after closing all other sessions -->
     <string name="confirmation_close_sessions_title">您要關閉所有其它工作階段嗎？</string>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
-    <string name="number_of_participants">%d位參與者</string>
+    <string name="number_of_participants">%d位與會者</string>
     <!-- Label of the button to join a chat by a chat link -->
     <string name="action_join">加入</string>
     <!-- Label for observers of a group chat -->
@@ -2782,9 +2780,9 @@
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
     <string name="ekr_label">加密金鑰輪替</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="ekr_explanation">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入者將看不到舊的訊息。</string>
+    <string name="ekr_explanation">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入的與會者將看不到舊的訊息。</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="subtitle_chat_message_enabled_ERK">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入者將看不到舊的訊息。</string>
+    <string name="subtitle_chat_message_enabled_ERK">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入的與會者將看不到舊的訊息。</string>
     <!-- Menu item -->
     <string name="action_open_chat_link">開啟對話連結</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
@@ -2955,7 +2953,7 @@
     </plurals>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <plurals name="subtitle_of_group_chat">
-        <item quantity="other">%d位參與者</item>
+        <item quantity="other">%d位與會者</item>
     </plurals>
     <!--  -->
     <string name="custom_subtitle_of_group_chat">還有%1$s和%2$d</string>
@@ -3042,13 +3040,13 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s已離開通話</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">由於超過參與人數限制，您無法發起通話。</string>
+    <string name="call_error_too_many_participants_start">由於超過與會者人數限制，您無法發起通話。</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">由於已達到最大參與人數，您無法加入通話，</string>
+    <string name="call_error_too_many_participants">由於已達到最大與會者人數，您無法加入通話，</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">由於該群組已達到最大參與人數，您無法加入通話。</string>
+    <string name="call_error_too_many_participants_join">由於該群組已達到最大與會者人數，您無法加入通話。</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">由於此通話已達到最大視訊參與人數，您無法開啟視訊。</string>
+    <string name="call_error_too_many_video">由於此通話已達到最大視訊與會者人數，您無法開啟視訊。</string>
     <!-- Message show when a user cannot put the call on hold -->
     <string name="call_error_call_on_hold">您無法進行通話保留</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
@@ -3192,7 +3190,7 @@
     <!-- Question of the dialog to generate a public chat link -->
     <string name="context_create_chat_link_question_text">您想建立一個新的群組對話並產出對話連結嗎？</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
-    <string name="context_make_private_chat_warning_text">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新參與者將看不到舊的訊息。</string>
+    <string name="context_make_private_chat_warning_text">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入的與會者將看不到舊的訊息。</string>
     <!-- Message shown when a user has joined to a public chat successfully -->
     <string name="message_joined_successfully">您已成功加入對話。</string>
     <!-- Label that indicates the steps of a wizard -->
@@ -3857,4 +3855,30 @@
     <string name="general_info">資訊</string>
     <!-- Item menu option upon right click on one image or video to save it to device gallery -->
     <string name="general_save_to_gallery">儲存至相簿</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">媒體</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">音樂檔案</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">在背景中播放</string>
+    <!-- Text of the empty screen when there are no elements in Photos -->
+    <string name="photos_empty">[B]沒有[/B] [A]相片[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="enable_cu_subtitle">自動備份相片與影片到您的MEGA雲端硬碟。</string>
+    <!-- Text of a button on Camera Uploads section to show all the content of the section-->
+    <string name="all_view_button">全部</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
+    <string name="days_view_button">日</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
+    <string name="months_view_button">月</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
+    <string name="years_view_button">年</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
+    <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
+    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
+    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
+    <plurals name="cu_upload_progress">
+        <item quantity="other">正在上傳，%1$d個待處理檔案</item>
+    </plurals>
 </resources>

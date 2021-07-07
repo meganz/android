@@ -102,6 +102,10 @@ public class SettingsChatNotificationsFragment extends SettingsBaseFragment {
 
         chatNotificationsSwitch.setChecked(option.equals(NOTIFICATIONS_ENABLED));
 
+        if (chatSettings == null) {
+            chatSettings = dbH.getChatSettings();
+        }
+
         boolean isVibrationEnabled = chatSettings.getVibrationEnabled() == null || Boolean.parseBoolean(chatSettings.getVibrationEnabled());
         dbH.setVibrationEnabledChat(isVibrationEnabled + "");
         chatSettings.setVibrationEnabled(isVibrationEnabled + "");

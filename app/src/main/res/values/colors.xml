@@ -160,6 +160,8 @@
     <!-- The list item divider; Stroke color (Grid item border color);
          The underline color of TextInputLayout when unfocused -->
     <color name="grey_012_white_012">@color/grey_alpha_012</color>
+    <!-- Simulate the background color when a dialog show -->
+    <color name="grey_012_transparent">@color/grey_alpha_012</color>
     <!-- The "eye" icon -->
     <color name="grey_012_white_038">@color/grey_alpha_012</color>
 
@@ -223,7 +225,7 @@
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
     <!-- AudioPlayer playlist position and duration  -->
-    <color name="grey_038_white">@color/grey_alpha_038</color>
+    <color name="grey_038_white_alpha_038">@color/grey_alpha_038</color>
 
     <!-- Bottom navigation menu disabled tint color  -->
     <color name="grey_016_white_016">@color/grey_alpha_016</color>
@@ -438,5 +440,6 @@
 
     <color name="grey_054_white_060">@color/grey_alpha_054</color>
     <color name="grey_012_white_020">@color/grey_alpha_012</color>
-
+    <color name="black_grey_alpha_012">@color/black</color>
+    <color name="grey_alpha_012_black">@color/grey_alpha_012</color>
 </resources>

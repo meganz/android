@@ -126,7 +126,6 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.google.android.material.textfield.TextInputLayout.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.IncomingCallNotification.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -154,6 +153,11 @@ public class Util {
 
 	// 150ms, a smaller value may cause the keyboard to fail to open
 	public final static int SHOW_IM_DELAY = 150;
+
+    /**
+     * Language tag for simplified Chinese.
+     */
+    private static final String HANS = "Hans";
 
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();
@@ -1427,7 +1431,7 @@ public class Util {
 	}
 
 	public static boolean isAndroid10() {
-		return Build.VERSION.SDK_INT >= ANDROID_10_Q;
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q;
 	}
 
 	public static boolean isAndroidOreoOrUpper() {
@@ -1639,4 +1643,8 @@ public class Util {
 
 		return false;
 	}
+
+    public static boolean isSimplifiedChinese() {
+        return Locale.getDefault().toLanguageTag().contains(HANS);
+    }
 }
