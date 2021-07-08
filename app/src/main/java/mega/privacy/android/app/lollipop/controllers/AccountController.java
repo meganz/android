@@ -31,7 +31,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
-import mega.privacy.android.app.myAccount.fragments.MyAccountFragment;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel;
 import mega.privacy.android.app.jobservices.SyncRecord;
@@ -488,21 +487,21 @@ public class AccountController {
 
     public int updateUserAttributes(String oldFirstName, String newFirstName, String oldLastName, String newLastName, String oldMail, String newMail){
         logDebug("updateUserAttributes");
-        MyAccountFragment myAccountFragmentLollipop = ((ManagerActivityLollipop) context).getMyAccountFragment();
+//        MyAccountFragment myAccountFragmentLollipop = ((ManagerActivityLollipop) context).getMyAccountFragment();
 
         if(!oldFirstName.equals(newFirstName)){
             logDebug("Changes in first name");
-            if(myAccountFragmentLollipop!=null){
+//            if(myAccountFragmentLollipop!=null){
                 count++;
                 megaApi.setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, newFirstName, (ManagerActivityLollipop)context);
-            }
+//            }
         }
         if(!oldLastName.equals(newLastName)){
             logDebug("Changes in last name");
-            if(myAccountFragmentLollipop!=null){
+//            if(myAccountFragmentLollipop!=null){
                 count++;
                 megaApi.setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, newLastName, (ManagerActivityLollipop)context);
-            }
+//            }
         }
         if(!oldMail.equals(newMail)){
             logDebug("Changes in mail, new mail: " + newMail);

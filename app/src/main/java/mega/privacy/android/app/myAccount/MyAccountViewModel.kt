@@ -1,9 +1,14 @@
 package mega.privacy.android.app.myAccount
 
+import android.Manifest
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,19 +29,17 @@ import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 class MyAccountViewModel @ViewModelInject constructor(
     private val myAccountInfo: MyAccountInfo,
-    @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbH: DatabaseHandler
+    @MegaApi private val megaApi: MegaApiAndroid
 ) : BaseRxViewModel() {
 
     companion object {
         private const val CLICKS_TO_STAGING = 5
-        private const val STAGING_URL = "https://staging.api.mega.co.nz/"
-        private const val PRODUCTION_URL = "https://g.api.mega.co.nz/"
         private const val TIME_TO_SHOW_PAYMENT_INFO = 604800 //1 week in seconds
     }
 
@@ -93,6 +96,10 @@ class MyAccountViewModel @ViewModelInject constructor(
     fun isMyAccountFragment(): Boolean = fragment == MY_ACCOUNT_FRAGMENT
 
     fun thereIsNoSubscription(): Boolean = myAccountInfo.numberOfSubscriptions <= 0
+
+    fun getRegisteredPhoneNumber(): String? = megaApi.smsVerifiedPhoneNumber()
+
+    fun isAlreadyRegisteredPhoneNumber(): Boolean = !getRegisteredPhoneNumber().isNullOrEmpty()
 
     fun checkVersions() {
         if (myAccountInfo.numVersions == -1) {
@@ -217,6 +224,59 @@ class MyAccountViewModel @ViewModelInject constructor(
         megaApi.shouldShowPasswordReminderDialog(
             true,
             ShouldShowPasswordReminderDialogListener(context, true)
+        )
+    }
+
+    fun capturePhoto(activity: Activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val hasStoragePermission: Boolean = ContextCompat.checkSelfPermission(
+                activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+            val hasCameraPermission: Boolean = ContextCompat.checkSelfPermission(
+                activity,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!hasStoragePermission && !hasCameraPermission) {
+                ActivityCompat.requestPermissions(
+                    activity, arrayOf(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA
+                    ),
+                    REQUEST_WRITE_STORAGE
+                )
+
+                return
+            } else if (!hasStoragePermission) {
+                ActivityCompat.requestPermissions(
+                    activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    REQUEST_WRITE_STORAGE
+                )
+
+                return
+            } else if (!hasCameraPermission) {
+                ActivityCompat.requestPermissions(
+                    activity, arrayOf(Manifest.permission.CAMERA),
+                    REQUEST_CAMERA
+                )
+
+                return
+            }
+        }
+
+        Util.checkTakePicture(activity, TAKE_PICTURE_PROFILE_CODE)
+    }
+
+    fun launchChoosePhotoIntent(activity: Activity) {
+        val intent = Intent()
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        intent.action = Intent.ACTION_GET_CONTENT
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        intent.type = "image/*";
+        activity.startActivityForResult(
+            Intent.createChooser(intent, null),
+            CHOOSE_PICTURE_PROFILE_CODE
         )
     }
 }

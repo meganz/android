@@ -152,7 +152,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.activities.OfflineFileInfoActivity;
-import mega.privacy.android.app.myAccount.fragments.MyAccountFragment;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
@@ -470,7 +469,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS,
-		RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
+		RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
 		RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
 		LINKS;
 
@@ -487,7 +486,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case SENT_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 1;
 				case RECEIVED_REQUESTS: return "android:switcher:" + R.id.contact_tabs_pager + ":" + 2;
 				case SETTINGS: return "sttF";
-				case MY_ACCOUNT: return "maF";
 				case SEARCH: return "sFLol";
 				case TRANSFERS: return "android:switcher:" + R.id.transfers_tabs_pager + ":" + 0;
 				case COMPLETED_TRANSFERS: return "android:switcher:" + R.id.transfers_tabs_pager + ":" + 1;
@@ -637,7 +635,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private ContactsFragmentLollipop cFLol;
 	private ReceivedRequestsFragmentLollipop rRFLol;
 	private SentRequestsFragmentLollipop sRFLol;
-	private MyAccountFragment maF;
 	private TransfersFragmentLollipop tFLol;
 	private CompletedTransfersFragmentLollipop completedTFLol;
 	private SearchFragmentLollipop sFLol;
@@ -689,7 +686,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem cancelAllTransfersMenuItem;
 	private MenuItem playTransfersMenuIcon;
 	private MenuItem pauseTransfersMenuIcon;
-	private MenuItem forgotPassMenuItem;
 	private MenuItem inviteMenuItem;
 	private MenuItem retryTransfers;
 	private MenuItem clearCompletedTransfers;
@@ -5924,7 +5920,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
 		scanQRcodeMenuItem = menu.findItem(R.id.action_scan_qr);
 		takePicture = menu.findItem(R.id.action_take_picture);
-		forgotPassMenuItem = menu.findItem(R.id.action_menu_forgot_pass);
 		inviteMenuItem = menu.findItem(R.id.action_menu_invite);
 		returnCallMenuItem = menu.findItem(R.id.action_return_call);
 		RelativeLayout rootView = (RelativeLayout) returnCallMenuItem.getActionView();
@@ -6657,13 +6652,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	navigateToUpgradeAccount();
 				return true;
 	        }
-			case R.id.action_menu_forgot_pass:{
-				logDebug("Action menu forgot pass pressed");
-				if (getMyAccountFragment() != null) {
-					showConfirmationResetPasswordFromMyAccount();
-				}
-				return true;
-			}
 			case R.id.action_scan_qr: {
 				logDebug("Action menu scan QR code pressed");
                 //Check if there is a in progress call:
@@ -6710,7 +6698,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             takePicture.setVisible(false);
             helpMenuItem.setVisible(false);
             gridSmallLargeMenuItem.setVisible(false);
-            forgotPassMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
             selectMenuItem.setVisible(false);
             thumbViewMenuItem.setVisible(false);
@@ -8290,32 +8277,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void leaveChatSuccess() {
 		// No update needed.
-	}
-
-	public void showConfirmationResetPasswordFromMyAccount (){
-		logDebug("showConfirmationResetPasswordFromMyAccount");
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE: {
-						if (getMyAccountFragment() != null) {
-							maF.resetPass();
-						}
-						break;
-					}
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		String message= getResources().getString(R.string.email_verification_text_change_pass);
-		builder.setMessage(message).setPositiveButton(R.string.general_ok, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
 	}
 
 	public void showConfirmationResetPassword (final String link){
@@ -10648,7 +10609,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (e.getErrorCode() == MegaError.API_OK){
 					logDebug("The first name has changed");
 					String fullName = myAccountInfo.getFullName();
-					maF.updateNameView(fullName);
+//					maF.updateNameView(fullName);
 					updateUserNameNavigationView(fullName);
 				}
 				else{
@@ -10677,7 +10638,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				if (e.getErrorCode() == MegaError.API_OK){
 					logDebug("The last name has changed");
-					maF.updateNameView(myAccountInfo.getFullName());
+//					maF.updateNameView(myAccountInfo.getFullName());
 					updateUserNameNavigationView(myAccountInfo.getFullName());
 				}
 				else{
@@ -10726,9 +10687,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					setProfileAvatar();
 
-					if (getMyAccountFragment() != null) {
-						maF.setUpAvatar(false);
-					}
+//					if (getMyAccountFragment() != null) {
+//						maF.setUpAvatar(false);
+//					}
 
 					LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(true);
 				}
@@ -10766,9 +10727,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				if (e.getErrorCode() != MegaError.API_OK) {
 					logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
-					if (getMyAccountFragment() != null) {
+//					if (getMyAccountFragment() != null) {
 //						maF.refreshVersionsInfo();
-					}
+//					}
 				} else {
 					logDebug("File versioning attribute changed correctly");
 				}
@@ -10780,10 +10741,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (e.getErrorCode() == MegaError.API_OK){
 					setProfileAvatar();
 					//refresh MyAccountFragment if visible
-					if(getMyAccountFragment()!=null){
+//					if(getMyAccountFragment()!=null){
 						logDebug("Update the account fragment");
-						maF.setUpAvatar(false);
-					}
+//						maF.setUpAvatar(false);
+//					}
 				}
 				else{
 					if(e.getErrorCode()==MegaError.API_ENOENT) {
@@ -10795,10 +10756,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 
 					//refresh MyAccountFragment if visible
-					if (getMyAccountFragment() != null) {
+//					if (getMyAccountFragment() != null) {
 						logDebug("Update the account fragment");
-						maF.setUpAvatar(false);
-					}
+//						maF.setUpAvatar(false);
+//					}
 				}
 				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
 			} else if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
@@ -10851,9 +10812,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
 
-				if (getMyAccountFragment() != null) {
+//				if (getMyAccountFragment() != null) {
 //					maF.refreshVersionsInfo();
-				}
+//				}
 			}
         } else if (request.getType() == MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK) {
             logDebug("TYPE_GET_CHANGE_EMAIL_LINK: " + request.getEmail());
@@ -11305,11 +11266,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			} else {
 				logError("ERROR requesting version info of the account");
 			}
-
-			//Refresh My Storage if it is shown
-			if (getMyAccountFragment() != null) {
-//				maF.refreshVersionsInfo();
-			}
 		}
 	}
 
@@ -11325,10 +11281,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			myAccountInfo.updateMyData(firstName, newName, e);
 			updateUserNameNavigationView(myAccountInfo.getFullName());
 
-			if (getMyAccountFragment() != null) {
-				logDebug("Update the account fragment");
-				maF.updateNameView(myAccountInfo.getFullName());
-			}
+//			if (getMyAccountFragment() != null) {
+//				logDebug("Update the account fragment");
+//				maF.updateNameView(myAccountInfo.getFullName());
+//			}
 		}
 	}
 
@@ -11459,10 +11415,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						if(cFLol!=null){
 							updateContactsView(true, false, false);
 						}
-						//When last contact changes avatar, update view.
-						if(getMyAccountFragment() != null) {
-							maF.setUpContactConnections();
-                        }
 					}
 				}
 				else{
@@ -11568,9 +11520,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		dbH.saveMyEmail(email);
 
-		if(getMyAccountFragment()!=null){
-			maF.updateMailView(email);
-		}
+//		if(getMyAccountFragment()!=null){
+//			maF.updateMailView(email);
+//		}
 	}
 
 	public void onNodesCloudDriveUpdate() {
@@ -12224,10 +12176,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.CONTACTS.getTag());
 	}
 
-	public MyAccountFragment getMyAccountFragment() {
-		return maF = (MyAccountFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.MY_ACCOUNT.getTag());
-	}
-
 	public void setContactsFragment(ContactsFragmentLollipop cFLol) {
 		this.cFLol = cFLol;
 	}
@@ -12813,9 +12761,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private void refreshAddPhoneNumberButton(){
         navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
 
-        if(getMyAccountFragment() != null){
-            maF.updateAddPhoneNumberLabel();
-        }
+//        if(getMyAccountFragment() != null){
+//            maF.updateAddPhoneNumberLabel();
+//        }
     }
 
     public void showAddPhoneNumberInMenu(){

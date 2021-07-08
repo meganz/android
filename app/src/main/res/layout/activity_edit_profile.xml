@@ -64,15 +64,23 @@
 
             <include layout="@layout/view_linear_layout_separator_16" />
 
-            <TextView
-                android:id="@+id/add_phone_number"
+            <LinearLayout
+                android:id="@+id/add_phone_number_layout"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:text="@string/add_phone_number_action"
-                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+                android:layout_height="wrap_content">
 
-            <include layout="@layout/view_linear_layout_separator" />
+                <TextView
+                    android:id="@+id/add_phone_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="@string/add_phone_number_action"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+
+                <include layout="@layout/view_linear_layout_separator" />
+
+            </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/recovery_key_layout"

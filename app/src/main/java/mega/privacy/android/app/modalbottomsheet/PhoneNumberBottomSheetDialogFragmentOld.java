@@ -7,21 +7,16 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.jeremyliao.liveeventbus.LiveEventBus;
+import com.jeremyliao.liveeventbus.core.LiveEvent;
+
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.managerSections.MyAccountFragmentLollipop;
 
-public class PhoneNumberBottomSheetDialogFragmentOld extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+import static mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_REMOVE_PHONE_NUMBER_CONFIRMATION;
 
-    private MyAccountFragmentLollipop myAccountFragment;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getActivity() != null) {
-            myAccountFragment = (MyAccountFragmentLollipop) getActivity().getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.MY_ACCOUNT.getTag());
-        }
-    }
+public class PhoneNumberBottomSheetDialogFragmentOld extends BaseBottomSheetDialogFragment {
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -31,23 +26,18 @@ public class PhoneNumberBottomSheetDialogFragmentOld extends BaseBottomSheetDial
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_phonenumber, null);
         mainLinearLayout = contentView.findViewById(R.id.phonenumber_bottom_sheet);
         items_layout = contentView.findViewById(R.id.items_layout);
-        contentView.findViewById(R.id.modify_phonenumber_layout).setOnClickListener(this);
-        contentView.findViewById(R.id.remove_phonenumber_layout).setOnClickListener(this);
+
+        contentView.findViewById(R.id.modify_phonenumber_layout).setOnClickListener(v -> {
+            LiveEventBus.get(EVENT_SHOW_REMOVE_PHONE_NUMBER_CONFIRMATION, Boolean.class).post(true);
+            setStateBottomSheetBehaviorHidden();
+        });
+
+        contentView.findViewById(R.id.remove_phonenumber_layout).setOnClickListener(v -> {
+            LiveEventBus.get(EVENT_SHOW_REMOVE_PHONE_NUMBER_CONFIRMATION, Boolean.class).post(false);
+            setStateBottomSheetBehaviorHidden();
+        });
+
         dialog.setContentView(contentView);
-
         setBottomSheetBehavior(HEIGHT_HEADER_LOW, false);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.modify_phonenumber_layout:
-                myAccountFragment.showConfirmRemovePhoneNumberDialog(true);
-                break;
-            case R.id.remove_phonenumber_layout:
-                myAccountFragment.showConfirmRemovePhoneNumberDialog(false);
-                break;
-        }
-        setStateBottomSheetBehaviorHidden();
     }
 }

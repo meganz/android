@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.managerFragments.myAccount.editProfile
+package mega.privacy.android.app.myAccount.editProfile
 
 import android.content.Intent
 import android.content.res.Configuration
@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
@@ -22,6 +23,7 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
+import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showRemoveOrModifyPhoneNumberConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDominantColor
@@ -53,7 +55,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         private const val IS_MODIFY = "IS_MODIFY"
     }
 
-    private val viewModel by viewModels<EditProfileViewModel>()
+    private val viewModel by viewModels<MyAccountViewModel>()
 
     private lateinit var binding: ActivityEditProfileBinding
 
@@ -118,7 +120,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
 
         binding.addPhoto.setOnClickListener {
-            if (ModalBottomSheetUtil.isBottomSheetDialogShown(photoBottomSheet))
+            if (isBottomSheetDialogShown(photoBottomSheet))
                 return@setOnClickListener
 
             photoBottomSheet = PhotoBottomSheetDialogFragment()
@@ -133,15 +135,18 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             startActivity(Intent(this, ChangePasswordActivityLollipop::class.java))
         }
 
-        binding.addPhoneNumber.apply {
-            if (canVoluntaryVerifyPhoneNumber()) {
-                startActivity(Intent(context, SMSVerificationActivity::class.java))
-            } else if (!isBottomSheetDialogShown(phoneNumberBottomSheetOld)) {
-                phoneNumberBottomSheetOld = PhoneNumberBottomSheetDialogFragment()
-                phoneNumberBottomSheetOld!!.show(
-                    supportFragmentManager,
-                    phoneNumberBottomSheetOld!!.tag
-                )
+        binding.addPhoneNumberLayout.apply {
+            isVisible = canVoluntaryVerifyPhoneNumber()
+            setOnClickListener {
+                if (canVoluntaryVerifyPhoneNumber()) {
+                    startActivity(Intent(this@EditProfileActivity, SMSVerificationActivity::class.java))
+                } else if (!isBottomSheetDialogShown(phoneNumberBottomSheetOld)) {
+                    phoneNumberBottomSheetOld = PhoneNumberBottomSheetDialogFragment()
+                    phoneNumberBottomSheetOld!!.show(
+                        supportFragmentManager,
+                        phoneNumberBottomSheetOld!!.tag
+                    )
+                }
             }
         }
 
