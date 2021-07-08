@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="participant"
             type="mega.privacy.android.app.meeting.adapter.Participant" />
@@ -57,7 +56,7 @@
                 android:show="@{!viewModel.participantGuest}"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
-                tools:text="@{viewModel.getEmail}" />
+                tools:text="@{viewModel.getEmail(context)}" />
         </LinearLayout>
 
         <View
