@@ -8,6 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.middlelayer.iab.MegaPurchase
 import mega.privacy.android.app.middlelayer.iab.MegaSku
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.ContactUtil.notifyFirstNameUpdate
 import mega.privacy.android.app.utils.ContactUtil.notifyLastNameUpdate
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -36,16 +37,16 @@ class MyAccountInfo @Inject constructor(
         const val hasSessionsDetails = 0x020
     }
 
-    var usedPercentage = -1
-    var usedTransferPercentage = -1
-    var usedStorage = -1L
-    var accountType = -1
+    var usedPercentage = INVALID_VALUE
+    var usedTransferPercentage = INVALID_VALUE
+    var usedStorage = INVALID_VALUE.toLong()
+    var accountType = INVALID_VALUE
     private var accountInfo: MegaAccountDetails? = null
     var paymentBitSet: BitSet? = null
-    var numberOfSubscriptions = -1L
-    var subscriptionStatus = -1
-    var subscriptionRenewTime = -1L
-    var proExpirationTime = -1L
+    var numberOfSubscriptions = -INVALID_VALUE.toLong()
+    var subscriptionStatus = INVALID_VALUE
+    var subscriptionRenewTime = INVALID_VALUE.toLong()
+    var proExpirationTime = INVALID_VALUE.toLong()
     var usedFormatted = ""
     var totalFormatted = ""
     var formattedUsedCloud = ""
@@ -55,8 +56,8 @@ class MyAccountInfo @Inject constructor(
     private var formattedAvailableSpace = ""
     var usedTransferFormatted = ""
     var totalTransferFormatted = ""
-    var levelInventory = -1
-    var levelAccountDetails = -1
+    var levelInventory = INVALID_VALUE
+    var levelAccountDetails = INVALID_VALUE
 
     var isInventoryFinished = false
     var isAccountDetailsFinished = false
@@ -70,7 +71,7 @@ class MyAccountInfo @Inject constructor(
     var fullName = ""
 
     var lastSessionFormattedDate: String? = null
-    var createSessionTimeStamp = -1L
+    var createSessionTimeStamp = INVALID_VALUE.toLong()
 
     var productAccounts: ArrayList<Product>? = null
 
@@ -79,8 +80,8 @@ class MyAccountInfo @Inject constructor(
 
     var pricing: MegaPricing? = null
 
-    var numVersions = -1
-    var previousVersionsSize = -1L
+    var numVersions = INVALID_VALUE
+    var previousVersionsSize = INVALID_VALUE.toLong()
 
     /**
      * Resets all values by default.
@@ -88,16 +89,16 @@ class MyAccountInfo @Inject constructor(
      * and call it each time the account logs out.
      */
     fun resetDefaults() {
-        usedPercentage = -1
-        usedTransferPercentage = -1
-        usedStorage = -1L
-        accountType = -1
+        usedPercentage = INVALID_VALUE
+        usedTransferPercentage = INVALID_VALUE
+        usedStorage = INVALID_VALUE.toLong()
+        accountType = INVALID_VALUE
         accountInfo = null
         paymentBitSet = null
-        numberOfSubscriptions = -1L
-        subscriptionStatus = -1
-        subscriptionRenewTime = -1L
-        proExpirationTime = -1L
+        numberOfSubscriptions = INVALID_VALUE.toLong()
+        subscriptionStatus = INVALID_VALUE
+        subscriptionRenewTime = INVALID_VALUE.toLong()
+        proExpirationTime = INVALID_VALUE.toLong()
         usedFormatted = ""
         totalFormatted = ""
         formattedUsedCloud = ""
@@ -107,8 +108,8 @@ class MyAccountInfo @Inject constructor(
         formattedAvailableSpace = ""
         usedTransferFormatted = ""
         totalTransferFormatted = ""
-        levelInventory = -1
-        levelAccountDetails = -1
+        levelInventory = INVALID_VALUE
+        levelAccountDetails = INVALID_VALUE
 
         isInventoryFinished = false
         isAccountDetailsFinished = false
@@ -122,7 +123,7 @@ class MyAccountInfo @Inject constructor(
         fullName = ""
 
         lastSessionFormattedDate = null
-        createSessionTimeStamp = -1L
+        createSessionTimeStamp = INVALID_VALUE.toLong()
 
         productAccounts = null
 
@@ -131,8 +132,8 @@ class MyAccountInfo @Inject constructor(
 
         pricing = null
 
-        numVersions = -1
-        previousVersionsSize = -1L
+        numVersions = INVALID_VALUE
+        previousVersionsSize = INVALID_VALUE.toLong()
     }
 
     fun setAccountDetails(numDetails: Int) {
@@ -212,7 +213,7 @@ class MyAccountInfo @Inject constructor(
             proExpirationTime = accountInfo.proExpiration
 
             when (accountType) {
-                0 -> levelAccountDetails = -1
+                0 -> levelAccountDetails = INVALID_VALUE
                 1 -> levelAccountDetails = 1
                 2 -> levelAccountDetails = 2
                 3 -> levelAccountDetails = 3

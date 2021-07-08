@@ -1,4 +1,4 @@
-package mega.privacy.android.app.activities.upgradeAccount
+package mega.privacy.android.app.upgradeAccount
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK

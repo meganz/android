@@ -1,12 +1,12 @@
-package mega.privacy.android.app.activities.exportMK
+package mega.privacy.android.app.exportMK
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.exportMK.ExportRecoveryKeyViewModel.Companion.ERROR_NO_SPACE
-import mega.privacy.android.app.activities.exportMK.ExportRecoveryKeyViewModel.Companion.GENERAL_ERROR
+import mega.privacy.android.app.exportMK.ExportRecoveryKeyViewModel.Companion.ERROR_NO_SPACE
+import mega.privacy.android.app.exportMK.ExportRecoveryKeyViewModel.Companion.GENERAL_ERROR
 import mega.privacy.android.app.databinding.ActivityExportRecoveryKeyBinding
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.utils.StringResourcesUtils

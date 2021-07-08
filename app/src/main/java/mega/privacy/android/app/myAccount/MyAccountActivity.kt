@@ -1,4 +1,4 @@
-package mega.privacy.android.app.activities.myAccount
+package mega.privacy.android.app.myAccount
 
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
@@ -16,7 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_general_confirmation.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.myAccount.fragments.MyAccountFragment
+import mega.privacy.android.app.myAccount.fragments.MyAccountFragment
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown

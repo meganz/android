@@ -1,4 +1,4 @@
-package mega.privacy.android.app.activities.myAccount.fragments
+package mega.privacy.android.app.myAccount.fragments
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -18,7 +18,7 @@ import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.SMSVerificationActivity
-import mega.privacy.android.app.activities.myAccount.MyAccountViewModel
+import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.fragments.BaseFragment

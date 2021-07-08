@@ -1,11 +1,10 @@
-package mega.privacy.android.app.activities.upgradeAccount
+package mega.privacy.android.app.upgradeAccount
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.os.Handler
 import android.text.Spanned
 import android.view.MenuItem
 import android.view.View
@@ -17,8 +16,8 @@ import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.activity_upgrade_account.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_STORAGE_LABEL
-import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_TRANSFER_LABEL
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_STORAGE_LABEL
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel.Companion.TYPE_TRANSFER_LABEL
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.databinding.ActivityUpgradeAccountBinding

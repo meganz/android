@@ -1,4 +1,4 @@
-package mega.privacy.android.app.activities.exportMK
+package mega.privacy.android.app.exportMK
 
 import android.Manifest
 import android.app.Activity

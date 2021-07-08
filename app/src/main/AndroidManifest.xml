@@ -634,20 +634,20 @@
             android:launchMode="singleTop" />
 
         <activity
-            android:name=".activities.myAccount.MyAccountActivity"
+            android:name="mega.privacy.android.app.myAccount.MyAccountActivity"
             android:launchMode="singleTop" />
 
         <activity
-            android:name=".activities.exportMK.ExportRecoveryKeyActivity"
+            android:name="mega.privacy.android.app.exportMK.ExportRecoveryKeyActivity"
             android:launchMode="singleTop" />
 
         <activity
-            android:name=".activities.upgradeAccount.UpgradeAccountActivity"
+            android:name="mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity"
             android:label="@string/action_upgrade_account"
             android:launchMode="singleTop" />
 
         <activity
-            android:name=".activities.upgradeAccount.ChooseAccountActivity"
+            android:name="mega.privacy.android.app.upgradeAccount.ChooseAccountActivity"
             android:label="@string/choose_account_fragment"
             android:launchMode="singleTop" />
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.activities.myAccount
+package mega.privacy.android.app.myAccount
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK
@@ -10,8 +10,8 @@ import androidx.lifecycle.MutableLiveData
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.activities.exportMK.ExportRecoveryKeyActivity
-import mega.privacy.android.app.activities.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.exportMK.ExportRecoveryKeyActivity
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.di.MegaApi
@@ -20,7 +20,6 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug

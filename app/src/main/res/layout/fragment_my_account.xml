@@ -79,7 +79,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant6"
-                        app:drawableTint="@color/dark_grey_white"
+                        app:drawableTint="@color/teal_300_teal_200"
                         tools:text="Daphne Oram" />
 
                     <TextView
