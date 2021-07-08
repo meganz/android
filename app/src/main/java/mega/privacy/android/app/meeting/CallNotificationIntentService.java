@@ -3,16 +3,11 @@ package mega.privacy.android.app.meeting;
 import android.app.IntentService;
 import android.content.Intent;
 
-import org.jetbrains.annotations.Nullable;
-
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener;
-import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
-import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -61,6 +56,9 @@ public class CallNotificationIntentService extends IntentService implements Hang
     protected void onHandleIntent(Intent intent) {
         logDebug("onHandleIntent");
 
+        if(intent == null || intent.getExtras() == null)
+            return;
+
         chatIdCurrentCall = intent.getExtras().getLong(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
         MegaChatCall currentCall = megaChatApi.getChatCall(chatIdCurrentCall);
         if(currentCall != null){
@@ -78,7 +76,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
         if (action == null)
             return;
 
-        logDebug("The button clicked is : " + action);
+        logDebug("The button clicked is : " + action+", currentChatId = "+chatIdCurrentCall+", incomingCall = "+chatIdIncomingCall);
         switch (action) {
             case ANSWER:
             case END_ANSWER:
@@ -86,7 +84,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
                 if (chatIdCurrentCall == MEGACHAT_INVALID_HANDLE) {
                     MegaChatCall call = megaChatApi.getChatCall(chatIdIncomingCall);
                     if (call != null && call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
-                        logDebug("Answering incoming call with status " + callStatusToString(call.getStatus()));
+                        logDebug("Answering incoming call ...");
                         addChecksForACall(chatIdIncomingCall, false);
                         megaChatApi.answerChatCall(chatIdIncomingCall, false, true, new AnswerChatCallListener(this, this));
                     }
@@ -98,7 +96,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
                         megaChatApi.answerChatCall(chatIdIncomingCall, false, true, new AnswerChatCallListener(this, this));
                     } else {
                         logDebug("Hanging up current call ... ");
-                        megaChatApi.hangChatCall(callIdIncomingCall, new HangChatCallListener(this, this));
+                        megaChatApi.hangChatCall(callIdCurrentCall, new HangChatCallListener(this, this));
                     }
 
                 }
@@ -148,12 +146,12 @@ public class CallNotificationIntentService extends IntentService implements Hang
     }
 
     @Override
-    public void onCallAnswered(long chatId, boolean falg) {
+    public void onCallAnswered(long chatId, boolean flag) {
         if (chatId != chatIdIncomingCall)
             return;
 
         logDebug("Incoming call answered.");
-        CallUtil.openMeetingInProgress(this, chatIdIncomingCall, true);
+        openMeetingInProgress(this, chatIdIncomingCall, true);
         clearIncomingCallNotification(callIdIncomingCall);
         stopSelf();
         Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
