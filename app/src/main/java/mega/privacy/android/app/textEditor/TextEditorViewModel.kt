@@ -261,7 +261,7 @@ class TextEditorViewModel @ViewModelInject constructor(
 
         setEditableAdapter()
 
-        fileName.value = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name!!
+        fileName.value = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name ?: ""
 
         this.preferences = preferences
         showLineNumbers = preferences.getBoolean(SHOW_LINE_NUMBERS, false)
@@ -276,7 +276,7 @@ class TextEditorViewModel @ViewModelInject constructor(
     private fun initializeReadParams(mi: ActivityManager.MemoryInfo) {
         localFileUri =
             if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
-            else getLocalFile(null, getNode()?.name, getNode()?.size!!)
+            else getLocalFile(null, getNode()?.name, getNode()?.size ?: 0)
 
         if (isTextEmpty(localFileUri)) {
             val api = textEditorData.value?.api ?: return
@@ -488,23 +488,6 @@ class TextEditorViewModel @ViewModelInject constructor(
      * @return True if the content has been modified, false otherwise.
      */
     fun isFileEdited(): Boolean = pagination.value?.isEdited() == true
-
-    /**
-     * Checks if the completed transfer refers to the same node of current view.
-     *
-     * @param completedTransfer Completed transfer to check.
-     * @return True if the completed transfer refers to the same getNode(), false otherwise.
-     */
-    private fun isSameNode(completedTransfer: AndroidCompletedTransfer): Boolean {
-        val fileParentHandle = when {
-            getNode() == null -> megaApi.rootNode.handle
-            getNode()!!.isFolder -> getNode()!!.handle
-            else -> getNode()!!.parentHandle
-        }
-
-        return completedTransfer.fileName == fileName.value
-                && completedTransfer.parentHandle == fileParentHandle
-    }
 
     /**
      * Manages the download action.
