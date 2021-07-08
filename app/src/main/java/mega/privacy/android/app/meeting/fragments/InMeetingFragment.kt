@@ -1261,13 +1261,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
         }
 
-        floatingWindowFragment?.let {
-            if (it.isAdded) {
-                removeChildFragment(it)
-                floatingWindowFragment = null
-            }
-        }
-
         checkGridSpeakerViewMenuItemVisibility()
     }
 

@@ -575,9 +575,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					return;
 				}
 
-				if (callStatus == CALL_STATUS_USER_NO_PRESENT && isRinging) {
-					logDebug("Is incoming call");
-					incomingCall(listAllCalls, chatId, callStatus);
+				if (callStatus == CALL_STATUS_USER_NO_PRESENT) {
+					if (isRinging) {
+						logDebug("Is incoming call");
+						incomingCall(listAllCalls, chatId, callStatus);
+					} else {
+						getChatManagement().checkToShowIncomingGroupCallNotification(call, chatId);
+					}
 				}
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
@@ -1326,7 +1330,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	 * @param chatId The chat ID of the chat with call.
 	 */
 	public void showGroupCallNotification(long chatId) {
-		logDebug("Show group call notification");
+		logDebug("Show group call notification: chatId = "+chatId);
 		getChatManagement().setNotificationShown(chatId);
 		stopService(new Intent(this, IncomingCallService.class));
 		ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
@@ -1356,7 +1360,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	@Override
-	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandlev, int status, boolean inProgress) {
 
 	}
 
