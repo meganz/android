@@ -57,10 +57,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -86,7 +82,7 @@ import static mega.privacy.android.app.utils.Util.*;
 /*
  * Background service to download files
  */
-public class DownloadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class DownloadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface {
 
 	// Action to stop download
 	public static final String ACTION_CANCEL = "CANCEL_DOWNLOAD";
@@ -368,7 +364,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 							logDebug("condition ret == MegaChatApi.INIT_NO_CACHE");
 						} else if (ret == MegaChatApi.INIT_ERROR) {
 							logDebug("condition ret == MegaChatApi.INIT_ERROR");
-							megaChatApi.logout(this);
+							megaChatApi.logout();
 						} else {
 							logDebug("Chat correctly initialized");
 						}
@@ -1803,8 +1799,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("Chat --> connect");
-				megaChatApi.connectInBackground(this);
 				isLoggingIn = false;
 				MegaApplication.setLoggingIn(isLoggingIn);
 
@@ -1876,37 +1870,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
 	{
 		return true;
-	}
-
-	@Override
-	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-	}
-
-	@Override
-	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
-
-			isLoggingIn = false;
-			MegaApplication.setLoggingIn(isLoggingIn);
-
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("Connected to chat!");
-			}
-			else{
-				logError("ERROR WHEN CONNECTING " + e.getErrorString());
-			}
-		}
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
 	}
 
 	private void refreshOfflineFragment(){

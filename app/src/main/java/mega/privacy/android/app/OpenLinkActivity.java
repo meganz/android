@@ -8,11 +8,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.jetbrains.annotations.NotNull;
-
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.activities.WebViewActivity;
-import mega.privacy.android.app.listeners.ConnectListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener;
 import mega.privacy.android.app.lollipop.FileLinkActivityLollipop;
@@ -28,11 +25,8 @@ import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRequest;
 import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaHandleList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -183,7 +177,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 					}
 
 					if (initResult != MegaChatApi.INIT_ERROR) {
-						megaChatApi.connect(new ConnectListener(this));
+						finishAfterConnect();
                     } else {
                         logError("Open chat url:initAnonymous:INIT_ERROR");
                         setError(getString(R.string.error_chat_link_init_error));

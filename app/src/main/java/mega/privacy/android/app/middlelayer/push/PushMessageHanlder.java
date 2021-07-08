@@ -22,16 +22,18 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
-import nz.mega.sdk.MegaChatError;
-import nz.mega.sdk.MegaChatRequest;
-import nz.mega.sdk.MegaChatRequestListenerInterface;
+import nz.mega.sdk.MegaChatListItem;
+import nz.mega.sdk.MegaChatListenerInterface;
+import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 
-public class PushMessageHanlder implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+public class PushMessageHanlder implements MegaRequestListenerInterface {
 
     private static final int AWAKE_CPU_FOR = 60 * 1000;
     private static final String TYPE_SHARE_FOLDER = "1";
@@ -62,6 +64,48 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
         dbH = DatabaseHandler.getDbHandler(app);
+
+        megaChatApi.addChatListener(new MegaChatListenerInterface() {
+            @Override
+            public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
+
+            }
+
+            @Override
+            public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+                logDebug("Chat init state update, new state: " + newState);
+                if(newState == MegaChatApi.INIT_ONLINE_SESSION) {
+                    if (showMessageNotificationAfterPush) {
+                        showMessageNotificationAfterPush = false;
+                        logDebug("Call to pushReceived");
+                        megaChatApi.pushReceived(beep);
+                        beep = false;
+                    } else {
+                        logDebug("Login do not started by CHAT message");
+                    }
+                }
+            }
+
+            @Override
+            public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
+
+            }
+
+            @Override
+            public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
+
+            }
+
+            @Override
+            public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
+
+            }
+
+            @Override
+            public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
+
+            }
+        });
     }
 
     /**
@@ -233,7 +277,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
 
                 } else if (ret == MegaChatApi.INIT_ERROR) {
                     logDebug("condition ret == MegaChatApi.INIT_ERROR");
-                    megaChatApi.logout(this);
+                    megaChatApi.logout();
 
                 } else {
                     logDebug("Chat correctly initialized");
@@ -283,13 +327,6 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             isLoggingIn = false;
             MegaApplication.setLoggingIn(isLoggingIn);
-            if (e.getErrorCode() == MegaError.API_OK) {
-                logDebug("OK fetch nodes");
-                logDebug("Chat --> connectInBackground");
-                megaChatApi.connectInBackground(this);
-            } else {
-                logError("ERROR: " + e.getErrorString());
-            }
         } else if (request.getType() == MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 String token = request.getText();
@@ -307,44 +344,6 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
     @Override
     public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
         logWarning("onRequestTemporary: " + request.getRequestString());
-    }
-
-    @Override
-    public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestUpdate(MegaChatApiJava api, MegaChatRequest request) {
-
-    }
-
-    @Override
-    public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-        logDebug("onRequestFinish: " + request.getRequestString() + " result: " + e.getErrorString());
-        if (request.getType() == MegaChatRequest.TYPE_CONNECT) {
-            logDebug("TYPE CONNECT");
-            if (e.getErrorCode() == MegaChatError.ERROR_OK) {
-                logDebug("Connected to chat!");
-                if (showMessageNotificationAfterPush) {
-                    showMessageNotificationAfterPush = false;
-                    logDebug("Call to pushReceived");
-                    megaChatApi.pushReceived(beep);
-                    beep = false;
-                } else {
-                    logDebug("Login do not started by CHAT message");
-                }
-            } else {
-                logError("ERROR WHEN CONNECTING" + e.getErrorString());
-            }
-        } else if (request.getType() == MegaChatRequest.TYPE_SET_BACKGROUND_STATUS) {
-            logDebug("TYPE SETBACKGROUNDSTATUS");
-        }
-    }
-
-    @Override
-    public void onRequestTemporaryError(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
-
     }
 
     /**

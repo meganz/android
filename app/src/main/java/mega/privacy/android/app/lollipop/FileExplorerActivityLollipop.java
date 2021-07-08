@@ -44,7 +44,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
@@ -289,16 +288,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	public void onRequestFinish(MegaChatApiJava api, MegaChatRequest request, MegaChatError e) {
 		logDebug("onRequestFinish(CHAT)");
 
-		if (request.getType() == MegaChatRequest.TYPE_CONNECT){
-			MegaApplication.setLoggingIn(false);
-			if(e.getErrorCode()==MegaChatError.ERROR_OK){
-				logDebug("Connected to chat!");
-			}
-			else{
-				logWarning("ERROR WHEN CONNECTING " + e.getErrorString());
-			}
-		}
-		else if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
+        if(request.getType() == MegaChatRequest.TYPE_CREATE_CHATROOM){
 			logDebug("Create chat request finish.");
 			onRequestFinishCreateChat(e.getErrorCode(), request.getChatHandle(), false);
 		}
@@ -2168,14 +2158,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				
 				loginLoggingIn.setVisibility(View.GONE);
 
-				logDebug("Chat --> connect");
-				if ((megaChatApi.getInitState() != MegaChatApi.INIT_ERROR)) {
-					logDebug("Connection goes!!!");
-					megaChatApi.connect(this);
-				} else {
-					logWarning("Not launch connect: " + megaChatApi.getInitState());
-				}
-
 				MegaApplication.setLoggingIn(false);
 				afterLoginAndFetch();
 			}
@@ -2613,10 +2595,17 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 	}
 
-	@Override
-	public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-
-	}
+    @Override
+    public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
+        if (newState == MegaChatApi.INIT_ONLINE_SESSION) {
+            logDebug("Has online session, try to set chats.");
+            if (chatExplorer != null && chatExplorer.isAdded()) {
+                chatExplorer.setChats();
+            }
+        } else {
+            chatExplorer.showConnecting();
+        }
+    }
 
 	@Override
 	public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {

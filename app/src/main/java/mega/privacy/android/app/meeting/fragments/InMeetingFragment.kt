@@ -555,32 +555,30 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         args.firstName,
                         args.lastName,
                         MegaRequestListener(onSuccess = { _, _, _ ->
-                            inMeetingViewModel.chatConnect(ChatRequestListener(onSuccess = { _, _, _ ->
-                                inMeetingViewModel.openChatPreview(
-                                    meetinglink,
-                                    ChatRequestListener(onSuccess = { _, request, _ ->
-                                        logDebug(
-                                            "Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
-                                                request.megaHandleList?.get(
-                                                    0
-                                                )
-                                            }"
-                                        )
-                                        MegaApplication.getChatManagement().setOpeningMeetingLink(
-                                            request.chatHandle,
-                                            true
-                                        )
-                                        camIsEnable = sharedModel.cameraLiveData.value!!
-                                        inMeetingViewModel.joinPublicChat(
-                                            args.chatId,
-                                            AutoJoinPublicChatListener(
-                                                context,
-                                                this@InMeetingFragment
+                            inMeetingViewModel.openChatPreview(
+                                meetinglink,
+                                ChatRequestListener(onSuccess = { _, request, _ ->
+                                    logDebug(
+                                        "Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
+                                            request.megaHandleList?.get(
+                                                0
                                             )
+                                        }"
+                                    )
+                                    MegaApplication.getChatManagement().setOpeningMeetingLink(
+                                        request.chatHandle,
+                                        true
+                                    )
+                                    camIsEnable = sharedModel.cameraLiveData.value!!
+                                    inMeetingViewModel.joinPublicChat(
+                                        args.chatId,
+                                        AutoJoinPublicChatListener(
+                                            context,
+                                            this@InMeetingFragment
                                         )
-                                    })
-                                )
-                            }))
+                                    )
+                                })
+                            )
                         })
                     )
                 }))
