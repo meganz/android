@@ -24,6 +24,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <LinearLayout
+        android:id="@+id/snackbar_position"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="125dp"
+        android:background="@android:color/transparent"
+        android:orientation="vertical" />
+
     <include
         android:id="@+id/bottom_floating_panel"
         layout="@layout/meeting_bottom_floating_panel" />
