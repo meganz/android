@@ -528,14 +528,7 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
 
     @Override
     public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-        if(newState == MegaChatApi.INIT_ONLINE_SESSION) {
-            logDebug("Has online session, try to set chats.");
-            if(chatExplorerFragment != null && chatExplorerFragment.isAdded()) {
-                chatExplorerFragment.setChats();
-            }
-        } else {
-            chatExplorerFragment.showConnecting();
-        }
+
     }
 
     @Override

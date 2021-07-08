@@ -64,48 +64,6 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
         megaApi = app.getMegaApi();
         megaChatApi = app.getMegaChatApi();
         dbH = DatabaseHandler.getDbHandler(app);
-
-        megaChatApi.addChatListener(new MegaChatListenerInterface() {
-            @Override
-            public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
-
-            }
-
-            @Override
-            public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-                logDebug("Chat init state update, new state: " + newState);
-                if(newState == MegaChatApi.INIT_ONLINE_SESSION) {
-                    if (showMessageNotificationAfterPush) {
-                        showMessageNotificationAfterPush = false;
-                        logDebug("Call to pushReceived");
-                        megaChatApi.pushReceived(beep);
-                        beep = false;
-                    } else {
-                        logDebug("Login do not started by CHAT message");
-                    }
-                }
-            }
-
-            @Override
-            public void onChatOnlineStatusUpdate(MegaChatApiJava api, long userhandle, int status, boolean inProgress) {
-
-            }
-
-            @Override
-            public void onChatPresenceConfigUpdate(MegaChatApiJava api, MegaChatPresenceConfig config) {
-
-            }
-
-            @Override
-            public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
-            }
-
-            @Override
-            public void onChatPresenceLastGreen(MegaChatApiJava api, long userhandle, int lastGreen) {
-
-            }
-        });
     }
 
     /**
@@ -327,6 +285,19 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             isLoggingIn = false;
             MegaApplication.setLoggingIn(isLoggingIn);
+
+            if(e.getErrorCode() == MegaError.API_OK) {
+                if (showMessageNotificationAfterPush) {
+                    showMessageNotificationAfterPush = false;
+                    logDebug("Call to pushReceived");
+                    megaChatApi.pushReceived(beep);
+                    beep = false;
+                } else {
+                    logDebug("Login do not started by CHAT message");
+                }
+            } else {
+                logDebug(request.getRequestString() + " failed. Error code: " + e.getErrorCode() + ", error string: " + e.getErrorString());
+            }
         } else if (request.getType() == MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION) {
             if (e.getErrorCode() == MegaError.API_OK) {
                 String token = request.getText();

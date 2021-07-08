@@ -2597,14 +2597,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
     @Override
     public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-        if (newState == MegaChatApi.INIT_ONLINE_SESSION) {
-            logDebug("Has online session, try to set chats.");
-            if (chatExplorer != null && chatExplorer.isAdded()) {
-                chatExplorer.setChats();
-            }
-        } else {
-            chatExplorer.showConnecting();
-        }
+
     }
 
 	@Override

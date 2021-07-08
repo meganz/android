@@ -232,6 +232,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             addedItemsSaved = new ArrayList<>();
         }
 
+        setChats();
+
         return v;
     }
 
