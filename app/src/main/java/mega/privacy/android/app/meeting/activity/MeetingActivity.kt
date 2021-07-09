@@ -194,10 +194,6 @@ class MeetingActivity : PasscodeActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                if (!meetingViewModel.isChatCreatedAndIParticipating()) {
-                    MegaApplication.getInstance().removeRTCAudioManager()
-                }
-
                 onBackPressed()
             }
         }
@@ -242,12 +238,15 @@ class MeetingActivity : PasscodeActivity() {
         when (currentFragment) {
             is CreateMeetingFragment -> {
                 currentFragment.releaseVideoAndHideKeyboard()
+                removeRTCAudioManager()
             }
             is JoinMeetingFragment -> {
                 currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
+                removeRTCAudioManager()
             }
             is JoinMeetingAsGuestFragment -> {
                 currentFragment.releaseVideoAndHideKeyboard()
+                removeRTCAudioManager()
             }
             is InMeetingFragment -> {
                 sendQuitCallEvent()
@@ -256,6 +255,15 @@ class MeetingActivity : PasscodeActivity() {
 
         if (currentFragment !is InMeetingFragment || !isGuest) {
             finish()
+        }
+    }
+
+    /**
+     * Method to remove the RTC Audio Manager when the call has not been finally established
+     */
+    private fun removeRTCAudioManager() {
+        if (!meetingViewModel.isChatCreatedAndIParticipating()) {
+            MegaApplication.getInstance().removeRTCAudioManager()
         }
     }
 

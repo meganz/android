@@ -61,7 +61,7 @@ class BottomFloatingPanelViewHolder(
     private var savedMicState: Boolean = false
     private var savedCamState: Boolean = false
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
-        AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+        AppRTCAudioManager.AudioDevice.EARPIECE
     private val participantsAdapter = ParticipantsAdapter(inMeetingViewModel, listener)
 
     private var currentHeight = 0
