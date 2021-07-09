@@ -28,6 +28,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
+
+import javax.inject.Inject;
 import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.lifecycle.Observer;
@@ -39,10 +41,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import org.webrtc.ContextUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Locale;
-
-import javax.inject.Inject;
 
 import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -104,6 +103,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
@@ -115,6 +115,13 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_ST
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.CacheFolderManager.*;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER_PREFERENCES;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.PRODUCTION_SERVER_VALUE;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.SANDBOX3_SERVER_VALUE;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue;
 import static mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER;
