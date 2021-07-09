@@ -2641,7 +2641,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						linkJoinToChatLink = getIntent().getDataString();
 						joiningToChatLink = true;
 
-						if(megaChatApi.getInitState() == MegaChatApi.INIT_ONLINE_SESSION) {
+						if(megaChatApi.getConnectionState() == MegaChatApi.CONNECTED) {
                             megaChatApi.checkChatLink(linkJoinToChatLink, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
                         }
 
@@ -2743,6 +2743,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        }
 
 			logDebug("Check if there any unread chat");
+            if (joiningToChatLink && !isTextEmpty(linkJoinToChatLink)) {
+                megaChatApi.checkChatLink(linkJoinToChatLink, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
+            }
+
+            if(drawerItem == DrawerItem.CHAT){
+                rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+                if(rChatFL!=null){
+                    rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
+                }
+            }
 			setChatBadge();
 
 			logDebug("Check if there any INCOMING pendingRequest contacts");
@@ -13408,18 +13418,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     @Override
     public void onChatInitStateUpdate(MegaChatApiJava api, int newState) {
-        logDebug("New state: " + newState);
-        if (newState == MegaChatApi.INIT_ONLINE_SESSION) {
-            if (joiningToChatLink && !isTextEmpty(linkJoinToChatLink)) {
-                megaChatApi.checkChatLink(linkJoinToChatLink, new LoadPreviewListener(ManagerActivityLollipop.this, ManagerActivityLollipop.this, CHECK_LINK_TYPE_UNKNOWN_LINK));
-            }
-
-            if (drawerItem == DrawerItem.CHAT) {
-                rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
-                if (rChatFL != null) {
-                    rChatFL.onlineStatusUpdate(megaChatApi.getOnlineStatus());
-                }
-            }
+        if (newState == MegaChatApi.INIT_ERROR) {
+            // chat cannot initialize, disable chat completely
         }
     }
 

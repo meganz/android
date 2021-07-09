@@ -269,11 +269,6 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
     }
 
-    public void showConnecting() {
-        String textToShow = context.getString(R.string.chat_connecting);
-        emptyTextView.setText(textToShow);
-    }
-
     private void setFirstLayoutVisibility (int visibility) {
         newGroupButton.setVisibility(visibility);
         if (visibility == View.VISIBLE) {
