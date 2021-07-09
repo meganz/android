@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
@@ -155,6 +156,9 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
     public void initiatePurchaseFlow(@Nullable String oldSku, @Nullable String purchaseToken, @NonNull MegaSku skuDetails) {
         logDebug("oldSku is:" + oldSku + ", new sku is:" + skuDetails);
 
+        String obfuscatedAccountId = ((MegaApplication)mActivity.getApplication()).getMyAccountInfo().generateObfuscatedAccountId();
+        logDebug("Obfuscated account id is:" + obfuscatedAccountId);
+
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
         final int prorationMode = getProductLevel(skuDetails.getSku()) > getProductLevel(oldSku) ? IMMEDIATE_WITH_TIME_PRORATION : DEFERRED;
         logDebug("prorationMode is " + prorationMode);
@@ -162,7 +166,8 @@ public class BillingManagerImpl implements PurchasesUpdatedListener, BillingMana
             BillingFlowParams.Builder builder = BillingFlowParams
                     .newBuilder()
                     .setSkuDetails(getSkuDetails(skuDetails))
-                    .setReplaceSkusProrationMode(prorationMode);
+                    .setReplaceSkusProrationMode(prorationMode)
+                    .setObfuscatedAccountId(obfuscatedAccountId);
 
             // setOldSku requires non-null parameters.
             if (oldSku != null && purchaseToken != null) {

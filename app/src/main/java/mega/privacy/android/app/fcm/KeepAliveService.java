@@ -60,14 +60,15 @@ public class KeepAliveService extends Service {
             //no sound and vibration for this channel.
             notificationChannel.enableVibration(false);
             notificationChannel.setSound(null, null);
+
             if (mNotificationManager != null) {
-                NotificationChannel oldChannel = mNotificationManager.getNotificationChannel(RETRIEVING_MSG_CHANNEL_ID);
-                if (oldChannel != null) {
-                    mNotificationManager.deleteNotificationChannel(RETRIEVING_MSG_CHANNEL_ID);
+                NotificationChannel channel = mNotificationManager.getNotificationChannel(RETRIEVING_MSG_CHANNEL_ID);
+                if (channel == null) {
+                    mNotificationManager.createNotificationChannel(notificationChannel);
                 }
-                mNotificationManager.createNotificationChannel(notificationChannel);
             }
         }
+
         if (mNotificationManager != null) {
             Notification notification = mBuilder.build();
             startForeground(NEW_MESSAGE_NOTIFICATION_ID, notification);

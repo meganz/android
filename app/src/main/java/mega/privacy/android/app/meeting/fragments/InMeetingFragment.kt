@@ -24,6 +24,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_assign_moderator.view.*
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.MegaApplication
@@ -51,6 +52,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.resumeAudioPlayerIfNotInCall
@@ -862,7 +864,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         sharedModel.snackBarLiveData.observe(viewLifecycleOwner) {
-            (requireActivity() as MeetingActivity).showSnackbar(it)
+            showSnackbar(SNACKBAR_TYPE, it, MEGACHAT_INVALID_HANDLE)
         }
         sharedModel.cameraGranted.observe(viewLifecycleOwner) {
             bottomFloatingPanelViewHolder.updateCamPermissionWaring(it)
@@ -1258,13 +1260,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
         }
 
-        floatingWindowFragment?.let {
-            if (it.isAdded) {
-                removeChildFragment(it)
-                floatingWindowFragment = null
-            }
-        }
-
         checkGridSpeakerViewMenuItemVisibility()
     }
 
@@ -1563,7 +1558,23 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        meetingActivity.showSnackbar(type, binding.root, content, chatId)
+        if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder.getState()) {
+            meetingActivity.showSnackbarWithAnchorView(
+                type,
+                binding.root,
+                binding.snackbarPosition,
+                content,
+                chatId
+            )
+        } else {
+            meetingActivity.showSnackbarWithAnchorView(
+                type,
+                binding.root,
+                null,
+                content,
+                chatId
+            )
+        }
     }
 
     private fun showRequestPermissionSnackBar() {
@@ -1614,10 +1625,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     /**
      * Change Mic State
      *
-     * @param isMicOn True, if the microphone is on. False, if the microphone is off
+     * @param micOn True, if the microphone is on. False, if the microphone is off
      */
-    override fun onChangeMicState(isMicOn: Boolean) {
-        sharedModel.clickMic(!isMicOn)
+    override fun onChangeMicState(micOn: Boolean) {
+        sharedModel.clickMic(!micOn)
     }
 
     /**
@@ -1796,10 +1807,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     /**
      * Change Cam State
      *
-     * @param isCamOn True, if the camera is switched on. False, if the camera is switched off
+     * @param camOn True, if the camera is switched on. False, if the camera is switched off
      */
-    override fun onChangeCamState(isCamOn: Boolean) {
-        sharedModel.clickCamera(!isCamOn)
+    override fun onChangeCamState(camOn: Boolean) {
+        sharedModel.clickCamera(!camOn)
     }
 
     /**
@@ -2291,7 +2302,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         inMeetingViewModel.checkAnotherCallsInProgress(chatId)
-        if(args.action != MEETING_ACTION_GUEST || CallUtil.isStatusConnected(context, args.chatId)){
+        if (args.action != MEETING_ACTION_GUEST || CallUtil.isStatusConnected(
+                context,
+                args.chatId
+            )
+        ) {
             answerCallAfterJoin()
         } else {
             inMeetingViewModel.registerConnectionUpdateListener(args.chatId) {
@@ -2367,6 +2382,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 finishActivity()
             }
             show()
+        }
+    }
+
+    /**
+     * Send add contact invitation
+     *
+     * @param peerId the peerId of users
+     */
+    fun addContact(peerId: Long) {
+        inMeetingViewModel.addContact(requireContext(), peerId) { content ->
+            sharedModel.showSnackBar(content)
         }
     }
 

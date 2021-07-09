@@ -155,6 +155,11 @@ public class Util {
 	// 150ms, a smaller value may cause the keyboard to fail to open
 	public final static int SHOW_IM_DELAY = 150;
 
+    /**
+     * Language tag for simplified Chinese.
+     */
+    private static final String HANS = "Hans";
+
 	// How many times the app has been launched till now
 	private final static String KEY_LAUNCHED_TIME = "launched_time";
 
@@ -1642,4 +1647,8 @@ public class Util {
 
 		return false;
 	}
+
+    public static boolean isSimplifiedChinese() {
+        return Locale.getDefault().toLanguageTag().contains(HANS);
+    }
 }

@@ -66,18 +66,22 @@ class CUCardViewHolder(
             binding.dateText.text = date?.toSpannedHtmlText()
         }
 
-        val numItems = card.numItems?.minus(1)
-        if (numItems != null) {
-            binding.numberItemsText.isVisible = viewType == DAYS_VIEW && numItems > 0
-            binding.numberItemsText.text = "+${numItems}"
-        }
+        val numItems = card.numItems
+
+        binding.numberItemsText.isVisible = viewType == DAYS_VIEW && numItems > 0
+        binding.numberItemsText.text = "+${numItems}"
 
         val preview = card.preview
 
         if (preview != null) {
-            binding.preview.setImageURI(Uri.fromFile(preview))
+            binding.progressBar.isVisible = false
+            binding.preview.apply {
+                isVisible = true
+                setImageURI(Uri.fromFile(preview))
+            }
         } else {
-            binding.preview.setActualImageResource(R.drawable.ic_image_thumbnail)
+            binding.progressBar.isVisible = true
+            binding.preview.isVisible = false
         }
     }
 }

@@ -14,7 +14,6 @@ import android.util.TypedValue
 import android.view.Display
 import android.view.KeyEvent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
@@ -26,9 +25,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.FragmentMeetingInfoBinding
-import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
-import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.listenAction
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
@@ -37,7 +35,7 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 /**
  * Fragment shows the basic information of meeting
  */
-class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
     private lateinit var binding: FragmentMeetingInfoBinding
     private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
     private val shareViewModel: MeetingActivityViewModel by activityViewModels()
@@ -66,11 +64,18 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             chatTitle = it
             binding.meetingName.text = it
         }
+
         inMeetingViewModel.participants.observe(this) { participants ->
             binding.participantSize.text =
-                StringResourcesUtils.getString(R.string.info_participants_number, participants.size + 1)
+                StringResourcesUtils.getString(
+                    R.string.info_participants_number,
+                    participants.size + 1
+                )
             binding.moderatorName.text =
-                StringResourcesUtils.getString(R.string.info_moderator_name, getModeratorList(participants))
+                StringResourcesUtils.getString(
+                    R.string.info_moderator_name,
+                    inMeetingViewModel.getModeratorNames(context, participants)
+                )
         }
 
         shareViewModel.meetingLinkLiveData.observe(this) { link ->
@@ -111,36 +116,6 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         listenAction(binding.invite) { (parentFragment as InMeetingFragment).onInviteParticipants() }
         listenAction(binding.copyLink) { copyLink() }
         listenAction(binding.edit) { showRenameGroupDialog() }
-    }
-
-    /**
-     * After execute the action, close the item dialog
-     */
-    private fun listenAction(view: View, action: () -> Unit) {
-        view.setOnClickListener {
-            action()
-            dismiss()
-        }
-    }
-
-    /**
-     * Get the moderator list and return the list string
-     *
-     * @param participants the current participant list
-     * @return the string of moderators' name
-     */
-    fun getModeratorList(participants: MutableList<Participant>): String {
-        var nameList =
-            if (inMeetingViewModel.isModerator()) ChatController(context).myFullName else ""
-
-        participants
-            .filter { it.isModerator && it.name.isNotEmpty() }
-            .map { it.name }
-            .forEach {
-                nameList = if (nameList.isNotEmpty()) "$nameList, $it" else "$it"
-            }
-
-        return nameList
     }
 
     /**
@@ -257,4 +232,6 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             return MeetingInfoBottomSheetDialogFragment()
         }
     }
+
+
 }

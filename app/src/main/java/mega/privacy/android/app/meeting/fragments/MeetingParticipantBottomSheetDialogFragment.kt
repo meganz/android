@@ -2,33 +2,28 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingParticipantBinding
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.controllers.ContactController
-import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.listenAction
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.*
 
 /**
- * Can use the SDK api from BaseFragment
+ * The fragment shows options for different roles when click the three dots
  */
-class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(),
-    MegaChatRequestListenerInterface {
+@AndroidEntryPoint
+class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private val bottomViewModel: MeetingParticipantBottomSheetDialogViewModel by viewModels()
     private val sharedViewModel: MeetingActivityViewModel by activityViewModels()
     private val inMeetingViewModel: InMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
@@ -60,7 +55,6 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         isSpeakerMode = arguments?.getBoolean(EXTRA_IS_SPEAKER_MODE) == true
 
         bottomViewModel.initValue(
-            requireContext(),
             isModerator,
             isGuest,
             isSpeakerMode,
@@ -89,12 +83,31 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
      * Init the action for different items
      */
     private fun initItemAction(binding: BottomSheetMeetingParticipantBinding) {
-        listenAction(binding.addContact) { onAddContact() }
+        listenAction(binding.addContact) {
+            (parentFragment as InMeetingFragment).addContact(participantItem.peerId)
+        }
+
         listenAction(binding.contactInfo) { onContactInfoOrEditProfile() }
-        listenAction(binding.sendMessage) { onSendMessage() }
-        listenAction(binding.pingToSpeaker) { onPingToSpeakerView() }
-        listenAction(binding.makeModerator) { onMakeModerator() }
+
+        listenAction(binding.sendMessage) {
+            // Opea chat page
+            bottomViewModel.sendMessage(requireActivity())
+        }
+
+        listenAction(binding.pingToSpeaker) {
+            // Pin to speaker view
+            inMeetingViewModel.onItemClick(participantItem)
+        }
+
+        listenAction(binding.makeModerator) {
+            // Make moderator
+            inMeetingViewModel.updateChatPermissions(
+                participantItem.peerId
+            )
+        }
+
         listenAction(binding.removeParticipant) {
+            // Remove participant
             sharedViewModel.currentChatId.value?.let {
                 onRemoveParticipant(it)
             }
@@ -102,23 +115,8 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     }
 
     /**
-     * After execute the action, close the item dialog
+     * Open contact info page or edit profile page
      */
-    private fun listenAction(view: View, action: () -> Unit) {
-        view.setOnClickListener {
-            action()
-            dismiss()
-        }
-    }
-
-    private fun onAddContact() {
-        ContactController(requireContext()).inviteContact(
-            ChatController(context).getParticipantEmail(
-                participantItem.peerId
-            )
-        )
-    }
-
     private fun onContactInfoOrEditProfile() {
         if (!bottomViewModel.showEditProfile()) {
             ContactUtil.openContactInfoActivity(
@@ -128,42 +126,12 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         } else {
             editProfile()
         }
-
-    }
-
-    private fun onSendMessage() {
-        val handle = participantItem.peerId
-        logDebug("Handle: $handle")
-
-        val chat = megaChatApi.getChatRoomByUser(participantItem.peerId)
-        val peers = MegaChatPeerList.createInstance()
-
-        if (chat == null) {
-            peers.addPeer(participantItem.peerId, MegaChatPeerList.PRIV_STANDARD)
-            megaChatApi.createChat(false, peers, this)
-        } else {
-            val intentOpenChat = Intent(requireActivity(), ChatActivityLollipop::class.java)
-            intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
-            requireActivity().startActivity(intentOpenChat)
-        }
-    }
-
-    /**
-     * Pin to speaker
-     *
-     */
-    private fun onPingToSpeakerView() {
-        inMeetingViewModel.onItemClick(participantItem)
-    }
-
-    private fun onMakeModerator() {
-        inMeetingViewModel.updateChatPermissions(participantItem.peerId)
     }
 
     /**
      * Shows an alert dialog to confirm the deletion of a participant.
      *
+     * @param chatId the current meeting id
      */
     private fun onRemoveParticipant(chatId: Long) {
         MaterialAlertDialogBuilder(
@@ -184,9 +152,14 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         }
     }
 
+    /**
+     * Remove participant from this meeting
+     *
+     * @param chatId the current meeting id
+     */
     private fun removeParticipant(chatId: Long) {
         if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-            megaChatApi.removeFromChat(chatId, participantItem.peerId, this)
+            megaChatApi.removeFromChat(chatId, participantItem.peerId, null)
         }
     }
 
@@ -194,13 +167,15 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
      * Open edit profile page
      */
     private fun editProfile() {
-        val editProfile = Intent(context, ManagerActivityLollipop::class.java)
-        editProfile.putExtra(EXTRA_FROM_MEETING, true)
-        editProfile.action = Constants.ACTION_SHOW_MY_ACCOUNT
-        startActivity(editProfile)
+        bottomViewModel.editProfile(requireActivity())
         dismissAllowingStateLoss()
     }
 
+    /**
+     * Init avatar for the participant
+     *
+     * @param participant the target participant
+     */
     private fun initAvatar(participant: Participant) {
         binding.avatar.setImageBitmap(inMeetingViewModel.getAvatarBitmapByPeerId(participant.peerId))
     }
@@ -231,27 +206,5 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
             fragment.arguments = args
             return fragment
         }
-    }
-
-    override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest?) {
-    }
-
-    override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest?) {
-    }
-
-    override fun onRequestFinish(
-        api: MegaChatApiJava?,
-        request: MegaChatRequest?,
-        e: MegaChatError?
-    ) {
-
-    }
-
-    override fun onRequestTemporaryError(
-        api: MegaChatApiJava?,
-        request: MegaChatRequest?,
-        e: MegaChatError?
-    ) {
-
     }
 }

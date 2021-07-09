@@ -51,13 +51,16 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
 
     private DatabaseHandler dbH;
 
-    private boolean isLoggingIn;
-
     private boolean showMessageNotificationAfterPush;
 
     private boolean beep;
 
     private static String token;
+
+    /**
+     * Flag for controlling if allows the app to do login in background upon receiving a push message.
+     */
+    public static volatile boolean allowBackgroundLogin = true;
 
     public PushMessageHanlder() {
         app = MegaApplication.getInstance();
@@ -216,10 +219,18 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
      * @param gSession Cached session, used to do a fast login.
      */
     private void performLoginProccess(String gSession) {
-        isLoggingIn = MegaApplication.isLoggingIn();
-        if (!isLoggingIn) {
-            isLoggingIn = true;
-            MegaApplication.setLoggingIn(isLoggingIn);
+        if (!MegaApplication.isLoggingIn()) {
+            /*
+                Two locks and synchronized block prevent background login executes after login process is launched in `LoginFragment`.
+                Otherwise the login process in foreground will failed with `-11` and cause logout.
+             */
+            if (allowBackgroundLogin) {
+                synchronized (MegaApplication.getInstance()) {
+                    if (allowBackgroundLogin) {
+                        megaApi.fastLogin(gSession, this);
+                    }
+                }
+            }
 
             if (megaChatApi == null) {
                 megaChatApi = app.getMegaChatApi();
@@ -241,7 +252,6 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
                     logDebug("Chat correctly initialized");
                 }
             }
-            megaApi.fastLogin(gSession, this);
         }
     }
 
@@ -262,6 +272,8 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
     @Override
     public void onRequestStart(MegaApiJava api, MegaRequest request) {
         logDebug("onRequestStart: " + request.getRequestString());
+        // Avoid duplicate login.
+        allowBackgroundLogin = false;
     }
 
     @Override
@@ -273,19 +285,16 @@ public class PushMessageHanlder implements MegaRequestListenerInterface {
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("onRequestFinish: " + request.getRequestString());
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
+            allowBackgroundLogin = true;
+
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("Fast login OK");
                 logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
                 megaApi.fetchNodes(this);
             } else {
                 logError("ERROR: " + e.getErrorString());
-                isLoggingIn = false;
-                MegaApplication.setLoggingIn(isLoggingIn);
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
-            isLoggingIn = false;
-            MegaApplication.setLoggingIn(isLoggingIn);
-
             if(e.getErrorCode() == MegaError.API_OK) {
                 if (showMessageNotificationAfterPush) {
                     showMessageNotificationAfterPush = false;

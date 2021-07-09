@@ -200,22 +200,41 @@ public class ChatManagement {
     public void checkActiveGroupChat(MegaChatListItem item) {
         if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(item.getChatId())) {
             currentActiveGroupChat.add(item.getChatId());
+            
             MegaChatCall call = app.getMegaChatApi().getChatCall(item.getChatId());
             if (call == null) {
-                logError("call is null");
+                logError("Call is null");
                 return;
             }
 
-            if (call.getStatus() == CALL_STATUS_USER_NO_PRESENT && !call.isRinging()) {
-                if (notificationShown.isEmpty() || !notificationShown.contains(item.getChatId())) {
-                    MegaChatRoom chatRoom = app.getMegaChatApi().getChatRoom(item.getChatId());
-                    if (chatRoom != null && (!chatRoom.isMeeting() || !isOpeningMeetingLink(item.getChatId()))) {
-                        logDebug("Show notification");
-                        app.createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-                        app.showGroupCallNotification(item.getChatId());
-                    }
-                }
+            if(call.getStatus() == CALL_STATUS_USER_NO_PRESENT){
+                checkToShowIncomingGroupCallNotification(call, item.getChatId());
             }
+        }
+    }
+
+    /**
+     * Method that displays the incoming call notification when I am added to a group that has a call in progress
+     *
+     * @param call   The call in this chat room
+     * @param chatId The chat ID
+     */
+    public void checkToShowIncomingGroupCallNotification(MegaChatCall call, long chatId) {
+        if (!call.isRinging() && (notificationShown.isEmpty() || !notificationShown.contains(chatId))) {
+            MegaChatRoom chatRoom = app.getMegaChatApi().getChatRoom(chatId);
+            if (chatRoom == null) {
+                logError("Chat is null");
+                return;
+            }
+
+            if (isOpeningMeetingLink(chatId)) {
+                logDebug("Opening meeting link, don't show notification");
+                return;
+            }
+
+            logDebug("Show incoming call notification");
+            app.createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
+            app.showGroupCallNotification(chatId);
         }
     }
 }

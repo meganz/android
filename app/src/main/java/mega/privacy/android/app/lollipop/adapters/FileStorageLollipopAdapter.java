@@ -27,6 +27,8 @@ import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 
+import static mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP;
+import static mega.privacy.android.app.utils.Constants.ICON_SIZE_DP;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -79,9 +81,6 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
         holder.itemLayout.setOnClickListener(this);
         holder.itemLayout.setOnLongClickListener(this);
         holder.imageView = v.findViewById(R.id.file_explorer_thumbnail);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
-        params.setMargins(36, 0, 0, 0);
-        holder.imageView.setLayoutParams(params);
 
         holder.textViewFileName = v.findViewById(R.id.file_explorer_filename);
         holder.textViewFileName.setOnClickListener(this);
@@ -107,6 +106,8 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
             long documentSize = document.getSize();
             holder.textViewFileSize.setText(getSizeString(documentSize));
         }
+
+        resetImageView(holder.imageView);
 
         switch (mode) {
             case PICK_FILE:
@@ -155,6 +156,18 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
                 }
                 break;
         }
+    }
+
+    /**
+     * Reset the imageview's params
+     * @param imageView the imageview shows the icon and the thumbnail
+     */
+    public void resetImageView(ImageView imageView) {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
+        params.height = params.width = dp2px(ICON_SIZE_DP);
+        int margin = dp2px(ICON_MARGIN_DP);
+        params.setMargins(margin, margin, margin, margin);
+        imageView.setLayoutParams(params);
     }
 
     /**

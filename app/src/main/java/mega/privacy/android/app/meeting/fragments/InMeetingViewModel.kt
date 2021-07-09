@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,12 +20,13 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_CALL
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.EditChatRoomNameListener
 import mega.privacy.android.app.listeners.GetUserEmailListener
+import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
 import mega.privacy.android.app.meeting.listeners.*
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.ChatUtil.*
+import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -2023,5 +2025,36 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return if creating, return true, else false
      */
     fun isCallInitial(): Boolean = previousState == CALL_STATUS_INITIAL
+
+    /**
+     * Get the moderator list and return the string of name list
+     *
+     * @param participants the current participant list
+     * @return the string of moderators' name
+     */
+    fun getModeratorNames(context: Context, participants: MutableList<Participant>): String {
+        var nameList =
+            if (isModerator()) ChatController(context).myFullName else ""
+
+        participants
+            .filter { it.isModerator && it.name.isNotEmpty() }
+            .map { it.name }
+            .forEach {
+                nameList = if (nameList.isNotEmpty()) "$nameList, $it" else "$it"
+            }
+
+        return nameList
+    }
+
+    /**
+     * Send add contact invitation
+     *
+     * @param context the Context
+     * @param peerId the peerId of users
+     * @param callback the callback for sending add contact request
+     */
+    fun addContact(context: Context, peerId: Long, callback: (String) -> Unit) {
+        inMeetingRepository.addContact(context, peerId, callback)
+    }
 }
 

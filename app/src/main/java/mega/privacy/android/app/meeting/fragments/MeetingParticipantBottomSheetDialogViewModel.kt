@@ -1,29 +1,38 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.widget.TextView
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import mega.privacy.android.app.R
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment.Companion.EXTRA_FROM_MEETING
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatPeerList
 
 /**
  * ViewModel for [MeetingParticipantBottomSheetDialogFragment]
  */
-class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
+class MeetingParticipantBottomSheetDialogViewModel @ViewModelInject constructor(
+    private val megaChatApi: MegaChatApiAndroid
+) : ViewModel() {
 
     var isGuest = false
     var isModerator = false
     var isSpeakerMode = false
     var participant: Participant? = null
-    var context: Context? = null
 
     /**
      * Init value for View Model
      */
     fun initValue(
-        con: Context,
         moderator: Boolean,
         guest: Boolean,
         speakerMode: Boolean,
@@ -32,49 +41,73 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
         isModerator = moderator
         participant = info
         isGuest = guest
-        context = con
         isSpeakerMode = speakerMode
     }
 
-    fun getEmail(): String = participant?.peerId?.let {
+    /**
+     * Get email
+     *
+     * @param context the context
+     * @return the email
+     */
+    fun getEmail(context: Context): String = participant?.peerId?.let {
         ChatController(context).getParticipantEmail(it)
     } ?: ""
 
+    /**
+     * Set showing name for text view
+     *
+     * @param name target view
+     */
     fun setShowingName(name: TextView) {
         name.text = participant?.getDisplayName(name.context)
     }
 
+    /**
+     * Determine if current participant is guest
+     *
+     * @return if is guest, return true, else false
+     */
     fun isParticipantGuest(): Boolean = participant?.isGuest == true
 
     /**
      * Determine if show the `Add Contact` item
-     *
      * it will show if is not guest and is not contact and not is me
+     *
+     * @return if should show `Add Contact` item, return true, else false
      */
     fun showAddContact(): Boolean =
         !isGuest && !isParticipantGuest() && participant?.isContact == false && participant?.isMe == false
 
     /**
      * Determine if show the `Contact Info` item
-     *
      * it will show if is not guest and is contact and not is me
+     *
+     * @return if should show `contactInfo Or EditProfile` item, return true, else false
      */
     fun showContactInfoOrEditProfile(): Boolean = !isGuest &&
             !isParticipantGuest() && (participant?.isContact == true || participant?.isMe == true)
 
 
+    /**
+     * Determine if show the divider between info item and option items
+     *
+     * @return if should show return true, else false
+     */
     fun showDividerContactInfo(): Boolean = showAddContact() || showContactInfoOrEditProfile()
 
     /**
      * Determine if show the `Edit Profile` item
      *
+     * @return if should show `Edit Profile` item, return true, else false
      */
     fun showEditProfile(): Boolean = !isGuest && !isParticipantGuest() && participant?.isMe == true
 
     /**
      * Determine if show the `Send Message` item
-     *
      * it will show if is not guest and is contact and not is me
+     *
+     * @return if should show `send Message` item, return true, else false
      */
     fun showSendMessage(): Boolean =
         !isGuest && !isParticipantGuest() && participant?.isContact == true && participant?.isMe == false
@@ -82,15 +115,17 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
 
     /**
      * Determine if show the `Pin to speaker view` item
-     *
      * it will show if current mode is speaker mode
+     *
+     * @return if it is speaker mode, return true, else false
      */
     fun showPinItem(): Boolean = isSpeakerMode
 
     /**
      * Set the text for Contact Info item
-     *
      * if `isMe` is true, will show `Edit Profile` text
+     *
+     * @return the target text for the item
      */
     fun getContactItemText(): String? {
         return StringResourcesUtils.getString(
@@ -101,16 +136,52 @@ class MeetingParticipantBottomSheetDialogViewModel : ViewModel() {
 
     /**
      * Determine if show the `Make Moderator` item
-     *
      * When the current user is moderator, and not isMe && the target user is not moderator
+     *
+     * @return if should show `Make Moderator` item, return true, else false
      */
     fun showMakeModeratorItem(): Boolean =
         !isGuest && isModerator && !(participant?.isMe == true || participant?.isModerator == true || isParticipantGuest())
 
     /**
      * Determine if show the `Remove Participant` item
-     *
      * When the current user is moderator, and not isMe
+     *
+     * @return if should show `Remove Participant` item, return true, else false
      */
     fun showRemoveItem(): Boolean = !isGuest && isModerator && participant?.isMe == false
+
+    /**
+     * Open edit profile page
+     *
+     * @param activity the current activity
+     */
+    fun editProfile(activity: Activity) {
+        val editProfile = Intent(activity, ManagerActivityLollipop::class.java)
+        editProfile.putExtra(EXTRA_FROM_MEETING, true)
+        editProfile.action = Constants.ACTION_SHOW_MY_ACCOUNT
+        activity.startActivity(editProfile)
+    }
+
+    /**
+     * Open sending message page
+     *
+     * @param activity the current activity
+     */
+    fun sendMessage(activity: Activity) {
+        participant?.peerId?.let {
+            val chat = megaChatApi.getChatRoomByUser(it)
+            val peers = MegaChatPeerList.createInstance()
+
+            if (chat == null) {
+                peers.addPeer(it, MegaChatPeerList.PRIV_STANDARD)
+                megaChatApi.createChat(false, peers, null)
+            } else {
+                val intentOpenChat = Intent(activity, ChatActivityLollipop::class.java)
+                intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
+                intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
+                activity.startActivity(intentOpenChat)
+            }
+        }
+    }
 }

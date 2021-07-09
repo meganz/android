@@ -2,6 +2,7 @@ package mega.privacy.android.app.constants
 
 object EventConstants {
     const val EVENT_TEXT_FILE_UPLOADED = "EVENT_TEXT_FILE_UPLOADED"
+    const val EVENT_FINISH_ACTIVITY = "EVENT_FINISH_ACTIVITY"
 
     const val EVENT_NETWORK_CHANGE = "network_change"
     const val EVENT_CHAT_TITLE_CHANGE = "chat_title_change"
