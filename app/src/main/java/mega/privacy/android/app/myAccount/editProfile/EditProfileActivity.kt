@@ -17,8 +17,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.AccountController
-import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberBottomSheetDialogFragment
@@ -34,11 +32,14 @@ import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
 import mega.privacy.android.app.utils.Util.dp2px
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.API_OK
+import nz.mega.sdk.MegaRequest
 import java.util.*
 
 class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback,
@@ -76,7 +77,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         binding = ActivityEditProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setUpView()
+        setupView()
+        setupObservers()
 
         if (savedInstanceState != null) {
             if (savedInstanceState.getBoolean(REMOVE_OR_MODIFY_PHONE_SHOWN, false)) {
@@ -110,7 +112,13 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setUpView() {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val error = viewModel.manageActivityResult(this, requestCode, resultCode, data)
+        if (!error.isNullOrEmpty()) showSnackbar(error)
+    }
+
+    private fun setupView() {
         setUpActionBar()
         setUpAvatar()
         setUpHeader()
@@ -139,7 +147,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             isVisible = canVoluntaryVerifyPhoneNumber()
             setOnClickListener {
                 if (canVoluntaryVerifyPhoneNumber()) {
-                    startActivity(Intent(this@EditProfileActivity, SMSVerificationActivity::class.java))
+                    startActivity(
+                        Intent(
+                            this@EditProfileActivity,
+                            SMSVerificationActivity::class.java
+                        )
+                    )
                 } else if (!isBottomSheetDialogShown(phoneNumberBottomSheetOld)) {
                     phoneNumberBottomSheetOld = PhoneNumberBottomSheetDialogFragment()
                     phoneNumberBottomSheetOld!!.show(
@@ -150,13 +163,27 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             }
         }
 
-        binding.recoveryKeyLayout.setOnClickListener {
-
-        }
+        binding.recoveryKeyLayout.setOnClickListener { viewModel.exportMK(this) }
 
         binding.logoutButton.setOnClickListener {
             viewModel.logout(this@EditProfileActivity)
         }
+    }
+
+    private fun setupObservers() {
+        viewModel.onSetProfileAvatar().observe(this, ::profileAvatarSet)
+    }
+
+    private fun profileAvatarSet(result: Pair<MegaRequest, MegaError>) {
+        val stringId = if (result.second.errorCode == API_OK) {
+            setUpAvatar()
+
+            if (result.first.file != null) R.string.success_changing_user_avatar
+            else R.string.success_deleting_user_avatar
+        } else if (result.first.file != null) R.string.error_changing_user_avatar
+        else R.string.error_deleting_user_avatar
+
+        showSnackbar(StringResourcesUtils.getString(stringId))
     }
 
     private fun setUpActionBar() {
@@ -299,9 +326,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     override fun deletePhoto() {
         val builder = MaterialAlertDialogBuilder(this)
         builder.setMessage(R.string.confirmation_delete_avatar)
-            .setPositiveButton(R.string.context_delete) { _, _ ->
-                AccountController(this).removeAvatar()
-            }
+            .setPositiveButton(R.string.context_delete) { _, _ -> viewModel.deleteProfileAvatar(this) }
             .setNegativeButton(R.string.general_cancel, null).show()
     }
 
@@ -325,5 +350,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
     override fun onUserDataUpdate(error: MegaError) {
         TODO("Not yet implemented")
+    }
+
+    private fun showSnackbar(message: String) {
+        showSnackbar(binding.root, message)
     }
 }

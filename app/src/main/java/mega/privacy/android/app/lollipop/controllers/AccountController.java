@@ -122,21 +122,6 @@ public class AccountController {
         return false;
     }
 
-    public void removeAvatar() {
-        logDebug("removeAvatar");
-        File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
-        File qrFile = buildQrFile(context,megaApi.getMyEmail() + QR_IMAGE_FILE_NAME);
-
-        if (isFileAvailable(avatar)) {
-            logDebug("Avatar to delete: " + avatar.getAbsolutePath());
-            avatar.delete();
-        }
-        if (isFileAvailable(qrFile)) {
-            qrFile.delete();
-        }
-        megaApi.setAvatar(null,(ManagerActivityLollipop)context);
-    }
-
     public void printRK(){
         Bitmap rKBitmap = createRkBitmap();
 

@@ -521,7 +521,7 @@ public class ShareInfo implements Serializable {
 		logDebug(title + " " + size);
 	}
 	
-	private String getRealPathFromURI(Context context, Uri contentURI) {
+	public static String getRealPathFromURI(Context context, Uri contentURI) {
 		if(contentURI == null) return null;
 	    String path = null;
 	    Cursor cursor = null;

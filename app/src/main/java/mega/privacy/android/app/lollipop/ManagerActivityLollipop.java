@@ -9361,34 +9361,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 logWarning("TAKE_PHOTO_CODE--->ERROR!");
             }
 		}
-		else if (requestCode == TAKE_PICTURE_PROFILE_CODE){
-			logDebug("TAKE_PICTURE_PROFILE_CODE");
-
-			if(resultCode == Activity.RESULT_OK){
-				String myEmail =  megaApi.getMyUser().getEmail();
-				File imgFile = getCacheFile(this, TEMPORAL_FOLDER, "picture.jpg");
-				if (!isFileAvailable(imgFile)) {
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error), -1);
-					return;
-				}
-
-				File qrFile = buildQrFile(this, myEmail + QR_IMAGE_FILE_NAME);
-                File newFile = buildAvatarFile(this,myEmail + "Temp.jpg");
-				if (isFileAvailable(qrFile)) {
-					qrFile.delete();
-				}
-
-                if (newFile != null) {
-                    MegaUtilsAndroid.createAvatar(imgFile,newFile);
-                    megaApi.setAvatar(newFile.getAbsolutePath(),this);
-                } else {
-					logError("ERROR! Destination PATH is NULL");
-                }
-			}else{
-				logError("TAKE_PICTURE_PROFILE_CODE--->ERROR!");
-			}
-
-		}
 		else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
 
 			if (intent == null) {
@@ -10664,44 +10636,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				logDebug("MK exported - USER_ATTR_PWD_REMINDER finished");
 				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
 					logDebug("New value of attribute USER_ATTR_PWD_REMINDER: " + request.getText());
-				}
-			}
-			else if (request.getParamType() == MegaApiJava.USER_ATTR_AVATAR) {
-				if (e.getErrorCode() == MegaError.API_OK){
-					logDebug("Avatar changed!!");
-                    if (request.getFile() != null) {
-                        File oldFile = new File(request.getFile());
-                        if (isFileAvailable(oldFile)) {
-                            File newFile = buildAvatarFile(this,megaApi.getMyEmail() + ".jpg");
-                            boolean result = oldFile.renameTo(newFile);
-                            if (result) {
-								logDebug("The avatar file was correctly renamed");
-                            }
-                        }
-						logDebug("User avatar changed!");
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.success_changing_user_avatar), -1);
-					}
-					else{
-						logDebug("User avatar deleted!");
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.success_deleting_user_avatar), -1);
-					}
-					setProfileAvatar();
-
-//					if (getMyAccountFragment() != null) {
-//						maF.setUpAvatar(false);
-//					}
-
-					LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(true);
-				}
-				else{
-					if(request.getFile()!=null) {
-						logError("Some error ocurred when changing avatar: " + e.getErrorString() + " " + e.getErrorCode());
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_changing_user_avatar), -1);
-					} else {
-						logError("Some error ocurred when deleting avatar: " + e.getErrorString() + " " + e.getErrorCode());
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_deleting_user_avatar), -1);
-					}
-
 				}
 			}
 			else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {

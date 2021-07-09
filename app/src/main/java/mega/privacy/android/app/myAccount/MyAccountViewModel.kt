@@ -13,29 +13,42 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.jeremyliao.liveeventbus.LiveEventBus
-import mega.privacy.android.app.DatabaseHandler
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.exportMK.ExportRecoveryKeyActivity
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.R
+import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.exportMK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
+import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
+import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
+import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.InputStream
 
 class MyAccountViewModel @ViewModelInject constructor(
     private val myAccountInfo: MyAccountInfo,
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val setAvatarUseCase: SetAvatarUseCase
 ) : BaseRxViewModel() {
 
     companion object {
@@ -47,6 +60,7 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val avatar: MutableLiveData<MegaError> = MutableLiveData()
     private val killSessions: MutableLiveData<MegaError> = MutableLiveData()
     private val cancelSubscriptions: MutableLiveData<MegaError> = MutableLiveData()
+    private val setProfileAvatar: MutableLiveData<Pair<MegaRequest, MegaError>> = MutableLiveData()
 
     private var fragment = MY_ACCOUNT_FRAGMENT
     private var numOfClicksLastSession = 0
@@ -55,6 +69,7 @@ class MyAccountViewModel @ViewModelInject constructor(
     fun onGetAvatarFinished(): LiveData<MegaError> = avatar
     fun onKillSessionsFinished(): LiveData<MegaError> = killSessions
     fun onCancelSubscriptions(): LiveData<MegaError> = cancelSubscriptions
+    fun onSetProfileAvatar(): LiveData<Pair<MegaRequest, MegaError>> = setProfileAvatar
 
     fun getName(): String = myAccountInfo.fullName
 
@@ -164,18 +179,62 @@ class MyAccountViewModel @ViewModelInject constructor(
         activity.startActivityForResult(intent, REQUEST_CODE_REFRESH)
     }
 
-    fun manageActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (data == null) {
-            return
+    fun manageActivityResult(
+        activity: Activity,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ): String? {
+        if (resultCode != RESULT_OK) {
+            logWarning("Result code not OK. Request code $requestCode")
+            return null
         }
 
-        if (requestCode == REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
-            val app = MegaApplication.getInstance()
+        when (requestCode) {
+            REQUEST_CODE_REFRESH -> {
+                val app = MegaApplication.getInstance()
 
-            app.askForAccountDetails()
-            app.askForExtendedAccountDetails()
-            LiveEventBus.get(EVENT_REFRESH).post(true)
+                app.askForAccountDetails()
+                app.askForExtendedAccountDetails()
+                LiveEventBus.get(EVENT_REFRESH).post(true)
+            }
+            TAKE_PICTURE_PROFILE_CODE -> {
+                return addProfileAvatar(activity, null)
+            }
+            CHOOSE_PICTURE_PROFILE_CODE -> {
+                if (data == null) {
+                    return getString(R.string.error_changing_user_avatar_image_not_available)
+                }
+
+                /* Need to check image existence before use due to android content provider issue.
+                Can not check query count - still get count = 1 even file does not exist
+                */
+                var fileExists = false
+                val inputStream: InputStream?
+
+                try {
+                    inputStream = data.data?.let { activity.contentResolver?.openInputStream(it) }
+                    if (inputStream != null) {
+                        fileExists = true
+                    }
+
+                    inputStream?.close()
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+
+                if (!fileExists) {
+                    return getString(R.string.error_changing_user_avatar_image_not_available)
+                }
+
+                val path = ShareInfo.getRealPathFromURI(activity, data.data)
+                return addProfileAvatar(activity, path)
+            }
         }
+
+        return null
     }
 
     fun incrementLastSessionClick(): Boolean {
@@ -278,5 +337,60 @@ class MyAccountViewModel @ViewModelInject constructor(
             Intent.createChooser(intent, null),
             CHOOSE_PICTURE_PROFILE_CODE
         )
+    }
+
+    fun openQR(activity: Activity) {
+        if (CallUtil.isNecessaryDisableLocalCamera() != INVALID_VALUE.toLong()) {
+            CallUtil.showConfirmationOpenCamera(activity, ACTION_OPEN_QR, false)
+        } else {
+            activity.startActivity(
+                Intent(activity, QRCodeActivity::class.java)
+                    .putExtra(OPEN_SCAN_QR, false)
+            )
+        }
+    }
+
+    private fun addProfileAvatar(activity: Activity, uri: String?): String? {
+        val myEmail = megaApi.myUser.email
+        val imgFile = if (!uri.isNullOrEmpty()) File(uri)
+        else CacheFolderManager.getCacheFile(
+            activity,
+            CacheFolderManager.TEMPORAL_FOLDER,
+            "picture.jpg"
+        )
+
+        if (!FileUtil.isFileAvailable(imgFile)) {
+            return getString(R.string.general_error)
+        }
+
+        val newFile = buildAvatarFile(activity, myEmail + "Temp.jpg")
+
+        if (newFile != null) {
+            MegaUtilsAndroid.createAvatar(imgFile, newFile)
+            setAvatarUseCase.set(newFile.absolutePath)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { result -> setProfileAvatar.value = result }
+                .addTo(composite)
+        } else {
+            logError("ERROR! Destination PATH is NULL")
+        }
+
+        return null
+    }
+
+    fun deleteProfileAvatar(context: Context) {
+        val avatar = buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)
+
+        if (FileUtil.isFileAvailable(avatar)) {
+            logDebug("Avatar to delete: " + avatar.absolutePath)
+            avatar.delete()
+        }
+
+        setAvatarUseCase.remove()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy { result -> setProfileAvatar.value = result }
+            .addTo(composite)
     }
 }

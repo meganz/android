@@ -123,6 +123,8 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
         showConfirmation(isModify)
     }
 
+    private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar(false) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMyAccountBinding.inflate(layoutInflater)
@@ -165,7 +167,8 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.manageActivityResult(requestCode, resultCode, data)
+        val error = viewModel.manageActivityResult(this, requestCode, resultCode, data)
+        if (!error.isNullOrEmpty()) showSnackbar(error)
     }
 
     override fun onResume() {
@@ -186,8 +189,12 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
     override fun onDestroy() {
         unregisterReceiver(updateMyAccountReceiver)
+
         LiveEventBus.get(EVENT_SHOW_REMOVE_PHONE_NUMBER_CONFIRMATION, Boolean::class.java)
             .removeObserver(showRemovePhoneNumberObserver)
+
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
+            .removeObserver(profileAvatarUpdatedObserver)
 
         dismissAlertDialogIfShown(killSessionsConfirmationDialog)
         dismissAlertDialogIfShown(cancelSubscriptionsDialog)
@@ -272,9 +279,7 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
         setUpAvatar(true)
 
-        binding.myAccountThumbnail.setOnClickListener {
-//            (mActivity as ManagerActivityLollipop).checkBeforeOpeningQR(false)
-        }
+        binding.myAccountThumbnail.setOnClickListener { viewModel.openQR(this) }
 
         binding.nameText.text = viewModel.getName()
         binding.emailText.text = viewModel.getEmail()
@@ -303,6 +308,9 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
         LiveEventBus.get(EVENT_SHOW_REMOVE_PHONE_NUMBER_CONFIRMATION, Boolean::class.java)
             .observeForever(showRemovePhoneNumberObserver)
+
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
+            .observeForever(profileAvatarUpdatedObserver)
 
         viewModel.onUpdateVersionsInfoFinished().observe(this, ::refreshVersionsInfo)
         viewModel.onGetAvatarFinished().observe(this, ::setAvatar)
