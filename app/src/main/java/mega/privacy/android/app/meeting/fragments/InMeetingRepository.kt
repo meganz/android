@@ -9,6 +9,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.ChatConnectionListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.listeners.AddContactListener
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
@@ -575,4 +576,20 @@ class InMeetingRepository @Inject constructor(
      * @return True, if my account is an ephemeral account. False otherwise
      */
     fun amIAGuest(): Boolean = megaApi.isEphemeralPlusPlus
+
+    /**
+     * Send add contact invitation
+     *
+     * @param context the Context
+     * @param peerId the peerId of users
+     * @param callback the callback for sending add contact request
+     */
+    fun addContact(context: Context, peerId: Long, callback: (String) -> Unit) {
+        megaApi.inviteContact(
+            ChatController(context).getParticipantEmail(peerId),
+            null,
+            MegaContactRequest.INVITE_ACTION_ADD,
+            AddContactListener(callback)
+        )
+    }
 }

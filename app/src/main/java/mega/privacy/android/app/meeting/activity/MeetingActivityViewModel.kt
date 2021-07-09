@@ -524,6 +524,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
         } else {
             logError("Error adding participants")
         }
+    }
 
+    /**
+     * Show snack bar
+     *
+     * @param content the content should be shown
+     */
+    fun showSnackBar(content: String) {
+        _snackBarLiveData.value = content
     }
 }

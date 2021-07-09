@@ -23,7 +23,7 @@ import nz.mega.sdk.*
  * The fragment shows options for different roles when click the three dots
  */
 @AndroidEntryPoint
-class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
+class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private val bottomViewModel: MeetingParticipantBottomSheetDialogViewModel by viewModels()
     private val sharedViewModel: MeetingActivityViewModel by activityViewModels()
     private val inMeetingViewModel: InMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
@@ -83,7 +83,9 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
      * Init the action for different items
      */
     private fun initItemAction(binding: BottomSheetMeetingParticipantBinding) {
-        listenAction(binding.addContact) { bottomViewModel.addContact(requireContext()) }
+        listenAction(binding.addContact) {
+            (parentFragment as InMeetingFragment).addContact(participantItem.peerId)
+        }
 
         listenAction(binding.contactInfo) { onContactInfoOrEditProfile() }
 

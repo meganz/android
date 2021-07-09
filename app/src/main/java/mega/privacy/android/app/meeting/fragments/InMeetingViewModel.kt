@@ -26,7 +26,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment.Companion.TYPE_IN_SPEAKER_VIEW
 import mega.privacy.android.app.meeting.listeners.*
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.ChatUtil.*
+import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -2060,6 +2060,17 @@ class InMeetingViewModel @ViewModelInject constructor(
             }
 
         return nameList
+    }
+
+    /**
+     * Send add contact invitation
+     *
+     * @param context the Context
+     * @param peerId the peerId of users
+     * @param callback the callback for sending add contact request
+     */
+    fun addContact(context: Context, peerId: Long, callback: (String) -> Unit) {
+        inMeetingRepository.addContact(context, peerId, callback)
     }
 }
 

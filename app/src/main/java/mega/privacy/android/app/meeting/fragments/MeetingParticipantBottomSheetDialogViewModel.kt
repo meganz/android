@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.lollipop.controllers.ContactController
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogFragment.Companion.EXTRA_FROM_MEETING
@@ -151,21 +150,6 @@ class MeetingParticipantBottomSheetDialogViewModel @ViewModelInject constructor(
      * @return if should show `Remove Participant` item, return true, else false
      */
     fun showRemoveItem(): Boolean = !isGuest && isModerator && participant?.isMe == false
-
-    /**
-     * Send add contact invitation
-     *
-     * @param context the Context
-     */
-    fun addContact(context: Context) {
-        participant?.peerId?.let {
-            ContactController(context).inviteContact(
-                ChatController(context).getParticipantEmail(
-                    it
-                )
-            )
-        }
-    }
 
     /**
      * Open edit profile page

@@ -14,7 +14,6 @@ import android.util.TypedValue
 import android.view.Display
 import android.view.KeyEvent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
@@ -26,9 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.FragmentMeetingInfoBinding
-import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
-import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listenAction
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
@@ -38,7 +35,7 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 /**
  * Fragment shows the basic information of meeting
  */
-class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
     private lateinit var binding: FragmentMeetingInfoBinding
     private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
     private val shareViewModel: MeetingActivityViewModel by activityViewModels()
@@ -235,4 +232,6 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             return MeetingInfoBottomSheetDialogFragment()
         }
     }
+
+
 }

@@ -2387,6 +2387,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    /**
+     * Send add contact invitation
+     *
+     * @param peerId the peerId of users
+     */
+    fun addContact(peerId: Long) {
+        inMeetingViewModel.addContact(requireContext(), peerId) { content ->
+            sharedModel.showSnackBar(content)
+        }
+    }
+
     class ChatRequestListener(
         private val onSuccess: (
             api: MegaChatApiJava,
