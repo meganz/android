@@ -52,7 +52,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
-import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.resumeAudioPlayerIfNotInCall
@@ -642,14 +641,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         floatingWindowFragment?.let {
             if (it.isAdded) {
-                it.updateOrientation(newConfig.orientation)
+                it.updateOrientation()
             }
         }
 
         gridViewCallFragment?.let {
             if (it.isAdded) {
                 it.updateLayout(
-                    newConfig.orientation,
                     outMetrics.widthPixels,
                     outMetrics.heightPixels
                 )

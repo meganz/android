@@ -17,6 +17,7 @@ import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -30,7 +31,6 @@ class VideoMeetingViewHolder(
     private val binding: ItemParticipantVideoBinding,
     private val screenWidth: Int,
     private val screenHeight: Int,
-    private val orientation: Int,
     private val isGrid: Boolean,
     private val listenerRenderer: MegaSurfaceRenderer.MegaSurfaceRendererListener?,
     private val onPageClickedCallback: (() -> Unit)?
@@ -66,7 +66,7 @@ class VideoMeetingViewHolder(
         if (isGrid) {
             avatarSize = BIG_AVATAR
 
-            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (Util.getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
                 portraitLayout(isFirstPage, itemCount)
             } else {
                 landscapeLayout(isFirstPage, itemCount)
@@ -118,7 +118,6 @@ class VideoMeetingViewHolder(
         paramsOnHoldIcon.width = dp2px(avatarSize.toFloat())
         paramsOnHoldIcon.height = dp2px(avatarSize.toFloat())
         binding.onHoldIcon.layoutParams = paramsOnHoldIcon
-
         binding.avatar.setImageBitmap(participant.avatar)
     }
 
@@ -451,8 +450,6 @@ class VideoMeetingViewHolder(
     private fun landscapeLayout(isFirstPage: Boolean, itemCount: Int) {
         if (!isGrid) return
 
-        val borderWidth = dp2px(BORDER_WIDTH)
-
         var w = 0
         var h = 0
 
@@ -568,8 +565,8 @@ class VideoMeetingViewHolder(
                         }
                     }
 
-                     when (adapterPosition) {
-                        POSITION_1, POSITION_3 -> marginLeft =borderWidth
+                    when (adapterPosition) {
+                        POSITION_1, POSITION_3 -> marginLeft = borderWidth
                     }
                 }
                 SLOT_NUM_5 -> {
@@ -591,8 +588,8 @@ class VideoMeetingViewHolder(
                         }
                     }
 
-                     when (adapterPosition) {
-                        POSITION_1, POSITION_3 -> marginLeft =borderWidth
+                    when (adapterPosition) {
+                        POSITION_1, POSITION_3 -> marginLeft = borderWidth
                     }
                 }
                 SLOT_NUM_6 -> {

@@ -12,6 +12,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridCallRecyclerView
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.Util.getCurrentOrientation
 
 class GridViewPagerAdapter(
     var data: List<List<Participant>>,
@@ -22,8 +23,6 @@ class GridViewPagerAdapter(
 ) : RecyclerView.Adapter<GridViewPagerAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-
-    private var orientation = Configuration.ORIENTATION_PORTRAIT
 
     private val adapterList = mutableListOf<VideoGridViewAdapter?>()
 
@@ -57,7 +56,7 @@ class GridViewPagerAdapter(
                     }
                     setHasFixedSize(true)
                     setParamsForGridView(position, participantsForPage, this)
-                    setColumnWidth(position, this, participantsForPage.size, orientation)
+                    setColumnWidth(position, this, participantsForPage.size)
                 }
             }
 
@@ -67,7 +66,6 @@ class GridViewPagerAdapter(
                 maxWidth,
                 maxHeight,
                 position,
-                orientation,
                 onPageClickedCallback
             )
 
@@ -150,7 +148,7 @@ class GridViewPagerAdapter(
                                     it.notifyDataSetChanged()
                                 }
                                 it.currentList.size == 4 -> {
-                                    logDebug("Update the current page, as the number of columns must be updated.")
+                                    logDebug("Update the current page, as the number of columns must be updated")
                                     notifyItemChanged(pageWithChange)
                                 }
                                 it.currentList.size == 5 -> {
@@ -518,7 +516,7 @@ class GridViewPagerAdapter(
         val layoutParams = recyclerView.layoutParams as RecyclerView.LayoutParams
         var leftRightMargin = 0
 
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (getCurrentOrientation() == Configuration.ORIENTATION_LANDSCAPE) {
             if (position == 0 && data.size < 4)
                 return
 
@@ -538,15 +536,13 @@ class GridViewPagerAdapter(
      * @param position Position of the participant
      * @param gridView The Recycler view
      * @param size Number of participants on a given page
-     * @param orientation The orientation of the device
      */
     private fun setColumnWidth(
         position: Int,
         gridView: CustomizedGridCallRecyclerView,
         size: Int,
-        orientation: Int
     ) {
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
             if (position == 0) {
                 gridView.setColumnWidth(
                     when (size) {
@@ -577,12 +573,10 @@ class GridViewPagerAdapter(
     /**
      * Change the layout when the orientation is changing
      *
-     * @param newOrientation the new orientation
      * @param widthPixels the new width
      * @param heightPixels the new height
      */
-    fun updateOrientation(newOrientation: Int, widthPixels: Int, heightPixels: Int) {
-        orientation = newOrientation
+    fun updateOrientation(widthPixels: Int, heightPixels: Int) {
         maxWidth = widthPixels
         maxHeight = heightPixels
         notifyDataSetChanged()

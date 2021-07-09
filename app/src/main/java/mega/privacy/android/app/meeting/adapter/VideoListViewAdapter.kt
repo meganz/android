@@ -40,7 +40,6 @@ class VideoListViewAdapter(
             ItemParticipantVideoBinding.inflate(inflater, parent, false),
             0,
             0,
-            1,
             false,
             listenerRenderer,
             null

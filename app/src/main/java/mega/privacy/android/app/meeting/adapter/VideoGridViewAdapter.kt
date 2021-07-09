@@ -15,7 +15,6 @@ class VideoGridViewAdapter(
     private val screenWidth: Int,
     private val screenHeight: Int,
     private var pagePosition: Int,
-    private val orientation: Int,
     private val onPageClickedCallback: () -> Unit
 ) : ListAdapter<Participant, VideoMeetingViewHolder>(ParticipantDiffCallback()) {
 
@@ -33,7 +32,6 @@ class VideoGridViewAdapter(
             ItemParticipantVideoBinding.inflate(inflater, parent, false),
             screenWidth,
             screenHeight,
-            orientation,
             true,
             null,
             onPageClickedCallback

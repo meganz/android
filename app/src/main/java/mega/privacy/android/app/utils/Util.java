@@ -1651,4 +1651,13 @@ public class Util {
     public static boolean isSimplifiedChinese() {
         return Locale.getDefault().toLanguageTag().contains(HANS);
     }
+
+	/**
+	 * Method to know the current orientation of the device
+	 *
+	 * @return current orientation of the device
+	 */
+	public static int getCurrentOrientation() {
+		return MegaApplication.getInstance().getApplicationContext().getResources().getConfiguration().orientation;
+	}
 }

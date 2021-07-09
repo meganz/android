@@ -599,14 +599,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
 					logDebug("Is ongoing call");
-					getChatManagement().setOpeningMeetingLink(chatId, false);
 					ongoingCall(chatId, (isOutgoing && getChatManagement().isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
 				}
 				break;
 
 			case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
 				logDebug("The user is no longer participating");
-				getChatManagement().setOpeningMeetingLink(chatId, false);
 				clearIncomingCallNotification(callId);
 				removeValues(chatId);
 				getChatManagement().setRequestSentCall(callId, false);
@@ -1527,7 +1525,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup() && (!chatRoom.isMeeting() || !getChatManagement().isOpeningMeetingLink(chatId))) {
+		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && chatRoom != null && chatRoom.isGroup() && (!getChatManagement().isOpeningMeetingLink(chatId))) {
 			showGroupCallNotification(chatId);
 			return;
 		}

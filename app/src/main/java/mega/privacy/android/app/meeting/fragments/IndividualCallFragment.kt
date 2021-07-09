@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.getCurrentOrientation
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
@@ -43,8 +44,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private var clientId: Long = MEGACHAT_INVALID_HANDLE
 
     private var isFloatingWindow = false
-
-    private var orientation = Configuration.ORIENTATION_PORTRAIT
 
     private var videoAlphaFloating = 255
 
@@ -524,17 +523,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     /**
      * Change the layout when the orientation is changing
-     *
-     * @param newOrientation the new orientation, portrait of landscape
      */
-    fun updateOrientation(newOrientation: Int) {
+    fun updateOrientation() {
         if (!isFloatingWindow) return
 
         logDebug("Orientation changed")
-        orientation = newOrientation
-
         val params = rootLayout.layoutParams
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
             params.width = Util.dp2px(88f, outMetrics)
             params.height = Util.dp2px(120f, outMetrics)
         } else {

@@ -95,7 +95,8 @@ class GridViewCallFragment : MeetingBaseFragment() {
         viewDataBinding.gridViewPager.adapter = adapterPager
         updateVisibleParticipantsGrid(newData)
 
-        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observe(viewLifecycleOwner,
+        (parentFragment as InMeetingFragment).inMeetingViewModel.participants.observe(
+            viewLifecycleOwner,
             participantsObserver
         )
     }
@@ -311,12 +312,11 @@ class GridViewCallFragment : MeetingBaseFragment() {
     /**
      * Update layout base on the new orientation
      *
-     * @param newOrientation New orientation, Portrait or Landscape
      * @param widthPixels The screen width
      * @param heightPixels The screen height
      */
-    fun updateLayout(newOrientation: Int, widthPixels: Int, heightPixels: Int) {
-        adapterPager.updateOrientation(newOrientation, widthPixels, heightPixels)
+    fun updateLayout(widthPixels: Int, heightPixels: Int) {
+        adapterPager.updateOrientation(widthPixels, heightPixels)
     }
 
     /**
