@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -8,7 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,10 +21,10 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -59,9 +60,11 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -83,8 +86,15 @@ import nz.mega.sdk.MegaUser;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.view.MotionEvent.ACTION_CANCEL;
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MOVE;
+import static android.view.MotionEvent.ACTION_UP;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -94,10 +104,13 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
+    private static final long LONG_CLICK_DELAY = 5000;
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
     private AlertDialog insertMKDialog;
+    private AlertDialog changeApiServerDialog;
 
+    private Rect loginTitleBoundaries;
     private TextView loginTitle;
     private TextView newToMega;
     private TextInputLayout et_userLayout;
@@ -208,6 +221,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         logDebug("onCreateView");
@@ -250,6 +264,41 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginTitle.setText(R.string.login_to_mega);
         loginTitle.setOnClickListener(this);
+
+        Runnable onLongPress = () -> {
+            if (!isAlertDialogShown(changeApiServerDialog)) {
+                changeApiServerDialog = showChangeApiServerDialog((LoginActivityLollipop) context, megaApi);
+            }
+        };
+
+        Runnable onTap = () ->
+                handler.postDelayed(onLongPress, LONG_CLICK_DELAY - ViewConfiguration.getTapTimeout());
+
+        loginTitle.setOnTouchListener((view, event) -> {
+            switch (event.getAction()) {
+                case ACTION_DOWN:
+                    loginTitleBoundaries = new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+                    handler.postDelayed(onTap, ViewConfiguration.getTapTimeout());
+                    break;
+
+                case ACTION_UP:
+                case ACTION_CANCEL:
+                    handler.removeCallbacks(onLongPress);
+                    handler.removeCallbacks(onTap);
+                    break;
+
+                case ACTION_MOVE:
+                    if (loginTitleBoundaries != null && !loginTitleBoundaries.contains(
+                            view.getLeft() + (int) event.getX(),
+                            view.getTop() + (int) event.getY())) {
+                        handler.removeCallbacks(onLongPress);
+                        handler.removeCallbacks(onTap);
+                    }
+                    break;
+            }
+
+            return false;
+        });
 
         et_userLayout = v.findViewById(R.id.login_email_text_layout);
         et_user = v.findViewById(R.id.login_email_text);
@@ -685,7 +734,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     startLoginInProcess();
                     return v;
                 }
-                else if (action.equals(ACTION_REFRESH_STAGING)){
+                else if (action.equals(ACTION_REFRESH_API_SERVER)){
                     twoFA = true;
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startFastLogin();
@@ -1065,8 +1114,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
 
             disableLoginButton();
+
+            // Primitive type directly set value, atomic operation. Don't allow background login.
+            PushMessageHanlder.allowBackgroundLogin = false;
+            IncomingCallService.allowBackgroundLogin = false;
+
             megaApi.fastLogin(gSession, this);
-            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_REFRESH_STAGING))  {
+
+            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_REFRESH_API_SERVER))  {
                 logDebug("megaChatApi.refreshUrl()");
                 megaChatApi.refreshUrl();
             }
@@ -1689,7 +1744,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
 
                     if (twoFA){
-                        intent.setAction(ACTION_REFRESH_STAGING);
+                        intent.setAction(ACTION_REFRESH_API_SERVER);
                         twoFA = false;
                     }
                     
@@ -1759,6 +1814,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         logDebug("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
+            PushMessageHanlder.allowBackgroundLogin = true;
+            IncomingCallService.allowBackgroundLogin = true;
+
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
                 logWarning("Terminate login process when login");
@@ -2273,6 +2331,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         closeCancelDialog();
+        dismissAlertDialogIfShown(changeApiServerDialog);
         super.onDestroy();
     }
 
@@ -2310,7 +2369,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public int onBackPressed() {
         logDebug("onBackPressed");
         //refresh, point to staging server, enable chat. block the back button
-        if (ACTION_REFRESH.equals(action) || ACTION_REFRESH_STAGING.equals(action)){
+        if (ACTION_REFRESH.equals(action) || ACTION_REFRESH_API_SERVER.equals(action)){
             return -1;
         }
         //login is in process

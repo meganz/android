@@ -109,6 +109,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWE
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_PROXIMITY_SENSOR_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE;
@@ -116,6 +117,11 @@ import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache;
 import static mega.privacy.android.app.utils.CallUtil.*;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER_PREFERENCES;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.PRODUCTION_SERVER_VALUE;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.SANDBOX3_SERVER_VALUE;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -755,17 +761,17 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		//Logout check resumed pending transfers
 		TransfersManagement.checkResumedPendingTransfers();
 
-		boolean staging = false;
-		if (dbH != null) {
-			MegaAttributes attrs = dbH.getAttributes();
-			if (attrs != null && attrs.getStaging() != null) {
-				staging = Boolean.parseBoolean(attrs.getStaging());
-			}
-		}
+		int apiServerValue = getSharedPreferences(API_SERVER_PREFERENCES, MODE_PRIVATE)
+				.getInt(API_SERVER, PRODUCTION_SERVER_VALUE);
 
-		if (staging) {
-			megaApi.changeApiUrl("https://staging.api.mega.co.nz/");
-			megaApiFolder.changeApiUrl("https://staging.api.mega.co.nz/");
+		if (apiServerValue != PRODUCTION_SERVER_VALUE) {
+			if (apiServerValue == SANDBOX3_SERVER_VALUE) {
+				megaApi.setPublicKeyPinning(false);
+			}
+
+			String apiServer = getApiServerFromValue(apiServerValue);
+			megaApi.changeApiUrl(apiServer);
+			megaApiFolder.changeApiUrl(apiServer);
 		}
 
 		boolean useHttpsOnly = false;
@@ -930,16 +936,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		megaApi.addGlobalListener(new GlobalListener());
 
-		String language = Locale.getDefault().toString();
-		boolean languageString = megaApi.setLanguage(language);
-		logDebug("Result: " + languageString + " Language: " + language);
-		if (!languageString) {
-			language = Locale.getDefault().getLanguage();
-			languageString = megaApi.setLanguage(language);
-			logDebug("Result: " + languageString + " Language: " + language);
-		}
+        setSDKLanguage();
 
-		// Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
+        // Set the proper resource limit to try avoid issues when the number of parallel transfers is very big.
 		final int DESIRABLE_R_LIMIT = 20000; // SDK team recommended value
 		int currentLimit = megaApi.platformGetRLimitNumFile();
 		logDebug("Current resource limit is set to " + currentLimit);
@@ -954,6 +953,34 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			logDebug("Resource limit is set to " + megaApi.platformGetRLimitNumFile());
 		}
 	}
+
+    /**
+     * Set the language code used by the app.
+     * Language code is from current system setting.
+     * Need to distinguish simplified and traditional Chinese.
+     */
+    private void setSDKLanguage() {
+        Locale locale = Locale.getDefault();
+        String langCode;
+
+        // If it's Chinese
+        if (Locale.CHINESE.toLanguageTag().equals(locale.getLanguage())) {
+            langCode = isSimplifiedChinese() ?
+                    Locale.SIMPLIFIED_CHINESE.toLanguageTag() :
+                    Locale.TRADITIONAL_CHINESE.toLanguageTag();
+        } else {
+            langCode = locale.toString();
+        }
+
+        boolean result = megaApi.setLanguage(langCode);
+
+        if (!result) {
+            langCode = locale.getLanguage();
+            result = megaApi.setLanguage(langCode);
+        }
+
+        logDebug("Result: " + result + " Language: " + langCode);
+    }
 
 	/**
 	 * Setup the MegaApiAndroid instance for folder link.
@@ -1252,8 +1279,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				int loggedState = megaApi.isLoggedIn();
 				logDebug("Login status on " + loggedState);
 				if(loggedState==0){
-					AccountController aC = new AccountController(this);
-					aC.logoutConfirmed(this);
+					AccountController.logoutConfirmed(this);
+					//Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
+					LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).post(true);
 
 					if (isLoggingRunning()) {
 						logDebug("Already in Login Activity, not necessary to launch it again");

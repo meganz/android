@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
+import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaEvent;
@@ -103,6 +104,9 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             MegaNode n = nodeList.get(i);
             if (n.isInShare() && n.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
                 megaApplication.showSharedFolderNotification(n);
+            } else if (n.hasChanged(MegaNode.CHANGE_TYPE_PUBLIC_LINK) && n.getPublicLink() != null) {
+                // when activated share, will show rating if it matches the condition
+                new RatingHandlerImpl(megaApplication.getApplicationContext()).showRatingBaseOnSharing();
             }
         }
     }

@@ -278,6 +278,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import nz.mega.sdk.MegaUtilsAndroid;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE;
@@ -1130,6 +1131,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	};
 
+	private final Observer<Boolean> finishObserver = finish -> {
+		if (finish) finish();
+	};
+
     public void launchPayment(String productId) {
         //start purchase/subscription flow
         MegaSku skuDetails = getSkuDetails(mSkuDetailsList, productId);
@@ -1792,6 +1797,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
         registerReceiver(cuUpdateReceiver, new IntentFilter(ACTION_UPDATE_CU));
+
+		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).observeForever(finishObserver);
 
         smsDialogTimeChecker = new LastShowSMSDialogTimeChecker(this);
         nC = new NodeController(this);
@@ -2728,7 +2735,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						markNotificationsSeen(true);
 						openContactLink(getIntent().getLongExtra(CONTACT_HANDLE, -1));
 					}
-					else if (getIntent().getAction().equals(ACTION_REFRESH_STAGING)){
+					else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
 						update2FASetting();
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
@@ -3680,7 +3687,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						ac.copyMK(false);
 					}
 				}
-				else if (getIntent().getAction().equals(ACTION_REFRESH_STAGING)){
+				else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
 					update2FASetting();
 				}
 				else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
@@ -4223,6 +4230,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         unregisterReceiver(cameraUploadLauncherReceiver);
         unregisterReceiver(updateCUSettingsReceiver);
 		unregisterReceiver(cuUpdateReceiver);
+		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
 
 		if (mBillingManager != null) {
 			mBillingManager.destroy();
@@ -5492,6 +5500,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		});
 	}
 
+	/**
+	 * Hides all views only related to CU section and sets the CU default view.
+	 */
+	private void resetCUFragment() {
+		cuLayout.setVisibility(View.GONE);
+		cuViewTypes.setVisibility(View.GONE);
+
+		if (getCameraUploadFragment() != null) {
+			cuFragment.setDefaultView();
+			showBottomView();
+		}
+	}
+
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item) {
     	if (item == null) {
@@ -5516,8 +5537,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		if (item != DrawerItem.CAMERA_UPLOADS) {
-			cuLayout.setVisibility(View.GONE);
-			cuViewTypes.setVisibility(View.GONE);
+			resetCUFragment();
 		}
 
 		if (item != DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
@@ -10301,7 +10321,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				refreshIncomingShares();
 			}
 		}
-		else if (requestCode == REQUEST_CODE_REFRESH_STAGING && resultCode == RESULT_OK) {
+		else if (requestCode == REQUEST_CODE_REFRESH_API_SERVER && resultCode == RESULT_OK) {
 			logDebug("Resfresh DONE");
 
 			if (intent == null) {
@@ -13800,21 +13820,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fragmentLayout.getLayoutParams();
 
 		if (hide && bottomView.getVisibility() == View.VISIBLE) {
-			params.setMargins(0, 0, 0, 0);
 			bottomView.animate().translationY(bottomView.getHeight()).setDuration(ANIMATION_DURATION)
+					.withStartAction(() -> params.bottomMargin = 0)
 					.withEndAction(() -> bottomView.setVisibility(View.GONE)).start();
 		} else if (!hide && bottomView.getVisibility() == View.GONE) {
-			params.setMargins(0, 0, 0,
-					getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
+			int bottomMargin = getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height);
 
-			int navigationBarId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-			int translationY = navigationBarId > 0
-					? getResources().getDimensionPixelSize(navigationBarId)
-					: bNV.getHeight();
-
-			bottomView.animate().translationY(translationY).setDuration(ANIMATION_DURATION)
+			bottomView.animate().translationY(0).setDuration(ANIMATION_DURATION)
 					.withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
-					.withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
+					.withEndAction(() -> params.bottomMargin = bottomMargin)
+					.start();
 		}
 	}
 
