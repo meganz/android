@@ -1796,7 +1796,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE);
         registerReceiver(updateCUSettingsReceiver, filterUpdateCUSettings);
 
-        registerReceiver(cuUpdateReceiver, new IntentFilter(ACTION_UPDATE_CU));
+		registerReceiver(cuUpdateReceiver, new IntentFilter(ACTION_UPDATE_CU));
 
 		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).observeForever(finishObserver);
 
@@ -4228,7 +4228,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(transferOverQuotaUpdateReceiver);
 		unregisterReceiver(transferFinishReceiver);
         unregisterReceiver(cameraUploadLauncherReceiver);
-        unregisterReceiver(updateCUSettingsReceiver);
+		unregisterReceiver(updateCUSettingsReceiver);
 		unregisterReceiver(cuUpdateReceiver);
 		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
 
