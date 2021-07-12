@@ -17,7 +17,7 @@
         app:errorEnabled="true"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.emoji.widget.EmojiEditText
+        <mega.privacy.android.app.components.twemoji.EmojiEditText
             android:id="@+id/email_field"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

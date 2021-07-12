@@ -30,6 +30,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_REMOVE_PHONE_NUMBER_CONFIRMATION
+import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
@@ -127,6 +128,8 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
     private val nameUpdatedObserver = Observer<Boolean> { binding.nameText.text = viewModel.getName() }
 
+    private val emailUpdatedObserver = Observer<Boolean> { binding.emailText.text = viewModel.getEmail() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMyAccountBinding.inflate(layoutInflater)
@@ -202,18 +205,15 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
         LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
             .removeObserver(nameUpdatedObserver)
 
+        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
+            .removeObserver(emailUpdatedObserver)
+
         killSessionsConfirmationDialog?.dismiss()
         cancelSubscriptionsDialog?.dismiss()
         cancelSubscriptionsConfirmationDialog?.dismiss()
         removeOrModifyPhoneNumberDialog?.dismiss()
         changeApiServerDialog?.dismiss()
         super.onDestroy()
-    }
-
-    override fun onBackPressed() {
-        if (viewModel.isMyAccountFragment()) {
-            super.onBackPressed()
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -251,20 +251,14 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
             return
         }
 
-        if (viewModel.isMyAccountFragment()) {
-            menu.toggleAllMenuItemsVisibility(true)
+        menu.toggleAllMenuItemsVisibility(true)
 
-            if (viewModel.thereIsNoSubscription()) {
-                menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
-            }
+        if (viewModel.thereIsNoSubscription()) {
+            menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
+        }
 
-            if (megaApi.isBusinessAccount) {
-                menu.findItem(R.id.action_upgrade_account).isVisible = false
-            }
-        } else {
-            menu.toggleAllMenuItemsVisibility(false)
-            menu.findItem(R.id.action_refresh).isVisible = true
-            menu.findItem(R.id.action_logout).isVisible = true
+        if (megaApi.isBusinessAccount) {
+            menu.findItem(R.id.action_upgrade_account).isVisible = false
         }
     }
 
@@ -320,6 +314,9 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
         LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
             .observeForever(nameUpdatedObserver)
+
+        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
+            .observeForever(emailUpdatedObserver)
 
         viewModel.onUpdateVersionsInfoFinished().observe(this, ::refreshVersionsInfo)
         viewModel.onGetAvatarFinished().observe(this, ::setAvatar)

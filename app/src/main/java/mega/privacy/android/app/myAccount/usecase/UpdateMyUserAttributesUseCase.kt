@@ -101,4 +101,13 @@ class UpdateMyUserAttributesUseCase @Inject constructor(
             megaApi.setUserAttribute(USER_ATTR_LASTNAME, lastName, listener)
         }
     }
+
+    fun updateEmail(email: String): Single<MegaError> = Single.create { emitter ->
+        megaApi.changeEmail(
+            email,
+            OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
+                emitter.onSuccess(error)
+            })
+        )
+    }
 }

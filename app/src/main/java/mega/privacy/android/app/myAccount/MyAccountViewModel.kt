@@ -29,8 +29,10 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
+import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask
+import mega.privacy.android.app.myAccount.usecase.Check2FAUseCase
 import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
 import mega.privacy.android.app.myAccount.usecase.UpdateMyUserAttributesUseCase
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -51,7 +53,8 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val setAvatarUseCase: SetAvatarUseCase,
-    private val updateMyUserAttributesUseCase: UpdateMyUserAttributesUseCase
+    private val updateMyUserAttributesUseCase: UpdateMyUserAttributesUseCase,
+    private val check2FAUseCase: Check2FAUseCase
 ) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
 
     companion object {
@@ -66,8 +69,9 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val cancelSubscriptions: MutableLiveData<MegaError> = MutableLiveData()
     private val setProfileAvatar: MutableLiveData<Pair<Boolean, Boolean>> = MutableLiveData()
     private val updateName: MutableLiveData<Boolean> = MutableLiveData()
+    private val updateEmail: MutableLiveData<MegaError> = MutableLiveData()
+    private val is2FaEnabled: MutableLiveData<Boolean> = MutableLiveData()
 
-    private var fragment = MY_ACCOUNT_FRAGMENT
     private var numOfClicksLastSession = 0
 
     fun onUpdateVersionsInfoFinished(): LiveData<MegaError> = versionsInfo
@@ -76,6 +80,7 @@ class MyAccountViewModel @ViewModelInject constructor(
     fun onCancelSubscriptions(): LiveData<MegaError> = cancelSubscriptions
     fun onSetProfileAvatar(): LiveData<Pair<Boolean, Boolean>> = setProfileAvatar
     fun onNameUpdated(): LiveData<Boolean> = updateName
+    fun onEmailUpdated(): LiveData<MegaError> = updateEmail
 
     fun getFirstName(): String = myAccountInfo.getFirstNameText()
 
@@ -113,12 +118,6 @@ class MyAccountViewModel @ViewModelInject constructor(
     fun hasExpirableSubscription(): Boolean = myAccountInfo.proExpirationTime > 0
 
     fun getLastSession(): String = myAccountInfo.lastSessionFormattedDate ?: ""
-
-    fun setFragment(fragment: Int) {
-        this.fragment = fragment
-    }
-
-    fun isMyAccountFragment(): Boolean = fragment == MY_ACCOUNT_FRAGMENT
 
     fun thereIsNoSubscription(): Boolean = myAccountInfo.numberOfSubscriptions <= 0
 
@@ -441,6 +440,39 @@ class MyAccountViewModel @ViewModelInject constructor(
                 true
             }
             else -> false
+        }
+    }
+
+    fun check2FA() {
+        check2FAUseCase.check()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy { result -> is2FaEnabled.value = result }
+            .addTo(composite)
+    }
+
+    fun changeEmail(context: Context, newEmail: String): String? {
+        return when {
+            newEmail == getEmail() -> getString(R.string.mail_same_as_old)
+            !EMAIL_ADDRESS.matcher(newEmail).matches() -> getString(R.string.error_invalid_email)
+            is2FaEnabled.value == true -> {
+                context.startActivity(
+                    Intent(context, VerifyTwoFactorActivity::class.java)
+                        .putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, CHANGE_MAIL_2FA)
+                        .putExtra(VerifyTwoFactorActivity.KEY_NEW_EMAIL, newEmail)
+                )
+
+                null
+            }
+            else -> {
+                updateMyUserAttributesUseCase.updateEmail(newEmail)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy { result -> updateEmail.value = result }
+                    .addTo(composite)
+
+                null
+            }
         }
     }
 }

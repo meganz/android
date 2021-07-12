@@ -21,6 +21,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
+import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
@@ -43,10 +44,10 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
-import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaError.*
 import java.util.*
 
 class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback,
@@ -189,7 +190,10 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             photoBottomSheet?.show(supportFragmentManager, photoBottomSheet?.tag)
         }
 
-        binding.changeEmail.setOnClickListener { showChangeEmailDialog(null) }
+        binding.changeEmail.setOnClickListener {
+            viewModel.check2FA()
+            showChangeEmailDialog(null)
+        }
 
         binding.changePassword.setOnClickListener {
             startActivity(Intent(this, ChangePasswordActivityLollipop::class.java))
@@ -226,6 +230,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         viewModel.onSetProfileAvatar().observe(this, ::profileAvatarSet)
         viewModel.onNameUpdated().observe(this, ::updateName)
+        viewModel.onEmailUpdated().observe(this, ::showChangeEmailResult)
     }
 
     /**
@@ -265,6 +270,42 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 if (success) R.string.success_changing_user_attributes
                 else R.string.error_changing_user_attributes
             )
+        )
+    }
+
+    /**
+     * Shows the result of an email change.
+     *
+     * @param error Error result of the email change.
+     */
+    private fun showChangeEmailResult(error: MegaError) {
+        binding.progressBar.isVisible = false
+        val firstMessageId: Int
+        val secondMessageId: Int
+
+        when (error.errorCode) {
+            API_OK -> {
+                firstMessageId = R.string.email_verification_text_change_mail
+                secondMessageId = R.string.email_verification_title
+            }
+            API_EACCESS -> {
+                firstMessageId = R.string.mail_already_used
+                secondMessageId = R.string.email_verification_title
+            }
+            API_EEXIST -> {
+                firstMessageId = R.string.mail_changed_confirm_requested
+                secondMessageId = R.string.email_verification_title
+            }
+            else -> {
+                firstMessageId = R.string.general_text_error
+                secondMessageId = R.string.general_error_word
+            }
+        }
+
+        showAlert(
+            this,
+            StringResourcesUtils.getString(firstMessageId),
+            StringResourcesUtils.getString(secondMessageId)
         )
     }
 
@@ -484,7 +525,66 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     }
 
     private fun showChangeEmailDialog(email: String?) {
+        val dialogBinding = DialogChangeEmailBinding.inflate(layoutInflater)
 
+        changeEmailDialog = MaterialAlertDialogBuilder(this)
+            .setTitle(StringResourcesUtils.getString(R.string.change_mail_title_last_step))
+            .setView(dialogBinding.root)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.save_action), null)
+            .setNegativeButton(StringResourcesUtils.getString(R.string.button_cancel), null)
+            .create()
+
+        changeEmailDialog?.apply {
+            setOnShowListener {
+                quitEditTextError(dialogBinding.emailLayout, dialogBinding.emailErrorIcon)
+
+                dialogBinding.emailField.apply {
+                    setText(email ?: viewModel.getEmail())
+                    requestFocus()
+                    setSelection(0, text.toString().length)
+                    showKeyboardDelayed(this)
+                    setOnEditorActionListener { _, actionId, _ ->
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+                        }
+
+                        false
+                    }
+
+                    doAfterTextChanged {
+                        quitEditTextError(dialogBinding.emailLayout, dialogBinding.emailErrorIcon)
+                    }
+                }
+
+                getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                    if (dialogBinding.emailField.text.isNullOrEmpty()) {
+                        setEditTextError(
+                            StringResourcesUtils.getString(R.string.error_enter_email),
+                            dialogBinding.emailLayout, dialogBinding.emailErrorIcon
+                        )
+                    } else {
+                        val error = viewModel.changeEmail(
+                            this@EditProfileActivity,
+                            dialogBinding.emailField.text.toString()
+                        )
+
+                        binding.progressBar.isVisible = error == null
+
+                        if (error != null) {
+                            setEditTextError(
+                                error,
+                                dialogBinding.emailLayout,
+                                dialogBinding.emailErrorIcon
+                            )
+                        } else {
+                            dismiss()
+                        }
+                    }
+                }
+            }
+
+            show()
+        }
     }
 
     override fun capturePhoto() {
