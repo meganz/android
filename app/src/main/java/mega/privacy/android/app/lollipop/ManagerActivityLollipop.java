@@ -3164,7 +3164,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 								break;
 						}
 					}
-					showSnackbar(SNACKBAR_TYPE, snackbarMessage, INVALID_HANDLE);
+					showSnackbar(SNACKBAR_TYPE, snackbarMessage, MEGACHAT_INVALID_HANDLE);
 				});
 	}
 

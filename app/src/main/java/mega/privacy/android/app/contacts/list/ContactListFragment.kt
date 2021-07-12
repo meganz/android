@@ -117,8 +117,7 @@ class ContactListFragment : Fragment() {
     }
 
     private fun onContactMoreInfoClick(userHandle: Long) {
-        ContactBottomSheetDialogFragment.newInstance(userHandle)
-            .show(childFragmentManager, userHandle.toString())
+        ContactBottomSheetDialogFragment.newInstance(userHandle).show(childFragmentManager)
     }
 
     private fun onRequestsClick() {

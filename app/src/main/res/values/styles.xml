@@ -565,6 +565,19 @@
         <item name="drawableTint">@color/red_600_red_300</item>
     </style>
 
+    <style name="BottomSheetOption.Request">
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Body1</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
+
+    <style name="BottomSheetOption.Request.Red">
+        <item name="android:textColor">@color/red_600_red_300</item>
+        <item name="drawableTint">@color/red_600_red_300</item>
+    </style>
+
     <style name="Widget.Mega.TimeBar" parent="ExoStyledControls.TimeBar">
         <item name="bar_height">2dp</item>
         <item name="buffered_color">@color/grey_300_grey_600</item>

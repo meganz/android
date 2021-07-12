@@ -113,7 +113,6 @@ class ContactRequestsPageFragment : Fragment() {
     }
 
     private fun onRequestClick(requestHandle: Long) {
-        ContactRequestBottomSheetDialogFragment.newInstance(requestHandle)
-            .show(childFragmentManager, requestHandle.toString())
+        ContactRequestBottomSheetDialogFragment.newInstance(requestHandle).show(childFragmentManager)
     }
 }

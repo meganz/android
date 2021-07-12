@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFragment
 import mega.privacy.android.app.contacts.requests.ContactRequestsViewModel
 import mega.privacy.android.app.databinding.BottomSheetContactRequestBinding
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
@@ -20,6 +22,7 @@ import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     companion object {
+        private const val TAG = "ContactRequestBottomSheetDialogFragment"
         private const val REQUEST_HANDLE = "REQUEST_HANDLE"
 
         fun newInstance(requestHandle: Long): ContactRequestBottomSheetDialogFragment =
@@ -83,6 +86,15 @@ class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 viewModel.removeRequest(requestHandle)
                 dismiss()
             }
+        }
+    }
+
+    /**
+     * Custom show method to avoid showing the same dialog multiple times
+     */
+    fun show(manager: FragmentManager) {
+        if (manager.findFragmentByTag(TAG) == null) {
+            super.show(manager, TAG)
         }
     }
 }

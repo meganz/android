@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import com.facebook.imagepipeline.request.ImageRequest
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -36,6 +37,7 @@ import nz.mega.sdk.MegaUser
 class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     companion object {
+        private const val TAG = "ContactBottomSheetDialogFragment"
         private const val USER_HANDLE = "USER_HANDLE"
         private const val INVALID_ITEM = -1
 
@@ -183,6 +185,15 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    /**
+     * Custom show method to avoid showing the same dialog multiple times
+     */
+    fun show(manager: FragmentManager) {
+        if (manager.findFragmentByTag(TAG) == null) {
+            super.show(manager, TAG)
         }
     }
 }

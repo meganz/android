@@ -31,7 +31,7 @@ sealed class ContactItem(val id: Long) {
             }
 
         override fun getSection(): String =
-            AvatarUtil.getFirstLetter(getTitle())
+            getFirstCharacter()
 
         fun getFirstCharacter(): String =
             AvatarUtil.getFirstLetter(getTitle())
