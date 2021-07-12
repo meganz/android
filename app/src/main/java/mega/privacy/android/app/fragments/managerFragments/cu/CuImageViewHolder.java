@@ -3,7 +3,7 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
 import android.view.View;
 import mega.privacy.android.app.databinding.ItemCameraUploadsImageBinding;
 
-class CuImageViewHolder extends CuViewHolder {
+class CuImageViewHolder extends CuGridViewHolder {
 
     private final ItemCameraUploadsImageBinding mBinding;
     private final CuItemSizeConfig mItemSizeConfig;

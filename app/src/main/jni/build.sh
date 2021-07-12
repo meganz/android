@@ -108,11 +108,10 @@ ZENLIB_DOWNLOAD_URL=https://github.com/MediaArea/ZenLib/archive/${ZENLIB_SOURCE_
 ZENLIB_SHA1="1af04654c9618f54ece624a0bad881a3cfef3692"
 
 LIBWEBSOCKETS=libwebsockets
-LIBWEBSOCKETS_VERSION=33a1e905113f05c3c1eec3b75e0727ca81a551b1
-LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-${LIBWEBSOCKETS_VERSION}.zip
+LIBWEBSOCKETS_VERSION=4.2-stable
+LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-v${LIBWEBSOCKETS_VERSION}.zip
 LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
-LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/${LIBWEBSOCKETS_VERSION}.zip
-LIBWEBSOCKETS_SHA1="cb99f397f586ce7333a1dc8b3e4a831cfb854dbc"
+LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/refs/heads/v${LIBWEBSOCKETS_VERSION}.zip
 
 PDFVIEWER=pdfviewer
 PDFVIEWER_VERSION=1.9.0
@@ -174,6 +173,33 @@ function downloadCheckAndUnpack()
     echo "* Extraction finished"
 }
 
+function downloadAndUnpack()
+{
+    local URL=$1
+    local FILENAME=$2
+    local TARGETPATH=$3
+
+    if [[ -f ${FILENAME} ]]; then
+        echo "* Already downloaded: '${FILENAME}'"
+    else
+        echo "* Downloading '${FILENAME}' ..."
+        wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE}
+    fi
+
+    if [[ "${FILENAME}" =~ \.tar\.[^\.]+$ ]]; then
+        echo "* Extracting TAR file..."
+        tar --overwrite -xf ${FILENAME} -C ${TARGETPATH} &>> ${LOG_FILE}
+    elif [[ "${FILENAME}" =~ \.zip$ ]]; then
+        echo "* Extracting ZIP file..."
+        unzip -o ${FILENAME} -d ${TARGETPATH} &>> ${LOG_FILE}
+    else
+        echo "* Dont know how to extract '${FILENAME}'"
+        exit 1
+    fi
+
+    echo "* Extraction finished"
+}
+
 function createMEGABindings
 {
     echo "* Creating MEGA Java bindings"
@@ -210,6 +236,7 @@ fi
 if [ "$1" == "clean_mega" ]; then
     echo "* Deleting Java bindings"
     make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &>> ${LOG_FILE}
+    rm -rf ${JAVA_OUTPUT_PATH}/nz/mega/sdk/*.java
     rm -rf megachat/megachat.cpp megachat/megachat.h
     echo "* Deleting tarballs"
     rm -rf ../obj/local/armeabi
@@ -223,6 +250,7 @@ fi
 if [ "$1" == "clean" ]; then
     echo "* Deleting Java bindings"
     make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &>> ${LOG_FILE}
+    rm -rf ${JAVA_OUTPUT_PATH}/nz/mega/sdk/*.java
     rm -rf megachat/megachat.cpp megachat/megachat.h
     
     echo "* Deleting source folders"    
@@ -404,30 +432,21 @@ echo "* cURL with c-ares is ready"
 
 echo "* Setting up crashlytics"
 if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
-    wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE}
-    wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O  ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C}
+    wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE} &>> ${LOG_FILE}
+    wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O  ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C} &>> ${LOG_FILE}
 
-    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/ares_android.c < curl/ares_android_c.patch; then
-        patch -p0 ${CURL}/ares/ares_android.c < curl/ares_android_c.patch
+    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/ares_android.c < curl/ares_android_c.patch &>> ${LOG_FILE}; then
+        patch -p0 ${CURL}/ares/ares_android.c < curl/ares_android_c.patch &>> ${LOG_FILE}
     fi
 
     touch ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready
 fi
 echo "* crashlytics is ready"
 
-echo "* Setting up libwebsockets"
-if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
-    downloadCheckAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS_SHA1} ${LIBWEBSOCKETS}
-    ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
-    touch ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
-fi
-echo "* libwebsockets is ready"
-
-
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
     WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
-    pwd
+
     if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "0755036bf7afd622e96289468fd753e20213cf01" ]; then
         echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI"
         echo "and uncompress it in megachat/webrtc"
@@ -438,6 +457,47 @@ if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
 else
     echo "* WebRTC is not needed"
 fi
+
+echo "* Setting up libwebsockets"
+if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
+    downloadAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS}
+    ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
+    LWS_REF_PATH="${PWD}"
+
+    for ABI in ${BUILD_ARCHS}; do
+        echo "* Prebuilding libwebsockets for ${ABI}"
+        if [ "${ABI}" == "armeabi-v7a" ]; then
+            TARGET="arm"
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-implicit-int-conversion"
+        elif [ "${ABI}" == "arm64-v8a" ]; then
+            TARGET="arm64"
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-shorten-64-to-32"
+        elif [ "${ABI}" == "x86" ]; then
+            TARGET=${ABI}
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-implicit-int-conversion"
+        elif [ "${ABI}" == "x86_64" ]; then
+            TARGET=${ABI}
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-shorten-64-to-32"
+        fi
+
+        rm -r ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE} ||:
+        mkdir -p ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
+        pushd ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
+        cmake -DCMAKE_INSTALL_PREFIX="${LWS_REF_PATH}/${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/libwebsockets-android-${ABI}" -DANDROID_ABI=${ABI} -DANDROID_PLATFORM=${APP_PLATFORM} \
+        -DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake -DLWS_WITH_SHARED=OFF -DLWS_WITH_STATIC=ON -DLWS_WITHOUT_TESTAPPS=ON \
+        -DLWS_WITHOUT_SERVER=ON -DLWS_IPV6=ON -DLWS_STATIC_PIC=ON -DLWS_WITH_HTTP2=0 -DLWS_WITH_BORINGSSL=ON -DLWS_SSL_CLIENT_USE_OS_CA_CERTS=0 \
+        -DLWS_OPENSSL_INCLUDE_DIRS="${LWS_REF_PATH}/megachat/webrtc/include/third_party/boringssl/src/include" -DLWS_OPENSSL_LIBRARIES="${LWS_REF_PATH}/megachat/webrtc/libwebrtc_${TARGET}.a" \
+        -DLWS_WITH_LIBUV=1 -DLWS_LIBUV_INCLUDE_DIRS="${LWS_REF_PATH}/libuv/libuv/include" -DLWS_LIBUV_LIBRARIES="${LWS_REF_PATH}/libuv/libuv/libuv.a" "${EXTRA_FLAGS}" \
+        ../ &>> ${LOG_FILE}
+
+        cmake --build . &>> ${LOG_FILE}
+        cmake --build . --target install &>> ${LOG_FILE}
+        popd &>> ${LOG_FILE}
+    done
+
+    touch ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
+fi
+echo "* libwebsockets is ready"
 
 echo "* Setting up PdfViewer"
 if [ ! -f ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready ]; then
@@ -471,9 +531,9 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     fi
     ENABLED_DECODERS=(ac3)
     pushd "${FFMPEG_EXT_PATH}/jni" &>> ${LOG_FILE}
-    (git -C ffmpeg pull || git clone git://source.ffmpeg.org/ffmpeg ffmpeg)
+    (git -C ffmpeg pull || git clone git://source.ffmpeg.org/ffmpeg ffmpeg) &>> ${LOG_FILE}
     pushd ffmpeg &>> ${LOG_FILE}
-    git checkout release/${FFMPEG_VERSION}
+    git checkout release/${FFMPEG_VERSION} &>> ${LOG_FILE}
     popd &>> ${LOG_FILE}
     echo "* Building FFMPEG"
     ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
@@ -509,28 +569,28 @@ rm -rf ../tmpLibs
 mkdir ../tmpLibs
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86`" ]; then
     echo "* Running ndk-build x86"
-    ${NDK_BUILD} -j8 APP_ABI=x86
+    ${NDK_BUILD} -j8 APP_ABI=x86 &>> ${LOG_FILE}
     mv ../libs/x86 ../tmpLibs/
     echo "* ndk-build finished for x86"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w armeabi-v7a`" ]; then
     echo "* Running ndk-build arm 32bits"
-    ${NDK_BUILD} -j8 APP_ABI=armeabi-v7a
+    ${NDK_BUILD} -j8 APP_ABI=armeabi-v7a &>> ${LOG_FILE}
     mv ../libs/armeabi-v7a ../tmpLibs/
     echo "* ndk-build finished for arm 32bits"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86_64`" ]; then
     echo "* Running ndk-build x86_64"
-    ${NDK_BUILD} -j8 APP_ABI=x86_64
+    ${NDK_BUILD} -j8 APP_ABI=x86_64 &>> ${LOG_FILE}
     mv ../libs/x86_64 ../tmpLibs/
     echo "* ndk-build finished for x86_64"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
     echo "* Running ndk-build arm 64bits"
-    ${NDK_BUILD} -j8 APP_ABI=arm64-v8a
+    ${NDK_BUILD} -j8 APP_ABI=arm64-v8a &>> ${LOG_FILE}
     echo "* ndk-build finished for arm 64bits"
     mv ../libs/arm64-v8a ../tmpLibs/
 fi
