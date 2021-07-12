@@ -1,8 +1,6 @@
 package mega.privacy.android.app.meeting.activity
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.*
 import androidx.activity.viewModels
@@ -20,9 +18,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.fragments.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-
-// FIXME: Keep Meeting Activity from implementing this and that listeners
-// FIXME: And don't directly call megaChatApi in view layer, try don't put everything together and bloat the View layer file
 
 @AndroidEntryPoint
 class MeetingActivity : PasscodeActivity() {
@@ -77,28 +72,24 @@ class MeetingActivity : PasscodeActivity() {
 
         initActionBar()
         initNavigation()
-        setStatusBarTranslucent(window, true)
+        setStatusBarTranslucent()
     }
 
-    private fun setStatusBarTranslucent(window: Window, translucent: Boolean) {
+    private fun setStatusBarTranslucent() {
         val decorView: View = window.decorView
 
-        if (translucent) {
-            decorView.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets? ->
-                val defaultInsets = v.onApplyWindowInsets(insets)
+        decorView.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets? ->
+            val defaultInsets = v.onApplyWindowInsets(insets)
 
-                toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
+            toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
 
-                @Suppress("DEPRECATION")
-                defaultInsets.replaceSystemWindowInsets(
-                    defaultInsets.systemWindowInsetLeft,
-                    0,
-                    defaultInsets.systemWindowInsetRight,
-                    defaultInsets.systemWindowInsetBottom
-                )
-            }
-        } else {
-            decorView.setOnApplyWindowInsetsListener(null)
+            @Suppress("DEPRECATION")
+            defaultInsets.replaceSystemWindowInsets(
+                defaultInsets.systemWindowInsetLeft,
+                0,
+                defaultInsets.systemWindowInsetRight,
+                defaultInsets.systemWindowInsetBottom
+            )
         }
 
         ViewCompat.requestApplyInsets(decorView)

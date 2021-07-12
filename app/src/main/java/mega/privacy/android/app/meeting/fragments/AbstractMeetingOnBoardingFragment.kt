@@ -26,6 +26,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils
@@ -73,16 +74,18 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             mRootViewHeight = visibleHeight
             return@OnGlobalLayoutListener
         }
+
         if (mRootViewHeight == visibleHeight) {
             // set bottom margin to 40dp
-            setMarginBottomOfMeetingButton(40f)
+            setMarginBottomOfMeetingButton(MEETING_BOTTOM_MARGIN)
             bKeyBoardExtend = false
             triggerAvatar(View.VISIBLE)
             return@OnGlobalLayoutListener
         }
-        if (mRootViewHeight - visibleHeight > 200) {
+
+        if (mRootViewHeight - visibleHeight > MIN_MEETING_HEIGHT_CHANGE) {
             // layout changing (keyboard popup), set bottom margin to 10dp
-            setMarginBottomOfMeetingButton(10f)
+            setMarginBottomOfMeetingButton(MEETING_BOTTOM_MARGIN_WITH_KEYBOARD)
             bKeyBoardExtend = true
             if ((preFabTop == fabRect.top) && (fabRect.top - avatarRect.bottom < 10)) {
                 triggerAvatar(View.GONE)
@@ -134,7 +137,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         setMarginTopOfMeetingName(
             Util.getStatusBarHeight() + ChatUtil.getActionBarHeight(
                 activity, activity?.resources
-            ) + Util.dp2px(16f)
+            ) + Util.dp2px(MEETING_NAME_MARGIN_TOP)
         )
 
         meetingActivity.toolbar?.apply {
@@ -211,80 +214,87 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      * Use ViewModel to manage UI-related data
      */
     private fun initViewModel() {
-        sharedModel.let { model ->
-            model.micLiveData.observe(viewLifecycleOwner) {
-                fab_mic.isOn = it
-            }
-            model.cameraLiveData.observe(viewLifecycleOwner) {
-                switchCamera(it)
-            }
-            model.speakerLiveData.observe(viewLifecycleOwner) {
-                when (it) {
-                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
-                        fab_speaker.isOn = true
-                        fab_speaker.setOnIcon(R.drawable.ic_speaker_on)
-                        fab_speaker_label.text =
-                            StringResourcesUtils.getString(R.string.general_speaker)
-                    }
-                    AppRTCAudioManager.AudioDevice.EARPIECE -> {
-                        fab_speaker.isOn = false
-                        fab_speaker.setOnIcon(R.drawable.ic_speaker_off)
-                        fab_speaker_label.text =
-                            StringResourcesUtils.getString(R.string.general_speaker)
-                    }
-                    else -> {
-                        fab_speaker.isOn = true
-                        fab_speaker.setOnIcon(R.drawable.ic_headphone)
-                        fab_speaker_label.text =
-                            StringResourcesUtils.getString(R.string.general_headphone)
+        sharedModel.let { model->
+            model.apply {
+                micLiveData.observe(viewLifecycleOwner) {
+                    fab_mic.isOn = it
+                }
+                cameraLiveData.observe(viewLifecycleOwner) {
+                    switchCamera(it)
+                }
+                speakerLiveData.observe(viewLifecycleOwner) {
+                    when (it) {
+                        AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                            fab_speaker.isOn = true
+                            fab_speaker.setOnIcon(R.drawable.ic_speaker_on)
+                            fab_speaker_label.text =
+                                StringResourcesUtils.getString(R.string.general_speaker)
+                        }
+                        AppRTCAudioManager.AudioDevice.EARPIECE -> {
+                            fab_speaker.isOn = false
+                            fab_speaker.setOnIcon(R.drawable.ic_speaker_off)
+                            fab_speaker_label.text =
+                                StringResourcesUtils.getString(R.string.general_speaker)
+                        }
+                        else -> {
+                            fab_speaker.isOn = true
+                            fab_speaker.setOnIcon(R.drawable.ic_headphone)
+                            fab_speaker_label.text =
+                                StringResourcesUtils.getString(R.string.general_headphone)
+                        }
                     }
                 }
-            }
-            model.tips.observe(viewLifecycleOwner) {
-                showToast(fab_tip_location, it, Toast.LENGTH_SHORT)
-            }
-            model.notificationNetworkState.observe(viewLifecycleOwner) {
-                logDebug("Network state changed, Online :$it")
-            }
-            model.cameraPermissionCheck.observe(viewLifecycleOwner) {
-                if (it) {
-                    permissionsRequester = permissionsBuilder(
-                        arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList())
-                    )
-                        .setOnRequiresPermission { l ->
-                            run {
-                                onRequiresCameraPermission(l)
-                                // Continue expected action after granted
-                                sharedModel.clickCamera(true)
-                            }
-                        }
-                        .setOnShowRationale { l -> onShowRationale(l) }
-                        .setOnNeverAskAgain { l -> onCameraNeverAskAgain(l) }
-                        .build()
-                    permissionsRequester.launch(false)
+                tips.observe(viewLifecycleOwner) {
+                    showToast(fab_tip_location, it, Toast.LENGTH_SHORT)
                 }
-            }
-            model.recordAudioPermissionCheck.observe(viewLifecycleOwner) {
-                if (it) {
-                    permissionsRequester = permissionsBuilder(
-                        arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList())
-                    )
-                        .setOnRequiresPermission { l ->
-                            run {
-                                onRequiresAudioPermission(l)
-                                // Continue expected action after granted
-                                sharedModel.clickMic(true)
+                notificationNetworkState.observe(viewLifecycleOwner) {
+                    logDebug("Network state changed, Online :$it")
+                }
+                cameraPermissionCheck.observe(viewLifecycleOwner) {
+                    if (it) {
+                        permissionsRequester = permissionsBuilder(
+                            arrayOf(Manifest.permission.CAMERA).toCollection(ArrayList())
+                        )
+                            .setOnRequiresPermission { l ->
+                                run {
+                                    onRequiresCameraPermission(l)
+                                    // Continue expected action after granted
+                                    sharedModel.clickCamera(true)
+                                }
                             }
-                        }
-                        .setOnShowRationale { l -> onShowRationale(l) }
-                        .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
-                        .build()
-                    permissionsRequester.launch(false)
+                            .setOnShowRationale { l -> onShowRationale(l) }
+                            .setOnNeverAskAgain { l -> onCameraNeverAskAgain(l) }
+                            .build()
+                        permissionsRequester.launch(false)
+                    }
+                }
+                recordAudioPermissionCheck.observe(viewLifecycleOwner) {
+                    if (it) {
+                        permissionsRequester = permissionsBuilder(
+                            arrayOf(Manifest.permission.RECORD_AUDIO).toCollection(ArrayList())
+                        )
+                            .setOnRequiresPermission { l ->
+                                run {
+                                    onRequiresAudioPermission(l)
+                                    // Continue expected action after granted
+                                    sharedModel.clickMic(true)
+                                }
+                            }
+                            .setOnShowRationale { l -> onShowRationale(l) }
+                            .setOnNeverAskAgain { l -> onAudioNeverAskAgain(l) }
+                            .build()
+                        permissionsRequester.launch(false)
+                    }
                 }
             }
         }
     }
 
+    /**
+     * user denies the RECORD_AUDIO permission
+     *
+     * @param permissions permission list
+     */
     private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
             logDebug("user denies the RECORD_AUDIO permission")
@@ -292,6 +302,11 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
     }
 
+    /**
+     * user denies the CAMERA permission
+     *
+     * @param permissions permission list
+     */
     private fun onCameraNeverAskAgain(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.CAMERA)) {
             logDebug("user denies the CAMERA permission")
@@ -397,6 +412,14 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
     }
 
+    /**
+     * Show or hide Avatar according to camera and keyboard
+     * 1 - Canera open - hide Avatar
+     * 2 - Camera close and KeyBoard hide - show Avatar
+     * 3 - Camera close and KeyBoard show - visibility
+     *
+     * @param visibility View.GONE / View.VISIBLE / View.INVISIBLE
+     */
     private fun triggerAvatar(visibility: Int) {
         logDebug("triggerAvatar bCameraOpen: $bCameraOpen & bKeyBoardExtend: $bKeyBoardExtend")
         if (bCameraOpen) {
