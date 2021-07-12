@@ -139,7 +139,7 @@
                 android:show="@{viewModel.showRemoveItem()}"
                 android:text="@string/remove_participant_menu_item"
                 android:textColor="@color/red_600_red_300"
-                app:drawableStartCompat="@drawable/ic_move"
+                app:drawableStartCompat="@drawable/ic_remove"
                 app:drawableTint="@color/red_600_red_300" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
