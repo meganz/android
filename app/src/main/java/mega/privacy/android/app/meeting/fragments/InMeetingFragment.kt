@@ -2175,7 +2175,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         val inviteParticipantIntent =
             Intent(meetingActivity, AddContactActivityLollipop::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-                putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
                 putExtra(INTENT_EXTRA_KEY_CHAT, true)
                 putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.currentChatId)
                 putExtra(
