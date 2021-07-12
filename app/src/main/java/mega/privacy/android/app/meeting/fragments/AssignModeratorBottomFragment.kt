@@ -43,6 +43,7 @@ class AssignModeratorBottomFragment(
 
         inMeetingViewModel.participants.observe(this) { newData ->
             update(newData.filter { inMeetingViewModel.isStandardUser(it.peerId) && !it.isGuest }
+                .map { it.copy() }
                 .toMutableList())
         }
 
