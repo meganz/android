@@ -5,10 +5,12 @@ import android.content.res.Configuration
 import android.graphics.*
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.inputmethod.EditorInfo
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -17,7 +19,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.SMSVerificationActivity
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.AppBarStateChangeListener
+import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
+import mega.privacy.android.app.databinding.DialogChangeNameBinding
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
@@ -25,6 +29,9 @@ import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberBottomSh
 import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.PROCESSING_FILE
+import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
+import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
 import mega.privacy.android.app.utils.AlertsAndWarnings.showRemoveOrModifyPhoneNumberConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDominantColor
@@ -52,6 +59,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         private const val EMAIL_SIZE = 12F
         private const val PADDING_LEFT_STATE = 8F
 
+        private const val CHANGE_NAME_SHOWN = "CHANGE_NAME_SHOWN"
+        private const val FIRST_NAME_TYPED = "FIRST_NAME_TYPED"
+        private const val LAST_NAME_TYPED = "LAST_NAME_TYPED"
+        private const val CHANGE_EMAIL_SHOWN = "CHANGE_EMAIL_SHOWN"
+        private const val EMAIL_TYPED = "EMAIL_TYPED"
         private const val REMOVE_OR_MODIFY_PHONE_SHOWN = "REMOVE_OR_MODIFY_PHONE_SHOWN"
         private const val IS_MODIFY = "IS_MODIFY"
     }
@@ -70,6 +82,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
     private var isModify = false
     private var removeOrModifyPhoneNumberDialog: AlertDialog? = null
+    private var changeNameDialog: AlertDialog? = null
+    private var changeEmailDialog: AlertDialog? = null
 
     private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar() }
 
@@ -83,6 +97,17 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         setupObservers()
 
         if (savedInstanceState != null) {
+            if (savedInstanceState.getBoolean(CHANGE_NAME_SHOWN, false)) {
+                showChangeNameDialog(
+                    savedInstanceState.getString(FIRST_NAME_TYPED),
+                    savedInstanceState.getString(LAST_NAME_TYPED)
+                )
+            }
+
+            if (savedInstanceState.getBoolean(CHANGE_EMAIL_SHOWN, false)) {
+                showChangeEmailDialog(savedInstanceState.getString(EMAIL_TYPED))
+            }
+
             if (savedInstanceState.getBoolean(REMOVE_OR_MODIFY_PHONE_SHOWN, false)) {
                 showConfirmation(savedInstanceState.getBoolean(IS_MODIFY, false))
             }
@@ -90,7 +115,29 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        if (isRemoveOrModifyDialogShowing()) {
+        if (isAlertDialogShown(changeNameDialog)) {
+            outState.putBoolean(CHANGE_NAME_SHOWN, true)
+            outState.putString(
+                FIRST_NAME_TYPED,
+                changeNameDialog?.findViewById<EmojiEditText>(R.id.first_name_field)?.text.toString()
+            )
+
+            outState.putString(
+                LAST_NAME_TYPED,
+                changeNameDialog?.findViewById<EmojiEditText>(R.id.last_name_field)?.text.toString()
+            )
+        }
+
+        if (isAlertDialogShown(changeEmailDialog)) {
+            outState.putBoolean(CHANGE_EMAIL_SHOWN, true)
+
+            outState.putString(
+                EMAIL_TYPED,
+                changeEmailDialog?.findViewById<EmojiEditText>(R.id.email_field)?.text.toString()
+            )
+        }
+
+        if (isAlertDialogShown(removeOrModifyPhoneNumberDialog)) {
             outState.putBoolean(REMOVE_OR_MODIFY_PHONE_SHOWN, true)
             outState.putBoolean(IS_MODIFY, isModify)
         }
@@ -104,9 +151,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .removeObserver(profileAvatarUpdatedObserver)
 
-        if (isRemoveOrModifyDialogShowing()) {
-            removeOrModifyPhoneNumberDialog?.dismiss()
-        }
+        changeNameDialog?.dismiss()
+        changeEmailDialog?.dismiss()
+        removeOrModifyPhoneNumberDialog?.dismiss()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -132,9 +179,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         setUpAvatar()
         setUpHeader()
 
-        binding.changeName.setOnClickListener {
-
-        }
+        binding.changeName.setOnClickListener { showChangeNameDialog(null, null) }
 
         binding.addPhoto.setOnClickListener {
             if (isBottomSheetDialogShown(photoBottomSheet))
@@ -144,9 +189,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             photoBottomSheet?.show(supportFragmentManager, photoBottomSheet?.tag)
         }
 
-        binding.changeEmail.setOnClickListener {
-
-        }
+        binding.changeEmail.setOnClickListener { showChangeEmailDialog(null) }
 
         binding.changePassword.setOnClickListener {
             startActivity(Intent(this, ChangePasswordActivityLollipop::class.java))
@@ -172,11 +215,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             }
         }
 
-        binding.recoveryKeyLayout.setOnClickListener { viewModel.exportMK(this) }
+        binding.recoveryKeyButton.setOnClickListener { viewModel.exportMK(this) }
 
-        binding.logoutButton.setOnClickListener {
-            viewModel.logout(this@EditProfileActivity)
-        }
+        binding.logoutButton.setOnClickListener { viewModel.logout(this@EditProfileActivity) }
     }
 
     private fun setupObservers() {
@@ -184,18 +225,47 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             .observeForever(profileAvatarUpdatedObserver)
 
         viewModel.onSetProfileAvatar().observe(this, ::profileAvatarSet)
+        viewModel.onNameUpdated().observe(this, ::updateName)
     }
 
+    /**
+     * Shows the result of an avatar change or deletion.
+     *
+     * @param result Pair<Boolean, Boolean> containing the result of the request.
+     *      If first value is true, indicates is an avatar change, otherwise is a deletion.
+     *      If second value is true, means the action finished with success, otherwise not.
+     */
     private fun profileAvatarSet(result: Pair<Boolean, Boolean>) {
         binding.progressBar.isVisible = false
 
-        val stringId = if (result.second) {
-            if (result.first) R.string.success_changing_user_avatar
+        val avatarChange = result.first
+        val success = result.second
+
+        val stringId = if (success) {
+            if (avatarChange) R.string.success_changing_user_avatar
             else R.string.success_deleting_user_avatar
-        } else if (result.first) R.string.error_changing_user_avatar
+        } else if (avatarChange) R.string.error_changing_user_avatar
         else R.string.error_deleting_user_avatar
 
         showSnackbar(StringResourcesUtils.getString(stringId))
+    }
+
+    /**
+     * Shows the result of a name change.
+     *
+     * @param success True if the name was changed successfully, false otherwise.
+     */
+    private fun updateName(success: Boolean) {
+        binding.progressBar.isVisible = false
+        binding.headerLayout.firstLineToolbar.text =
+            viewModel.getName().toUpperCase(Locale.getDefault())
+
+        showSnackbar(
+            StringResourcesUtils.getString(
+                if (success) R.string.success_changing_user_attributes
+                else R.string.error_changing_user_attributes
+            )
+        )
     }
 
     private fun setUpActionBar() {
@@ -327,6 +397,96 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
     }
 
+    private fun showChangeNameDialog(firstName: String?, lastName: String?) {
+        val dialogBinding = DialogChangeNameBinding.inflate(layoutInflater)
+
+        changeNameDialog = MaterialAlertDialogBuilder(this)
+            .setTitle(StringResourcesUtils.getString(R.string.change_name_action))
+            .setView(dialogBinding.root)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.save_action), null)
+            .setNegativeButton(StringResourcesUtils.getString(R.string.button_cancel), null)
+            .create()
+
+        changeNameDialog?.apply {
+            setOnShowListener {
+                quitEditTextError(dialogBinding.firstNameLayout, dialogBinding.firstNameErrorIcon)
+                quitEditTextError(dialogBinding.lastNameLayout, dialogBinding.lastNameErrorIcon)
+
+                dialogBinding.firstNameField.apply {
+                    setText(firstName ?: viewModel.getFirstName())
+                    setOnEditorActionListener { _, actionId, _ ->
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+                        }
+
+                        false
+                    }
+
+                    doAfterTextChanged {
+                        quitEditTextError(
+                            dialogBinding.firstNameLayout,
+                            dialogBinding.firstNameErrorIcon
+                        )
+                    }
+                }
+
+                dialogBinding.lastNameField.apply {
+                    setText(lastName ?: viewModel.getLastName())
+                    setOnEditorActionListener { _, actionId, _ ->
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            getButton(AlertDialog.BUTTON_POSITIVE).performClick()
+                        }
+
+                        false
+                    }
+
+                    doAfterTextChanged {
+                        quitEditTextError(
+                            dialogBinding.lastNameLayout,
+                            dialogBinding.lastNameErrorIcon
+                        )
+                    }
+                }
+
+                getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                    var errorShown = false
+
+                    if (dialogBinding.firstNameField.text.isNullOrEmpty()) {
+                        errorShown = true
+                        setEditTextError(
+                            StringResourcesUtils.getString(R.string.error_enter_username),
+                            dialogBinding.firstNameLayout, dialogBinding.firstNameErrorIcon
+                        )
+                    }
+
+                    if (dialogBinding.lastNameField.text.isNullOrEmpty()) {
+                        errorShown = true
+                        setEditTextError(
+                            StringResourcesUtils.getString(R.string.error_enter_userlastname),
+                            dialogBinding.lastNameLayout, dialogBinding.lastNameErrorIcon
+                        )
+                    }
+
+                    if (!errorShown) {
+                        binding.progressBar.isVisible =
+                            viewModel.changeName(
+                                dialogBinding.firstNameField.text.toString(),
+                                dialogBinding.lastNameField.text.toString()
+                            )
+
+                        dismiss()
+                    }
+                }
+            }
+
+            show()
+        }
+    }
+
+    private fun showChangeEmailDialog(email: String?) {
+
+    }
+
     override fun capturePhoto() {
         viewModel.capturePhoto(this)
     }
@@ -340,10 +500,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         builder.setMessage(R.string.confirmation_delete_avatar)
             .setPositiveButton(R.string.context_delete) { _, _ -> viewModel.deleteProfileAvatar(this) }
             .setNegativeButton(R.string.general_cancel, null).show()
-    }
-
-    private fun isRemoveOrModifyDialogShowing(): Boolean {
-        return removeOrModifyPhoneNumberDialog != null && removeOrModifyPhoneNumberDialog?.isShowing == true
     }
 
     override fun showConfirmation(isModify: Boolean) {

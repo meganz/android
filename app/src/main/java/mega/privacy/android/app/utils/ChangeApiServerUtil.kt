@@ -13,8 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
-import mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown
-import mega.privacy.android.app.utils.AlertsAndWarnings.enableOrDisableDialogButton
+import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiJava
@@ -125,7 +124,7 @@ object ChangeApiServerUtil {
         val currentApiServerValue = preferences.getInt(API_SERVER, PRODUCTION_SERVER_VALUE)
         val newApiServerValue = preferences.getInt(API_SERVER_CHECKED, currentApiServerValue)
 
-        dismissAlertDialogIfShown(changeApiServerDialog)
+        changeApiServerDialog.dismiss()
 
         if (newApiServerValue == currentApiServerValue) {
             return

@@ -74,8 +74,8 @@ import nz.mega.sdk.MegaUser;
 
 import static android.graphics.Color.WHITE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfShown;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
 import static mega.privacy.android.app.utils.Constants.*;

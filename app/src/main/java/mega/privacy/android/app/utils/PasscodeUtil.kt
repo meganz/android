@@ -12,7 +12,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
-import mega.privacy.android.app.utils.AlertsAndWarnings.enableOrDisableDialogButton
+import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString

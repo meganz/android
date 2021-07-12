@@ -10574,67 +10574,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             checkBeforeShowSMSVerificationDialog();
         }
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
-			if(request.getParamType()==MegaApiJava.USER_ATTR_FIRSTNAME){
-				logDebug("request.getText(): "+request.getText());
-				countUserAttributes--;
-
-				myAccountInfo.setFirstNameText(request.getText());
-
-				if (e.getErrorCode() == MegaError.API_OK){
-					logDebug("The first name has changed");
-					String fullName = myAccountInfo.getFullName();
-//					maF.updateNameView(fullName);
-					updateUserNameNavigationView(fullName);
-				}
-				else{
-					logError("Error with first name");
-					errorUserAttibutes++;
-				}
-
-				if(countUserAttributes==0){
-					if(errorUserAttibutes==0){
-						logDebug("All user attributes changed!");
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.success_changing_user_attributes), -1);
-					}
-					else{
-						logWarning("Some error ocurred when changing an attribute: " + errorUserAttibutes);
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_changing_user_attributes), -1);
-					}
-					AccountController aC = new AccountController(this);
-					errorUserAttibutes=0;
-					aC.setCount(0);
-				}
-			}
-			else if(request.getParamType()==MegaApiJava.USER_ATTR_LASTNAME){
-				logDebug("request.getText(): " + request.getText());
-				countUserAttributes--;
-				myAccountInfo.setLastNameText(request.getText());
-
-				if (e.getErrorCode() == MegaError.API_OK){
-					logDebug("The last name has changed");
-//					maF.updateNameView(myAccountInfo.getFullName());
-					updateUserNameNavigationView(myAccountInfo.getFullName());
-				}
-				else{
-					logError("Error with last name");
-					errorUserAttibutes++;
-				}
-
-				if(countUserAttributes==0){
-					if(errorUserAttibutes==0){
-						logDebug("All user attributes changed!");
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.success_changing_user_attributes), -1);
-					}
-					else{
-						logWarning("Some error ocurred when changing an attribute: " + errorUserAttibutes);
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.error_changing_user_attributes), -1);
-					}
-					AccountController aC = new AccountController(this);
-					errorUserAttibutes=0;
-					aC.setCount(0);
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
+			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
 				logDebug("MK exported - USER_ATTR_PWD_REMINDER finished");
 				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
 					logDebug("New value of attribute USER_ATTR_PWD_REMINDER: " + request.getText());

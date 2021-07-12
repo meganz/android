@@ -32,6 +32,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask
 import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
+import mega.privacy.android.app.myAccount.usecase.UpdateMyUserAttributesUseCase
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -49,7 +50,8 @@ import java.io.InputStream
 class MyAccountViewModel @ViewModelInject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val setAvatarUseCase: SetAvatarUseCase
+    private val setAvatarUseCase: SetAvatarUseCase,
+    private val updateMyUserAttributesUseCase: UpdateMyUserAttributesUseCase
 ) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
 
     companion object {
@@ -63,6 +65,7 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val killSessions: MutableLiveData<MegaError> = MutableLiveData()
     private val cancelSubscriptions: MutableLiveData<MegaError> = MutableLiveData()
     private val setProfileAvatar: MutableLiveData<Pair<Boolean, Boolean>> = MutableLiveData()
+    private val updateName: MutableLiveData<Boolean> = MutableLiveData()
 
     private var fragment = MY_ACCOUNT_FRAGMENT
     private var numOfClicksLastSession = 0
@@ -72,6 +75,11 @@ class MyAccountViewModel @ViewModelInject constructor(
     fun onKillSessionsFinished(): LiveData<MegaError> = killSessions
     fun onCancelSubscriptions(): LiveData<MegaError> = cancelSubscriptions
     fun onSetProfileAvatar(): LiveData<Pair<Boolean, Boolean>> = setProfileAvatar
+    fun onNameUpdated(): LiveData<Boolean> = updateName
+
+    fun getFirstName(): String = myAccountInfo.getFirstNameText()
+
+    fun getLastName(): String = myAccountInfo.getLastNameText()
 
     fun getName(): String = myAccountInfo.fullName
 
@@ -400,5 +408,39 @@ class MyAccountViewModel @ViewModelInject constructor(
 
     override fun onIntentProcessed(info: MutableList<ShareInfo>) {
         addProfileAvatar(info[0].fileAbsolutePath)
+    }
+
+    fun changeName(newFirstName: String, newLastName: String): Boolean {
+        val shouldUpdateLastName = newLastName != myAccountInfo.getLastNameText()
+
+        return when {
+            newFirstName != myAccountInfo.getFirstNameText() -> {
+                if (shouldUpdateLastName) {
+                    updateMyUserAttributesUseCase.updateFirstAndLastName(newFirstName, newLastName)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy { result -> updateName.value = result }
+                        .addTo(composite)
+                } else {
+                    updateMyUserAttributesUseCase.updateFirstName(newFirstName)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy { result -> updateName.value = result }
+                        .addTo(composite)
+                }
+
+                true
+            }
+            shouldUpdateLastName -> {
+                updateMyUserAttributesUseCase.updateLastName(newLastName)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy { result -> updateName.value = result }
+                    .addTo(composite)
+
+                true
+            }
+            else -> false
+        }
     }
 }

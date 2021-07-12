@@ -30,6 +30,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_REMOVE_PHONE_NUMBER_CONFIRMATION
+import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.listeners.GetUserDataListener
@@ -40,8 +41,7 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
 import mega.privacy.android.app.myAccount.editProfile.EditProfileActivity
-import mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown
-import mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown
+import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showRemoveOrModifyPhoneNumberConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
@@ -125,6 +125,8 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
     private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar(false) }
 
+    private val nameUpdatedObserver = Observer<Boolean> { binding.nameText.text = viewModel.getName() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMyAccountBinding.inflate(layoutInflater)
@@ -162,6 +164,7 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
             CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN,
             isAlertDialogShown(cancelSubscriptionsConfirmationDialog)
         )
+
         super.onSaveInstanceState(outState)
     }
 
@@ -196,11 +199,14 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .removeObserver(profileAvatarUpdatedObserver)
 
-        dismissAlertDialogIfShown(killSessionsConfirmationDialog)
-        dismissAlertDialogIfShown(cancelSubscriptionsDialog)
-        dismissAlertDialogIfShown(cancelSubscriptionsConfirmationDialog)
-        dismissAlertDialogIfShown(removeOrModifyPhoneNumberDialog)
-        dismissAlertDialogIfShown(changeApiServerDialog)
+        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
+            .removeObserver(nameUpdatedObserver)
+
+        killSessionsConfirmationDialog?.dismiss()
+        cancelSubscriptionsDialog?.dismiss()
+        cancelSubscriptionsConfirmationDialog?.dismiss()
+        removeOrModifyPhoneNumberDialog?.dismiss()
+        changeApiServerDialog?.dismiss()
         super.onDestroy()
     }
 
@@ -311,6 +317,9 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .observeForever(profileAvatarUpdatedObserver)
+
+        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
+            .observeForever(nameUpdatedObserver)
 
         viewModel.onUpdateVersionsInfoFinished().observe(this, ::refreshVersionsInfo)
         viewModel.onGetAvatarFinished().observe(this, ::setAvatar)
