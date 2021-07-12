@@ -929,7 +929,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     fun onPageClick() {
         // If the tips is showing or bottom is fully expanded, can not hide the toolbar and panel
-        if (bottomFloatingPanelViewHolder.isPopWindowShowing() 
+        if (bottomFloatingPanelViewHolder.isPopWindowShowing()
             || bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) return
 
         // Prevent fast tapping.
