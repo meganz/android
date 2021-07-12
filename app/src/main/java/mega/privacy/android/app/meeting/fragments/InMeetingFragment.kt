@@ -923,7 +923,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     fun onPageClick() {
         // If the tips is showing or bottom is fully expanded, can not hide the toolbar and panel
-        if (bottomFloatingPanelViewHolder.isPopWindowShowing() || bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) return
+        if (bottomFloatingPanelViewHolder.isPopWindowShowing()
+            || bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) return
 
         // Prevent fast tapping.
         if (System.currentTimeMillis() - lastTouch < TAP_THRESHOLD) return
@@ -2174,6 +2175,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         val inviteParticipantIntent =
             Intent(meetingActivity, AddContactActivityLollipop::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
                 putExtra(INTENT_EXTRA_KEY_CHAT, true)
                 putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.currentChatId)
                 putExtra(

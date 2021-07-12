@@ -135,6 +135,8 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
     private MegaChatApiAndroid megaChatApi;
     private DatabaseHandler dbH = null;
     private int contactType = 0;
+    // Determine if open this page from meeting
+    private boolean isFromMeeting;
     private int multipleSelectIntent;
     private long nodeHandle = -1;
     private long[] nodeHandles;
@@ -1548,6 +1550,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
         if (getIntent() != null){
             contactType = getIntent().getIntExtra("contactType", CONTACT_TYPE_MEGA);
+            isFromMeeting = getIntent().getBooleanExtra(INTENT_EXTRA_IS_FROM_MEETING, false);
             chatId = getIntent().getLongExtra("chatId", -1);
             newGroup = getIntent().getBooleanExtra("newGroup", false);
             comesFromRecent = getIntent().getBooleanExtra(FROM_RECENT, false);
@@ -1932,7 +1935,9 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             emptyTextView.setVisibility(View.VISIBLE);
             if (contactType == CONTACT_TYPE_MEGA && (addedContactsMEGA == null || addedContactsMEGA.isEmpty())) {
                 emptySubTextView.setVisibility(View.VISIBLE);
-                emptyInviteButton.setVisibility(View.VISIBLE);
+                if (!isFromMeeting) {
+                    emptyInviteButton.setVisibility(View.VISIBLE);
+                }
             }
             else {
                 emptySubTextView.setVisibility(View.GONE);
