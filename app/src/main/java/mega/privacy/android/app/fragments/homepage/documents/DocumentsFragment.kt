@@ -32,6 +32,7 @@ import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
@@ -92,6 +93,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         setupActionMode()
         setupNavigation()
         setupAddFabButton()
+        setupMiniAudioPlayer()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (viewModel.searchMode) {
@@ -458,5 +460,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         binding.addFabButton.setOnClickListener {
             (requireActivity() as ManagerActivityLollipop).showUploadPanel(DOCUMENTS_UPLOAD)
         }
+    }
+
+    private fun setupMiniAudioPlayer() {
+        val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
+            shouldVisible = true
+        }
+        lifecycle.addObserver(audioPlayerController)
     }
 }

@@ -30,12 +30,12 @@
 
         <mega.privacy.android.app.components.NewGridRecyclerView
             android:id="@+id/audio_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:columnWidth="@dimen/grid_node_item_width"
             android:paddingBottom="@dimen/grid_node_list_padding_bottom"
             app:items="@{viewModel.items}"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/mini_audio_player"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -44,9 +44,9 @@
         <mega.privacy.android.app.components.scrollBar.FastScroller
             android:id="@+id/scroller"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/mini_audio_player"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:visibleGone="@{viewModel.items.size() > Constants.MIN_ITEMS_SCROLLBAR}" />

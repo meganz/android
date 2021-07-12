@@ -58,7 +58,6 @@ class AudioFragment : Fragment(), HomepageSearchable {
     private lateinit var listAdapter: NodeListAdapter
     private lateinit var gridAdapter: NodeGridAdapter
     private lateinit var itemDecoration: PositionDividerItemDecoration
-    private lateinit var audioPlayerController: MiniAudioPlayerController
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
@@ -101,13 +100,6 @@ class AudioFragment : Fragment(), HomepageSearchable {
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.node != null })
         }
-    }
-
-    private fun setupMiniAudioPlayer() {
-        audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
-            shouldVisible = true
-        }
-        lifecycle.addObserver(audioPlayerController)
     }
 
     private fun setupEmptyHint() {
@@ -194,6 +186,13 @@ class AudioFragment : Fragment(), HomepageSearchable {
                 spanSizeLookup = gridAdapter.getSpanSizeLookup(spanCount)
             }
         }
+    }
+
+    private fun setupMiniAudioPlayer() {
+        val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
+            shouldVisible = true
+        }
+        lifecycle.addObserver(audioPlayerController)
     }
 
     private fun openNode(node: MegaNode?, index: Int) {
