@@ -883,11 +883,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         // Util.changeToolBarElevation, so we just use the actual color here.
 
         if (!isAudioPlayer() || Util.isDarkMode(this)) {
-            val darkElevationColor = ContextCompat.getColor(this, R.color.action_mode_background)
-
             toolbar.setBackgroundColor(
                 when {
-                    withElevation -> darkElevationColor
+                    withElevation -> ContextCompat.getColor(this, R.color.action_mode_background)
                     isAudioPlayer() -> Color.TRANSPARENT
                     else -> ContextCompat.getColor(this, R.color.dark_grey)
                 }
