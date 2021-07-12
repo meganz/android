@@ -652,6 +652,9 @@ public class Constants {
     public static final int AVATAR_SIZE_CALLS = 50;
     public static final int AVATAR_SIZE_GRID = 75;
     public static final int AVATAR_SIZE = 150;
+    public static final float MEETING_BOTTOM_MARGIN = 40f;
+    public static final float MEETING_BOTTOM_MARGIN_WITH_KEYBOARD = 10f;
+    public static final float MIN_MEETING_HEIGHT_CHANGE = 200;
 
     //Thumbnail dimens
     public static final float THUMB_CORNER_RADIUS_DP = 4;
@@ -879,4 +882,6 @@ public class Constants {
     public final static int LINK_IS_FOR_MEETING = 1;
 
     public static final long ANIMATION_DURATION = 400;
+
+    public static final float MEETING_NAME_MARGIN_TOP = 16f;
 }
