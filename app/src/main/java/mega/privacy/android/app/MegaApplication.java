@@ -188,6 +188,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private boolean isActivityChangingConfigurations = false;
 
 	private static boolean isLoggingIn = false;
+	private static boolean isLoggingOut = false;
 	private static boolean firstConnect = true;
 
 	private static boolean showInfoChatMessages = false;
@@ -1075,6 +1076,15 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setLoggingIn(boolean loggingIn) {
 		isLoggingIn = loggingIn;
+		setLoggingOut(false);
+	}
+
+	public static boolean isLoggingOut() {
+		return isLoggingOut;
+	}
+
+	public static void setLoggingOut(boolean loggingOut) {
+		isLoggingOut = loggingOut;
 	}
 
 	public static void setOpenChatId(long openChatId){
