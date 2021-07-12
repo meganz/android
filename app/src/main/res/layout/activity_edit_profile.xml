@@ -66,9 +66,9 @@
 
             <LinearLayout
                 android:id="@+id/add_phone_number_layout"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/add_phone_number"
@@ -125,8 +125,8 @@
                     <Button
                         android:id="@+id/recovery_key_button"
                         style="@style/Widget.Mega.Button.Transparent"
-                        android:text="@string/action_export_master_key"
-                        android:layout_marginStart="-5dp"/>
+                        android:layout_marginStart="-5dp"
+                        android:text="@string/action_export_master_key" />
 
                 </LinearLayout>
 
@@ -156,5 +156,13 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLargeInverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

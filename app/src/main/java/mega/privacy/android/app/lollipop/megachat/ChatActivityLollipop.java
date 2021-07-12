@@ -211,7 +211,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
         MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener,
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
-        SnackbarShower, AttachNodeToChatListener {
+        SnackbarShower, AttachNodeToChatListener, FilePrepareTask.ProcessedFilesCallback {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -8306,9 +8306,10 @@ public class ChatActivityLollipop extends PasscodeActivity
         outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
     }
 
-    /*
+    /**
 	 * Handle processed upload intent
 	 */
+    @Override
     public void onIntentProcessed(List<ShareInfo> infos) {
         logDebug("onIntentProcessedLollipop");
 

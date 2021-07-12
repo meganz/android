@@ -9,8 +9,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.Observer
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
 import mega.privacy.android.app.SMSVerificationActivity
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -22,6 +24,7 @@ import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
 import mega.privacy.android.app.myAccount.MyAccountViewModel
+import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.PROCESSING_FILE
 import mega.privacy.android.app.utils.AlertsAndWarnings.showRemoveOrModifyPhoneNumberConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDominantColor
@@ -31,15 +34,12 @@ import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
 import mega.privacy.android.app.utils.Util.dp2px
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaError.API_OK
-import nz.mega.sdk.MegaRequest
 import java.util.*
 
 class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback,
@@ -71,6 +71,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private var isModify = false
     private var removeOrModifyPhoneNumberDialog: AlertDialog? = null
 
+    private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -99,6 +101,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     override fun onDestroy() {
         super.onDestroy()
 
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
+            .removeObserver(profileAvatarUpdatedObserver)
+
         if (isRemoveOrModifyDialogShowing()) {
             removeOrModifyPhoneNumberDialog?.dismiss()
         }
@@ -115,7 +120,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val error = viewModel.manageActivityResult(this, requestCode, resultCode, data)
-        if (!error.isNullOrEmpty()) showSnackbar(error)
+
+        if (!error.isNullOrEmpty()) {
+            if (error == PROCESSING_FILE) binding.progressBar.isVisible = true
+            else showSnackbar(error)
+        }
     }
 
     private fun setupView() {
@@ -171,16 +180,19 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     }
 
     private fun setupObservers() {
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
+            .observeForever(profileAvatarUpdatedObserver)
+
         viewModel.onSetProfileAvatar().observe(this, ::profileAvatarSet)
     }
 
-    private fun profileAvatarSet(result: Pair<MegaRequest, MegaError>) {
-        val stringId = if (result.second.errorCode == API_OK) {
-            setUpAvatar()
+    private fun profileAvatarSet(result: Pair<Boolean, Boolean>) {
+        binding.progressBar.isVisible = false
 
-            if (result.first.file != null) R.string.success_changing_user_avatar
+        val stringId = if (result.second) {
+            if (result.first) R.string.success_changing_user_avatar
             else R.string.success_deleting_user_avatar
-        } else if (result.first.file != null) R.string.error_changing_user_avatar
+        } else if (result.first) R.string.error_changing_user_avatar
         else R.string.error_deleting_user_avatar
 
         showSnackbar(StringResourcesUtils.getString(stringId))
@@ -272,7 +284,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         val avatar = buildAvatarFile(this, megaApi.myEmail + FileUtil.JPG_EXTENSION)
         var avatarBitmap: Bitmap? = null
 
-        if (isFileAvailable(avatar)) {
+        if (avatar != null) {
             avatarBitmap = BitmapFactory.decodeFile(avatar.absolutePath, BitmapFactory.Options())
 
             if (avatarBitmap != null) {
@@ -289,12 +301,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
 
         if (avatarBitmap == null) {
+            binding.headerLayout.toolbarImage.setImageDrawable(null)
             binding.headerLayout.imageLayout.setBackgroundColor(getColorAvatar(megaApi.myUser))
         }
     }
 
     private fun setUpHeader() {
-
         firstLineTextMaxWidthExpanded = outMetrics.widthPixels - dp2px(108f, outMetrics)
         binding.headerLayout.firstLineToolbar.apply {
             setMaxWidthEmojis(firstLineTextMaxWidthExpanded)

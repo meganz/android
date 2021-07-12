@@ -306,7 +306,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-		ChatManagementCallback, ActionNodeCallback, SnackbarShower {
+		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
+		FilePrepareTask.ProcessedFilesCallback {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -10222,9 +10223,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	/*
+	/**
 	 * Handle processed upload intent
 	 */
+	@Override
 	public void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentProcessedLollipop");
 		if (statusDialog != null) {
@@ -10672,29 +10674,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			if(request.getParamType()==MegaApiJava.USER_ATTR_AVATAR){
 				logDebug("Request avatar");
-				if (e.getErrorCode() == MegaError.API_OK){
+				if (e.getErrorCode() == MegaError.API_OK) {
 					setProfileAvatar();
-					//refresh MyAccountFragment if visible
-//					if(getMyAccountFragment()!=null){
-						logDebug("Update the account fragment");
-//						maF.setUpAvatar(false);
-//					}
+				} else if (e.getErrorCode() == MegaError.API_ENOENT) {
+					setDefaultAvatar();
+				} else if (e.getErrorCode() == MegaError.API_EARGS) {
+					logError("Error changing avatar: ");
 				}
-				else{
-					if(e.getErrorCode()==MegaError.API_ENOENT) {
-						setDefaultAvatar();
-					}
 
-					if(e.getErrorCode()==MegaError.API_EARGS){
-						logError("Error changing avatar: ");
-					}
-
-					//refresh MyAccountFragment if visible
-//					if (getMyAccountFragment() != null) {
-						logDebug("Update the account fragment");
-//						maF.setUpAvatar(false);
-//					}
-				}
 				LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean.class).post(false);
 			} else if (request.getParamType() == MegaApiJava.USER_ATTR_FIRSTNAME) {
 				updateMyData(true, request.getText(), e);

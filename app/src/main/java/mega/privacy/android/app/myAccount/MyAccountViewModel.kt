@@ -30,6 +30,7 @@ import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListen
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
+import mega.privacy.android.app.lollipop.tasks.FilePrepareTask
 import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.*
@@ -49,18 +50,19 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val setAvatarUseCase: SetAvatarUseCase
-) : BaseRxViewModel() {
+) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
 
     companion object {
         private const val CLICKS_TO_STAGING = 5
         private const val TIME_TO_SHOW_PAYMENT_INFO = 604800 //1 week in seconds
+        const val PROCESSING_FILE = "PROCESSING_FILE"
     }
 
     private val versionsInfo: MutableLiveData<MegaError> = MutableLiveData()
     private val avatar: MutableLiveData<MegaError> = MutableLiveData()
     private val killSessions: MutableLiveData<MegaError> = MutableLiveData()
     private val cancelSubscriptions: MutableLiveData<MegaError> = MutableLiveData()
-    private val setProfileAvatar: MutableLiveData<Pair<MegaRequest, MegaError>> = MutableLiveData()
+    private val setProfileAvatar: MutableLiveData<Pair<Boolean, Boolean>> = MutableLiveData()
 
     private var fragment = MY_ACCOUNT_FRAGMENT
     private var numOfClicksLastSession = 0
@@ -69,7 +71,7 @@ class MyAccountViewModel @ViewModelInject constructor(
     fun onGetAvatarFinished(): LiveData<MegaError> = avatar
     fun onKillSessionsFinished(): LiveData<MegaError> = killSessions
     fun onCancelSubscriptions(): LiveData<MegaError> = cancelSubscriptions
-    fun onSetProfileAvatar(): LiveData<Pair<MegaRequest, MegaError>> = setProfileAvatar
+    fun onSetProfileAvatar(): LiveData<Pair<Boolean, Boolean>> = setProfileAvatar
 
     fun getName(): String = myAccountInfo.fullName
 
@@ -199,7 +201,7 @@ class MyAccountViewModel @ViewModelInject constructor(
                 LiveEventBus.get(EVENT_REFRESH).post(true)
             }
             TAKE_PICTURE_PROFILE_CODE -> {
-                return addProfileAvatar(activity, null)
+                return addProfileAvatar(null)
             }
             CHOOSE_PICTURE_PROFILE_CODE -> {
                 if (data == null) {
@@ -229,8 +231,9 @@ class MyAccountViewModel @ViewModelInject constructor(
                     return getString(R.string.error_changing_user_avatar_image_not_available)
                 }
 
-                val path = ShareInfo.getRealPathFromURI(activity, data.data)
-                return addProfileAvatar(activity, path)
+                data.action = Intent.ACTION_GET_CONTENT
+                FilePrepareTask(this).execute(data)
+                return PROCESSING_FILE
             }
         }
 
@@ -350,11 +353,12 @@ class MyAccountViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun addProfileAvatar(activity: Activity, uri: String?): String? {
+    private fun addProfileAvatar(path: String?): String? {
+        val app = MegaApplication.getInstance()
         val myEmail = megaApi.myUser.email
-        val imgFile = if (!uri.isNullOrEmpty()) File(uri)
+        val imgFile = if (!path.isNullOrEmpty()) File(path)
         else CacheFolderManager.getCacheFile(
-            activity,
+            app,
             CacheFolderManager.TEMPORAL_FOLDER,
             "picture.jpg"
         )
@@ -363,7 +367,7 @@ class MyAccountViewModel @ViewModelInject constructor(
             return getString(R.string.general_error)
         }
 
-        val newFile = buildAvatarFile(activity, myEmail + "Temp.jpg")
+        val newFile = buildAvatarFile(app, myEmail + "Temp.jpg")
 
         if (newFile != null) {
             MegaUtilsAndroid.createAvatar(imgFile, newFile)
@@ -392,5 +396,9 @@ class MyAccountViewModel @ViewModelInject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy { result -> setProfileAvatar.value = result }
             .addTo(composite)
+    }
+
+    override fun onIntentProcessed(info: MutableList<ShareInfo>) {
+        addProfileAvatar(info[0].fileAbsolutePath)
     }
 }
