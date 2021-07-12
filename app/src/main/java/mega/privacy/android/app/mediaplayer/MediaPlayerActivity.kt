@@ -893,9 +893,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 }
             )
 
-            post {
-                window.statusBarColor = if (withElevation) darkElevationColor else Color.BLACK
-            }
+            ColorUtils.changeStatusBarColorForElevation(this, withElevation)
         } else {
             toolbar.setBackgroundColor(
                 when {
