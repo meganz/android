@@ -99,6 +99,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
+    private Snackbar snackbar = null;
 
     /**
      * Load the psa in the web browser fragment if the psa is a web one and this activity
@@ -716,6 +717,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
                     snackbar = Snackbar.make(view, R.string.notifications_are_already_muted, Snackbar.LENGTH_LONG);
                     break;
+                case SNACKBAR_IMCOMPATIBILITY_TYPE:
+                    snackbar = Snackbar.make(view, !isTextEmpty(s) ? s : getString(R.string.sent_as_message), Snackbar.LENGTH_INDEFINITE);
+                    break;
                 default:
                     snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
                     break;
@@ -727,9 +731,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setBackgroundResource(R.drawable.background_snackbar);
+
         if (anchor != null) {
             snackbar.setAnchorView(anchor);
         }
+
         switch (type) {
             case SNACKBAR_TYPE: {
                 TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
@@ -752,16 +758,32 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 snackbar.show();
                 break;
 
-            case PERMISSIONS_TYPE:
+            case PERMISSIONS_TYPE: {
+                TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                snackbarTextView.setMaxLines(3);
                 snackbar.setAction(R.string.action_settings, PermissionUtils.toAppInfo(getApplicationContext()));
                 snackbar.show();
                 break;
+            }
 
             case INVITE_CONTACT_TYPE:
                 snackbar.setAction(R.string.contact_invite, new SnackbarNavigateOption(view.getContext(), type, userEmail));
                 snackbar.show();
                 break;
+
+            case SNACKBAR_IMCOMPATIBILITY_TYPE: {
+                this.snackbar = snackbar;
+                TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                snackbarTextView.setMaxLines(5);
+                snackbar.setAction(R.string.general_ok, v -> {snackbar.dismiss();});
+                snackbar.show();
+                break;
+            }
         }
+    }
+
+    public Snackbar getSnackbar() {
+        return snackbar;
     }
 
     /**
