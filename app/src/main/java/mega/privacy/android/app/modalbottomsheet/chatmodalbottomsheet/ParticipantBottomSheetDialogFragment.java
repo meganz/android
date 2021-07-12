@@ -182,8 +182,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             } else {
                 optionContactInfoChat.setVisibility(View.GONE);
                 optionStartConversationChat.setVisibility(View.GONE);
-                optionInvite.setVisibility(View.VISIBLE);
-
+                optionInvite.setVisibility(chatC.getParticipantEmail(participantHandle) == null ? View.GONE : View.VISIBLE);
                 titleMailContactChatPanel.setVisibility(View.GONE);
             }
 
