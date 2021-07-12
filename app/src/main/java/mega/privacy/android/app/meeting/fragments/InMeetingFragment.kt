@@ -18,6 +18,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -27,6 +28,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_assign_moderator.view.*
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -139,6 +142,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private lateinit var binding: InMeetingFragmentBinding
 
     val inMeetingViewModel by viewModels<InMeetingViewModel>()
+
+    // Create Timer
+    val channel = Channel<Int>()
 
     private val proximitySensorChangeObserver = Observer<Boolean> {
         val chatId = inMeetingViewModel.getChatId()
@@ -1460,7 +1466,30 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     toolbarSubtitle?.let {
                         it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
                     }
+                    lifecycleScope.launch {
+                        launch(Dispatchers.IO) {
+                            delay(WAITING_TIME)
+                            channel.send(WAITING_TIME.toInt())
+                            channel.close()
+                        }
+                        launch(Dispatchers.IO) {
+                            for (n in channel) {
+                                // After 26 seconds if the call is still not answered, they will see a message
+                                activity?.runOnUiThread {
+                                    showSnackbar(
+                                        SNACKBAR_IMCOMPATIBILITY_TYPE,
+                                        StringResourcesUtils.getString(
+                                            R.string.version_incompatibility
+                                        ),
+                                        MEGACHAT_INVALID_HANDLE
+                                    )
+                                }
+                            }
+                        }
+                    }
                 } else {
+                    channel.cancel()
+                    meetingActivity.snackbar?.dismiss()
                     toolbarSubtitle?.let {
                         it.text = StringResourcesUtils.getString(R.string.duration_meeting)
                     }
@@ -2123,8 +2152,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     /**
      * Method to control when call ended
      */
+    @ObsoleteCoroutinesApi
     private fun finishActivity() {
         logDebug("Finishing the activity")
+        channel.cancel()
+        meetingActivity.snackbar?.dismiss()
         meetingActivity.finish()
     }
 
@@ -2220,6 +2252,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         const val TYPE_IN_SPEAKER_VIEW = "TYPE_IN_SPEAKER_VIEW"
 
         const val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
+        const val WAITING_TIME = 26000L // 26 seconds
     }
 
     /**
