@@ -880,6 +880,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    /**
+     * User denies the RECORD_AUDIO permission
+     *
+     * @param permissions permission list
+     */
     private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
             logDebug("user denies the RECORD_AUDIO permissions")
@@ -887,6 +892,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    /**
+     * User denies the CAMERA permission
+     *
+     * @param permissions permission list
+     */
     private fun onCameraNeverAskAgain(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.CAMERA)) {
             logDebug("user denies the CAMERA permission")
