@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.listeners
 
 import android.util.Pair
 import com.jeremyliao.liveeventbus.LiveEventBus
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_SPEAK_CHANGE
@@ -27,12 +28,16 @@ import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCallListenerInterface
 import nz.mega.sdk.MegaChatSession
 
-
 class MeetingListener : MegaChatCallListenerInterface {
 
     override fun onChatCallUpdate(api: MegaChatApiJava?, call: MegaChatCall?) {
         if (api == null || call == null) {
-            logWarning("Call is null")
+            logWarning("MegaChatApiJava or call is null")
+            return
+        }
+
+        if (MegaApplication.isLoggingOut()) {
+            logWarning("Logging out")
             return
         }
 
@@ -94,7 +99,12 @@ class MeetingListener : MegaChatCallListenerInterface {
         session: MegaChatSession?
     ) {
         if (session == null) {
-            logWarning("Session null")
+            logWarning("Session is null")
+            return
+        }
+
+        if (MegaApplication.isLoggingOut()) {
+            logWarning("Logging out")
             return
         }
 

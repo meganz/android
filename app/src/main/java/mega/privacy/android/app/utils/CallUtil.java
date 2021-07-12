@@ -1276,7 +1276,7 @@ public class CallUtil {
         logDebug("Controlling outgoing/in progress call");
         if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && chatRoom.isMeeting()) {
             clearIncomingCallNotification(chatId);
-            return;
+            typeAudioManager = AUDIO_MANAGER_CALL_IN_PROGRESS;
         }
 
         MegaApplication.getInstance().createOrUpdateAudioManager(MegaApplication.getChatManagement().getSpeakerStatus(chatId), typeAudioManager);
