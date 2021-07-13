@@ -41,6 +41,10 @@
             app:argType="long"
             android:defaultValue="0L"/>
         <argument
+            android:name="publicChatHandle"
+            app:argType="long"
+            android:defaultValue="0L"/>
+        <argument
             android:name="meetingName"
             app:argType="string"
             android:defaultValue=""/>

@@ -177,6 +177,14 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     }
 
     /**
+     * Method to get a specific chat
+     *
+     * @param chatId Chat ID
+     * @return MegaChatRoom
+     */
+    fun getSpecificChat(chatId: Long): MegaChatRoom? = meetingActivityRepository.getChatRoom(chatId)
+
+    /**
      * Generate and show the round avatar based on the actual avatar stored in the cache folder.
      * Try to retrieve the avatar from the server if it has not been cached.
      * Showing the default avatar if the retrieve failed

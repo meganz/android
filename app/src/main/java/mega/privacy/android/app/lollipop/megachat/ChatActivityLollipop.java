@@ -694,14 +694,14 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     @Override
-    public void onPreviewLoaded(MegaChatRequest request) {
+    public void onPreviewLoaded(MegaChatRequest request, boolean alreadyExist) {
         long chatId = request.getChatHandle();
         boolean isFromOpenChatPreview = request.getFlag();
         int type = request.getParamType();
         String link = request.getLink();
 
         if (type == LINK_IS_FOR_MEETING) {
-            logDebug("It's a meeting");
+            logDebug("It's a meeting link");
             boolean linkInvalid = TextUtil.isTextEmpty(link) && chatId == MEGACHAT_INVALID_HANDLE;
             if (linkInvalid) {
                 logError("Invalid link");
@@ -723,10 +723,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                 }).show(getSupportFragmentManager(),
                         MeetingHasEndedDialogFragment.TAG);
             } else  {
-                CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText());
+                CallUtil.checkMeetingInProgress(ChatActivityLollipop.this, ChatActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle());
             }
         } else {
-            logDebug("Chat link");
+            logDebug("It's a chat link");
             loadChatLink(link);
         }
     }

@@ -14350,7 +14350,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	@Override
-	public void onPreviewLoaded(MegaChatRequest request) {
+	public void onPreviewLoaded(MegaChatRequest request, boolean alreadyExist) {
 		long chatId = request.getChatHandle();
 		boolean isFromOpenChatPreview = request.getFlag();
 		int type = request.getParamType();
@@ -14383,7 +14383,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}).show(getSupportFragmentManager(),
 						MeetingHasEndedDialogFragment.TAG);
 			} else {
-				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText());
+				CallUtil.checkMeetingInProgress(ManagerActivityLollipop.this, ManagerActivityLollipop.this, chatId, isFromOpenChatPreview, link, request.getMegaHandleList(), request.getText(), alreadyExist, request.getUserHandle());
 			}
 		} else {
 			logDebug("It's a chat");

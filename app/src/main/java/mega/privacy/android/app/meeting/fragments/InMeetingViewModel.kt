@@ -700,7 +700,8 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun isRequestSent(): Boolean {
         val callId = _callLiveData.value?.callId ?: return false
 
-        return callId != MEGACHAT_INVALID_HANDLE && MegaApplication.getChatManagement().isRequestSent(callId)
+        return callId != MEGACHAT_INVALID_HANDLE && MegaApplication.getChatManagement()
+            .isRequestSent(callId)
     }
 
     /**
@@ -1854,13 +1855,28 @@ class InMeetingViewModel @ViewModelInject constructor(
         inMeetingRepository.openChatPreview(link, listener)
 
     /**
-     * Method to join chat when joining as a guest
+     * Method to join a chat group
      *
      * @param chatId Chat ID
      * @param listener MegaChatRequestListenerInterface
      */
     fun joinPublicChat(chatId: Long, listener: MegaChatRequestListenerInterface) =
         inMeetingRepository.joinPublicChat(chatId, listener)
+
+    /**
+     * Method to rejoin a chat group
+     *
+     * @param chatId Chat ID
+     * @param publicChatHandle MegaChatHandle that corresponds with the public handle of chat room
+     * @param listener MegaChatRequestListenerInterface
+     */
+    fun rejoinPublicChat(
+        chatId: Long,
+        publicChatHandle: Long,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        inMeetingRepository.rejoinPublicChat(chatId, publicChatHandle, listener)
+    }
 
     /**
      * Method to add the chat listener when joining as a guest
@@ -2054,7 +2070,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param status new status
      */
-    fun updateNetworkStatus(status: Boolean){
+    fun updateNetworkStatus(status: Boolean) {
         this.haveConnection = status
     }
 
