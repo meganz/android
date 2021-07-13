@@ -319,8 +319,6 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
         LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
             .observeForever(emailUpdatedObserver)
-
-        viewModel.onGetAvatarFinished().observe(this, ::setAvatar)
     }
 
     private fun showKillSessionsResult(success: Boolean) {
@@ -754,7 +752,9 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
             }
         }
 
-        if (retry) viewModel.getAvatar(this) else setDefaultAvatar()
+        if (retry) {
+            viewModel.getAvatar(this) { success -> showAvatarResult(success) }
+        } else setDefaultAvatar()
     }
 
     private fun setDefaultAvatar() {
@@ -869,11 +869,11 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
     }
 
-    private fun setAvatar(error: MegaError) {
-        if (error.errorCode == API_ENOENT) {
-            setDefaultAvatar()
-        } else {
+    private fun showAvatarResult(success: Boolean) {
+        if (success) {
             setUpAvatar(false)
+        } else {
+            setDefaultAvatar()
         }
     }
 

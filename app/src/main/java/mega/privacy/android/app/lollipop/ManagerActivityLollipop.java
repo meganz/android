@@ -112,6 +112,9 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.BusinessExpiredAlertActivity;
@@ -133,9 +136,9 @@ import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.exportMK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
+import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase;
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
-import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
@@ -361,6 +364,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     private LastShowSMSDialogTimeChecker smsDialogTimeChecker;
 
+    @Inject
+	CheckPasswordReminderUseCase checkPasswordReminderUseCase;
 	@Inject
 	CookieDialogHandler cookieDialogHandler;
 	@Inject
@@ -2739,8 +2744,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 
-		megaApi.shouldShowPasswordReminderDialog(false,
-				new ShouldShowPasswordReminderDialogListener(this, false));
+		new CompositeDisposable().add(checkPasswordReminderUseCase.check(false)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe(show -> {
+					if (show) {
+						startActivity(new Intent(this, TestPasswordActivity.class));
+					}
+				}, throwable -> logError("doUpdateProgressNotification onError", throwable)));
 
 		updateAccountDetailsVisibleInfo();
 

@@ -10,8 +10,6 @@ import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
@@ -25,11 +23,11 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.exportMK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.listeners.ShouldShowPasswordReminderDialogListener
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
+import mega.privacy.android.app.lollipop.TestPasswordActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
+import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask
 import mega.privacy.android.app.myAccount.usecase.*
@@ -41,7 +39,6 @@ import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -55,7 +52,9 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val check2FAUseCase: Check2FAUseCase,
     private val checkVersionsUseCase: CheckVersionsUseCase,
     private val killSessionUseCase: KillSessionUseCase,
-    private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase
+    private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase,
+    private val getMyAvatarUseCase: GetMyAvatarUseCase,
+    private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase
 ) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
 
     companion object {
@@ -65,15 +64,11 @@ class MyAccountViewModel @ViewModelInject constructor(
         const val CHECKING_2FA = "CHECKING_2FA"
     }
 
-    private val avatar: MutableLiveData<MegaError> = MutableLiveData()
-
     private var is2FaEnabled = false
 
     private var numOfClicksLastSession = 0
 
     private var setAvatarAction: ((Pair<Boolean, Boolean>) -> Unit)? = null
-
-    fun onGetAvatarFinished(): LiveData<MegaError> = avatar
 
     fun getFirstName(): String = myAccountInfo.getFirstNameText()
 
@@ -131,18 +126,18 @@ class MyAccountViewModel @ViewModelInject constructor(
         } else action.invoke()
     }
 
-    fun getAvatar(context: Context) {
-        megaApi.getUserAvatar(megaApi.myUser,
-            buildAvatarFile(context, megaApi.myEmail).absolutePath,
-            OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, error ->
-                    if (error.errorCode == MegaError.API_EARGS) {
-                        logError("Error getting avatar: " + error.errorString)
-                    } else {
-                        avatar.value = error
-                    }
+    fun getAvatar(context: Context, action: (Boolean) -> Unit) {
+        getMyAvatarUseCase.get(buildAvatarFile(context, megaApi.myEmail).absolutePath)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { action.invoke(true) },
+                onError = { error ->
+                    logWarning(error.message)
+                    action.invoke(false)
                 }
-            ))
+            )
+            .addTo(composite)
     }
 
     fun killSessions(action: (Boolean) -> Unit) {
@@ -285,10 +280,23 @@ class MyAccountViewModel @ViewModelInject constructor(
     }
 
     fun logout(context: Context) {
-        megaApi.shouldShowPasswordReminderDialog(
-            true,
-            ShouldShowPasswordReminderDialogListener(context, true)
-        )
+        checkPasswordReminderUseCase.check(true)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { show ->
+                    if (show) {
+                        context.startActivity(
+                            Intent(context, TestPasswordActivity::class.java)
+                                .putExtra("logout", true)
+                        )
+                    } else AccountController.logout(context, megaApi)
+                },
+                onError = { error ->
+                    logError("Error when killing sessions: ${error.message}")
+                }
+            )
+            .addTo(composite)
     }
 
     fun capturePhoto(activity: Activity) {
