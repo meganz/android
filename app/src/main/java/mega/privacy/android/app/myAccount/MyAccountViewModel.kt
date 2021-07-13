@@ -68,20 +68,17 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val avatar: MutableLiveData<MegaError> = MutableLiveData()
     private val killSessions: MutableLiveData<MegaError> = MutableLiveData()
     private val cancelSubscriptions: MutableLiveData<MegaError> = MutableLiveData()
-    private val setProfileAvatar: MutableLiveData<Pair<Boolean, Boolean>> = MutableLiveData()
-    private val updateName: MutableLiveData<Boolean> = MutableLiveData()
-    private val updateEmail: MutableLiveData<MegaError> = MutableLiveData()
-    private val is2FaEnabled: MutableLiveData<Boolean> = MutableLiveData()
+
+    private var is2FaEnabled = false
 
     private var numOfClicksLastSession = 0
+
+    private var setAvatarAction: ((Pair<Boolean, Boolean>) -> Unit)? = null
 
     fun onUpdateVersionsInfoFinished(): LiveData<MegaError> = versionsInfo
     fun onGetAvatarFinished(): LiveData<MegaError> = avatar
     fun onKillSessionsFinished(): LiveData<MegaError> = killSessions
     fun onCancelSubscriptions(): LiveData<MegaError> = cancelSubscriptions
-    fun onSetProfileAvatar(): LiveData<Pair<Boolean, Boolean>> = setProfileAvatar
-    fun onNameUpdated(): LiveData<Boolean> = updateName
-    fun onEmailUpdated(): LiveData<MegaError> = updateEmail
 
     fun getFirstName(): String = myAccountInfo.getFirstNameText()
 
@@ -193,12 +190,15 @@ class MyAccountViewModel @ViewModelInject constructor(
         activity: Activity,
         requestCode: Int,
         resultCode: Int,
-        data: Intent?
+        data: Intent?,
+        setAvatarAction: ((Pair<Boolean, Boolean>) -> Unit)? = null
     ): String? {
         if (resultCode != RESULT_OK) {
             logWarning("Result code not OK. Request code $requestCode")
             return null
         }
+
+        this.setAvatarAction = setAvatarAction
 
         when (requestCode) {
             REQUEST_CODE_REFRESH -> {
@@ -382,7 +382,7 @@ class MyAccountViewModel @ViewModelInject constructor(
             setAvatarUseCase.set(newFile.absolutePath)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy { result -> setProfileAvatar.value = result }
+                .subscribeBy { result -> setAvatarAction?.invoke(result) }
                 .addTo(composite)
         } else {
             logError("ERROR! Destination PATH is NULL")
@@ -391,7 +391,7 @@ class MyAccountViewModel @ViewModelInject constructor(
         return null
     }
 
-    fun deleteProfileAvatar(context: Context) {
+    fun deleteProfileAvatar(context: Context, action: (Pair<Boolean, Boolean>) -> Unit) {
         val avatar = buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)
 
         if (FileUtil.isFileAvailable(avatar)) {
@@ -402,7 +402,7 @@ class MyAccountViewModel @ViewModelInject constructor(
         setAvatarUseCase.remove()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy { result -> setProfileAvatar.value = result }
+            .subscribeBy { result -> action.invoke(result) }
             .addTo(composite)
     }
 
@@ -410,7 +410,7 @@ class MyAccountViewModel @ViewModelInject constructor(
         addProfileAvatar(info[0].fileAbsolutePath)
     }
 
-    fun changeName(newFirstName: String, newLastName: String): Boolean {
+    fun changeName(newFirstName: String, newLastName: String, action: (Boolean) -> Unit): Boolean {
         val shouldUpdateLastName = newLastName != myAccountInfo.getLastNameText()
 
         return when {
@@ -419,13 +419,13 @@ class MyAccountViewModel @ViewModelInject constructor(
                     updateMyUserAttributesUseCase.updateFirstAndLastName(newFirstName, newLastName)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy { result -> updateName.value = result }
+                        .subscribeBy { result -> action.invoke(result) }
                         .addTo(composite)
                 } else {
                     updateMyUserAttributesUseCase.updateFirstName(newFirstName)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy { result -> updateName.value = result }
+                        .subscribeBy { result -> action.invoke(result) }
                         .addTo(composite)
                 }
 
@@ -435,7 +435,7 @@ class MyAccountViewModel @ViewModelInject constructor(
                 updateMyUserAttributesUseCase.updateLastName(newLastName)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy { result -> updateName.value = result }
+                    .subscribeBy { result -> action.invoke(result) }
                     .addTo(composite)
 
                 true
@@ -448,15 +448,15 @@ class MyAccountViewModel @ViewModelInject constructor(
         check2FAUseCase.check()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy { result -> is2FaEnabled.value = result }
+            .subscribeBy { result -> is2FaEnabled = result }
             .addTo(composite)
     }
 
-    fun changeEmail(context: Context, newEmail: String): String? {
+    fun changeEmail(context: Context, newEmail: String, action: (MegaError) -> Unit): String? {
         return when {
             newEmail == getEmail() -> getString(R.string.mail_same_as_old)
             !EMAIL_ADDRESS.matcher(newEmail).matches() -> getString(R.string.error_invalid_email)
-            is2FaEnabled.value == true -> {
+            is2FaEnabled -> {
                 context.startActivity(
                     Intent(context, VerifyTwoFactorActivity::class.java)
                         .putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, CHANGE_MAIL_2FA)
@@ -469,7 +469,7 @@ class MyAccountViewModel @ViewModelInject constructor(
                 updateMyUserAttributesUseCase.updateEmail(newEmail)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy { result -> updateEmail.value = result }
+                    .subscribeBy { result -> action.invoke(result) }
                     .addTo(composite)
 
                 null

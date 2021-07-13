@@ -177,7 +177,10 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val error = viewModel.manageActivityResult(this, requestCode, resultCode, data)
+        val error =
+            viewModel.manageActivityResult(this, requestCode, resultCode, data) { result ->
+                profileAvatarChange(result)
+            }
 
         if (!error.isNullOrEmpty()) {
             if (error == PROCESSING_FILE) binding.progressBar.isVisible = true
@@ -237,10 +240,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private fun setupObservers() {
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .observeForever(profileAvatarUpdatedObserver)
-
-        viewModel.onSetProfileAvatar().observe(this, ::profileAvatarSet)
-        viewModel.onNameUpdated().observe(this, ::updateName)
-        viewModel.onEmailUpdated().observe(this, ::showChangeEmailResult)
     }
 
     /**
@@ -250,7 +249,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
      *      If first value is true, indicates is an avatar change, otherwise is a deletion.
      *      If second value is true, means the action finished with success, otherwise not.
      */
-    private fun profileAvatarSet(result: Pair<Boolean, Boolean>) {
+    private fun profileAvatarChange(result: Pair<Boolean, Boolean>) {
         binding.progressBar.isVisible = false
 
         val avatarChange = result.first
@@ -523,7 +522,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                             viewModel.changeName(
                                 dialogBinding.firstNameField.text.toString(),
                                 dialogBinding.lastNameField.text.toString()
-                            )
+                            ) { success -> updateName(success) }
 
                         dismiss()
                     }
@@ -576,7 +575,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                         val error = viewModel.changeEmail(
                             this@EditProfileActivity,
                             dialogBinding.emailField.text.toString()
-                        )
+                        ) { result -> showChangeEmailResult(result) }
 
                         binding.progressBar.isVisible = error == null
 
@@ -608,7 +607,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     override fun deletePhoto() {
         deletePhotoDialog = MaterialAlertDialogBuilder(this)
             .setMessage(R.string.confirmation_delete_avatar)
-            .setPositiveButton(R.string.context_delete) { _, _ -> viewModel.deleteProfileAvatar(this) }
+            .setPositiveButton(R.string.context_delete) { _, _ ->
+                viewModel.deleteProfileAvatar(this) { result ->
+                    profileAvatarChange(result)
+                }
+            }
             .setNegativeButton(R.string.general_cancel, null)
             .show()
     }
