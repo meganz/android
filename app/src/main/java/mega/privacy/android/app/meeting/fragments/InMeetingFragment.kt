@@ -878,6 +878,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.recordAudioGranted.observe(viewLifecycleOwner) {
             bottomFloatingPanelViewHolder.updateMicPermissionWaring(it)
         }
+
+        sharedModel.notificationNetworkState.observe(viewLifecycleOwner) { haveConnection ->
+            inMeetingViewModel.updateNetworkStatus(haveConnection)
+            checkInfoBanner(TYPE_NO_CONNECTION)
+        }
     }
 
     /**

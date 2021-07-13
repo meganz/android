@@ -47,6 +47,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     var isSpeakerSelectionAutomatic: Boolean = true
     var isFromReconnectingStatus: Boolean = false
     var isReconnectingStatus: Boolean = false
+    private var haveConnection: Boolean = false
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
     val pinItemEvent: LiveData<Event<Participant>> = _pinItemEvent
@@ -497,6 +498,11 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun shouldShowFixedBanner(type: Int): Boolean {
         when (type) {
+            TYPE_NO_CONNECTION -> {
+                if (showShouldNoConnectionBanner())
+                    return true
+            }
+
             TYPE_RECONNECTING -> {
                 _callLiveData.value?.let {
                     if (isReconnectingStatus) {
@@ -2036,11 +2042,21 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Determine if this call is creating
+     * Determine if this call is creating and have network connection
      *
-     * @return if creating, return true, else false
+     * @return if creating and no connection, return true, else false
      */
-    fun isCallInitial(): Boolean = previousState == CALL_STATUS_INITIAL
+    fun showShouldNoConnectionBanner(): Boolean =
+        previousState == CALL_STATUS_INITIAL && !haveConnection
+
+    /**
+     * Update the connection status
+     *
+     * @param status new status
+     */
+    fun updateNetworkStatus(status: Boolean){
+        this.haveConnection = status
+    }
 
     /**
      * Get the moderator list and return the string of name list
