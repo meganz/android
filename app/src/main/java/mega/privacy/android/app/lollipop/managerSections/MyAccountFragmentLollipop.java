@@ -629,7 +629,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			case R.id.my_account_email:
 			case R.id.my_account_edit_icon:{
 				logDebug("Click user attributes text");
-				((ManagerActivityLollipop)context).showDialogChangeUserAttribute();
 				break;
 			}
 			case R.id.MK_button:{

@@ -65,8 +65,6 @@ public class AccountController {
     Context context;
     MegaApiAndroid megaApi;
 
-    static int count = 0;
-
     public AccountController(Context context){
         logDebug("AccountController created");
         this.context = context;
@@ -468,48 +466,5 @@ public class AccountController {
                 c.delete();
             }
         }
-    }
-
-    public int updateUserAttributes(String oldFirstName, String newFirstName, String oldLastName, String newLastName, String oldMail, String newMail){
-        logDebug("updateUserAttributes");
-//        MyAccountFragment myAccountFragmentLollipop = ((ManagerActivityLollipop) context).getMyAccountFragment();
-
-        if(!oldFirstName.equals(newFirstName)){
-            logDebug("Changes in first name");
-//            if(myAccountFragmentLollipop!=null){
-                count++;
-                megaApi.setUserAttribute(MegaApiJava.USER_ATTR_FIRSTNAME, newFirstName, (ManagerActivityLollipop)context);
-//            }
-        }
-        if(!oldLastName.equals(newLastName)){
-            logDebug("Changes in last name");
-//            if(myAccountFragmentLollipop!=null){
-                count++;
-                megaApi.setUserAttribute(MegaApiJava.USER_ATTR_LASTNAME, newLastName, (ManagerActivityLollipop)context);
-//            }
-        }
-        if(!oldMail.equals(newMail)){
-            logDebug("Changes in mail, new mail: " + newMail);
-            if (((ManagerActivityLollipop) context).is2FAEnabled()){
-                Intent intent = new Intent(context, VerifyTwoFactorActivity.class);
-                intent.putExtra(VerifyTwoFactorActivity.KEY_VERIFY_TYPE, CHANGE_MAIL_2FA);
-                intent.putExtra(VerifyTwoFactorActivity.KEY_NEW_EMAIL, newMail);
-
-                context.startActivity(intent);
-            }
-            else {
-                megaApi.changeEmail(newMail, (ManagerActivityLollipop)context);
-            }
-        }
-        logDebug("The number of attributes to change is: " + count);
-        return count;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    static public void setCount(int countUa) {
-        count = countUa;
     }
 }

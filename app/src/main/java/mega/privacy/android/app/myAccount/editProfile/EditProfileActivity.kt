@@ -65,6 +65,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         private const val FIRST_NAME_TYPED = "FIRST_NAME_TYPED"
         private const val LAST_NAME_TYPED = "LAST_NAME_TYPED"
         private const val CHANGE_EMAIL_SHOWN = "CHANGE_EMAIL_SHOWN"
+        private const val DELETE_PHOTO_SHOWN = "DELETE_PHOTO_SHOWN"
         private const val EMAIL_TYPED = "EMAIL_TYPED"
         private const val REMOVE_OR_MODIFY_PHONE_SHOWN = "REMOVE_OR_MODIFY_PHONE_SHOWN"
         private const val IS_MODIFY = "IS_MODIFY"
@@ -86,6 +87,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private var removeOrModifyPhoneNumberDialog: AlertDialog? = null
     private var changeNameDialog: AlertDialog? = null
     private var changeEmailDialog: AlertDialog? = null
+    private var deletePhotoDialog: AlertDialog? = null
 
     private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar() }
 
@@ -108,6 +110,10 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
             if (savedInstanceState.getBoolean(CHANGE_EMAIL_SHOWN, false)) {
                 showChangeEmailDialog(savedInstanceState.getString(EMAIL_TYPED))
+            }
+
+            if (savedInstanceState.getBoolean(DELETE_PHOTO_SHOWN, false)) {
+                deletePhoto()
             }
 
             if (savedInstanceState.getBoolean(REMOVE_OR_MODIFY_PHONE_SHOWN, false)) {
@@ -139,6 +145,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             )
         }
 
+        outState.putBoolean(DELETE_PHOTO_SHOWN, isAlertDialogShown(deletePhotoDialog))
+
         if (isAlertDialogShown(removeOrModifyPhoneNumberDialog)) {
             outState.putBoolean(REMOVE_OR_MODIFY_PHONE_SHOWN, true)
             outState.putBoolean(IS_MODIFY, isModify)
@@ -155,6 +163,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         changeNameDialog?.dismiss()
         changeEmailDialog?.dismiss()
+        deletePhotoDialog?.dismiss()
         removeOrModifyPhoneNumberDialog?.dismiss()
     }
 
@@ -597,10 +606,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     }
 
     override fun deletePhoto() {
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setMessage(R.string.confirmation_delete_avatar)
+        deletePhotoDialog = MaterialAlertDialogBuilder(this)
+            .setMessage(R.string.confirmation_delete_avatar)
             .setPositiveButton(R.string.context_delete) { _, _ -> viewModel.deleteProfileAvatar(this) }
-            .setNegativeButton(R.string.general_cancel, null).show()
+            .setNegativeButton(R.string.general_cancel, null)
+            .show()
     }
 
     override fun showConfirmation(isModify: Boolean) {
