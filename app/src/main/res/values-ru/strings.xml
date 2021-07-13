@@ -582,7 +582,7 @@
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">Папки оставлены(%d).</string>
     <!-- Message shown when a share has been left -->
-    <string name="share_left">Остался общий элемент</string>
+    <string name="share_left">Покинут общий элемент</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">Папки не были закрыты (%d)</string>
     <!-- success message when sending multiple files -->
@@ -614,13 +614,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">Папка больше не доступна контактам</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Ошибка, доступ к папке всё ещё открыт другому контакту.</string>
+    <string name="context_no_removed_sharing_contacts">Произошла ошибка. Папка по-прежнему доступна другому контакту</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Выбрать только один файл</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Корзина очищена</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Ошибка. Корзина не была очищена</string>
+    <string name="rubbish_bin_no_emptied">Произошла ошибка. Корзина не очищена</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Вы собираетесь отменить подписку MEGA. Пожалуйста, дайте нам знать, если можно что-нибудь сделать, чтобы вы изменили своё решение.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -628,7 +628,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Отправить</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Спасибо за ваш отзыв! Вы действительно хотите отменить подписку MEGA?</string>
+    <string name="confirmation_cancel_subscriptions">Спасибо за ваш отзыв. Вы действительно хотите отменить подписку на MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Ваша подписка не отменена. Пожалуйста, укажите причину отмены</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -685,7 +685,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Ошибка файловой системы</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">При выполнении произошла ошибка</string>
+    <string name="general_error">Произошла ошибка при просмотре локальных файлов.</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Просмотр изображений</string>
     <!-- Headline for the amount of storage space is used -->
@@ -693,7 +693,7 @@
     <!-- menu item -->
     <string name="my_account_change_password">Изменить пароль</string>
     <!-- Dialog text overquota error -->
-    <string name="overquota_alert_text">Вы превысили лимит хранилища. Хотите улучшить учётную запись?</string>
+    <string name="overquota_alert_text">Вы превысили лимит хранилища. Хотите улучшить аккаунт?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Последняя сессия</string>
     <!-- header for the social connections, showing the number of contacts the user has -->
@@ -715,7 +715,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">На данный момент ни один метод оплаты не доступен для данного плана</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
-    <string name="upgrade_per_month">Ежемесячное*</string>
+    <string name="upgrade_per_month">Ежемесячно*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
     <string name="upgrade_per_year">Ежегодно*</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
@@ -920,9 +920,9 @@
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="one">1 неудачная попытка ввода пароля</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Неудачных попыток ввода: %1$d</item>
+        <item quantity="few">%1$d неудачные попытки ввода пароля</item>
+        <item quantity="many">%1$d неудачных попыток ввода пароля</item>
+        <item quantity="other">%1$d неудачные попытки ввода пароля</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">После 10 неудачных попыток локальные файлы будут удалены, а вы выйдете из системы</string>
@@ -938,13 +938,13 @@
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">Пароли не совпадают. Попробуйте снова.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="unlock_pin_title">Введите свой пароль</string>
+    <string name="unlock_pin_title">Введите код доступа</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="unlock_pin_title_2">Повторно введите пароль</string>
+    <string name="unlock_pin_title_2">Повторно введите код доступа</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="reset_pin_title">Введите новый пароль</string>
+    <string name="reset_pin_title">Введите новый код доступа</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="reset_pin_title_2">Повторно введите новый пароль</string>
+    <string name="reset_pin_title_2">Повторно введите новый код доступа</string>
     <!-- Text of the screen after 10 attemps with a wrong Passcode -->
     <string name="incorrect_pin_activity">Локальные данные будут удалены, а вы выйдете из системы через %1d сек.</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
@@ -2324,7 +2324,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Ваш аккаунт был заблокирован из-за многочисленных нарушений Условий предоставления услуг MEGA. Пожалуйста, проверьте свой почтовый ящик.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Ваша учетная запись была прервана из-за нарушения Условий предоставления услуг MEGA, таких как злоупотребление правами других лиц; обмен и/или импорт незаконных данных; или злоупотребление системой.</string>
+    <string name="account_suspended_breache_ToS">Ваш аккаунт был заблокирован из-за нарушения условий предоставления услуг MEGA, включая, помимо прочего, пункт 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Загрузка файлов</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2725,9 +2725,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Архивированные чаты (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Архивация чата</string>
+    <string name="archive_chat_option">Архивировать чат</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Разархивация чата</string>
+    <string name="unarchive_chat_option">Разархивировать чат</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Архив</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->

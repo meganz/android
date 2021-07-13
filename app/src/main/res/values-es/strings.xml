@@ -161,7 +161,7 @@
         <item quantity="other">Compartido con %1$d contactos</item>
     </plurals>
     <!-- Alert text before download. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file">Se descargarán %s</string>
+    <string name="alert_larger_file">Se descargarán %s.</string>
     <!-- Alert text before download -->
     <string name="alert_no_app">No hay ninguna aplicación para abrir el archivo %s. ¿Quieres continuar con la descarga?</string>
     <!-- Dialog option that permits user do not show it again -->
@@ -490,7 +490,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Invitación reenviada</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
+    <string name="context_contact_request_sent">Solicitud enviada correctamente a %s. Ver Solicitudes enviadas.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contacto borrado</string>
     <!-- error message -->
@@ -596,13 +596,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">La carpeta ya no está compartida</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Error, la carpeta todavía está compartida</string>
+    <string name="context_no_removed_sharing_contacts">Error: la carpeta está compartida todavía con otro contacto</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Selecciona sólo un archivo</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">La Papelera se ha vaciado correctamente</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Error: no se ha podido vaciar la Papelera</string>
+    <string name="rubbish_bin_no_emptied">No se ha podido vaciar la Papelera</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Estás a punto de cancelar tu suscripción MEGA. Por favor, dinos si hay algo que podamos hacer que pueda hacerte cambiar de opinión.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -610,7 +610,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Enviar</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">¡Gracias por tu mensaje! ¿Estás seguro de que quieres cancelar la suscripción?</string>
+    <string name="confirmation_cancel_subscriptions">Gracias por tu mensaje. ¿Estás seguro de que quieres cancelar la suscripción?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Tu suscripción no se ha cancelado. Indica una razón para cancelarla.</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -665,11 +665,11 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Error en el sistema de archivos</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Error en el sistema de archivos</string>
+    <string name="general_error">No se han podido explorar los archivos locales.</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Visor de imágenes</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Espacio utilizado</string>
+    <string name="my_account_used_space">Almacenamiento utilizado</string>
     <!-- menu item -->
     <string name="my_account_change_password">Cambiar contraseña</string>
     <!-- Dialog text overquota error -->
@@ -693,7 +693,7 @@
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Renovación automática anual o mensual</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">En este momento, no hay ningún método de pago disponible para este plan</string>
+    <string name="no_available_payment_method">No hay ningún método de pago asociado. Por favor, selecciona uno.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Mensual*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -701,7 +701,7 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">El enlace se ha copiado al portapapeles</string>
     <!-- before sharing an image, the preview has to be downloaded -->
-    <string name="full_image_viewer_not_preview">La vista previa todavía no se ha descargado, por favor espera</string>
+    <string name="full_image_viewer_not_preview">La vista previa todavía no se ha descargado, por favor espera.</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
     <string name="not_load_preview_low_memory">No se ha podido cargar la vista previa porque no hay suficiente memoria disponible. Por favor, inténtalo de nuevo más tarde.</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -1289,7 +1289,7 @@
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d solicitudes ya enviadas.</string>
     <!-- success message when reinviting multiple contacts -->
-    <string name="number_correctly_invite_contact_request">%d invitaciones enviadas correctamente</string>
+    <string name="number_correctly_invite_contact_request">%d invitaciones enviadas correctamente.</string>
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d invitaciones enviadas correctamente y %2$d no enviadas.</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -1428,7 +1428,7 @@
     <!-- success message when inviting multiple contacts to a group chat -->
     <string name="number_correctly_add_participant">Se han invitado %d participantes</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">Se han invitado %1$d participantes y no se han podido invitar %2$d participantes</string>
+    <string name="number_no_add_participant_request">Se han invitado %1$d participantes y no se han podido invitar %2$d participantes.</string>
     <!-- chat message when the permissions for a user has been changed -->
     <string name="message_permissions_changed">[/D][E]%3$s[/E] ha cambiado el permiso de [A]%1$s[/A][B] a [/B][C]%2$s[/C][D]</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -1853,9 +1853,9 @@
     <!--  -->
     <string name="attachment_uploading_state_compressing">Comprimiendo&#8230;</string>
     <!--  -->
-    <string name="attachment_uploading_state_error">No se ha podido enviar</string>
+    <string name="attachment_uploading_state_error">No se ha podido enviar.</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending -->
-    <string name="already_downloaded_multiple">%d archivos descargados anteriormente</string>
+    <string name="already_downloaded_multiple">%d archivos descargados anteriormente.</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
     <string name="pending_multiple">%d archivos pendientes.</string>
     <!--  -->
@@ -2625,7 +2625,7 @@
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
     <string name="success_unarchive_chat">%s chat ha sido restaurado.</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">No se ha podido restaurar %s chat</string>
+    <string name="error_unarchive_chat">No se ha podido restaurar %s chat.</string>
     <!-- Message shown when the user has no archived chats -->
     <string name="archived_chats_empty">[A]No hay[/A] [B]chats archivados[/B]</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
@@ -3472,7 +3472,7 @@
     <!-- Error when renaming a chat title and it is too long -->
     <string name="title_long">Título demasiado largo</string>
     <!-- Alert shown to the user when they is trying to create an empty group for attach a file -->
-    <string name="error_creating_group_and_attaching_file">Selecciona uno o más contactos</string>
+    <string name="error_creating_group_and_attaching_file">Selecciona uno o más contactos.</string>
     <!-- Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts -->
     <string name="contacts_sent">%s contactos enviados.</string>
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
@@ -3560,7 +3560,7 @@
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Obtén más cuota de transferencia</string>
     <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">La carpeta no existe</string>
+    <string name="warning_folder_not_exists">La carpeta no existe.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">El archivo no existe</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->

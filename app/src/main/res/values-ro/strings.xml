@@ -1228,8 +1228,8 @@
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Folderul este partajat cu %1$d contact. Elimini partajarea?</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Folderul este partajat cu %1$d contacte. Elimini partajarea?</item>
+        <item quantity="few">Folderul este partajat cu %1$d contacte. Elimini toate partajările?</item>
+        <item quantity="other">Folderul este partajat cu %1$d de contacte. Elimini toate partajările?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">E-mail și/sau parolă nevalide. Te rugăm să încerci din nou.</string>
@@ -1250,7 +1250,7 @@
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Acest URL este corupt sau deformat. Linkul pe care încerci să îl accesezi nu există.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">Se așteaptă confirmarea e-mailului</string>
+    <string name="confirm_email_text">În așteptarea confirmării e-mailului.</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
     <string name="confirm_email_explanation">Te rugăm să verifici e-mailul și să dai clic pe link pentru a confirma contul.</string>
     <!-- Plural of items which contains a folder. 2 items -->

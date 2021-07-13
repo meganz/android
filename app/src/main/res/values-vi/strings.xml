@@ -453,7 +453,7 @@
     <!-- Menu option title -->
     <string name="context_clear_rubbish">Dọn Thùng Rác</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">Bạn có chắc muốn xóa vĩnh viễn các mục ở trong Thùng Rác không?</string>
+    <string name="clear_rubbish_confirmation">Bạn đang chuẩn bị tiến hành xóa vĩnh viễn các mục ở trong Thùng Rác.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Gửi</string>
     <!-- send the file to inbox -->

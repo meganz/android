@@ -481,7 +481,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">요청이 재발송되었습니다</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
+    <string name="context_contact_request_sent">%s님께 요청이 성공적으로 전송되었습니다. 보낸 요청 탭에서 보세요.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">연락처가 제거되었습니다</string>
     <!-- error message -->
@@ -577,7 +577,7 @@
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">%d개의 연락처와 폴더를 공유하였습니다</string>
     <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">파일이 %d개의 연락처와 공유되지 않았습니다</string>
+    <string name="number_contact_file_not_shared_">%d개의 연락처와 파일을 공유할 수 없습니다.</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d개의 폴더가 잘 공유되었습니다</string>
     <!-- error message when sharing multiple files -->
@@ -587,13 +587,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">폴더가 더 이상 공유되지 않음</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">오류, 폴더가 아직 다른 연락처와 공유중입니다</string>
+    <string name="context_no_removed_sharing_contacts">오류가 발생하였습니다. 이 폴더는 아직 다른 연락처와 공유 중입니다</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">파일 하나만 선택하세요</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">휴지통이 성공적으로 비워졌습니다</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">오류. 휴지통이 비워지지 않았습니다</string>
+    <string name="rubbish_bin_no_emptied">오류가 발생하였습니다. 휴지통이 비워지지 않았습니다</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">MEGA 구독을 취소하려고 합니다. 당신의 생각을 바꾸게 하기 위해 우리가 뭘 해야할지 알려주세요.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -601,7 +601,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">보내기</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">피드백을 보내주셔서 고맙습니다! 메가 구독을 취소하시겠습니까?</string>
+    <string name="confirmation_cancel_subscriptions">피드백을 보내주셔서 고맙습니다. MEGA 구독을 정말 취소하시겠습니까?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">당신의 구독권이 취소되지 않았습니다. 취소 사유를 입력해주세요.</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -655,11 +655,11 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">파일 시스템 문제</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">행동 실행 중 오류가 발생했습니다</string>
+    <string name="general_error">로컬 파일을 탐색하던 중 오류 발생</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">이미지 뷰어</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">사용된 공간</string>
+    <string name="my_account_used_space">사용한 저장 공간</string>
     <!-- menu item -->
     <string name="my_account_change_password">암호 변경</string>
     <!-- Dialog text overquota error -->
@@ -683,7 +683,7 @@
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">월간 또는 연간 재구독</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">지금 이 요금제를 결제할 수 있는 수단이 없습니다</string>
+    <string name="no_available_payment_method">이 요금제에 설정된 결제 수단이 없습니다. 하나를 선택하세요.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">월간*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -691,9 +691,9 @@
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">링크가 클립보드로 복사되었습니다</string>
     <!-- before sharing an image, the preview has to be downloaded -->
-    <string name="full_image_viewer_not_preview">미리보기가 다운로드 되지 않았습니다. 기다려주세요.</string>
+    <string name="full_image_viewer_not_preview">미리 보기가 다운로드 되지 않았습니다. 기다려주세요.</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">사용 가능한 메모리가 부족하여 미리 보기를 이용할 수 없습니다. 나중에 다시 시도하세요.</string>
+    <string name="not_load_preview_low_memory">미리 보기를 표시할 여유 메모리가 부족합니다. 나중에 다시 시도하세요.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">계정을 만들기 전에 로그아웃 하세요</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -707,9 +707,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">수신중인 MEGA 통화의 알림 허용</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA는 백그라운드에서 통화 인터페이스를 띄우기 위해 당신의 허가가 필요합니다.</string>
+    <string name="ask_for_display_over_msg">통화를 위해 MEGA에 다른 앱 위에 표시 권한을 허용해주세요.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">걱정 마세요, 기기 설정에서 수동으로 권한을 허용할 수 있습니다.</string>
+    <string name="ask_for_display_over_explain">기기 설정에서 수동으로 권한을 허용할 수 있습니다.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">와이파이 전용</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -723,7 +723,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">업로드할 파일 확인중</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">카메라 업로드 초기화중</string>
+    <string name="settings_camera_notif_initializing_title">카메라 업로드 초기화 중</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">카메라 업로드가 해제되었습니다. 로컬 폴더를 이용할 수 없습니다.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -741,9 +741,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">암호 옵션</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">동영상 압축은 전력을 많이 소모합니다, MEGA는 압축하려는 동영상이 %s보다 클 경우 기기를 충전할 것을 요구할 것입니다.</string>
+    <string name="settings_camera_upload_charging_helper_label">동영상 압축은 꽤 많은 전력을 소모합니다. 만약 압축할 동영상이 %s보다 크다면 기기를 충전할 수 있도록 연결하세요.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">활성화하면, 당신이 어디에서 사진을 촬영하였는지에 대한 정보가 업로드 되오니, 공유할 때 유의하시기 바랍니다.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">활성화하면, 당신의 위치 정보가 사진에 포함됩니다. 공유할 때 주의하세요.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">고급</string>
     <!-- Settings preference title for cache -->
@@ -2189,7 +2189,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">당신의 계정은 MEGA 이용 약관을 다수 위반하여 정지되었습니다. 이메일 수신함을 확인하세요.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">당신의 계정은 타인의 권리 침해, 불법 데이터의 공유 및 내보내기, 시스템 오용 등의 MEGA 이용 약관 위반으로 제거되었습니다.</string>
+    <string name="account_suspended_breache_ToS">당신의 계정은 MEGA 이용 약관 제15조를 포함한 위반 행위로 인하여 제거되었습니다.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">파일 불러오는 중</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2386,7 +2386,7 @@
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(대기중)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="option_enable_chat_rich_preview">고급 URL 미리보기</string>
+    <string name="option_enable_chat_rich_preview">고급 URL 미리 보기</string>
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">항상 허용</string>
     <!-- Button do not allow now the rich links previews on chat -->
@@ -2394,7 +2394,7 @@
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">절대 안함</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
-    <string name="title_enable_rich_links">고급 URL 미리보기 활성화</string>
+    <string name="title_enable_rich_links">고급 URL 미리 보기 활성화</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">MEGAchat 경험을 향상하세요. URL 컨텐츠가 종단간 암호화 없이 수신됩니다.</string>
     <!-- Subtitle of a MEGA rich link without the decryption key -->
@@ -2496,13 +2496,13 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d개의 파일이 공유되지 않음</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">컨텐츠 미리보기</string>
+    <string name="preview_content">컨텐츠 미리 보기</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">스트리밍을 실행할 수 없고 파일이 다운로드되지 않았습니다</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">파일을 열 수 없습니다.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">네트워크 연결이 없어서 파일을 열 수 없습니다.</string>
+    <string name="error_fail_to_open_file_no_network">네트워크 연결이 없습니다. 파일을 열 수 없습니다.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">파일이 이미 오프라인용으로 저장되어 있습니다</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2510,9 +2510,9 @@
         <item quantity="other">메시지가 전달되지 않음</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">고급 URL 미리보기</string>
+    <string name="title_confirmation_disable_rich_links">고급 URL 미리 보기</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">고급 URL 미리보기를 영구히 해제하려고 합니다. 당신은 고급 URL 미리보기를 설정에서 다시 활성화할 수 있습니다. 진행하시겠습니까?</string>
+    <string name="text_confirmation_disable_rich_links">고급 URL 미리 보기를 해제하려고 합니다. 설정에서 고급 URL 미리 보기를 다시 활성화할 수 있습니다. 진행 하시겠습니까?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]부재중 전화[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -3370,7 +3370,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">%1$s님의 연락처는 당신의 비즈니스 계정의 일부이기 때문에 삭제할 수 없습니다.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">최근 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저로 MEGA에 접속하세요.</string>
+    <string name="grace_period_admin_alert">지난 결제에 문제가 있었습니다. 자세한 정보를 보려면 데스크톱 브라우저를 이용하여 MEGA에 접속하세요.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">당신의 비즈니스 계정이 만료되었습니다</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3378,7 +3378,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">당신의 계정은 현재 [B]정지[/B]되었습니다. 당신의 데이터를 탐색만할 수 있습니다.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA는 당신의 데이터에 접근할 수 없지만, 당신의 비즈니스 계정 관리자는 당신의 이용자 계정의 카메라 업로드를 보거나 제어할 수 있는 권한이 있습니다.</string>
+    <string name="camera_uploads_business_alert">MEGA는 당신의 데이터에 접근할 수 없지만, 당신의 비즈니스 계정 관리자는 당신의 카메라 업로드를 보거나 삭제할 수 있습니다.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">뭔가 잘못 됐습니다</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->

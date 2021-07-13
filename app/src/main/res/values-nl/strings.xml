@@ -586,7 +586,7 @@
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Map met %d contacten succesvol gedeeld</string>
     <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Bestand kon niet gedeeld worden met %d contacten</string>
+    <string name="number_contact_file_not_shared_">Bestand kan niet worden gedeeld met %d contacten</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d mappen succesvol gedeeld</string>
     <!-- error message when sharing multiple files -->
@@ -596,13 +596,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">De map wordt niet meer gedeeld</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Fout, de map wordt nog steeds gedeeld met een ander contactpersoon</string>
+    <string name="context_no_removed_sharing_contacts">Er is een fout opgetreden. De map wordt nog steeds gedeeld met een ander contact</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Selecteer alleen één bestand</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Prullenbak is succesvol geleegd</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Fout. De Prullenbak was niet leeggemaakt</string>
+    <string name="rubbish_bin_no_emptied">Er is een fout opgetreden. De Prullenbak is niet geleegd</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">U gaat uw MEGA abonnement opzeggen. Laat het ons alstublieft weten als er iets is wat we kunnen doen om u te helpen van gedachten te veranderen.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -610,7 +610,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Versturen</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Bedankt u voor uw feedback! Weet u zeker dat u uw MEGA-abonnement wilt opzeggen?</string>
+    <string name="confirmation_cancel_subscriptions">Bedankt voor uw feedback. Weet u zeker dat u uw MEGA-abonnement wilt opzeggen?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Uw abonnement was niet geannuleerd. Geef een reden voor uw annulering</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -665,11 +665,11 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Bestandssysteem probleem</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Fout opgetreden bij uitvoeren van actie</string>
+    <string name="general_error">Er is een fout opgetreden bij het bladeren door lokale bestanden.</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Afbeelding weergave</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Gebruikte Ruimte</string>
+    <string name="my_account_used_space">Gebruikte opslag ruimte</string>
     <!-- menu item -->
     <string name="my_account_change_password">Wijzig wachtwoord</string>
     <!-- Dialog text overquota error -->
@@ -693,7 +693,7 @@
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Maandelijks of jaarlijks terugkerend</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">Op dit moment is er geen betaalmethode beschikbaar voor dit abonnement</string>
+    <string name="no_available_payment_method">Er is momenteel geen betalingsmethode ingesteld voor dit plan. Selecteer er één alstublieft.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Maandelijks*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -703,7 +703,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">De weergave was nog niet gedownload. Wacht a.u.b.</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">De weergave kan niet worden geladen door dat er onvoldoende geheugen beschikbaar is. Probeer later nogmaals.</string>
+    <string name="not_load_preview_low_memory">Onvoldoende vrij geheugen om voorbeeld weer te geven. Probeer het later opnieuw.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Log uit voordat u een account aanmaakt</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -717,9 +717,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Meldingen van binnenkomende MEGA-oproepen toestaan</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA heeft uw toestemming nodig om de oproepinterface op de achtergrond te laten verschijnen.</string>
+    <string name="ask_for_display_over_msg">Verleen MEGA toestemming voor weergave over andere applicaties voor oproepen.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Maakt u zich geen zorgen, u kunt nog steeds handmatig machtigingen verlenen via de instellingen van uw apparaat.</string>
+    <string name="ask_for_display_over_explain">U kunt nog steeds handmatig machtigingen verlenen in de apparaat Instellingen.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Alleen Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -733,7 +733,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Bezig met zoeken naar te uploaden bestanden</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Camera-Uploads initialiseren</string>
+    <string name="settings_camera_notif_initializing_title">Camera-uploads initialiseren</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Camera-uploads zijn uitgeschakeld. Uw lokale map is niet beschikbaar.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -751,9 +751,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Toegangscode-opties</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Video compressie verbruikt veel stroom; MEGA vereist dat u uw apparaat actief oplaadt als de te comprimeren video’s groter zijn dan %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Videocompressie gebruikt aanzienlijke hoeveelheden stroom. Sluit uw apparaat aan om op te laden als de te comprimeren video’s groter zijn dan %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Indien ingeschakeld, uploadt u informatie over waar uw foto’s zijn gemaakt, dus wees voorzichtig wanneer u ze deelt.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Indien ingeschakeld, worden uw locatiegegevens bij uw foto’s gevoegd. Wees voorzichtig bij het delen ervan.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Geavanceerd</string>
     <!-- Settings preference title for cache -->
@@ -2234,7 +2234,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Uw account is geschorst door meerdere misbruiken van MEGA’s Algemene Voorwaarden. Controleer uw email postvak in.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Uw account was beëindigd door een schending van MEGA’s Algemene Voorwaarden, zoals misbruik van rechten van anderen; Het delen en/of importen van illegale gegevens; of systeem misbruik.</string>
+    <string name="account_suspended_breache_ToS">Uw account is beëindigd vanwege een schending van de Servicevoorwaarden van MEGA, inclusief, maar niet beperkt tot, clausule 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Bestanden laden</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2557,7 +2557,7 @@
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Kan bestand niet openen.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">We konden het bestand niet openen omdat er geen netwerkverbinding was.</string>
+    <string name="error_fail_to_open_file_no_network">Geen netwerkverbinding. Bestand kan niet worden geopend.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Bestand bestaat al in Opgeslagen voor Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2568,7 +2568,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">Rijke URL Weergave</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">U schakelt rijke URL weergave permanent uit. U kunt rijke URL weergave opnieuw inschakelen in uw instellingen. Wilt u doorgaan?</string>
+    <string name="text_confirmation_disable_rich_links">U schakelt uitgebreide URL-voorbeelden uit. U kunt uitgebreide URL-voorbeelden opnieuw inschakelen in uw instellingen. Wilt u doorgaan?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Gemiste oproep[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2613,7 +2613,7 @@
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">Gesprek archiveren</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Gesprek dearchiveren</string>
+    <string name="unarchive_chat_option">Gesprek uit het archief halen</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archiveren</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2645,7 +2645,7 @@
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading_share">Contacten laden&#8230;</string>
     <!-- Title of the screen New Group -->
-    <string name="title_new_group">Nieuwe Groep</string>
+    <string name="title_new_group">Nieuwe groep</string>
     <!-- Subtitle of the screen New Group -->
     <string name="subtitle_new_group">Typ uw groep naam</string>
     <!-- Hint of edittext shown when it is creating a new group to guide user to type the name of the group -->
@@ -3448,7 +3448,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">U kunt %1$s niet verwijderen als contact omdat deze deel uitmaakt van uw zakelijke account.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">Er is een probleem opgetreden met uw laatste betaling. Ga naar MEGA via een desktopbrowser voor meer informatie.</string>
+    <string name="grace_period_admin_alert">Er is een probleem opgetreden met uw laatste betaling. Ga voor meer informatie naar MEGA met een desktopbrowser.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Uw Zakelijke account is verlopen</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3456,7 +3456,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Uw account is momenteel [B]geschorst[/B]. U kunt alleen door uw gegevens bladeren.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">Hoewel MEGA geen toegang heeft tot uw gegevens, heeft uw zakelijke accountbeheerder de mogelijkheid om de camera-uploads in uw gebruikersaccount te beheren en te bekijken</string>
+    <string name="camera_uploads_business_alert">MEGA heeft geen toegang tot uw gegevens, maar uw zakelijke accountbeheerder kan uw Camera Uploads bekijken en verwijderen.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Er is iets fout gegaan</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
