@@ -17,8 +17,8 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUN
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.listeners.GetUserDataListener
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
@@ -35,6 +35,8 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener{
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
+    @Inject
+    lateinit var getUserDataUseCase: GetUserDataUseCase
 
     private var timer: CountDownTimer? = null
 
@@ -62,7 +64,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener{
             megaApi.getSpecificAccountDetails(true, false, false)
         }
 
-        megaApi.getUserData(GetUserDataListener(this))
+        getUserDataUseCase.get()
 
         setContentView(R.layout.activity_over_disk_quota_paywall)
 

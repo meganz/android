@@ -25,25 +25,20 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.android.synthetic.main.dialog_general_confirmation.*
 import mega.privacy.android.app.R
-import mega.privacy.android.app.SMSVerificationActivity
+import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_REMOVE_PHONE_NUMBER_CONFIRMATION
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
-import mega.privacy.android.app.listeners.GetUserDataListener
-import mega.privacy.android.app.listeners.ResetPhoneNumberListener
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberBottomSheetDialogFragment
-import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
+import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.editProfile.EditProfileActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.AlertsAndWarnings.showRemoveOrModifyPhoneNumberConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -54,11 +49,9 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TimeUtils.DATE_MM_DD_YYYY_FORMAT
 import mega.privacy.android.app.utils.TimeUtils.formatDate
@@ -67,14 +60,11 @@ import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED
 import nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaError.API_ENOENT
-import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaUser
 import org.jetbrains.anko.contentView
 import java.io.File
 
-class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
+class MyAccountActivity : PasscodeActivity(), Scrollable {
 
     companion object {
         private const val KILL_SESSIONS_SHOWN = "KILL_SESSIONS_SHOWN"
@@ -95,7 +85,6 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
     private var killSessionsConfirmationDialog: AlertDialog? = null
     private var cancelSubscriptionsDialog: AlertDialog? = null
     private var cancelSubscriptionsConfirmationDialog: AlertDialog? = null
-    private var removeOrModifyPhoneNumberDialog: AlertDialog? = null
     private var changeApiServerDialog: AlertDialog? = null
 
     private var cancelSubscriptionsFeedback: String? = null
@@ -118,10 +107,6 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
                 UPDATE_CREDIT_CARD_SUBSCRIPTION -> refreshMenuOptionsVisibility()
             }
         }
-    }
-
-    private val showRemovePhoneNumberObserver = Observer<Boolean> { isModify ->
-        showConfirmation(isModify)
     }
 
     private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar(false) }
@@ -198,9 +183,6 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
     override fun onDestroy() {
         unregisterReceiver(updateMyAccountReceiver)
 
-        LiveEventBus.get(EVENT_SHOW_REMOVE_PHONE_NUMBER_CONFIRMATION, Boolean::class.java)
-            .removeObserver(showRemovePhoneNumberObserver)
-
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .removeObserver(profileAvatarUpdatedObserver)
 
@@ -213,7 +195,6 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
         killSessionsConfirmationDialog?.dismiss()
         cancelSubscriptionsDialog?.dismiss()
         cancelSubscriptionsConfirmationDialog?.dismiss()
-        removeOrModifyPhoneNumberDialog?.dismiss()
         changeApiServerDialog?.dismiss()
         super.onDestroy()
     }
@@ -307,9 +288,6 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
                 BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS
             )
         )
-
-        LiveEventBus.get(EVENT_SHOW_REMOVE_PHONE_NUMBER_CONFIRMATION, Boolean::class.java)
-            .observeForever(showRemovePhoneNumberObserver)
 
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .observeForever(profileAvatarUpdatedObserver)
@@ -809,59 +787,6 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
                     isVisible = false
                 }
             }
-        }
-    }
-
-    override fun showConfirmation(isModify: Boolean) {
-        this.isModify = isModify
-        removeOrModifyPhoneNumberDialog =
-            showRemoveOrModifyPhoneNumberConfirmDialog(this, isModify, this)
-    }
-
-    override fun reset() {
-        megaApi.resetSmsVerifiedPhoneNumber(ResetPhoneNumberListener(this, this))
-    }
-
-    override fun onReset(error: MegaError) {        /*
-          Reset phone number successfully or the account has reset the phone number,
-          but user data hasn't refreshed successfully need to refresh user data again.
-        */
-        if (error.errorCode == MegaError.API_OK || error.errorCode == MegaError.API_ENOENT) {
-            // Have to getUserData to refresh, otherwise, phone number remains previous value.
-            megaApi.getUserData(GetUserDataListener(this, this))
-        } else {
-            binding.phoneText.isClickable = true
-            showSnackbar(StringResourcesUtils.getString(R.string.remove_phone_number_fail))
-            logWarning("Reset phone number failed: " + getTranslatedErrorString(error))
-        }
-    }
-
-    override fun onUserDataUpdate(error: MegaError) {
-        binding.phoneText.isClickable = true
-
-        if (error.errorCode == API_OK) {
-            if (canVoluntaryVerifyPhoneNumber()) {
-                binding.phoneText.text =
-                    StringResourcesUtils.getString(R.string.add_phone_number_label)
-                binding.phoneText.isVisible = true
-
-//                if (this is ManagerActivityLollipop) {
-//                    (this as ManagerActivityLollipop).showAddPhoneNumberInMenu();
-//                }
-
-                if (isModify) {
-                    startActivity(Intent(this, SMSVerificationActivity::class.java))
-                } else {
-                    showSnackbar(StringResourcesUtils.getString(R.string.remove_phone_number_success))
-                }
-            }
-        } else {
-            showSnackbar(StringResourcesUtils.getString(R.string.remove_phone_number_fail))
-            logWarning(
-                "Get user data for updating phone number failed: " + getTranslatedErrorString(
-                    error
-                )
-            )
         }
     }
 

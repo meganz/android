@@ -1,11 +1,11 @@
-package mega.privacy.android.app;
+package mega.privacy.android.app.smsVerification;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.appcompat.app.AlertDialog;
+
 import androidx.core.content.ContextCompat;
 
 import android.telephony.PhoneNumberUtils;
@@ -29,6 +29,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.CountryCodePickerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -423,7 +425,7 @@ public class SMSVerificationActivity extends PasscodeActivity implements View.On
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("The SMS verification request has been sent successfully.");
                 String enteredPhoneNumber = phoneNumberInput.getText().toString();
-                Intent intent = new Intent(this,SMSVerificationReceiveTxtActivity.class);
+                Intent intent = new Intent(this, SMSVerificationReceiveTxtActivity.class);
                 intent.putExtra(SELECTED_COUNTRY_CODE,selectedDialCode);
                 intent.putExtra(ENTERED_PHONE_NUMBER,enteredPhoneNumber);
                 intent.putExtra(NAME_USER_LOCKED,isUserLocked);

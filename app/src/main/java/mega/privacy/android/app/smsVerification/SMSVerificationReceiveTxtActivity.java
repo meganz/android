@@ -1,4 +1,4 @@
-package mega.privacy.android.app;
+package mega.privacy.android.app.smsVerification;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -33,6 +33,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.EditTextPIN;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
@@ -44,7 +45,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import static mega.privacy.android.app.SMSVerificationActivity.*;
+import static mega.privacy.android.app.smsVerification.SMSVerificationActivity.*;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 

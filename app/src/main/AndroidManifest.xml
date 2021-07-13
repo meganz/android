@@ -417,9 +417,9 @@
             android:label="@string/app_name">
         </activity>
 
-        <activity android:name="mega.privacy.android.app.SMSVerificationActivity" />
+        <activity android:name="mega.privacy.android.app.smsVerification.SMSVerificationActivity" />
 
-        <activity android:name="mega.privacy.android.app.SMSVerificationReceiveTxtActivity"/>
+        <activity android:name="mega.privacy.android.app.smsVerification.SMSVerificationReceiveTxtActivity"/>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity"

@@ -17,8 +17,7 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SMSVerificationActivity;
-import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;

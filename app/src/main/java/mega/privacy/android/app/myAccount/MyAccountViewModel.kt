@@ -31,6 +31,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask
 import mega.privacy.android.app.myAccount.usecase.*
+import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -54,7 +55,9 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val killSessionUseCase: KillSessionUseCase,
     private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase,
     private val getMyAvatarUseCase: GetMyAvatarUseCase,
-    private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase
+    private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
+    private val resetPhoneNumberUseCase: ResetPhoneNumberUseCase,
+    private val getUserDataUseCase: GetUserDataUseCase
 ) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
 
     companion object {
@@ -477,5 +480,26 @@ class MyAccountViewModel @ViewModelInject constructor(
                 null
             }
         }
+    }
+
+    fun resetPhoneNumber(action: (Boolean) -> Unit) {
+        resetPhoneNumberUseCase.reset()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { getUserData(action) },
+                onError = { error ->
+                    logWarning("Reset phone number failed: ${error.message}")
+                    action.invoke(false)
+                })
+            .addTo(composite)
+    }
+
+    private fun getUserData(action: (Boolean) -> Unit) {
+        getUserDataUseCase.get()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy { success -> action.invoke(success) }
+            .addTo(composite)
     }
 }
