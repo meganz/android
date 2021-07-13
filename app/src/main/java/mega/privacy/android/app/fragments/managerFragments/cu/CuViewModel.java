@@ -567,6 +567,7 @@ class CuViewModel extends BaseRxViewModel {
         int cardMonth = cardLocalDate.getMonthValue();
         int cardYear = cardLocalDate.getYear();
         int currentDay = LocalDate.now().getDayOfMonth();
+        int dayPosition = 0;
 
         for (int i = 0; i < dayCards.size(); i++) {
             LocalDate nextLocalDate = dayCards.get(i).getLocalDate();
@@ -574,24 +575,26 @@ class CuViewModel extends BaseRxViewModel {
             int nextMonth = nextLocalDate.getMonthValue();
             int nextYear = nextLocalDate.getYear();
 
-            if (nextYear == cardYear && nextMonth == cardMonth && nextDay <= currentDay) {
-                //Month of year clicked, current day. If not exists, the closest day behind the current.
-                if (i == 0 || nextDay == currentDay
-                        || dayCards.get(i - 1).getLocalDate().getMonthValue() != cardMonth) {
-                    return i;
+            if (nextYear == cardYear && nextMonth == cardMonth) {
+                if (nextDay <= currentDay) {
+                    //Month of year clicked, current day. If not exists, the closest day behind the current.
+                    if (i == 0 || nextDay == currentDay
+                            || dayCards.get(i - 1).getLocalDate().getMonthValue() != cardMonth) {
+                        return i;
+                    }
+
+                    int previousDay = dayCards.get(i - 1).getLocalDate().getDayOfMonth();
+
+                    //The closest day to the current
+                    return previousDay - currentDay <= currentDay - nextDay ? i - 1 : i;
+                } else {
+                    //Save the closest day above the current in case there is no day of month behind the current.
+                    dayPosition = i;
                 }
-
-                int previousDay = dayCards.get(i - 1).getLocalDate().getDayOfMonth();
-
-                //The closest day to the current
-                return previousDay - currentDay <= currentDay - nextDay ? i - 1 : i;
-            } else if (nextYear == cardYear && nextMonth < cardMonth) {
-                //No day equal or behind the current found, then return the previous day.
-                return i == 0 ? i : i -1;
             }
         }
 
-        return 0;
+        return dayPosition;
     }
 
     /**
