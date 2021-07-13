@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
+import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -46,7 +47,7 @@ class GetContactsUseCase @Inject constructor(
     fun get(): Flowable<List<ContactItem.Data>> =
         Flowable.create({ emitter: FlowableEmitter<List<ContactItem.Data>> ->
             val contacts = megaApi.contacts
-                .filter { it.visibility == MegaUser.VISIBILITY_VISIBLE }
+                .filter { it.visibility == VISIBILITY_VISIBLE }
                 .map { it.toContactItem() }
                 .toMutableList()
 
@@ -133,18 +134,21 @@ class GetContactsUseCase @Inject constructor(
                     users.forEach { user ->
                         val index = contacts.indexOfFirst { it.email == user.email }
                         if (index != NOT_FOUND) {
+                            val isExternalChange = user.isOwnChange != 0
+
                             when {
-                                user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) -> {
-                                    if (user.isOwnChange == 0) {
-                                        megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
-                                    }
-                                }
+                                isExternalChange && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) ->
+                                    megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
+                                isExternalChange && user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ->
+                                    megaApi.getUserAttribute(user.email, USER_ATTR_FIRSTNAME, userAttrsListener)
+                                isExternalChange && user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ->
+                                    megaApi.getUserAttribute(user.email, USER_ATTR_LASTNAME, userAttrsListener)
                                 user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS) ->
                                     megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
-                                user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ->
-                                    megaApi.getUserAttribute(user.email, USER_ATTR_FIRSTNAME, userAttrsListener)
-                                user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ->
-                                    megaApi.getUserAttribute(user.email, USER_ATTR_LASTNAME, userAttrsListener)
+                                user.visibility != VISIBILITY_VISIBLE -> {
+                                    contacts.removeAt(index)
+                                    emitter.onNext(contacts.sortedAlphabetically())
+                                }
                             }
                         }
                     }
