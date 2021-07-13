@@ -19,9 +19,11 @@ import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
+import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaUser
+import java.util.concurrent.TimeUnit
 
 class ContactListViewModel @ViewModelInject constructor(
     private val getContactsUseCase: GetContactsUseCase,
@@ -32,6 +34,7 @@ class ContactListViewModel @ViewModelInject constructor(
 
     companion object {
         private const val TAG = "ContactListViewModel"
+        private const val REQUEST_TIMEOUT_IN_MS = 100L
     }
 
     private var queryString: String? = null
@@ -63,6 +66,7 @@ class ContactListViewModel @ViewModelInject constructor(
 
     private fun retrieveContacts() {
         getContactsUseCase.get()
+            .debounceImmediate(REQUEST_TIMEOUT_IN_MS, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
