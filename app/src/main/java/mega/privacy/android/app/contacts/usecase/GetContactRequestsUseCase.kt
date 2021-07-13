@@ -13,20 +13,21 @@ import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.FlowableEmitter
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.listeners.OptionalMegaGlobalListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.view.TextDrawable
-import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
-import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaContactRequest
-import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaContactRequest.STATUS_REMINDED
+import nz.mega.sdk.MegaContactRequest.STATUS_UNRESOLVED
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -43,57 +44,39 @@ class GetContactRequestsUseCase @Inject constructor(
 
     fun get(): Flowable<List<ContactRequestItem>> =
         Flowable.create({ emitter: FlowableEmitter<List<ContactRequestItem>> ->
-            val contactRequests = arrayListOf<MegaContactRequest>().apply {
+            val requests = arrayListOf<MegaContactRequest>().apply {
                 addAll(megaApi.incomingContactRequests)
                 addAll(megaApi.outgoingContactRequests)
             }
 
-            val contacts = contactRequests.sortedByDescending { it.creationTime }.map { request ->
-                var userImageUri: Uri? = null
+            val requestItems = requests
+                .sortedByDescending { it.creationTime }
+                .map { it.toContactRequestItem() }
+                .toMutableList()
 
-                val userEmail = if (request.isOutgoing) request.targetEmail else request.sourceEmail
-                val userName = megaChatApi.getUserFirstnameFromCache(request.handle)
-                val userImageColor = megaApi.getUserAvatarColor(request.handle.toString()).toColorInt()
-                val placeholder = getImagePlaceholder(userName ?: userEmail, userImageColor)
-                val userImageFile = AvatarUtil.getUserAvatarFile(context, userEmail)
-                if (userImageFile?.exists() == true) {
-                    userImageUri = userImageFile.toUri()
-                }
-
-                ContactRequestItem(
-                    handle = request.handle,
-                    email = userEmail,
-                    name = userName,
-                    avatarUri = userImageUri,
-                    placeholder = placeholder,
-                    isOutgoing = request.isOutgoing,
-                    createdTime = getRelativeTimeSpanString(request.creationTime * 1000).toString()
-                )
-            }.toMutableList()
-
-            emitter.onNext(contacts)
+            emitter.onNext(requestItems)
 
             val userAttrsListener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
                     if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
 
                     if (error.errorCode == MegaError.API_OK) {
-                        val index = contacts.indexOfFirst { it.email == request.email }
+                        val index = requestItems.indexOfFirst { it.email == request.email }
                         if (index != NOT_FOUND) {
-                            val currentContact = contacts[index]
+                            val currentContact = requestItems[index]
 
                             when (request.paramType) {
                                 USER_ATTR_AVATAR ->
-                                    contacts[index] = currentContact.copy(
+                                    requestItems[index] = currentContact.copy(
                                         avatarUri = File(request.file).toUri()
                                     )
                                 USER_ATTR_FIRSTNAME ->
-                                    contacts[index] = currentContact.copy(
+                                    requestItems[index] = currentContact.copy(
                                         name = request.text
                                     )
                             }
 
-                            emitter.onNext(contacts)
+                            emitter.onNext(requestItems)
                         }
                     } else {
                         logError(error.toThrowable().stackTraceToString())
@@ -104,15 +87,77 @@ class GetContactRequestsUseCase @Inject constructor(
                 }
             )
 
-            contacts.forEach { request ->
-                val userImageFile = AvatarUtil.getUserAvatarFile(context, request.email!!)?.absolutePath
-                megaApi.getUserAvatar(request.email, userImageFile, userAttrsListener)
-                megaApi.getUserAttribute(request.email, USER_ATTR_FIRSTNAME, userAttrsListener)
+            val globalListener = OptionalMegaGlobalListenerInterface(
+                onContactRequestsUpdate = { updatedRequests ->
+                    updatedRequests.forEach { request ->
+                        when (request.status) {
+                            STATUS_UNRESOLVED -> {
+                                if (requestItems.any { it.handle == request.handle }) return@forEach
+
+                                val newRequestItem = request.toContactRequestItem().apply {
+                                    val userImageFile = AvatarUtil.getUserAvatarFile(context, email)?.absolutePath
+                                    megaApi.getUserAvatar(email, userImageFile, userAttrsListener)
+                                    megaApi.getUserAttribute(email, USER_ATTR_FIRSTNAME, userAttrsListener)
+                                }
+
+                                requestItems.add(newRequestItem)
+                            }
+                            STATUS_REMINDED -> {
+                                // do nothing
+                            }
+                            else -> {
+                                requestItems.removeIf { it.handle == request.handle }
+                            }
+                        }
+                    }
+
+                    emitter.onNext(requestItems)
+                }
+            )
+
+            megaApi.addGlobalListener(globalListener)
+
+            requestItems.forEach { request ->
+                if (request.avatarUri == null) {
+                    val userImageFile = AvatarUtil.getUserAvatarFile(context, request.email)?.absolutePath
+                    megaApi.getUserAvatar(request.email, userImageFile, userAttrsListener)
+                }
+
+                if (request.name.isNullOrBlank()) {
+                    megaApi.getUserAttribute(request.email, USER_ATTR_FIRSTNAME, userAttrsListener)
+                }
             }
-        }, BackpressureStrategy.BUFFER)
+
+            emitter.setDisposable(Disposable.fromAction {
+                megaApi.removeGlobalListener(globalListener)
+            })
+        }, BackpressureStrategy.LATEST)
 
     fun getIncomingRequestsSize(): Single<Int> =
         Single.fromCallable { megaApi.incomingContactRequests.size }
+
+    private fun MegaContactRequest.toContactRequestItem(): ContactRequestItem {
+        var userImageUri: Uri? = null
+
+        val userEmail = if (isOutgoing) targetEmail else sourceEmail
+        val userName = megaChatApi.getUserFirstnameFromCache(handle)
+        val userImageColor = megaApi.getUserAvatarColor(handle.toString()).toColorInt()
+        val placeholder = getImagePlaceholder(userName ?: userEmail, userImageColor)
+        val userImageFile = AvatarUtil.getUserAvatarFile(context, userEmail)
+        if (userImageFile?.exists() == true) {
+            userImageUri = userImageFile.toUri()
+        }
+
+        return ContactRequestItem(
+            handle = handle,
+            email = userEmail,
+            name = userName,
+            avatarUri = userImageUri,
+            placeholder = placeholder,
+            isOutgoing = isOutgoing,
+            createdTime = getRelativeTimeSpanString(creationTime * 1000).toString()
+        )
+    }
 
     private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
         TextDrawable.builder()

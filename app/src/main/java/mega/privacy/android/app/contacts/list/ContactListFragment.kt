@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -18,7 +17,6 @@ import mega.privacy.android.app.contacts.list.adapter.ContactListAdapter
 import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFragment
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.lollipop.InviteContactActivity
-import mega.privacy.android.app.utils.Constants.EVENT_CONTACT_UPDATE
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
@@ -105,10 +103,6 @@ class ContactListFragment : Fragment() {
             binding.listScroller.isVisible = items.size >= MIN_ITEMS_SCROLLBAR
             binding.viewEmpty.isVisible = items.isNullOrEmpty()
             contactsAdapter.submitList(items)
-        }
-
-        LiveEventBus.get(EVENT_CONTACT_UPDATE).observe(viewLifecycleOwner) {
-            viewModel.retrieveContacts()
         }
     }
 

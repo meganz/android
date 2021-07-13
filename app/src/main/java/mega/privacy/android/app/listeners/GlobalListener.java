@@ -26,8 +26,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.EVENT_TEXT;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
-import static mega.privacy.android.app.utils.Constants.EVENT_CONTACT_REQUESTS_UPDATE;
-import static mega.privacy.android.app.utils.Constants.EVENT_CONTACT_UPDATE;
 import static mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE;
 import static mega.privacy.android.app.utils.Constants.EXTRA_STORAGE_STATE;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
@@ -47,18 +45,12 @@ public class GlobalListener implements MegaGlobalListenerInterface {
     public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
         if (users == null || users.isEmpty()) return;
 
-        boolean shouldUpdateContacts = false;
-
         for (MegaUser user : users) {
             if (user == null) {
                 continue;
             }
 
             boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
-
-            if (!isMyChange && !user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)) {
-                shouldUpdateContacts = true;
-            }
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && isMyChange) {
                 MegaApplication.getPushNotificationSettingManagement().updateMegaPushNotificationSetting();
@@ -90,10 +82,6 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 api.getFileVersionsOption(new GetAttrUserListener(megaApplication));
                 break;
             }
-        }
-
-        if (shouldUpdateContacts) {
-            LiveEventBus.get(EVENT_CONTACT_UPDATE).post(null);
         }
     }
 
@@ -152,8 +140,6 @@ public class GlobalListener implements MegaGlobalListenerInterface {
         megaApplication.updateAppBadge();
 
         notifyNotificationCountChange(api);
-
-        LiveEventBus.get(EVENT_CONTACT_REQUESTS_UPDATE).post(null);
 
         for (int i = 0; i < requests.size(); i++) {
             MegaContactRequest cr = requests.get(i);

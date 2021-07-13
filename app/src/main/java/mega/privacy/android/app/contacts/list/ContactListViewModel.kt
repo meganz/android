@@ -61,7 +61,7 @@ class ContactListViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun retrieveContacts() {
+    private fun retrieveContacts() {
         getContactsUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

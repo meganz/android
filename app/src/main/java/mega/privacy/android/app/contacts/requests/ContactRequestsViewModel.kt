@@ -17,7 +17,7 @@ import mega.privacy.android.app.contacts.usecase.ReplyContactRequestUseCase
 import mega.privacy.android.app.utils.notifyObserver
 
 class ContactRequestsViewModel @ViewModelInject constructor(
-    private val getContactRequestsUseCase: GetContactRequestsUseCase,
+    getContactRequestsUseCase: GetContactRequestsUseCase,
     private val replyContactRequestUseCase: ReplyContactRequestUseCase
 ) : BaseRxViewModel() {
 
@@ -29,11 +29,6 @@ class ContactRequestsViewModel @ViewModelInject constructor(
     private var queryString: String? = null
 
     init {
-        updateRequests()
-    }
-
-    fun updateRequests() {
-        composite.clear()
         getContactRequestsUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -98,7 +93,6 @@ class ContactRequestsViewModel @ViewModelInject constructor(
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onComplete = { updateRequests() },
                 onError = { Log.e(TAG, it.stackTraceToString()) }
             )
             .addTo(composite)

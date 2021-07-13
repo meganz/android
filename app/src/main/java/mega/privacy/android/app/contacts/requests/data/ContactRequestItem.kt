@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 
 data class ContactRequestItem constructor(
     val handle: Long,
-    val email: String? = null,
+    val email: String,
     val name: String? = null,
     var avatarUri: Uri? = null,
     val placeholder: Drawable,

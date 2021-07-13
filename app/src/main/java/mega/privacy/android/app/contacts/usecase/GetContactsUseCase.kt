@@ -16,21 +16,19 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaChatListenerInterface
+import mega.privacy.android.app.listeners.OptionalMegaGlobalListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.MegaChatApiJavaUtils.getUserAliasFromCacheDecoded
 import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
 import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.view.TextDrawable
-import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
 import nz.mega.sdk.MegaChatApi.*
-import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaUser
-import nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -48,37 +46,8 @@ class GetContactsUseCase @Inject constructor(
     fun get(): Flowable<List<ContactItem.Data>> =
         Flowable.create({ emitter: FlowableEmitter<List<ContactItem.Data>> ->
             val contacts = megaApi.contacts
-                .filter { it.visibility == VISIBILITY_VISIBLE }
-                .map { megaUser ->
-                    val alias = megaChatApi.getUserAliasFromCache(megaUser.handle)
-                    val fullName = megaChatApi.getUserFullnameFromCache(megaUser.handle)
-                    val userStatus = megaChatApi.getUserOnlineStatus(megaUser.handle)
-                    val userImageColor = megaApi.getUserAvatarColor(megaUser).toColorInt()
-                    val title = when {
-                        !alias.isNullOrBlank() -> alias
-                        !fullName.isNullOrBlank() -> fullName
-                        else -> megaUser.email
-                    }
-                    val placeholder = getImagePlaceholder(title, userImageColor)
-                    val userAvatarFile = AvatarUtil.getUserAvatarFile(context, megaUser.email)
-                    val userAvatar = if (userAvatarFile?.exists() == true) {
-                        userAvatarFile.toUri()
-                    } else {
-                        null
-                    }
-
-                    ContactItem.Data(
-                        handle = megaUser.handle,
-                        email = megaUser.email,
-                        alias = alias,
-                        fullName = fullName,
-                        status = userStatus,
-                        statusColor = getUserStatusColor(userStatus),
-                        avatarUri = userAvatar,
-                        placeholder = placeholder,
-                        isNew = megaUser.wasRecentlyAdded()
-                    )
-                }
+                .filter { it.visibility == MegaUser.VISIBILITY_VISIBLE }
+                .map { it.toContactItem() }
                 .toMutableList()
 
             emitter.onNext(contacts.sortedAlphabetically())
@@ -93,10 +62,13 @@ class GetContactsUseCase @Inject constructor(
                             val currentContact = contacts[index]
 
                             when (request.paramType) {
-                                USER_ATTR_AVATAR ->
-                                    contacts[index] = currentContact.copy(
-                                        avatarUri = File(request.file).toUri()
-                                    )
+                                USER_ATTR_AVATAR -> {
+                                    if (!request.file.isNullOrBlank()) {
+                                        contacts[index] = currentContact.copy(
+                                            avatarUri = File(request.file).toUri()
+                                        )
+                                    }
+                                }
                                 USER_ATTR_FIRSTNAME, USER_ATTR_LASTNAME ->
                                     contacts[index] = currentContact.copy(
                                         fullName = megaChatApi.getUserFullnameFromCache(currentContact.handle)
@@ -154,7 +126,33 @@ class GetContactsUseCase @Inject constructor(
                 }
             )
 
+            val globalListener = OptionalMegaGlobalListenerInterface(
+                onUsersUpdate = { users ->
+                    if (emitter.isCancelled) return@OptionalMegaGlobalListenerInterface
+
+                    users.forEach { user ->
+                        val index = contacts.indexOfFirst { it.email == user.email }
+                        if (index != NOT_FOUND) {
+                            when {
+                                user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) -> {
+                                    if (user.isOwnChange == 0) {
+                                        megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
+                                    }
+                                }
+                                user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS) ->
+                                    megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
+                                user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ->
+                                    megaApi.getUserAttribute(user.email, USER_ATTR_FIRSTNAME, userAttrsListener)
+                                user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ->
+                                    megaApi.getUserAttribute(user.email, USER_ATTR_LASTNAME, userAttrsListener)
+                            }
+                        }
+                    }
+                }
+            )
+
             megaChatApi.addChatListener(chatListener)
+            megaApi.addGlobalListener(globalListener)
 
             contacts.forEach { contact ->
                 if (contact.avatarUri == null) {
@@ -175,11 +173,43 @@ class GetContactsUseCase @Inject constructor(
 
             emitter.setDisposable(Disposable.fromAction {
                 megaChatApi.removeChatListener(chatListener)
+                megaApi.removeGlobalListener(globalListener)
             })
         }, BackpressureStrategy.LATEST)
 
     fun getMegaUser(userEmail: String): Single<MegaUser> =
         Single.fromCallable { megaApi.getContact(userEmail) }
+
+    private fun MegaUser.toContactItem(): ContactItem.Data {
+        val alias = megaChatApi.getUserAliasFromCacheDecoded(handle)
+        val fullName = megaChatApi.getUserFullnameFromCache(handle)
+        val userStatus = megaChatApi.getUserOnlineStatus(handle)
+        val userImageColor = megaApi.getUserAvatarColor(this).toColorInt()
+        val title = when {
+            !alias.isNullOrBlank() -> alias
+            !fullName.isNullOrBlank() -> fullName
+            else -> email
+        }
+        val placeholder = getImagePlaceholder(title, userImageColor)
+        val userAvatarFile = AvatarUtil.getUserAvatarFile(context, email)
+        val userAvatar = if (userAvatarFile?.exists() == true) {
+            userAvatarFile.toUri()
+        } else {
+            null
+        }
+
+        return ContactItem.Data(
+            handle = handle,
+            email = email,
+            alias = alias,
+            fullName = fullName,
+            status = userStatus,
+            statusColor = getUserStatusColor(userStatus),
+            avatarUri = userAvatar,
+            placeholder = placeholder,
+            isNew = wasRecentlyAdded()
+        )
+    }
 
     private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
         TextDrawable.builder()

@@ -5,13 +5,11 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.tabs.TabLayoutMediator
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs
 import mega.privacy.android.app.databinding.FragmentContactRequestsBinding
-import mega.privacy.android.app.utils.Constants.EVENT_CONTACT_REQUESTS_UPDATE
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 
@@ -41,7 +39,6 @@ class ContactRequestsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView(savedInstanceState)
-        setupObservers()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -75,12 +72,6 @@ class ContactRequestsFragment : Fragment() {
 
             binding.pager.currentItem = savedInstanceState?.getInt(STATE_PAGER_POSITION, defaultPosition)
                 ?: defaultPosition
-        }
-    }
-
-    private fun setupObservers() {
-        LiveEventBus.get(EVENT_CONTACT_REQUESTS_UPDATE).observe(viewLifecycleOwner) {
-            viewModel.updateRequests()
         }
     }
 
