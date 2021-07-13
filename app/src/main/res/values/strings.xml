@@ -4107,4 +4107,5 @@
     <string name="production_api_server">Production</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Change server</string>
+    <string name="version_incompatibility">We are upgrading MEGAChat. Your call might not be connected due to version incompatibility issues</string>
 </resources>
