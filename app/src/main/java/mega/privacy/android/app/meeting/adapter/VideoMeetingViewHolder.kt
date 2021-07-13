@@ -517,6 +517,9 @@ class VideoMeetingViewHolder(
 
         val borderWidth = dp2px(BORDER_WIDTH)
 
+        // Margin top for the first and second items when total item count >= 4.
+        val nonZeroMarginTop = (screenHeight - screenWidth / 2 * 3) / 2
+
         var w = 0
         var h = 0
 
@@ -526,7 +529,7 @@ class VideoMeetingViewHolder(
         var marginLeft = 0
         var marginTop = 0
         var marginRight = 0
-        var marginBottom = 0
+        val marginBottom = 0
 
         if (isFirstPage) {
             when (itemCount) {
@@ -538,9 +541,8 @@ class VideoMeetingViewHolder(
                     w = screenWidth
                     h = screenHeight / TWO_FILES
 
-                    // The 0 item has a bottom border.
                     when (adapterPosition) {
-                        POSITION_0 -> marginBottom = borderWidth
+                        POSITION_1 -> marginTop = borderWidth
                     }
                 }
                 SLOT_NUM_3 -> {
@@ -549,9 +551,8 @@ class VideoMeetingViewHolder(
                     marginLeft = (screenWidth - w) / 2
                     marginRight = marginLeft
 
-                    // The 0, 1 item have a bottom border.
                     when (adapterPosition) {
-                        POSITION_0, POSITION_1 -> marginBottom = borderWidth
+                        POSITION_1, POSITION_2 -> marginTop = borderWidth
                     }
                 }
                 SLOT_NUM_4 -> {
@@ -559,10 +560,11 @@ class VideoMeetingViewHolder(
                     h = w
 
                     when (adapterPosition) {
-                        POSITION_0, POSITION_1 -> {
-                            marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
-                            marginBottom = borderWidth
-                        }
+                        POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
+                    }
+
+                    when (adapterPosition) {
+                        POSITION_2, POSITION_3 -> marginTop = borderWidth
                     }
 
                     when (adapterPosition) {
@@ -574,13 +576,10 @@ class VideoMeetingViewHolder(
                     h = w
 
                     when (adapterPosition) {
-                        POSITION_0, POSITION_1 -> {
-                            marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
-                            marginBottom = borderWidth
-                        }
-                        POSITION_2, POSITION_3 -> {
-                            marginTop = 0
-                        }
+                        POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
+
+                        POSITION_2, POSITION_3 -> marginTop = borderWidth
+
                         POSITION_4 -> {
                             marginTop = borderWidth
                             marginLeft = (screenWidth - w) / 2
@@ -597,12 +596,9 @@ class VideoMeetingViewHolder(
                     h = w
 
                     when (adapterPosition) {
-                        POSITION_0, POSITION_1 -> {
-                            marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
-                        }
-                        POSITION_2, POSITION_3, POSITION_4, POSITION_5 -> {
-                            marginTop = borderWidth
-                        }
+                        POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
+
+                        POSITION_2, POSITION_3, POSITION_4, POSITION_5 ->  marginTop = borderWidth
                     }
 
                     when (adapterPosition) {
@@ -615,7 +611,8 @@ class VideoMeetingViewHolder(
             h = w
 
             when (adapterPosition) {
-                POSITION_0, POSITION_1 -> marginTop = ((screenHeight - screenWidth / 2 * 3) / 2)
+                POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
+
                 POSITION_2, POSITION_3, POSITION_4, POSITION_5 -> {
                     marginTop = borderWidth
                 }
