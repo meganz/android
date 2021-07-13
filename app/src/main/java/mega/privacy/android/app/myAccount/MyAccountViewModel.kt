@@ -32,9 +32,7 @@ import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask
-import mega.privacy.android.app.myAccount.usecase.Check2FAUseCase
-import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
-import mega.privacy.android.app.myAccount.usecase.UpdateMyUserAttributesUseCase
+import mega.privacy.android.app.myAccount.usecase.*
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
@@ -54,7 +52,10 @@ class MyAccountViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val setAvatarUseCase: SetAvatarUseCase,
     private val updateMyUserAttributesUseCase: UpdateMyUserAttributesUseCase,
-    private val check2FAUseCase: Check2FAUseCase
+    private val check2FAUseCase: Check2FAUseCase,
+    private val checkVersionsUseCase: CheckVersionsUseCase,
+    private val killSessionUseCase: KillSessionUseCase,
+    private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase
 ) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
 
     companion object {
@@ -64,10 +65,7 @@ class MyAccountViewModel @ViewModelInject constructor(
         const val CHECKING_2FA = "CHECKING_2FA"
     }
 
-    private val versionsInfo: MutableLiveData<MegaError> = MutableLiveData()
     private val avatar: MutableLiveData<MegaError> = MutableLiveData()
-    private val killSessions: MutableLiveData<MegaError> = MutableLiveData()
-    private val cancelSubscriptions: MutableLiveData<MegaError> = MutableLiveData()
 
     private var is2FaEnabled = false
 
@@ -75,10 +73,7 @@ class MyAccountViewModel @ViewModelInject constructor(
 
     private var setAvatarAction: ((Pair<Boolean, Boolean>) -> Unit)? = null
 
-    fun onUpdateVersionsInfoFinished(): LiveData<MegaError> = versionsInfo
     fun onGetAvatarFinished(): LiveData<MegaError> = avatar
-    fun onKillSessionsFinished(): LiveData<MegaError> = killSessions
-    fun onCancelSubscriptions(): LiveData<MegaError> = cancelSubscriptions
 
     fun getFirstName(): String = myAccountInfo.getFirstNameText()
 
@@ -123,23 +118,17 @@ class MyAccountViewModel @ViewModelInject constructor(
 
     fun isAlreadyRegisteredPhoneNumber(): Boolean = !getRegisteredPhoneNumber().isNullOrEmpty()
 
-    fun checkVersions() {
-        if (myAccountInfo.numVersions == -1) {
-            megaApi.getFolderInfo(megaApi.rootNode, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (error.errorCode == MegaError.API_OK) {
-                        val info: MegaFolderInfo = request.megaFolderInfo
-
-                        myAccountInfo.numVersions = info.numVersions
-                        myAccountInfo.previousVersionsSize = info.versionsSize
-                    } else {
-                        logError("Error refreshing info: " + error.errorString)
-                    }
-
-                    versionsInfo.value = error
-                }
-            ))
-        }
+    fun checkVersions(action: () -> Unit) {
+        if (myAccountInfo.numVersions == INVALID_VALUE) {
+            checkVersionsUseCase.check()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { action.invoke() },
+                    onError = { error -> logWarning(error.message) }
+                )
+                .addTo(composite)
+        } else action.invoke()
     }
 
     fun getAvatar(context: Context) {
@@ -156,18 +145,18 @@ class MyAccountViewModel @ViewModelInject constructor(
             ))
     }
 
-    fun killSessions() {
-        megaApi.killSession(INVALID_HANDLE, OptionalMegaRequestListenerInterface(
-            onRequestFinish = { _, error ->
-                if (error.errorCode == MegaError.API_OK) {
-                    logDebug("Success kill sessions")
-                } else {
-                    logError("Error when killing sessions: " + error.errorString)
+    fun killSessions(action: (Boolean) -> Unit) {
+        killSessionUseCase.kill()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { action.invoke(true) },
+                onError = { error ->
+                    logWarning("Error when killing sessions: ${error.message}")
+                    action.invoke(false)
                 }
-
-                killSessions.value = error
-            }
-        ))
+            )
+            .addTo(composite)
     }
 
     fun changePassword(context: Context) {
@@ -277,13 +266,18 @@ class MyAccountViewModel @ViewModelInject constructor(
                 || timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO
     }
 
-    fun cancelSubscriptions(feedback: String) {
-        megaApi.creditCardCancelSubscriptions(feedback,
-            OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, error ->
-                    cancelSubscriptions.value = error
+    fun cancelSubscriptions(feedback: String?, action: (Boolean) -> Unit) {
+        cancelSubscriptionsUseCase.cancel(feedback)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { action.invoke(true) },
+                onError = { error ->
+                    logWarning("Error when killing sessions: ${error.message}")
+                    action.invoke(false)
                 }
-            ))
+            )
+            .addTo(composite)
     }
 
     fun upgradeAccount(context: Context) {

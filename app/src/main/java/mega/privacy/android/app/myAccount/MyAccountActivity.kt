@@ -126,9 +126,11 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
 
     private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar(false) }
 
-    private val nameUpdatedObserver = Observer<Boolean> { binding.nameText.text = viewModel.getName() }
+    private val nameUpdatedObserver =
+        Observer<Boolean> { binding.nameText.text = viewModel.getName() }
 
-    private val emailUpdatedObserver = Observer<Boolean> { binding.emailText.text = viewModel.getEmail() }
+    private val emailUpdatedObserver =
+        Observer<Boolean> { binding.emailText.text = viewModel.getEmail() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -295,7 +297,7 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
     }
 
     private fun updateInfo() {
-        viewModel.checkVersions()
+        viewModel.checkVersions { refreshVersionsInfo() }
         app.refreshAccountInfo()
     }
 
@@ -318,25 +320,22 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
         LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
             .observeForever(emailUpdatedObserver)
 
-        viewModel.onUpdateVersionsInfoFinished().observe(this, ::refreshVersionsInfo)
         viewModel.onGetAvatarFinished().observe(this, ::setAvatar)
-        viewModel.onKillSessionsFinished().observe(this, ::showKillSessionsResult)
-        viewModel.onCancelSubscriptions().observe(this, ::showCancelSubscriptionsResult)
     }
 
-    private fun showKillSessionsResult(error: MegaError) {
+    private fun showKillSessionsResult(success: Boolean) {
         showSnackbar(
             StringResourcesUtils.getString(
-                if (error.errorCode == API_OK) R.string.success_kill_all_sessions
+                if (success) R.string.success_kill_all_sessions
                 else R.string.error_kill_all_sessions
             )
         )
     }
 
-    private fun showCancelSubscriptionsResult(error: MegaError) {
+    private fun showCancelSubscriptionsResult(success: Boolean) {
         showSnackbar(
             StringResourcesUtils.getString(
-                if (error.errorCode == API_OK) R.string.cancel_subscription_ok
+                if (success) R.string.cancel_subscription_ok
                 else R.string.cancel_subscription_error
             )
         )
@@ -353,7 +352,7 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
             .setTitle(StringResourcesUtils.getString(R.string.confirmation_close_sessions_title))
             .setMessage(StringResourcesUtils.getString(R.string.confirmation_close_sessions_text))
             .setPositiveButton(StringResourcesUtils.getString(R.string.contact_accept)) { _, _ ->
-                viewModel.killSessions()
+                viewModel.killSessions { success -> showKillSessionsResult(success) }
             }.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
             .show()
     }
@@ -406,7 +405,9 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
         cancelSubscriptionsConfirmationDialog = MaterialAlertDialogBuilder(this)
             .setMessage(StringResourcesUtils.getString(R.string.confirmation_cancel_subscriptions))
             .setPositiveButton(StringResourcesUtils.getString(R.string.general_yes)) { _, _ ->
-                viewModel.cancelSubscriptions(cancelSubscriptionsFeedback!!)
+                viewModel.cancelSubscriptions(cancelSubscriptionsFeedback) { success ->
+                    showCancelSubscriptionsResult(success)
+                }
             }.setNegativeButton(StringResourcesUtils.getString(R.string.general_no), null)
             .show()
     }
@@ -864,10 +865,8 @@ class MyAccountActivity : PasscodeActivity(), Scrollable, PhoneNumberCallback {
         }
     }
 
-    private fun refreshVersionsInfo(error: MegaError) {
-        if (error.errorCode == API_OK) {
-            //Update versions info
-        }
+    private fun refreshVersionsInfo() {
+
     }
 
     private fun setAvatar(error: MegaError) {
