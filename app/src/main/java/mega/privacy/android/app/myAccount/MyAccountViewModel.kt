@@ -61,6 +61,7 @@ class MyAccountViewModel @ViewModelInject constructor(
         private const val CLICKS_TO_STAGING = 5
         private const val TIME_TO_SHOW_PAYMENT_INFO = 604800 //1 week in seconds
         const val PROCESSING_FILE = "PROCESSING_FILE"
+        const val CHECKING_2FA = "CHECKING_2FA"
     }
 
     private val versionsInfo: MutableLiveData<MegaError> = MutableLiveData()
@@ -462,7 +463,7 @@ class MyAccountViewModel @ViewModelInject constructor(
                         .putExtra(VerifyTwoFactorActivity.KEY_NEW_EMAIL, newEmail)
                 )
 
-                null
+                CHECKING_2FA
             }
             else -> {
                 updateMyUserAttributesUseCase.updateEmail(newEmail)

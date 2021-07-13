@@ -29,6 +29,7 @@ import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.phoneNumber.PhoneNumberCallback
 import mega.privacy.android.app.myAccount.MyAccountViewModel
+import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_2FA
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.PROCESSING_FILE
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -570,7 +571,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
                         binding.progressBar.isVisible = error == null
 
-                        if (error != null) {
+                        if (error != null && error != CHECKING_2FA) {
                             setEditTextError(
                                 error,
                                 dialogBinding.emailLayout,
