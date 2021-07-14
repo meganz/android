@@ -10,10 +10,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Surface
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.LinearLayout
-import android.widget.PopupWindow
-import android.widget.TextView
+import android.widget.*
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
 import org.jetbrains.anko.contentView
@@ -57,10 +54,13 @@ class HighLightHintHelper(private val activity: Activity) {
     private fun navigationBarOnLeft(): Boolean {
         val windowManager = activity.windowManager
 
-        // On Android 8 and below, navigation bar is always at right side.
-        if(Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) return false
-
         if (!hasNavigationBar()) return false
+
+        // If it's a tablet.
+        if(Util.isTablet(activity)) return false
+
+        // If it's a HUAWEI device.
+        if(MANUFACTURE_HUAWEI.equals(Build.MANUFACTURER, true)) return false
 
         // Rotate to right, navigation bar will stay at the left of the screen.
         return windowManager.defaultDisplay.rotation == Surface.ROTATION_270
@@ -188,15 +188,9 @@ class HighLightHintHelper(private val activity: Activity) {
     ).apply {
         val arrowLeft =
             targetLocation.left + (targetLocation.right - targetLocation.left) / 2 - arrowSize / 2
-        val exceedsPart = hintLayoutWidth + arrowLeft - screenWidth
 
-        leftMargin = if (exceedsPart >= 0) {
-            // Exceeds screen end. (screenWidth - arrowLeft - arrowSize) / 4 is a bit of offset.
-            arrowLeft - exceedsPart - (screenWidth - arrowLeft - arrowSize) / 4
-        } else {
-            // arrowLeft / 6 is a bit of offset.
-            arrowLeft / 6
-        } + navigationBarHeight
+        // arrowLeft / 6 is a bit of offset.
+        leftMargin = arrowLeft / 6 + navigationBarHeight
 
         topMargin =
             targetLocation.bottom + statusBarHeight + arrowSize + (textCoverHeight - (targetLocation.bottom - targetLocation.top)) / 2
@@ -306,6 +300,7 @@ class HighLightHintHelper(private val activity: Activity) {
 
     companion object {
 
+        const val MANUFACTURE_HUAWEI = "HUAWEI"
         const val ARROW_SIZE_DP = 16f
         const val HINT_LAYOUT_WIDTH_DP = 290f
         const val HINT_LAYOUT_HEIGHT_DP = 75f
