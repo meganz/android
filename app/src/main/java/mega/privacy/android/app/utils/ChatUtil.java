@@ -457,11 +457,18 @@ public class ChatUtil {
      * @param isFromKeyboard If it's from the keyboard.
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, Emoji emoji, boolean isFromKeyboard) {
-        if (!(context instanceof ChatActivityLollipop))
+        if (!(context instanceof ChatActivityLollipop)) {
+            logWarning("Incorrect context");
             return;
+        }
 
         EmojiEditText editText = new EmojiEditText(context);
         editText.input(emoji);
+        if (editText.getText() == null) {
+            logError("Text null");
+            return;
+        }
+
         String reaction = editText.getText().toString();
         addReactionInMsg(context, chatId, messageId, reaction, isFromKeyboard);
     }
@@ -476,16 +483,17 @@ public class ChatUtil {
      * @param isFromKeyboard If it's from the keyboard.
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, String reaction, boolean isFromKeyboard) {
-        if (!(context instanceof ChatActivityLollipop))
+        if (!(context instanceof ChatActivityLollipop)) {
+            logWarning("Incorrect context");
             return;
+        }
 
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-
-        if (isMyOwnReaction(chatId, messageId, reaction)) {
-            if (!isFromKeyboard) {
-                megaChatApi.delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
-            }
+        if (isMyOwnReaction(chatId, messageId, reaction) && !isFromKeyboard) {
+            logDebug("Removing reaction...");
+            megaChatApi.delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
         } else {
+            logDebug("Adding reaction...");
             megaChatApi.addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
         }
     }
