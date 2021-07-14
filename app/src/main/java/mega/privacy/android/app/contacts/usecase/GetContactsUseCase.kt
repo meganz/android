@@ -25,7 +25,7 @@ import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
 import mega.privacy.android.app.utils.MegaUserUtils.isExternalChange
 import mega.privacy.android.app.utils.MegaUserUtils.isRequestedChange
 import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
-import mega.privacy.android.app.utils.StringUtils.decodeAliases
+import mega.privacy.android.app.utils.StringUtils.decodedAliases
 import mega.privacy.android.app.utils.StringUtils.decodeBase64
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.view.TextDrawable
@@ -85,7 +85,7 @@ class GetContactsUseCase @Inject constructor(
 
                             emitter.onNext(contacts.sortedAlphabetically())
                         } else if (request.paramType == USER_ATTR_ALIAS) {
-                            val requestAliases = request.megaStringMap.decodeAliases()
+                            val requestAliases = request.megaStringMap.decodedAliases()
 
                             contacts.forEachIndexed { indexToUpdate, contact ->
                                 var newAlias: String? = null
