@@ -55,13 +55,13 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
+import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.OnDragTouchListener
-import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
@@ -2189,14 +2189,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun leaveMeeting() {
         inMeetingViewModel.leaveMeeting()
         if (inMeetingViewModel.amIAGuest()) {
-            meetingActivity.startActivity(
-                Intent(
-                    meetingActivity,
-                    LeftMeetingActivity::class.java
-                )
-            )
-
-            finishActivity()
+            AccountController.logout(meetingActivity, MegaApplication.getInstance().megaApi)
         } else {
             checkIfAnotherCallShouldBeShown()
         }
@@ -2328,6 +2321,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onDestroy() {
         super.onDestroy()
 
+        removeUI()
         logDebug("Fragment destroyed")
         CallUtil.activateChrono(false, meetingChrono, null)
         MegaApplication.getInstance().unregisterProximitySensor()
