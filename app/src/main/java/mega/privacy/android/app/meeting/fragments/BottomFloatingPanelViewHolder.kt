@@ -237,6 +237,10 @@ class BottomFloatingPanelViewHolder(
      * Init the state for the Mic, Cam and End button on button bar
      */
     private fun initButtonsState() {
+        disableEnableButtons(
+            inMeetingViewModel.isCallEstablished(),
+            inMeetingViewModel.isCallOnHold()
+        )
         floatingPanelView.fabMic.isOn = savedMicState
         floatingPanelView.fabCam.isOn = savedCamState
         updateSpeakerIcon(savedSpeakerState)
@@ -299,6 +303,21 @@ class BottomFloatingPanelViewHolder(
         initUpdaters()
     }
 
+    /**
+     * Method that disables or enables buttons depending on whether the call is connected or not
+     *
+     * @param isCallEstablished True, if the call is connected. False, otherwise
+     * @param isHold True, if the call is on hold. False, otherwise
+     */
+    fun disableEnableButtons(isCallEstablished: Boolean, isHold: Boolean) {
+        val shouldBeEnable = !(!isCallEstablished || isHold)
+        floatingPanelView.apply {
+            fabMic.enable = shouldBeEnable
+            fabCam.enable = shouldBeEnable
+            fabHold.enable = isCallEstablished
+            fabHold.isOn = !isHold
+        }
+    }
 
     /**
      * Init listener for all the button
@@ -570,7 +589,7 @@ class BottomFloatingPanelViewHolder(
      */
     fun enableHoldIcon(isEnabled: Boolean, isHold: Boolean) {
         floatingPanelView.fabHold.enable = isEnabled
-        updateHoldIcon(isHold)
+        disableEnableButtons(inMeetingViewModel.isCallEstablished(), isHold)
     }
 
     /**
@@ -598,17 +617,6 @@ class BottomFloatingPanelViewHolder(
             if (existsAnotherCallOnHold) R.drawable.ic_call_swap
             else R.drawable.ic_transfers_pause
         )
-    }
-
-    /**
-     * Method that enables or disables the mic and camera buttons when the call on hold status is changed
-     *
-     * @param isHold True, if the call is on hold. False, otherwise
-     */
-    fun updateHoldIcon(isHold: Boolean) {
-        floatingPanelView.fabHold.isOn = !isHold
-        floatingPanelView.fabMic.enable = !isHold
-        floatingPanelView.fabCam.enable = !isHold
     }
 
     /**

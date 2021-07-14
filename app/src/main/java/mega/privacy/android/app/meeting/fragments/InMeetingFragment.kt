@@ -235,8 +235,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             updatePanelAndToolbar(it)
 
             when (it.status) {
+                MegaChatCall.CALL_STATUS_INITIAL, MegaChatCall.CALL_STATUS_JOINING -> {
+                    bottomFloatingPanelViewHolder.disableEnableButtons(
+                        false,
+                        inMeetingViewModel.isCallOnHold()
+                    )
+                }
                 MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> finishActivity()
                 MegaChatCall.CALL_STATUS_CONNECTING -> {
+                    bottomFloatingPanelViewHolder.disableEnableButtons(
+                        false,
+                        inMeetingViewModel.isCallOnHold()
+                    )
+
                     if (inMeetingViewModel.isReconnectingStatus) {
                         reconnecting()
                     } else {
@@ -247,6 +258,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     checkMenuItemsVisibility()
                 }
                 MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
+                    bottomFloatingPanelViewHolder.disableEnableButtons(
+                        true,
+                        inMeetingViewModel.isCallOnHold()
+                    )
                     checkCurrentParticipants()
                     checkMenuItemsVisibility()
                     checkChildFragments()
@@ -462,6 +477,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        logDebug("In the meeting fragment")
         MegaApplication.getInstance().startProximitySensor()
         initToolbar()
         initFloatingWindowContainerDragListener(view)
@@ -1688,6 +1704,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param micOn True, if the microphone is on. False, if the microphone is off
      */
     override fun onChangeMicState(micOn: Boolean) {
+        logDebug("Change in mic state")
         sharedModel.clickMic(!micOn)
     }
 
@@ -1845,7 +1862,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun isCallOnHold(isHold: Boolean) {
         logDebug("Changes in the on hold status of the call")
         bottomFloatingPanelViewHolder.let {
-            bottomFloatingPanelViewHolder.updateHoldIcon(isHold)
+            bottomFloatingPanelViewHolder.disableEnableButtons(
+                inMeetingViewModel.isCallEstablished(),
+                isHold
+            )
         }
 
         showMuteBanner()
@@ -1870,6 +1890,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * @param camOn True, if the camera is switched on. False, if the camera is switched off
      */
     override fun onChangeCamState(camOn: Boolean) {
+        logDebug("Change in camera state")
         sharedModel.clickCamera(!camOn)
     }
 
@@ -2101,6 +2122,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Change Speaker state
      */
     override fun onChangeSpeakerState() {
+        logDebug("Change in speaker state")
         sharedModel.clickSpeaker()
     }
 

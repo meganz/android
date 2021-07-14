@@ -324,6 +324,15 @@ class InMeetingViewModel @ViewModelInject constructor(
             ?: false
 
     /**
+     * Method to know if a call is in progress status
+     *
+     * @return True, if the chas is in progress. False, otherwise.
+     */
+    fun isCallEstablished(): Boolean =
+        _callLiveData.value?.let { (it.status == CALL_STATUS_IN_PROGRESS) }
+            ?: false
+
+    /**
      * Method to know if a call is on hold
      *
      * @return True, if is on hold. False, otherwise

@@ -3198,7 +3198,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 logDebug("The call in this chat is In progress, but I do not participate");
                 addChecksForACall(chatRoom.getChatId(), startVideo);
                 callInProgressLayout.setEnabled(false);
-                megaChatApi.answerChatCall(idChat, startVideo, true, new AnswerChatCallListener(this, this));
+                megaChatApi.answerChatCall(idChat, startVideo, !chatRoom.isMeeting(), new AnswerChatCallListener(this, this));
             }
             return;
         }

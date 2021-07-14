@@ -599,13 +599,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				}
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
+					getChatManagement().setNotificationShown(chatId);
 					logDebug("Is ongoing call");
 					ongoingCall(chatId, (isOutgoing && getChatManagement().isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
 				}
 				break;
 
 			case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-				logDebug("The user is no longer participating");
 				clearIncomingCallNotification(callId);
 				removeValues(chatId);
 				getChatManagement().setRequestSentCall(callId, false);
@@ -1419,7 +1419,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	@Override
 	public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
-
 	}
 
 	@Override
