@@ -445,6 +445,8 @@
     <color name="black_grey_alpha_012">@color/black</color>
     <color name="grey_alpha_012_black">@color/grey_alpha_012</color>
 
+    <color name="white_teal_100">@color/white</color>
+
     <!--   my account -->
     <color name="grey_020_black">@color/grey_020</color>
     <color name="grey_050_grey_700">@color/grey_050</color>

@@ -490,7 +490,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Anfrage erneut gesendet</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Anfrage an %s verschickt. Der Status ist unter “Gesendete Anfragen” einsehbar.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Kontakt gelöscht</string>
     <!-- error message -->
@@ -3969,4 +3969,8 @@
         <item quantity="one">Upload in progress, 1 file pending</item>
         <item quantity="other">Upload in progress, %1$d files pending</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Change server</string>
 </resources>

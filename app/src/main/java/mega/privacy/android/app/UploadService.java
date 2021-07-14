@@ -25,7 +25,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
 
-import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
@@ -53,9 +52,9 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_TEXT_FILE_UPLOADED;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
+import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
@@ -345,7 +344,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         final File file = new File(filePath);
         logDebug("File to manage: " + file.getAbsolutePath());
 
-        boolean isTextFile = intent.getBooleanExtra(EXTRA_UPLOAD_TXT, false);
+        String textFileMode = intent.getStringExtra(EXTRA_UPLOAD_TXT);
         long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
         String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
         String nameInMEGAEdited = intent.getStringExtra(EXTRA_NAME_EDITED);
@@ -356,8 +355,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 
-        if (isTextFile) {
-            megaApi.startUploadWithTopPriority(file.getAbsolutePath(), parentNode, APP_DATA_TXT_FILE, true, nameInMEGA);
+        if (!isTextEmpty(textFileMode)) {
+            boolean fromHome = intent.getBooleanExtra(FROM_HOME_PAGE, false);
+            String appData = APP_DATA_TXT_FILE + APP_DATA_INDICATOR + textFileMode
+                    + APP_DATA_INDICATOR + fromHome;
+
+            megaApi.startUploadWithTopPriority(file.getAbsolutePath(), parentNode, appData, true, nameInMEGA);
         } else if (file.isDirectory()) {
             // Folder upload
             totalFolderUploads++;
@@ -823,9 +826,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		        AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
                 addCompletedTransfer(completedTransfer);
 
-                if (APP_DATA_TXT_FILE.equals(transfer.getAppData())) {
-                    LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long.class)
-                            .post(completedTransfer.getId());
+                String appData = transfer.getAppData();
+
+                if (!isTextEmpty(appData) && appData.contains(APP_DATA_TXT_FILE)) {
+                    sendBroadcast(new Intent(BROADCAST_ACTION_SHOW_SNACKBAR)
+                            .putExtra(SNACKBAR_TEXT, getCreationOrEditorText(transfer, error)));
                 }
 
                 if (transfer.getState() == MegaTransfer.STATE_FAILED) {
