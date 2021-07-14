@@ -627,12 +627,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
 		if (chatRoom != null && call.getCallCompositionChange() == 1 && call.getNumParticipants() > 1) {
 			logDebug("Stop sound");
-			if (chatRoom.isMeeting()) {
-				removeRTCAudioManagerRingIn();
-			} else if (megaChatApi.getMyUserHandle() == call.getPeeridCallCompositionChange()) {
+			if (megaChatApi.getMyUserHandle() == call.getPeeridCallCompositionChange()) {
 				stopService(new Intent(getInstance(), IncomingCallService.class));
 				removeRTCAudioManagerRingIn();
 				LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
+			} else if (chatRoom.isMeeting()) {
+				removeRTCAudioManagerRingIn();
 			}
 		}
 	};
