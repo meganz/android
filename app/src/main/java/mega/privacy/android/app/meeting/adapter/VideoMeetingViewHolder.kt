@@ -478,7 +478,6 @@ class VideoMeetingViewHolder(
                     when (adapterPosition) {
                         POSITION_0 -> {
                             w -= borderWidth
-                            marginRight = borderWidth
                         }
                     }
                 }
@@ -489,48 +488,39 @@ class VideoMeetingViewHolder(
                     when (adapterPosition) {
                         POSITION_0, POSITION_1 -> {
                             w -= borderWidth
-                            marginRight = borderWidth
                         }
                     }
                 }
                 SLOT_NUM_4 -> {
                     w = (screenWidth / FOUR_COLUMNS)
-                    h = (screenHeight / TWO_FILES)
+                    h = (screenHeight - borderWidth) / TWO_FILES
                     when (adapterPosition) {
                         POSITION_0 -> {
                             w -= borderWidth
-                            h -= borderWidth
-                            marginRight = borderWidth
                             marginBottom = borderWidth
                         }
                         POSITION_1 -> {
-                            h -= borderWidth
                             marginBottom = borderWidth
                         }
                         POSITION_2 -> {
                             w -= borderWidth
-                            marginRight = borderWidth
                         }
                     }
                 }
                 SLOT_NUM_5 -> {
                     w = screenWidth / FOUR_COLUMNS
-                    h = screenHeight / TWO_FILES
+                    h = (screenHeight - borderWidth) / TWO_FILES
 
                     when (adapterPosition) {
                         POSITION_0, POSITION_1 -> {
                             w -= borderWidth
-                            h -= borderWidth
-                            marginRight = borderWidth
                             marginBottom = borderWidth
                         }
                         POSITION_2 -> {
-                            h -= borderWidth
                             marginBottom = borderWidth
                         }
                         POSITION_3 -> {
                             w -= borderWidth
-                            marginRight = borderWidth
                             marginLeft = w / 2
                         }
                         POSITION_4 -> {
@@ -539,46 +529,35 @@ class VideoMeetingViewHolder(
                     }
                 }
                 SLOT_NUM_6 -> {
-                    w = (screenWidth / FOUR_COLUMNS)
-                    h = (screenHeight / TWO_FILES)
+                    w = screenWidth / FOUR_COLUMNS
+                    h = (screenHeight - borderWidth) / TWO_FILES
                     when (adapterPosition) {
                         POSITION_0, POSITION_1 -> {
                             w -= borderWidth
-                            h -= borderWidth
-                            marginRight = borderWidth
                             marginBottom = borderWidth
                         }
                         POSITION_2 -> {
-                            h -= borderWidth
                             marginBottom = borderWidth
                         }
                         POSITION_3, POSITION_4 -> {
                             w -= borderWidth
-                            h -= borderWidth
-                            marginRight = borderWidth
                         }
                     }
                 }
             }
         } else {
-            w = (screenWidth / FOUR_COLUMNS)
-            h = (screenHeight / TWO_FILES)
-
+            w = screenWidth / FOUR_COLUMNS
+            h = (screenHeight - borderWidth) / TWO_FILES
             when (adapterPosition) {
                 POSITION_0, POSITION_1 -> {
                     w -= borderWidth
-                    h -= borderWidth
-                    marginRight = borderWidth
                     marginBottom = borderWidth
                 }
                 POSITION_2 -> {
-                    h -= borderWidth
                     marginBottom = borderWidth
                 }
                 POSITION_3, POSITION_4 -> {
                     w -= borderWidth
-                    h -= borderWidth
-                    marginRight = borderWidth
                 }
             }
         }
