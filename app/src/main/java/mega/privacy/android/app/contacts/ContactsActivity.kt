@@ -2,7 +2,9 @@ package mega.privacy.android.app.contacts
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -16,6 +18,7 @@ import mega.privacy.android.app.databinding.ActivityContactsBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
+import mega.privacy.android.app.utils.Util
 
 @AndroidEntryPoint
 class ContactsActivity : PasscodeActivity(), SnackbarShower {
@@ -112,6 +115,10 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
 
     fun showElevation(show: Boolean) {
         binding.toolbar.elevation = if (show) toolbarElevation else 0F
+        if (Util.isDarkMode(this)) {
+            val color = if (show) R.color.action_mode_background else R.color.dark_grey
+            window.statusBarColor = ContextCompat.getColor(this, color)
+        }
     }
 
     private fun getNavController(): NavController =

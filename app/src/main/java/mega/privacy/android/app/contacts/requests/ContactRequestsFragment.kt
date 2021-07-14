@@ -7,11 +7,13 @@ import androidx.fragment.app.viewModels
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestPageAdapter.Tabs
 import mega.privacy.android.app.databinding.FragmentContactRequestsBinding
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
+import mega.privacy.android.app.utils.Util
 
 @AndroidEntryPoint
 class ContactRequestsFragment : Fragment() {
@@ -77,5 +79,8 @@ class ContactRequestsFragment : Fragment() {
 
     fun showElevation(show: Boolean) {
         binding.tabs.elevation = if (show) toolbarElevation else 0F
+        if (Util.isDarkMode(requireContext())) {
+            (activity as ContactsActivity?)?.showElevation(show)
+        }
     }
 }
