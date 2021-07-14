@@ -291,13 +291,19 @@ class GridViewPagerAdapter(
                                     else -> {
                                         logDebug("First page, update position only")
                                         var rangeToUpdate = position
-                                        if (participantsForPage.size <= 5 && position == 5) {
-                                            rangeToUpdate = if (isLandscape()) {
-                                                position - 2
-                                            } else {
-                                                position - 1
+
+                                        if (participantsForPage.size <= 5) {
+                                            if (position == 5) {
+                                                rangeToUpdate = if (isLandscape()) {
+                                                    position - 2
+                                                } else {
+                                                    position - 1
+                                                }
+                                            } else if (position == 4 && isLandscape()) {
+                                                rangeToUpdate = position - 1
                                             }
                                         }
+
                                         it.notifyItemRemoved(position)
                                         it.notifyItemRangeRemoved(
                                             rangeToUpdate,

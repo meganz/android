@@ -317,6 +317,12 @@ class GridViewCallFragment : MeetingBaseFragment() {
      */
     fun updateLayout(widthPixels: Int, heightPixels: Int) {
         adapterPager.updateOrientation(widthPixels, heightPixels)
+
+        val currentItem = viewDataBinding.gridViewPager.currentItem
+        if (currentItem != null) {
+            viewDataBinding.gridViewPager.adapter = adapterPager
+            viewDataBinding.gridViewPager.currentItem = currentItem
+        }
     }
 
     /**
