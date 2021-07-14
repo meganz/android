@@ -47,6 +47,8 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     protected var meetingName = ""
     protected var chatId: Long = MEGACHAT_INVALID_HANDLE
+    protected var publicChatHandle: Long = MEGACHAT_INVALID_HANDLE
+
     protected var meetingLink = ""
 
     var mRootViewHeight: Int = 0
@@ -127,6 +129,9 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             args.getLong(MeetingActivity.MEETING_CHAT_ID).let {
                 chatId = it
                 sharedModel.updateChatRoomId(chatId)
+            }
+            args.getLong(MeetingActivity.MEETING_PUBLIC_CHAT_HANDLE).let {
+                publicChatHandle = it
             }
         }
     }

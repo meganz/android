@@ -1346,9 +1346,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			if(e.getErrorCode()==MegaChatError.ERROR_OK){
 				logDebug("OK:TYPE_PUSH_RECEIVED");
 				chatNotificationReceived = true;
-				ChatAdvancedNotificationBuilder notificationBuilder;
-				notificationBuilder =  ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-				notificationBuilder.generateChatNotification(request);
+				if (!getMegaApi().isEphemeralPlusPlus()) {
+					ChatAdvancedNotificationBuilder	notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
+					notificationBuilder.generateChatNotification(request);
+				}
 			}
 			else{
 				logError("Error TYPE_PUSH_RECEIVED: " + e.getErrorString());

@@ -139,7 +139,6 @@ class InMeetingRepository @Inject constructor(
     fun getChatRoom(chatId: Long): MegaChatRoom? =
         if (chatId == MEGACHAT_INVALID_HANDLE) null else megaChatApi.getChatRoom(chatId)
 
-
     /**
      * Get contact name
      *
@@ -506,6 +505,15 @@ class InMeetingRepository @Inject constructor(
             MegaApplication.getChatManagement().addJoiningChatId(chatId)
             megaChatApi.autojoinPublicChat(chatId, listener)
         }
+    }
+
+    fun rejoinPublicChat(
+        chatId: Long,
+        publicChatHandle: Long,
+        listener: MegaChatRequestListenerInterface
+    ) {
+        logDebug("Rejoining to public chat with ID $chatId")
+        megaChatApi.autorejoinPublicChat(chatId, publicChatHandle, listener)
     }
 
     fun registerConnectionUpdateListener(chatId: Long, callback: () -> Unit) =

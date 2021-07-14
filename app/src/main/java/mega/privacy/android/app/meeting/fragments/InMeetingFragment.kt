@@ -66,6 +66,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_GUEST
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_REJOIN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
@@ -555,6 +556,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     AutoJoinPublicChatListener(requireContext(), this)
                 )
             }
+            MEETING_ACTION_REJOIN -> {
+                logDebug("Action rejoin")
+                updateMicAndCam()
+
+                if (args.publicChatHandle != MEGACHAT_INVALID_HANDLE) {
+                    inMeetingViewModel.rejoinPublicChat(
+                        args.chatId, args.publicChatHandle,
+                        AutoJoinPublicChatListener(requireContext(), this)
+                    )
+                }
+
+            }
             MEETING_ACTION_GUEST -> {
                 logDebug("Action guest")
                 inMeetingViewModel.chatLogout(ChatRequestListener(onSuccess = { _, _, _ ->
@@ -945,7 +958,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     fun onPageClick() {
         // If the tips is showing or bottom is fully expanded, can not hide the toolbar and panel
         if (bottomFloatingPanelViewHolder.isPopWindowShowing()
-            || bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) return
+            || bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED
+        ) return
 
         // Prevent fast tapping.
         if (System.currentTimeMillis() - lastTouch < TAP_THRESHOLD) return
@@ -1503,6 +1517,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                             }
                         }
                     }
+
                 } else {
                     channel.cancel()
                     meetingActivity.snackbar?.dismiss()
@@ -2168,7 +2183,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     /**
      * Method to control when call ended
      */
-    @ObsoleteCoroutinesApi
     private fun finishActivity() {
         logDebug("Finishing the activity")
         channel.cancel()
@@ -2384,7 +2398,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    override fun onErrorJoinedChat(chatId: Long, error: Int) {
+    override fun onErrorJoinedChat(chatId: Long, userHandle: Long, error: Int) {
         logDebug("Error joining the meeting so close it, error code is $error")
         finishActivity()
     }

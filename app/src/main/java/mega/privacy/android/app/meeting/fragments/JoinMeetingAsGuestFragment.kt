@@ -15,6 +15,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 
 @AndroidEntryPoint
@@ -37,6 +38,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
             .actionGlobalInMeeting(
                 MeetingActivity.MEETING_ACTION_GUEST,
                 chatId,
+                MEGACHAT_INVALID_HANDLE,
                 meetingName,
                 meetingLink,
                 firstName,

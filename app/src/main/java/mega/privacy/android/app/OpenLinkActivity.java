@@ -529,7 +529,7 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 	}
 
 	@Override
-	public void onPreviewLoaded(MegaChatRequest request) {
+	public void onPreviewLoaded(MegaChatRequest request, boolean alreadyExist) {
 		long chatId = request.getChatHandle();
 		boolean isFromOpenChatPreview = request.getFlag();
 		int type = request.getParamType();

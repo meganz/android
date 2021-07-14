@@ -26,6 +26,7 @@ class MeetingActivity : PasscodeActivity() {
         /** The name of actions denoting set
         JOIN/CREATE/JOIN AS GUEST/In-meeting screen as the initial screen */
         const val MEETING_ACTION_JOIN = "join_meeting"
+        const val MEETING_ACTION_REJOIN = "rejoin_meeting"
         const val MEETING_ACTION_CREATE = "create_meeting"
         const val MEETING_ACTION_GUEST = "join_meeting_as_guest"
         const val MEETING_ACTION_IN = "in_meeting"
@@ -38,6 +39,7 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_NAME = "meeting_name"
         const val MEETING_LINK = "meeting_link"
         const val MEETING_CHAT_ID = "chat_id"
+        const val MEETING_PUBLIC_CHAT_HANDLE = "public_chat_handle"
         const val MEETING_AUDIO_ENABLE = "audio_enable"
         const val MEETING_VIDEO_ENABLE = "video_enable"
         const val MEETING_IS_GUEST = "is_guest"
@@ -133,6 +135,11 @@ class MeetingActivity : PasscodeActivity() {
             intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
         )
 
+        bundle.putLong(
+            MEETING_PUBLIC_CHAT_HANDLE,
+            intent.getLongExtra(MEETING_PUBLIC_CHAT_HANDLE, MEGACHAT_INVALID_HANDLE)
+        )
+
         // Pass the meeting data to Join Meeting screen
         if (meetingAction == MEETING_ACTION_GUEST || meetingAction == MEETING_ACTION_JOIN) {
             bundle.putString(MEETING_LINK, intent.dataString)
@@ -170,7 +177,7 @@ class MeetingActivity : PasscodeActivity() {
 
         navGraph.startDestination = when (meetingAction) {
             MEETING_ACTION_CREATE -> R.id.createMeetingFragment
-            MEETING_ACTION_JOIN -> R.id.joinMeetingFragment
+            MEETING_ACTION_JOIN, MEETING_ACTION_REJOIN -> R.id.joinMeetingFragment
             MEETING_ACTION_GUEST -> R.id.joinMeetingAsGuestFragment
             MEETING_ACTION_START, MEETING_ACTION_IN -> R.id.inMeetingFragment
             MEETING_ACTION_RINGING -> R.id.ringingMeetingFragment

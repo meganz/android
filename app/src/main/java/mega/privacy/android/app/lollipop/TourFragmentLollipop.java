@@ -28,6 +28,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
@@ -291,6 +292,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                 break;
             case R.id.join_meeting_as_guest:
                 logDebug("onJoinMeetingAsGuestClick");
+                MegaApplication.setLoggingOut(false);
                 new PasteMeetingLinkGuestDialogFragment().show(getChildFragmentManager(),
                         PasteMeetingLinkGuestDialogFragment.TAG);
                 break;

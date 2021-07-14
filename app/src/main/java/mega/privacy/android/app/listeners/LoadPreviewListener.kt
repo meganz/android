@@ -44,7 +44,7 @@ class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
             else -> {
                 if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_EEXIST) {
                     logDebug("Preview loaded")
-                    callback?.onPreviewLoaded(request)
+                    callback?.onPreviewLoaded(request, e.errorCode == MegaError.API_EEXIST)
                 } else {
                     LogUtil.logError("Error loading preview. Error code " + e.errorCode)
                     callback?.onErrorLoadingPreview(e.errorCode)
@@ -54,7 +54,7 @@ class LoadPreviewListener(context: Context?) : ChatBaseListener(context) {
     }
 
     interface OnPreviewLoadedCallback {
-        fun onPreviewLoaded(request: MegaChatRequest)
+        fun onPreviewLoaded(request: MegaChatRequest, alreadyExist: Boolean)
 
         fun onErrorLoadingPreview(errorCode: Int)
     }

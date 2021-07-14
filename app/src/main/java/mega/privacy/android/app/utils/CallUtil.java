@@ -85,12 +85,17 @@ public class CallUtil {
      * @param meetingName Meeting Name
      * @param link        Meeting's link
      */
-    public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link) {
+    public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link, long publicChatHandle, boolean isRejoin) {
         logDebug("Open join a meeting screen:: chatId = "+chatId);
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
-        meetingIntent.setAction(MEETING_ACTION_JOIN);
+        if (isRejoin) {
+            meetingIntent.setAction(MEETING_ACTION_JOIN);
+            meetingIntent.putExtra(MEETING_PUBLIC_CHAT_HANDLE, publicChatHandle);
+        } else {
+            meetingIntent.setAction(MEETING_ACTION_JOIN);
+        }
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
         meetingIntent.putExtra(MEETING_NAME, meetingName);
         meetingIntent.setData(Uri.parse(link));
@@ -1211,26 +1216,33 @@ public class CallUtil {
      * @param list                  The MegaHandleList with the call ID
      * @param titleChat             The title of the chat
      */
-    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, MegaHandleList list, String titleChat) {
+    public static void checkMeetingInProgress(Context context, LoadPreviewListener.OnPreviewLoadedCallback activity, long chatId, boolean isFromOpenChatPreview, String link, MegaHandleList list, String titleChat, boolean alreadyExist, long publicChatHandle) {
         if (amIParticipatingInThisMeeting(chatId)) {
             logDebug("I am participating in the meeting of this meeting link");
             returnCall(context, chatId);
-        } else if (amIParticipatingInAnotherCall(chatId)) {
+            return;
+        }
+
+        if (amIParticipatingInAnotherCall(chatId)) {
             logDebug("I am participating in another call");
             showConfirmationInACall(context);
-        } else if (isFromOpenChatPreview) {
+            return;
+        }
+
+        if (isFromOpenChatPreview) {
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
             if (call == null || call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                 logDebug("Call id: " + list.get(0) + ". It's a meeting, open to join");
-                CallUtil.openMeetingToJoin(context, chatId, titleChat, link);
+                CallUtil.openMeetingToJoin(context, chatId, titleChat, link, alreadyExist ? publicChatHandle : MEGACHAT_INVALID_HANDLE, alreadyExist);
             } else {
                 logDebug("Call id: " + list.get(0) + ". Return to call");
                 returnCall(context, chatId);
             }
-        } else {
-            logDebug("Open chat preview");
-            MegaApplication.getInstance().getMegaChatApi().openChatPreview(link, new LoadPreviewListener(context, activity, CHECK_LINK_TYPE_MEETING_LINK));
+            return;
         }
+
+        logDebug("Open chat preview");
+        MegaApplication.getInstance().getMegaChatApi().openChatPreview(link, new LoadPreviewListener(context, activity, CHECK_LINK_TYPE_MEETING_LINK));
     }
 
     /**
