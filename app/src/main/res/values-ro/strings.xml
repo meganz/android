@@ -497,7 +497,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Cerere retrimisă</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Cererea trimisă cu succes la %s. Starea poate fi consultată în fila Cereri trimise.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contact eliminat</string>
     <!-- error message -->
@@ -1228,8 +1228,8 @@
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Folderul este partajat cu %1$d contact. Elimini partajarea?</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Folderul este partajat cu %1$d contacte. Elimini partajarea?</item>
+        <item quantity="few">Folderul este partajat cu %1$d contacte. Elimini toate partajările?</item>
+        <item quantity="other">Folderul este partajat cu %1$d de contacte. Elimini toate partajările?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">E-mail și/sau parolă nevalide. Te rugăm să încerci din nou.</string>
@@ -1250,7 +1250,7 @@
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Acest URL este corupt sau deformat. Linkul pe care încerci să îl accesezi nu există.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">Se așteaptă confirmarea e-mailului</string>
+    <string name="confirm_email_text">În așteptarea confirmării e-mailului.</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
     <string name="confirm_email_explanation">Te rugăm să verifici e-mailul și să dai clic pe link pentru a confirma contul.</string>
     <!-- Plural of items which contains a folder. 2 items -->
@@ -4046,4 +4046,8 @@
         <item quantity="one">Upload in progress, 1 file pending</item>
         <item quantity="other">Upload in progress, %1$d files pending</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Change server</string>
 </resources>

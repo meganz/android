@@ -29,7 +29,7 @@
   <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
   <string name="api_eexist">Уже существует</string>
   <!-- Label to show that an error related with an Incomplete SDK operation. -->
-  <string name="api_eincomplete">Неполный</string>
+  <string name="api_eincomplete">Неполная</string>
   <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
   <string name="api_ekey">Неверный ключ/Ошибка расшифровки</string>
   <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->

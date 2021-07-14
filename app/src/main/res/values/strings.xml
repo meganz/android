@@ -492,7 +492,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Request resent</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request successfully sent to %s. The status can be consulted in the Sent Requests tab.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contact removed</string>
     <!-- error message -->
@@ -588,7 +588,7 @@
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Folder shared with %d contacts successfully</string>
     <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">File can not be shared with %d contacts</string>
+    <string name="number_contact_file_not_shared_">File cannot be shared with %d contacts</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d folders shared successfully</string>
     <!-- error message when sharing multiple files -->
@@ -598,13 +598,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">The folder is no longer shared</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Error, the folder is still shared with another contact</string>
+    <string name="context_no_removed_sharing_contacts">An error occurred. The folder is still shared with another contact</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Select just one file</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Rubbish Bin emptied successfully</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Error. The Rubbish Bin has not been emptied</string>
+    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish Bin has not been emptied</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">You are about to cancel your MEGA subscription. Please let us know if there is anything we can do to help change your mind.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -612,7 +612,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Send</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Thank you for your feedback! Are you sure you want to cancel your MEGA subscription?</string>
+    <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Your subscription has not been cancelled. Please provide a reason for your cancellation</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -667,11 +667,11 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">File system problem</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Error happened when executing the action</string>
+    <string name="general_error">An error occurred when browsing local files.</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Image viewer</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Used Space</string>
+    <string name="my_account_used_space">Used storage space</string>
     <!-- menu item -->
     <string name="my_account_change_password">Change password</string>
     <!-- Dialog text overquota error -->
@@ -695,7 +695,7 @@
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Monthly or annually recurring</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">At this moment, no method of payment is available for this plan</string>
+    <string name="no_available_payment_method">There is no payment method set for this plan currently. Please select one.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Monthly*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -705,7 +705,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">The preview has not been downloaded yet. Please wait</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">The preview is not able to load due to insufficient memory available. Please try again later.</string>
+    <string name="not_load_preview_low_memory">Not enough free memory to display preview. Please try again later.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Please log out before creating the account</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -719,9 +719,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Allow notifications for incoming MEGA calls</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA needs your authorization to allow the call interface to pop up from the background.</string>
+    <string name="ask_for_display_over_msg">Please grant MEGA permission to display over other apps for calls.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Don’t worry, you can still manually grant permissions from your device’s settings.</string>
+    <string name="ask_for_display_over_explain">You can still manually grant permissions in the device Settings.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Wi-Fi only</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -735,7 +735,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Checking for files to be uploaded</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Initializing Camera Uploads</string>
+    <string name="settings_camera_notif_initializing_title">Initialising Camera Uploads</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Camera Uploads have been disabled. Your local folder is unavailable.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -753,9 +753,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Passcode options</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Video compression consumes a lot of power; MEGA will require you to be actively charging your device if the videos to be compressed are larger than %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Video compression uses considerable amounts of power. Please plug in your device to charge if the videos to be compressed are larger than %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">If enabled, you will upload information about where your pictures were taken, so be careful when sharing them.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">If enabled, you location information will be included with your pictures. Please be careful when sharing them.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Advanced</string>
     <!-- Settings preference title for cache -->
@@ -2238,7 +2238,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Your account has been suspended due to multiple breaches of MEGA’s Terms of Service. Please check your email inbox.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service, such as abuse of rights of others; sharing and/or importing illegal data; or system abuse.</string>
+    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service including, but not limited to, clause 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Loading files</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2557,11 +2557,11 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Preview Content</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">The streaming can not be executed and the file has not been downloaded</string>
+    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Unable to open file.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">We were not able to open the file due to no network connection.</string>
+    <string name="error_fail_to_open_file_no_network">No network connection. File cannot be opened.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">File already exists in Saved for Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2572,7 +2572,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">Rich URL Previews</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">You are disabling rich URL previews permanently. You can re-enable rich URL previews in your settings. Do you want to proceed?</string>
+    <string name="text_confirmation_disable_rich_links">You are disabling rich URL previews. You can re-enable rich URL previews in your settings. Do you want to proceed?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Missed call[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2615,9 +2615,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Archived chats (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Archive Chat</string>
+    <string name="archive_chat_option">Archive chat</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Unarchive Chat</string>
+    <string name="unarchive_chat_option">Unarchive chat</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archive</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2649,7 +2649,7 @@
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading_share">Loading contacts&#8230;</string>
     <!-- Title of the screen New Group -->
-    <string name="title_new_group">New Group</string>
+    <string name="title_new_group">New group</string>
     <!-- Subtitle of the screen New Group -->
     <string name="subtitle_new_group">Type group name</string>
     <!-- Hint of edittext shown when it is creating a new group to guide user to type the name of the group -->
@@ -3452,7 +3452,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">You cannot remove %1$s as a contact because they are part of your Business account.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">There has been a problem with your last payment. Please access MEGA using a desktop browser for more information.</string>
+    <string name="grace_period_admin_alert">A problem occurred with your last payment. Please access MEGA using a desktop browser for more information.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Your Business account has expired</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3460,7 +3460,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">While MEGA can not access to your data, your business account administrator does have the ability to control and view the Camera Uploads in your user account</string>
+    <string name="camera_uploads_business_alert">MEGA can not access to your data, but your business account administrator can view and delete your Camera Uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Something went wrong</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3977,6 +3977,12 @@
     <string name="production_api_server">Production</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Change server</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Show line numbers</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Hide line numbers</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
     <!-- Section name for the “Requests” section.Preferably one word. There is little space for this word. -->
     <string name="section_requests">Requests</string>
     <!-- Section name for the “Groups” section.Preferably one word. There is little space for this word. -->

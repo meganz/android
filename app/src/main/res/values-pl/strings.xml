@@ -508,7 +508,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Zgłoszenie wysłane</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Zgłoszenie prawidłowo wysłane do %s. Status może być zweryfikowany w zakładce Wysłane zgłoszenia.</string>
+    <string name="context_contact_request_sent">Żądanie zostało pomyślnie wysłane do %s. Zobacz w zakładce Wysłane żądania.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Kontakt został usunięty</string>
     <!-- error message -->
@@ -604,7 +604,7 @@
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Katalog został&#160;udostępniony z %d kontaktami</string>
     <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Plik nie może być udostępniony %d kontaktom.</string>
+    <string name="number_contact_file_not_shared_">Plik nie może być udostępniony dla %d kontaktów</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d katalogów zostało udostępnione</string>
     <!-- error message when sharing multiple files -->
@@ -614,13 +614,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">Ten katalog nie jest już dostępny</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Błąd, ten katalog jest wciąż udostępniony z innym kontaktem</string>
+    <string name="context_no_removed_sharing_contacts">Wystąpił błąd. Folder jest nadal współdzielony z innym kontaktem.</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Wybierz tylko jeden plik</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Koszt został wyczyszczony</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Błąd. Kosz nie został opróżniony</string>
+    <string name="rubbish_bin_no_emptied">Wystąpił błąd. Kosz na śmieci nie został opróżniony.</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Mass zamiar anulować swoją subskrypcję&#160;MEGA. Prosimy o poinformowanie nas, czy możemy jakoś pomóc i wpłynąć na zmianę Twojej decyzji.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -628,7 +628,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Wyślij</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Dziękujemy za opinię! Czy na pewno chcesz anulować swoja subskrypcję&#160;MEGA?</string>
+    <string name="confirmation_cancel_subscriptions">Dziękujemy za Twoją opinię. Czy na pewno chcesz zrezygnować z subskrypcji MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Twoja subskrypcja nie została anulowane. Prosimy o podane powodu anulowania</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -685,11 +685,11 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problem z systemem plików</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Wystąpił&#160;błąd podczas wykonywania operacji</string>
+    <string name="general_error">Wystąpił błąd podczas przeglądania plików lokalnych.</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Podgląd zdjęcia</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Użyta pamięć</string>
+    <string name="my_account_used_space">Używana pamięć</string>
     <!-- menu item -->
     <string name="my_account_change_password">Zmień hasło</string>
     <!-- Dialog text overquota error -->
@@ -713,7 +713,7 @@
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Płatność miesięczna lub roczna</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">Na chwilę&#160;obecną, brak form płatności dla tego planu</string>
+    <string name="no_available_payment_method">Obecnie nie ma ustawionej metody płatności dla tego planu. Proszę wybrać jedną z nich.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Miesięcznie*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -723,7 +723,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">Podgląd nie został jeszcze pobrany. Prosimy czekać</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Nie można załadować podglądu z powodu niewystarczającej ilości dostępnej pamięci. Spróbuj ponownie później.</string>
+    <string name="not_load_preview_low_memory">Za mało wolnej pamięci do wyświetlenia podglądu. Proszę spróbować ponownie później.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Wyloguj się przed utworzeniem konta</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -737,9 +737,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Zezwalaj na powiadomienia o przychodzących połączeniach MEGA</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA potrzebuje Twojej autoryzacji, aby interfejs wyskakiwał z tła.</string>
+    <string name="ask_for_display_over_msg">Prosimy o udzielenie MEGA pozwolenia na wyświetlanie nad innymi aplikacjami do połączeń.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Nie martw się, nadal możesz ręcznie przyznawać uprawnienia w ustawieniach urządzenia.</string>
+    <string name="ask_for_display_over_explain">Nadal możesz ręcznie nadawać uprawnienia w Ustawieniach urządzenia.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Tylko Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -753,7 +753,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Sprawdzanie plików do przesłania</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Inicjowanie przesyłania z kamery</string>
+    <string name="settings_camera_notif_initializing_title">Inicjalizowanie obrazu z kamery</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Przesyłanie z kamery zostało wyłączone. Twój folder lokalny jest niedostępny.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -771,9 +771,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Opcje kodu dostępu</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Kompresja wideo zużywa dużo energii; MEGA będzie wymagać aktywnego ładowania urządzenia, jeśli filmy do skompresowania są większe niż %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Kompresja wideo zużywa znaczne ilości energii. Proszę podłączyć urządzenie do ładowania, jeśli kompresowane filmy są większe niż %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Jeśli ta opcja jest włączona, prześlesz informacje o tym, gdzie zostały zrobione Twoje zdjęcia, więc zachowaj ostrożność, udostępniając je.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Jeśli opcja ta jest włączona, informacje o lokalizacji użytkownika będą dołączane do zdjęć. Zachowaj ostrożność podczas ich udostępniania.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Zaawansowane</string>
     <!-- Settings preference title for cache -->
@@ -2324,7 +2324,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Twoje konto zostało zawieszone ze względu na liczne naruszenia regulaminu MEGA. Sprawdź swoją skrzynkę odbiorczą.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Twoje konto zostało zawieszone ze względu na liczne naruszenia regulaminu MEGA, w postaci naruszenia praw innych osób; udostępniania lub pobierania nielegalnych danych; lub naruszenia zasobów aplikacji.</string>
+    <string name="account_suspended_breache_ToS">Twoje konto zostało zlikwidowane z powodu naruszenia warunków korzystania z usług firmy MEGA, w tym między innymi klauzuli 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Ładowanie plików</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2667,7 +2667,7 @@
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Nie można otworzyć pliku.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">Nie mogliśmy otworzyć pliku z powodu braku połączenia sieciowego.</string>
+    <string name="error_fail_to_open_file_no_network">Brak połączenia sieciowego. Nie można otworzyć pliku.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Plik już istnieje w Zapisane dla trybu offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2680,7 +2680,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">Zaawansowane podglądy adresów URL</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Podgląd linków zostanie zablokowany. Możesz to zmienić&#160;później w ustawieniach. Czy chcesz kontynuować?</string>
+    <string name="text_confirmation_disable_rich_links">Wyłączasz pełny podgląd adresów URL. Możesz ponownie włączyć podgląd adresów URL w ustawieniach. Czy chcesz kontynuować?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Nieodebrane połączenie[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2725,9 +2725,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Zarchiwizowane rozmowy (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Archiwum czatu</string>
+    <string name="archive_chat_option">Zarchiwizuj czat</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Unarchive Chat</string>
+    <string name="unarchive_chat_option">Odarchiwizuj czat</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archiwizuj</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -3604,7 +3604,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Nie możesz usunąć %1$s jako kontaktu, ponieważ są one częścią twojego konta firmowego.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">Wystąpił problem z ostatnią płatnością. Proszę uzyskać dostęp do MEGA za pomocą przeglądarki na pulpicie, aby uzyskać więcej informacji.</string>
+    <string name="grace_period_admin_alert">Wystąpił problem z ostatnią płatnością. Aby uzyskać więcej informacji, skorzystaj z MEGA przeglądarki na komputerze.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Konto biznesowe wygasło</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3612,7 +3612,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Twoje konto jest obecnie [B]zawieszone[/B]. Możesz tylko przeglądać swoje dane.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">Chociaż MEGA nie ma dostępu do twoich danych, administrator twojego konta biznesowego ma możliwość kontrolowania i przeglądania przesłanych z aparatu na twoim koncie użytkownika</string>
+    <string name="camera_uploads_business_alert">MEGA nie ma dostępu do Twoich danych, ale administrator Twojego konta biznesowego może przeglądać i usuwać Twoje pliki z aparatu.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Wystąpiły problemy</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -4145,4 +4145,8 @@
         <item quantity="many">Trwa przesyłanie, %1$d plików czeka na przesłanie.</item>
         <item quantity="other">Trwa przesyłanie, %1$d plików czeka na przesłanie.</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Produkcyjny</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Inny serwer</string>
 </resources>
