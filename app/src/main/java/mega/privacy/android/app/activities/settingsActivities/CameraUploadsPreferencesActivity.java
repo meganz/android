@@ -68,10 +68,6 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                 return;
 
             switch (intent.getAction()){
-                case ACTION_UPDATE_ENABLE_CU_SETTING:
-                    sttCameraUploads.enableCameraUpload();
-                    break;
-
                 case ACTION_UPDATE_DISABLE_CU_SETTING:
                     sttCameraUploads.disableCameraUpload();
                     break;
@@ -136,8 +132,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                 new IntentFilter(ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING));
 
         IntentFilter filterCUMUSettings =
-                new IntentFilter(ACTION_UPDATE_ENABLE_CU_SETTING);
-        filterCUMUSettings.addAction(ACTION_UPDATE_DISABLE_CU_SETTING);
+                new IntentFilter(ACTION_UPDATE_DISABLE_CU_SETTING);
         filterCUMUSettings.addAction(ACTION_UPDATE_DISABLE_CU_UI_SETTING);
         registerReceiver(enableDisableCameraUploadReceiver, filterCUMUSettings);
 
