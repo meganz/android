@@ -23,6 +23,8 @@ import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaChatApiJavaUtils.getUserAliasFromCacheDecoded
 import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
+import mega.privacy.android.app.utils.MegaUserUtils.isExternalChange
+import mega.privacy.android.app.utils.MegaUserUtils.isRequestedChange
 import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.view.TextDrawable
@@ -134,14 +136,12 @@ class GetContactsUseCase @Inject constructor(
                     users.forEach { user ->
                         val index = contacts.indexOfFirst { it.email == user.email }
                         if (index != NOT_FOUND) {
-                            val isExternalChange = user.isOwnChange != 0
-
                             when {
-                                isExternalChange && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) ->
+                                user.isExternalChange() && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) ->
                                     megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
-                                isExternalChange && user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ->
+                                user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ->
                                     megaApi.getUserAttribute(user.email, USER_ATTR_FIRSTNAME, userAttrsListener)
-                                isExternalChange && user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ->
+                                user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ->
                                     megaApi.getUserAttribute(user.email, USER_ATTR_LASTNAME, userAttrsListener)
                                 user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS) ->
                                     megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
@@ -150,6 +150,10 @@ class GetContactsUseCase @Inject constructor(
                                     emitter.onNext(contacts.sortedAlphabetically())
                                 }
                             }
+                        } else if (user.isRequestedChange() && user.visibility == VISIBILITY_VISIBLE) { // New contact
+                            val contact = user.toContactItem().apply { requestMissingFields(userAttrsListener) }
+                            contacts.add(contact)
+                            emitter.onNext(contacts.sortedAlphabetically())
                         }
                     }
                 }
@@ -158,22 +162,7 @@ class GetContactsUseCase @Inject constructor(
             megaChatApi.addChatListener(chatListener)
             megaApi.addGlobalListener(globalListener)
 
-            contacts.forEach { contact ->
-                if (contact.avatarUri == null) {
-                    val userAvatarFile = AvatarUtil.getUserAvatarFile(context, contact.email)?.absolutePath
-                    megaApi.getUserAvatar(contact.email, userAvatarFile, userAttrsListener)
-                }
-                if (contact.fullName.isNullOrBlank()) {
-                    megaApi.getUserAttribute(contact.email, USER_ATTR_FIRSTNAME, userAttrsListener)
-                    megaApi.getUserAttribute(contact.email, USER_ATTR_LASTNAME, userAttrsListener)
-                }
-                if (contact.alias.isNullOrBlank()) {
-                    megaApi.getUserAttribute(contact.email, USER_ATTR_ALIAS, userAttrsListener)
-                }
-                if (contact.status != STATUS_ONLINE) {
-                    megaChatApi.requestLastGreen(contact.handle, null)
-                }
-            }
+            contacts.forEach { it.requestMissingFields(userAttrsListener) }
 
             emitter.setDisposable(Disposable.fromAction {
                 megaChatApi.removeChatListener(chatListener)
@@ -213,6 +202,23 @@ class GetContactsUseCase @Inject constructor(
             placeholder = placeholder,
             isNew = wasRecentlyAdded()
         )
+    }
+
+    private fun ContactItem.Data.requestMissingFields(listener: MegaRequestListenerInterface) {
+        if (avatarUri == null) {
+            val userAvatarFile = AvatarUtil.getUserAvatarFile(context, email)?.absolutePath
+            megaApi.getUserAvatar(email, userAvatarFile, listener)
+        }
+        if (fullName.isNullOrBlank()) {
+            megaApi.getUserAttribute(email, USER_ATTR_FIRSTNAME, listener)
+            megaApi.getUserAttribute(email, USER_ATTR_LASTNAME, listener)
+        }
+        if (alias.isNullOrBlank()) {
+            megaApi.getUserAttribute(email, USER_ATTR_ALIAS, listener)
+        }
+        if (status != STATUS_ONLINE) {
+            megaChatApi.requestLastGreen(handle, null)
+        }
     }
 
     private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =

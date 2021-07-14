@@ -11,8 +11,6 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.FlowableEmitter
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
@@ -43,7 +41,7 @@ class GetContactRequestsUseCase @Inject constructor(
     }
 
     fun get(): Flowable<List<ContactRequestItem>> =
-        Flowable.create({ emitter: FlowableEmitter<List<ContactRequestItem>> ->
+        Flowable.create({ emitter ->
             val requests = arrayListOf<MegaContactRequest>().apply {
                 addAll(megaApi.incomingContactRequests)
                 addAll(megaApi.outgoingContactRequests)
@@ -133,8 +131,22 @@ class GetContactRequestsUseCase @Inject constructor(
             })
         }, BackpressureStrategy.LATEST)
 
-    fun getIncomingRequestsSize(): Single<Int> =
-        Single.fromCallable { megaApi.incomingContactRequests.size }
+    fun getIncomingRequestsSize(): Flowable<Int> =
+        Flowable.create({ emitter ->
+            emitter.onNext(megaApi.incomingContactRequests.size)
+
+            val globalListener = OptionalMegaGlobalListenerInterface(
+                onContactRequestsUpdate = {
+                    emitter.onNext(megaApi.incomingContactRequests.size)
+                }
+            )
+
+            megaApi.addGlobalListener(globalListener)
+
+            emitter.setDisposable(Disposable.fromAction {
+                megaApi.removeGlobalListener(globalListener)
+            })
+        }, BackpressureStrategy.LATEST)
 
     private fun MegaContactRequest.toContactRequestItem(): ContactRequestItem {
         var userImageUri: Uri? = null

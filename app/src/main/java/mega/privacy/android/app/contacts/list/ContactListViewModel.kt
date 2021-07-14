@@ -51,9 +51,9 @@ class ContactListViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { size ->
+                onNext = { incomingRequests ->
                     contactActions.value = listOf(
-                        ContactActionItem(Type.REQUESTS, getString(R.string.section_requests), size),
+                        ContactActionItem(Type.REQUESTS, getString(R.string.section_requests), incomingRequests),
                         ContactActionItem(Type.GROUPS, getString(R.string.section_groups))
                     )
                 },

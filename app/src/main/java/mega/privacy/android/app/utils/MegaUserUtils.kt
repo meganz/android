@@ -31,4 +31,23 @@ object MegaUserUtils {
             .toLocalDateTime()
         return Duration.between(addedTime, now).toHours() < RECENTLY_ADDED_MIN_HOURS
     }
+
+    /**
+     * Indicates if the user is changed by another client.
+     */
+    fun MegaUser.isExternalChange(): Boolean =
+        isOwnChange == 0
+
+    /**
+     * Indicates if the user is changed as a result of an explicit request.
+     */
+    fun MegaUser.isRequestedChange(): Boolean =
+        isOwnChange > 0
+
+    /**
+     * Indicates if the user is changed as a result of an implicit request made by
+     * the SDK internally.
+     */
+    fun MegaUser.isRequestedSDKChange(): Boolean =
+        isOwnChange == -1
 }
