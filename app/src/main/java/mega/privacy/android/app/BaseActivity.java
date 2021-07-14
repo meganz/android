@@ -62,6 +62,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_IMCOMPATIBILITY_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -99,6 +100,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
+
+    private Snackbar snackbar = null;
 
     /**
      * Load the psa in the web browser fragment if the psa is a web one and this activity
@@ -660,7 +663,26 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
      */
     public void showSnackbar(int type, View view, String s, long idChat) {
-        showSnackbar(type, view, s, idChat, null);
+        showSnackbar(type, view, null, s, idChat, null);
+    }
+
+    /**
+     * Method to display a simple or action Snackbar.
+     *
+     * @param type   There are three possible values to this param:
+     *               - SNACKBAR_TYPE: creates a simple snackbar
+     *               - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
+     *               - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
+     *               - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
+     *               - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
+     * @param view   Layout where the snackbar is going to show.
+     * @param anchor Sets the view the Snackbar should be anchored above, null as default
+     * @param s      Text to shown in the snackbar
+     * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
+     *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
+     */
+    public void showSnackbarWithAnchorView(int type, View view, View anchor, String s, long idChat) {
+        showSnackbar(type, view, anchor, s, idChat, null);
     }
 
     /**
@@ -673,12 +695,13 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      *            - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
      *            - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
      * @param view Layout where the snackbar is going to show.
+     * @param anchor Sets the view the Snackbar should be anchored above, null as default
      * @param s Text to shown in the snackbar
      * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
      *               If the value is -1 (INVALID_HANLDE) the function ends in chats list view.
      * @param userEmail Email of the user to be invited.
      */
-    public void showSnackbar (int type, View view, String s, long idChat, String userEmail) {
+    public void showSnackbar (int type, View view, View anchor, String s, long idChat, String userEmail) {
         logDebug("Show snackbar: " + s);
         Display  display = getWindowManager().getDefaultDisplay();
         DisplayMetrics outMetrics = new DisplayMetrics();
@@ -696,6 +719,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 case MUTE_NOTIFICATIONS_SNACKBAR_TYPE:
                     snackbar = Snackbar.make(view, R.string.notifications_are_already_muted, Snackbar.LENGTH_LONG);
                     break;
+                case SNACKBAR_IMCOMPATIBILITY_TYPE:
+                    snackbar = Snackbar.make(view, !isTextEmpty(s) ? s : getString(R.string.sent_as_message), Snackbar.LENGTH_INDEFINITE);
+                    break;
                 default:
                     snackbar = Snackbar.make(view, s, Snackbar.LENGTH_LONG);
                     break;
@@ -707,6 +733,10 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         Snackbar.SnackbarLayout snackbarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
         snackbarLayout.setBackgroundResource(R.drawable.background_snackbar);
+
+        if (anchor != null) {
+            snackbar.setAnchorView(anchor);
+        }
 
         switch (type) {
             case SNACKBAR_TYPE: {
@@ -739,7 +769,24 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 snackbar.setAction(R.string.contact_invite, new SnackbarNavigateOption(view.getContext(), type, userEmail));
                 snackbar.show();
                 break;
+            case SNACKBAR_IMCOMPATIBILITY_TYPE: {
+                this.snackbar = snackbar;
+                snackbarLayout.setBackgroundResource(R.drawable.background_snackbar_incompatibility);
+                TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                snackbarTextView.setMaxLines(3);
+                snackbar.show();
+                break;
+            }
         }
+    }
+
+    /**
+     * Get snackbar instance
+     *
+     * @return snackbar
+     */
+    public Snackbar getSnackbar() {
+        return snackbar;
     }
 
     /**
