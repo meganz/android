@@ -13,6 +13,12 @@ class CheckPasswordReminderUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
+    /**
+     * Launches a request to check if should show Password reminder.
+     *
+     * @param atLogout True if the request is launched before logout action, false otherwise.
+     * @return Single<Boolean> True/false if the request finished with success, error if not.
+     */
     fun check(atLogout: Boolean): Single<Boolean> =
         Single.create { emitter ->
             megaApi.shouldShowPasswordReminderDialog(

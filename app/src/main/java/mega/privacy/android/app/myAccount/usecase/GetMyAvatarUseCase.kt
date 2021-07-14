@@ -11,6 +11,13 @@ import javax.inject.Inject
 class GetMyAvatarUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
+
+    /**
+     * Launches a request to get the current account avatar.
+     *
+     * @param avatarPath Path in which the avatar will be save.
+     * @return Single<Boolean> True if the request finished with success, error if not.
+     */
     fun get(avatarPath: String): Single<Boolean> =
         Single.create { emitter ->
             megaApi.getUserAvatar(megaApi.myUser,

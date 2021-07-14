@@ -1,6 +1,6 @@
 package mega.privacy.android.app.myAccount.usecase
 
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Completable
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -15,15 +15,20 @@ class CheckVersionsUseCase  @Inject constructor(
     private val myAccountInfo: MyAccountInfo
 ) {
 
-    fun check(): Single<Boolean> =
-        Single.create { emitter ->
+    /**
+     * Launches a request to check versions and updates MyAccountInfo if finishes with success.
+     *
+     * @return Completable onComplete() if the request finished with success, error if not.
+     */
+    fun check(): Completable =
+        Completable.create { emitter ->
             megaApi.getFolderInfo(megaApi.rootNode, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
                     if (error.errorCode == MegaError.API_OK) {
                         val info: MegaFolderInfo = request.megaFolderInfo
                         myAccountInfo.numVersions = info.numVersions
                         myAccountInfo.previousVersionsSize = info.versionsSize
-                        emitter.onSuccess(true)
+                        emitter.onComplete()
                     } else {
                         emitter.onError(error.toThrowable())
                     }

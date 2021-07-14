@@ -31,10 +31,10 @@ class MyAccountInfo @Inject constructor(
 ) {
 
     companion object {
-        const val hasStorageDetails = 0x01
-        const val hasTransferDetails = 0x02
-        const val hasProDetails = 0x04
-        const val hasSessionsDetails = 0x020
+        const val HAS_STORAGE_DETAILS = 0x01
+        const val HAS_TRANSFER_DETAILS = 0x02
+        const val HAS_PRO_DETAILS = 0x04
+        const val HAS_SESSIONS_DETAILS = 0x020
     }
 
     var usedPercentage = INVALID_VALUE
@@ -145,9 +145,9 @@ class MyAccountInfo @Inject constructor(
 
         val accountInfo = accountInfo ?: return
 
-        val storage = numDetails and hasStorageDetails != 0
-        val transfer = numDetails and hasTransferDetails != 0
-        val pro = numDetails and hasProDetails != 0
+        val storage = numDetails and HAS_STORAGE_DETAILS != 0
+        val transfer = numDetails and HAS_TRANSFER_DETAILS != 0
+        val pro = numDetails and HAS_PRO_DETAILS != 0
 
         if (storage) {
             val totalStorage = accountInfo.storageMax

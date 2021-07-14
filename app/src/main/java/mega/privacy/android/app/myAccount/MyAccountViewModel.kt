@@ -61,7 +61,7 @@ class MyAccountViewModel @ViewModelInject constructor(
 ) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
 
     companion object {
-        private const val CLICKS_TO_STAGING = 5
+        private const val CLICKS_TO_CHANGE_API_SERVER = 5
         private const val TIME_TO_SHOW_PAYMENT_INFO = 604800 //1 week in seconds
         const val PROCESSING_FILE = "PROCESSING_FILE"
         const val CHECKING_2FA = "CHECKING_2FA"
@@ -116,19 +116,30 @@ class MyAccountViewModel @ViewModelInject constructor(
 
     fun isAlreadyRegisteredPhoneNumber(): Boolean = !getRegisteredPhoneNumber().isNullOrEmpty()
 
+    /**
+     * Checks versions info.
+     *
+     * @param action Action to perform after versions info has been checked.
+     */
     fun checkVersions(action: () -> Unit) {
         if (myAccountInfo.numVersions == INVALID_VALUE) {
             checkVersionsUseCase.check()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onSuccess = { action.invoke() },
+                    onComplete = { action.invoke() },
                     onError = { error -> logWarning(error.message) }
                 )
                 .addTo(composite)
         } else action.invoke()
     }
 
+    /**
+     * Gets the avatar of the current account.
+     *
+     * @param context Current context.
+     * @param action  Action to perform after the avatar has been get.
+     */
     fun getAvatar(context: Context, action: (Boolean) -> Unit) {
         getMyAvatarUseCase.get(buildAvatarFile(context, megaApi.myEmail).absolutePath)
             .subscribeOn(Schedulers.io())
@@ -143,6 +154,11 @@ class MyAccountViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Kills other sessions.
+     *
+     * @param action Action to perform after kill sessions.
+     */
     fun killSessions(action: (Boolean) -> Unit) {
         killSessionUseCase.kill()
             .subscribeOn(Schedulers.io())
@@ -157,14 +173,29 @@ class MyAccountViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Launches the ChangePasswordActivityLollipop activity.
+     *
+     * @param context Current context.
+     */
     fun changePassword(context: Context) {
         context.startActivity(Intent(context, ChangePasswordActivityLollipop::class.java))
     }
 
+    /**
+     * Launches the ExportRecoveryKeyActivity activity.
+     *
+     * @param context Current context.
+     */
     fun exportMK(context: Context) {
         context.startActivity(Intent(context, ExportRecoveryKeyActivity::class.java))
     }
 
+    /**
+     * Launches the LoginActivityLollipop activity to perform an account refresh.
+     *
+     * @param activity Current activity.
+     */
     fun refresh(activity: Activity) {
         val intent = Intent(activity, LoginActivityLollipop::class.java)
         intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
@@ -173,6 +204,18 @@ class MyAccountViewModel @ViewModelInject constructor(
         activity.startActivityForResult(intent, REQUEST_CODE_REFRESH)
     }
 
+    /**
+     * Manages onActivityResult.
+     *
+     * @param activity    Current activity.
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode  The integer result code returned by the child activity
+     *                    through its setResult().
+     * @param data        An Intent, which can return result data to the caller
+     *                    (various data can be attached to Intent "extras").
+     */
     fun manageActivityResult(
         activity: Activity,
         requestCode: Int,
@@ -235,16 +278,26 @@ class MyAccountViewModel @ViewModelInject constructor(
         return null
     }
 
+    /**
+     * Increments the number of clicks before show the change API server dialog.
+     *
+     * @return True if already clicked CLICKS_TO_CHANGE_API_SERVER times, false otherwise.
+     */
     fun incrementLastSessionClick(): Boolean {
         numOfClicksLastSession++
 
-        if (numOfClicksLastSession < CLICKS_TO_STAGING)
+        if (numOfClicksLastSession < CLICKS_TO_CHANGE_API_SERVER)
             return false
 
         numOfClicksLastSession = 0
         return true
     }
 
+    /**
+     * Checks if business payment attention is needed.
+     *
+     * @return True if business payment attention is needed, false otherwise.
+     */
     private fun isBusinessPaymentAttentionNeeded(): Boolean {
         val status = megaApi.businessStatus
 
@@ -253,6 +306,11 @@ class MyAccountViewModel @ViewModelInject constructor(
                 || status == MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD)
     }
 
+    /**
+     * Checks if should show payment info.
+     *
+     * @return True if should show payment info, false otherwise.
+     */
     fun shouldShowPaymentInfo(): Boolean {
         val timeToCheck =
             if (hasRenewableSubscription()) myAccountInfo.subscriptionRenewTime
@@ -264,6 +322,12 @@ class MyAccountViewModel @ViewModelInject constructor(
                 || timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO
     }
 
+    /**
+     * Cancel current subscriptions.
+     *
+     * @param feedback Message to send as feedback to cancel subscriptions.
+     * @param action   Action to perform after cancel subscriptions.
+     */
     fun cancelSubscriptions(feedback: String?, action: (Boolean) -> Unit) {
         cancelSubscriptionsUseCase.cancel(feedback)
             .subscribeOn(Schedulers.io())
@@ -278,10 +342,20 @@ class MyAccountViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Launches the UpgradeAccountActivity activity.
+     *
+     * @param context Current context.
+     */
     fun upgradeAccount(context: Context) {
         context.startActivity(Intent(context, UpgradeAccountActivity::class.java))
     }
 
+    /**
+     * Checks if should show Password reminder before logout and logs out if not.
+     *
+     * @param context Current context.
+     */
     fun logout(context: Context) {
         checkPasswordReminderUseCase.check(true)
             .subscribeOn(Schedulers.io())
@@ -302,6 +376,11 @@ class MyAccountViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Checks if all permissions are granted before capture a photo.
+     *
+     * @param activity Current activity.
+     */
     fun capturePhoto(activity: Activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val hasStoragePermission: Boolean = ContextCompat.checkSelfPermission(
@@ -343,6 +422,11 @@ class MyAccountViewModel @ViewModelInject constructor(
         Util.checkTakePicture(activity, TAKE_PICTURE_PROFILE_CODE)
     }
 
+    /**
+     * Launches an intent to choose a photo.
+     *
+     * @param activity Current activity.
+     */
     fun launchChoosePhotoIntent(activity: Activity) {
         val intent = Intent()
         intent.action = Intent.ACTION_OPEN_DOCUMENT
@@ -355,6 +439,9 @@ class MyAccountViewModel @ViewModelInject constructor(
         )
     }
 
+    /**
+     * Checks if can open QRCodeActivity and if so, launches an intent to do it.
+     */
     fun openQR(activity: Activity) {
         if (CallUtil.isNecessaryDisableLocalCamera() != INVALID_VALUE.toLong()) {
             CallUtil.showConfirmationOpenCamera(activity, ACTION_OPEN_QR, false)
@@ -366,6 +453,12 @@ class MyAccountViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Adds a photo as avatar.
+     *
+     * @param path Path of the chosen photo or null if is a new taken photo.
+     * @return An error message if something was wrong, null otherwise.
+     */
     private fun addProfileAvatar(path: String?): String? {
         val app = MegaApplication.getInstance()
         val myEmail = megaApi.myUser.email
@@ -396,6 +489,12 @@ class MyAccountViewModel @ViewModelInject constructor(
         return null
     }
 
+    /**
+     * Deletes the current avatar.
+     *
+     * @param context Current context.
+     * @param action  Action to perform after delete the avatar.
+     */
     fun deleteProfileAvatar(context: Context, action: (Pair<Boolean, Boolean>) -> Unit) {
         val avatar = buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)
 
@@ -415,6 +514,14 @@ class MyAccountViewModel @ViewModelInject constructor(
         addProfileAvatar(info[0].fileAbsolutePath)
     }
 
+    /**
+     * Changes the name of the account.
+     *
+     * @param newFirstName New first name if changed, same as current one if not.
+     * @param newLastName  New last name if changed, same as current one if not.
+     * @param action       Action to perform after change name.
+     * @return True if something changed, false otherwise.
+     */
     fun changeName(newFirstName: String, newLastName: String, action: (Boolean) -> Unit): Boolean {
         val shouldUpdateLastName = newLastName != myAccountInfo.getLastNameText()
 
@@ -449,6 +556,9 @@ class MyAccountViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Checks if 2FA is enabled or not.
+     */
     fun check2FA() {
         check2FAUseCase.check()
             .subscribeOn(Schedulers.io())
@@ -457,6 +567,14 @@ class MyAccountViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Changes the email of the account.
+     *
+     * @param context  Current context.
+     * @param newEmail New email if changed, same as the current one if not.
+     * @param action   Action to perform after change the email.
+     * @return An error string if something wrong happened, CHECKING_2FA if checking 2FA or null otherwise
+     */
     fun changeEmail(context: Context, newEmail: String, action: (MegaError) -> Unit): String? {
         return when {
             newEmail == getEmail() -> getString(R.string.mail_same_as_old)
@@ -482,6 +600,11 @@ class MyAccountViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Resets the verified phone number of the current account.
+     *
+     * @param action Action to perform after reset the phone number.
+     */
     fun resetPhoneNumber(action: (Boolean) -> Unit) {
         resetPhoneNumberUseCase.reset()
             .subscribeOn(Schedulers.io())
@@ -495,6 +618,11 @@ class MyAccountViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Gets the current account user data.
+     *
+     * @param action Action to perform after reset the phone number.
+     */
     private fun getUserData(action: (Boolean) -> Unit) {
         getUserDataUseCase.get()
             .subscribeOn(Schedulers.io())

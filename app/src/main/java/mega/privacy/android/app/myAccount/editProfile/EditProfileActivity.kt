@@ -352,6 +352,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         })
     }
 
+    /**
+     * Checks online status and shows it if needed.
+     */
     private fun visibilityStateIcon() {
         val status = megaChatApi.onlineStatus
         val showStatus = stateToolbar == AppBarStateChangeListener.State.EXPANDED
@@ -456,6 +459,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
     }
 
+    /**
+     * Shows a dialog to change the name of the account.
+     *
+     * @param firstName Current typed first name if any, null otherwise.
+     * @param lastName  Current typed last name if any, null otherwise.
+     */
     private fun showChangeNameDialog(firstName: String?, lastName: String?) {
         val dialogBinding = DialogChangeNameBinding.inflate(layoutInflater)
 
@@ -542,6 +551,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
     }
 
+    /**
+     * Shows a dialog to change the email of the account.
+     *
+     * @param email Current typed email if any, null otherwise.
+     */
     private fun showChangeEmailDialog(email: String?) {
         val dialogBinding = DialogChangeEmailBinding.inflate(layoutInflater)
 
@@ -647,6 +661,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 .show()
     }
 
+    /**
+     * Removes the current phone number.
+     */
     private fun resetPhoneNumber() {
         viewModel.resetPhoneNumber { success ->
             if (success) {

@@ -12,6 +12,12 @@ class CancelSubscriptionsUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
+    /**
+     * Launches a request to cancel card subscriptions.
+     *
+     * @param feedback Message typed as reason to cancel subscriptions.
+     * @return Single<Boolean> True if the request finished with success, error if not.
+     */
     fun cancel(feedback: String?): Single<Boolean> =
         Single.create { emitter ->
             megaApi.creditCardCancelSubscriptions(feedback, OptionalMegaRequestListenerInterface(

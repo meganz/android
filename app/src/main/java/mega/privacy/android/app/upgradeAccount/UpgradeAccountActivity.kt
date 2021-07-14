@@ -121,6 +121,9 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         checkScroll()
     }
 
+    /**
+     * Hides the current selected payment plan.
+     */
     private fun cancelClick() {
         checkScroll()
 
@@ -142,6 +145,11 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         viewModel.onUpdatePricing().observe(this, ::updatePricing)
     }
 
+    /**
+     * Shows the result of a purchase as an alert.
+     *
+     * @param message String to show as message alert.
+     */
     private fun showQueryPurchasesResult(message: String?) {
         if (isTextEmpty(message)) {
             return
@@ -151,6 +159,11 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         viewModel.resetQueryPurchasesMessage()
     }
 
+    /**
+     * Updates the pricing info if needed.
+     *
+     * @param update True if should update, false otherwise.
+     */
     private fun updatePricing(update: Boolean) {
         if (update) {
             setPricingInfo()
@@ -307,6 +320,11 @@ open class UpgradeAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
+    /**
+     * Shows the selected payment plan.
+     *
+     * @param upgradeType Selected payment plan.
+     */
     private fun onUpgradeClick(upgradeType: Int) {
         if (viewModel.getPaymentBitSet() == null) {
             logWarning("PaymentBitSet Null")

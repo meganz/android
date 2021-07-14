@@ -12,6 +12,11 @@ class Check2FAUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
+    /**
+     * Launches a request to check if 2FA is enabled or not.
+     *
+     * @return Single<Boolean> True/false if the request finished with success, error if not.
+     */
     fun check(): Single<Boolean> =
         Single.create { emitter ->
             megaApi.multiFactorAuthCheck(

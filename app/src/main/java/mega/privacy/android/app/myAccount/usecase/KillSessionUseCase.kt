@@ -13,6 +13,11 @@ class KillSessionUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
+    /**
+     * Launches a request to kill other sessions.
+     *
+     * @return Single<Boolean> True if the request finished with success, error if not.
+     */
     fun kill(): Single<Boolean> =
         Single.create { emitter ->
             megaApi.killSession(MegaApiJava.INVALID_HANDLE, OptionalMegaRequestListenerInterface(

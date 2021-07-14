@@ -19,6 +19,11 @@ class UpdateMyUserAttributesUseCase @Inject constructor(
     private val myAccountInfo: MyAccountInfo
 ) {
 
+    /**
+     * Launches a request to set a new first name for the current account.
+     *
+     * @return Single<Boolean> True if action finished with success, false otherwise.
+     */
     fun updateFirstName(firstName: String): Single<Boolean> =
         Single.create { emitter ->
             megaApi.setUserAttribute(
@@ -31,12 +36,23 @@ class UpdateMyUserAttributesUseCase @Inject constructor(
             )
         }
 
-    private fun updateFirstName(lastName: String, error: MegaError) {
+    /**
+     * Updates the first name on MyAccountInfo.
+     *
+     * @param firstName New first name.
+     * @param error     Error of the request.
+     */
+    private fun updateFirstName(firstName: String, error: MegaError) {
         if (error.errorCode == API_OK) {
-            myAccountInfo.setFirstNameText(lastName)
+            myAccountInfo.setFirstNameText(firstName)
         }
     }
 
+    /**
+     * Launches a request to set a new last name for the current account.
+     *
+     * @return Single<Boolean> True if action finished with success, false otherwise.
+     */
     fun updateLastName(firstName: String): Single<Boolean> =
         Single.create { emitter ->
             megaApi.setUserAttribute(
@@ -49,12 +65,22 @@ class UpdateMyUserAttributesUseCase @Inject constructor(
             )
         }
 
+    /**
+     * Updates the last name on MyAccountInfo.
+     *
+     * @param lastName New first name.
+     * @param error    Error of the request.
+     */
     private fun updateLastName(lastName: String, error: MegaError) {
         if (error.errorCode == API_OK) {
             myAccountInfo.setLastNameText(lastName)
         }
     }
 
+    /**
+     * Finishes the request action (change first or last name) by sending the emitter result
+     * and launching an update event if success.
+     */
     private fun finishAction(success: Boolean, emitter: SingleEmitter<Boolean>) {
         if (success) {
             LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java).post(true)
@@ -63,6 +89,11 @@ class UpdateMyUserAttributesUseCase @Inject constructor(
         emitter.onSuccess(success)
     }
 
+    /**
+     * Launches a request to set a new first name and a new last name for the current account.
+     *
+     * @return Single<Boolean> True if action finished with success, false otherwise.
+     */
     fun updateFirstAndLastName(
         firstName: String,
         lastName: String
@@ -102,6 +133,11 @@ class UpdateMyUserAttributesUseCase @Inject constructor(
         }
     }
 
+    /**
+     * Launches a request to set a new email for the current account.
+     *
+     * @return Single<Boolean> True if action finished with success, false otherwise.
+     */
     fun updateEmail(email: String): Single<MegaError> = Single.create { emitter ->
         megaApi.changeEmail(
             email,

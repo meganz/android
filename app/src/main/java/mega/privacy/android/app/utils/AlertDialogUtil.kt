@@ -37,6 +37,13 @@ object AlertDialogUtil {
         )
     }
 
+    /**
+     * Sets an error in EditText.
+     *
+     * @param error          Message to show as error.
+     * @param editTextLayout TextInputLayout which should contain the EditText.
+     * @param errorIcon      Image icon to show as error indicator.
+     */
     @JvmStatic
     fun setEditTextError(error: String?, editTextLayout: TextInputLayout, errorIcon: ImageView) {
         if (error.isNullOrEmpty()) return
@@ -49,6 +56,12 @@ object AlertDialogUtil {
         errorIcon.isVisible = true
     }
 
+    /**
+     * Hides an error in EditText.
+     *
+     * @param editTextLayout TextInputLayout which should contain the EditText.
+     * @param errorIcon      Image icon to hide as error indicator.
+     */
     @JvmStatic
     fun quitEditTextError(editTextLayout: TextInputLayout, errorIcon: ImageView) {
         editTextLayout.apply {

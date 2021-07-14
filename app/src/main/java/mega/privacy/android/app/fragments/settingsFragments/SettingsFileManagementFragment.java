@@ -22,6 +22,7 @@ import mega.privacy.android.app.lollipop.tasks.ManageOfflineTask;
 import nz.mega.sdk.MegaAccountDetails;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -85,7 +86,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
 
         rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, myAccountInfo.getFormattedUsedRubbish()));
 
-        if (myAccountInfo.getNumVersions() == -1) {
+        if (myAccountInfo.getNumVersions() == INVALID_VALUE) {
             fileVersionsFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
             getPreferenceScreen().removePreference(clearVersionsFileManagement);
         } else {

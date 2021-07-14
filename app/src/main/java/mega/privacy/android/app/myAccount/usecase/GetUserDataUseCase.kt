@@ -14,6 +14,12 @@ class GetUserDataUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
+    /**
+     * Launches a request to get the current account user data.
+     * Launches a broadcast to update user data if finishes with success.
+     *
+     * @return Single<Boolean> True if the request finished with success, false if not.
+     */
     fun get(): Single<Boolean> =
         Single.create { emitter ->
             megaApi.getUserData(

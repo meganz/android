@@ -93,8 +93,6 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
 
     private var gettingInfo = StringResourcesUtils.getString(R.string.recovering_info)
 
-    private var isModify = false
-
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val actionType = intent.getIntExtra(
@@ -277,6 +275,9 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
         setUpContactConnections()
     }
 
+    /**
+     * Checks and refreshes account info.
+     */
     private fun updateInfo() {
         viewModel.checkVersions { refreshVersionsInfo() }
         app.refreshAccountInfo()
@@ -299,6 +300,11 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
             .observeForever(emailUpdatedObserver)
     }
 
+    /**
+     * Shows the result of the kill sessions action.
+     *
+     * @param success True if the request finishes with success, false otherwise.
+     */
     private fun showKillSessionsResult(success: Boolean) {
         showSnackbar(
             StringResourcesUtils.getString(
@@ -308,6 +314,11 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
         )
     }
 
+    /**
+     * Shows the result of the cancel subscriptions action.
+     *
+     * @param success True if the request finishes with success, false otherwise.
+     */
     private fun showCancelSubscriptionsResult(success: Boolean) {
         showSnackbar(
             StringResourcesUtils.getString(
@@ -319,6 +330,9 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
         app.askForCCSubscriptions()
     }
 
+    /**
+     * Shows a confirmation dialog before kill sessions.
+     */
     private fun showConfirmationKillSessions() {
         if (isAlertDialogShown(killSessionsConfirmationDialog)) {
             return
@@ -333,6 +347,9 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
             .show()
     }
 
+    /**
+     * Shows the dialog to fill before cancel subscriptions.
+     */
     private fun showCancelSubscriptions() {
         if (isAlertDialogShown(cancelSubscriptionsDialog)) {
             return
@@ -373,6 +390,9 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
+    /**
+     * Shows a confirmation dialog before cancel subscriptions.
+     */
     private fun showConfirmationCancelSubscriptions() {
         if (isAlertDialogShown(cancelSubscriptionsConfirmationDialog)) {
             return
@@ -388,6 +408,11 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
             .show()
     }
 
+    /**
+     * Updates the edit view.
+     *
+     * @param editable True if the account can be edited, false otherwise.
+     */
     private fun setupEditProfile(editable: Boolean) {
         binding.nameText.setCompoundDrawablesWithIntrinsicBounds(
             0,
@@ -582,6 +607,9 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
+    /**
+     * Shows the payment info if the subscriptions is almost to renew or expiry.
+     */
     fun expandPaymentInfoIfNeeded() {
         if (!viewModel.shouldShowPaymentInfo())
             return
@@ -698,14 +726,11 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
-    fun resetPass() {
-        AccountController(this).resetPass(megaApi.myEmail)
-    }
-
-    fun updateNameView(fullName: String) {
-        binding.nameText.text = fullName
-    }
-
+    /**
+     * Checks if an avatar file already exist for the current account.
+     *
+     * @param retry True if should request for avatar if it's not available, false otherwise.
+     */
     fun setUpAvatar(retry: Boolean) {
         val avatar = buildAvatarFile(this, megaApi.myEmail + JPG_EXTENSION)
 
@@ -716,6 +741,10 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
         }
     }
 
+    /**
+     * Sets the avatar file if available.
+     * If not, requests it if should retry, sets the default one if not.
+     */
     fun setProfileAvatar(avatar: File, retry: Boolean) {
         val avatarBitmap: Bitmap?
 
@@ -763,31 +792,6 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
             visibleContacts.size,
             visibleContacts.size
         )
-    }
-
-    fun updateMailView(email: String) {
-        binding.emailText.text = email
-
-        if (!isFileAvailable(buildAvatarFile(this, email + JPG_EXTENSION))) {
-            setDefaultAvatar()
-        }
-    }
-
-    fun updateAddPhoneNumberLabel() {
-        runDelay(PHONE_NUMBER_CHANGE_DELAY) {
-            //work around - it takes time for megaApi.smsVerifiedPhoneNumber() to return value
-            val registeredPhoneNumber = megaApi.smsVerifiedPhoneNumber()
-            LogUtil.logDebug("updateAddPhoneNumberLabel $registeredPhoneNumber")
-
-            binding.phoneText.apply {
-                if (!isTextEmpty(registeredPhoneNumber)) {
-                    isVisible = true
-                    text = registeredPhoneNumber
-                } else {
-                    isVisible = false
-                }
-            }
-        }
     }
 
     private fun refreshVersionsInfo() {

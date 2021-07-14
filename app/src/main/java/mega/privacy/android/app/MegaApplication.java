@@ -28,7 +28,6 @@ import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
-import androidx.preference.PreferenceManager;
 
 import android.text.Html;
 import android.text.Spanned;
@@ -462,7 +461,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				logDebug ("Account details request");
 				if (e.getErrorCode() == MegaError.API_OK){
 
-					boolean storage = (request.getNumDetails() & MyAccountInfo.hasStorageDetails) != 0;
+					boolean storage = (request.getNumDetails() & MyAccountInfo.HAS_STORAGE_DETAILS) != 0;
 					if (storage) {
 						dbH.setAccountDetailsTimeStamp();
 					}
@@ -471,7 +470,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
 						myAccountInfo.setAccountDetails(request.getNumDetails());
 
-						boolean sessions = (request.getNumDetails() & MyAccountInfo.hasSessionsDetails) != 0;
+						boolean sessions = (request.getNumDetails() & MyAccountInfo.HAS_SESSIONS_DETAILS) != 0;
 						if (sessions) {
 							MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
 

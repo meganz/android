@@ -13,6 +13,11 @@ class ResetPhoneNumberUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
 
+    /**
+     * Launches a request to remove current verified phone number.
+     *
+     * @return Single<Boolean> True if the request finished with success, error if not.
+     */
     fun reset(): Single<Boolean> =
         Single.create { emitter ->
             megaApi.resetSmsVerifiedPhoneNumber(

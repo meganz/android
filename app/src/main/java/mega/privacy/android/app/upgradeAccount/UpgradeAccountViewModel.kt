@@ -87,6 +87,9 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         } else productAccounts
     }
 
+    /**
+     * Asks for account info if needed.
+     */
     fun refreshAccountInfo() {
         logDebug("Check the last call to callToPricing")
         if (callToPricing()) {
@@ -101,6 +104,14 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Gets a formatted string to show in a payment plan.
+     *
+     * @param context          Current context.
+     * @param product          Selected product plan.
+     * @param monthlyBasePrice True if the plan is monthly based, false otherwise.
+     * @return The formatted string.
+     */
     fun getPriceString(
         context: Context,
         product: Product,
@@ -130,7 +141,7 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
             }
 
             when (product.level) {
-                Constants.PRO_I, Constants.PRO_II, Constants.PRO_III -> color =
+                PRO_I, PRO_II, PRO_III -> color =
                     ContextCompat.getColor(context, R.color.red_600_red_300).toString()
                 PRO_LITE -> color =
                     ContextCompat.getColor(context, R.color.orange_400_orange_300).toString()
@@ -154,6 +165,14 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         return HtmlCompat.fromHtml(stringPrice, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
+    /**
+     * Gets the string to show as storage or transfer size label.
+     *
+     * @param context   Current context.
+     * @param gb        Size to show in the string.
+     * @param labelType TYPE_STORAGE_LABEL or TYPE_TRANSFER_LABEL.
+     * @return The formatted string.
+     */
     fun generateByteString(context: Context, gb: Long, labelType: Int): Spanned {
         var textToShow =
             "[A] " + getSizeStringGBBased(gb) + " [/A] " + storageOrTransferLabel(labelType)
@@ -167,9 +186,15 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         } catch (e: java.lang.Exception) {
             logError("Exception formatting string", e)
         }
+
         return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
+    /**
+     * Gets the label to show depending on labelType.
+     *
+     * @param labelType TYPE_STORAGE_LABEL or TYPE_TRANSFER_LABEL.
+     */
     private fun storageOrTransferLabel(labelType: Int): String? {
         return when (labelType) {
             TYPE_STORAGE_LABEL -> getString(R.string.label_storage_upgrade_account)
@@ -178,10 +203,18 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Initializes BillingManager.
+     *
+     * @param activity Current activity.
+     */
     fun initPayments(activity: Activity) {
         billingManager = BillingManagerImpl(activity, this)
     }
 
+    /**
+     * Removes BillingManager.
+     */
     fun destroyPayments() {
         if (this::billingManager.isInitialized) {
             billingManager.destroy()
@@ -204,6 +237,13 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Gets SKU details of the key received.
+     *
+     * @param list List of MegaSku objects.
+     * @param key  Product key of which the details should to be get.
+     * @return SKU details if exist, null otherwise.
+     */
     private fun getSkuDetails(list: List<MegaSku>?, key: String): MegaSku? {
         if (list == null || list.isEmpty()) {
             return null
@@ -284,6 +324,11 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         updateSubscriptionLevel(myAccountInfo, dbH, megaApi)
     }
 
+    /**
+     * Updates the account info after a purchase finished.
+     *
+     * @param purchases List of purchases
+     */
     private fun updateAccountInfo(purchases: List<MegaPurchase>) {
         var highest = INVALID_VALUE
         var temp = INVALID_VALUE
@@ -315,6 +360,18 @@ class UpgradeAccountViewModel @ViewModelInject constructor(
         updatePricing.value = true
     }
 
+    /**
+     *
+     * Manages onActivityResult.
+     *
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode  The integer result code returned by the child activity
+     *                    through its setResult().
+     * @param intent      An Intent, which can return result data to the caller
+     *                    (various data can be attached to Intent "extras").
+     */
     fun manageActivityResult(requestCode: Int, resultCode: Int, intent: Intent) {
         if (requestCode == RequestCode.REQ_CODE_BUY) {
             // For HMS purchase only
