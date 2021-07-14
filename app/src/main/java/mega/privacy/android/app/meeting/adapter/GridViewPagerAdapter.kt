@@ -145,7 +145,11 @@ class GridViewPagerAdapter(
                             when {
                                 it.currentList.size <= 3 -> {
                                     logDebug("Update only the adapter in the pager")
-                                    it.notifyDataSetChanged()
+                                    if (isLandscape()){
+                                        notifyItemChanged(pageWithChange)
+                                    } else {
+                                        it.notifyDataSetChanged()
+                                    }
                                 }
                                 it.currentList.size == 4 -> {
                                     logDebug("Update the current page, as the number of columns must be updated")
@@ -153,12 +157,21 @@ class GridViewPagerAdapter(
                                 }
                                 it.currentList.size == 5 -> {
                                     logDebug("Update position only")
-                                    it.notifyItemInserted(position)
+                                    if (isLandscape()){
+                                        notifyItemChanged(pageWithChange)
+                                    } else {
+                                        it.notifyItemInserted(position)
+                                    }
                                 }
                                 else -> {
                                     logDebug("update the position and the previous position")
                                     it.notifyItemInserted(position)
-                                    it.notifyItemRangeChanged(position - 1, it.currentList.size)
+                                    if (isLandscape()){
+                                        it.notifyItemRangeChanged(position - 2, it.currentList.size)
+                                    } else {
+                                        it.notifyItemRangeChanged(position - 1, it.currentList.size)
+                                    }
+
                                 }
                             }
                         }
@@ -256,10 +269,17 @@ class GridViewPagerAdapter(
                         when {
                             it.currentList.size <= 2 -> {
                                 logDebug("Update only the adapter in the pager")
-                                it.notifyDataSetChanged()
+                                if (isLandscape()) {
+                                    notifyItemChanged(pageWithChange)
+                                } else {
+                                    it.notifyDataSetChanged()
+                                }
                             }
                             it.currentList.size == 3 -> {
                                 logDebug("Update the current page, as the number of columns must be updated.")
+                                notifyItemChanged(pageWithChange)
+                            }
+                            it.currentList.size == 4 && isLandscape() -> {
                                 notifyItemChanged(pageWithChange)
                             }
                             else -> {
@@ -272,7 +292,11 @@ class GridViewPagerAdapter(
                                         logDebug("First page, update position only")
                                         var rangeToUpdate = position
                                         if (participantsForPage.size <= 5 && position == 5) {
-                                            rangeToUpdate = position - 1
+                                            rangeToUpdate = if (isLandscape()) {
+                                                position - 2
+                                            } else {
+                                                position - 1
+                                            }
                                         }
                                         it.notifyItemRemoved(position)
                                         it.notifyItemRangeRemoved(
@@ -516,9 +540,9 @@ class GridViewPagerAdapter(
         val layoutParams = recyclerView.layoutParams as RecyclerView.LayoutParams
         var leftRightMargin = 0
 
-        if (getCurrentOrientation() == Configuration.ORIENTATION_LANDSCAPE) {
+        if (isLandscape()) {
             if (position == 0 && data.size < 4)
-                return
+                leftRightMargin = 0
 
             if (position > 0 || (position == 0 && data.size > 4))
                 leftRightMargin = maxWidth / 8
@@ -581,6 +605,12 @@ class GridViewPagerAdapter(
         maxHeight = heightPixels
         notifyDataSetChanged()
     }
+
+    /**
+     * Determine if current orientation is landscape
+     */
+    fun isLandscape() =
+        getCurrentOrientation() == Configuration.ORIENTATION_LANDSCAPE
 
     companion object {
         private const val PARTICIPANTS_PER_PAGE = 6

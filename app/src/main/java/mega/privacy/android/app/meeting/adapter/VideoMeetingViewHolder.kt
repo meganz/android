@@ -450,6 +450,7 @@ class VideoMeetingViewHolder(
     private fun landscapeLayout(isFirstPage: Boolean, itemCount: Int) {
         if (!isGrid) return
 
+        val borderWidth = dp2px(BORDER_WIDTH)
         var w = 0
         var h = 0
 
@@ -473,32 +474,113 @@ class VideoMeetingViewHolder(
                 SLOT_NUM_2 -> {
                     w = screenWidth / TWO_COLUMNS
                     h = screenHeight
+
+                    when (adapterPosition) {
+                        POSITION_0 -> {
+                            w -= borderWidth
+                            marginRight = borderWidth
+                        }
+                    }
                 }
                 SLOT_NUM_3 -> {
                     w = (screenWidth / THREE_COLUMNS)
                     h = (screenHeight * 0.6).toInt()
                     marginBottom = screenHeight - h
+                    when (adapterPosition) {
+                        POSITION_0, POSITION_1 -> {
+                            w -= borderWidth
+                            marginRight = borderWidth
+                        }
+                    }
                 }
                 SLOT_NUM_4 -> {
                     w = (screenWidth / FOUR_COLUMNS)
                     h = (screenHeight / TWO_FILES)
+                    when (adapterPosition) {
+                        POSITION_0 -> {
+                            w -= borderWidth
+                            h -= borderWidth
+                            marginRight = borderWidth
+                            marginBottom = borderWidth
+                        }
+                        POSITION_1 -> {
+                            h -= borderWidth
+                            marginBottom = borderWidth
+                        }
+                        POSITION_2 -> {
+                            w -= borderWidth
+                            marginRight = borderWidth
+                        }
+                    }
                 }
                 SLOT_NUM_5 -> {
                     w = screenWidth / FOUR_COLUMNS
                     h = screenHeight / TWO_FILES
 
                     when (adapterPosition) {
-                        POSITION_3, POSITION_4 -> marginLeft = w / 2
+                        POSITION_0, POSITION_1 -> {
+                            w -= borderWidth
+                            h -= borderWidth
+                            marginRight = borderWidth
+                            marginBottom = borderWidth
+                        }
+                        POSITION_2 -> {
+                            h -= borderWidth
+                            marginBottom = borderWidth
+                        }
+                        POSITION_3 -> {
+                            w -= borderWidth
+                            marginRight = borderWidth
+                            marginLeft = w / 2
+                        }
+                        POSITION_4 -> {
+                            marginLeft = w / 2
+                        }
                     }
                 }
                 SLOT_NUM_6 -> {
                     w = (screenWidth / FOUR_COLUMNS)
                     h = (screenHeight / TWO_FILES)
+                    when (adapterPosition) {
+                        POSITION_0, POSITION_1 -> {
+                            w -= borderWidth
+                            h -= borderWidth
+                            marginRight = borderWidth
+                            marginBottom = borderWidth
+                        }
+                        POSITION_2 -> {
+                            h -= borderWidth
+                            marginBottom = borderWidth
+                        }
+                        POSITION_3, POSITION_4 -> {
+                            w -= borderWidth
+                            h -= borderWidth
+                            marginRight = borderWidth
+                        }
+                    }
                 }
             }
         } else {
             w = (screenWidth / FOUR_COLUMNS)
             h = (screenHeight / TWO_FILES)
+
+            when (adapterPosition) {
+                POSITION_0, POSITION_1 -> {
+                    w -= borderWidth
+                    h -= borderWidth
+                    marginRight = borderWidth
+                    marginBottom = borderWidth
+                }
+                POSITION_2 -> {
+                    h -= borderWidth
+                    marginBottom = borderWidth
+                }
+                POSITION_3, POSITION_4 -> {
+                    w -= borderWidth
+                    h -= borderWidth
+                    marginRight = borderWidth
+                }
+            }
         }
 
         layoutParams.setMargins(marginLeft, marginTop, marginRight, marginBottom)
@@ -674,7 +756,7 @@ class VideoMeetingViewHolder(
         const val TWO_FILES = 2
         const val THREE_COLUMNS = 3
         const val THREE_FILES = 3
-        const val FOUR_COLUMNS = 3
+        const val FOUR_COLUMNS = 4
         const val SLOT_NUM_1 = 1
         const val SLOT_NUM_2 = 2
         const val SLOT_NUM_3 = 3
