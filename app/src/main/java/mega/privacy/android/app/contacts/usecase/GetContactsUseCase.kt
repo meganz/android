@@ -21,11 +21,12 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MegaChatApiJavaUtils.getUserAliasFromCacheDecoded
 import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
 import mega.privacy.android.app.utils.MegaUserUtils.isExternalChange
 import mega.privacy.android.app.utils.MegaUserUtils.isRequestedChange
 import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
+import mega.privacy.android.app.utils.StringUtils.decodeAliases
+import mega.privacy.android.app.utils.StringUtils.decodeBase64
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.*
@@ -80,6 +81,20 @@ class GetContactsUseCase @Inject constructor(
                                     contacts[index] = currentContact.copy(
                                         alias = request.text
                                     )
+                            }
+
+                            emitter.onNext(contacts.sortedAlphabetically())
+                        } else if (request.paramType == USER_ATTR_ALIAS) {
+                            val requestAliases = request.megaStringMap.decodeAliases()
+
+                            contacts.forEachIndexed { indexToUpdate, contact ->
+                                var newAlias: String? = null
+                                if (requestAliases.isNotEmpty() && requestAliases.containsKey(contact.handle)) {
+                                    newAlias = requestAliases[contact.handle]
+                                }
+                                if (newAlias != contact.alias) {
+                                    contacts[indexToUpdate] = contact.copy(alias = newAlias)
+                                }
                             }
 
                             emitter.onNext(contacts.sortedAlphabetically())
@@ -143,13 +158,13 @@ class GetContactsUseCase @Inject constructor(
                                     megaApi.getUserAttribute(user.email, USER_ATTR_FIRSTNAME, userAttrsListener)
                                 user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ->
                                     megaApi.getUserAttribute(user.email, USER_ATTR_LASTNAME, userAttrsListener)
-                                user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS) ->
-                                    megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
                                 user.visibility != VISIBILITY_VISIBLE -> {
                                     contacts.removeAt(index)
                                     emitter.onNext(contacts.sortedAlphabetically())
                                 }
                             }
+                        } else if (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS)) {
+                            megaApi.getUserAttribute(user, USER_ATTR_ALIAS, userAttrsListener)
                         } else if (user.isRequestedChange() && user.visibility == VISIBILITY_VISIBLE) { // New contact
                             val contact = user.toContactItem().apply { requestMissingFields(userAttrsListener) }
                             contacts.add(contact)
@@ -174,7 +189,7 @@ class GetContactsUseCase @Inject constructor(
         Single.fromCallable { megaApi.getContact(userEmail) }
 
     private fun MegaUser.toContactItem(): ContactItem.Data {
-        val alias = megaChatApi.getUserAliasFromCacheDecoded(handle)
+        val alias = megaChatApi.getUserAliasFromCache(handle)?.decodeBase64()
         val fullName = megaChatApi.getUserFullnameFromCache(handle)
         val userStatus = megaChatApi.getUserOnlineStatus(handle)
         val userImageColor = megaApi.getUserAvatarColor(this).toColorInt()

@@ -135,7 +135,8 @@ class ContactListViewModel @ViewModelInject constructor(
 
     fun getChatRoomId(userHandle: Long): LiveData<Long> {
         val result = MutableLiveData<Long>()
-        getChatRoomUseCase.get(userHandle).subscribeOn(Schedulers.io())
+        getChatRoomUseCase.get(userHandle)
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { chatId ->
