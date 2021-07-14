@@ -87,7 +87,7 @@
     <!-- Error getting the root node -->
     <string name="error_general_nodes">Erro. Por favor, tente novamente.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
-    <string name="general_rk">MEGA-RECOVERYKEY</string>
+    <string name="general_rk">MEGA-CHAVEDERECUPERACAO</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">A pasta secundária de mídia não existe. Por favor, selecione uma pasta nova.</string>
     <!-- when no external card exists -->
@@ -1951,7 +1951,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Como funciona</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage.</string>
+    <string name="first_paragraph_achievement_invite_friends">Convide os seus amigos a criar uma conta gratuita no MEGA e instalar o nosso aplicativo para dispositivos móveis. Cada vez que um amigo convidado se cadastrar e instalar um aplicativo, você receberá uma cota extra de armazenamento.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Você não receberá bônus por convidar alguém que já tiver usado o MEGA antes, e você não será avisado sobre isso. Os convidados devem instalar o aplicativo do MEGA para celular ou para desktop nos seus dispositivos.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1965,17 +1965,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Formato de email incorreto</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
+    <string name="paragraph_info_achievement_install_desktop">Ao instalar o aplicativo para desktop do MEGA, você recebe grátis %1$s de espaço de armazenamento, válidos por 365 dias. O aplicativo para desktop do MEGA está disponível para Windows, macOS e a maioria das distribuições Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">When you install our mobile app you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS, Android and Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Ao instalar o nosso aplicativo para dispositivos móveis, você recebe grátis %1$s de espaço de armazenamento, válidos por 365 dias. Oferecemos aplicativos para dispositivos móveis com iOS, Android e Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space, valid for 365 days.</string>
+    <string name="paragraph_info_achievement_add_phone">Ao verificar o seu número de telefone, você vai obter %1$s de espaço de armazenamento gratuito, válidos por 365 dias.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA desktop app.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Você recebeu %1$s de espaço de armazenamento por instalar o aplicativo do MEGA para desktop.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing our mobile app.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Você recebeu %1$s de espaço de armazenamento por instalar o aplicativo do MEGA para dispositivos móveis.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space for verifying your phone number.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Você recebeu %1$s de espaço de armazenamento por verificar o seu número de telefone.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Você recebeu %1$s de espaço de armazenamento como bônus gratuito pelo seu registro.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2169,8 +2169,6 @@
     <string name="label_set_period">Definir período</string>
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]Convide os seus amigos para o [/B][A]Chat[/A][B] e aproveite a nossa plataforma criptografada com privacidade e segurança.[/B]</string>
-    <!-- Text of the empty screen when there are not elements in Camera Uploads -->
-    <string name="context_empty_camera_uploads">[B]Não há arquivos nos[/B] [A]Uploads da câmera[/A]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Lixeira [/A][B]vazia[/B]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -3332,7 +3330,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Converse com segurança com os seus contatos usando criptografia de ponta a ponta</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hi! Have secure conversations on MEGA with me and get up to 20 GB+ free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Olá! Converse com segurança no MEGA comigo e obtenha 20 GB de armazenamento gratuito. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Não há link de chat disponível.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3943,5 +3941,36 @@
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
     <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Save to gallery</string>
+    <string name="general_save_to_gallery">Salvar na galeria</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">Imprensa</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">Arquivos de áudio</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">Reproduzindo em segundo plano</string>
+    <!-- Text of the empty screen when there are no elements in Photos -->
+    <string name="photos_empty">[B]Não há [/B][A]Fotos[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="enable_cu_subtitle">Faça o backup automático de fotos e vídeos na sua Nuvem.</string>
+    <!-- Text of a button on Camera Uploads section to show all the content of the section-->
+    <string name="all_view_button">Todas</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
+    <string name="days_view_button">Dias</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
+    <string name="months_view_button">Meses</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
+    <string name="years_view_button">Anos</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
+    <string name="cu_month_year_date">[B]%1$s[/B] de %2$s</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
+    <string name="cu_day_month_year_date">[B]%1$s de %2$s[/B] de %3$s</string>
+    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
+    <plurals name="cu_upload_progress">
+        <item quantity="one">Upload em andamento, 1 arquivo pendente</item>
+        <item quantity="other">Upload em andamento, %1$d arquivos pendentes</item>
+    </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Produção</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Alterar servidor</string>
 </resources>

@@ -217,7 +217,7 @@
     <!--  -->
     <string name="tour_access_title">Akses MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB+ of free space</string>
+    <string name="tour_space_text">Daftar sekarang dan dapatkan 20 GB+ ruang gratis</string>
     <!--  -->
     <string name="tour_speed_text">Upload cepat. Bagikan file dengan siapapun</string>
     <!--  -->
@@ -481,7 +481,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Permintaan terkirim kembali</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Permintaan berhasil dikirim ke %s. Status dapat dikonsultasikan di tab  Permintaan Terkirim.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Kontak telah dihapus</string>
     <!-- error message -->
@@ -644,8 +644,7 @@
     <string name="upload_uploaded">Berhasil di upload</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
-        <item quantity="one">Processing file</item>
-        <item quantity="other">Processing files</item>
+        <item quantity="other">Memproses file</item>
     </plurals>
     <!-- error message when downloading a file -->
     <string name="error_temporary_unavaible">Sumber sementara tidak tersedia, harap coba kembali nanti</string>
@@ -1129,7 +1128,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Upgrade sekarang</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Improve your cloud capacity![A]Get more space and transfer quota with a Pro account!</string>
+    <string name="get_pro_account">Tingkatkan kapasitas cloud anda! [A]Dapatkan lebih banyak ruang dan kuota transfer dengan akun Pro!</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">Recovery Key telah dicadangkan menjadi: %1s. [A] Sementara file tetap berada di  jalur ini, Anda akan menemukannya di Bagian Saved for Offline. [A]Catatan: Ini akan dihapus jika Anda log out,  tolong simpan itu di tempat yang aman</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -1804,7 +1803,7 @@
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">Hanya-baca</string>
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
-    <string name="file_properties_shared_folder_read_write">Read and write</string>
+    <string name="file_properties_shared_folder_read_write">Baca dan tulis</string>
     <!-- State of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="attachment_uploading_state_paused">Transfer dihentikan!</string>
     <!-- label to indicate the state of an upload in chat -->
@@ -1878,9 +1877,9 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Undang teman dan dapatkan hadiah</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each referral. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">%1$spenyimpanan untuk setiap rujukan. Berlaku selama 365 hari.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
-    <string name="figures_achievements_text">%1$s of storage. Valid for 365 days.</string>
+    <string name="figures_achievements_text">%1$spenyimpanan. Berlaku selama 365 hari.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Imbalan diterima</string>
     <!-- title of the section for unlocked storage quota -->
@@ -1910,7 +1909,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cara kerja</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage.</string>
+    <string name="first_paragraph_achievement_invite_friends">Undang teman anda untuk membuat akun MEGA gratis dan instal aplikasi seluler kami. Untuk setiap pendaftaran dan pemasangan aplikasi yang berhasil, anda menerima penyimpanan bonus.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Anda tidak akan menerima kredit karena mengundang  seseorang yang telah menggunakan MEGA sebelumnya dan Anda tidak akan diberitahu tentang penolakan semacam itu.  Kontak yang diundang harus menginstal aplikasi seluler MEGA atau aplikasi desktop MEGA di perangkat mereka.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -1924,17 +1923,17 @@
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">Email salah</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
+    <string name="paragraph_info_achievement_install_desktop">Saat anda menginstal aplikasi desktop MEGA, anda mendapatkan %1$sruang penyimpanan gratis, berlaku selama 365 hari. Aplikasi desktop MEGA tersedia untuk Windows, macOS, dan sebagian besar distro Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">When you install our mobile app you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS, Android and Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">Saat anda menginstal aplikasi seluler kami, anda mendapatkan %1$sruang penyimpanan gratis, berlaku selama 365 hari. Kami menyediakan aplikasi seluler untuk iOS, Android, dan Windows Phone.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space, valid for 365 days.</string>
+    <string name="paragraph_info_achievement_add_phone">Ketika anda memverifikasi nomor telepon anda, anda mendapatkan %1$sruang penyimpanan gratis, berlaku selama 365 hari.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA desktop app.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Anda telah menerima %1$sruang penyimpanan untuk menginstal aplikasi desktop MEGA kami.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing our mobile app.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Anda telah menerima %1$sruang penyimpanan untuk menginstal aplikasi seluler kami.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space for verifying your phone number.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Anda telah menerima %1$sruang penyimpanan untuk memverifikasi nomor telepon anda.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Anda telah menerima ruang penyimpanan %1$s sebagai  bonus pendaftaran gratis Anda.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2125,8 +2124,6 @@
     <string name="label_set_period">Setel periode</string>
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]Undang teman ke [/B][A]Chat[/A][B] dan nikmati platform terenkripsi kami  dengan privasi dan keamanan[/B]</string>
-    <!-- Text of the empty screen when there are not elements in Camera Uploads -->
-    <string name="context_empty_camera_uploads">[B]Tidak ada media di [/B][A]Unggahan Kamera[/A]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[B]Kosong [/B][A]Sampah[/A]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2162,7 +2159,7 @@
     <!-- Message shown when a link is being processing -->
     <string name="processing_link">Memproses tautan &#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
-    <string name="passwd_weak">Your password is easily guessed. Try making your password longer. Combine uppercase and lowercase letters. Add special characters. Do not use names or dictionary words.</string>
+    <string name="passwd_weak">Kata sandi anda mudah ditebak. Coba buat kata sandi anda lebih panjang. Menggabungkan huruf besar dan huruf kecil. Tambahkan karakter khusus. Jangan gunakan nama atau kata-kata kamus.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
     <string name="passwd_medium">Password anda cukup kuat, namun disarankan untuk lebih memperkuat password anda lagi.</string>
     <!-- Message shown when it is creating an acount and it is been introduced a good password -->
@@ -2287,7 +2284,7 @@
     <!-- First step to turn on notifications -->
     <string name="turn_on_notifications_first_step">Buka perangkat Android [A]Pengaturan[/A]</string>
     <!-- Second step to turn on notifications -->
-    <string name="turn_on_notifications_second_step">Open [A]Apps &amp; notifications[/A]</string>
+    <string name="turn_on_notifications_second_step">Buka [A]Aplikasi &amp; notifikasi[/A]</string>
     <!-- Third step to turn on notifications -->
     <string name="turn_on_notifications_third_step">Pilih [A]MEGA[/A]</string>
     <!-- Fourth step to turn on notifications -->
@@ -2453,7 +2450,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Lain kali Anda login ke akun Anda, Anda akan diminta memasukkan kode 6-digit  yang disediakan oleh aplikasi Otentikasi Anda.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Consider exporting your <b>Recovery Key</b> in case you lose access to your app or want to disable Two-Factor Authentication in the future.</string>
+    <string name="recommendation_2fa_enabled">Pertimbangkan untuk mengekspor <b>Kunci Pemulihan</b>jika anda kehilangan akses ke aplikasi anda atau ingin menonaktifkan Otentikasi Dua Faktor di masa mendatang.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Kode salah</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -3257,7 +3254,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Mulai mengobrol dengan aman dengan kontak Anda menggunakan enkripsi  ujung-ke-ujung</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hi! Have secure conversations on MEGA with me and get up to 20 GB+ free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hi! Lakukan percakapan aman di MEGA dengan saya dan dapatkan penyimpanan gratis hingga 20 GB+. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Tautan obrolan tidak tersedia.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3857,5 +3854,35 @@
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
     <!-- Item menu option upon right click on one image or video to save it to device gallery -->
-    <string name="general_save_to_gallery">Save to gallery</string>
+    <string name="general_save_to_gallery">Simpan ke galeri</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">Media</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">File audio</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">Bermain di latar belakang</string>
+    <!-- Text of the empty screen when there are no elements in Photos -->
+    <string name="photos_empty">[B]Tidak ada[/B] [A]Foto[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="enable_cu_subtitle">Cadangkan foto dan video anda ke Penyimpanan Cloud anda secara otomatis.</string>
+    <!-- Text of a button on Camera Uploads section to show all the content of the section-->
+    <string name="all_view_button">Semua</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
+    <string name="days_view_button">Hari</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
+    <string name="months_view_button">Bulan</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
+    <string name="years_view_button">Tahun</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
+    <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
+    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
+    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
+    <plurals name="cu_upload_progress">
+        <item quantity="other">Unggah sedang berlangsung, %1$dfile tertunda</item>
+    </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Change server</string>
 </resources>

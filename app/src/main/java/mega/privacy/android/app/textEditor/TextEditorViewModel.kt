@@ -1,9 +1,10 @@
-package mega.privacy.android.app.textFileEditor
+package mega.privacy.android.app.textEditor
 
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.ViewModelInject
@@ -46,7 +47,7 @@ import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 
-class TextFileEditorViewModel @ViewModelInject constructor(
+class TextEditorViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
@@ -61,52 +62,53 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         const val NON_UPDATE_FINISH_ACTION = 0
         const val SUCCESS_FINISH_ACTION = 1
         const val ERROR_FINISH_ACTION = 2
+        const val SHOW_LINE_NUMBERS = "SHOW_LINE_NUMBERS"
     }
 
-    private val textFileEditorData: MutableLiveData<TextFileEditorData> =
-        MutableLiveData(TextFileEditorData())
+    private val textEditorData: MutableLiveData<TextEditorData> = MutableLiveData(TextEditorData())
     private val mode: MutableLiveData<String> = MutableLiveData()
-    private val savingMode: MutableLiveData<String> = MutableLiveData()
     private val fileName: MutableLiveData<String> = MutableLiveData()
-    private val contentText: MutableLiveData<String> = MutableLiveData()
-    private val editedText: MutableLiveData<String> by lazy { MutableLiveData<String>() }
+    private val pagination: MutableLiveData<Pagination> = MutableLiveData()
 
     private var needsReadContent = false
     private var isReadingContent = false
     private var errorSettingContent = false
     private var localFileUri: String? = null
     private var streamingFileURL: URL? = null
+    private var showLineNumbers = false
 
-    fun onTextFileEditorDataUpdate(): LiveData<TextFileEditorData> = textFileEditorData
+    private lateinit var preferences: SharedPreferences
 
-    fun onSavingMode(): LiveData<String> = savingMode
+    fun onTextFileEditorDataUpdate(): LiveData<TextEditorData> = textEditorData
 
     fun getFileName(): LiveData<String> = fileName
 
-    fun onContentTextRead(): LiveData<String> = contentText
+    fun onContentTextRead(): LiveData<Pagination> = pagination
 
-    fun getNode(): MegaNode? = textFileEditorData.value?.node
+    fun getPagination(): Pagination? = pagination.value
+
+    fun getNode(): MegaNode? = textEditorData.value?.node
 
     fun getNodeAccess(): Int = megaApi.getAccess(getNode())
 
     fun updateNode() {
-        val node = textFileEditorData.value?.node ?: return
+        val node = textEditorData.value?.node ?: return
 
-        textFileEditorData.value?.node = megaApi.getNodeByHandle(node.handle)
-        textFileEditorData.notifyObserver()
+        textEditorData.value?.node = megaApi.getNodeByHandle(node.handle)
+        textEditorData.notifyObserver()
     }
 
-    private fun getFileUri(): Uri? = textFileEditorData.value?.fileUri
+    private fun getFileUri(): Uri? = textEditorData.value?.fileUri
 
-    private fun getFileSize(): Long? = textFileEditorData.value?.fileSize
+    private fun getFileSize(): Long? = textEditorData.value?.fileSize
 
-    fun getAdapterType(): Int = textFileEditorData.value?.adapterType ?: INVALID_VALUE
+    fun getAdapterType(): Int = textEditorData.value?.adapterType ?: INVALID_VALUE
 
-    fun isEditableAdapter(): Boolean = textFileEditorData.value?.editableAdapter ?: false
+    fun isEditableAdapter(): Boolean = textEditorData.value?.editableAdapter ?: false
 
-    fun getMsgChat(): MegaChatMessage? = textFileEditorData.value?.msgChat
+    fun getMsgChat(): MegaChatMessage? = textEditorData.value?.msgChat
 
-    fun getChatRoom(): MegaChatRoom? = textFileEditorData.value?.chatRoom
+    fun getChatRoom(): MegaChatRoom? = textEditorData.value?.chatRoom
 
     fun getMode(): LiveData<String> = mode
 
@@ -124,18 +126,10 @@ class TextFileEditorViewModel @ViewModelInject constructor(
         mode.value = EDIT_MODE
     }
 
-    private fun isSaving(): Boolean = savingMode.value != null
-
-    fun isSavingModeEdit(): Boolean = savingMode.value == EDIT_MODE
-
-    fun resetSavingMode() {
-        savingMode.value = null
-    }
-
-    fun getEditedText(): String? = editedText.value
+    fun getCurrentText(): String? = pagination.value?.getCurrentPageText()
 
     fun setEditedText(text: String?) {
-        editedText.value = text
+        pagination.value?.updatePage(text)
     }
 
     fun getNameOfFile(): String = fileName.value ?: ""
@@ -154,20 +148,24 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
     fun thereIsNoErrorSettingContent(): Boolean = !errorSettingContent
 
-    fun canShowEditFab(): Boolean =
-        isViewMode() && isEditableAdapter() && !isSaving()
-                && !needsReadOrIsReadingContent() && thereIsNoErrorSettingContent()
+    fun setShowLineNumbers(): Boolean {
+        showLineNumbers = !showLineNumbers
+        preferences.edit().putBoolean(SHOW_LINE_NUMBERS, showLineNumbers).apply()
 
-    init {
-        contentText.value = ""
-        editedText.value = ""
+        return shouldShowLineNumbers()
     }
+
+    fun shouldShowLineNumbers(): Boolean = showLineNumbers
+
+    fun canShowEditFab(): Boolean =
+        isViewMode() && isEditableAdapter() && !needsReadOrIsReadingContent()
+                && thereIsNoErrorSettingContent()
 
     /**
      * Checks if the file can be editable depending on the current adapter.
      */
     private fun setEditableAdapter() {
-        textFileEditorData.value?.editableAdapter =
+        textEditorData.value?.editableAdapter =
             if (isCreateMode()) true
             else getAdapterType() != OFFLINE_ADAPTER
                     && getAdapterType() != RUBBISH_BIN_ADAPTER && !megaApi.isInRubbish(getNode())
@@ -180,14 +178,19 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Gets all necessary values from intent if available.
+     * Sets all necessary values from params if available.
      *
-     * @param intent Received intent.
-     * @param mi     Current phone memory info in case is needed to read the file on streaming.
+     * @param intent      Received intent.
+     * @param mi          Current phone memory info in case is needed to read the file on streaming.
+     * @param preferences Preference data.
      */
-    fun setValuesFromIntent(intent: Intent, mi: ActivityManager.MemoryInfo) {
+    fun setInitialValues(
+        intent: Intent,
+        mi: ActivityManager.MemoryInfo,
+        preferences: SharedPreferences
+    ) {
         val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
-        textFileEditorData.value?.adapterType = adapterType
+        textEditorData.value?.adapterType = adapterType
 
         when (adapterType) {
             FROM_CHAT -> {
@@ -195,7 +198,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 val chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
 
                 if (msgId != MEGACHAT_INVALID_HANDLE && chatId != MEGACHAT_INVALID_HANDLE) {
-                    textFileEditorData.value?.chatRoom = megaChatApi.getChatRoom(chatId)
+                    textEditorData.value?.chatRoom = megaChatApi.getChatRoom(chatId)
                     var msgChat = megaChatApi.getMessage(chatId, msgId)
 
                     if (msgChat == null) {
@@ -203,9 +206,9 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                     }
 
                     if (msgChat != null) {
-                        textFileEditorData.value?.msgChat = msgChat
+                        textEditorData.value?.msgChat = msgChat
 
-                        textFileEditorData.value?.node = authorizeNodeIfPreview(
+                        textEditorData.value?.node = authorizeNodeIfPreview(
                             msgChat.megaNodeList.get(0),
                             megaChatApi,
                             megaApi,
@@ -218,12 +221,12 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 val filePath = intent.getStringExtra(INTENT_EXTRA_KEY_PATH)
 
                 if (filePath != null) {
-                    textFileEditorData.value?.fileUri = filePath.toUri()
-                    textFileEditorData.value?.fileSize = File(filePath).length()
+                    textEditorData.value?.fileUri = filePath.toUri()
+                    textEditorData.value?.fileSize = File(filePath).length()
                 }
             }
             FILE_LINK_ADAPTER -> {
-                textFileEditorData.value?.node =
+                textEditorData.value?.node =
                     MegaNode.unserialize(intent.getStringExtra(EXTRA_SERIALIZE_STRING))
             }
             FOLDER_LINK_ADAPTER -> {
@@ -234,10 +237,10 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                     )
                 )
 
-                textFileEditorData.value?.node = megaApiFolder.authorizeNode(node)
+                textEditorData.value?.node = megaApiFolder.authorizeNode(node)
             }
             else -> {
-                textFileEditorData.value?.node = megaApi.getNodeByHandle(
+                textEditorData.value?.node = megaApi.getNodeByHandle(
                     intent.getLongExtra(
                         INTENT_EXTRA_KEY_HANDLE,
                         INVALID_HANDLE
@@ -246,7 +249,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             }
         }
 
-        textFileEditorData.value?.api =
+        textEditorData.value?.api =
             if (adapterType == FOLDER_LINK_ADAPTER) megaApiFolder else megaApi
 
         mode.value = intent.getStringExtra(MODE) ?: VIEW_MODE
@@ -258,7 +261,10 @@ class TextFileEditorViewModel @ViewModelInject constructor(
 
         setEditableAdapter()
 
-        fileName.value = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name!!
+        fileName.value = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME) ?: getNode()?.name ?: ""
+
+        this.preferences = preferences
+        showLineNumbers = preferences.getBoolean(SHOW_LINE_NUMBERS, false)
     }
 
     /**
@@ -270,14 +276,14 @@ class TextFileEditorViewModel @ViewModelInject constructor(
     private fun initializeReadParams(mi: ActivityManager.MemoryInfo) {
         localFileUri =
             if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
-            else getLocalFile(null, getNode()?.name, getNode()?.size!!)
+            else getLocalFile(null, getNode()?.name, getNode()?.size ?: 0)
 
         if (isTextEmpty(localFileUri)) {
-            val api = textFileEditorData.value?.api ?: return
+            val api = textEditorData.value?.api ?: return
 
             if (api.httpServerIsRunning() == 0) {
                 api.httpServerStart()
-                textFileEditorData.value?.needStopHttpServer = true
+                textEditorData.value?.needStopHttpServer = true
             }
 
             api.httpServerSetMaxBufferSize(
@@ -359,8 +365,8 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 sb.deleteRange(latestBreak, sb.length)
             }
 
-            contentText.postValue(sb.toString())
-            editedText.postValue(sb.toString())
+
+            pagination.postValue(Pagination(sb.toString(), 0))
             sb.clear()
         }
     }
@@ -369,24 +375,24 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      * Starts the save file content action by creating a temp file, setting the new or modified text,
      * and then uploading it to the Cloud.
      *
-     * @param context Current context.
+     * @param activity Current activity.
+     * @param fromHome True if is creating file from Home page, false otherwise.
      */
-    fun saveFile(context: Context) {
+    fun saveFile(activity: Activity, fromHome: Boolean) {
         if (!isFileEdited() && !isCreateMode()) {
             setViewMode()
             return
         }
 
-        val tempFile = buildTempFile(context, fileName.value)
+        val tempFile = buildTempFile(activity, fileName.value)
         if (tempFile == null) {
             logError("Cannot get temporal file.")
-
             return
         }
 
         val fileWriter = FileWriter(tempFile.absolutePath)
         val out = BufferedWriter(fileWriter)
-        out.write(editedText.value ?: "")
+        out.write(pagination.value?.getEditedText() ?: "")
         out.close()
 
         if (!isFileAvailable(tempFile)) {
@@ -394,8 +400,9 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             return
         }
 
-        val uploadIntent = Intent(context, UploadService::class.java)
-            .putExtra(UploadService.EXTRA_UPLOAD_TXT, true)
+        val uploadIntent = Intent(activity, UploadService::class.java)
+            .putExtra(UploadService.EXTRA_UPLOAD_TXT, mode.value)
+            .putExtra(FROM_HOME_PAGE, fromHome)
             .putExtra(UploadService.EXTRA_FILEPATH, tempFile.absolutePath)
             .putExtra(UploadService.EXTRA_NAME, fileName.value)
             .putExtra(UploadService.EXTRA_SIZE, tempFile.length())
@@ -410,18 +417,17 @@ class TextFileEditorViewModel @ViewModelInject constructor(
                 }
             )
 
-        context.startService(uploadIntent)
-        savingMode.value = mode.value
-        setViewMode()
+        activity.startService(uploadIntent)
+        activity.finish()
     }
 
     /**
      * Stops the http server if has been started before.
      */
     fun checkIfNeedsStopHttpServer() {
-        if (textFileEditorData.value?.needStopHttpServer == true) {
-            textFileEditorData.value?.api?.httpServerStop()
-            textFileEditorData.value?.needStopHttpServer = false
+        if (textEditorData.value?.needStopHttpServer == true) {
+            textEditorData.value?.api?.httpServerStop()
+            textEditorData.value?.needStopHttpServer = false
         }
     }
 
@@ -485,64 +491,7 @@ class TextFileEditorViewModel @ViewModelInject constructor(
      *
      * @return True if the content has been modified, false otherwise.
      */
-    fun isFileEdited(): Boolean = contentText.value != editedText.value
-
-    /**
-     * Checks if the completed transfer refers to the same node of current view.
-     *
-     * @param completedTransfer Completed transfer to check.
-     * @return True if the completed transfer refers to the same getNode(), false otherwise.
-     */
-    private fun isSameNode(completedTransfer: AndroidCompletedTransfer): Boolean {
-        val fileParentHandle = when {
-            getNode() == null -> megaApi.rootNode.handle
-            getNode()!!.isFolder -> getNode()!!.handle
-            else -> getNode()!!.parentHandle
-        }
-
-        return completedTransfer.fileName == fileName.value
-                && completedTransfer.parentHandle == fileParentHandle
-    }
-
-    /**
-     * Finishes the create or edit action if the received completed transfer makes reference to
-     * the current opened file.
-     *
-     * @param completedTransferId The completed transfer identifier.
-     */
-    fun finishCreationOrEdition(completedTransferId: Long): Int {
-        if (completedTransferId == INVALID_ID.toLong()) {
-            LogUtil.logWarning("Invalid completedTransferId")
-            return NON_UPDATE_FINISH_ACTION
-        }
-
-        val completedTransfer = dbH.getcompletedTransfer(completedTransferId)
-        if (completedTransfer == null) {
-            LogUtil.logWarning("Invalid completedTransfer")
-            return NON_UPDATE_FINISH_ACTION
-        }
-
-        if (!isSameNode(completedTransfer)) {
-            LogUtil.logWarning("Not the same file, no update needed.")
-            return NON_UPDATE_FINISH_ACTION
-        }
-
-        if (completedTransfer.state != MegaTransfer.STATE_COMPLETED) {
-            return ERROR_FINISH_ACTION
-        }
-
-        if (editedText.value == null) {
-            contentText.value = ""
-            editedText.value = ""
-        } else {
-            contentText.value = editedText.value
-        }
-
-        textFileEditorData.value?.node =
-            megaApi.getNodeByHandle(completedTransfer.nodeHandle.toLong())
-
-        return SUCCESS_FINISH_ACTION
-    }
+    fun isFileEdited(): Boolean = pagination.value?.isEdited() == true
 
     /**
      * Manages the download action.
@@ -609,5 +558,15 @@ class TextFileEditorViewModel @ViewModelInject constructor(
             FILE_LINK_ADAPTER -> shareLink(context, urlFileLink)
             else -> shareNode(context, getNode()!!) { updateNode() }
         }
+    }
+
+    fun previousClicked() {
+        pagination.value?.previousPage()
+        pagination.notifyObserver()
+    }
+
+    fun nextClicked() {
+        pagination.value?.nextPage()
+        pagination.notifyObserver()
     }
 }

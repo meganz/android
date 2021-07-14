@@ -411,9 +411,9 @@
     <!-- Warning message -->
     <string name="error_file_size_greater_than_4gb">Большинство устройств не может скачивать файлы больше 4 ГБ. Возможно, скачивание не удастся</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
-    <string name="intent_not_available">На вашем устройстве отсутствует приложение для открытия этого файла.</string>
+    <string name="intent_not_available">На вашем устройстве нет приложений для открытия этого файла</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
-    <string name="intent_not_available_location">На вашем устройстве нет доступных приложений, чтобы открыть эту папку.</string>
+    <string name="intent_not_available_location">На вашем устройстве нет приложений, чтобы открыть эту папку</string>
     <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
     <string name="intent_not_available_file">Возможно, у вас не установлены приложения, поддерживающие этот тип файлов.</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
@@ -433,7 +433,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_remove_link_menu">Удалить ссылку</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
-    <string name="context_remove_link_warning_text">Эта ссылка больше не будет общедоступна.</string>
+    <string name="context_remove_link_warning_text">Эта ссылка больше не будет доступна публично.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
         <item quantity="one">Эта ссылка больше не будет общедоступна.</item>
@@ -508,11 +508,11 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Запрос отправлен повторно</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Запрос успешно отправлен %s. Его состояние доступно во вкладке «Отправленные запросы».</string>
+    <string name="context_contact_request_sent">Запрос успешно отправлен пользователю %s. Его можно посмотреть на вкладке «Отправленные запросы».</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Контакт удалён</string>
     <!-- error message -->
-    <string name="context_contact_not_removed">Ошибка. Контакт не удален</string>
+    <string name="context_contact_not_removed">Ошибка. Контакт не удалён</string>
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">Права изменены</string>
     <!-- error message -->
@@ -582,7 +582,7 @@
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">Папки оставлены(%d).</string>
     <!-- Message shown when a share has been left -->
-    <string name="share_left">Остался общий элемент</string>
+    <string name="share_left">Покинут общий элемент</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">Папки не были закрыты (%d)</string>
     <!-- success message when sending multiple files -->
@@ -614,13 +614,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">Папка больше не доступна контактам</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Ошибка, доступ к папке всё ещё открыт другому контакту.</string>
+    <string name="context_no_removed_sharing_contacts">Произошла ошибка. Папка по-прежнему доступна другому контакту</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Выбрать только один файл</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Корзина очищена</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Ошибка. Корзина не была очищена</string>
+    <string name="rubbish_bin_no_emptied">Произошла ошибка. Корзина не очищена</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Вы собираетесь отменить подписку MEGA. Пожалуйста, дайте нам знать, если можно что-нибудь сделать, чтобы вы изменили своё решение.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -628,7 +628,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Отправить</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Спасибо за ваш отзыв! Вы действительно хотите отменить подписку MEGA?</string>
+    <string name="confirmation_cancel_subscriptions">Спасибо за ваш отзыв. Вы действительно хотите отменить подписку на MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Ваша подписка не отменена. Пожалуйста, укажите причину отмены</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -685,7 +685,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Ошибка файловой системы</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">При выполнении произошла ошибка</string>
+    <string name="general_error">Произошла ошибка при просмотре локальных файлов.</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Просмотр изображений</string>
     <!-- Headline for the amount of storage space is used -->
@@ -693,7 +693,7 @@
     <!-- menu item -->
     <string name="my_account_change_password">Изменить пароль</string>
     <!-- Dialog text overquota error -->
-    <string name="overquota_alert_text">Вы превысили лимит хранилища. Хотите улучшить учётную запись?</string>
+    <string name="overquota_alert_text">Вы превысили лимит хранилища. Хотите улучшить аккаунт?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Последняя сессия</string>
     <!-- header for the social connections, showing the number of contacts the user has -->
@@ -715,7 +715,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">На данный момент ни один метод оплаты не доступен для данного плана</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
-    <string name="upgrade_per_month">Ежемесячное*</string>
+    <string name="upgrade_per_month">Ежемесячно*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
     <string name="upgrade_per_year">Ежегодно*</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
@@ -920,9 +920,9 @@
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="one">1 неудачная попытка ввода пароля</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">Неудачных попыток ввода: %1$d</item>
+        <item quantity="few">%1$d неудачные попытки ввода пароля</item>
+        <item quantity="many">%1$d неудачных попыток ввода пароля</item>
+        <item quantity="other">%1$d неудачные попытки ввода пароля</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">После 10 неудачных попыток локальные файлы будут удалены, а вы выйдете из системы</string>
@@ -938,13 +938,13 @@
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">Пароли не совпадают. Попробуйте снова.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="unlock_pin_title">Введите свой пароль</string>
+    <string name="unlock_pin_title">Введите код доступа</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="unlock_pin_title_2">Повторно введите пароль</string>
+    <string name="unlock_pin_title_2">Повторно введите код доступа</string>
     <!-- Title of the screen to unlock screen with Passcode -->
-    <string name="reset_pin_title">Введите новый пароль</string>
+    <string name="reset_pin_title">Введите новый код доступа</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
-    <string name="reset_pin_title_2">Повторно введите новый пароль</string>
+    <string name="reset_pin_title_2">Повторно введите новый код доступа</string>
     <!-- Text of the screen after 10 attemps with a wrong Passcode -->
     <string name="incorrect_pin_activity">Локальные данные будут удалены, а вы выйдете из системы через %1d сек.</string>
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
@@ -2259,8 +2259,6 @@
     <string name="label_set_period">Выбрать период</string>
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]Приглашайте друзей в [/B][A]чат[/A][B] и наслаждайтесь нашей зашифрованной платформой конфиденциально и безопасно[/B]</string>
-    <!-- Text of the empty screen when there are not elements in Camera Uploads -->
-    <string name="context_empty_camera_uploads">[B]Нет медиа в [/B][A]загрузках камеры[/A]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Корзина [/A][B]пуста[/B]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2326,7 +2324,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Ваш аккаунт был заблокирован из-за многочисленных нарушений Условий предоставления услуг MEGA. Пожалуйста, проверьте свой почтовый ящик.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Ваша учетная запись была прервана из-за нарушения Условий предоставления услуг MEGA, таких как злоупотребление правами других лиц; обмен и/или импорт незаконных данных; или злоупотребление системой.</string>
+    <string name="account_suspended_breache_ToS">Ваш аккаунт был заблокирован из-за нарушения условий предоставления услуг MEGA, включая, помимо прочего, пункт 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Загрузка файлов</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2727,9 +2725,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Архивированные чаты (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Архивация чата</string>
+    <string name="archive_chat_option">Архивировать чат</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Разархивация чата</string>
+    <string name="unarchive_chat_option">Разархивировать чат</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Архив</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -4118,4 +4116,37 @@
     <string name="general_info">Информация</string>
     <!-- Item menu option upon right click on one image or video to save it to device gallery -->
     <string name="general_save_to_gallery">Сохранить в галерее</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">Медиа</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">Аудиофайлы</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">Воспроизведение в фоновом режиме</string>
+    <!-- Text of the empty screen when there are no elements in Photos -->
+    <string name="photos_empty">[B]Нет[/B] [A]фотографий[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="enable_cu_subtitle">Автоматически загружать фото и видео на облачный диск.</string>
+    <!-- Text of a button on Camera Uploads section to show all the content of the section-->
+    <string name="all_view_button">Все</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
+    <string name="days_view_button">Дни</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
+    <string name="months_view_button">Месяцы</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
+    <string name="years_view_button">Годы</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
+    <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
+    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
+    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
+    <plurals name="cu_upload_progress">
+        <item quantity="one">Загрузка, 1 файл ожидает обработки</item>
+        <item quantity="few">Загрузка, %1$d файла ожидает обработки</item>
+        <item quantity="many">Загрузка, %1$d файлов ожидает обработки</item>
+        <item quantity="other">Загрузка, %1$d файла ожидает обработки</item>
+    </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Производство</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Изменение сервера</string>
 </resources>

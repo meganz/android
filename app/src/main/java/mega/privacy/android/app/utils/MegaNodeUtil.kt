@@ -24,7 +24,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -40,9 +40,9 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.EDIT_MODE
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.VIEW_MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
@@ -1574,7 +1574,7 @@ object MegaNodeUtil {
         urlFileLink: String?,
         mode: String
     ) {
-        val textFileIntent = Intent(context, TextFileEditorActivity::class.java)
+        val textFileIntent = Intent(context, TextEditorActivity::class.java)
 
         if (adapterType == FILE_LINK_ADAPTER) {
             textFileIntent.putExtra(EXTRA_SERIALIZE_STRING, node.serialize())
