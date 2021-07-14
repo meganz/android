@@ -21,7 +21,7 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.exportMK.ExportRecoveryKeyActivity
+import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop

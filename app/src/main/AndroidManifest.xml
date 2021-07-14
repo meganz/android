@@ -638,7 +638,7 @@
             android:launchMode="singleTop" />
 
         <activity
-            android:name="mega.privacy.android.app.exportMK.ExportRecoveryKeyActivity"
+            android:name="mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity"
             android:launchMode="singleTop" />
 
         <activity
