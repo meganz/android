@@ -10,6 +10,8 @@ import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
@@ -65,6 +67,14 @@ class MyAccountViewModel @ViewModelInject constructor(
         private const val TIME_TO_SHOW_PAYMENT_INFO = 604800 //1 week in seconds
         const val PROCESSING_FILE = "PROCESSING_FILE"
         const val CHECKING_2FA = "CHECKING_2FA"
+    }
+
+    private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
+
+    fun checkElevation(): LiveData<Boolean> = withElevation
+
+    fun setElevation(withElevation: Boolean) {
+        this.withElevation.value = withElevation
     }
 
     private var is2FaEnabled = false

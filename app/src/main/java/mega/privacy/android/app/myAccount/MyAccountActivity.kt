@@ -5,79 +5,44 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.animation.Animation
-import android.view.animation.Transformation
 import android.widget.EditText
-import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.Observer
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.android.synthetic.main.dialog_general_confirmation.*
 import mega.privacy.android.app.R
-import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
-import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
-import mega.privacy.android.app.fragments.homepage.Scrollable
-import mega.privacy.android.app.lollipop.controllers.AccountController
-import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
-import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
-import mega.privacy.android.app.myAccount.editProfile.EditProfileActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
-import mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar
-import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
-import mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
-import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
-import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.TimeUtils.DATE_MM_DD_YYYY_FORMAT
-import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
 import mega.privacy.android.app.utils.Util.isOnline
-import nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_EXPIRED
-import nz.mega.sdk.MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD
-import nz.mega.sdk.MegaUser
 import org.jetbrains.anko.contentView
-import java.io.File
 
-class MyAccountActivity : PasscodeActivity(), Scrollable {
+class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback {
 
     companion object {
         private const val KILL_SESSIONS_SHOWN = "KILL_SESSIONS_SHOWN"
         private const val CANCEL_SUBSCRIPTIONS_SHOWN = "CANCEL_SUBSCRIPTIONS_SHOWN"
         private const val TYPED_FEEDBACK = "TYPED_FEEDBACK"
         private const val CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN = "CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN"
-        private const val ANIMATION_DURATION = 200L
-        private const val ANIMATION_DELAY = 500L
-        private const val PHONE_NUMBER_CHANGE_DELAY = 3000L
     }
 
     private val viewModel: MyAccountViewModel by viewModels()
 
+    private lateinit var navController: NavController
     private lateinit var binding: ActivityMyAccountBinding
 
     private var menu: Menu? = null
@@ -85,13 +50,8 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
     private var killSessionsConfirmationDialog: AlertDialog? = null
     private var cancelSubscriptionsDialog: AlertDialog? = null
     private var cancelSubscriptionsConfirmationDialog: AlertDialog? = null
-    private var changeApiServerDialog: AlertDialog? = null
 
     private var cancelSubscriptionsFeedback: String? = null
-
-    private var phoneNumberBottomSheet: PhoneNumberBottomSheetDialogFragment? = null
-
-    private var gettingInfo = StringResourcesUtils.getString(R.string.recovering_info)
 
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -101,26 +61,17 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
             )
 
             when (actionType) {
-                UPDATE_ACCOUNT_DETAILS -> setUpAccountDetails()
+//                UPDATE_ACCOUNT_DETAILS -> setUpAccountDetails()
                 UPDATE_CREDIT_CARD_SUBSCRIPTION -> refreshMenuOptionsVisibility()
             }
         }
     }
-
-    private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar(false) }
-
-    private val nameUpdatedObserver =
-        Observer<Boolean> { binding.nameText.text = viewModel.getName() }
-
-    private val emailUpdatedObserver =
-        Observer<Boolean> { binding.emailText.text = viewModel.getEmail() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMyAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        updateInfo()
         setupView()
         setupObservers()
 
@@ -162,6 +113,12 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
         if (!error.isNullOrEmpty()) showSnackbar(error)
     }
 
+    override fun onBackPressed() {
+        if (!navController.navigateUp()) {
+            finish()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         app.refreshAccountInfo()
@@ -174,26 +131,16 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
                 NOTIFICATION_STORAGE_OVERQUOTA
             )
         } catch (e: Exception) {
-            LogUtil.logError("Exception NotificationManager - remove all notifications", e)
+            logError("Exception NotificationManager - remove all notifications", e)
         }
     }
 
     override fun onDestroy() {
         unregisterReceiver(updateMyAccountReceiver)
 
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .removeObserver(profileAvatarUpdatedObserver)
-
-        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
-            .removeObserver(nameUpdatedObserver)
-
-        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
-            .removeObserver(emailUpdatedObserver)
-
         killSessionsConfirmationDialog?.dismiss()
         cancelSubscriptionsDialog?.dismiss()
         cancelSubscriptionsConfirmationDialog?.dismiss()
-        changeApiServerDialog?.dismiss()
         super.onDestroy()
     }
 
@@ -232,18 +179,26 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
             return
         }
 
-        menu.toggleAllMenuItemsVisibility(true)
+        when (navController.currentDestination?.id) {
+            R.id.my_account -> {
+                menu.toggleAllMenuItemsVisibility(true)
 
-        if (viewModel.thereIsNoSubscription()) {
-            menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
-        }
+                if (viewModel.thereIsNoSubscription()) {
+                    menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
+                }
 
-        if (megaApi.isBusinessAccount) {
-            menu.findItem(R.id.action_upgrade_account).isVisible = false
+                if (megaApi.isBusinessAccount) {
+                    menu.findItem(R.id.action_upgrade_account).isVisible = false
+                }
+            }
+            else -> {
+                menu.toggleAllMenuItemsVisibility(false)
+            }
         }
     }
 
     private fun setupView() {
+        updateInfo()
         setSupportActionBar(binding.toolbar)
 
         supportActionBar?.apply {
@@ -252,34 +207,54 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
             setDisplayHomeAsUpEnabled(true)
         }
 
-        ListenScrollChangesHelper().addViewToListen(
-            binding.scrollView
-        ) { _, _, _, _, _ -> checkScroll() }
+        navController =
+            (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+                .navController
 
-        checkScroll()
+        navController.addOnDestinationChangedListener { _, _, _ ->
+            refreshMenuOptionsVisibility()
 
-        setUpAvatar(true)
+            supportActionBar?.setHomeAsUpIndicator(
+                when (navController.currentDestination?.id) {
+                    R.id.my_account -> R.drawable.ic_arrow_back_white
+                    else -> R.drawable.ic_close_white
+                }
+            )
+        }
+    }
 
-        binding.myAccountThumbnail.setOnClickListener { viewModel.openQR(this) }
+    /**
+     * Changes the ActionBar elevation depending on the withElevation value received.
+     *
+     * @param withElevation True if should set elevation, false otherwise.
+     */
+    private fun changeElevation(withElevation: Boolean) {
+        val isDark = Util.isDarkMode(this)
+        val darkAndElevation = withElevation && isDark
+        val background = ContextCompat.getColor(this, R.color.grey_020_grey_087)
 
-        binding.nameText.text = viewModel.getName()
-        binding.emailText.text = viewModel.getEmail()
+        if (darkAndElevation) {
+            ColorUtils.changeStatusBarColorForElevation(this, true)
+        } else {
+            window?.statusBarColor = background
+        }
 
-        setUpPhoneNumber()
-        setUpAccountDetails()
+        val elevation = resources.getDimension(R.dimen.toolbar_elevation)
 
-        binding.backupRecoveryKeyLayout.setOnClickListener { viewModel.exportMK(this) }
+        binding.toolbar.setBackgroundColor(
+            if (darkAndElevation) ColorUtils.getColorForElevation(this, elevation)
+            else background
+        )
 
-        setUpAchievements()
-        setUpLastSession()
-        setUpContactConnections()
+        supportActionBar?.elevation =
+            if (withElevation && !isDark) elevation else 0F
     }
 
     /**
      * Checks and refreshes account info.
      */
     private fun updateInfo() {
-        viewModel.checkVersions { refreshVersionsInfo() }
+//        viewModel.checkVersions { refreshVersionsInfo() }
         app.refreshAccountInfo()
     }
 
@@ -290,14 +265,7 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
             )
         )
 
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .observeForever(profileAvatarUpdatedObserver)
-
-        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
-            .observeForever(nameUpdatedObserver)
-
-        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
-            .observeForever(emailUpdatedObserver)
+        viewModel.checkElevation().observe(this, ::changeElevation)
     }
 
     /**
@@ -408,433 +376,11 @@ class MyAccountActivity : PasscodeActivity(), Scrollable {
             .show()
     }
 
-    /**
-     * Updates the edit view.
-     *
-     * @param editable True if the account can be edited, false otherwise.
-     */
-    private fun setupEditProfile(editable: Boolean) {
-        binding.nameText.setCompoundDrawablesWithIntrinsicBounds(
-            0,
-            0,
-            if (editable) R.drawable.ic_view_edit_profile else 0,
-            0
-        )
-
-        binding.myAccountTextInfoLayout.setOnClickListener {
-            if (editable) {
-                startActivity(Intent(this, EditProfileActivity::class.java))
-            }
-        }
-    }
-
-    fun setUpAccountDetails() {
-        binding.lastSessionSubtitle.text =
-            if (viewModel.getLastSession().isNotEmpty()) viewModel.getLastSession()
-            else gettingInfo
-
-        if (megaApi.isBusinessAccount) {
-            setUpBusinessAccount()
-            return
-        }
-
-        setupEditProfile(true)
-
-        binding.upgradeButton.apply {
-            isEnabled = true
-            text = StringResourcesUtils.getString(R.string.my_account_upgrade_pro)
-
-            setOnClickListener { viewModel.upgradeAccount(this@MyAccountActivity) }
-        }
-
-        binding.accountTypeText.isVisible = true
-        binding.upgradeButton.isVisible = true
-
-        binding.accountTypeText.text = StringResourcesUtils.getString(
-            when (viewModel.getAccountType()) {
-                FREE -> R.string.free_account
-                PRO_I -> R.string.pro1_account
-                PRO_II -> R.string.pro2_account
-                PRO_III -> R.string.pro3_account
-                PRO_LITE -> R.string.prolite_account
-                else -> R.string.recovering_info
-            }
-        )
-
-        binding.accountTypeLayout.background = tintIcon(
-            this, R.drawable.background_account_type, ContextCompat.getColor(
-                this,
-                when (viewModel.getAccountType()) {
-                    FREE -> R.color.green_400_green_300
-                    PRO_I -> R.color.orange_600_orange_300
-                    PRO_II, PRO_III, PRO_LITE -> R.color.red_300_red_200
-                    else -> R.color.white_black
-                }
-            )
-        )
-
-        setUpPaymentDetails()
-
-        binding.storageProgressPercentage.isVisible = true
-        binding.storageProgressBar.isVisible = true
-        binding.businessStorageImage.isVisible = false
-        binding.transferProgressPercentage.isVisible = true
-        binding.transferProgressBar.isVisible = true
-        binding.businessTransferImage.isVisible = false
-
-        binding.businessAccountManagementText.isVisible = false
-
-        binding.transferLayout.isVisible = !viewModel.isFreeAccount()
-
-        if (viewModel.getUsedStorage().isEmpty()) {
-            binding.storageProgressPercentage.isVisible = false
-            binding.storageProgressBar.progress = 0
-            binding.storageProgress.text = gettingInfo
-        } else {
-            binding.storageProgressPercentage.isVisible = true
-            binding.storageProgressPercentage.text = StringResourcesUtils.getString(
-                R.string.used_storage_transfer_percentage,
-                viewModel.getUsedStoragePercentage()
-            )
-
-            binding.storageProgressBar.progress = viewModel.getUsedStoragePercentage()
-            binding.storageProgress.text = StringResourcesUtils.getString(
-                R.string.used_storage_transfer,
-                viewModel.getUsedStorage(),
-                viewModel.getTotalStorage()
-            )
-        }
-
-        if (viewModel.getUsedTransfer().isEmpty()) {
-            binding.transferProgressPercentage.isVisible = false
-            binding.transferProgressBar.progress = 0
-            binding.transferProgress.text = gettingInfo
-        } else {
-            binding.transferProgressPercentage.isVisible = true
-            binding.transferProgressPercentage.text = StringResourcesUtils.getString(
-                R.string.used_storage_transfer_percentage,
-                viewModel.getUsedTransferPercentage()
-            )
-
-            binding.transferProgressBar.progress = viewModel.getUsedTransferPercentage()
-            binding.transferProgress.text = StringResourcesUtils.getString(
-                R.string.used_storage_transfer,
-                viewModel.getUsedTransfer(),
-                viewModel.getTotalTransfer()
-            )
-        }
-    }
-
-    private fun setUpBusinessAccount() {
-        binding.accountTypeText.text = StringResourcesUtils.getString(R.string.business_label)
-        binding.upgradeButton.apply {
-            isEnabled = false
-            text = StringResourcesUtils.getString(
-                if (megaApi.isMasterBusinessAccount) R.string.admin_label
-                else R.string.user_label
-            )
-        }
-
-        binding.accountTypeLayout.background = tintIcon(
-            this, R.drawable.background_account_type, ContextCompat.getColor(
-                this,
-                R.color.blue_400_blue_300
-            )
-        )
-
-        if (megaApi.isMasterBusinessAccount) {
-            when (megaApi.businessStatus) {
-                BUSINESS_STATUS_EXPIRED, BUSINESS_STATUS_GRACE_PERIOD -> {
-                    binding.renewExpiryText.isVisible = false
-                    binding.renewExpiryDateText.isVisible = false
-                    binding.businessStatusText.apply {
-                        isVisible = true
-
-                        text = StringResourcesUtils.getString(
-                            if (megaApi.businessStatus == BUSINESS_STATUS_EXPIRED) R.string.payment_overdue_label
-                            else R.string.payment_required_label
-                        )
-                    }
-
-                    expandPaymentInfoIfNeeded()
-                }
-                else -> setUpPaymentDetails() //BUSINESS_STATUS_ACTIVE
-            }
-
-            binding.businessAccountManagementText.isVisible = true
-            setupEditProfile(true)
-        } else {
-            binding.businessAccountManagementText.isVisible = false
-            setupEditProfile(false)
-        }
-
-        binding.storageProgressPercentage.isVisible = false
-        binding.storageProgressBar.isVisible = false
-        binding.businessStorageImage.isVisible = true
-
-        binding.storageProgress.text =
-            if (viewModel.getUsedStorage().isEmpty()) gettingInfo
-            else viewModel.getUsedStorage()
-
-        binding.transferProgressPercentage.isVisible = false
-        binding.transferProgressBar.isVisible = false
-        binding.businessTransferImage.isVisible = true
-
-        binding.transferProgress.text =
-            if (viewModel.getUsedTransfer().isEmpty()) gettingInfo
-            else viewModel.getUsedTransfer()
-
-        binding.achievementsLayout.isVisible = false
-    }
-
-    private fun setUpPaymentDetails() {
-        binding.businessStatusText.isVisible = false
-
-        if (viewModel.hasRenewableSubscription() || viewModel.hasExpirableSubscription()) {
-            binding.renewExpiryText.isVisible = true
-            binding.renewExpiryDateText.isVisible = true
-
-            binding.renewExpiryText.text = StringResourcesUtils.getString(
-                if (viewModel.hasRenewableSubscription()) R.string.renews_on else R.string.expires_on
-            )
-
-            binding.renewExpiryDateText.text = formatDate(
-                if (viewModel.hasRenewableSubscription()) viewModel.getRenewTime() else viewModel.getExpirationTime(),
-                DATE_MM_DD_YYYY_FORMAT
-            )
-
-            expandPaymentInfoIfNeeded()
-        }
-    }
-
-    /**
-     * Shows the payment info if the subscriptions is almost to renew or expiry.
-     */
-    fun expandPaymentInfoIfNeeded() {
-        if (!viewModel.shouldShowPaymentInfo())
-            return
-
-        val v = binding.paymentInfoLayout
-        v.isVisible = false
-
-        val matchParentMeasureSpec =
-            View.MeasureSpec.makeMeasureSpec((v.parent as View).width, View.MeasureSpec.EXACTLY)
-
-        val wrapContentMeasureSpec =
-            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-
-        v.measure(matchParentMeasureSpec, wrapContentMeasureSpec)
-
-        val targetHeight = v.measuredHeight
-
-        v.layoutParams.height = 1
-
-        val a: Animation = object : Animation() {
-            override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
-                v.layoutParams.height =
-                    if (interpolatedTime == 1f) LinearLayout.LayoutParams.WRAP_CONTENT
-                    else (targetHeight * interpolatedTime).toInt()
-
-                v.isVisible = true
-                v.requestLayout()
-            }
-
-            override fun willChangeBounds(): Boolean {
-                return true
-            }
-        }
-
-        a.duration = ANIMATION_DURATION
-        a.startOffset = ANIMATION_DELAY
-        v.startAnimation(a)
-    }
-
-    private fun setUpPhoneNumber() {
-        val canVerifyPhoneNumber = canVoluntaryVerifyPhoneNumber()
-        val alreadyRegisteredPhoneNumber = viewModel.isAlreadyRegisteredPhoneNumber()
-
-        binding.phoneText.apply {
-            if (alreadyRegisteredPhoneNumber) {
-                isVisible = true
-                text = viewModel.getRegisteredPhoneNumber()
-            } else {
-                isVisible = false
-            }
-        }
-
-        val addPhoneNumberVisible = canVerifyPhoneNumber && !alreadyRegisteredPhoneNumber
-
-        binding.addPhoneNumberLayout.apply {
-            isVisible = addPhoneNumberVisible
-
-            setOnClickListener {
-                if (canVoluntaryVerifyPhoneNumber()) {
-                    startActivity(
-                        Intent(
-                            this@MyAccountActivity,
-                            SMSVerificationActivity::class.java
-                        )
-                    )
-                } else if (!isBottomSheetDialogShown(phoneNumberBottomSheet)) {
-                    phoneNumberBottomSheet = PhoneNumberBottomSheetDialogFragment()
-                    phoneNumberBottomSheet!!.show(
-                        supportFragmentManager,
-                        phoneNumberBottomSheet!!.tag
-                    )
-                }
-            }
-        }
-
-        if (addPhoneNumberVisible) {
-            binding.addPhoneSubtitle.text =
-                if (megaApi.isAchievementsEnabled) StringResourcesUtils.getString(
-                    R.string.sms_add_phone_number_dialog_msg_achievement_user,
-//                    (mActivity as ManagerActivityLollipop).bonusStorageSMS
-                    ""
-                ) else StringResourcesUtils.getString(
-                    R.string.sms_add_phone_number_dialog_msg_non_achievement_user
-                )
-        }
-    }
-
-    private fun setUpAchievements() {
-        binding.achievementsLayout.apply {
-            isVisible = megaApi.isAchievementsEnabled
-
-            if (isVisible) {
-                setOnClickListener {
-                    if (!isOnline(this@MyAccountActivity)) {
-                        showSnackbar(StringResourcesUtils.getString(R.string.error_server_connection_problem))
-                    } else {
-                        startActivity(
-                            Intent(
-                                this@MyAccountActivity,
-                                AchievementsActivity::class.java
-                            )
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private fun setUpLastSession() {
-        binding.lastSessionLayout.setOnClickListener {
-            if (viewModel.incrementLastSessionClick()) {
-                changeApiServerDialog = showChangeApiServerDialog(this, megaApi)
-            }
-        }
-    }
-
-    /**
-     * Checks if an avatar file already exist for the current account.
-     *
-     * @param retry True if should request for avatar if it's not available, false otherwise.
-     */
-    fun setUpAvatar(retry: Boolean) {
-        val avatar = buildAvatarFile(this, megaApi.myEmail + JPG_EXTENSION)
-
-        if (avatar != null) {
-            setProfileAvatar(avatar, retry)
-        } else {
-            setDefaultAvatar()
-        }
-    }
-
-    /**
-     * Sets the avatar file if available.
-     * If not, requests it if should retry, sets the default one if not.
-     */
-    fun setProfileAvatar(avatar: File, retry: Boolean) {
-        val avatarBitmap: Bitmap?
-
-        if (avatar.exists() && avatar.length() > 0) {
-            avatarBitmap = BitmapFactory.decodeFile(avatar.absolutePath, BitmapFactory.Options())
-
-            if (avatarBitmap == null) {
-                avatar.delete()
-            } else {
-                binding.myAccountThumbnail.setImageBitmap(avatarBitmap)
-                return
-            }
-        }
-
-        if (retry) {
-            viewModel.getAvatar(this) { success -> showAvatarResult(success) }
-        } else setDefaultAvatar()
-    }
-
-    private fun setDefaultAvatar() {
-        binding.myAccountThumbnail.setImageBitmap(
-            getDefaultAvatar(
-                getColorAvatar(megaApi.myUser),
-                viewModel.getName(),
-                AVATAR_SIZE,
-                true
-            )
-        )
-    }
-
-    fun setUpContactConnections() {
-        val contacts = megaApi.contacts
-        val visibleContacts = ArrayList<MegaUser>()
-
-        for (contact in contacts.indices) {
-            if (contacts[contact].visibility == MegaUser.VISIBILITY_VISIBLE
-                || megaApi.getInShares(contacts[contact]).size > 0
-            ) {
-                visibleContacts.add(contacts[contact])
-            }
-        }
-
-        binding.contactsSubtitle.text = StringResourcesUtils.getQuantityString(
-            R.plurals.my_account_connections,
-            visibleContacts.size,
-            visibleContacts.size
-        )
-    }
-
-    private fun refreshVersionsInfo() {
-
-    }
-
-    private fun showAvatarResult(success: Boolean) {
-        if (success) {
-            setUpAvatar(false)
-        } else {
-            setDefaultAvatar()
-        }
-    }
-
     fun showSnackbar(text: String) {
         showSnackbar(contentView?.findViewById(R.id.container), text)
     }
 
-    override fun checkScroll() {
-        if (!this::binding.isInitialized)
-            return
-
-        val withElevation = binding.scrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
-        val isDark = Util.isDarkMode(this)
-        val darkAndElevation = withElevation && isDark
-        val background = ContextCompat.getColor(this, R.color.grey_020_grey_087)
-
-        if (darkAndElevation) {
-            ColorUtils.changeStatusBarColorForElevation(this, true)
-        } else {
-            window.statusBarColor = background
-        }
-
-        val elevation = resources.getDimension(R.dimen.toolbar_elevation)
-
-        binding.toolbar.setBackgroundColor(
-            if (darkAndElevation) ColorUtils.getColorForElevation(
-                this,
-                elevation
-            ) else background
-        )
-
-        supportActionBar?.elevation =
-            if (withElevation && !isDark) elevation else 0F
+    override fun show(message: String) {
+        showSnackbar(message)
     }
 }
