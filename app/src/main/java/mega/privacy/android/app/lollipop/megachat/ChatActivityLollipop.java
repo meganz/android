@@ -92,6 +92,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
+import mega.privacy.android.app.meeting.fragments.InMeetingFragment;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
@@ -2541,7 +2542,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 contactInfoMenuItem.setVisible(false);
                 archiveMenuItem.setVisible(false);
             }else {
-                if (megaChatApi != null && (megaChatApi.getNumCalls() <= 0 || (!participatingInACall() && !megaChatApi.hasCallInChatRoom(chatRoom.getChatId())))) {
+                if (megaChatApi != null && (megaChatApi.getNumCalls() <= 0 || (!megaChatApi.hasCallInChatRoom(chatRoom.getChatId())))) {
                     callMenuItem.setEnabled(true);
                     callMenuItem.setIcon(mutateIcon(this, R.drawable.ic_phone_white, R.color.grey_087_white_087));
 
@@ -2709,6 +2710,11 @@ public class ChatActivityLollipop extends PasscodeActivity
             case R.id.cab_menu_call_chat:{
                 if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
 
+                if(participatingInACall()){
+                    showConfirmationInACall(this);
+                    break;
+                }
+
                 startVideo = false;
                 if(checkPermissionsCall()){
                     startCall();
@@ -2718,6 +2724,11 @@ public class ChatActivityLollipop extends PasscodeActivity
             case R.id.cab_menu_video_chat:{
                 logDebug("cab_menu_video_chat");
                 if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
+
+                if(CallUtil.participatingInACall()){
+                    showConfirmationInACall(this);
+                    break;
+                }
 
                 startVideo = true;
                 if(checkPermissionsCall()){
@@ -3453,6 +3464,11 @@ public class ChatActivityLollipop extends PasscodeActivity
             final List<String> contactsData = intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS);
             if (contactsData != null) {
                 new InviteToChatRoomListener(this).inviteToChat(chatRoom.getChatId(), contactsData);
+
+                // Invite participants, check
+                if(participatingInACall()){
+                    InMeetingFragment.setBInviteSent(true);
+                }
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
