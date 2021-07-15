@@ -5495,6 +5495,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		});
 	}
 
+	/**
+	 * Hides all views only related to CU section and sets the CU default view.
+	 */
+	private void resetCUFragment() {
+		cuLayout.setVisibility(View.GONE);
+		cuViewTypes.setVisibility(View.GONE);
+
+		if (getCameraUploadFragment() != null) {
+			cuFragment.setDefaultView();
+			showBottomView();
+		}
+	}
+
 	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item) {
     	if (item == null) {
@@ -5519,8 +5532,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		if (item != DrawerItem.CAMERA_UPLOADS) {
-			cuLayout.setVisibility(View.GONE);
-			cuViewTypes.setVisibility(View.GONE);
+			resetCUFragment();
 		}
 
 		if (item != DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
@@ -13617,21 +13629,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fragmentLayout.getLayoutParams();
 
 		if (hide && bottomView.getVisibility() == View.VISIBLE) {
-			params.setMargins(0, 0, 0, 0);
 			bottomView.animate().translationY(bottomView.getHeight()).setDuration(ANIMATION_DURATION)
+					.withStartAction(() -> params.bottomMargin = 0)
 					.withEndAction(() -> bottomView.setVisibility(View.GONE)).start();
 		} else if (!hide && bottomView.getVisibility() == View.GONE) {
-			params.setMargins(0, 0, 0,
-					getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height));
+			int bottomMargin = getResources().getDimensionPixelSize(R.dimen.bottom_navigation_view_height);
 
-			int navigationBarId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-			int translationY = navigationBarId > 0
-					? getResources().getDimensionPixelSize(navigationBarId)
-					: bNV.getHeight();
-
-			bottomView.animate().translationY(translationY).setDuration(ANIMATION_DURATION)
+			bottomView.animate().translationY(0).setDuration(ANIMATION_DURATION)
 					.withStartAction(() -> bottomView.setVisibility(View.VISIBLE))
-					.withEndAction(() -> fragmentLayout.setLayoutParams(params)).start();
+					.withEndAction(() -> params.bottomMargin = bottomMargin)
+					.start();
 		}
 	}
 

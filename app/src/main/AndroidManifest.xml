@@ -507,7 +507,7 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.textFileEditor.TextFileEditorActivity"
+            android:name="mega.privacy.android.app.textEditor.TextEditorActivity"
             android:launchMode="singleTop">
         </activity>
 

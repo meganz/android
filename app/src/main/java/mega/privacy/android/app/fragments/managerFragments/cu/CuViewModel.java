@@ -449,8 +449,6 @@ class CuViewModel extends BaseRxViewModel {
         List<CUCard> months = new ArrayList<>();
         List<CUCard> years = new ArrayList<>();
         List<MegaNode> nodesWithoutPreview = new ArrayList<>();
-        long dayItemCount = 0;
-        long totalItemCount = 0;
         LocalDate lastDayDate = null;
         LocalDate lastMonthDate = null;
         LocalDate lastYearDate = null;
@@ -465,24 +463,14 @@ class CuViewModel extends BaseRxViewModel {
             String year = ofPattern("yyyy").format(modifyDate);
             boolean sameYear = Year.from(LocalDate.now()).equals(Year.from(modifyDate));
 
-            totalItemCount++;
-            dayItemCount++;
-
             if (lastDayDate == null || lastDayDate.getDayOfYear() != modifyDate.getDayOfYear()) {
-                if (lastDayDate != null) {
-                    days.get(days.size() - 1).setNumItems(dayItemCount);
-                    dayItemCount = 0;
-                }
-
                 shouldGetPreview = true;
                 lastDayDate = modifyDate;
                 String date = ofPattern(sameYear ? "dd MMMM" : "dd MMMM yyyy").format(lastDayDate);
                 days.add(new CUCard(node, preview.exists() ? preview : null, day, month,
-                        sameYear ? null : year, date, modifyDate, null));
-            }
-
-            if (totalItemCount == cardNodes.size()) {
-                days.get(days.size() - 1).setNumItems(dayItemCount + 1);
+                        sameYear ? null : year, date, modifyDate, 0));
+            } else if (!days.isEmpty()){
+                days.get(days.size() - 1).incrementNumItems();
             }
 
             if (lastMonthDate == null
@@ -491,14 +479,14 @@ class CuViewModel extends BaseRxViewModel {
                 lastMonthDate = modifyDate;
                 String date = sameYear ? month : ofPattern("MMMM yyyy").format(modifyDate);
                 months.add(new CUCard(node, preview.exists() ? preview : null,null, month,
-                        sameYear ? null : year, date, modifyDate, null));
+                        sameYear ? null : year, date, modifyDate, 0));
             }
 
             if (lastYearDate == null || !Year.from(lastYearDate).equals(Year.from(modifyDate))) {
                 shouldGetPreview = true;
                 lastYearDate = modifyDate;
                 years.add(new CUCard(node, preview.exists() ? preview : null,null, null,
-                        year, year, modifyDate, null));
+                        year, year, modifyDate, 0));
             }
 
             if (shouldGetPreview && !preview.exists()) {
@@ -579,6 +567,7 @@ class CuViewModel extends BaseRxViewModel {
         int cardMonth = cardLocalDate.getMonthValue();
         int cardYear = cardLocalDate.getYear();
         int currentDay = LocalDate.now().getDayOfMonth();
+        int dayPosition = 0;
 
         for (int i = 0; i < dayCards.size(); i++) {
             LocalDate nextLocalDate = dayCards.get(i).getLocalDate();
@@ -586,24 +575,26 @@ class CuViewModel extends BaseRxViewModel {
             int nextMonth = nextLocalDate.getMonthValue();
             int nextYear = nextLocalDate.getYear();
 
-            if (nextYear == cardYear && nextMonth == cardMonth && nextDay <= currentDay) {
-                //Month of year clicked, current day. If not exists, the closest day behind the current.
-                if (i == 0 || nextDay == currentDay
-                        || dayCards.get(i - 1).getLocalDate().getMonthValue() != cardMonth) {
-                    return i;
+            if (nextYear == cardYear && nextMonth == cardMonth) {
+                if (nextDay <= currentDay) {
+                    //Month of year clicked, current day. If not exists, the closest day behind the current.
+                    if (i == 0 || nextDay == currentDay
+                            || dayCards.get(i - 1).getLocalDate().getMonthValue() != cardMonth) {
+                        return i;
+                    }
+
+                    int previousDay = dayCards.get(i - 1).getLocalDate().getDayOfMonth();
+
+                    //The closest day to the current
+                    return previousDay - currentDay <= currentDay - nextDay ? i - 1 : i;
+                } else {
+                    //Save the closest day above the current in case there is no day of month behind the current.
+                    dayPosition = i;
                 }
-
-                int previousDay = dayCards.get(i - 1).getLocalDate().getDayOfMonth();
-
-                //The closest day to the current
-                return previousDay - currentDay <= currentDay - nextDay ? i - 1 : i;
-            } else if (nextYear == cardYear && nextMonth < cardMonth) {
-                //No day equal or behind the current found, then return the previous day.
-                return i == 0 ? i : i -1;
             }
         }
 
-        return 0;
+        return dayPosition;
     }
 
     /**

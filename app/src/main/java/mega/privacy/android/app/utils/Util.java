@@ -154,6 +154,11 @@ public class Util {
 	// 150ms, a smaller value may cause the keyboard to fail to open
 	public final static int SHOW_IM_DELAY = 150;
 
+    /**
+     * Language tag for simplified Chinese.
+     */
+    private static final String HANS = "Hans";
+
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();
         String nodeOriginalFingerprint = node.getOriginalFingerprint();
@@ -1638,4 +1643,8 @@ public class Util {
 
 		return false;
 	}
+
+    public static boolean isSimplifiedChinese() {
+        return Locale.getDefault().toLanguageTag().contains(HANS);
+    }
 }

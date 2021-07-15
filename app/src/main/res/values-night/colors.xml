@@ -33,7 +33,7 @@
     <color name="grey_038_white_038">@color/white_alpha_038</color>
 
     <!-- AudioPlayer playlist position and duration  -->
-    <color name="grey_038_white">@color/white</color>
+    <color name="grey_038_white_alpha_038">@color/white_alpha_038</color>
 
     <!-- Bottom navigation menu disabled tint color  -->
     <color name="grey_016_white_016">@color/white_alpha_016</color>
@@ -271,5 +271,9 @@
 
     <color name="grey_054_white_060">@color/white_alpha_060</color>
     <color name="grey_012_white_020">@color/white_alpha_020</color>
+    <color name="black_grey_alpha_012">@color/grey_alpha_012</color>
+    <color name="grey_alpha_012_black">@color/black</color>
+
+    <color name="white_teal_100">@color/teal_100</color>
 
 </resources>
