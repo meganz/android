@@ -146,9 +146,13 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         }
     }
 
+    /**
+     * Let the button execute fade out animation.
+     * Go up then disappear.
+     */
     private fun animationButtons() {
-        val translateAnim = TranslateAnimation(0f, 0f, 0f, -380f).apply {
-            duration = 500L
+        val translateAnim = TranslateAnimation(0f, 0f, 0f, DELTA_Y).apply {
+            duration = TRANSLATE_DURATION
             fillAfter = true
             fillBefore = true
             repeatCount = 0
@@ -171,7 +175,7 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         }
 
         val alphaAnim = AlphaAnimation(1.0f, 0.0f).apply {
-            duration = 600L
+            duration = DISAPPEAR_DURATION
             fillAfter = true
             fillBefore = true
             repeatCount = 0
@@ -205,6 +209,11 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         }
     }
 
+    /**
+     * Let the arrow icon execute alpha animation. Disappear then appear.
+     *
+     * @param arrow The arrow image view that will execute the animation.
+     */
     private fun animationAlphaArrows(arrow: ImageView) {
         logDebug("animationAlphaArrows")
         val alphaAnimArrows = AlphaAnimation(1.0f, 0.0f).apply {
@@ -342,10 +351,11 @@ class RingingMeetingFragment : MeetingBaseFragment(),
     }
 
     companion object {
-
         private const val ALPHA_ANIMATION_DURATION = 1000L
         private const val ALPHA_ANIMATION_DELAY = 250L
-
+        private const val DELTA_Y = -380f
+        private const val TRANSLATE_DURATION = 500L
+        private const val DISAPPEAR_DURATION = 600L
     }
 
     override fun onCallAnswered(chatId: Long, flag: Boolean) {

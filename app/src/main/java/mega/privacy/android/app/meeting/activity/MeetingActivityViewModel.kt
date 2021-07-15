@@ -314,14 +314,10 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             //The chat is not yet created or the call is not yet established
             _micLiveData.value = shouldAudioBeEnabled
             logDebug("open Mic: $shouldAudioBeEnabled")
-            tips.value = when (shouldAudioBeEnabled) {
-                true -> getString(
-                    R.string.general_mic_unmute
-                )
-                false -> getString(
-                    R.string.general_mic_mute,
-                    "mute"
-                )
+            tips.value = if (shouldAudioBeEnabled) {
+                getString(R.string.general_mic_unmute)
+            } else{
+                getString(R.string.general_mic_mute)
             }
         }
     }

@@ -1641,23 +1641,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
-        if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder.getState()) {
-            meetingActivity.showSnackbarWithAnchorView(
-                type,
-                binding.root,
-                binding.snackbarPosition,
-                content,
-                chatId
-            )
-        } else {
-            meetingActivity.showSnackbarWithAnchorView(
-                type,
-                binding.root,
-                null,
-                content,
-                chatId
-            )
-        }
+        val anchor =
+            if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder.getState()) {
+                binding.snackbarPosition
+            } else null
+
+        meetingActivity.showSnackbarWithAnchorView(
+            type,
+            binding.root,
+            anchor,
+            content,
+            chatId
+        )
     }
 
     private fun showRequestPermissionSnackBar() {

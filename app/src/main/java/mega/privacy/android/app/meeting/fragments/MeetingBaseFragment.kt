@@ -24,7 +24,16 @@ import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
- * Base fragment for meeting fragment: [CreateMeetingFragment],[JoinMeetingAsGuestFragment],[JoinMeetingFragment],[InMeetingFragment]
+ * Base fragment for meeting fragment:
+ * [AbstractMeetingOnBoardingFragment]
+ * [CreateMeetingFragment],
+ * [JoinMeetingAsGuestFragment],
+ * [JoinMeetingFragment],
+ * [InMeetingFragment],
+ * [RingingMeetingFragment],
+ * [IndividualCallFragment],
+ * [GridViewCallFragment],
+ * [SpeakerViewCallFragment]
  * include some common functions: Permissions...
  * Use shareModel to share data between sub fragments
  */
@@ -243,7 +252,7 @@ open class MeetingBaseFragment : BaseFragment() {
     }
 
     /**
-     * Update the permission state of ViewModel,
+     * Update the permission state of ViewModel.
      *
      * @param permission One or more permission strings.
      */
@@ -296,6 +305,6 @@ open class MeetingBaseFragment : BaseFragment() {
         protected const val KEY_SHOW_EDUCATION = "show_education"
 
         // SharedPreference file name
-        protected const val MEETINGS_PREFERENCE = "meeting_prefrence"
+        protected const val MEETINGS_PREFERENCE = "meeting_preference"
     }
 }

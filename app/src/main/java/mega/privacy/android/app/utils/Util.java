@@ -160,9 +160,6 @@ public class Util {
      */
     private static final String HANS = "Hans";
 
-	// How many times the app has been launched till now
-	private final static String KEY_LAUNCHED_TIME = "launched_time";
-
     public static boolean checkFingerprint(MegaApiAndroid megaApi, MegaNode node, String localPath) {
         String nodeFingerprint = node.getFingerprint();
         String nodeOriginalFingerprint = node.getOriginalFingerprint();

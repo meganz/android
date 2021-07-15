@@ -91,12 +91,8 @@ sealed class PermissionFragment : Fragment() {
      */
     internal class CheckRequestFragment : PermissionFragment() {
 
-
         companion object {
-
-            fun newInstance() =
-                CheckRequestFragment()
+            fun newInstance() = CheckRequestFragment()
         }
     }
-
 }
