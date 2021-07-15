@@ -54,6 +54,8 @@ import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
+import mega.privacy.android.app.listeners.SimpleChatRequestListener
+import mega.privacy.android.app.listeners.SimpleMegaRequestListener
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
@@ -587,15 +589,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             MEETING_ACTION_GUEST -> {
                 logDebug("Action guest")
-                inMeetingViewModel.chatLogout(ChatRequestListener(onSuccess = { _, _, _ ->
+                inMeetingViewModel.chatLogout(SimpleChatRequestListener(MegaChatRequest.TYPE_LOGOUT, onSuccess = { _, _, _ ->
                     inMeetingViewModel.createEphemeralAccountAndJoinChat(
                         args.firstName,
                         args.lastName,
-                        MegaRequestListener(onSuccess = { _, _, _ ->
-                            inMeetingViewModel.chatConnect(ChatRequestListener(onSuccess = { _, _, _ ->
+                        SimpleMegaRequestListener(MegaRequest.TYPE_CREATE_ACCOUNT, onSuccess = { _, _, _ ->
+                            inMeetingViewModel.chatConnect(SimpleChatRequestListener(MegaChatRequest.TYPE_CONNECT, onSuccess = { _, _, _ ->
                                 inMeetingViewModel.openChatPreview(
                                     meetinglink,
-                                    ChatRequestListener(onSuccess = { _, request, _ ->
+                                    SimpleChatRequestListener(MegaChatRequest.TYPE_LOAD_PREVIEW, onSuccess = { _, request, _ ->
                                         logDebug(
                                             "Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
                                                 request.megaHandleList?.get(
@@ -951,10 +953,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private fun initFloatingWindowContainerDragListener(view: View) {
+    /**
+     * Create `OnDragTouchListener` and set it as `OnTouchListener` for the target view to make it draggable.
+     *
+     * @param parent Parent view of the draggable view.
+     */
+    private fun initFloatingWindowContainerDragListener(parent: View) {
         dragTouchListener = OnDragTouchListener(
             floatingWindowContainer,
-            view,
+            parent,
             object :
                 OnDragTouchListener.OnDragActionListener {
 
@@ -2510,103 +2517,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     fun addContact(peerId: Long) {
         inMeetingViewModel.addContact(requireContext(), peerId) { content ->
             sharedModel.showSnackBar(content)
-        }
-    }
-
-    class ChatRequestListener(
-        private val onSuccess: (
-            api: MegaChatApiJava,
-            request: MegaChatRequest,
-            e: MegaChatError
-        ) -> Unit,
-        private val onFail: (
-            api: MegaChatApiJava,
-            request: MegaChatRequest,
-            e: MegaChatError
-        ) -> Unit = { _, request, e ->
-            logWarning("[${request.requestString}] -> Error code: ${e.errorCode} [${e.errorString}]")
-        },
-        private val isSuccess: (
-            request: MegaChatRequest,
-            e: MegaChatError
-        ) -> Boolean = { _, e ->
-            e.errorCode == MegaChatError.ERROR_OK
-        }
-    ) : MegaChatRequestListenerInterface {
-
-        override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {
-            logDebug("Start [${request.requestString}]")
-        }
-
-        override fun onRequestUpdate(api: MegaChatApiJava?, request: MegaChatRequest) {
-
-        }
-
-        override fun onRequestFinish(
-            api: MegaChatApiJava,
-            request: MegaChatRequest,
-            e: MegaChatError
-        ) {
-            if (isSuccess(request, e)) {
-                logDebug("[${request.requestString}] -> is successful")
-                onSuccess(api, request, e)
-            } else {
-                onFail(api, request, e)
-            }
-        }
-
-        override fun onRequestTemporaryError(
-            api: MegaChatApiJava?,
-            request: MegaChatRequest?,
-            e: MegaChatError?
-        ) {
-
-        }
-    }
-
-    class MegaRequestListener(
-        private val onSuccess: (
-            api: MegaApiJava,
-            request: MegaRequest,
-            e: MegaError
-        ) -> Unit,
-        private val onFail: (
-            api: MegaApiJava,
-            request: MegaRequest,
-            e: MegaError
-        ) -> Unit = { _, request, e ->
-            logWarning("[${request.requestString}] -> Error code: ${e.errorCode} [${e.errorString}]")
-        },
-        private val isSuccess: (
-            request: MegaRequest,
-            e: MegaError
-        ) -> Boolean = { _, e ->
-            e.errorCode == MegaError.API_OK
-        }
-    ) : MegaRequestListenerInterface {
-
-        override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-            logDebug("Start [${request.requestString}]")
-        }
-
-        override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-
-        }
-
-        override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-            if (isSuccess(request, e)) {
-                logDebug("[${request.requestString}] -> is successful")
-                onSuccess(api, request, e)
-            } else {
-                onFail(api, request, e)
-            }
-        }
-
-        override fun onRequestTemporaryError(
-            api: MegaApiJava,
-            request: MegaRequest,
-            e: MegaError?
-        ) {
         }
     }
 }

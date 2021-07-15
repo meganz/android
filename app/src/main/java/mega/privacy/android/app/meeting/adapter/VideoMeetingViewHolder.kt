@@ -5,10 +5,12 @@ import android.view.TextureView
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.RelativeLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.item_participant_video.view.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
@@ -83,6 +85,15 @@ class VideoMeetingViewHolder(
             layoutParams.height = dp2px(ITEM_HEIGHT)
             binding.root.setOnClickListener {
                 inMeetingViewModel.onItemClick(participant)
+            }
+
+
+            (binding.root.mute_icon.layoutParams as ConstraintLayout.LayoutParams).apply {
+                bottomMargin = 0
+            }
+
+            (binding.root.moderator_icon.layoutParams as ConstraintLayout.LayoutParams).apply {
+                bottomMargin = 0
             }
 
             binding.name.isVisible = false

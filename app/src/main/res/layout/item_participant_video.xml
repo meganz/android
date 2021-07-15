@@ -86,9 +86,9 @@
         android:id="@+id/moderator_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="2dp"
         android:layout_marginBottom="5dp"
-        android:src="@drawable/ic_moderator"
+        android:src="@drawable/ic_moderator_bg"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/name" />
