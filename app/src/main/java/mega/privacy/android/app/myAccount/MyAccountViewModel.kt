@@ -59,7 +59,8 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val getMyAvatarUseCase: GetMyAvatarUseCase,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     private val resetPhoneNumberUseCase: ResetPhoneNumberUseCase,
-    private val getUserDataUseCase: GetUserDataUseCase
+    private val getUserDataUseCase: GetUserDataUseCase,
+    private val getFileVersionsOptionUseCase: GetFileVersionsOptionUseCase
 ) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
 
     companion object {
@@ -70,11 +71,23 @@ class MyAccountViewModel @ViewModelInject constructor(
     }
 
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
+    private val versionsInfo: MutableLiveData<String> = MutableLiveData()
+    private val updateAccountDetails: MutableLiveData<Boolean> = MutableLiveData()
 
     fun checkElevation(): LiveData<Boolean> = withElevation
+    fun getVersionsInfo(): LiveData<String> = versionsInfo
+    fun onUpdateAccountDetails(): LiveData<Boolean> = updateAccountDetails
 
     fun setElevation(withElevation: Boolean) {
         this.withElevation.value = withElevation
+    }
+
+    private fun setVersionsInfo() {
+        versionsInfo.value = myAccountInfo.getFormattedPreviousVersionsSize()
+    }
+
+    fun updateAccountDetails() {
+        updateAccountDetails.value = true
     }
 
     private var is2FaEnabled = false
@@ -126,22 +139,28 @@ class MyAccountViewModel @ViewModelInject constructor(
 
     fun isAlreadyRegisteredPhoneNumber(): Boolean = !getRegisteredPhoneNumber().isNullOrEmpty()
 
+    fun getCloudStorage(): String = myAccountInfo.formattedUsedCloud
+
+    fun getInboxStorage(): String = myAccountInfo.formattedUsedInbox
+
+    fun getIncomingStorage(): String = myAccountInfo.formattedUsedIncoming
+
+    fun getRubbishStorage(): String = myAccountInfo.formattedUsedRubbish
+
     /**
      * Checks versions info.
-     *
-     * @param action Action to perform after versions info has been checked.
      */
-    fun checkVersions(action: () -> Unit) {
+    fun checkVersions() {
         if (myAccountInfo.numVersions == INVALID_VALUE) {
             checkVersionsUseCase.check()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onComplete = { action.invoke() },
+                    onComplete = { setVersionsInfo() },
                     onError = { error -> logWarning(error.message) }
                 )
                 .addTo(composite)
-        } else action.invoke()
+        } else setVersionsInfo()
     }
 
     /**
@@ -638,6 +657,19 @@ class MyAccountViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy { success -> action.invoke(success) }
+            .addTo(composite)
+    }
+
+    /**
+     * Gets file versions option.
+     */
+    fun getFileVersionsOption() {
+        getFileVersionsOptionUseCase.get()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = { setVersionsInfo() },
+                onError = { error -> logWarning(error.message) })
             .addTo(composite)
     }
 }

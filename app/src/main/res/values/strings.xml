@@ -676,6 +676,8 @@
     <string name="overquota_alert_text">You have exceeded your storage limit. Would you like to upgrade your account?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Last session</string>
+    <!-- header for the social connections, showing the number of contacts the user has -->
+    <string name="my_account_connections">Connections</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Changing password</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -751,7 +753,7 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">Video compression uses considerable amounts of power. Please plug in your device to charge if the videos to be compressed are larger than %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">If enabled, you location information will be included with your pictures. Please be careful when sharing them.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">If enabled, location information will be included with your pictures. Please be careful when sharing them.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Advanced</string>
     <!-- Settings preference title for cache -->
@@ -2082,7 +2084,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Advanced options</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA needs your permission to download files</string>
+    <string name="download_requires_permission">MEGA needs read and write permissions for your external storage for file downloads.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">The old SD card is not available, please set a new download location.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2100,13 +2102,13 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
     <string name="save_cloud_drive">To Cloud Drive</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
-    <string name="save_file_system">To File System</string>
+    <string name="save_file_system">To file system</string>
     <!-- Title of QR code section -->
-    <string name="section_my_code">My Code</string>
+    <string name="section_my_code">My code</string>
     <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Scan Code</string>
+    <string name="section_scan_code">Scan code</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">Auto-Accept</string>
+    <string name="settings_qrcode_autoaccept">Auto-accept</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">MEGA users who scan your QR code will be automatically added to your contact list.</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2142,9 +2144,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">The invitation has not been sent. %s is already in your contacts list.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">The invitation has not been sent. An error occurred processing it.</string>
+    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Generating QR Code&#8230;</string>
+    <string name="generatin_qr">Generating QR code&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Scan QR code</string>
     <!-- get the contact link and copy it -->
@@ -2549,7 +2551,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d files were not shared</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Preview Content</string>
+    <string name="preview_content">Preview content</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -2564,9 +2566,9 @@
         <item quantity="other">Messages not forwarded</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Rich URL Previews</string>
+    <string name="title_confirmation_disable_rich_links">Rich URL previews</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">You are disabling rich URL previews. You can re-enable rich URL previews in your settings. Do you want to proceed?</string>
+    <string name="text_confirmation_disable_rich_links">You are disabling rich URL previews. You can re-enable them in Settings. Do you want to continue?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Missed call[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2578,7 +2580,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Call was not answered[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Contact’s email</string>
+    <string name="contact_email">Contact email</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">You have already added this contact.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2592,7 +2594,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Restored to %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Error. Not restored</string>
+    <string name="context_no_restored">An error occured. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Send Message</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -3040,11 +3042,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Setup MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs access to your photos, media and files so you are able to share them with friends, exchange encrypted messages and make secure calls.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed for exchanging encrypted messages and to make secure calls.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Allow access to photos, media and files.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">To share photos, media and files MEGA needs your permission.</string>
+    <string name="allow_acces_media_subtitle">MEGA needs your permission to access files for sharing.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Enable camera</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -3052,7 +3054,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Enable calls</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Enable Access to Your Address Book</string>
+    <string name="allow_acces_contact_title">Enable access to your contacts</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Easily discover contacts from your address book on MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3437,8 +3439,8 @@
     <string name="business_management_alert">User management is only available from a desktop web browser.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Usage</string>
-    <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Storage usage details</string>
+    <!-- Title of usage storage details section in My Account -->
+    <string name="usage_storage_details_label">Usage storage details</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Overall usage</string>
     <!-- Title of transfer section in Storage -->
@@ -3454,7 +3456,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA can not access to your data, but your business account administrator can view and delete your Camera Uploads.</string>
+    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your business account administrator can access your Camera Uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Something went wrong</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3795,7 +3797,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Link: %1$s\n\nPassword: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA needs your permission in order to share files.</string>
+    <string name="files_required_permissions_warning">MEGA needs your permission to access your files for sharing.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Favourite</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3996,7 +3998,7 @@
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Add phone number</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
-    <string name="denied_write_permissions">MEGA needs write permissions to proceed with this action.</string>
+    <string name="denied_write_permissions">MEGA needs write permissions to storage to proceed.</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
         <item quantity="one">1 connection</item>

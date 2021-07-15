@@ -5,7 +5,7 @@
     android:id="@+id/usage_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_020_grey_087"
+    android:background="@color/white_grey_087"
     android:fillViewport="true"
     android:paddingStart="14dp"
     android:paddingEnd="14dp"
@@ -50,17 +50,17 @@
             android:paddingTop="16dp">
 
             <TextView
-                android:id="@+id/my_storage_account_cloud_storage_title"
+                android:id="@+id/cloud_storage_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/my_storage_account_cloud_storage_text"
+                android:layout_toStartOf="@+id/cloud_storage_text"
                 android:text="@string/section_cloud_drive"
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/my_storage_account_cloud_storage_text"
+                android:id="@+id/cloud_storage_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -85,17 +85,17 @@
             android:paddingTop="16dp">
 
             <TextView
-                android:id="@+id/my_storage_account_inbox_storage_title"
+                android:id="@+id/inbox_storage_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/my_storage_account_inbox_storage_text"
+                android:layout_toStartOf="@+id/inbox_storage_text"
                 android:text="@string/section_inbox"
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/my_storage_account_inbox_storage_text"
+                android:id="@+id/inbox_storage_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -119,17 +119,17 @@
             android:paddingTop="16dp">
 
             <TextView
-                android:id="@+id/my_storage_account_incoming_storage_title"
+                android:id="@+id/incoming_storage_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/my_storage_account_incoming_storage_text"
+                android:layout_toStartOf="@+id/incoming_storage_text"
                 android:text="@string/title_incoming_shares_explorer"
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/my_storage_account_incoming_storage_text"
+                android:id="@+id/incoming_storage_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -153,17 +153,17 @@
             android:paddingTop="16dp">
 
             <TextView
-                android:id="@+id/my_storage_account_rubbish_storage_title"
+                android:id="@+id/rubbish_storage_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/my_storage_account_rubbish_storage_text"
+                android:layout_toStartOf="@+id/rubbish_storage_text"
                 android:text="@string/section_rubbish_bin"
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/my_storage_account_rubbish_storage_text"
+                android:id="@+id/rubbish_storage_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -188,17 +188,17 @@
             android:paddingTop="16dp">
 
             <TextView
-                android:id="@+id/my_storage_account_previous_versions_title"
+                android:id="@+id/previous_versions_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/my_storage_account_previous_versions_text"
+                android:layout_toStartOf="@+id/previous_versions_text"
                 android:text="@string/file_properties_folder_previous_versions"
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/my_storage_account_previous_versions_text"
+                android:id="@+id/previous_versions_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"

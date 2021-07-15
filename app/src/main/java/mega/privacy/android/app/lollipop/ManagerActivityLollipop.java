@@ -10260,13 +10260,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             checkBeforeShowSMSVerificationDialog();
         }
 		else if(request.getType() == MegaRequest.TYPE_SET_ATTR_USER) {
-			if(request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER){
+			if (request.getParamType() == MegaApiJava.USER_ATTR_PWD_REMINDER) {
 				logDebug("MK exported - USER_ATTR_PWD_REMINDER finished");
 				if (e.getErrorCode() == MegaError.API_OK || e.getErrorCode() == MegaError.API_ENOENT) {
 					logDebug("New value of attribute USER_ATTR_PWD_REMINDER: " + request.getText());
 				}
-			}
-			else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
+			} else if (request.getParamType() == MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION) {
 				logDebug("change QR autoaccept - USER_ATTR_CONTACT_LINK_VERIFICATION finished");
 				if (e.getErrorCode() == MegaError.API_OK) {
 					logDebug("OK setContactLinkOption: " + request.getText());
@@ -10282,18 +10281,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 				} else {
 					logError("Error setContactLinkOption");
-				}
-			}
-			else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
-				MegaApplication.setDisableFileVersions(Boolean.valueOf(request.getText()));
-
-				if (e.getErrorCode() != MegaError.API_OK) {
-					logError("ERROR:USER_ATTR_DISABLE_VERSIONS");
-//					if (getMyAccountFragment() != null) {
-//						maF.refreshVersionsInfo();
-//					}
-				} else {
-					logDebug("File versioning attribute changed correctly");
 				}
 			}
 		}

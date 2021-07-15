@@ -32,6 +32,8 @@ import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.editProfile.EditProfileActivity
+import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
+import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -146,6 +148,8 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         LiveEventBus.get(EventConstants.EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
             .observeForever(emailUpdatedObserver)
+
+        viewModel.onUpdateAccountDetails().observe(viewLifecycleOwner) { setupAccountDetails() }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -354,6 +358,8 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         setupPaymentDetails()
 
+        binding.businessAccountManagementText.isVisible = false
+
         usageBinding.root.setOnClickListener {
             findNavController().navigate(
                 R.id.action_my_account_to_my_account_usage,
@@ -363,56 +369,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             )
         }
 
-        usageBinding.storageProgressPercentage.isVisible = true
-        usageBinding.storageProgressBar.isVisible = true
-        usageBinding.businessStorageImage.isVisible = false
-        usageBinding.transferProgressPercentage.isVisible = true
-        usageBinding.transferProgressBar.isVisible = true
-        usageBinding.businessTransferImage.isVisible = false
-
-        binding.businessAccountManagementText.isVisible = false
-
-        usageBinding.transferLayout.isVisible = !viewModel.isFreeAccount()
-
-        if (viewModel.getUsedStorage().isEmpty()) {
-            usageBinding.storageProgressPercentage.isVisible = false
-            usageBinding.storageProgressBar.progress = 0
-            usageBinding.storageProgress.text = gettingInfo
-        } else {
-            usageBinding.storageProgressPercentage.isVisible = true
-            usageBinding.storageProgressPercentage.text = StringResourcesUtils.getString(
-                R.string.used_storage_transfer_percentage,
-                viewModel.getUsedStoragePercentage()
-            )
-
-            usageBinding.storageProgressBar.progress =
-                viewModel.getUsedStoragePercentage()
-            usageBinding.storageProgress.text = StringResourcesUtils.getString(
-                R.string.used_storage_transfer,
-                viewModel.getUsedStorage(),
-                viewModel.getTotalStorage()
-            )
-        }
-
-        if (viewModel.getUsedTransfer().isEmpty()) {
-            usageBinding.transferProgressPercentage.isVisible = false
-            usageBinding.transferProgressBar.progress = 0
-            usageBinding.transferProgress.text = gettingInfo
-        } else {
-            usageBinding.transferProgressPercentage.isVisible = true
-            usageBinding.transferProgressPercentage.text = StringResourcesUtils.getString(
-                R.string.used_storage_transfer_percentage,
-                viewModel.getUsedTransferPercentage()
-            )
-
-            usageBinding.transferProgressBar.progress =
-                viewModel.getUsedTransferPercentage()
-            usageBinding.transferProgress.text = StringResourcesUtils.getString(
-                R.string.used_storage_transfer,
-                viewModel.getUsedTransfer(),
-                viewModel.getTotalTransfer()
-            )
-        }
+        usageBinding.update(viewModel)
     }
 
     private fun setupBusinessAccount() {
@@ -435,17 +392,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         if (megaApi.isMasterBusinessAccount) {
             when (megaApi.businessStatus) {
                 MegaApiJava.BUSINESS_STATUS_EXPIRED, MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD -> {
-                    paymentAlertBinding.renewExpiryText.isVisible = false
-                    paymentAlertBinding.renewExpiryDateText.isVisible = false
-                    paymentAlertBinding.businessStatusText.apply {
-                        isVisible = true
-
-                        text = StringResourcesUtils.getString(
-                            if (megaApi.businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED) R.string.payment_overdue_label
-                            else R.string.payment_required_label
-                        )
-                    }
-
+                    paymentAlertBinding.businessUpdate(megaApi)
                     expandPaymentInfoIfNeeded()
                 }
                 else -> setupPaymentDetails() //BUSINESS_STATUS_ACTIVE
@@ -458,41 +405,13 @@ class MyAccountFragment : Fragment(), Scrollable {
             setupEditProfile(false)
         }
 
-        usageBinding.storageProgressPercentage.isVisible = false
-        usageBinding.storageProgressBar.isVisible = false
-        usageBinding.businessStorageImage.isVisible = true
-
-        usageBinding.storageProgress.text =
-            if (viewModel.getUsedStorage().isEmpty()) gettingInfo
-            else viewModel.getUsedStorage()
-
-        usageBinding.transferProgressPercentage.isVisible = false
-        usageBinding.transferProgressBar.isVisible = false
-        usageBinding.businessTransferImage.isVisible = true
-
-        usageBinding.transferProgress.text =
-            if (viewModel.getUsedTransfer().isEmpty()) gettingInfo
-            else viewModel.getUsedTransfer()
+        usageBinding.businessUpdate(viewModel)
 
         binding.achievementsLayout.isVisible = false
     }
 
     private fun setupPaymentDetails() {
-        paymentAlertBinding.businessStatusText.isVisible = false
-
-        if (viewModel.hasRenewableSubscription() || viewModel.hasExpirableSubscription()) {
-            paymentAlertBinding.renewExpiryText.isVisible = true
-            paymentAlertBinding.renewExpiryDateText.isVisible = true
-
-            paymentAlertBinding.renewExpiryText.text = StringResourcesUtils.getString(
-                if (viewModel.hasRenewableSubscription()) R.string.renews_on else R.string.expires_on
-            )
-
-            paymentAlertBinding.renewExpiryDateText.text = TimeUtils.formatDate(
-                if (viewModel.hasRenewableSubscription()) viewModel.getRenewTime() else viewModel.getExpirationTime(),
-                TimeUtils.DATE_MM_DD_YYYY_FORMAT
-            )
-
+        if (paymentAlertBinding.update(viewModel)) {
             expandPaymentInfoIfNeeded()
         }
     }

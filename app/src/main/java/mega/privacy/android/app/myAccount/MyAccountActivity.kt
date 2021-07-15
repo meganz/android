@@ -16,6 +16,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.activity_my_account.*
 import kotlinx.android.synthetic.main.dialog_general_confirmation.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -61,7 +62,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             )
 
             when (actionType) {
-//                UPDATE_ACCOUNT_DETAILS -> setUpAccountDetails()
+                UPDATE_ACCOUNT_DETAILS -> viewModel.updateAccountDetails()
                 UPDATE_CREDIT_CARD_SUBSCRIPTION -> refreshMenuOptionsVisibility()
             }
         }
@@ -190,9 +191,12 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 if (megaApi.isBusinessAccount) {
                     menu.findItem(R.id.action_upgrade_account).isVisible = false
                 }
+
+                updateActionBar(ContextCompat.getColor(this, R.color.grey_020_grey_087))
             }
             else -> {
                 menu.toggleAllMenuItemsVisibility(false)
+                updateActionBar(ContextCompat.getColor(this, R.color.white))
             }
         }
     }
@@ -215,11 +219,26 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             refreshMenuOptionsVisibility()
 
             supportActionBar?.setHomeAsUpIndicator(
-                when (navController.currentDestination?.id) {
-                    R.id.my_account -> R.drawable.ic_arrow_back_white
-                    else -> R.drawable.ic_close_white
-                }
+                ColorUtils.tintIcon(
+                    this,
+                    when (navController.currentDestination?.id) {
+                        R.id.my_account -> R.drawable.ic_arrow_back_white
+                        else -> R.drawable.ic_close_white
+                    }
+                )
             )
+        }
+    }
+
+    /**
+     * Updates the action bar by changing the Toolbar and status bar color.
+     *
+     * @param background Color to set as background.
+     */
+    private fun updateActionBar(background: Int) {
+        if (!Util.isDarkMode(this)) {
+            window?.statusBarColor = background
+            toolbar.setBackgroundColor(background)
         }
     }
 
@@ -254,7 +273,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
      * Checks and refreshes account info.
      */
     private fun updateInfo() {
-//        viewModel.checkVersions { refreshVersionsInfo() }
+        viewModel.checkVersions()
         app.refreshAccountInfo()
     }
 
