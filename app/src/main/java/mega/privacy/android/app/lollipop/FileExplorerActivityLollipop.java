@@ -2146,6 +2146,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
                 credentials = new UserCredentials(lastEmail, gSession, "", "", "");
                 dbH.saveCredentials(credentials);
 				logDebug("Logged in with session");
+				logDebug("Setting account auth token for folder links.");
+				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
 				megaApi.fetchNodes(this);
 			}
 		}
