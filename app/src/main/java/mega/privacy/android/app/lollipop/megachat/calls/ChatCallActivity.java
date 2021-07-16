@@ -1101,8 +1101,6 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     }
 
     private void finishActivity() {
-        removeIncompatibilityTips();
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             super.finishAndRemoveTask();
         } else {
