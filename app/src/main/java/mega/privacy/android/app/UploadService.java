@@ -1028,7 +1028,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				} else {
 					logError("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
-					if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
+					if (error.getErrorCode() == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota()) {
 						isOverquota = OVERQUOTA_STORAGE_STATE;
 					}
 					else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
@@ -1138,6 +1138,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			{
 				case MegaError.API_EOVERQUOTA:
 				case MegaError.API_EGOINGOVERQUOTA:
+				    if (transfer.isForeignOverquota()) {
+				        break;
+                    }
+
 					if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 						isOverquota = OVERQUOTA_STORAGE_STATE;
 					}

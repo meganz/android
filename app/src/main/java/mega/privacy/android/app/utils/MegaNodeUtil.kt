@@ -43,6 +43,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
+import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -1053,14 +1054,19 @@ object MegaNodeUtil {
     /**
      * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_MOVE.
      *
-     * @param requestCode requestCode parameter of onActivityResult
-     * @param resultCode resultCode parameter of onActivityResult
-     * @param data data parameter of onActivityResult
-     * @param snackbarShower interface to show snackbar
+     * @param context        Current Context.
+     * @param requestCode    RequestCode parameter of onActivityResult
+     * @param resultCode     ResultCode parameter of onActivityResult
+     * @param data           Data parameter of onActivityResult
+     * @param snackbarShower Interface to show snackbar
      */
     @JvmStatic
     fun handleSelectFolderToMoveResult(
-        requestCode: Int, resultCode: Int, data: Intent?, snackbarShower: SnackbarShower
+        context: Context,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower
     ): List<Long> {
         if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_MOVE
             || resultCode != RESULT_OK || data == null
@@ -1080,7 +1086,12 @@ object MegaNodeUtil {
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return emptyList()
 
-        val listener = MoveListener(snackbarShower)
+        val listener = MoveListener(snackbarShower) { _, isForeignOverQuota ->
+            if (isForeignOverQuota) {
+                showForeignStorageOverQuotaWarningDialog(context)
+            }
+        }
+
         val result = ArrayList<Long>()
 
         for (handle in moveHandles) {
@@ -1117,15 +1128,20 @@ object MegaNodeUtil {
     /**
      * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_COPY.
      *
-     * @param requestCode requestCode parameter of onActivityResult
-     * @param resultCode resultCode parameter of onActivityResult
-     * @param data data parameter of onActivityResult
-     * @param snackbarShower interface to show snackbar
-     * @param activityLauncher interface to start activity
+     * @param context          Current Context.
+     * @param requestCode      RequestCode parameter of onActivityResult
+     * @param resultCode       ResultCode parameter of onActivityResult
+     * @param data             Data parameter of onActivityResult
+     * @param snackbarShower   Interface to show snackbar
+     * @param activityLauncher Interface to start activity
      */
     @JvmStatic
     fun handleSelectFolderToCopyResult(
-        requestCode: Int, resultCode: Int, data: Intent?, snackbarShower: SnackbarShower,
+        context: Context,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower,
         activityLauncher: ActivityLauncher
     ): Boolean {
         if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_COPY
@@ -1146,7 +1162,7 @@ object MegaNodeUtil {
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return false
 
-        val listener = CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, megaApp)
+        val listener = CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, context)
 
         for (handle in copyHandles) {
             val node = megaApi.getNodeByHandle(handle)
