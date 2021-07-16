@@ -10311,7 +10311,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         } else if (requestCode == PERMISSIONS_FRAGMENT) {
         	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         		if (!Environment.isExternalStorageManager()) {
-        			Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT).show();
+        			Toast.makeText(this,
+							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+							Toast.LENGTH_SHORT).show();
         		}
 
         		pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());

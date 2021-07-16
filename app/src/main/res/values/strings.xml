@@ -3979,4 +3979,6 @@
     <string name="action_hide_line_numbers">Hide line numbers</string>
     <!-- Indicates pagination progress. E.g.: 3/49 -->
     <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Permission needed to access storage.</string>
 </resources>
