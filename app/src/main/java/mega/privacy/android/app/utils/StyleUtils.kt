@@ -38,4 +38,29 @@ object StyleUtils {
             )
         }
     }
+
+    /**
+     * Sets a text style if the current version supports textAppearance,
+     * changes the text color if not.
+     *
+     * @param context         Current context.
+     * @param textAppearance  The style to set as textAppearance
+     * @param textColor       Color to set to the text in case the current version does not support textAppearance.
+     * @param isTextAttrColor True if the color to set is an attr color, false otherwise.
+     */
+    fun TextView.setTextStyle(
+        context: Context,
+        textAppearance: Int,
+        textColor: Int,
+        isTextAttrColor: Boolean
+    ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setTextAppearance(textAppearance)
+        } else {
+            setTextColor(
+                if (isTextAttrColor) getThemeColor(context, textColor)
+                else ContextCompat.getColor(context, textColor)
+            )
+        }
+    }
 }

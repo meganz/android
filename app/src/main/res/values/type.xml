@@ -286,6 +286,14 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Grey54White54">
+        <item name="android:textColor">@color/grey_054_white_054</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Grey87White">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
     <!--- 0.5px, Medium, AllCap -->
     <style name="TextAppearance.Mega.Subtitle2.Variant">
         <item name="android:letterSpacing">0.035714286</item>
@@ -373,6 +381,10 @@
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="TextAppearance.Mega.Body2.Medium.Grey87White87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
     <!-- Accent -->
     <style name="TextAppearance.Mega.Body2.Accent">
         <item name="android:textColor">?attr/colorSecondary</item>
@@ -392,6 +404,10 @@
 
     <style name="TextAppearance.Mega.Body2.Red400">
         <item name="android:textColor">@color/red_400</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Teal300Teal200">
+        <item name="android:textColor">@color/teal_300_teal_200</item>
     </style>
 
     <!-- Medium, Accent -->

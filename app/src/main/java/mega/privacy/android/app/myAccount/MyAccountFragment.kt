@@ -316,6 +316,15 @@ class MyAccountFragment : Fragment(), Scrollable {
             if (viewModel.getLastSession().isNotEmpty()) viewModel.getLastSession()
             else gettingInfo
 
+        usageBinding.root.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_my_account_to_my_account_usage,
+                null,
+                null,
+                FragmentNavigatorExtras(usageBinding.root to usageBinding.root.transitionName)
+            )
+        }
+
         if (megaApi.isBusinessAccount) {
             setupBusinessAccount()
             return
@@ -360,15 +369,6 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         binding.businessAccountManagementText.isVisible = false
 
-        usageBinding.root.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_my_account_to_my_account_usage,
-                null,
-                null,
-                FragmentNavigatorExtras(usageBinding.root to usageBinding.root.transitionName)
-            )
-        }
-
         usageBinding.update(viewModel)
     }
 
@@ -392,7 +392,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         if (megaApi.isMasterBusinessAccount) {
             when (megaApi.businessStatus) {
                 MegaApiJava.BUSINESS_STATUS_EXPIRED, MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD -> {
-                    paymentAlertBinding.businessUpdate(megaApi)
+                    paymentAlertBinding.businessUpdate(megaApi, viewModel)
                     expandPaymentInfoIfNeeded()
                 }
                 else -> setupPaymentDetails() //BUSINESS_STATUS_ACTIVE

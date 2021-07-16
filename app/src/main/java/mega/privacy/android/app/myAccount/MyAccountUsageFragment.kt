@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -21,6 +22,7 @@ import mega.privacy.android.app.fragments.homepage.Scrollable
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
+import mega.privacy.android.app.utils.StyleUtils.setTextStyle
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -73,6 +75,27 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
             R.drawable.background_usage_storage_transfer
         )
 
+        paymentAlertBinding.renewExpiryText.setTextStyle(
+            requireContext(),
+            R.style.TextAppearance_Mega_Subtitle2_Normal_Grey54White54,
+            R.color.grey_054_white_054,
+            false
+        )
+
+        paymentAlertBinding.renewExpiryDateText.apply {
+            setTextStyle(
+                requireContext(),
+                R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White,
+                R.color.grey_087_white,
+                false
+            )
+
+            (layoutParams as RelativeLayout.LayoutParams).topMargin = 0
+        }
+
+        binding.rubbishSeparator.isVisible = false
+        binding.previousVersionsStorageContainer.isVisible = false
+
         setupAccountDetails()
     }
 
@@ -108,13 +131,12 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     private fun setupAccountDetails() {
         if (megaApi.isBusinessAccount) {
             usageBinding.businessUpdate(viewModel)
-            paymentAlertBinding.businessUpdate(megaApi)
+            paymentAlertBinding.businessUpdate(megaApi, viewModel)
             paymentAlertBinding.root.isVisible = true
-            return
+        } else {
+            usageBinding.update(viewModel)
+            paymentAlertBinding.root.isVisible = paymentAlertBinding.update(viewModel)
         }
-
-        usageBinding.update(viewModel)
-        paymentAlertBinding.root.isVisible = paymentAlertBinding.update(viewModel)
 
         binding.cloudStorageText.text = viewModel.getCloudStorage()
 
