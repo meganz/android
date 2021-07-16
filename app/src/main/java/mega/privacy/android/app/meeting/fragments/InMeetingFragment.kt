@@ -41,6 +41,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_PROXIMITY_SENSOR_CHANGE
@@ -91,7 +92,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     StartChatCallListener.OnCallStartedCallback, AnswerChatCallListener.OnCallAnsweredCallback,
     AutoJoinPublicChatListener.OnJoinedChatCallback {
 
-    private var bWaiting: Boolean = false
+    private var bShowImcompatibility: Boolean = false
+    private var bInviteSent: Boolean = false
     val args: InMeetingFragmentArgs by navArgs()
 
     // Views
@@ -465,6 +467,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+    private val inviteObserver =
+        Observer<Boolean> { invite ->
+            if (invite && !bInviteSent){
+                bInviteSent = true
+                launchTimer()
+            }
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -744,6 +754,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_CHAT_CONNECTION_STATUS)
             .observe(this, chatConnectionStatusObserver as Observer<Any>)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_MEETING_INVITE)
+            .observe(this, inviteObserver as Observer<Any>)
     }
 
     private fun initToolbar() {
@@ -907,9 +920,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 bInviteSent = false;
                 val count = inMeetingViewModel.participants.value
                 if (count != null) {
-                    if (count.size < 1) {
+                    var participantsCount = getparticipantsCount()
+                    if(participantsCount == 0L && count.size == 0){
+                        launchTimer()
+                    } else if (participantsCount > 0 && count.size < participantsCount.toInt()) {
                         // start timer
                         launchTimer()
+                    } else {
+                        logDebug("noting to do")
                     }
                 }
 
@@ -926,6 +944,16 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.notificationNetworkState.observe(viewLifecycleOwner) { haveConnection ->
             inMeetingViewModel.updateNetworkStatus(haveConnection)
             checkInfoBanner(TYPE_NO_CONNECTION)
+        }
+    }
+
+    private fun getparticipantsCount(): Long {
+        val chat = megaChatApi.getChatRoom(inMeetingViewModel.currentChatId)
+        return if (chat == null) {
+            -1L
+        } else {
+            logDebug("all participants: $chat.peerCount")
+            chat.peerCount
         }
     }
 
@@ -1527,6 +1555,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
                 val chatRoom = inMeetingViewModel.getChat()
+                val isMeeting = chatRoom?.isMeeting
+                val isGroup = chatRoom?.isGroup
                 if (inMeetingViewModel.isRequestSent() && chatRoom != null && !chatRoom.isMeeting) {
                     CallUtil.activateChrono(false, meetingChrono, null)
                     toolbarSubtitle?.let {
@@ -1534,7 +1564,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
                     launchTimer()
                 } else {
-                    meetingActivity.snackbar?.dismiss()
+                    val chatRoom = inMeetingViewModel.getChat()
+                    if(chatRoom != null && !chatRoom.isMeeting){
+                        channel.cancel()
+                        meetingActivity.snackbar?.dismiss()
+                    }
                     toolbarSubtitle?.let {
                         it.text = StringResourcesUtils.getString(R.string.duration_meeting)
                     }
@@ -1549,19 +1583,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Start Timer for 26s and show snackbar for version incompatibility
      */
     private fun launchTimer() {
-        if(!bWaiting) {
-            bWaiting = true
+        if(!bShowImcompatibility) {
+            bShowImcompatibility = true
             lifecycleScope.launch {
                 launch(Dispatchers.IO) {
-                    logDebug("launchTimer() send")
+                    logDebug("launchTimer() will send after 26s")
                     delay(WAITING_TIME)
-                    channel.send(WAITING_TIME.toInt())
+                    if(!channel.isClosedForSend) {
+                        logDebug("launchTimer() send and then close")
+                        channel.send(WAITING_TIME.toInt())
+                        channel.close()
+                    }
                 }
                 launch(Dispatchers.IO) {
                     for (element in channel) {
                         logDebug("launchTimer() receive $element")
                         // After 26 seconds if the call is still not answered, they will see a message
-                        bWaiting = false;
                         activity?.runOnUiThread {
                             showSnackbar(
                                 SNACKBAR_IMCOMPATIBILITY_TYPE,
@@ -1704,11 +1741,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 updatePanelParticipantList(it.toMutableList())
 
                 // Check current the count of participants
+                var participantsCount = getparticipantsCount()
                 val count = it.size
-                if (count >= 1) {
-                    // stop timer and remove snackbar
+                if (participantsCount > 0 && count == participantsCount.toInt()) {
+                    // all participants in and stop timer and remove snackbar
                     channel.cancel()
                     meetingActivity.snackbar?.dismiss()
+                }
+                if(participantsCount > 0 && count < participantsCount.toInt()){
+                    launchTimer()
                 }
             }
         }
@@ -2233,7 +2274,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun finishActivity() {
         logDebug("Finishing the activity")
-        channel.cancel()
         meetingActivity.snackbar?.dismiss()
         meetingActivity.finish()
     }
@@ -2293,7 +2333,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         meetingActivity.startActivityForResult(
             inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
         )
-        bInviteSent = true;
+        bInviteSent = false;
     }
 
     /**
@@ -2332,8 +2372,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         const val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
         const val WAITING_TIME = 26000L // 26 seconds
-        @kotlin.jvm.JvmStatic
-        var bInviteSent: Boolean = false
     }
 
     /**
@@ -2370,10 +2408,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onResume()
         MegaApplication.getInstance().startProximitySensor()
         checkChildFragments()
-        if(bInviteSent){
-            bInviteSent = false
-            launchTimer()
-        }
     }
 
     override fun onCallAnswered(chatId: Long, flag: Boolean) {

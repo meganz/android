@@ -14,6 +14,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
+import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CHANGE
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
@@ -24,9 +25,10 @@ import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.ChatUtil.*
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
+import mega.privacy.android.app.utils.ChatUtil.getTitleChat
+import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING
+import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -520,6 +522,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
             val contactsData: List<String>? =
                 intent.getStringArrayListExtra(AddContactActivityLollipop.EXTRA_CONTACTS)
             if (contactsData != null) {
+                LiveEventBus.get(EVENT_MEETING_INVITE, Boolean::class.java).post(true)
                 currentChatId.value?.let {
                     InviteToChatRoomListener(context).inviteToChat(it, contactsData)
                     _snackBarLiveData.value = getString(R.string.invite_sent)
