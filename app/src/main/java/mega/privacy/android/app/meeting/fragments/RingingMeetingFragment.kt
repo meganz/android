@@ -324,24 +324,16 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         (activity as BaseActivity).showSnackbar(binding.root, message)
 
     private fun onAudioNeverAskAgain(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.RECORD_AUDIO -> {
-                    showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
-                }
-            }
+        if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
+            logDebug("user denies the RECORD_AUDIO permissions")
+            showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
         }
     }
 
     private fun onCameraNeverAskAgain(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user denies the permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
-                }
-            }
+        if (permissions.contains(Manifest.permission.CAMERA)) {
+            logDebug("user denies the CAMERA permissions")
+            showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
         }
     }
 

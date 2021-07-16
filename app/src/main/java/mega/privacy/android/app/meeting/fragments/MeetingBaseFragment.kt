@@ -200,13 +200,9 @@ open class MeetingBaseFragment : BaseFragment() {
      * @param permissions permission list
      */
     protected fun onRequiresAudioPermission(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user requires the Audio permissions: $it")
-            when (it) {
-                Manifest.permission.RECORD_AUDIO -> {
-                    sharedModel.setRecordAudioPermission(true)
-                }
-            }
+        if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
+            logDebug("user requires the Audio permissions")
+            sharedModel.setRecordAudioPermission(true)
         }
     }
 
@@ -216,13 +212,9 @@ open class MeetingBaseFragment : BaseFragment() {
      * @param permissions permission list
      */
     protected fun onRequiresCameraPermission(permissions: ArrayList<String>) {
-        permissions.forEach {
-            logDebug("user requires the Camera permissions: $it")
-            when (it) {
-                Manifest.permission.CAMERA -> {
-                    sharedModel.setCameraPermission(true)
-                }
-            }
+        if (permissions.contains(Manifest.permission.CAMERA)) {
+            logDebug("user requires the Camera permissions")
+            sharedModel.setRecordAudioPermission(true)
         }
     }
 
