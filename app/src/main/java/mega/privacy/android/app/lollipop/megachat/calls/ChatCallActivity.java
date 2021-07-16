@@ -191,6 +191,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private CountDownTimer countDownTimer;
     private CountDownTimer incompatibilityCountDownTimer;
     private ChatController chatC;
+    private boolean bNoShown = true;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -2278,8 +2279,16 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 incompatibilityCountDownTimer = new CountDownTimer(WAITING_TIME, 1000) {
                     public void onTick(long millisUntilFinished) {
                     }
+
                     public void onFinish() {
-                        showSnackbarWithAnchorView(SNACKBAR_IMCOMPATIBILITY_TYPE, fragmentContainer, hangFAB, getString(R.string.version_incompatibility), MEGACHAT_INVALID_HANDLE);
+                        if(bNoShown) {
+                            bNoShown = false;
+                            if (chat.isGroup()) {
+                                showSnackbarWithAnchorView(SNACKBAR_IMCOMPATIBILITY_BUTTON_TYPE, fragmentContainer, hangFAB, getString(R.string.version_incompatibility), MEGACHAT_INVALID_HANDLE);
+                            } else {
+                                showSnackbarWithAnchorView(SNACKBAR_IMCOMPATIBILITY_TYPE, fragmentContainer, hangFAB, getString(R.string.version_incompatibility), MEGACHAT_INVALID_HANDLE);
+                            }
+                        }
                     }
                 }.start();
                 return;
@@ -2298,7 +2307,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     boolean isInProgress = false;
                     MegaHandleList listPeerids = callChat.getSessionsPeerid();
                     MegaHandleList listClientids = callChat.getSessionsClientid();
-                    for (int i = 0; i < listPeerids.size(); i++) {
+                    long size = listPeerids.size();
+                    long participantsCount = chat.getPeerCount();
+                    for (int i = 0; i < size; i++) {
                         MegaChatSession userSession = callChat.getMegaChatSession(listPeerids.get(i), listClientids.get(i));
                         if (userSession != null && userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
                             isInProgress = true;
@@ -2306,7 +2317,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                         }
                     }
 
-                    removeIncompatibilityTips();
+                    if (participantsCount > 0 && size == participantsCount) {
+                        removeIncompatibilityTips();
+                    }
 
                     if (isInProgress) {
                         logDebug("Session in progress");
