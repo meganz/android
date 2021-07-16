@@ -37,7 +37,7 @@ import nz.mega.sdk.MegaApiAndroid
 import java.text.NumberFormat
 import java.util.*
 
-class UpgradeAccountViewModel @ViewModelInject constructor(
+class ChooseUpgradeAccountViewModel @ViewModelInject constructor(
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbH: DatabaseHandler

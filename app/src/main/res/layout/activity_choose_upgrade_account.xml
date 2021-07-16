@@ -6,7 +6,7 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"/>
+        android:layout_height="?attr/actionBarSize" />
 
     <ScrollView
         android:id="@+id/scroll_view"
@@ -26,7 +26,8 @@
                 android:layout_height="36dp"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
-                android:paddingStart="72dp">
+                android:paddingStart="72dp"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/text_of_my_account"
@@ -35,6 +36,146 @@
                     android:textColor="?android:attr/textColorSecondary"
                     android:textSize="14sp" />
             </RelativeLayout>
+
+            <!-- FREE -->
+            <RelativeLayout
+                android:id="@+id/choose_account_free_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingTop="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/choose_account_free_layout_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Left side (title) -->
+                    <RelativeLayout
+                        android:id="@+id/choose_account_free_left_side"
+                        android:layout_width="121dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingTop="4dp">
+
+                            <ImageView
+                                android:id="@+id/image_free"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginBottom="5dp"
+                                android:background="@null"
+                                android:src="@drawable/ic_free_crest" />
+
+                            <TextView
+                                android:id="@+id/choose_account_free_title_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/image_free"
+                                android:text="@string/free_account"
+                                android:textAllCaps="true"
+                                android:textColor="@color/green_500_green_400"
+                                android:textSize="18sp" />
+
+                        </RelativeLayout>
+
+                    </RelativeLayout>
+
+                    <!-- Right side (price, storage and bandwidth)-->
+                    <RelativeLayout
+                        android:id="@+id/choose_account_free_layout_right_side"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toEndOf="@id/choose_account_free_left_side"
+                        android:gravity="center_vertical">
+
+                        <TableLayout
+                            android:id="@+id/table_free"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true">
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp">
+
+                                    <TextView
+                                        android:id="@+id/storage_free"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+
+                                </RelativeLayout>
+
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="6dp">
+
+                                    <TextView
+                                        android:id="@+id/bandwidth_free"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="15sp" />
+                                </RelativeLayout>
+
+                            </TableRow>
+
+                            <TableRow>
+
+                                <RelativeLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="start"
+                                    android:layout_marginBottom="16dp">
+
+                                    <TextView
+                                        android:id="@+id/achievements_free"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="8dp"
+                                        android:maxWidth="200dp"
+                                        android:textColor="?android:attr/textColorSecondary"
+                                        android:textSize="11sp" />
+
+                                </RelativeLayout>
+
+                            </TableRow>
+
+                        </TableLayout>
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/linear_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignBottom="@id/choose_account_free_layout_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@color/grey_012_white_012"
+                    android:orientation="horizontal" />
+
+            </RelativeLayout>
+
             <!-- Pro Lite -->
             <RelativeLayout
                 android:id="@+id/upgrade_prolite_layout"
@@ -155,7 +296,7 @@
                 </RelativeLayout>
 
                 <LinearLayout
-                    android:id="@+id/linear_divider"
+                    android:id="@+id/linear_divider_pro_lite"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_alignBottom="@id/upgrade_prolite_layout_content"
@@ -621,7 +762,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/grey_020_white_020"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <ScrollView
         android:id="@+id/available_payment_methods"
