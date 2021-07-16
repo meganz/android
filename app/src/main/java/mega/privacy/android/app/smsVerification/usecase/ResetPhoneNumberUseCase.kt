@@ -1,6 +1,8 @@
 package mega.privacy.android.app.smsVerification.usecase
 
+import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.Single
+import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -23,7 +25,12 @@ class ResetPhoneNumberUseCase @Inject constructor(
             megaApi.resetSmsVerifiedPhoneNumber(
                 OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
                     when (error.errorCode) {
-                        API_OK, API_ENOENT -> emitter.onSuccess(true)
+                        API_OK, API_ENOENT -> {
+                            LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
+                                .post(true)
+
+                            emitter.onSuccess(true)
+                        }
                         else -> emitter.onError(error.toThrowable())
                     }
                 })

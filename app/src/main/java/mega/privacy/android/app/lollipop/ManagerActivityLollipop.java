@@ -258,6 +258,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
@@ -733,17 +734,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private NavController mNavController;
 	private HomepageSearchable mHomepageSearchable;
 
-	private BroadcastReceiver refreshAddPhoneNumberButtonReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context,Intent intent) {
-            if (intent != null && intent.getAction() == BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER) {
-                if(drawerLayout != null) {
-                    drawerLayout.closeDrawer(Gravity.LEFT);
-                }
-                refreshAddPhoneNumberButton();
-            }
-        }
-    };
+	private final Observer<Boolean> refreshAddPhoneNumberButtonObserver = new Observer<Boolean>() {
+		@Override
+		public void onChanged(Boolean aBoolean) {
+			if(drawerLayout != null) {
+				drawerLayout.closeDrawer(Gravity.LEFT);
+			}
+			refreshAddPhoneNumberButton();
+		}
+	};
+
 	private EditText openLinkText;
 	private RelativeLayout openLinkError;
 	private TextView openLinkErrorText;
@@ -1565,8 +1565,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
 		registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED));
 
-		registerReceiver(refreshAddPhoneNumberButtonReceiver,
-				new IntentFilter(BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER));
+		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
+				.observeForever(refreshAddPhoneNumberButtonObserver);
 
 		IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
 		filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
@@ -3665,7 +3665,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(receiverUpdateOrder);
 		unregisterReceiver(receiverUpdateView);
 		unregisterReceiver(chatArchivedReceiver);
-        unregisterReceiver(refreshAddPhoneNumberButtonReceiver);
+		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
+				.removeObserver(refreshAddPhoneNumberButtonObserver);
 		unregisterReceiver(receiverCUAttrChanged);
 		unregisterReceiver(transferOverQuotaUpdateReceiver);
 		unregisterReceiver(transferFinishReceiver);

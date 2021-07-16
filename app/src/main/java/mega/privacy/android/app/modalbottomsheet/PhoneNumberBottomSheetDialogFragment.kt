@@ -19,10 +19,12 @@ class PhoneNumberBottomSheetDialogFragment: BaseBottomSheetDialogFragment() {
 
         contentView.findViewById<View>(R.id.modify_phonenumber_layout).setOnClickListener {
             phoneNumberCallback.showRemovePhoneNumberConfirmation(true)
+            setStateBottomSheetBehaviorHidden()
         }
 
         contentView.findViewById<View>(R.id.remove_phonenumber_layout).setOnClickListener {
             phoneNumberCallback.showRemovePhoneNumberConfirmation(false)
+            setStateBottomSheetBehaviorHidden()
         }
 
         dialog.setContentView(contentView)

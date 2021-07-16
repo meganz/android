@@ -19,6 +19,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
@@ -88,6 +89,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private var deletePhotoDialog: AlertDialog? = null
 
     private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar() }
+
+    private val phoneNumberObserver = Observer<Boolean> { setupPhoneNumber() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -159,6 +162,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .removeObserver(profileAvatarUpdatedObserver)
 
+        LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
+            .removeObserver(phoneNumberObserver)
+
         changeNameDialog?.dismiss()
         changeEmailDialog?.dismiss()
         deletePhotoDialog?.dismiss()
@@ -220,6 +226,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private fun setupObservers() {
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .observeForever(profileAvatarUpdatedObserver)
+
+        LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
+            .observeForever(phoneNumberObserver)
     }
 
     /**

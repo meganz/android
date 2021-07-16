@@ -78,6 +78,8 @@ class MyAccountFragment : Fragment(), Scrollable {
     private val emailUpdatedObserver =
         Observer<Boolean> { binding.emailText.text = viewModel.getEmail() }
 
+    private val phoneNumberObserver = Observer<Boolean> { setupPhoneNumber() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         messageResultCallback = activity as? MessageResultCallback
@@ -149,6 +151,9 @@ class MyAccountFragment : Fragment(), Scrollable {
         LiveEventBus.get(EventConstants.EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
             .observeForever(emailUpdatedObserver)
 
+        LiveEventBus.get(EventConstants.EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
+            .observeForever(phoneNumberObserver)
+
         viewModel.onUpdateAccountDetails().observe(viewLifecycleOwner) { setupAccountDetails() }
     }
 
@@ -168,6 +173,9 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         LiveEventBus.get(EventConstants.EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
             .removeObserver(emailUpdatedObserver)
+
+        LiveEventBus.get(Constants.EVENT_AVATAR_CHANGE, Boolean::class.java)
+            .removeObserver(profileAvatarUpdatedObserver)
 
         changeApiServerDialog?.dismiss()
     }

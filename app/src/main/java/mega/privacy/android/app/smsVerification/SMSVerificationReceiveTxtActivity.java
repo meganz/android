@@ -29,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,6 +46,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.smsVerification.SMSVerificationActivity.*;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -672,8 +674,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
                 showError(getString(R.string.verify_account_error_wrong_code));
             } else if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("verification successful");
-                Intent intent = new Intent(Constants.BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER);
-                sendBroadcast(intent);
+                LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class).post(true);
                 showSnackbar(inputContainer, getString(R.string.verify_account_successfully));
                 //showing the successful text for 2 secs, then finish itself back to previous page.
                 new Handler().postDelayed(new Runnable() {
