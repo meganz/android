@@ -753,7 +753,7 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">Video compression uses considerable amounts of power. Please plug in your device to charge if the videos to be compressed are larger than %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">If enabled, you location information will be included with your pictures. Please be careful when sharing them.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">If enabled, location information will be included with your pictures. Please be careful when sharing them.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Advanced</string>
     <!-- Settings preference title for cache -->
@@ -2084,7 +2084,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Advanced options</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA needs your permission to download files</string>
+    <string name="download_requires_permission">MEGA needs read and write permissions for your external storage for file downloads.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">The old SD card is not available, please set a new download location.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2102,13 +2102,13 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
     <string name="save_cloud_drive">To Cloud Drive</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
-    <string name="save_file_system">To File System</string>
+    <string name="save_file_system">To file system</string>
     <!-- Title of QR code section -->
-    <string name="section_my_code">My Code</string>
+    <string name="section_my_code">My code</string>
     <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Scan Code</string>
+    <string name="section_scan_code">Scan code</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">Auto-Accept</string>
+    <string name="settings_qrcode_autoaccept">Auto-accept</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">MEGA users who scan your QR code will be automatically added to your contact list.</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2144,9 +2144,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">The invitation has not been sent. %s is already in your contacts list.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">The invitation has not been sent. An error occurred processing it.</string>
+    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Generating QR Code&#8230;</string>
+    <string name="generatin_qr">Generating QR code&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Scan QR code</string>
     <!-- get the contact link and copy it -->
@@ -2551,7 +2551,7 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d files were not shared</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Preview Content</string>
+    <string name="preview_content">Preview content</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
     <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
@@ -2566,9 +2566,9 @@
         <item quantity="other">Messages not forwarded</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Rich URL Previews</string>
+    <string name="title_confirmation_disable_rich_links">Rich URL previews</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">You are disabling rich URL previews. You can re-enable rich URL previews in your settings. Do you want to proceed?</string>
+    <string name="text_confirmation_disable_rich_links">You are disabling rich URL previews. You can re-enable them in Settings. Do you want to continue?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Missed call[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2580,7 +2580,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Call was not answered[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Contact’s email</string>
+    <string name="contact_email">Contact email</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">You have already added this contact.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2594,7 +2594,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Restored to %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Error. Not restored</string>
+    <string name="context_no_restored">An error occured. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Send Message</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -3042,11 +3042,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Setup MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs access to your photos, media and files so you are able to share them with friends, exchange encrypted messages and make secure calls.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed for exchanging encrypted messages and to make secure calls.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Allow access to photos, media and files.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">To share photos, media and files MEGA needs your permission.</string>
+    <string name="allow_acces_media_subtitle">MEGA needs your permission to access files for sharing.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Enable camera</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -3054,7 +3054,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Enable calls</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Enable Access to Your Address Book</string>
+    <string name="allow_acces_contact_title">Grant MEGA permission to access to your contacts</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Easily discover contacts from your address book on MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3062,9 +3062,9 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Allow access to your microphone to make encrypted calls.</string>
     <!-- General enable access -->
-    <string name="general_enable_access">Allow Access</string>
+    <string name="general_enable_access">Grant access</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
-    <string name="title_chat_shared_files_info">Shared Files</string>
+    <string name="title_chat_shared_files_info">Shared files</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">Attachment already sent</string>
     <!-- Message shown when a group call ends. -->
@@ -3109,17 +3109,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s left the call</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">You are not allowed to start a call because the participants limit has been exceeded.</string>
+    <string name="call_error_too_many_participants_start">Call cannot start because the maximum number of participants has been exceeded.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">You are not allowed to join this call as it has reached the maximum number of participants.</string>
+    <string name="call_error_too_many_participants">Call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">You are not allowed to join this call as the group has reached the maximum number of participants in the chat.</string>
+    <string name="call_error_too_many_participants_join">Group call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">You are not allowed to enable video as this call has reached the maximum number of participants using video.</string>
+    <string name="call_error_too_many_video">Video call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">You are not allowed to put the call on hold.</string>
+    <string name="call_error_call_on_hold">Call cannot be put on hold.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Error. The file cannot be opened.</string>
+    <string name="error_open_file_with">An error has occurred and the file cannot be opened with this app.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">Incoming call&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3127,7 +3127,7 @@
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">Message contains invalid metadata</string>
     <!-- Title of the activity that sends a location -->
-    <string name="title_activity_maps">Send Location</string>
+    <string name="title_activity_maps">Send location</string>
     <!-- Label layout on maps activity that permits send current location -->
     <string name="current_location_label">Send your current location</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
@@ -3440,7 +3440,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Usage</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Storage usage details</string>
+    <string name="usage_storage_details_label">Storage usage breakdown</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Overall usage</string>
     <!-- Title of transfer section in Storage -->
@@ -3456,7 +3456,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA can not access to your data, but your business account administrator can view and delete your Camera Uploads.</string>
+    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your business account administrator can access your Camera Uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Something went wrong</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3797,7 +3797,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Link: %1$s\n\nPassword: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA needs your permission in order to share files.</string>
+    <string name="files_required_permissions_warning">MEGA needs your permission to access your files for sharing.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Favourite</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3974,5 +3974,15 @@
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Change server</string>
     <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">We are upgrading MEGAChat. Your call might not be connected due to version incompatibility issues</string>
+    <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Show line numbers</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Hide line numbers</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Share owner is over storage quota.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
 </resources>

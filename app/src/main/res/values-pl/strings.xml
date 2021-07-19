@@ -773,7 +773,7 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">Kompresja wideo zużywa znaczne ilości energii. Proszę podłączyć urządzenie do ładowania, jeśli kompresowane filmy są większe niż %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Jeśli opcja ta jest włączona, informacje o lokalizacji użytkownika będą dołączane do zdjęć. Zachowaj ostrożność podczas ich udostępniania.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Jeśli funkcja ta jest włączona, informacje o lokalizacji będą dołączane do zdjęć. Zachowaj ostrożność podczas ich udostępniania.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Zaawansowane</string>
     <!-- Settings preference title for cache -->
@@ -2174,7 +2174,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Opcje zaawansowane</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">Typ nośnika Mega wymaga Twojej zgody na pobieranie plików</string>
+    <string name="download_requires_permission">Do pobierania plików MEGA potrzebuje uprawnień do odczytu i zapisu na zewnętrznej pamięci masowej.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">Stara karta SD nie jest dostępna. Ustaw nową katalog pobierania.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2192,13 +2192,13 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
     <string name="save_cloud_drive">Na Cloud Drive</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
-    <string name="save_file_system">Na dysk</string>
+    <string name="save_file_system">Do systemu plików</string>
     <!-- Title of QR code section -->
     <string name="section_my_code">Mój kod</string>
     <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Zeskanuj kod</string>
+    <string name="section_scan_code">Skanuj kod</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">Auto-akceptacja</string>
+    <string name="settings_qrcode_autoaccept">Automatycznie akceptuj</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Użytkownicy MEGA, którzy skanują Twój kod QR, zostaną automatycznie dodani do Twojej listy kontaktów.</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2234,9 +2234,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Zaproszenie nie zostało wysłane. %s jest już&#160;na liście Twoich kontaktów.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">Zaproszenie nie zostało wysłane. Wystąpił błąd podczas przetwarzania.</string>
+    <string name="invite_not_sent_text_error">Wystąpił błąd i zaproszenie nie zostało wysłane.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Generowanie kodu QR&#8230;</string>
+    <string name="generatin_qr">Generowanie kodu QR...</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Skanowanie kodu QR</string>
     <!-- get the contact link and copy it -->
@@ -2661,9 +2661,9 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d plików nieudostępniono</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Podgląd zawartości</string>
+    <string name="preview_content">Podgląd</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">Strumieniowania nie można wykonać, a plik nie został pobrany</string>
+    <string name="no_network_connection_on_play_file">Brak połączenia sieciowego. Plik nie został pobrany i nie może być przesyłany strumieniowo.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Nie można otworzyć pliku.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2678,9 +2678,9 @@
         <item quantity="other">Wiadomości nie zostały przesłane</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Zaawansowane podglądy adresów URL</string>
+    <string name="title_confirmation_disable_rich_links">Podgląd linków</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Wyłączasz pełny podgląd adresów URL. Możesz ponownie włączyć podgląd adresów URL w ustawieniach. Czy chcesz kontynuować?</string>
+    <string name="text_confirmation_disable_rich_links">Wyłączasz podgląd adresów URL. Możesz je ponownie włączyć w Ustawieniach. Czy chcesz kontynuować?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Nieodebrane połączenie[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2692,7 +2692,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Połączenie nie zostało odebrane[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Kontaktowy adres e-mail</string>
+    <string name="contact_email">E-mail</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Już dodałeś ten kontakt.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2706,7 +2706,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Przywrócono do %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Błąd. Nie przywrócono</string>
+    <string name="context_no_restored">Wystąpił błąd. Element nie został przywrócony.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Wyślij wiadomość</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -3174,11 +3174,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Skonfiguruj MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA potrzebuje dostępu do Twoich zdjęć, multimediów i plików, dzięki czemu możesz udostępniać je znajomym, wymieniać zaszyfrowane wiadomości i wykonywać bezpieczne połączenia.</string>
+    <string name="setup_mega_explanation">MEGA potrzebuje twojej zgody na dostęp do twoich mediów i plików w celu ich udostępnienia. Inne uprawnienia dostępu mogą być potrzebne do wymiany zaszyfrowanych wiadomości i do wykonywania bezpiecznych połączeń.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Zezwalaj na dostęp do zdjęć, multimediów i plików.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">Aby udostępnić zdjęcia, multimedia i pliki, MEGA potrzebuje twojej zgody.</string>
+    <string name="allow_acces_media_subtitle">MEGA potrzebuje Twojej zgody na dostęp do plików w celu ich udostępnienia.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Włącz kamerę</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -3186,7 +3186,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Włącz połączenia</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Włącz dostęp do swojej książki adresowej</string>
+    <string name="allow_acces_contact_title">Udziel MEGA dostępu do swoich kontaktów</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Łatwo odkrywaj kontakty z książki adresowej na MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3194,9 +3194,9 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Zezwalaj na dostęp do mikrofonu, aby wykonywać połączenia szyfrowane.</string>
     <!-- General enable access -->
-    <string name="general_enable_access">Udostępnik</string>
+    <string name="general_enable_access">Przyznaj dostęp</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
-    <string name="title_chat_shared_files_info">Udostępnione pliki</string>
+    <string name="title_chat_shared_files_info">Współdzielone pliki</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">Załącznik już wysłany</string>
     <!-- Message shown when a group call ends. -->
@@ -3247,17 +3247,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s opuścił połączenie</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">Nie możesz rozpocząć rozmowy, ponieważ został przekroczony limit uczestników.</string>
+    <string name="call_error_too_many_participants_start">Połączenie nie może się rozpocząć, ponieważ przekroczona została maksymalna liczba uczestników.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">Nie możesz dołączyć do tej rozmowy, ponieważ osiągnęła maksymalną liczbę uczestników.</string>
+    <string name="call_error_too_many_participants">Nie można dołączyć do połączenia, ponieważ przekroczona została maksymalna liczba uczestników.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Nie możesz dołączyć do tej rozmowy, ponieważ grupa osiągnęła maksymalną liczbę uczestników czatu.</string>
+    <string name="call_error_too_many_participants_join">Nie można dołączyć do połączenia grupowego, ponieważ przekroczona została maksymalna liczba uczestników.</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Nie możesz włączyć wideo, ponieważ to połączenie osiągnęło maksymalną liczbę uczestników korzystających z wideo.</string>
+    <string name="call_error_too_many_video">Nie można dołączyć do rozmowy wideo, ponieważ przekroczona została maksymalna liczba uczestników.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">Nie możesz zawiesić połączenia.</string>
+    <string name="call_error_call_on_hold">Połączenie nie może zostać zawieszone.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Błąd. Nie można otworzyć pliku.</string>
+    <string name="error_open_file_with">Wystąpił błąd i plik nie może zostać otwarty za pomocą tej aplikacji.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">Połączenie przychodzące&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3596,7 +3596,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Zużycie</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Szczegóły użycia pamięci</string>
+    <string name="usage_storage_details_label">Podział wykorzystania pamięci</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Ogólne wykorzystanie</string>
     <!-- Title of transfer section in Storage -->
@@ -3612,7 +3612,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Twoje konto jest obecnie [B]zawieszone[/B]. Możesz tylko przeglądać swoje dane.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA nie ma dostępu do Twoich danych, ale administrator Twojego konta biznesowego może przeglądać i usuwać Twoje pliki z aparatu.</string>
+    <string name="camera_uploads_business_alert">MEGA nie ma dostępu do Państwa danych. Administrator konta biznesowego ma jednak dostęp do danych Camera Uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Wystąpiły problemy</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3971,7 +3971,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Link: %1$s\n\nHasło: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA potrzebuje Twojej zgody, aby udostępniać pliki.</string>
+    <string name="files_required_permissions_warning">MEGA potrzebuje Twojej zgody na dostęp do Twoich plików w celu ich udostępnienia.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Ulubione</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -4149,4 +4149,14 @@
     <string name="production_api_server">Produkcyjny</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Inny serwer</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Pokaż numery linii</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Ukryj numery linii</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Właściciel przekroczył limit pamięci.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Plik nie może zostać wysłany, ponieważ użytkownik docelowy przekroczył limit pamięci.</string>
 </resources>

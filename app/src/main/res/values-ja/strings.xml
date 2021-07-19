@@ -2039,7 +2039,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">詳細設定オプション</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGAがファイルをダウンロードするにはあなたの許可が必要です</string>
+    <string name="download_requires_permission">MEGAは、ファイルをダウンロードするために、外部ストレージの読み取りと書き込みの権限が必要です。</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">古いSDカードは使用できません。新しいダウンロード場所を設定してください。</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2099,9 +2099,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">招待状は送信されていません。%sさんはすでに連絡先に入っています。</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">招待状は送信されていません。処理中にエラーが発生しました。</string>
+    <string name="invite_not_sent_text_error">エラーが発生し、招待状が送信されておりません。</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">QRコードを生成中&#8230;</string>
+    <string name="generatin_qr">QRコードの生成中...</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">QRコードをスキャン</string>
     <!-- get the contact link and copy it -->
@@ -2512,7 +2512,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">リッチURLプレビュー</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">リッチURLのプレビューを無効にしています。リッチURLプレビューを設定で再度有効にできます。続行しますか？　</string>
+    <string name="text_confirmation_disable_rich_links">リッチURLのプレビューを無効にしています。設定で再度有効にすることができます。続行しますか？　</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]不在着信[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2524,7 +2524,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]着信に応答されませんでした[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">連絡先のメールアドレス</string>
+    <string name="contact_email">連絡先メールアドレス</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">すでにこの連絡先を追加しています。</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2538,7 +2538,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">%sに復元されました</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">エラー。復元されませんでした</string>
+    <string name="context_no_restored">エラーが発生しました。項目が復元できませんでした。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">メッセージを送信</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -2976,11 +2976,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGAをセットアップ</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGAはあなたの写真、メディア、ファイルをあなたがご友人と共有したり、暗号化されたメッセージを交換したり、安全な通話を行うことができるように、それらへのアクセスを必要とします。</string>
+    <string name="setup_mega_explanation">MEGAは、共有するために、あなたのメディアやファイルにアクセスするためのあなたの許可が必要です。暗号化されたメッセージを交換したり、安全な通話を行うためには、他のアクセス権限が必要な場合があります。</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">写真、メディア、ファイルへのアクセスを許可します。</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">写真、メディア、ファイルを共有するには、MEGAはあなたの許可が必要です。</string>
+    <string name="allow_acces_media_subtitle">MEGAは、共有するために、あなたのファイルにアクセスするためのあなたの許可が必要です。</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">カメラを有効にする</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -2988,7 +2988,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">通話を有効にする</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">アドレス帳へのアクセスを有効にする</string>
+    <string name="allow_acces_contact_title">MEGAに連絡先へのアクセスを許可する</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">MEGAのあなたのアドレス帳から連絡先を簡単に見つけます。</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3040,17 +3040,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$sさんが通話から抜けました</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">参加者の制限を超えたため、通話を開始できません。</string>
+    <string name="call_error_too_many_participants_start">最大参加者数を超えてしまったため、通話を開始できません。</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">最大参加者数に達したため、この通話に参加できません。</string>
+    <string name="call_error_too_many_participants">最大参加者数を超えてしまったため、通話に参加できません。</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">グループがチャットの最大参加者数に達しているため、この通話に参加できません。</string>
+    <string name="call_error_too_many_participants_join">最大参加者数を超えてしまったため、グループ通話に参加できません。</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">この通話はビデオを使用している最大参加者数に達したため、ビデオを有効にできません。</string>
+    <string name="call_error_too_many_video">最大参加者数を超えてしまったため、ビデオ通話に参加できません。</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">通話を保留にすることはできません。</string>
+    <string name="call_error_call_on_hold">通話を保留できません。</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">エラー。ファイルが開けません。</string>
+    <string name="error_open_file_with">エラーが発生したため、このアプリではファイルを開くことができません。</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">着信&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3362,7 +3362,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">使用状況</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">ストレージ使用状況詳細</string>
+    <string name="usage_storage_details_label">ストレージ使用量の内訳</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">全体的な使用状況</string>
     <!-- Title of transfer section in Storage -->
@@ -3378,7 +3378,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">あなたのアカウントは現在[B]凍結[/B]されています。あなたのデータの閲覧のみ可能です。</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGAはお客様のデータにアクセスすることはできませんが、お客様のビジネスアカウント管理者はお客様のカメラアップロードを閲覧・削除することができます。</string>
+    <string name="camera_uploads_business_alert">MEGAはお客様のデータにアクセスできません。ただし、ビジネスアカウントの管理者様は、あなたのカメラアップロードにアクセスすることができます。</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">何かがうまくいきませんでした</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3710,7 +3710,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">リンク：%1$s\n\nパスワード：%2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGAはファイルを共有するためにあなたの許可を必要とします。</string>
+    <string name="files_required_permissions_warning">MEGAは、共有に向けてあなたのファイルにアクセスするために、あなたの許可が必要です。</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">お気に入り</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3885,4 +3885,14 @@
     <string name="production_api_server">本番</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">サーバーの変更</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">行番号を表示</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">行番号を隠す</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">共有所有者はストレージ容量を超えています。</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">ターゲットユーザーはストレージ容量を超えているため、ファイルを送信できません。</string>
 </resources>
