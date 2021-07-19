@@ -44,6 +44,7 @@ class PasscodeLockActivity : BaseActivity() {
         private const val SB_FIRST = "SB_FIRST"
         private const val ATTEMPTS = "ATTEMPTS"
         private const val PASSCODE_TYPE = "PASSCODE_TYPE"
+        private const val IS_CONFIRM_LOGOUT_SHOWN = "IS_CONFIRM_LOGOUT_SHOWN"
     }
 
     private var attempts = 0
@@ -61,6 +62,8 @@ class PasscodeLockActivity : BaseActivity() {
 
     private var passcodeOptionsBottomSheetDialogFragment: PasscodeOptionsBottomSheetDialogFragment? =
         null
+
+    private var isConfirmLogoutDialogShown: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,6 +85,10 @@ class PasscodeLockActivity : BaseActivity() {
 
             attempts = savedInstanceState.getInt(ATTEMPTS, 0)
             passcodeType = savedInstanceState.getString(PASSCODE_TYPE, PIN_4)
+
+            if (savedInstanceState.getBoolean(IS_CONFIRM_LOGOUT_SHOWN, false)) {
+                askConfirmLogout()
+            }
         } else {
             val prefs = dbH.preferences
 
@@ -150,11 +157,16 @@ class PasscodeLockActivity : BaseActivity() {
             .setTitle(StringResourcesUtils.getString(R.string.proceed_to_logout))
             .setMessage(message)
             .setPositiveButton(StringResourcesUtils.getString(R.string.action_logout)) { _, _ ->
+                isConfirmLogoutDialogShown = false
                 logout()
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel)) { _, _ -> }
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel)) { _, _ ->
+                isConfirmLogoutDialogShown = false
+            }
             .create()
             .show()
+
+        isConfirmLogoutDialogShown = true
     }
 
     /**
@@ -596,6 +608,7 @@ class PasscodeLockActivity : BaseActivity() {
 
         outState.putInt(ATTEMPTS, attempts)
         outState.putString(PASSCODE_TYPE, passcodeType)
+        outState.putBoolean(IS_CONFIRM_LOGOUT_SHOWN, isConfirmLogoutDialogShown)
 
         super.onSaveInstanceState(outState)
     }
