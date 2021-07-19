@@ -1934,9 +1934,10 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             emptyImageView.setVisibility(View.VISIBLE);
             emptyTextView.setVisibility(View.VISIBLE);
             if (contactType == CONTACT_TYPE_MEGA && (addedContactsMEGA == null || addedContactsMEGA.isEmpty())) {
-                emptySubTextView.setVisibility(View.VISIBLE);
                 if (!isFromMeeting) {
                     emptyInviteButton.setVisibility(View.VISIBLE);
+                } else {
+                    emptyInviteButton.setVisibility(View.GONE);
                 }
             }
             else {
