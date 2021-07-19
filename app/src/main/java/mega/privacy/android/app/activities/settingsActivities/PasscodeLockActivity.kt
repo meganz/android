@@ -90,7 +90,7 @@ class PasscodeLockActivity : BaseActivity() {
         setContentView(binding.root)
 
         if (mode == UNLOCK_MODE) {
-            binding.toolbarPasscodeLockTitle.isVisible = true
+            binding.toolbarPasscodeLockTitle.isVisible = false
         } else {
             setSupportActionBar(binding.toolbarPasscode)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
