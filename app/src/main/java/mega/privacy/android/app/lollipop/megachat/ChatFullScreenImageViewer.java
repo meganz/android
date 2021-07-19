@@ -76,6 +76,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -573,6 +574,11 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 				logWarning("e.getErrorCode() != MegaError.API_OK");
 
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					if (api.isForeignNode(request.getParentHandle())) {
+						showForeignStorageOverQuotaWarningDialog(this);
+						return;
+					}
+
 					logWarning("OVERQUOTA ERROR: "+e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(ACTION_OVERQUOTA_STORAGE);

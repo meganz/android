@@ -3975,14 +3975,14 @@
     <string name="title_change_server">Change server</string>
     <!-- Content to show in a Snackbar to tip the incompatibility-->
     <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Share owner is over storage quota.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
     <!-- Show line numbers action -->
     <string name="action_show_line_numbers">Show line numbers</string>
     <!-- Hide line numbers action -->
     <string name="action_hide_line_numbers">Hide line numbers</string>
     <!-- Indicates pagination progress. E.g.: 3/49 -->
     <string name="pagination_progress">%1$s/%2$s</string>
-    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
-    <string name="error_share_owner_storage_quota">Share owner is over storage quota.</string>
-    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
-    <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
 </resources>
