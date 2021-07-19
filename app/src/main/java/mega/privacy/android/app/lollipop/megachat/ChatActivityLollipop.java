@@ -7557,7 +7557,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void showSnackbar(int type, String s, long idChat, String emailUser){
-        showSnackbar(type, fragmentContainer, s, idChat, emailUser);
+        showSnackbar(type, fragmentContainer, null, s, idChat, emailUser);
     }
 
     public void removeProgressDialog(){
