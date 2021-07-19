@@ -8,6 +8,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -18,9 +19,11 @@ import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboardView
 import java.util.*
@@ -119,6 +122,39 @@ class PasscodeLockActivity : BaseActivity() {
     private fun resetAttempts() {
         attempts = 0
         dbH.setAttrAttemps(attempts)
+    }
+
+    /**
+     * If user has offline files or ongoing transfers shows a confirmation dialog before proceed to logout.
+     * Otherwise, if user has no offline files or ongoing transfers, then proceeds to logout.
+     */
+    private fun askConfirmLogout() {
+        val existOfflineFiles = OfflineUtils.existsOffline(this)
+        val existOutgoingTransfers = Util.existOngoingTransfers(megaApi)
+
+        if (!existOfflineFiles && !existOutgoingTransfers) {
+            logout()
+            return
+        }
+
+        var message = ""
+        if (existOfflineFiles && existOutgoingTransfers) {
+            message = getString(R.string.logout_warning_offline_and_transfers)
+        } else if (existOfflineFiles) {
+            message = getString(R.string.logout_warning_offline)
+        } else if (existOutgoingTransfers) {
+            message = getString(R.string.logout_warning_transfers)
+        }
+
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setTitle(StringResourcesUtils.getString(R.string.proceed_to_logout))
+            .setMessage(message)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.action_logout)) { _, _ ->
+                logout()
+            }
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel)) { _, _ -> }
+            .create()
+            .show()
     }
 
     /**
@@ -305,7 +341,7 @@ class PasscodeLockActivity : BaseActivity() {
         }
 
         binding.logoutButton.setOnClickListener {
-            logout()
+            askConfirmLogout()
         }
 
         binding.passcodeOptionsButton.setOnClickListener {
