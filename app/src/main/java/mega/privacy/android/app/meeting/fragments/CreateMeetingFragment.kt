@@ -113,7 +113,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
             it.hint = defaultName
             val maxAllowed = ChatUtil.getMaxAllowed(defaultName)
             it.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxAllowed))
-            showKeyboardDelayed(type_meeting_edit_text)
         }
     }
 
@@ -129,5 +128,23 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         viewModel.meetingName.observe(viewLifecycleOwner) {
             meetingName = it
         }
+    }
+
+    /**
+     * Callback when permissions are all granted
+     * @param permissions the granted permissions
+     */
+    override fun onRequiresPermission(permissions: ArrayList<String>) {
+        super.onRequiresPermission(permissions)
+        showKeyboardDelayed(type_meeting_edit_text)
+    }
+
+    /**
+     * Callback when permissions are denied
+     * @param permissions the granted permissions
+     */
+    override fun onPermissionDenied(permissions: ArrayList<String>) {
+        super.onPermissionDenied(permissions)
+        showKeyboardDelayed(type_meeting_edit_text)
     }
 }

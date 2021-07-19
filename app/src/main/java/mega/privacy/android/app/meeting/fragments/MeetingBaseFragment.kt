@@ -117,7 +117,7 @@ open class MeetingBaseFragment : BaseFragment() {
      *
      * @param permissions permission list
      */
-    protected fun onRequiresPermission(permissions: ArrayList<String>) {
+    protected open fun onRequiresPermission(permissions: ArrayList<String>) {
         permissions.forEach {
             logDebug("user requires the permissions: $it")
             when (it) {
@@ -152,7 +152,7 @@ open class MeetingBaseFragment : BaseFragment() {
      *
      * @param permissions permission list
      */
-    protected fun onPermissionDenied(permissions: ArrayList<String>) {
+    protected open fun onPermissionDenied(permissions: ArrayList<String>) {
         permissions.forEach {
             logDebug("user denies the permissions: $it")
             when (it) {
