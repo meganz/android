@@ -111,6 +111,11 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
         Util.showKeyboardDelayed(meeting_link)
     }
 
+    override fun onPause() {
+        super.onPause()
+        Util.hideKeyboard(activity)
+    }
+
     companion object {
         const val TAG = "PasteMeetingLinkGuestDialog"
 
