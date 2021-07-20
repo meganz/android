@@ -2104,7 +2104,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param attr Attributes to save.
 	 */
 	private void setAttributes (SQLiteDatabase db, MegaAttributes attr) {
-		logDebug("setAttributes");
+		if (attr == null) {
+			logError("Error: Attributes are null");
+			return;
+		}
+
 		ContentValues values = new ContentValues();
 		values.put(KEY_ATTR_ONLINE, encrypt(attr.getOnline()));
 		values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
