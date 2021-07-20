@@ -2524,7 +2524,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Panggilan tidak dijawab[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Email kontak</string>
+    <string name="contact_email">Kontak email</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Anda telah menambahkan kontak ini.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2998,7 +2998,7 @@
     <!-- General enable access -->
     <string name="general_enable_access">Izinkan Akses</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
-    <string name="title_chat_shared_files_info">Shared Files</string>
+    <string name="title_chat_shared_files_info">Shared files</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">Lampiran sudah terkirim</string>
     <!-- Message shown when a group call ends. -->
@@ -3885,4 +3885,14 @@
     <string name="production_api_server">Production</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Change server</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Show line numbers</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Hide line numbers</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Pemilik berbagi melebihi kuota penyimpanan.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">File tidak dapat dikirim karena pengguna target melebihi kuota penyimpanan mereka.</string>
 </resources>

@@ -689,7 +689,7 @@
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Просмотр изображений</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Занято</string>
+    <string name="my_account_used_space">Использовано места</string>
     <!-- menu item -->
     <string name="my_account_change_password">Изменить пароль</string>
     <!-- Dialog text overquota error -->
@@ -713,7 +713,7 @@
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Ежемесячное или ежегодное возобновление</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">На данный момент ни один метод оплаты не доступен для данного плана</string>
+    <string name="no_available_payment_method">В настоящее время для этого плана не задан способ оплаты. Пожалуйста, выберите способ.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Ежемесячно*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -723,7 +723,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">Предварительное изображение ещё не загружено. Подождите.</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Не удаётся загрузить превью из-за недостатка доступной памяти. Пожалуйста, повторите попытку позже.</string>
+    <string name="not_load_preview_low_memory">Недостаточно свободной памяти для предварительного просмотра. Пожалуйста, повторите попытку позже.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Для новой регистрации выйдите из системы</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -737,9 +737,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Разрешить уведомления для входящих MEGA-звонков</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA нужна ваше разрешение, чтобы сообщение о вызове всплывало поверх экрана.</string>
+    <string name="ask_for_display_over_msg">MEGA нужно разрешение на отображение поверх других приложений для звонков.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Не волнуйтесь, вы всё равно можете вручную давать разрешения в настройках устройства.</string>
+    <string name="ask_for_display_over_explain">Вы по-прежнему можете предоставить разрешения вручную в настройках устройства.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Только Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -771,9 +771,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Варианты кода</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Сжатие видео очень энергозатратно. MEGA потребует подключить зарядное устройство, если размер сжимаемых видео превышает %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Сжатие видео требует значительного количества энергии. Поставьте устройство на зарядку, если размер сжимаемых видео превышает %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Если включено, вы будете загружать информацию о том, где были сняты ваши фотографии. Поэтому будьте осторожны, когда делитесь ими.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Если включено, информация о местоположении будет добавлена к вашим фотографиям. Пожалуйста, будьте осторожны, когда делитесь ими.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Продвинутые</string>
     <!-- Settings preference title for cache -->
@@ -2174,7 +2174,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Расширенные опции</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA нужно ваше разрешение на скачивание файлов</string>
+    <string name="download_requires_permission">MEGA нужны разрешения на чтение и запись в вашем внешнем хранилище для загрузки файлов.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">Старая SD-карта недоступна, пожалуйста, укажите новое место для загрузки.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2196,7 +2196,7 @@
     <!-- Title of QR code section -->
     <string name="section_my_code">Мой код</string>
     <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Скан кода</string>
+    <string name="section_scan_code">Сканировать код</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
     <string name="settings_qrcode_autoaccept">Принимать автоматически</string>
     <!-- Subtitle of QR code settings auto-accept -->
@@ -2234,7 +2234,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Приглашение не отправлено. %s уже в вашем списке контактов.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">Приглашение не было отправлено из-за ошибки.</string>
+    <string name="invite_not_sent_text_error">Произошла ошибка, и приглашение не было отправлено.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Создание QR-кода&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -2661,13 +2661,13 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">Не удалось импортировать файлы: %d</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Предпросмотр</string>
+    <string name="preview_content">Предварительный просмотр</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">Потоковая передача не может быть выполнена, файл не был загружен</string>
+    <string name="no_network_connection_on_play_file">Нет подключения к сети. Файл не был загружен и не может быть воспроизведён в потоковом режиме.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Невозможно открыть файл.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">Нам не удалось открыть файл из-за отсутствия сетевого подключения.</string>
+    <string name="error_fail_to_open_file_no_network">Файл невозмозможно открыть, так как нет подключения к сети.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Файл уже сохранён локально</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2680,7 +2680,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">Превью URL</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Вы отключаете превью URL насовсем. Их можно включить позже в «настройках». Продолжить</string>
+    <string name="text_confirmation_disable_rich_links">Вы отключаете превью URL. Вы можете снова включить их в настройках. Продолжить?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Пропущенный вызов[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2692,7 +2692,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Вызов не получил ответа[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">E-mail контакта</string>
+    <string name="contact_email">Эл. почта контакта</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Вы уже добавили этот контакт</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2706,7 +2706,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Восстановлено в %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Ошибка. Не восстановлено</string>
+    <string name="context_no_restored">Произошла ошибка. Элемент не восстановлен.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Отправить Сообщение</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -3174,11 +3174,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Настроить MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA необходим доступ к вашим фотографиям, медиа и файлам, чтобы вы могли делиться ими с друзьями, обмениваться зашифрованными сообщениями и совершать безопасные звонки.</string>
+    <string name="setup_mega_explanation">Чтобы делиться файлами, MEGA требуется ваше разрешение на доступ к медиафайлам и файлам. Другие разрешения доступа могут потребоваться для обмена зашифрованными сообщениями и для безопасных звонков.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Разрешить доступ к фотографиям, медиа и файлам.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">Для обмена фотографиями, медиа и файлами MEGA нужно ваше разрешение.</string>
+    <string name="allow_acces_media_subtitle">Чтобы делиться файлами, MEGA требуется ваше разрешение на доступ к файлам.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Разрешить доступ к камере</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -3186,7 +3186,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Разрешить звонки</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Откройте доступ к вашей адресной книге</string>
+    <string name="allow_acces_contact_title">Предоставьте MEGA разрешение на доступ к контактам</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Легко находите контакты из своей адресной книги в MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3247,17 +3247,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s отключился</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">Вам не разрешено начать звонок, потому что лимит участников был превышен.</string>
+    <string name="call_error_too_many_participants_start">Невозможно начать к звонок, поскольку превышено максимальное количество участников.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">Вы не можете присоединиться к этому вызову, так как в нём максимальное количество участников.</string>
+    <string name="call_error_too_many_participants">Невозможно присоединиться к звонку, поскольку превышено максимальное количество участников.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Вам не разрешено присоединиться к этому звонку, поскольку группа достигла максимального количества участников в чате.</string>
+    <string name="call_error_too_many_participants_join">Невозможно присоединиться к групповому звонку, поскольку превышено максимальное количество участников.</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Вы не можете включить видео, так в этом вызове уже максимальное количество участников, использующих видео.</string>
+    <string name="call_error_too_many_video">Невозможно присоединиться к видеозвонку, поскольку превышено максимальное количество участников.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">Вы не можете удерживать вызов.</string>
+    <string name="call_error_call_on_hold">Звонок нельзя поставить на удержание.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Ошибка. Файл не может быть открыт.</string>
+    <string name="error_open_file_with">Произошла ошибка, и файл не может быть открыт в этом приложении.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">Входящий вызов&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3596,7 +3596,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Использование</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Детали использования хранилища</string>
+    <string name="usage_storage_details_label">Распределение использования хранилища</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Общее использование</string>
     <!-- Title of transfer section in Storage -->
@@ -3604,7 +3604,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Вы не можете удалить %1$s как контакт, поскольку он является частью вашего бизнес-аккаунта.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">Возникла проблема с вашим последним платежом. Пожалуйста, откройте MEGA в браузере настольного компьютера для дополнительной информации.</string>
+    <string name="grace_period_admin_alert">Возникла проблема с вашим последним платежом. Пожалуйста, войдите в MEGA с помощью настольного браузера для получения дополнительной информации.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Срок действия вашего бизнес-аккаунта истёк</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3612,7 +3612,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Ваш аккаунт [B]приостановлен[/B]. Вы можете только просматривать данные.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">Несмотря на то, что у MEGA нет доступа к вашим данным, администратор вашего бизнес-аккаунта может контролировать и просматривать загрузки из камеры в вашем аккаунте.</string>
+    <string name="camera_uploads_business_alert">MEGA не может получить доступ к вашим данным. Однако администратор вашего бизнес-аккаунта может получить доступ к вашим загрузкам из камеры.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Что-то пошло не так</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -4149,4 +4149,14 @@
     <string name="production_api_server">Производство</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Изменение сервера</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Показывать номера строк</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Скрывать номера строк</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Владелец общего ресурса превысил квоту на хранение.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Файл не может быть отправлен, поскольку получатель превысил квоту на хранение.</string>
 </resources>

@@ -2580,7 +2580,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Anruf wurde nicht angenommen[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">E-Mail-Adresse des Kontakts</string>
+    <string name="contact_email">Kontakt E-Mail</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Dieser Kontakt wurde bereits hinzugefügt</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -3973,4 +3973,14 @@
     <string name="production_api_server">Production</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Change server</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Show line numbers</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Hide line numbers</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Der Eigentümer der Ordnerfreigabe hat sein Speicherplatzlimit überschritten.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Die Datei kann nicht versandt werden, da der Empfänger sein Speicherplatzlimit überschritten hat.</string>
 </resources>

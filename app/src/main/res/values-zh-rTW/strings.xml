@@ -743,7 +743,7 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">影片壓縮會用掉相當多的電力。如果要壓縮的影片大小超過%s，請將您的裝置接上電源進行充電。</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">如果啟用，您的位置資訊將包含在您的照片中。分享它們時請小心。</string>
+    <string name="settings_camera_upload_include_gps_helper_label">啟用後，您的位置資訊將包含在您的照片中。分享此資訊時請小心。</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">進階</string>
     <!-- Settings preference title for cache -->
@@ -2039,7 +2039,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">進階選項</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA需要您的授權才能下載檔案</string>
+    <string name="download_requires_permission">MEGA需要您的外部儲存讀寫權限才能進行檔案下載。</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">找不到原來的SD記憶卡，請設定新的下載位置。</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2059,11 +2059,11 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">到檔案系統</string>
     <!-- Title of QR code section -->
-    <string name="section_my_code">我的條碼</string>
+    <string name="section_my_code">我的二維條碼</string>
     <!-- Title of QR code scan section -->
     <string name="section_scan_code">掃描條碼</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">自動加入</string>
+    <string name="settings_qrcode_autoaccept">自動接受</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">掃描您二維條碼的MEGA用戶將會自動加入至您的聯絡人列表。</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2099,9 +2099,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">邀請沒有送出。%s已經在您的聯絡人列表。</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">此邀請尚未發送。處理時發生錯誤。</string>
+    <string name="invite_not_sent_text_error">發生錯誤，邀請尚未發送。</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">產生二維條碼中&#8230;</string>
+    <string name="generatin_qr">正在生成二維條碼&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">掃描二維條碼</string>
     <!-- get the contact link and copy it -->
@@ -2498,7 +2498,7 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">預覽內容</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">無法執行串流傳輸，也未下載檔案</string>
+    <string name="no_network_connection_on_play_file">沒有網路連線。檔案尚未下載而且無法串流傳輸。</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">無法開啟檔案。</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2510,9 +2510,9 @@
         <item quantity="other">訊息未轉發</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">預覽網址</string>
+    <string name="title_confirmation_disable_rich_links">網址連結預覽</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">您可以停用預覽網址縮圖。您可以在您的設定重新啟用預覽網址縮圖。您想要繼續嗎？</string>
+    <string name="text_confirmation_disable_rich_links">您正停用網址連結預覽。您可以在設定中重新啟用。要繼續嗎？</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]未接來電[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2524,7 +2524,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]通話未接[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">聯絡人電子郵件</string>
+    <string name="contact_email">聯絡人email</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">您已加入此連絡人。</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2538,7 +2538,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">恢復至%s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">發生錯誤。未能恢復</string>
+    <string name="context_no_restored">發生錯誤。項目無法還原。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">發送訊息</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -2976,11 +2976,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">設定MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA需存取您的相片、媒體與檔案，好讓您可與朋友共享、交換加密訊息與進行安全通話。</string>
+    <string name="setup_mega_explanation">MEGA需要您的授權才能存取您的多媒體與檔案以進行共享。交換加密訊息和進行安全通話可能也需要其他存取權限。</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">允許存取相片、媒體與檔案。</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">為了共享相片、媒體與檔案，MEGA需要您的允許。</string>
+    <string name="allow_acces_media_subtitle">MEGA需要您的授權才能進行檔案共享。</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">啟用相機</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -2988,7 +2988,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">啟用通話</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">啟用存取您的通訊錄</string>
+    <string name="allow_acces_contact_title">同意MEGA存取您聯絡人的權限</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">輕易的在您通訊錄中找到有在使用MEGA的聯絡人。</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -2996,9 +2996,9 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">允許存取麥克風以進行加密通話。</string>
     <!-- General enable access -->
-    <string name="general_enable_access">允許存取</string>
+    <string name="general_enable_access">同意存取</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
-    <string name="title_chat_shared_files_info">共享檔案</string>
+    <string name="title_chat_shared_files_info">共享的檔案</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">已經發送附件</string>
     <!-- Message shown when a group call ends. -->
@@ -3040,17 +3040,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s已離開通話</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">由於超過與會者人數限制，您無法發起通話。</string>
+    <string name="call_error_too_many_participants_start">已超過最大與會人數，通話無法開始。</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">由於已達到最大與會者人數，您無法加入通話。</string>
+    <string name="call_error_too_many_participants">已超過最大與會人數，無法加入通話。</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">由於該群組已達到最大與會者人數，您無法加入通話。</string>
+    <string name="call_error_too_many_participants_join">已超過最大與會人數，無法加入群組通話。</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">由於此通話已達到最大視訊與會者人數，您無法開啟視訊。</string>
+    <string name="call_error_too_many_video">已超過最大與會人數，無法加入視訊通話。</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">您無法進行通話保留。</string>
+    <string name="call_error_call_on_hold">通話無法保留</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">發生錯誤。該檔案無法打開。</string>
+    <string name="error_open_file_with">發生錯誤，無法使用此應用程式開啟檔案。</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">來電&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3362,7 +3362,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">用量</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">空間使用狀態</string>
+    <string name="usage_storage_details_label">儲存空間使用分析</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">總使用量</string>
     <!-- Title of transfer section in Storage -->
@@ -3378,7 +3378,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">您的帳戶目前[B]暫停使用[/B]。您只能瀏覽您的資料。</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA無法存取您的資料，但是您商業帳戶的管理員可以檢視與刪除您的相機上傳。</string>
+    <string name="camera_uploads_business_alert">MEGA無法存取您的資料。然而，您的商業帳戶管理員可以存取您的相機上傳。</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">出錯了</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3710,7 +3710,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">連結: %1$s\n\n密碼: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA需要您的授權才能共享檔案。</string>
+    <string name="files_required_permissions_warning">MEGA需要您的授權才能存取您的檔案進行共享。</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">喜歡</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3885,4 +3885,14 @@
     <string name="production_api_server">生產力</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">變更伺服器</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">顯示行號</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">隱藏行號</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">共享的擁有者已超出其空間配額。</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">由於接收者的儲存空間不足，您無法傳送此檔案。</string>
 </resources>
