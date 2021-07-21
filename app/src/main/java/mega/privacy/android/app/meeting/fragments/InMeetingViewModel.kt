@@ -1460,8 +1460,9 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param listener GroupVideoListener
      * @param session MegaChatSession of a participant
      * @param chatId Chat ID
+     * @param callback the callback when remove the hi res video listener
      */
-    private fun removeHiRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long) {
+    private fun removeHiRes(listener: GroupVideoListener, session: MegaChatSession?, chatId: Long, callback:(()->Unit)? = null) {
         session?.let { sessionParticipant ->
             if (sessionParticipant.canRecvVideoHiRes()) {
                 logDebug("Removing HiRes video, clientId ${sessionParticipant.clientid}")
@@ -1479,6 +1480,8 @@ class InMeetingViewModel @ViewModelInject constructor(
                     true,
                     listener
                 )
+
+                callback?.invoke()
             }
         }
     }
@@ -1576,10 +1579,12 @@ class InMeetingViewModel @ViewModelInject constructor(
                 currentChatId
             )
         } else {
-            if (!isSpeaker) {
-                logDebug("Remove highRes before request lowRes of ${participant.clientId}")
-                removeHiRes(participant.videoListener!!, session, currentChatId)
-            }
+            // I commented out these codes to solve a bug at it will crash when pin to speaker view quickly, if there are some bugs releated to this,
+            // Please open that
+//            if (!isSpeaker) {
+//                logDebug("Remove highRes before request lowRes of ${participant.clientId}")
+//                removeHiRes(participant.videoListener!!, session, currentChatId)
+//            }
 
             if (session.hasVideo()) {
                 logDebug("The session had no video, check and delete if lowRes was allowed by default.")
@@ -1599,8 +1604,9 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Close Video of participant in a meeting
      *
      * @param participant The participant from whom the video is to be closed
+     * @param callback the callback when remove the hi res video listener
      */
-    fun onCloseVideo(participant: Participant) {
+    fun onCloseVideo(participant: Participant, callback:(()->Unit)? = null) {
         if (participant.videoListener == null) return
 
         inMeetingRepository.getChatRoom(currentChatId)?.let { chat ->
@@ -1610,7 +1616,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                     removeHiRes(
                         participant.videoListener!!,
                         it,
-                        chat.chatId
+                        chat.chatId, callback
                     )
                 } else {
                     removeLowRes(

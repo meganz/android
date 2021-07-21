@@ -337,11 +337,22 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         if (speaker.isMe) {
             logDebug("Close local video")
             closeLocalVideo(speaker)
+
+            resetSpeaker(speaker)
         } else {
             logDebug("Close remote video")
-            inMeetingViewModel.onCloseVideo(speaker)
+            inMeetingViewModel.onCloseVideo(speaker) {
+                resetSpeaker(speaker)
+            }
         }
+    }
 
+    /**
+     * Remove the views and listener for current speaker
+     *
+     * @param speaker the current participant selected as speaker
+     */
+    fun resetSpeaker(speaker: Participant){
         speaker.videoListener?.let { listener ->
             logDebug("Removing texture view")
             if (surfaceContainer.childCount > 0) {
