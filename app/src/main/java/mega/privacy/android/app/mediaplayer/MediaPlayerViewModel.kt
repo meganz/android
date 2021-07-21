@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.app.Activity.RESULT_OK
+import android.content.Context
 import android.content.Intent
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
@@ -24,13 +25,15 @@ class MediaPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
     /**
      * Handle activity result.
      *
-     * @param requestCode requestCode of onActivityResult
-     * @param resultCode resultCode of onActivityResult
-     * @param data data of onActivityResult
-     * @param snackbarShower interface to show snackbar
-     * @param activityLauncher interface to start activity
+     * @param context          Current Context.
+     * @param requestCode      RequestCode of onActivityResult
+     * @param resultCode       ResultCode of onActivityResult
+     * @param data             Data of onActivityResult
+     * @param snackbarShower   Interface to show snackbar
+     * @param activityLauncher Interface to start activity
      */
     fun handleActivityResult(
+        context: Context,
         requestCode: Int,
         resultCode: Int,
         data: Intent?,
@@ -44,7 +47,7 @@ class MediaPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
         when (requestCode) {
             REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
                 val handles = handleSelectFolderToMoveResult(
-                    requestCode, resultCode, data, snackbarShower
+                    context, requestCode, resultCode, data, snackbarShower
                 )
 
                 for (handle in handles) {
@@ -53,7 +56,7 @@ class MediaPlayerViewModel @ViewModelInject constructor() : BaseRxViewModel() {
             }
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
                 handleSelectFolderToCopyResult(
-                    requestCode, resultCode, data, snackbarShower, activityLauncher
+                    context, requestCode, resultCode, data, snackbarShower, activityLauncher
                 )
             }
         }

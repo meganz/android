@@ -46,7 +46,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
-import mega.privacy.android.app.textFileEditor.TextFileEditorActivity;
+import mega.privacy.android.app.textEditor.TextEditorActivity;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 
@@ -470,7 +470,7 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 			startActivity(pdfIntent);
 			overridePendingTransition(0,0);
 		} else if (MimeTypeList.typeForName(currentFile.getName()).isOpenableTextFile(currentFile.length())) {
-			startActivity(new Intent(this, TextFileEditorActivity.class)
+			startActivity(new Intent(this, TextEditorActivity.class)
 					.putExtra(INTENT_EXTRA_KEY_FILE_NAME, currentFile.getName())
 					.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)
 					.putExtra(INTENT_EXTRA_KEY_PATH, currentFile.getAbsolutePath()));

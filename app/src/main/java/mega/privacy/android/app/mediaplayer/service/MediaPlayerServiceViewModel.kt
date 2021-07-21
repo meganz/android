@@ -982,7 +982,9 @@ class MediaPlayerServiceViewModel(
             return
         }
 
-        if ((e.errorCode == MegaError.API_EOVERQUOTA && e.value != 0L) || e.errorCode == MegaError.API_EBLOCKED) {
+        if ((e.errorCode == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota && e.value != 0L)
+            || e.errorCode == MegaError.API_EBLOCKED
+        ) {
             _error.value = e.errorCode
         }
     }
