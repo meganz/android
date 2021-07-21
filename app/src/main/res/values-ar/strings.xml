@@ -793,7 +793,7 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">ضغط الفيديو يستهلك الكثير من الطاقة. سوف تطلب منك ميغا MEGA أن تشحن جهازك بشكل مستمر إذا كانت مقاطع الفيديو المراد ضغطها أكبر من %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">في حالة التمكين، ستقوم بترفيع معلومات حول مكان التقاط الصور، لذا كن حذراً عند مشاركتها.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">في حالة التمكين، سيتم تضمين معلومات الموقع مع صورك. يرجى توخي الحذر عند مشاركتهم.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">متقدم</string>
     <!-- Settings preference title for cache -->
@@ -2804,7 +2804,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]لم تتم الإجابة على الاتصال[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">البريد الالكتروني لجهة الاتصال</string>
+    <string name="contact_email">عنوان البريد الإلكتروني</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">لقد قمت بإضافة جهة الاتصال مسبقاً</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -3752,7 +3752,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">الاستخدام</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">تفاصيل مساحة التخزين</string>
+    <string name="usage_storage_details_label">تفاصيل توزيع استخدام مساحة التخزين</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">حجم الاستخدام</string>
     <!-- Title of transfer section in Storage -->
@@ -4325,4 +4325,16 @@
     <string name="production_api_server">النسخة الحية</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">تغيير المخدم</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">إظهار أرقام الأسطر</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">إخفاء أرقام الأسطر</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">صاحب المشاركة تجاوز مساحة التخزين المتاحة له.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">لا يمكن إرسال الملف لأن المستخدم المستهدف قد تجاوز حصة التخزين المتاحة له.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">نحن بصدد ترقية محادثات ميغا MEGAchat. قد لا تكون مكالمتك متصلة بسبب مشكلات عدم توافق الإصدار.</string>
 </resources>
