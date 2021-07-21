@@ -7448,8 +7448,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void onBackPressed() {
 		logDebug("onBackPressed");
 
-		// Let the PSA web browser fragment(if visible) to consume the back key event
-		if (psaWebBrowser.consumeBack()) return;
+		// Let the PSA web browser fragment (if visible) to consume the back key event
+		if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 
 		retryConnectionsAndSignalPresence();
 
