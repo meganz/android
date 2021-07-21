@@ -4,7 +4,7 @@ import io.reactivex.rxjava3.core.Completable
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaContactRequest.*
 import nz.mega.sdk.MegaError
@@ -48,7 +48,7 @@ class ReplyContactRequestUseCase @Inject constructor(
                             }
                         },
                         onRequestTemporaryError = { _, error ->
-                            LogUtil.logError(error.toThrowable().stackTraceToString())
+                            logError(error.toThrowable().stackTraceToString())
                         }
                     ))
             } else {
@@ -76,7 +76,7 @@ class ReplyContactRequestUseCase @Inject constructor(
                             }
                         },
                         onRequestTemporaryError = { _, error ->
-                            LogUtil.logError(error.toThrowable().stackTraceToString())
+                            logError(error.toThrowable().stackTraceToString())
                         }
                     ))
             } else {

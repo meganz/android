@@ -32,7 +32,7 @@ object StringUtils {
     /**
      * Decode each alias within MegaStringMap into a Map<Long, String>
      */
-    fun MegaStringMap.decodedAliases(): Map<Long, String> {
+    fun MegaStringMap.getDecodedAliases(): Map<Long, String> {
         val aliases = mutableMapOf<Long, String>()
 
         for (i in 0 until keys.size()) {

@@ -29,7 +29,12 @@ import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES
+import mega.privacy.android.app.utils.Constants.CHAT_ID
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FILE
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER
+import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import nz.mega.sdk.MegaUser

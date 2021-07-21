@@ -5,7 +5,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.AFFILIATE_TYPE_CONTACT
 import nz.mega.sdk.MegaContactRequest.*
@@ -66,7 +66,7 @@ class InviteContactUseCase @Inject constructor(
                     }
                 },
                 onRequestTemporaryError = { _, error ->
-                    LogUtil.logError(error.toThrowable().stackTraceToString())
+                    logError(error.toThrowable().stackTraceToString())
                 }
             ))
         }
@@ -113,7 +113,7 @@ class InviteContactUseCase @Inject constructor(
                         }
                     },
                     onRequestTemporaryError = { _, error ->
-                        LogUtil.logError(error.toThrowable().stackTraceToString())
+                        logError(error.toThrowable().stackTraceToString())
                     }
                 ))
         }

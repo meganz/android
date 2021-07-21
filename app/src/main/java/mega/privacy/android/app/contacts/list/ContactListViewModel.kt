@@ -1,6 +1,5 @@
 package mega.privacy.android.app.contacts.list
 
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -19,6 +18,7 @@ import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
@@ -58,7 +58,7 @@ class ContactListViewModel @ViewModelInject constructor(
                     )
                 },
                 onError = { error ->
-                    Log.e(TAG, error.stackTraceToString())
+                    logError(error.stackTraceToString())
                 }
             )
             .addTo(composite)
@@ -74,7 +74,7 @@ class ContactListViewModel @ViewModelInject constructor(
                     contacts.value = items.toList()
                 },
                 onError = { error ->
-                    Log.e(TAG, error.stackTraceToString())
+                    logError(error.stackTraceToString())
                 }
             )
             .addTo(composite)
@@ -126,7 +126,7 @@ class ContactListViewModel @ViewModelInject constructor(
                         result.value = megaUser
                     },
                     onError = { error ->
-                        Log.e(TAG, error.stackTraceToString())
+                        logError(error.stackTraceToString())
                     }
                 )
                 .addTo(composite)
@@ -143,7 +143,7 @@ class ContactListViewModel @ViewModelInject constructor(
                     result.value = chatId
                 },
                 onError = { error ->
-                    Log.e(TAG, error.stackTraceToString())
+                    logError(error.stackTraceToString())
                 }
             )
             .addTo(composite)
@@ -155,7 +155,7 @@ class ContactListViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onError = { error ->
-                Log.e(TAG, error.stackTraceToString())
+                logError(error.stackTraceToString())
             })
             .addTo(composite)
     }

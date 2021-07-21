@@ -1,6 +1,5 @@
 package mega.privacy.android.app.contacts.group
 
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,6 +11,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.contacts.usecase.GetContactGroupsUseCase
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.notifyObserver
 
 class ContactGroupsViewModel @ViewModelInject constructor(
@@ -34,7 +34,7 @@ class ContactGroupsViewModel @ViewModelInject constructor(
                     groups.value = items.toList()
                 },
                 onError = { error ->
-                    Log.e(TAG, error.stackTraceToString())
+                    logError(error.stackTraceToString())
                 }
             )
             .addTo(composite)

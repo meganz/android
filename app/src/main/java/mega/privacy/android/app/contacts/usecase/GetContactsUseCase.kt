@@ -25,8 +25,7 @@ import mega.privacy.android.app.utils.MegaUserUtils.getUserStatusColor
 import mega.privacy.android.app.utils.MegaUserUtils.isExternalChange
 import mega.privacy.android.app.utils.MegaUserUtils.isRequestedChange
 import mega.privacy.android.app.utils.MegaUserUtils.wasRecentlyAdded
-import mega.privacy.android.app.utils.StringUtils.decodedAliases
-import mega.privacy.android.app.utils.StringUtils.decodeBase64
+import mega.privacy.android.app.utils.StringUtils.getDecodedAliases
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.view.TextDrawable
 import nz.mega.sdk.*
@@ -85,7 +84,7 @@ class GetContactsUseCase @Inject constructor(
 
                             emitter.onNext(contacts.sortedAlphabetically())
                         } else if (request.paramType == USER_ATTR_ALIAS) {
-                            val requestAliases = request.megaStringMap.decodedAliases()
+                            val requestAliases = request.megaStringMap.getDecodedAliases()
 
                             contacts.forEachIndexed { indexToUpdate, contact ->
                                 var newAlias: String? = null
@@ -189,7 +188,7 @@ class GetContactsUseCase @Inject constructor(
         Single.fromCallable { megaApi.getContact(userEmail) }
 
     private fun MegaUser.toContactItem(): ContactItem.Data {
-        val alias = megaChatApi.getUserAliasFromCache(handle)?.decodeBase64()
+        val alias = megaChatApi.getUserAliasFromCache(handle)
         val fullName = megaChatApi.getUserFullnameFromCache(handle)
         val userStatus = megaChatApi.getUserOnlineStatus(handle)
         val userImageColor = megaApi.getUserAvatarColor(this).toColorInt()

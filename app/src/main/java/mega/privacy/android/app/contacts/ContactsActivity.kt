@@ -2,7 +2,6 @@ package mega.privacy.android.app.contacts
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
@@ -16,7 +15,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment
 import mega.privacy.android.app.databinding.ActivityContactsBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.Util
 

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.contacts.requests
 
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,6 +13,7 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.ReplyContactRequestUseCase
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.notifyObserver
 
 class ContactRequestsViewModel @ViewModelInject constructor(
@@ -37,7 +37,7 @@ class ContactRequestsViewModel @ViewModelInject constructor(
                     contactRequests.value = items
                 },
                 onError = { error ->
-                    Log.e(TAG, error.stackTraceToString())
+                    logError(error.stackTraceToString())
                 }
             )
             .addTo(composite)
@@ -48,7 +48,7 @@ class ContactRequestsViewModel @ViewModelInject constructor(
             if (!queryString.isNullOrBlank()) {
                 items.filter { item ->
                     item.name?.contains(queryString!!, true) == true
-                            || item.email?.contains(queryString!!, true) == true
+                            || item.email.contains(queryString!!, true)
                 }
             } else {
                 items
@@ -93,7 +93,7 @@ class ContactRequestsViewModel @ViewModelInject constructor(
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onError = { Log.e(TAG, it.stackTraceToString()) }
+                onError = { logError(it.stackTraceToString()) }
             )
             .addTo(composite)
     }

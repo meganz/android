@@ -3,7 +3,7 @@ package mega.privacy.android.app.contacts.usecase
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.listeners.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatPeerList
@@ -37,7 +37,7 @@ class GetChatRoomUseCase @Inject constructor(
                         }
                     },
                     onRequestTemporaryError = { _: MegaChatRequest, error: MegaChatError ->
-                        LogUtil.logError(error.toThrowable().stackTraceToString())
+                        logError(error.toThrowable().stackTraceToString())
                     }
                 ))
             }
