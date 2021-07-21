@@ -3895,4 +3895,6 @@
     <string name="error_share_owner_storage_quota">Pemilik berbagi melebihi kuota penyimpanan.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">File tidak dapat dikirim karena pengguna target melebihi kuota penyimpanan mereka.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues.</string>
 </resources>

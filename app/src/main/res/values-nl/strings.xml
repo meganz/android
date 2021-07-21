@@ -2084,7 +2084,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Geavanceerde opties</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA heeft lees- en schrijfrechten nodig voor uw externe opslag voor het downloaden van bestanden.</string>
+    <string name="download_requires_permission">MEGA heeft lees- en schrijfrechten nodig voor uw externe opslag om daar bestanden te downloaden.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">Oude SD-kaart is niet beschikbaar, stel een nieuwe downloadlocatie in.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -3440,7 +3440,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Verbruik</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Opslag verbruik details</string>
+    <string name="usage_storage_details_label">Uitsplitsing van opslaggebruik</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Totaal gebruik</string>
     <!-- Title of transfer section in Storage -->
@@ -3983,4 +3983,6 @@
     <string name="error_share_owner_storage_quota">Gedeelde gebruiker is over opslag tegoed.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Het bestand kan niet worden verstuurd omdat de doelgebruiker zijn opslagtegoed heeft overschreden.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">We upgraden MEGAchat. Uw oproep is mogelijk niet verbonden vanwege incompatibiliteitsproblemen met de versie.</string>
 </resources>

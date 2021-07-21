@@ -3983,4 +3983,6 @@
     <string name="error_share_owner_storage_quota">Il proprietario della condivisione ha superato il limite dello spazio di archiviazione.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Il file non può essere inviato in quanto l’utente destinatario ha superato il limite dello spazio di archiviazione.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues.</string>
 </resources>

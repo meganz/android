@@ -3895,4 +3895,6 @@
     <string name="error_share_owner_storage_quota">共享的擁有者已超出其空間配額。</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">由於接收者的儲存空間不足，您無法傳送此檔案。</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">我們正在升級MEGAChat。由於版本不相容，您可能會遇到無法連線問題。</string>
 </resources>

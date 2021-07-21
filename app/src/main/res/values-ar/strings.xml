@@ -3752,7 +3752,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">الاستخدام</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">تفاصيل مساحة التخزين</string>
+    <string name="usage_storage_details_label">تفاصيل توزيع استخدام مساحة التخزين</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">حجم الاستخدام</string>
     <!-- Title of transfer section in Storage -->
@@ -4335,4 +4335,6 @@
     <string name="error_share_owner_storage_quota">صاحب المشاركة تجاوز مساحة التخزين المتاحة له.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">لا يمكن إرسال الملف لأن المستخدم المستهدف قد تجاوز حصة التخزين المتاحة له.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">نحن بصدد ترقية محادثات ميغا MEGAchat. قد لا تكون مكالمتك متصلة بسبب مشكلات عدم توافق الإصدار.</string>
 </resources>
