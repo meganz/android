@@ -107,6 +107,14 @@
             android:textStyle="normal" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/banner_info"
+        style="@style/CallBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/banner_another_call" />
+
     <LinearLayout
         android:id="@+id/banner_mute"
         android:layout_width="match_parent"
@@ -116,7 +124,7 @@
         android:minHeight="36dp"
         android:orientation="horizontal"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/banner_another_call">
+        app:layout_constraintTop_toBottomOf="@id/banner_info">
 
         <ImageView
             android:id="@+id/banner_mute_icon"
@@ -141,14 +149,6 @@
             app:emojiSize="16sp"
             android:textStyle="normal" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/banner_info"
-        style="@style/CallBanner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <mega.privacy.android.app.components.twemoji.EmojiTextView
         android:id="@+id/banner_participant"
