@@ -2538,7 +2538,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">还原至%s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">错误。项目未还原。</string>
+    <string name="context_no_restored">发生错误。项目未还原。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">发送信息</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -3895,4 +3895,6 @@
     <string name="error_share_owner_storage_quota">共享所有者帐户已超出存储空间。</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">由于目标用户帐户已超出其存储空间，无法发送此文件。</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">我们正在升级MEGAchat。您的通话可能由于版本不兼容问题导致无法连接。</string>
 </resources>

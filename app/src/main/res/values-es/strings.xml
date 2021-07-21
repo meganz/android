@@ -3983,4 +3983,6 @@
     <string name="error_share_owner_storage_quota">El propietario de la carpeta compartida ha superado la cuota de almacenamiento disponible.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">El archivo no se puede enviar porque el destinatario ha superado su límite de almacenamiento.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Estamos actualizando MEGAchat. Es posible que tu llamada no se conecte correctamente por problemas de incompatibilidad de versiones.</string>
 </resources>

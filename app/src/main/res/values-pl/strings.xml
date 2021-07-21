@@ -4159,4 +4159,6 @@
     <string name="error_share_owner_storage_quota">Właściciel przekroczył limit pamięci.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Plik nie może zostać wysłany, ponieważ użytkownik docelowy przekroczył limit pamięci.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Aktualizujemy MEGAchat. Ze względu na niekompatybilność wersji połączenie może nie zostać nawiązane.</string>
 </resources>

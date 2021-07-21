@@ -3440,7 +3440,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Utilisation</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Utilisation détaillée de l’espace de stockage</string>
+    <string name="usage_storage_details_label">Répartition de l’espace de stockage utilisé</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Utilisation globale</string>
     <!-- Title of transfer section in Storage -->
@@ -3983,4 +3983,6 @@
     <string name="error_share_owner_storage_quota">Le propriétaire du partage a dépassé son quota de stockage.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Le fichier ne peut pas être envoyé, car l’utilisateur cible a dépassé son quota de stockage.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Nous mettons MEGAchat à niveau. Votre appel pourrait ne pas être connecté en raison de problèmes d’incompatibilité des versions.</string>
 </resources>
