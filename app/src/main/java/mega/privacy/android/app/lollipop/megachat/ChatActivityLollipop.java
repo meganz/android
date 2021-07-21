@@ -9067,7 +9067,11 @@ public class ChatActivityLollipop extends PasscodeActivity
                         String callerFullName = chatC.getParticipantFullName(callerHandle);
                         String textLayout;
                         if (callerHandle != MEGACHAT_INVALID_HANDLE && !isTextEmpty(callerFullName)) {
-                            textLayout = getString(R.string.join_meeting_layout_in_group_call, callerFullName);
+                            if(chatRoom.isMeeting()) {
+                                textLayout = getString(R.string.join_meeting_layout_in_group_call, callerFullName);
+                            } else {
+                                textLayout = getString(R.string.join_call_layout_in_group_call, callerFullName);
+                            }
                         } else {
                             textLayout = getString(R.string.join_call_layout);
                         }
