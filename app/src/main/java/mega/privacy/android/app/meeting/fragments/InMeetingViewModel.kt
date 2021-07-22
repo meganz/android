@@ -457,39 +457,20 @@ class InMeetingViewModel @ViewModelInject constructor(
      * Method to find out if there is a participant in the call
      *
      * @param peerId Use handle of a participant
+     * @param typeChange the type of change, name or avatar
      * @return list of participants with changes
      */
-    fun updateParticipantsName(peerId: Long): MutableSet<Participant> {
+    fun updateParticipantsNameOrAvatar(peerId: Long, typeChange: Int): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
                 val iterator = listParticipants.iterator()
                 iterator.forEach {
                     if (it.peerId == peerId) {
-                        it.name = getParticipantFullName(peerId)
-                        listWithChanges.add(it)
-                    }
-                }
-            }
-        }
-
-        return listWithChanges
-    }
-
-    /**
-     * Method to find out if there is a participant in the call
-     *
-     * @param peerId Use handle of a participant
-     * @return list of participants with avatar changes
-     */
-    fun updateParticipantsAvatar(peerId: Long): MutableSet<Participant> {
-        val listWithChanges = mutableSetOf<Participant>()
-        inMeetingRepository.getChatRoom(currentChatId)?.let {
-            participants.value?.let { listParticipants ->
-                val iterator = listParticipants.iterator()
-                iterator.forEach {
-                    if (it.peerId == peerId) {
-                        it.avatar = getAvatarBitmap(peerId)
+                        when(typeChange){
+                            NAME_CHANGE -> it.name = getParticipantFullName(peerId)
+                            AVATAR_CHANGE -> it.avatar = getAvatarBitmap(peerId)
+                        }
                         listWithChanges.add(it)
                     }
                 }

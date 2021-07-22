@@ -17,6 +17,8 @@ import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
+import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
+import mega.privacy.android.app.utils.Constants.NAME_CHANGE
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.Util
@@ -354,27 +356,19 @@ class VideoMeetingViewHolder(
     }
 
     /**
-     * Update name and avatar
+     * Update name or avatar
      *
      * @param participant Participant whose name needs to be updated
+     * @param type the type of change, name or avatar
      */
-    fun updateName(participant: Participant) {
+    fun updateNameOrAvatar(participant: Participant, type: Int) {
         if (isInvalid(participant)) return
 
         logDebug("Update name")
-        binding.name.text = participant.name
-    }
-
-    /**
-     * Update name and avatar
-     *
-     * @param participant Participant whose name needs to be updated
-     */
-    fun updateAvatar(participant: Participant) {
-        if (isInvalid(participant)) return
-
-        logDebug("Update name")
-        binding.avatar.setImageBitmap(participant.avatar)
+        when (type) {
+            NAME_CHANGE -> binding.name.text = participant.name
+            AVATAR_CHANGE -> binding.avatar.setImageBitmap(participant.avatar)
+        }
     }
 
     /**

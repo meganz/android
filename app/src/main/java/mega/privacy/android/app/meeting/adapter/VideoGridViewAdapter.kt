@@ -70,32 +70,15 @@ class VideoGridViewAdapter(
      * Update participant name
      *
      * @param participant Participant to update
+     * @param typeChange the type of change, name or avatar
      */
-    fun updateParticipantName(participant: Participant) {
+    fun updateParticipantNameOrAvatar(participant: Participant, typeChange: Int) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         if (position == INVALID_POSITION)
             return
 
         getHolderAtPosition(position)?.let {
-            it.updateName(participant)
-            return
-        }
-
-        notifyItemChanged(position)
-    }
-
-    /**
-     * Update participant name
-     *
-     * @param participant Participant to update
-     */
-    fun updateParticipantAvatar(participant: Participant) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
-        if (position == INVALID_POSITION)
-            return
-
-        getHolderAtPosition(position)?.let {
-            it.updateAvatar(participant)
+            it.updateNameOrAvatar(participant, typeChange)
             return
         }
 

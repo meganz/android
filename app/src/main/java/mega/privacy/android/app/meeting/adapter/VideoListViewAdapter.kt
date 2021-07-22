@@ -75,26 +75,12 @@ class VideoListViewAdapter(
      * Update participant when the name is changed
      *
      * @param participant Participant to update
+     * @param typeChange the type of change, name or avatar
      */
-    fun updateName(participant: Participant) {
+    fun updateNameOrAvatar(participant: Participant, typeChange: Int) {
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position)?.let {
-            it.updateName(participant)
-            return
-        }
-
-        notifyItemChanged(position)
-    }
-
-    /**
-     * Update participant when the avatar is changed
-     *
-     * @param participant Participant to update
-     */
-    fun updateAvatar(participant: Participant) {
-        val position = getParticipantPosition(participant.peerId, participant.clientId)
-        getHolder(position)?.let {
-            it.updateAvatar(participant)
+            it.updateNameOrAvatar(participant, typeChange)
             return
         }
 

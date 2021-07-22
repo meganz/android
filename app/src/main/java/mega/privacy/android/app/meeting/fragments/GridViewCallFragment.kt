@@ -273,8 +273,9 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * Check changes in name
      *
      * @param listPeers List of participants with changes
+     * @param type the type of change, name or avatar
      */
-    fun updateName(listPeers: MutableSet<Participant>) {
+    fun updateNameOrAvatar(listPeers: MutableSet<Participant>, typeChange: Int) {
         val iterator = listPeers.iterator()
         iterator.forEach { peer ->
             (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
@@ -282,25 +283,12 @@ class GridViewCallFragment : MeetingBaseFragment() {
                 peer.clientId
             )?.let {
                 logDebug("Update participant name")
-                adapterPager.updateParticipantName(it, currentPage, viewDataBinding.gridViewPager)
-            }
-        }
-    }
-
-    /**
-     * Check changes in avatar
-     *
-     * @param listPeers List of participants with changes
-     */
-    fun updateAvatar(listPeers: MutableSet<Participant>) {
-        val iterator = listPeers.iterator()
-        iterator.forEach { peer ->
-            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
-                peer.peerId,
-                peer.clientId
-            )?.let {
-                logDebug("Update participant name")
-                adapterPager.updateParticipantAvatar(it, currentPage, viewDataBinding.gridViewPager)
+                adapterPager.updateParticipantNameOrAvatar(
+                    it,
+                    currentPage,
+                    viewDataBinding.gridViewPager,
+                    typeChange
+                )
             }
         }
     }

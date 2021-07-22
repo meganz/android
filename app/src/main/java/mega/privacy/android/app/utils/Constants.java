@@ -884,4 +884,8 @@ public class Constants {
     public static final long ANIMATION_DURATION = 400;
 
     public static final float MEETING_NAME_MARGIN_TOP = 16f;
+
+    public static final int NAME_CHANGE = 0;
+    public static final int AVATAR_CHANGE = 1;
+
 }

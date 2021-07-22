@@ -692,8 +692,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * Check changes in name
      *
      * @param listPeers List of participants with changes
+     * @param typeChange the type of change, name or avatar
      */
-    fun updateName(listPeers: MutableSet<Participant>) {
+    fun updateNameOrAvatar(listPeers: MutableSet<Participant>, typeChange: Int) {
         val iterator = listPeers.iterator()
         iterator.forEach { peer ->
             inMeetingViewModel.getParticipant(
@@ -701,25 +702,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 peer.clientId
             )?.let {
                 logDebug("Update participant name")
-                adapter.updateName(it)
-            }
-        }
-    }
-
-    /**
-     * Check changes in avatar
-     *
-     * @param listPeers List of participants with changes
-     */
-    fun updateAvatar(listPeers: MutableSet<Participant>) {
-        val iterator = listPeers.iterator()
-        iterator.forEach { peer ->
-            inMeetingViewModel.getParticipant(
-                peer.peerId,
-                peer.clientId
-            )?.let {
-                logDebug("Update participant name")
-                adapter.updateAvatar(it)
+                adapter.updateNameOrAvatar(it, typeChange)
             }
         }
     }

@@ -185,7 +185,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val nameChangeObserver = Observer<Long> { peerId ->
         if (peerId != MegaApiJava.INVALID_HANDLE) {
             logDebug("Change in name")
-            updateParticipantName(peerId)
+            updateParticipantInfo(peerId, NAME_CHANGE)
+        }
+    }
+
+    private val avatarChangeObserver = Observer<Long> { peerId ->
+        if (peerId != MegaApiJava.INVALID_HANDLE) {
+            logDebug("Change in avatar")
+            updateParticipantInfo(peerId, AVATAR_CHANGE)
         }
     }
 
@@ -203,13 +210,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val visibilityChangeObserver = Observer<Long> {
         logDebug("Change in the visibility of a participant")
         inMeetingViewModel.updateParticipantsVisibility(it)
-    }
-
-    private val avatarChangeObserver = Observer<Long> { peerId ->
-        if (peerId != MegaApiJava.INVALID_HANDLE) {
-            logDebug("Change in avatar")
-            updateParticipantAvatar(peerId)
-        }
     }
 
     private val privilegesChangeObserver = Observer<MegaChatListItem> { item ->
@@ -2130,58 +2130,38 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Method that checks if a participant's name has changed and updates the UI
+     * Method that checks if a participant's name or avatar has changed and updates the UI
      *
      * @param peerId user handle that has changed
+     * @param type the type of change, name or avatar
      */
-    private fun updateParticipantName(peerId: Long) {
+    private fun updateParticipantInfo(peerId: Long, type: Int) {
         logDebug("Participant's name has changed")
-        val listParticipants = inMeetingViewModel.updateParticipantsName(peerId)
+        val listParticipants = inMeetingViewModel.updateParticipantsNameOrAvatar(peerId, type)
         if (listParticipants.isNotEmpty()) {
             gridViewCallFragment?.let {
                 if (it.isAdded) {
-                    it.updateName(listParticipants)
+                    it.updateNameOrAvatar(listParticipants, type)
                 }
             }
             speakerViewCallFragment?.let {
                 if (it.isAdded) {
-                    it.updateName(listParticipants)
+                    it.updateNameOrAvatar(listParticipants, type)
                 }
             }
 
             bottomFloatingPanelViewHolder.updateName(listParticipants)
         }
-    }
 
-    /**
-     * Method that checks if a participant's avatar has changed and updates the UI
-     * Or get the avatar from SDK
-     *
-     * @param peerId user handle that has changed
-     */
-    private fun updateParticipantAvatar(peerId: Long) {
-        logDebug("Participant's name has changed")
-        val listParticipants = inMeetingViewModel.updateParticipantsAvatar(peerId)
-        if (listParticipants.isNotEmpty()) {
-            gridViewCallFragment?.let {
-                if (it.isAdded) {
-                    it.updateAvatar(listParticipants)
+        if (type == AVATAR_CHANGE){
+            individualCallFragment?.let {
+                if (it.isAdded && inMeetingViewModel.isMe(peerId)){
+                    it.updateMyAvatar()
                 }
             }
-            speakerViewCallFragment?.let {
-                if (it.isAdded) {
-                    it.updateAvatar(listParticipants)
-                }
-            }
-        }
 
-        individualCallFragment?.let {
-            if (it.isAdded && inMeetingViewModel.isMe(peerId)){
-                it.updateMyAvatar()
-            }
+            bottomFloatingPanelViewHolder.updateAvatar(peerId)
         }
-
-        bottomFloatingPanelViewHolder.updateAvatar(peerId)
     }
 
     /**
