@@ -2123,5 +2123,14 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun addContact(context: Context, peerId: Long, callback: (String) -> Unit) {
         inMeetingRepository.addContact(context, peerId, callback)
     }
+
+    /**
+     * Get avatar from sdk
+     *
+     * @param peerId the peerId of participant
+     */
+    fun getRemoteAvatar(peerId: Long) {
+        inMeetingRepository.getRemoteAvatar(peerId)
+    }
 }
 

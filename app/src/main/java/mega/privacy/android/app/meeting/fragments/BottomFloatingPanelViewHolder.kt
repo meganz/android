@@ -62,7 +62,7 @@ class BottomFloatingPanelViewHolder(
     private var savedCamState: Boolean = false
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
         AppRTCAudioManager.AudioDevice.EARPIECE
-    private val participantsAdapter = ParticipantsAdapter(inMeetingViewModel, listener)
+    private val participantsAdapter = ParticipantsAdapter(listener)
 
     private var currentHeight = 0
 
@@ -690,7 +690,8 @@ class BottomFloatingPanelViewHolder(
         updateParticipantsPrivileges.forEach { participant ->
             participantsAdapter.updateParticipantPermission(
                 participant.peerId,
-                participant.clientId
+                participant.clientId,
+                inMeetingViewModel.isParticipantModerator(participant.peerId)
             )
         }
     }
@@ -764,21 +765,18 @@ class BottomFloatingPanelViewHolder(
     }
 
     /**
-     * Update avatar base on peerId
+     * Method that checks if a participant's name or avatar has changed and updates the UI
      *
-     * @param peerId the peerId of participant
+     * @param peerId user handle that has changed
+     * @param type the type of change, name or avatar
      */
-    fun updateAvatar(peerId: Long) {
-        participantsAdapter.updateAvatar(peerId)
-    }
-
-    /**
-     * Update participant's name
-     *
-     * @param listParticipants List of participants with changes
-     */
-    fun updateName(listParticipants: MutableSet<Participant>) {
-        participantsAdapter.updateName(listParticipants)
+    fun updateParticipantInfo(peerId: Long, type: Int) {
+        participantsAdapter.updateParticipantInfo(
+            peerId,
+            type,
+            inMeetingViewModel.getParticipantFullName(peerId),
+            inMeetingViewModel.getAvatarBitmap(peerId)
+        )
     }
 
     companion object {

@@ -41,6 +41,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
@@ -189,10 +190,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private val avatarChangeObserver = Observer<Long> { peerId ->
+    // Observer for getting avatar
+    private val getAvatarObserver = Observer<Long> { peerId ->
         if (peerId != MegaApiJava.INVALID_HANDLE) {
             logDebug("Change in avatar")
             updateParticipantInfo(peerId, AVATAR_CHANGE)
+        }
+    }
+
+    // Observer for changing avatar
+    private val avatarChangeObserver = Observer<Long> { peerId ->
+        if (peerId != MegaApiJava.INVALID_HANDLE) {
+            logDebug("Change in avatar")
+            inMeetingViewModel.getRemoteAvatar(peerId)
         }
     }
 
@@ -731,6 +741,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             .observe(this, visibilityChangeObserver)
 
         LiveEventBus.get(EVENT_MEETING_GET_AVATAR, Long::class.java)
+            .observe(this, getAvatarObserver)
+
+        LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long::class.java)
             .observe(this, avatarChangeObserver)
 
         //Calls level
@@ -2149,9 +2162,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.updateNameOrAvatar(listParticipants, type)
                 }
             }
-
-            bottomFloatingPanelViewHolder.updateName(listParticipants)
         }
+
+        bottomFloatingPanelViewHolder.updateParticipantInfo(peerId, type)
 
         if (type == AVATAR_CHANGE){
             individualCallFragment?.let {
@@ -2160,7 +2173,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
 
-            bottomFloatingPanelViewHolder.updateAvatar(peerId)
+            floatingWindowFragment?.let {
+                if (it.isAdded && inMeetingViewModel.isMe(peerId)){
+                    it.updateMyAvatar()
+                }
+            }
         }
     }
 

@@ -224,13 +224,8 @@ class InMeetingRepository @Inject constructor(
      */
     fun getAvatarBitmap(chat: MegaChatRoom, peerId: Long): Bitmap? {
         var avatar = CallUtil.getImageAvatarCall(chat, peerId)
-        val email = ChatController(context).getParticipantEmail(peerId)
         if (avatar == null) {
-            megaApi.getUserAvatar(email,
-                CacheFolderManager.buildAvatarFile(
-                    context,
-                    email + FileUtil.JPG_EXTENSION
-                ).absolutePath, MeetingAvatarListener(context, peerId))
+            getRemoteAvatar(peerId)
 
             avatar = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
@@ -525,7 +520,12 @@ class InMeetingRepository @Inject constructor(
             megaApi.myUserHandleBinary,
             MEGACHAT_INVALID_HANDLE,
             megaChatApi.myFullname ?: "",
-            null, true, moderator, audio, video, isGuest = megaApi.isEphemeralPlusPlus
+            getAvatarBitmapByPeerId(megaApi.myUserHandleBinary),
+            true,
+            moderator,
+            audio,
+            video,
+            isGuest = megaApi.isEphemeralPlusPlus
         )
     }
 
@@ -605,5 +605,19 @@ class InMeetingRepository @Inject constructor(
             MegaContactRequest.INVITE_ACTION_ADD,
             AddContactListener(callback)
         )
+    }
+
+    /**
+     * Get avatar from sdk
+     *
+     * @param peerId the peerId of participant
+     */
+    fun getRemoteAvatar(peerId: Long){
+        val email = ChatController(context).getParticipantEmail(peerId)
+        megaApi.getUserAvatar(email,
+            CacheFolderManager.buildAvatarFile(
+                context,
+                email + FileUtil.JPG_EXTENSION
+            ).absolutePath, MeetingAvatarListener(context, peerId))
     }
 }

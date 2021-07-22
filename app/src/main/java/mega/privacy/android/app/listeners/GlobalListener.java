@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -79,6 +80,11 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS) && isMyChange) {
                 api.getFileVersionsOption(new GetAttrUserListener(megaApplication));
                 break;
+            }
+
+            // Receive the avatar change, send the event
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange() == 0){
+                LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long.class).post(user.getHandle());
             }
         }
     }
