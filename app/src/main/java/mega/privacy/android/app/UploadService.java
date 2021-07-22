@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -126,6 +127,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private BroadcastReceiver pauseBroadcastReceiver;
 
     private CompositeDisposable rxSubscriptions = new CompositeDisposable();
+
+    // the flag to determine the rating dialog is showed for this upload action
+    private boolean isRatingShowed;
 
     @SuppressLint("NewApi")
 	@Override
@@ -678,6 +682,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         if (total > 0) {
             inProgressTemp = inProgress * 100;
             progressPercent = (int)(inProgressTemp / total);
+
+            showRating(total, megaApi.getCurrentUploadSpeed());
         }
 
         String message = getMessageForProgressNotification(inProgress,isFolderTransfer);
@@ -690,6 +696,19 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             notifyProgressNotification(progressPercent, message, info, actionString, NOTIFICATION_UPLOAD_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER);
         } else {
             notifyProgressNotification(progressPercent, message, info, actionString, NOTIFICATION_UPLOAD, NOTIFICATION_CHANNEL_UPLOAD_ID, NOTIFICATION_CHANNEL_UPLOAD_NAME);
+        }
+    }
+
+    /**
+     * Determine if should show the rating page to users
+     *
+     * @param total the total size of uploading file
+     * @param currentUploadSpeed current uploading speed
+     */
+    private void showRating(long total, int currentUploadSpeed) {
+        if (!isRatingShowed) {
+            new RatingHandlerImpl(this)
+                    .showRatingBaseOnSpeedAndSize(total, currentUploadSpeed, () -> isRatingShowed = true);
         }
     }
 

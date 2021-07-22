@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
@@ -100,6 +101,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private final static String FULLSCREEN_FRAGMENT = "cameraFragmentFullScreen";
     private final static String PEERSELECTED_FRAGMENT = "cameraFragmentPeerSelected";
     private static final int TIMEOUT = 5000;
+    private static final int WAITING_TIME = 26000; // 26 seconds
     private long chatId;
     private MegaChatRoom chat;
     private MegaChatCall callChat;
@@ -187,7 +189,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private ViewGroup peerSelectedCameraLayout;
     private FrameLayout peerSelectedFragmentContainer;
     private CountDownTimer countDownTimer;
+    private CountDownTimer incompatibilityCountDownTimer;
     private ChatController chatC;
+    private boolean bNoShown = true;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -2125,7 +2129,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
      * Method to hide or show the buttons when clicked on the screen.
      */
     public void remoteCameraClick() {
-        stopCountDownTimer();
+        stopCountDownTimer(countDownTimer);
 
         if (getCall() == null || (callChat.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS && callChat.getStatus() != MegaChatCall.CALL_STATUS_JOINING && callChat.getStatus() != MegaChatCall.CALL_STATUS_RECONNECTING))
             return;
@@ -2267,6 +2271,24 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 subtitleToobar.setVisibility(View.VISIBLE);
                 activateChrono(false, callInProgressChrono, callChat);
                 subtitleToobar.setText(getString(R.string.outgoing_call_starting));
+
+                removeIncompatibilityTips();
+
+                incompatibilityCountDownTimer = new CountDownTimer(WAITING_TIME, 1000) {
+                    public void onTick(long millisUntilFinished) {
+                    }
+
+                    public void onFinish() {
+                        if(bNoShown) {
+                            bNoShown = false;
+                            if (chat.isGroup()) {
+                                showSnackbarWithAnchorView(SNACKBAR_IMCOMPATIBILITY_BUTTON_TYPE, fragmentContainer, hangFAB, getString(R.string.version_incompatibility), MEGACHAT_INVALID_HANDLE);
+                            } else {
+                                showSnackbarWithAnchorView(SNACKBAR_IMCOMPATIBILITY_TYPE, fragmentContainer, hangFAB, getString(R.string.version_incompatibility), MEGACHAT_INVALID_HANDLE);
+                            }
+                        }
+                    }
+                }.start();
                 return;
             }
 
@@ -2283,13 +2305,20 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                     boolean isInProgress = false;
                     MegaHandleList listPeerids = callChat.getSessionsPeerid();
                     MegaHandleList listClientids = callChat.getSessionsClientid();
-                    for (int i = 0; i < listPeerids.size(); i++) {
+                    long size = listPeerids.size();
+                    long participantsCount = chat.getPeerCount();
+                    for (int i = 0; i < size; i++) {
                         MegaChatSession userSession = callChat.getMegaChatSession(listPeerids.get(i), listClientids.get(i));
                         if (userSession != null && userSession.getStatus() == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
                             isInProgress = true;
                             break;
                         }
                     }
+
+                    if (participantsCount > 0 && size == participantsCount) {
+                        removeIncompatibilityTips();
+                    }
+
                     if (isInProgress) {
                         logDebug("Session in progress");
                         subtitleToobar.setVisibility(View.GONE);
@@ -2303,6 +2332,8 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
                 }
 
                 logDebug("Individual call in progress");
+
+                removeIncompatibilityTips();
                 linearParticipants.setVisibility(View.GONE);
                 MegaChatSession userSession = callChat.getMegaChatSession(callChat.getSessionsPeerid().get(0), callChat.getSessionsClientid().get(0));
                 if (userSession == null) {
@@ -2321,6 +2352,14 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
 
         subtitleToobar.setVisibility(View.GONE);
         activateChrono(false, callInProgressChrono, callChat);
+    }
+
+    private void removeIncompatibilityTips() {
+        stopCountDownTimer(incompatibilityCountDownTimer);
+        Snackbar snackbar = getSnackbar();
+        if(snackbar != null){
+            snackbar.dismiss();
+        }
     }
 
     /**
@@ -2705,7 +2744,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         updateSubtitleNumberOfVideos();
 
         updateLocalSpeakerStatus();
-        stopCountDownTimer();
+        stopCountDownTimer(countDownTimer);
 
         countDownTimer = new CountDownTimer(TIMEOUT, 1000) {
             public void onTick(long millisUntilFinished) {
@@ -3272,10 +3311,9 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     /**
      * Stop the countdown timer.
      */
-    private void stopCountDownTimer() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-            countDownTimer = null;
+    private void stopCountDownTimer(CountDownTimer timer) {
+        if (timer != null) {
+            timer.cancel();
         }
     }
 }
