@@ -362,7 +362,7 @@ class VideoMeetingViewHolder(
         if (isInvalid(participant)) return
 
         logDebug("Update name")
-        binding.avatar.setImageBitmap(participant.avatar)
+        binding.name.text = participant.name
     }
 
     /**
