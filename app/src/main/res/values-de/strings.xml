@@ -490,7 +490,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Anfrage erneut gesendet</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Anfrage an %s verschickt. Der Status ist unter “Gesendete Anfragen” einsehbar.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Kontakt gelöscht</string>
     <!-- error message -->
@@ -2557,7 +2557,7 @@
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Unable to open file.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">We were not able to open the file due to no network connection.</string>
+    <string name="error_fail_to_open_file_no_network">No network connection. File cannot be opened.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Datei bereits für Offlinezugriff gespeichert</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2580,7 +2580,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Anruf wurde nicht angenommen[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">E-Mail-Adresse des Kontakts</string>
+    <string name="contact_email">Kontakt E-Mail</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Dieser Kontakt wurde bereits hinzugefügt</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -3109,11 +3109,11 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s hat die Konferenz verlassen</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">You are not allowed to start a call because the participants limit has been exceeded.</string>
+    <string name="call_error_too_many_participants_start">Call cannot start because the maximum number of participants has been exceeded.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Diese Konferenz hat die maximale Teilnehmerzahl erreicht. Sie können derzeit nicht teilnehmen.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">You are not allowed to join this call as the group has reached the maximum number of participants in the chat.</string>
+    <string name="call_error_too_many_participants_join">Group call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
     <string name="call_error_too_many_video">Die maximale Anzahl von Video-Teilnehmern ist erreicht, bitte beschränken Sie sich auf Audio.</string>
     <!-- Message show when a user cannot put the call on hold -->
@@ -3440,7 +3440,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Nutzung</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Storage usage details</string>
+    <string name="usage_storage_details_label">Storage usage breakdown</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Overall usage</string>
     <!-- Title of transfer section in Storage -->
@@ -3448,7 +3448,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">You cannot remove %1$s as a contact because they are part of your Business account.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">There has been a problem with your last payment. Please access MEGA using a desktop browser for more information.</string>
+    <string name="grace_period_admin_alert">A problem occurred with your last payment. Please access MEGA using a desktop browser for more information.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Ihr Business-Account ist abgelaufen</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3456,7 +3456,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Ihr Account ist [B]gesperrt[/B]. Sie können lediglich lesend auf Ihre Daten zugreifen.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">While MEGA can not access to your data, your business account administrator does have the ability to control and view the Camera Uploads in your user account</string>
+    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your business account administrator can access your Camera Uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Ein Fehler ist aufgetreten</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3969,4 +3969,20 @@
         <item quantity="one">Upload in progress, 1 file pending</item>
         <item quantity="other">Upload in progress, %1$d files pending</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Change server</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Show line numbers</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Hide line numbers</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Der Eigentümer der Ordnerfreigabe hat sein Speicherplatzlimit überschritten.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Die Datei kann nicht versandt werden, da der Empfänger sein Speicherplatzlimit überschritten hat.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues.</string>
 </resources>

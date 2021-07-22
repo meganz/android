@@ -497,7 +497,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Cerere retrimisă</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Cererea trimisă cu succes la %s. Starea poate fi consultată în fila Cereri trimise.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contact eliminat</string>
     <!-- error message -->
@@ -1228,8 +1228,8 @@
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Folderul este partajat cu %1$d contact. Elimini partajarea?</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Folderul este partajat cu %1$d contacte. Elimini partajarea?</item>
+        <item quantity="few">Folderul este partajat cu %1$d contacte. Elimini toate partajările?</item>
+        <item quantity="other">Folderul este partajat cu %1$d de contacte. Elimini toate partajările?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">E-mail și/sau parolă nevalide. Te rugăm să încerci din nou.</string>
@@ -1250,7 +1250,7 @@
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Acest URL este corupt sau deformat. Linkul pe care încerci să îl accesezi nu există.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">Se așteaptă confirmarea e-mailului</string>
+    <string name="confirm_email_text">În așteptarea confirmării e-mailului.</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
     <string name="confirm_email_explanation">Te rugăm să verifici e-mailul și să dai clic pe link pentru a confirma contul.</string>
     <!-- Plural of items which contains a folder. 2 items -->
@@ -2628,7 +2628,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Nu s-a răspuns la apel[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">E-mailul contactului</string>
+    <string name="contact_email">E-mail de contact</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Ai adăugat deja acest contact.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -4046,4 +4046,20 @@
         <item quantity="one">Upload in progress, 1 file pending</item>
         <item quantity="other">Upload in progress, %1$d files pending</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Change server</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Show line numbers</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Hide line numbers</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Proprietarul partajării depăște cota de stocare.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Fișierul nu poate fi trimis deoarece utilizatorul țintă și-a depășit cota sa de stocare.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues.</string>
 </resources>

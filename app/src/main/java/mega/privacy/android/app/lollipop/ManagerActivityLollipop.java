@@ -285,6 +285,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_NETWORK_CH
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
@@ -7463,8 +7464,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void onBackPressed() {
 		logDebug("onBackPressed");
 
-		// Let the PSA web browser fragment(if visible) to consume the back key event
-		if (psaWebBrowser.consumeBack()) return;
+		// Let the PSA web browser fragment (if visible) to consume the back key event
+		if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 
 		retryConnectionsAndSignalPresence();
 
@@ -12191,6 +12192,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 			}
 			else {
+				if (e.getErrorCode() == MegaError.API_EOVERQUOTA
+						&& api.isForeignNode(request.getParentHandle())) {
+					showForeignStorageOverQuotaWarningDialog(this);
+
+					if (restoreFromRubbish) restoreFromRubbish = false;
+					else moveToRubbish = false;
+
+					return;
+				}
+
 				if(restoreFromRubbish){
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_restored), -1);
 					restoreFromRubbish = false;
@@ -12339,7 +12350,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			else{
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
-					showOverquotaAlert(false);
+					if (api.isForeignNode(request.getParentHandle())) {
+						showForeignStorageOverQuotaWarningDialog(this);
+					} else {
+						showOverquotaAlert(false);
+					}
 				}
 				else if(e.getErrorCode()==MegaError.API_EGOINGOVERQUOTA){
 					logDebug("OVERQUOTA ERROR: " + e.getErrorCode());
@@ -13096,6 +13111,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 //work around - SDK does not return over quota error for folder upload,
                 //so need to be notified from global listener
                 if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+                	if (transfer.isForeignOverquota()) {
+                		return;
+					}
+
 					logDebug("Over quota");
                     Intent intent = new Intent(this,UploadService.class);
                     intent.setAction(ACTION_OVERQUOTA_STORAGE);
