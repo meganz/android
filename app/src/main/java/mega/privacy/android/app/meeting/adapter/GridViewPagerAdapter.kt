@@ -362,7 +362,7 @@ class GridViewPagerAdapter(
     /**
      * Update participant name
      *
-     * @param participant
+     * @param participant the target participant
      * @param currentPage the current page number
      * @param pager the ViewPager2
      */
@@ -375,6 +375,31 @@ class GridViewPagerAdapter(
 
                 for (i in 0 until adapterList.size) {
                     adapterList[i]?.updateParticipantName(participant)
+                }
+
+            }
+            return
+        }
+
+        notifyItemChanged(currentPage)
+    }
+
+    /**
+     * Update participant's avatar
+     *
+     * @param participant the target participant
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
+     */
+    fun updateParticipantAvatar(participant: Participant, currentPage: Int, pager: ViewPager2) {
+        val holder = getHolder(currentPage, pager)
+        holder?.let {
+            adapterList.let {
+                if (adapterList.isEmpty())
+                    return
+
+                for (i in 0 until adapterList.size) {
+                    adapterList[i]?.updateParticipantAvatar(participant)
                 }
 
             }

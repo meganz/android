@@ -87,6 +87,21 @@ class VideoListViewAdapter(
     }
 
     /**
+     * Update participant when the avatar is changed
+     *
+     * @param participant Participant to update
+     */
+    fun updateAvatar(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position)?.let {
+            it.updateAvatar(participant)
+            return
+        }
+
+        notifyItemChanged(position)
+    }
+
+    /**
      * Update participant that is speaking
      *
      * @param participant Participant to update

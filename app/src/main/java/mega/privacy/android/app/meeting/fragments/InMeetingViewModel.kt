@@ -477,6 +477,29 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
+     * Method to find out if there is a participant in the call
+     *
+     * @param peerId Use handle of a participant
+     * @return list of participants with avatar changes
+     */
+    fun updateParticipantsAvatar(peerId: Long): MutableSet<Participant> {
+        val listWithChanges = mutableSetOf<Participant>()
+        inMeetingRepository.getChatRoom(currentChatId)?.let {
+            participants.value?.let { listParticipants ->
+                val iterator = listParticipants.iterator()
+                iterator.forEach {
+                    if (it.peerId == peerId) {
+                        it.avatar = getAvatarBitmap(peerId)
+                        listWithChanges.add(it)
+                    }
+                }
+            }
+        }
+
+        return listWithChanges
+    }
+
+    /**
      * Method to switch a call on hold
      *
      * @param isCallOnHold True, if I am going to put it on hold. False, otherwise

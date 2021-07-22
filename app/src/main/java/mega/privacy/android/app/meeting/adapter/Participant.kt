@@ -16,7 +16,7 @@ data class Participant(
     val peerId: Long,
     val clientId: Long,
     var name: String,
-    val avatar: Bitmap?,
+    var avatar: Bitmap?,
     val isMe: Boolean,
     var isModerator: Boolean,
     var isAudioOn: Boolean,

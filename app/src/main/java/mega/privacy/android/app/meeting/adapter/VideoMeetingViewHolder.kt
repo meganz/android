@@ -366,6 +366,18 @@ class VideoMeetingViewHolder(
     }
 
     /**
+     * Update name and avatar
+     *
+     * @param participant Participant whose name needs to be updated
+     */
+    fun updateAvatar(participant: Participant) {
+        if (isInvalid(participant)) return
+
+        logDebug("Update name")
+        binding.avatar.setImageBitmap(participant.avatar)
+    }
+
+    /**
      * Check changes in call on hold
      *
      * @param participant Participant to update

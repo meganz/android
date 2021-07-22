@@ -288,6 +288,24 @@ class GridViewCallFragment : MeetingBaseFragment() {
     }
 
     /**
+     * Check changes in avatar
+     *
+     * @param listPeers List of participants with changes
+     */
+    fun updateAvatar(listPeers: MutableSet<Participant>) {
+        val iterator = listPeers.iterator()
+        iterator.forEach { peer ->
+            (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
+                peer.peerId,
+                peer.clientId
+            )?.let {
+                logDebug("Update participant name")
+                adapterPager.updateParticipantAvatar(it, currentPage, viewDataBinding.gridViewPager)
+            }
+        }
+    }
+
+    /**
      * Check changes in privileges
      *
      * @param listPeers List of participants with changes

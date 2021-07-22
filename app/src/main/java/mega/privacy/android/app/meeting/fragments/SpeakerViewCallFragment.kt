@@ -707,6 +707,24 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     /**
+     * Check changes in avatar
+     *
+     * @param listPeers List of participants with changes
+     */
+    fun updateAvatar(listPeers: MutableSet<Participant>) {
+        val iterator = listPeers.iterator()
+        iterator.forEach { peer ->
+            inMeetingViewModel.getParticipant(
+                peer.peerId,
+                peer.clientId
+            )?.let {
+                logDebug("Update participant name")
+                adapter.updateAvatar(it)
+            }
+        }
+    }
+
+    /**
      * Check changes in privileges
      *
      * @param listPeers List of participants with changes

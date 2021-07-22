@@ -540,6 +540,15 @@ class IndividualCallFragment : MeetingBaseFragment() {
         rootLayout.layoutParams = params
     }
 
+    /**
+     * Update my own avatar
+     */
+    fun updateMyAvatar(){
+        inMeetingViewModel.getAvatarBitmap(peerId)?.let {
+            avatarImageView.setImageBitmap(it)
+        }
+    }
+
     companion object {
 
         const val TAG = "IndividualCallFragment"

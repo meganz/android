@@ -85,6 +85,24 @@ class VideoGridViewAdapter(
     }
 
     /**
+     * Update participant name
+     *
+     * @param participant Participant to update
+     */
+    fun updateParticipantAvatar(participant: Participant) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        if (position == INVALID_POSITION)
+            return
+
+        getHolderAtPosition(position)?.let {
+            it.updateAvatar(participant)
+            return
+        }
+
+        notifyItemChanged(position)
+    }
+
+    /**
      * Method to activate or stop a participant's video whether it is visible or not
      *
      * @param shouldActivate True, if video should be activated. False, otherwise.

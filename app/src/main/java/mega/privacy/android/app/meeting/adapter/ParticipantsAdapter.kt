@@ -58,6 +58,32 @@ class ParticipantsAdapter(
         notifyItemChanged(index, me)
     }
 
+    /**
+     * Update the participant's avatar
+     *
+     * @param peerId User handle of the participant
+     */
+    fun updateAvatar(peerId: Long){
+        val localList = this.currentList
+        if (localList.isNullOrEmpty()) {
+            return
+        }
+
+        val changeParticipants = this.currentList.filter { it.peerId == peerId }
+        if (changeParticipants.isNullOrEmpty()) {
+            return
+        }
+
+        val target = changeParticipants.last()
+        val index = localList.indexOf(target)
+        if (index < 0 || target == null) {
+            return
+        }
+
+        target.avatar = null
+        notifyItemChanged(index)
+    }
+
 
     /**
      * Update the icon when the state of other participant's mic or cam changing
@@ -105,6 +131,33 @@ class ParticipantsAdapter(
         participant.isModerator = inMeetingViewModel.isParticipantModerator(peerId)
         val index = localList.indexOf(participant)
         notifyItemChanged(index, participant)
+    }
+
+    /**
+     * Update participant's name
+     *
+     * @param listParticipants List of participants with changes
+     */
+    fun updateName(listParticipants: MutableSet<Participant>) {
+        val localList = this.currentList
+        if (localList.isNullOrEmpty()) {
+            return
+        }
+
+        listParticipants.forEach { newParticipant ->
+            val participants =
+                this.currentList.filter { participant -> participant.peerId == newParticipant.peerId && participant.clientId == newParticipant.clientId }
+
+            if (participants.isNullOrEmpty()) {
+                return@forEach
+            }
+
+            participants.forEach {
+                it.name = newParticipant.name
+                val index = localList.indexOf(it)
+                notifyItemChanged(index, it)
+            }
+        }
     }
 
     companion object {

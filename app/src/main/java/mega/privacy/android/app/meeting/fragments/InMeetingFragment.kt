@@ -41,6 +41,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
@@ -202,6 +203,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private val visibilityChangeObserver = Observer<Long> {
         logDebug("Change in the visibility of a participant")
         inMeetingViewModel.updateParticipantsVisibility(it)
+    }
+
+    private val avatarChangeObserver = Observer<Long> { peerId ->
+        if (peerId != MegaApiJava.INVALID_HANDLE) {
+            logDebug("Change in avatar")
+            updateParticipantAvatar(peerId)
+        }
     }
 
     private val privilegesChangeObserver = Observer<MegaChatListItem> { item ->
@@ -721,6 +729,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long::class.java)
             .observe(this, visibilityChangeObserver)
+
+        LiveEventBus.get(EVENT_MEETING_GET_AVATAR, Long::class.java)
+            .observe(this, avatarChangeObserver)
 
         //Calls level
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
@@ -2137,7 +2148,40 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.updateName(listParticipants)
                 }
             }
+
+            bottomFloatingPanelViewHolder.updateName(listParticipants)
         }
+    }
+
+    /**
+     * Method that checks if a participant's avatar has changed and updates the UI
+     * Or get the avatar from SDK
+     *
+     * @param peerId user handle that has changed
+     */
+    private fun updateParticipantAvatar(peerId: Long) {
+        logDebug("Participant's name has changed")
+        val listParticipants = inMeetingViewModel.updateParticipantsAvatar(peerId)
+        if (listParticipants.isNotEmpty()) {
+            gridViewCallFragment?.let {
+                if (it.isAdded) {
+                    it.updateAvatar(listParticipants)
+                }
+            }
+            speakerViewCallFragment?.let {
+                if (it.isAdded) {
+                    it.updateAvatar(listParticipants)
+                }
+            }
+        }
+
+        individualCallFragment?.let {
+            if (it.isAdded && inMeetingViewModel.isMe(peerId)){
+                it.updateMyAvatar()
+            }
+        }
+
+        bottomFloatingPanelViewHolder.updateAvatar(peerId)
     }
 
     /**

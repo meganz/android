@@ -9,16 +9,10 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.ChatConnectionListener
 import mega.privacy.android.app.lollipop.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
-import mega.privacy.android.app.meeting.listeners.AddContactListener
-import mega.privacy.android.app.meeting.listeners.GroupVideoListener
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
-import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
-import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.app.meeting.listeners.*
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApi.INIT_WAITING_NEW_SESSION
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -230,7 +224,14 @@ class InMeetingRepository @Inject constructor(
      */
     fun getAvatarBitmap(chat: MegaChatRoom, peerId: Long): Bitmap? {
         var avatar = CallUtil.getImageAvatarCall(chat, peerId)
+        val email = ChatController(context).getParticipantEmail(peerId)
         if (avatar == null) {
+            megaApi.getUserAvatar(email,
+                CacheFolderManager.buildAvatarFile(
+                    context,
+                    email + FileUtil.JPG_EXTENSION
+                ).absolutePath, MeetingAvatarListener(context, peerId))
+
             avatar = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
                 peerId
@@ -561,6 +562,11 @@ class InMeetingRepository @Inject constructor(
         }
 
         if (bitmap == null) {
+            megaApi.getUserAvatar(mail,
+                CacheFolderManager.buildAvatarFile(
+                    context,
+                    mail + FileUtil.JPG_EXTENSION
+                ).absolutePath, MeetingAvatarListener(context, peerId))
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
                 peerId

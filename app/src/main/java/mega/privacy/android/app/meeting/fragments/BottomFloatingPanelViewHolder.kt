@@ -763,6 +763,24 @@ class BottomFloatingPanelViewHolder(
         floatingPanelView.camWarning.isVisible = !isGranted
     }
 
+    /**
+     * Update avatar base on peerId
+     *
+     * @param peerId the peerId of participant
+     */
+    fun updateAvatar(peerId: Long) {
+        participantsAdapter.updateAvatar(peerId)
+    }
+
+    /**
+     * Update participant's name
+     *
+     * @param listParticipants List of participants with changes
+     */
+    fun updateName(listParticipants: MutableSet<Participant>) {
+        participantsAdapter.updateName(listParticipants)
+    }
+
     companion object {
         private const val BOTTOM_PANEL_MIN_ALPHA = 0.32F
         private const val BOTTOM_PANEL_PROPERTY_UPDATER_OFFSET_THRESHOLD = 0.5F

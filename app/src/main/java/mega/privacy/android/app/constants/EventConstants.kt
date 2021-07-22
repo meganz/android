@@ -7,6 +7,7 @@ object EventConstants {
     const val EVENT_NETWORK_CHANGE = "network_change"
     const val EVENT_CHAT_TITLE_CHANGE = "chat_title_change"
     const val EVENT_CONTACT_NAME_CHANGE = "contact_name_change"
+    const val EVENT_MEETING_GET_AVATAR = "meeting_get_avatar"
 
     /** Event Keys related to calls*/
     const val EVENT_ERROR_STARTING_CALL = "error_starting_call"

@@ -24,7 +24,6 @@ class ParticipantViewHolder(
     }
 
     fun bind(participant: Participant) {
-
         if (participant.avatar == null) {
             initAvatar(participant)
         } else {
