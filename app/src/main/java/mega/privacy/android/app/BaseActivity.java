@@ -62,6 +62,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_IMCOMPATIBILITY_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -99,7 +100,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
-    private Snackbar snackbar = null;
+    private Snackbar snackbar;
 
     /**
      * Load the psa in the web browser fragment if the psa is a web one and this activity
@@ -705,7 +706,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         DisplayMetrics outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
 
-        Snackbar snackbar;
         try {
             switch (type) {
                 case MESSAGE_SNACKBAR_TYPE:
@@ -782,6 +782,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         }
     }
 
+    /**
+     * Get snackbar instance
+     *
+     * @return snackbar
+     */
     public Snackbar getSnackbar() {
         return snackbar;
     }

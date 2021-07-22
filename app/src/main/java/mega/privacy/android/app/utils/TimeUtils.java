@@ -574,7 +574,7 @@ public class TimeUtils implements Comparator<Calendar> {
 
             @Override
             public void onFinish() {
-                if (alertDialog != null) {
+                if (alertDialog != null && alertDialog.isShowing()) {
                     alertDialog.dismiss();
                 } else if (v != null) {
                     v.setVisibility(View.GONE);

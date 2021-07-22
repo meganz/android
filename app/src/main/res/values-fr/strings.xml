@@ -253,7 +253,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Les mots de passe ne correspondent pas</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Un compte MEGA a déjà été créé avec cette adresse courriel</string>
+    <string name="error_email_registered">Un compte&#160;MEGA a déjà été créé avec cette adresse courriel</string>
     <!--  -->
     <string name="create_account_creating_account">Connexion au serveur&#160;: création du compte</string>
     <!--  -->
@@ -490,7 +490,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">La demande a été envoyée de nouveau</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">La demande a été envoyée avec succès %s. L’état peut être consulté dans l’onglet Demandes envoyées.</string>
+    <string name="context_contact_request_sent">La demande a été envoyée avec succès à %s. Consultez-la dans l’onglet Demandes envoyées.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Le contact a été supprimé</string>
     <!-- error message -->
@@ -596,13 +596,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">Le dossier n’est plus partagé</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Erreur, le dossier est encore partagé avec un autre contact</string>
+    <string name="context_no_removed_sharing_contacts">Une erreur est survenue. Le dossier est encore partagé avec un autre contact</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Ne sélectionner qu’un fichier</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">La corbeille a été vidée avec succès</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Erreur. La corbeille n’a pas été vidée</string>
+    <string name="rubbish_bin_no_emptied">Une erreur est survenue. La corbeille n’a pas été vidée</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Vous êtes sur le point d’annuler votre abonnement MEGA. Si nous pouvons faire quoi que ce soit pour vous faire changer d’idée, n’hésitez pas à nous le communiquer.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -610,7 +610,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Envoyer</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Nous vous remercions de votre rétroaction. Voulez-vous vraiment annuler votre abonnement MEGA ?</string>
+    <string name="confirmation_cancel_subscriptions">Nous vous remercions de votre rétroaction. Voulez-vous vraiment annuler votre abonnement&#160;MEGA ?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Votre abonnement n’a pas été annulé. Veuillez indiquer le motif de votre annulation.</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -665,11 +665,11 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problème de système de fichiers</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Une erreur s’est produite lors de l’exécution de l’action</string>
+    <string name="general_error">Une erreur est survenue en parcourant les fichiers locaux</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Visualiseur d’images</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Espace utilisé</string>
+    <string name="my_account_used_space">Espace de stockage utilisé</string>
     <!-- menu item -->
     <string name="my_account_change_password">Changer le mot de passe</string>
     <!-- Dialog text overquota error -->
@@ -693,7 +693,7 @@
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Périodique mensuel ou annuel</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">Pour le moment, aucun mode de paiement n’est proposé pour cet abonnement.</string>
+    <string name="no_available_payment_method">Aucun mode de paiement n’est actuellement défini pour cet abonnement. Veuillez en sélectionner un.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Mensuel*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -703,7 +703,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">L’aperçu n’a pas encore été téléchargé. Veuillez patienter</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Une mémoire insuffisante empêche de charger l’aperçu. Veuillez réessayer ultérieurement.</string>
+    <string name="not_load_preview_low_memory">Il n’y a pas assez de mémoire libre pour afficher l’aperçu. Veuillez réessayer plus tard.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Veuillez vous déconnecter avant de créer le compte</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -717,9 +717,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Permettre les notifications pour les appels MEGA entrants</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA a besoin de votre autorisation pour autoriser l’apparition de l’interface d’appel.</string>
+    <string name="ask_for_display_over_msg">Veuillez accorder à MEGA la permission de s’afficher par-dessus d’autres applis pour les appels.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Ne vous inquiétez pas, vous pouvez quand même accorder les autorisations à partir des paramètres de votre appareil.</string>
+    <string name="ask_for_display_over_explain">Vous pouvez toujours accorder les permissions dans les paramètres de l’appareil.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Wi-Fi seulement</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -733,7 +733,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Vérification des fichiers à téléverser</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Initialisation des téléversements de l’appareil photo</string>
+    <string name="settings_camera_notif_initializing_title">Initialisation des Téléversements de l’appareil photo</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Téléversements de l’appareil photo a été désactivée. Votre dossier local est inaccessible.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -751,9 +751,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">Options du code d’accès</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">La compression vidéo demande beaucoup d’énergie. MEGA exigera que vous rechargiez activement votre appareil si les vidéos à compresser dépassent %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">La compression vidéo utilise une grande quantité d’énergie. Veuillez mettre votre appareil en charge si les vidéos à compresser dépassent %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Si cette option est activée, vous téléverserez des renseignements sur le lieu où vos photos ont été prises. Veuillez donc faire preuve de prudence en les partageant.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Si cette option est activée, des renseignements sur le lieu seront ajoutés à vos photos. Veuillez donc faire preuve de prudence en les partageant.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Avancés</string>
     <!-- Settings preference title for cache -->
@@ -809,7 +809,7 @@
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Renvoyer</string>
     <!-- error message that will show to user when host detected that the mobile number has been registered already -->
-    <string name="verify_account_error_phone_number_register">Ce numéro est déjà associé à un compte MEGA.</string>
+    <string name="verify_account_error_phone_number_register">Ce numéro est déjà associé à un compte&#160;MEGA.</string>
     <!-- error message that will show to user when user reached the sms verification daily limit -->
     <string name="verify_account_error_reach_limit">Vous avez atteint la limite quotidienne</string>
     <!-- error message that will show to user when user reached the sms verification daily limit -->
@@ -1034,15 +1034,15 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Compte Gratuit</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite">Compte Pro léger</string>
+    <string name="my_account_prolite">Compte&#160;Pro léger</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Compte Pro I</string>
+    <string name="my_account_pro1">Compte&#160;Pro I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Compte Pro II</string>
+    <string name="my_account_pro2">Compte&#160;Pro II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Compte Pro III</string>
+    <string name="my_account_pro3">Compte&#160;Pro III</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Compte Pro léger</string>
+    <string name="my_account_prolite_feedback_email">Compte&#160;Pro léger</string>
     <!--  -->
     <string name="backup_title">Sauvegarder votre clé de récupération</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -1098,7 +1098,7 @@
     <!-- Error message when a user attempts to change their email without an active login session. -->
     <string name="change_email_not_logged_in">Vous devez être connecté pour effectuer votre changement d’adresse courriel. Veuillez vous connecter de nouveau avec votre adresse courriel actuelle et recliquer ensuite sur le lien de confirmation.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
-    <string name="email_changed">Félicitations, votre nouvelle adresse courriel pour ce compte MEGA est&#160;: %1$s</string>
+    <string name="email_changed">Félicitations, votre nouvelle adresse courriel pour ce compte&#160;MEGA est&#160;: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Erroné</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
@@ -1140,7 +1140,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Surclasser le compte maintenant</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Améliorez la capacité de votre nuage.[A]Obtenez plus d’espace et un quota de transfert supérieur avec un compte PRO.</string>
+    <string name="get_pro_account">Améliorez la capacité de votre nuage.[A]Obtenez plus d’espace et un quota de transfert supérieur avec un compte&#160;Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">La clé de récupération a été sauvegardée dans&#160;: %1s. [A]Tant que le fichier restera dans ce chemin, vous la trouverez dans la section Enregistré Hors ligne.[A]Note&#160;: Elle sera supprimée si vous vous déconnectez, veuillez la conserver en lieu sûr.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -1156,7 +1156,7 @@
     <!-- Iitle of the warning when the user is running out of space -->
     <string name="title_new_warning_out_space">Vous êtes presque à court d’espace.</string>
     <!-- Text of the warning when the user is running out of space -->
-    <string name="new_warning_out_space">Profitez pleinement de votre compte MEGA en passant à un compte Pro.</string>
+    <string name="new_warning_out_space">Profitez pleinement de votre compte&#160;MEGA en passant à un compte&#160;Pro.</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
     <string name="title_options_avatar_panel">Changer la photo de profil</string>
     <!-- Option of the sliding panel to capture a new picture to upload to Cloud Drive or to set as user avatar -->
@@ -1951,7 +1951,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Fonctionnement</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invitez vos amis à créer un compte MEGA gratuit et à installer l’appli MEGA mobile. Pour chaque inscription et installation d’appli réussie, vous recevez de l’espace de stockage en prime.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invitez vos amis à créer un compte&#160;MEGA gratuit et à installer l’appli MEGA mobile. Pour chaque inscription et installation d’appli réussie, vous recevez de l’espace de stockage en prime.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Vous ne recevrez pas de crédit si vous invitez quelqu’un qui a utilisé MEGA par le passé et un tel refus ne vous sera pas signalé. Les contacts invités doivent installer l’appli MEGA mobile ou l’appli MEGA pour ordinateur sur leurs appareils.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -2084,7 +2084,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Options avancées</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA a besoin de votre autorisation pour télécharger des fichiers</string>
+    <string name="download_requires_permission">MEGA a besoin de droits en lecture et en écriture sur votre mémoire externe pour y télécharger des fichiers.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">L’ancienne carte SD n’est pas accessible. Veuillez définir un nouvel emplacement de téléchargement.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2144,7 +2144,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">L’invitation n’a pas été envoyée. %s est déjà dans votre liste de contacts.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">L’invitation n’a pas été envoyée. Une erreur est survenue lors de son traitement.</string>
+    <string name="invite_not_sent_text_error">Une erreur est survenue et l’invitation n’a pas été envoyée.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Création du code QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -2234,7 +2234,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Votre compte a été désactivé en raison de non-respects répétés des Conditions générales d’utilisation de MEGA. Veuillez vérifier votre boîte de réception de courriels.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Votre compte a été résilié à la suite d’un non-respect des Conditions générales d’utilisation de MEGA, tel qu’une violation des droits d’autrui ; un partage ou une importation de données illégales ; ou un abus du système.</string>
+    <string name="account_suspended_breache_ToS">Votre compte a été résilié à la suite d’un non-respect des Conditions générales d’utilisation de MEGA, y compris, mais sans toutefois s’y limiter, la clause&#160;15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Chargement des fichiers</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2551,13 +2551,13 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d fichiers n’ont pas été partagés</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Aperçu du contenu</string>
+    <string name="preview_content">Prévisualiser le contenu</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">La diffusion en continu ne peut pas avoir lieu et le fichier n’a pas été téléchargé</string>
+    <string name="no_network_connection_on_play_file">Il n’y a pas de connexion réseau. Le fichier n’a pas été téléchargé et ne peut pas être diffusé en continu.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">L’ouverture du fichier est impossible.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">Nous n’avons pas pu ouvrir le fichier en raison de l’absence de connexion réseau.</string>
+    <string name="error_fail_to_open_file_no_network">Il n’y a pas de connexion réseau. Le fichier ne peut pas être ouvert.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Le fichier existe déjà dans Enregistré Hors ligne</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2568,7 +2568,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">Aperçus d’URL enrichis</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Vous êtes sur le point de désactiver définitivement les aperçus d’URL enrichis. Vous pourrez réactiver les aperçus d’URL enrichis dans vos paramètres. Voulez-vous poursuivre ?</string>
+    <string name="text_confirmation_disable_rich_links">Vous désactivez les aperçus d’URL enrichis. Vous pourrez les réactiver dans vos Paramètres. Voulez-vous poursuivre ?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Un appel a été manqué[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2594,7 +2594,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Restauré vers %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Erreur. N’a pas été restauré</string>
+    <string name="context_no_restored">Une erreur est survenue. L’élément n’a pas été restauré.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Envoyer un message</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -2647,7 +2647,7 @@
     <!-- Title of the screen New Group -->
     <string name="title_new_group">Nouveau groupe</string>
     <!-- Subtitle of the screen New Group -->
-    <string name="subtitle_new_group">Saisir le nom du groupe</string>
+    <string name="subtitle_new_group">Saisissez le nom du groupe</string>
     <!-- Hint of edittext shown when it is creating a new group to guide user to type the name of the group -->
     <string name="hint_type_group">Nommez votre groupe</string>
     <!-- Text of the confirm dialog shown when it wants to remove a contact from a chat -->
@@ -2699,13 +2699,13 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Le code est invalide</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Votre disque nuagique est presque plein. Passez à un compte Pro et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_almost_full_warning">Votre disque nuagique est presque plein. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">Votre disque nuagique est presque plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
     <string name="text_almost_full_warning_pro3_account">Votre disque nuagique est presque plein. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Votre disque nuagique est plein. Passez à un compte Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_storage_full_warning">Votre disque nuagique est plein. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
     <string name="text_storage_full_warning_pro_account">Votre disque nuagique est plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
@@ -3042,11 +3042,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurer MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA a besoin d’accéder à vos photos, à vos médias et à vos fichiers afin que vous puissiez les partager avec des amis, échanger des messages chiffrés et faire des appels chiffrés.</string>
+    <string name="setup_mega_explanation">MEGA a besoin de votre autorisation pour accéder à vos fichiers afin de les partager. D’autres permissions d’accès pourraient être nécessaires pour échanger des messages chiffrés et faire des appels sécurisés.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Autoriser l’accès aux photos, aux médias et aux fichiers.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">Afin de partager des photos, des médias et des fichiers, MEGA a besoin de votre autorisation.</string>
+    <string name="allow_acces_media_subtitle">MEGA a besoin de votre autorisation pour accéder aux fichiers afin de les partager.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Activer l’appareil photo</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -3054,7 +3054,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Autoriser les appels</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Donner accès à votre carnet d’adresses</string>
+    <string name="allow_acces_contact_title">Accorder à MEGA l’autorisation d’accéder à vos contacts</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Trouvez facilement les contacts de votre carnet d’adresses sur MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3062,7 +3062,7 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Autorisez l’accès à votre microphone pour faire des appels chiffrés.</string>
     <!-- General enable access -->
-    <string name="general_enable_access">Autoriser l’accès</string>
+    <string name="general_enable_access">Accorder l’accès</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">Fichiers partagés</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3109,17 +3109,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s a quitté l’appel</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">Vous n’êtes pas autorisé à commencer un appel, car la limite de participants a été dépassée.</string>
+    <string name="call_error_too_many_participants_start">L’appel ne peut pas commencer, car la limite de participants a été dépassée.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">Vous n’êtes pas autorisé à vous joindre à cet appel, car le nombre maximal de participants a été atteint.</string>
+    <string name="call_error_too_many_participants">Vous ne pouvez pas vous joindre à l’appel, car la limite de participants a été dépassée.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Vous n’êtes pas autorisé à vous joindre à cet appel, car le groupe a atteint le nombre maximal de participants de la conversation.</string>
+    <string name="call_error_too_many_participants_join">Vous ne pouvez pas vous joindre à l’appel de groupe, car la limite de participants a été dépassée.</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Vous n’êtes pas autorisé à activer la vidéo pour cet appel, car le nombre maximal de participants qui utilisent la vidéo a été atteint.</string>
+    <string name="call_error_too_many_video">Vous ne pouvez pas vous joindre à l’appel vidéo, car la limite de participants a été dépassée.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">Vous n’êtes pas autorisé à mettre l’appel en attente.</string>
+    <string name="call_error_call_on_hold">L’appel ne peut pas être mis en attente.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Erreur. Le fichier ne peut pas être ouvert.</string>
+    <string name="error_open_file_with">Une erreur est survenue et le fichier ne peut pas être ouvert avec cette appli.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">Appel entrant&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3370,9 +3370,9 @@
         <item quantity="other">%d fichiers en attente.</item>
     </plurals>
     <!-- Title of the login screen -->
-    <string name="login_to_mega">Se connecter à MEGA</string>
+    <string name="login_to_mega">Connectez-vous à MEGA</string>
     <!-- Title of the create account screen -->
-    <string name="create_account_title">Créer votre compte MEGA</string>
+    <string name="create_account_title">Créer votre compte&#160;MEGA</string>
     <!-- Label to reference a recents section -->
     <string name="recents_label">Récents</string>
     <!-- Label to reference a chats section -->
@@ -3440,7 +3440,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Utilisation</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Utilisation détaillée de l’espace de stockage</string>
+    <string name="usage_storage_details_label">Répartition de l’espace de stockage utilisé</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Utilisation globale</string>
     <!-- Title of transfer section in Storage -->
@@ -3456,7 +3456,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Votre compte est actuellement [B]désactivé[/B]. Vous ne pouvez que parcourir vos données.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">Bien que MEGA ne puisse pas accéder à vos données, l’administrateur de votre compte d’entreprise a la possibilité de contrôler et de visualiser les téléversements de l’appareil photo dans votre compte utilisateur</string>
+    <string name="camera_uploads_business_alert">MEGA ne peut pas accéder à vos données. Cependant, l’administrateur de votre compte d’entreprise peut accéder à vos Téléversements de l’appareil photo.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Quelque chose a mal tourné</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3494,9 +3494,9 @@
     <!-- Title of a helping view about locked accounts -->
     <string name="locked_accounts_label">Comptes verrouillés</string>
     <!-- Locked accounts description text by an external data breach. This text is 1 of 2 paragraph of a description -->
-    <string name="locked_accounts_text_1">Il est possible que vous utilisiez le même mot de passe pour votre compte MEGA que pour d’autres services et qu’au moins l’un de ses services ait souffert d’une atteinte à la protection des données.</string>
+    <string name="locked_accounts_text_1">Il est possible que vous utilisiez le même mot de passe pour votre compte&#160;MEGA que pour d’autres services et qu’au moins l’un de ses services ait souffert d’une atteinte à la protection des données.</string>
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
-    <string name="locked_accounts_text_2">Votre mot de passe a été divulgué et est maintenant utilisé par des personnes malveillantes pour se connecter à vos comptes dont, mais sans s’y limiter, à votre compte MEGA.</string>
+    <string name="locked_accounts_text_2">Votre mot de passe a été divulgué et est maintenant utilisé par des personnes malveillantes pour se connecter à vos comptes dont, mais sans s’y limiter, à votre compte&#160;MEGA.</string>
     <!-- Button to add a nickname for a user -->
     <string name="add_nickname">Définir un pseudonyme</string>
     <!-- Button to update a nickname for a user -->
@@ -3779,7 +3779,7 @@
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_password_sent">Le lien et le mot de passe ont été envoyés avec succès.</string>
     <!-- Title of a warning recommending upgrade to Pro -->
-    <string name="upgrade_pro">Passer à un compte Pro</string>
+    <string name="upgrade_pro">Passer à un compte&#160;Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Les utilisateurs de MEGA Pro ont l’accès exclusif à des fonctions supplémentaires de sécurité des liens qui rendent votre compte encore plus sûr.</string>
     <!-- Meaning of links decryption key -->
@@ -3797,7 +3797,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Lien&#160;: %1$s\n\nMot de passe&#160;: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA a besoin de votre autorisation afin de partager des fichiers.</string>
+    <string name="files_required_permissions_warning">MEGA a besoin de votre autorisation pour accéder à vos fichiers afin de les partager.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Favori</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3969,4 +3969,20 @@
         <item quantity="one">Téléversement en cours, 1&#160;fichier en attente</item>
         <item quantity="other">Téléversement en cours, %1$d&#160;fichiers en attente</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Changer de serveur</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Afficher les numéros de ligne</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Cacher les numéros de ligne</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Le propriétaire du partage a dépassé son quota de stockage.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Le fichier ne peut pas être envoyé, car l’utilisateur cible a dépassé son quota de stockage.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Nous mettons MEGAchat à niveau. Votre appel pourrait ne pas être connecté en raison de problèmes d’incompatibilité des versions.</string>
 </resources>

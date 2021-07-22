@@ -152,6 +152,7 @@
     <string name="error_kill_all_sessions">خطأ عند إغلاق الجلسات المفتوحة</string>
     <!-- General label for files -->
     <plurals name="general_num_files">
+        <item quantity="zero">empty</item>
         <item quantity="one">ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -160,6 +161,7 @@
     </plurals>
     <!-- Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts -->
     <plurals name="general_num_shared_with">
+        <item quantity="zero">empty</item>
         <item quantity="one">مشارك مع %1$s</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -270,6 +272,7 @@
     <string name="cancel_all_action">إلغاء الكل</string>
     <!-- Warning to confirm remove selected transfers. Plural more than 1 transfer -->
     <plurals name="cancel_selected_transfers">
+        <item quantity="zero">empty</item>
         <item quantity="one">سيتم إلغاء عملية النقل المحددة.</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -374,6 +377,7 @@
     <string name="download_preparing_files">جاري تحضير الملفات</string>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_began">
+        <item quantity="zero">%1$d لم يتم البدء بأي عملية تنزيل</item>
         <item quantity="one">عملية تنزيل واحدة تم البدء بها</item>
         <item quantity="two">%1$d عمليتا تنزيل تم البدء بهما</item>
         <item quantity="few">%1$d عمليات تنزيل تم البدء بها</item>
@@ -382,6 +386,7 @@
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_finish">
+        <item quantity="zero">empty</item>
         <item quantity="one">انتهى التنزيل</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -390,6 +395,7 @@
     </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
+        <item quantity="zero">empty</item>
         <item quantity="one">بدأ الرفع</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -398,6 +404,7 @@
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_finish">
+        <item quantity="zero">empty</item>
         <item quantity="one">انتهى الترفيع</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -406,6 +413,7 @@
     </plurals>
     <!-- Warning shown when it tries to download some empty folders. Plural -->
     <plurals name="empty_folders">
+        <item quantity="zero">empty</item>
         <item quantity="one">المجلد فارغ.</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -444,6 +452,7 @@
     <string name="context_remove_link_warning_text">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
+        <item quantity="zero">empty</item>
         <item quantity="one">لن يكون هذا الرابط متاحا للعامة بعد الآن</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -517,7 +526,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">تم إعادة إرسال الطلب</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">تم إرسال الطلب بنجاح إلى %s. يمكن مراجعة الحالة في صفحة الطلبات المرسلة.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">تم حذف جهة الاتصال</string>
     <!-- error message -->
@@ -680,6 +689,7 @@
     <string name="upload_uploaded">تم الرفع</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
+        <item quantity="zero">لا يوجد أي ملف جاري المعالجة</item>
         <item quantity="one">جاري معالجة ملف</item>
         <item quantity="two">جاري معالجة ملفين</item>
         <item quantity="few">جاري معالجة ثلاث ملفات</item>
@@ -783,7 +793,7 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">ضغط الفيديو يستهلك الكثير من الطاقة. سوف تطلب منك ميغا MEGA أن تشحن جهازك بشكل مستمر إذا كانت مقاطع الفيديو المراد ضغطها أكبر من %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">في حالة التمكين، ستقوم بترفيع معلومات حول مكان التقاط الصور، لذا كن حذراً عند مشاركتها.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">في حالة التمكين، سيتم تضمين معلومات الموقع مع صورك. يرجى توخي الحذر عند مشاركتهم.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">متقدم</string>
     <!-- Settings preference title for cache -->
@@ -929,6 +939,7 @@
     <string name="pin_lock_enter">دخول</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
+        <item quantity="zero">%1$d محاولات فاشلة لإدخال رمز المرور</item>
         <item quantity="one">1 محاولة فاشلة لإدخال رمز المرور</item>
         <item quantity="two">%1$d محاولتان فاشلتان لإدخال رمز المرور</item>
         <item quantity="few">%1$d محاولات فاشلة لإدخال رمز المرور</item>
@@ -941,6 +952,7 @@
     <string name="pin_lock_incorrect">رمز غير صحيح</string>
     <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
     <plurals name="pin_lock_incorrect_alert">
+        <item quantity="zero">empty</item>
         <item quantity="one">رمز المرور خاطئ، يرجى المحاولة مرة أخرى. لديك 1 محاولة باقية</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1249,6 +1261,7 @@
     <string name="number_incorrectly_invitation_reply_sent">%1$d طلب إرسال الردود بنجاح ولكن %2$d لم يتم إرسالهم</string>
     <!-- Referring to a invitation request in the Contacts section. Plural. e.g. 5 requests -->
     <plurals name="general_num_request">
+        <item quantity="zero">empty</item>
         <item quantity="one">1 طلب</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1257,6 +1270,7 @@
     </plurals>
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
+        <item quantity="zero">empty</item>
         <item quantity="one">هذا المجلد مشارك من قبل %1$d جهات اتصال. هل تود إزالة المشاركة؟</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1287,6 +1301,7 @@
     <string name="confirm_email_explanation">يُرجى التحقق من البريد الإلكتروني الخاص بك واضغط على الرابط لتأكيد حسابك.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
+        <item quantity="zero">empty</item>
         <item quantity="one">1 عنصر</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1365,6 +1380,7 @@
     <string name="success_muting_a_chat_for_specific_time">سيتم كتم إشعارات المحادثة حتى %s</string>
     <!-- Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15 -->
     <plurals name="success_muting_chat_until_specific_time">
+        <item quantity="zero">empty</item>
         <item quantity="one">سيتم كتم صوت إشعارات المحادثة حتى %1$s</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1373,6 +1389,7 @@
     </plurals>
     <!-- Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00 -->
     <plurals name="success_muting_chat_until_specific_date_and_time">
+        <item quantity="zero">empty</item>
         <item quantity="one">سيتم كتم صوت إشعارات المحادثة حتى %1$s الساعة %2$s</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1385,6 +1402,7 @@
     <string name="success_unmuting_a_chat">تم تمكين إشعارات المحادثة</string>
     <!-- String to indicate the time in 24h format until which a specific chat is muted. Plural, used for any format different to 1:XX, e.g. 14:15 -->
     <plurals name="chat_notifications_muted_until_specific_time">
+        <item quantity="zero">empty</item>
         <item quantity="one">كتم الصوت حتى %1$s</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1535,6 +1553,7 @@
     <string name="menu_choose_contact">اختر جهة اتصال</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d جهة اتصال</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1545,6 +1564,7 @@
     <string name="error_sharing_folder">خطأ في مشاركة المجلد. حاول مرة اخرى.</string>
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
+        <item quantity="zero">empty</item>
         <item quantity="one">سيتم فقدان جميع البيانات المرتبطة بجهة الاتصال المحددة بشكل دائم.</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1553,6 +1573,7 @@
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
+        <item quantity="zero">empty</item>
         <item quantity="one">حذف جهة الاتصال</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1569,6 +1590,7 @@
     <string name="no_conversation_history">لا توجد محادثات سابقة</string>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="user_typing">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$s [A]جاري الكتابة&#8230;[/A]</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1662,6 +1684,7 @@
     <string name="error_editing_message">لايمكن التعديل على الرسالة</string>
     <!-- Label to show the number of transfers in progress, Plural -->
     <plurals name="text_number_transfers">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d من %2$d ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1710,6 +1733,7 @@
     <string name="completed_transfers_empty">لا عمليات نقل مكتملة</string>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">رفع %1$d من %2$d ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1718,6 +1742,7 @@
     </plurals>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_paused_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">ترفيع ملف %1$d من %2$d (متوقف مؤقتاً)</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1726,6 +1751,7 @@
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">ترفيع %1$d من %2$d مجلد</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1734,6 +1760,7 @@
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_paused_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">ترفيع %1$d من %2$d مجلد (متوقف مؤقتاً)</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1742,6 +1769,7 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم رفع %1$d ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1750,6 +1778,7 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم تحميل ملف واحد بالفعل</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1758,6 +1787,7 @@
     </plurals>
     <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
     <plurals name="folder_upload_service_final_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم ترفيع %1$d مجلد</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1768,6 +1798,7 @@
     <string name="general_total_size">الحجم الكلي: %1$s</string>
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d ملف لم يتم رفعه</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1776,6 +1807,7 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
     <plurals name="copied_service_upload">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d ملف تم نسخه</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1784,6 +1816,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service do not download because the file is already on the device, Plural -->
     <plurals name="already_downloaded_service">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d ملف تم تحميله سابقا</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1792,6 +1825,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished, Plural -->
     <plurals name="download_service_final_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم تحميل %1$d ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1800,6 +1834,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم تحميل %1$d من %2$d ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1808,6 +1843,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d ملف غير مكتمل التحميل</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1816,6 +1852,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service is running, Plural -->
     <plurals name="download_service_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">جاري تحميل %1$d من %2$d ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1824,6 +1861,7 @@
     </plurals>
     <!-- Text of the notification shown when the download service is paused, Plural -->
     <plurals name="download_service_paused_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">تنزيل %1$d من %2$d ملف (متوقف مؤقتاً)</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1842,6 +1880,7 @@
     <string name="continue_without_account_transfer_overquota">الاستمرار دون حساب</string>
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
     <plurals name="new_general_num_files">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1886,6 +1925,7 @@
     <string name="download_show_info">شاهد المعلومات</string>
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
+        <item quantity="zero">empty</item>
         <item quantity="one">فشل إزالة الرابط، يرجى إعادة المحاولة لاحقاً.</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1894,6 +1934,7 @@
     </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
+        <item quantity="zero">empty</item>
         <item quantity="one">فشل إنشاء الرابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -1902,6 +1943,7 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
+        <item quantity="zero">empty</item>
         <item quantity="one">تمت إزالة الرابط بنجاح.</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2108,6 +2150,7 @@
     <string name="expiration_date_for_achievements">الزيادة تنتهي في %1$d أيام</string>
     <!-- menu items -->
     <plurals name="context_share_folders">
+        <item quantity="zero">empty</item>
         <item quantity="one">مجلد المشاركة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2116,6 +2159,7 @@
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
+        <item quantity="zero">empty</item>
         <item quantity="one">إذا تركت المجلد، لن تكون قادراً على الوصول إليه مرة أخرى.</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2186,6 +2230,7 @@
     <string name="invalid_characters_defined">الأحرف التالية غير مسموح بها: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
+        <item quantity="zero">empty</item>
         <item quantity="one">قم بتسمية ملفك قبل المتابعة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2398,6 +2443,7 @@
     <string name="label_mega_byte">ميغابايب</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
     <plurals name="number_of_versions">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d نسخة معدلة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2410,6 +2456,7 @@
     <string name="header_current_section_item">الاصدار الحالي</string>
     <!--  -->
     <plurals name="header_previous_section_item">
+        <item quantity="zero">empty</item>
         <item quantity="one">الاصدار السابق</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2422,6 +2469,7 @@
     <string name="menu_item_clear_versions">مسح النسخ السابقة</string>
     <!-- Title of the dialog to confirm that a version os going to be deleted, version items -->
     <plurals name="title_dialog_delete_version">
+        <item quantity="zero">empty</item>
         <item quantity="one">هل تود حذف الاصدار؟</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2455,6 +2503,7 @@
     <string name="file_properties_folder_previous_versions">للنسخ السابقة</string>
     <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
     <plurals name="number_of_versions_inside_folder">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d ملف له نسخ معدلة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2467,6 +2516,7 @@
     <string name="messages_forwarded_error">حدث خطأ، لم تتم عملية اعادة التوجيه</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
+        <item quantity="zero">empty</item>
         <item quantity="one">خطأ. فشل عملية إعادة توجيه %1$d رسالة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2475,6 +2525,7 @@
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
+        <item quantity="zero">empty</item>
         <item quantity="one">خطأ. المصدر غير متوفر</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2497,6 +2548,7 @@
     <string name="turn_on_notifications_fifth_step">قم بالتفعيل ثم اختر تفضيلاتك</string>
     <!-- Alert message after sending to chat one or several messages to several chats, version items -->
     <plurals name="files_send_to_chat_success">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم ارسال الملف بنجاح</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2549,6 +2601,7 @@
     <string name="notification_enable_display">تم تعطيل النوافذ المنبثقة من ميغا MEGA.\nانقر لتغيير الإعدادات.</string>
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$s رسالة غير مقروءة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2557,6 +2610,7 @@
     </plurals>
     <!-- Notification title to show the number of unread chats, unread messages -->
     <plurals name="plural_number_messages_chat_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d محادثة غير مقروءة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2621,6 +2675,7 @@
     <string name="title_acceptance_contact_request_notification">جهة اتصال جديدة</string>
     <!-- Notification title to show the number of incoming contact request, contact requests -->
     <plurals name="plural_number_contact_request_notification">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d طلب من جهات الاتصال قيد الانتظار</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2727,6 +2782,7 @@
     <string name="file_already_exists">الملف موجود ضمن الملفات المخزنة دون الاتصال بالإنترنت</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
+        <item quantity="zero">empty</item>
         <item quantity="one">فشل إعادة توجيه الرسالة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2748,7 +2804,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]لم تتم الإجابة على الاتصال[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">البريد الالكتروني لجهة الاتصال</string>
+    <string name="contact_email">عنوان البريد الإلكتروني</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">لقد قمت بإضافة جهة الاتصال مسبقاً</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2767,6 +2823,7 @@
     <string name="context_send_message">أرسل رسالة</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
     <plurals name="plural_contact_sent_to_chats">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم ارسال جهة الاتصال الى المحادثة بنجاح</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -2909,6 +2966,7 @@
     <string name="contact_info_button_more">المزيد</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
+        <item quantity="zero">empty</item>
         <item quantity="one">اختر ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3077,6 +3135,7 @@
     <string name="error_download_takendown_node">لا يمكن الوصول إليها بسبب انتهاك شروط استخدام الخدمة أو سياسة الاستخدام المقبول</string>
     <!-- Alert shown when some files were not downloaded due to ToS/AUP violation, Plural of taken down files. 2 files -->
     <plurals name="alert_taken_down_files">
+        <item quantity="zero">empty</item>
         <item quantity="one">لم يتم تنزيل ملف %d بسبب انتهاك شروط استخدام الخدمة أو سياسة الاستخدام المقبول ToS/AUP.</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3163,6 +3222,7 @@
     <string name="one_folder_several_files">1 مجلد · %1$d ملفات</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
+        <item quantity="zero">empty</item>
         <item quantity="one">%d ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3171,6 +3231,7 @@
     </plurals>
     <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
     <plurals name="num_folders_with_parameter">
+        <item quantity="zero">empty</item>
         <item quantity="one">%d مجلد</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3179,6 +3240,7 @@
     </plurals>
     <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
     <plurals name="num_folders_num_files">
+        <item quantity="zero">empty</item>
         <item quantity="one">%1$d مجلدات · 1 ملف</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3189,6 +3251,7 @@
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] أضيف %2$s و %3$s[/B]</string>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->
     <plurals name="subtitle_notification_added_files">
+        <item quantity="zero">empty</item>
         <item quantity="one">[A]%1$s [/A][B]أضيف %2$d ملف.[/B]</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3197,6 +3260,7 @@
     </plurals>
     <!-- Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items -->
     <plurals name="subtitle_notification_deleted_items">
+        <item quantity="zero">empty</item>
         <item quantity="one">[A]%1$s [/A][B]تم حذف%2$d عنصر.[/B]</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3205,6 +3269,7 @@
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of folder. 2 folders -->
     <plurals name="subtitle_notification_added_folders">
+        <item quantity="zero">empty</item>
         <item quantity="one">[A]%1$s [/A][B]تم إضافة%2$d مجلد.[/B]</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3213,6 +3278,7 @@
     </plurals>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <plurals name="subtitle_of_group_chat">
+        <item quantity="zero">empty</item>
         <item quantity="one">%d المشارك</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3271,6 +3337,7 @@
     <string name="call_ended_message">[A]تم إنهاء الاتصال[/A][C]. المدة: [/C]</string>
     <!-- Message that shows the hours of a call when it ends, more hours -->
     <plurals name="plural_call_ended_messages_hours">
+        <item quantity="zero">empty</item>
         <item quantity="one">[B]%1$s ساعة[/B]</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3279,6 +3346,7 @@
     </plurals>
     <!-- Message that shows the minutes of a call when it ends, more minutes -->
     <plurals name="plural_call_ended_messages_minutes">
+        <item quantity="zero">empty</item>
         <item quantity="one">[B]%1$s دقيقة[/B]</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3287,6 +3355,7 @@
     </plurals>
     <!-- Message that shows the seconds of a call when it ends, more seconds -->
     <plurals name="plural_call_ended_messages_seconds">
+        <item quantity="zero">empty</item>
         <item quantity="one">[B]%1$d ثانية[/B]</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3359,6 +3428,7 @@
     <string name="explanation_for_contacts_permission">إذا سمحت لميغا MEGA بالوصول إلى دفتر العناوين الخاص بك، فستتمكن من اكتشاف جهات الاتصال الخاصة بك بسهولة أكبر. لن تستخدم ميغا MEGA هذه البيانات لأي غرض آخر ولن تتفاعل أبداً مع جهات الاتصال الخاصة بك دون موافقتك.</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم إعادة توجيه الرسالة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3371,6 +3441,7 @@
     <string name="attachment_upload_panel_from_device">من نظام الملفات</string>
     <!-- Alert shown when a num of files have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_files_not_send">
+        <item quantity="zero">empty</item>
         <item quantity="one">لم يتم إرسال %d ملف إلى %d المحادثات</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3379,6 +3450,7 @@
     </plurals>
     <!-- Alert shown when a num of contacts have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_contacts_not_send">
+        <item quantity="zero">empty</item>
         <item quantity="one">لم يتم ارسال %d جهة اتصال إلى %d محادثات</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3387,6 +3459,7 @@
     </plurals>
     <!-- Alert shown when a num of messages have not been sent because of any error occurs, Plural of file. 2 files -->
     <plurals name="num_messages_not_send">
+        <item quantity="zero">empty</item>
         <item quantity="one">لم يتم ارسال %d رسالة إلى %d محادثات</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3395,6 +3468,7 @@
     </plurals>
     <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
     <plurals name="quantity_of_local_contact">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم العثور على جهة اتصال %d على ميغا MEGA</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3431,6 +3505,7 @@
     <string name="version_history_deleted_erroneously">الإصدارات السابقة غير محذوفة.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم حذف %d إصدار بنجاح</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3439,6 +3514,7 @@
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
+        <item quantity="zero">empty</item>
         <item quantity="one">%d إصدارغير محذوفة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3589,6 +3665,7 @@
     <string name="invite_contact_action_button">دعوة صديق عبر&#8230;</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files -->
     <plurals name="file_already_downloaded">
+        <item quantity="zero">empty</item>
         <item quantity="one">تم تنزيل ملف %d بالفعل.&#160;</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3597,6 +3674,7 @@
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
     <plurals name="file_pending_download">
+        <item quantity="zero">empty</item>
         <item quantity="one">ملف %d قيد الانتظار</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3674,7 +3752,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">الاستخدام</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">تفاصيل مساحة التخزين</string>
+    <string name="usage_storage_details_label">تفاصيل توزيع استخدام مساحة التخزين</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">حجم الاستخدام</string>
     <!-- Title of transfer section in Storage -->
@@ -3803,6 +3881,7 @@
     <string name="over_disk_quota_paywall_title">بياناتك في خطر!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
     <plurals name="over_disk_quota_paywall_text">
+        <item quantity="zero">empty</item>
         <item quantity="one">لقد تواصنا معك عبر البريد الإلكتروني %1$s بتاريخ %2$s، ولكن لا يزال لديك %3$s ملف تَشغل     %4$s من حسابك على ميغا MEGA، مما يتطلب أن يكون لديك %5$s.</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3819,6 +3898,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left">[B]يجب التصرف فوراً لحفظ بياناتك.[/B]</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
+        <item quantity="zero">empty</item>
         <item quantity="one">يوم واحد</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3953,6 +4033,7 @@
     <string name="subtitle_properties_manage_chat_label_year">سنة واحدة</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
     <plurals name="retention_time_picker_hours">
+        <item quantity="zero">empty</item>
         <item quantity="one">ساعة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3961,6 +4042,7 @@
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <plurals name="retention_time_picker_days">
+        <item quantity="zero">empty</item>
         <item quantity="one">يوم</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3969,6 +4051,7 @@
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several weeks -->
     <plurals name="retention_time_picker_weeks">
+        <item quantity="zero">empty</item>
         <item quantity="one">أسبوع</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3977,6 +4060,7 @@
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several months -->
     <plurals name="retention_time_picker_months">
+        <item quantity="zero">empty</item>
         <item quantity="one">شهر</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3987,6 +4071,7 @@
     <string name="retention_time_picker_year">سنة</string>
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
+        <item quantity="zero">empty</item>
         <item quantity="one">1 ساعة</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -3995,6 +4080,7 @@
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
+        <item quantity="zero">empty</item>
         <item quantity="one">أسبوع واحد</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -4003,6 +4089,7 @@
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
+        <item quantity="zero">empty</item>
         <item quantity="one">شهر واحد</item>
         <item quantity="two">empty</item>
         <item quantity="few">empty</item>
@@ -4227,10 +4314,27 @@
     <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
+        <item quantity="zero">جاري الترفيع، %1$d ملف معلق</item>
         <item quantity="one">جاري الترفيع، 1 ملف معلق</item>
         <item quantity="two">جاري الترفيع، %1$d ملفان معلقان</item>
         <item quantity="few">جاري الترفيع، %1$d ملفات معلقة</item>
         <item quantity="many">جاري الترفيع، %1$d ملف معلق</item>
         <item quantity="other">جاري الترفيع، %1$d ملف معلق</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">النسخة الحية</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">تغيير المخدم</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">إظهار أرقام الأسطر</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">إخفاء أرقام الأسطر</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">صاحب المشاركة تجاوز مساحة التخزين المتاحة له.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">لا يمكن إرسال الملف لأن المستخدم المستهدف قد تجاوز حصة التخزين المتاحة له.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">نحن بصدد ترقية محادثات ميغا MEGAchat. قد لا تكون مكالمتك متصلة بسبب مشكلات عدم توافق الإصدار.</string>
 </resources>
