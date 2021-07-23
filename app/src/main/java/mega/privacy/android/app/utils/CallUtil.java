@@ -192,6 +192,8 @@ public class CallUtil {
         logDebug("Open meeting in guest mode");
         MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
+        MegaApplication.getInstance().setIsLoggingRunning(true);
+
         Intent intent = new Intent(context, MeetingActivity.class);
         intent.setAction(MEETING_ACTION_GUEST);
         if (!isTextEmpty(meetingName)) {
