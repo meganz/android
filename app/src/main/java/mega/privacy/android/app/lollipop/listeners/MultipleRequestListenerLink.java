@@ -10,6 +10,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
@@ -53,6 +54,11 @@ public class MultipleRequestListenerLink implements MegaRequestListenerInterface
                     if(success == 0){
                         counter = -1;
                         if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                            if (api.isForeignNode(request.getParentHandle())) {
+                                showForeignStorageOverQuotaWarningDialog(context);
+                                return;
+                            }
+
                             //first error is OVERQUOTA
                             if(elementToImport == FOLDER_LINK){
                                 ((FolderLinkActivityLollipop) context).errorOverquota();

@@ -923,6 +923,12 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		if (hashes != null && hashes.length > 0) {
 			for (long hash : hashes) {
 				MegaNode tempNode = megaApi.getNodeByHandle(hash);
+				// If node doesn't exist continue to the next one
+				if (tempNode == null) {
+					logWarning("Temp node is null");
+					continue;
+				}
+
 				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
 				if(localPath != null){
 					try {

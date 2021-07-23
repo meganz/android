@@ -86,6 +86,7 @@ import static android.graphics.Color.*;
 import static mega.privacy.android.app.SearchNodesTask.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -1335,7 +1336,9 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
             if (e.getErrorCode() == MegaError.API_OK) {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_moved), -1);
                 finish();
-            } else {
+            } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+				showForeignStorageOverQuotaWarningDialog(this);
+			} else {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), -1);
             }
         } else if (request.getType() == MegaRequest.TYPE_COPY) {
@@ -1348,6 +1351,11 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+				if (api.isForeignNode(request.getParentHandle())) {
+					showForeignStorageOverQuotaWarningDialog(this);
+					return;
+				}
+
 				logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
 				Intent intent = new Intent(this, ManagerActivityLollipop.class);
 				intent.setAction(ACTION_OVERQUOTA_STORAGE);

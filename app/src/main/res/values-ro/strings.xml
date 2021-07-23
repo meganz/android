@@ -2628,7 +2628,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Nu s-a răspuns la apel[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">E-mailul contactului</string>
+    <string name="contact_email">E-mail de contact</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Ai adăugat deja acest contact.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -4050,4 +4050,16 @@
     <string name="production_api_server">Production</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Change server</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Show line numbers</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Hide line numbers</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Proprietarul partajării depăște cota de stocare.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Fișierul nu poate fi trimis deoarece utilizatorul țintă și-a depășit cota sa de stocare.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues.</string>
 </resources>

@@ -743,7 +743,7 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">동영상 압축은 꽤 많은 전력을 소모합니다. 만약 압축할 동영상이 %s보다 크다면 기기를 충전할 수 있도록 연결하세요.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">활성화하면, 당신의 위치 정보가 사진에 포함됩니다. 공유할 때 주의하세요.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">활성화하면, 위치 정보가 사진에 포함됩니다. 공유할 때 주의하세요.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">고급</string>
     <!-- Settings preference title for cache -->
@@ -2039,7 +2039,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">고급 설정</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA가 파일을 다운로드하려면 당신의 허락이 필요합니다.</string>
+    <string name="download_requires_permission">MEGA가 파일 다운로드를 위해 외부 저장소에 읽고 쓸 수 있는 권한이 필요합니다.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">이전 SD 카드를 이용할 수 없습니다. 새 다운로드 위치를 설정하세요.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2063,7 +2063,7 @@
     <!-- Title of QR code scan section -->
     <string name="section_scan_code">코드 스캔</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">자동 승인</string>
+    <string name="settings_qrcode_autoaccept">자동 수락</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">당신의 QR 코드를 스캔한 MEGA 이용자는 자동으로 연락처 목록에 추가됩니다.</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2099,9 +2099,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">초대가 발송되지 않았습니다. %s님은 이미 연락처 목록에 존재합니다.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">초대가 발송되지 않았습니다. 처리 중에 오류가 발생했습니다.</string>
+    <string name="invite_not_sent_text_error">오류가 발생하여 초대장이 발송되지 않았습니다.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">QR 코드 생성중&#8230;</string>
+    <string name="generatin_qr">QR 코드 생성중...</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">QR 코드 스캔</string>
     <!-- get the contact link and copy it -->
@@ -2498,7 +2498,7 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">컨텐츠 미리 보기</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">스트리밍을 실행할 수 없고 파일이 다운로드되지 않았습니다</string>
+    <string name="no_network_connection_on_play_file">네트워크 연결이 없습니다. 파일을 다운로드하고 스트림할 수 없습니다.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">파일을 열 수 없습니다.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2510,9 +2510,9 @@
         <item quantity="other">메시지가 전달되지 않음</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">고급 URL 미리 보기</string>
+    <string name="title_confirmation_disable_rich_links">고급 URL 미리보기</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">고급 URL 미리 보기를 해제하려고 합니다. 설정에서 고급 URL 미리 보기를 다시 활성화할 수 있습니다. 진행 하시겠습니까?</string>
+    <string name="text_confirmation_disable_rich_links">고급 URL 미리 보기를 해제하려고 합니다. 설정에서 다시 활성화할 수 있습니다. 진행하시겠습니까?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]부재중 전화[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2524,7 +2524,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]통화에 응답하지 않음[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">연락처의 이메일</string>
+    <string name="contact_email">연락처 이메일</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">당신은 이미 이 연락처를 추가했습니다</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2538,7 +2538,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">%s(으)로 되돌렸음</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">오류. 복원되지 않음</string>
+    <string name="context_no_restored">오류가 발생하였습니다. 항목이 복원되지 않았습니다.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">메시지 보내기</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -2976,11 +2976,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA 설정</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA가 당신이 친구와 사진, 미디어와 파일을 공유하고, 암호화된 메시지를 교환하며 안전한 통화를 할 수 있도록 접근 권한이 필요합니다.</string>
+    <string name="setup_mega_explanation">공유를 하려면 MEGA에 미디어와 파일 접근 권한이 필요합니다. 암호화된 메시지를 교환하고 안전한 통화를 하려면 다른 접근 권한이 필요할 수 있습니다.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">사진, 미디어 그리고 파일에 대한 접근 허용</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">사진, 미디어와 파일을 공유하려면 MEGA는 당신의 허가가 필요합니다.</string>
+    <string name="allow_acces_media_subtitle">공유를 하려면 MEGA에 파일 접근 권한이 필요합니다.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">카메라 활성화</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -2988,7 +2988,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">통화 활성화</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">주소록에 대한 접근 허용</string>
+    <string name="allow_acces_contact_title">MEGA에 연락처 접근 권한을 허용</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">MEGA에서 당신의 주소록에 있는 지인들을 쉽게 찾으세요.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -2996,7 +2996,7 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">암호화된 통화를 하려면 당신의 마이크에 접근을 허용하세요.</string>
     <!-- General enable access -->
-    <string name="general_enable_access">접근 허용</string>
+    <string name="general_enable_access">접근 허가</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
     <string name="title_chat_shared_files_info">공유된 파일</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
@@ -3040,17 +3040,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s님이 통화에서 떠났습니다</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">참여자 수 제한을 초과하였기 때문에 통화를 시작할 수 없습니다.</string>
+    <string name="call_error_too_many_participants_start">최대 참가자 수가 초과하여 통화를 시작할 수 없습니다.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">이 통화가 최대 참가자 수에 도달했기 때문에 참여할 수 없습니다.</string>
+    <string name="call_error_too_many_participants">최대 참가자 수가 초과하여 통화에 참가할 수 없습니다.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">단체 대화의 최대 참여자 수에 도달하였기 때문에 이 통화에 참여할 수 없습니다.</string>
+    <string name="call_error_too_many_participants_join">최대 참가자 수가 초과하여 단체 통화에 참가할 수 없습니다.</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">이 통화의 최대 영상 사용 참가자 수에 도달했기 때문에 영상을 활성화할 수 없습니다.</string>
+    <string name="call_error_too_many_video">최대 참가자 수가 초과하여 영상 통화에 참가할 수 없습니다.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">통화를 보류할 수 없습니다</string>
+    <string name="call_error_call_on_hold">통화를 보류할 수 없습니다.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">오류. 파일을 열 수 없습니다.</string>
+    <string name="error_open_file_with">오류가 발생하여 이 앱으로 파일을 열 수 없습니다.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">전화 수신중&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3710,7 +3710,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">링크: %1$s\n\n암호: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">파일을 공유하려면 권한 허용이 필요합니다.</string>
+    <string name="files_required_permissions_warning">공유를 하려면 MEGA에 파일 접근 권한이 필요합니다.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">즐겨찾기</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3885,4 +3885,16 @@
     <string name="production_api_server">운영</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">서버 변경</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">줄 번호 보기</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">줄 번호 숨기기</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">공유 소유자의 저장소 할당량 초과.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">대상 이용자의 저장소 할당량이 초과되어 파일을 전송할 수 없습니다.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">MEGAChat을 업그레이드하고 있습니다. 버전 호환성 문제로 통화가 연결되지 않을 수 있습니다.</string>
 </resources>
