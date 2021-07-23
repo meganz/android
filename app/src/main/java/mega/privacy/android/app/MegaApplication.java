@@ -34,6 +34,7 @@ import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.lifecycle.Observer;
 import androidx.multidex.MultiDexApplication;
+import androidx.preference.PreferenceManager;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -1587,6 +1588,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	private void removeValues(long chatId) {
+		PreferenceManager.getDefaultSharedPreferences(this).edit().remove(KEY_IS_SHOWED_WARNING_MESSAGE + chatId).apply();
 		getChatManagement().removeStatusVideoAndSpeaker(chatId);
 
         if (!existsAnOngoingOrIncomingCall()) {

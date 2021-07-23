@@ -862,6 +862,7 @@ public class Constants {
     public static final String EVENT_DRAG_TO_EXIT_SCROLL = "drag_to_exit_scroll";
 
     public static final String KEY_HINT_IS_SHOWING = "hint_is_showing";
+    public static final String KEY_IS_SHOWED_WARNING_MESSAGE = "is_showed_meeting_warning_message_";
 
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";

@@ -2046,6 +2046,23 @@ class InMeetingViewModel @ViewModelInject constructor(
             .putBoolean(IS_SHOWED_TIPS, true).apply()
     }
 
+    /**
+     * Method to check if warning message should be displayed
+     *
+     * @return True, if warning message must be shown. False, if not.
+     */
+    fun shouldShowWarningMessage(): Boolean =
+        !MegaApplication.getInstance().applicationContext.defaultSharedPreferences
+            .getBoolean(KEY_IS_SHOWED_WARNING_MESSAGE + getChatId(), false)
+
+    /**
+     * Update whether or not to display warning message
+     */
+    fun updateShowWarningMessage() {
+        MegaApplication.getInstance().applicationContext.defaultSharedPreferences.edit()
+            .putBoolean(KEY_IS_SHOWED_WARNING_MESSAGE + getChatId(), true).apply()
+    }
+
     companion object {
         const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"
     }

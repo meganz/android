@@ -941,7 +941,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.snackBarLiveData.observe(viewLifecycleOwner) {
             showSnackbar(SNACKBAR_TYPE, it, MEGACHAT_INVALID_HANDLE)
             if (bInviteSent) {
-                bInviteSent = false;
+                bInviteSent = false
                 val count = inMeetingViewModel.participants.value
                 if (count != null) {
                     var participantsCount = getparticipantsCount()
@@ -1622,15 +1622,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 launch(Dispatchers.IO) {
                     for (element in channel) {
                         logDebug("launchTimer() receive $element")
-                        // After 26 seconds if the call is still not answered, they will see a message
-                        activity?.runOnUiThread {
-                            showSnackbar(
-                                SNACKBAR_IMCOMPATIBILITY_TYPE,
-                                StringResourcesUtils.getString(
-                                    R.string.version_incompatibility
-                                ),
-                                MEGACHAT_INVALID_HANDLE
-                            )
+                        if (inMeetingViewModel.shouldShowWarningMessage()) {
+                            // After 26 seconds if the call is still not answered, they will see a message
+                            activity?.runOnUiThread {
+                                showSnackbar(
+                                    SNACKBAR_IMCOMPATIBILITY_TYPE,
+                                    StringResourcesUtils.getString(
+                                        R.string.version_incompatibility
+                                    ),
+                                    MEGACHAT_INVALID_HANDLE
+                                )
+                            }
+
+                            inMeetingViewModel.updateShowWarningMessage()
                         }
                     }
                 }
