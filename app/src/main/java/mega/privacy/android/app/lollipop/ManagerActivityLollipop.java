@@ -6861,6 +6861,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					requestPermission(this,
 							REQUEST_WRITE_STORAGE,
 							Manifest.permission.WRITE_EXTERNAL_STORAGE);
+					return true;
 				}
 
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
