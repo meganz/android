@@ -6775,6 +6775,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					requestPermission(this,
 							REQUEST_WRITE_STORAGE,
 							Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+					// If device is Android 11+ request this permission independently before any other one
+					// in order to avoid display the permission request activity twice.
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+						return true;
+					}
 				}
 
 				boolean hasCameraPermission = hasPermissions(this, Manifest.permission.CAMERA);
