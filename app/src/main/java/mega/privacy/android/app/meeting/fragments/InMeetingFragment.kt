@@ -859,7 +859,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.meetingNameLiveData.observe(viewLifecycleOwner) {
             if (!TextUtil.isTextEmpty(it)) {
                 logDebug("Meeting name has changed")
-                inMeetingViewModel.setTitleChat(it)
+                inMeetingViewModel.updateMeetingName(it)
             }
         }
 
