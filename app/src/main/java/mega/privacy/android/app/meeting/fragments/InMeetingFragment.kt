@@ -91,7 +91,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
-    StartChatCallListener.OnCallStartedCallback, AnswerChatCallListener.OnCallAnsweredCallback,
+    StartChatCallListener.StartChatCallCallback, AnswerChatCallListener.OnCallAnsweredCallback,
     AutoJoinPublicChatListener.OnJoinedChatCallback {
 
     private var bShowImcompatibility: Boolean = false
@@ -2596,4 +2596,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             sharedModel.showSnackBar(content)
         }
     }
+
+    override fun onCallFailed(chatId: Long) {}
 }

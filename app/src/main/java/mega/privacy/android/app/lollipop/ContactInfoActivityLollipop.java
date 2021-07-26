@@ -148,7 +148,7 @@ import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 public class ContactInfoActivityLollipop extends PasscodeActivity
 		implements MegaChatRequestListenerInterface, OnClickListener,
 		MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener,
-		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower, StartChatCallListener.OnCallStartedCallback {
+		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower, StartChatCallListener.StartChatCallCallback {
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -2097,8 +2097,14 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 	private void startCallWithChatOnline(MegaChatRoom chatRoom) {
 		addChecksForACall(chatRoom.getChatId(), startVideo);
+		enableCallLayouts(false);
 		megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, new StartChatCallListener(this, this, this));
 		MegaApplication.setIsWaitingForCall(false);
+	}
+
+	private void enableCallLayouts(Boolean enable) {
+		videoCallLayout.setEnabled(enable);
+		audioCallLayout.setEnabled(enable);
 	}
 
 	/**
@@ -2184,5 +2190,12 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 		if (chatRoomTo != null && chatRoomTo.getChatId() == chatId) {
 			openMeetingWithAudioOrVideo(this, chatId, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo);
 		}
+
+		enableCallLayouts(true);
+	}
+
+	@Override
+	public void onCallFailed(long chatId) {
+		enableCallLayouts(true);
 	}
 }

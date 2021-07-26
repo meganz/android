@@ -92,7 +92,6 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
-import mega.privacy.android.app.meeting.fragments.InMeetingFragment;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
@@ -228,7 +227,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
         MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener,
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
-        SnackbarShower, AttachNodeToChatListener, StartChatCallListener.OnCallStartedCallback,
+        SnackbarShower, AttachNodeToChatListener, StartChatCallListener.StartChatCallCallback,
         HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback,
         SetCallOnHoldListener.OnCallOnHoldCallback, LoadPreviewListener.OnPreviewLoadedCallback,
         LoadPreviewListener.OnChatPreviewLoadedCallback {
@@ -692,7 +691,10 @@ public class ChatActivityLollipop extends PasscodeActivity
     @Override
     public void onCallStarted(long chatId, boolean enableVideo, int enableAudio) {
         if (idChat == chatId) {
+            // In this case, the callMenuItem will be reset to enabled after resuming this activity (it calls invalidateOptionMenu())
             openMeetingWithAudioOrVideo(this, idChat, enableAudio == START_CALL_AUDIO_ENABLE, enableVideo);
+        } else {
+            enableCallMenuItems(true);
         }
     }
 
@@ -805,6 +807,11 @@ public class ChatActivityLollipop extends PasscodeActivity
 
             emptyScreen(text);
         }
+    }
+
+    @Override
+    public void onCallFailed(long chatId) {
+        enableCallMenuItems(true);
     }
 
     private class UserTyping {
@@ -3219,11 +3226,17 @@ public class ChatActivityLollipop extends PasscodeActivity
         if (!participatingInACall()) {
             logDebug("There is not a call in this chat and I am NOT in another call");
             addChecksForACall(chatRoom.getChatId(), startVideo);
+            enableCallMenuItems(false);
             megaChatApi.startChatCall(chatRoom.getChatId(), startVideo, true, new StartChatCallListener(this, this, this));
         }else{
             logDebug("There is not a call in this chat and I am in another call");
         }
 
+    }
+
+    private void enableCallMenuItems(Boolean enable) {
+        callMenuItem.setEnabled(enable);
+        videoMenuItem.setEnabled(enable);
     }
 
     private boolean checkPermissions(String permission, int requestCode) {
