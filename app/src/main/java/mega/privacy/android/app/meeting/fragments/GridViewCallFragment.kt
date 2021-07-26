@@ -273,7 +273,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * Check changes in name
      *
      * @param listPeers List of participants with changes
-     * @param type the type of change, name or avatar
+     * @param typeChange the type of change, name or avatar
      */
     fun updateNameOrAvatar(listPeers: MutableSet<Participant>, typeChange: Int) {
         val iterator = listPeers.iterator()
@@ -325,10 +325,8 @@ class GridViewCallFragment : MeetingBaseFragment() {
         adapterPager.updateOrientation(widthPixels, heightPixels)
 
         val currentItem = viewDataBinding.gridViewPager.currentItem
-        if (currentItem != null) {
-            viewDataBinding.gridViewPager.adapter = adapterPager
-            viewDataBinding.gridViewPager.currentItem = currentItem
-        }
+        viewDataBinding.gridViewPager.adapter = adapterPager
+        viewDataBinding.gridViewPager.currentItem = currentItem
     }
 
     /**

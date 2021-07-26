@@ -944,7 +944,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 bInviteSent = false
                 val count = inMeetingViewModel.participants.value
                 if (count != null) {
-                    var participantsCount = getparticipantsCount()
+                    val participantsCount = getparticipantsCount()
                     if(participantsCount == 0L && count.size == 0){
                         launchTimer()
                     } else if (participantsCount > 0 && count.size < participantsCount.toInt()) {
@@ -1579,8 +1579,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
                 val chatRoom = inMeetingViewModel.getChat()
-                val isMeeting = chatRoom?.isMeeting
-                val isGroup = chatRoom?.isGroup
                 if (inMeetingViewModel.isRequestSent() && chatRoom != null && !chatRoom.isMeeting) {
                     CallUtil.activateChrono(false, meetingChrono, null)
                     toolbarSubtitle?.let {
@@ -1588,8 +1586,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
                     launchTimer()
                 } else {
-                    val chatRoom = inMeetingViewModel.getChat()
-                    if(chatRoom != null && !chatRoom.isMeeting){
+                    if (chatRoom != null && !chatRoom.isMeeting) {
                         channel.cancel()
                         meetingActivity.snackbar?.dismiss()
                     }
@@ -1598,7 +1595,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
 
                     CallUtil.activateChrono(true, meetingChrono, call)
-                }
             }
         }
     }
@@ -1771,7 +1767,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 updatePanelParticipantList(it.toMutableList())
 
                 // Check current the count of participants
-                var participantsCount = getparticipantsCount()
+                val participantsCount = getparticipantsCount()
                 val count = it.size
                 if (participantsCount > 0 && count == participantsCount.toInt()) {
                     // all participants in and stop timer and remove snackbar
@@ -2384,7 +2380,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bInviteSent = false;
     }
 
-    /**
+    /*
      * Show participant bottom sheet when user click the three dots on participant item
      *
      * @param participant Participant of the meeting
