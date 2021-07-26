@@ -274,9 +274,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
      * Shows the fabButton
      */
     private void showFabButton() {
-        if (fabButton != null){
-            fabButton.show();
-        }
+        setSendInvitationVisibility();
     }
 
     /**
