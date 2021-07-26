@@ -257,6 +257,8 @@ class TextEditorViewModel @ViewModelInject constructor(
         if (isViewMode() || isEditMode()) {
             needsReadContent = true
             initializeReadParams(mi)
+        } else {
+            pagination.value = Pagination()
         }
 
         setEditableAdapter()
@@ -366,7 +368,7 @@ class TextEditorViewModel @ViewModelInject constructor(
             }
 
 
-            pagination.postValue(Pagination(sb.toString(), 0))
+            pagination.postValue(Pagination(sb.toString()))
             sb.clear()
         }
     }
