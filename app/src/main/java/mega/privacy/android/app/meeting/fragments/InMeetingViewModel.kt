@@ -1340,6 +1340,17 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
+     * Update the title when the meeting name is be changed
+     *
+     * @param newName the new meeting name
+     */
+    fun updateMeetingName(newName: String){
+        if (currentChatId != MEGACHAT_INVALID_HANDLE) {
+            _chatTitle.value = newName
+        }
+    }
+
+    /**
      * Method of obtaining the video
      *
      * @param chatId Chat ID
