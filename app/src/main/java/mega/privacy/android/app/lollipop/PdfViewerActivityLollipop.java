@@ -216,10 +216,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     int typeExport = -1;
     private Handler handler;
 
-//    private TextView actualPage;
-//    private TextView totalPages;
-//    private RelativeLayout pageNumber;
-
     boolean toolbarVisible = true;
     boolean fromChat = false;
     boolean isDeleteDialogShow = false;
@@ -488,10 +484,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         }
         bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
         fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
-//        actualPage = (TextView) findViewById(R.id.pdf_viewer_actual_page_number);
-//        actualPage.setText(""+currentPage);
-//        totalPages = (TextView) findViewById(R.id.pdf_viewer_total_page_number);
-//        pageNumber = (RelativeLayout) findViewById(R.id.pdf_viewer_page_number);
         progressBar = (ProgressBar) findViewById(R.id.pdf_viewer_progress_bar);
 
         pdfView = (PDFView) findViewById(R.id.pdfView);
@@ -526,13 +518,11 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             aB.setTitle(pdfFileName);
             uploadContainer.setVisibility(View.VISIBLE);
             bottomLayout.setVisibility(View.GONE);
-//            pageNumber.animate().translationY(-150).start();
         }
         else {
             aB.setTitle(" ");
             uploadContainer.setVisibility(View.GONE);
             bottomLayout.setVisibility(View.VISIBLE);
-//            pageNumber.animate().translationY(-100).start();
         }
 
         uploadContainer.setOnClickListener(v -> {
@@ -673,11 +663,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
             bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
             fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
-//            actualPage = (TextView) findViewById(R.id.pdf_viewer_actual_page_number);
-//            actualPage.setText(""+currentPage);
-//            totalPages = (TextView) findViewById(R.id.pdf_viewer_total_page_number);
-//            pageNumber = (RelativeLayout) findViewById(R.id.pdf_viewer_page_number);
-//            pageNumber.animate().translationY(-150).start();
             progressBar = (ProgressBar) findViewById(R.id.pdf_viewer_progress_bar);
 
             pdfView = (PDFView) findViewById(R.id.pdfView);
@@ -730,7 +715,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                         tB.animate().translationY(-220).setDuration(0).withEndAction(aB::hide).start();
                         bottomLayout.animate().translationY(220).setDuration(0).start();
                         uploadContainer.animate().translationY(220).setDuration(0).start();
-//                        pageNumber.animate().translationY(0).setDuration(0).start();
                     } else {
                         aB.hide();
                     }
@@ -975,12 +959,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             tB.animate().translationY(0).setDuration(200L).start();
             bottomLayout.animate().translationY(0).setDuration(200L).start();
             uploadContainer.animate().translationY(0).setDuration(200L).start();
-//            if (inside){
-//                pageNumber.animate().translationY(-100).setDuration(200L).start();
-//            }
-//            else {
-//                pageNumber.animate().translationY(-150).setDuration(200L).start();
-//            }
         }
     }
 
@@ -991,7 +969,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             tB.animate().translationY(-220).setDuration(duration).withEndAction(() -> aB.hide()).start();
             bottomLayout.animate().translationY(220).setDuration(duration).start();
             uploadContainer.animate().translationY(220).setDuration(duration).start();
-//            pageNumber.animate().translationY(0).setDuration(duration).start();
         }
         else {
             aB.hide();
@@ -1818,7 +1795,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         logDebug("page: " + page + ", pageCount: " + pageCount);
         if (!notChangePage) {
             currentPage = page+1;
-//            actualPage.setText(String.valueOf(currentPage));
             setTitle(String.format("%s %s / %s", pdfFileName, currentPage, pageCount));
         }
         else {
@@ -1833,7 +1809,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
     @Override
     public void loadComplete(int nbPages) {
-//        totalPages.setText(""+nbPages);
         defaultScrollHandle.setTotalPages(nbPages);
         PdfDocument.Meta meta = pdfView.getDocumentMeta();
         logDebug("Title = " + meta.getTitle());

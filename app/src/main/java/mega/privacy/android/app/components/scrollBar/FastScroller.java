@@ -133,12 +133,6 @@ public class FastScroller extends LinearLayout {
             TextViewCompat.setTextAppearance(bubbleTextView, bubbleTextAppearance);
     }
 
-    private void setBackgroundTint(View view, int color) {
-        final Drawable background = DrawableCompat.wrap(view.getBackground());
-        DrawableCompat.setTint(background.mutate(), color);
-        Utils.setBackground(view, background);
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     private void initHandleMovement() {
         handle.setOnTouchListener((v, event) -> {

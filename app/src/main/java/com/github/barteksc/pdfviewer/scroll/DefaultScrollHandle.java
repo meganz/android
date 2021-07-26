@@ -38,10 +38,6 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
     private int totalPages = 0;
 
     public DefaultScrollHandle(Context context) {
-        this(context, false);
-    }
-
-    public DefaultScrollHandle(Context context, boolean inverted) {
         super(context);
         logDebug("DefaultScrollHandle");
         this.context = context;
@@ -57,11 +53,11 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
     public void setupLayout(PDFView pdfView) {
         logDebug("setupLayout");
 
-        RelativeLayout.LayoutParams tvHlp = new RelativeLayout.LayoutParams(Util.getDP(context, 50), Util.getDP(context, 50));
+        RelativeLayout.LayoutParams tvHlp = new RelativeLayout.LayoutParams(dp2px(50), dp2px(50));
         textViewHandle.setBackgroundResource(R.drawable.fastscroll_pdf_viewer);
         tvHlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        tvHlp.setMargins(Util.getDP(context, 5), 0, Util.getDP(context, -20), 0);
-        textViewHandle.setPadding(Util.getDP(context, 10), Util.getDP(context, 10), Util.getDP(context, 10), Util.getDP(context, 10));
+        tvHlp.setMargins(dp2px(5), 0, dp2px(-20), 0);
+        textViewHandle.setPadding(dp2px(10), dp2px(10), dp2px(10), dp2px(10));
         addView(textViewHandle, tvHlp);
 
         RelativeLayout.LayoutParams tvBlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -71,8 +67,8 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
         tvBlp.addRule(RelativeLayout.CENTER_VERTICAL);
         textViewBubble.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         textViewBubble.setTextColor(ContextCompat.getColor(context, R.color.scroll_bubble_text_color));
-        textViewBubble.setPadding(Util.getDP(context, 10), Util.getDP(context, 5), Util.getDP(context, 10), Util.getDP(context, 5));
-        tvBlp.setMargins(0, 0, Util.getDP(context, 35), 0);
+        textViewBubble.setPadding(dp2px(10), dp2px(5), dp2px(10), dp2px(5));
+        tvBlp.setMargins(0, 0, dp2px(35), 0);
         addView(textViewBubble, tvBlp);
 
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);

@@ -148,9 +148,7 @@
     <!-- For fast scroller -->
     <color name="scroll_bubble">#90727272</color>
 
-    <color name="scroll_handle">#FAFAFA</color>
-
-    <color name="scroll_bubble_pdf">@color/scroll_handle</color>
+    <color name="scroll_handle">@color/grey_010</color>
 
     <color name="scroll_bubble_text_color">@color/grey_alpha_050</color>
     <!-- ======================== Color pair: light_dark ================== -->
@@ -210,7 +208,7 @@
     <color name="grey_012_white_015">@color/grey_alpha_012</color>
 
     <!-- chat reaction contact emoji background fill -->
-    <color name="teal_300_006_teal_400_050">@color/teal_300_alpha_006</color>dark_grey
+    <color name="teal_300_006_teal_400_050">@color/teal_300_alpha_006</color>
 
     <!-- chat reaction contact emoji background border -->
     <color name="teal_300_teal_600">@color/teal_300</color>
