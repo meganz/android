@@ -1607,6 +1607,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Start Timer for 26s and show snackbar for version incompatibility
      */
     private fun launchTimer() {
+        if(!inMeetingViewModel.isModerator())
+            return
         if(!bShowImcompatibility) {
             bShowImcompatibility = true
             lifecycleScope.launch {
