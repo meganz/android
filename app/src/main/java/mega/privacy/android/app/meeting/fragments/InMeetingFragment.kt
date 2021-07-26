@@ -89,6 +89,7 @@ import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, SnackbarShower,
     StartChatCallListener.StartChatCallCallback, AnswerChatCallListener.OnCallAnsweredCallback,
@@ -1595,6 +1596,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
 
                     CallUtil.activateChrono(true, meetingChrono, call)
+                }
             }
         }
     }
@@ -2377,10 +2379,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         meetingActivity.startActivityForResult(
             inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
         )
-        bInviteSent = false;
+        bInviteSent = false
     }
 
-    /*
+    /**
      * Show participant bottom sheet when user click the three dots on participant item
      *
      * @param participant Participant of the meeting
