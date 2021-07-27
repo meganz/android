@@ -47,7 +47,7 @@
         android:id="@+id/exo_rew"
         style="@style/AudioPlayerButton"
         android:layout_marginEnd="10dp"
-        android:src="@drawable/audio_player_15_minus"
+        android:src="@drawable/video_player_15_minus"
         app:layout_constraintBottom_toBottomOf="@id/exo_prev"
         app:layout_constraintEnd_toStartOf="@id/exo_prev"
         app:layout_constraintTop_toTopOf="@id/exo_prev" />
@@ -65,7 +65,7 @@
         android:id="@+id/exo_ffwd"
         style="@style/AudioPlayerButton"
         android:layout_marginStart="10dp"
-        android:src="@drawable/audio_player_15_plus"
+        android:src="@drawable/video_player_15_plus"
         app:layout_constraintBottom_toBottomOf="@id/exo_next"
         app:layout_constraintStart_toEndOf="@id/exo_next"
         app:layout_constraintTop_toTopOf="@id/exo_next" />
