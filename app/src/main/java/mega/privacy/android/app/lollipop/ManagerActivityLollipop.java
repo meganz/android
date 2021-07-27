@@ -5258,17 +5258,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
-	public void setBottomNavigationMenuItemChecked (int item) {
-		if (bNV != null && bNV.getMenu() != null) {
-			if(item == HIDDEN_BNV) {
+	public void setBottomNavigationMenuItemChecked(int item) {
+		if (bNV != null) {
+			if (item == HIDDEN_BNV) {
 				showHideBottomNavigationView(true);
-			}
-			else if (bNV.getMenu().getItem(item) != null) {
+			} else if (bNV.getMenu().getItem(item) != null) {
 				if (!bNV.getMenu().getItem(item).isChecked()) {
 					bNV.getMenu().getItem(item).setChecked(true);
 				}
 			}
 		}
+
+		boolean isCameraUploadItem = item == CAMERA_UPLOADS_BNV;
+		updateMiniAudioPlayerVisibility(!isCameraUploadItem);
 	}
 
 	private void setTabsVisibility() {
