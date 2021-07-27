@@ -92,6 +92,7 @@ import nz.mega.sdk.MegaUser;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
 import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
@@ -1316,6 +1317,11 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
                 logDebug("e.getErrorCode() != MegaError.API_OK");
 
                 if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+                    if (api.isForeignNode(request.getParentHandle())) {
+                        showForeignStorageOverQuotaWarningDialog(this);
+                        return;
+                    }
+
                     logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
                     Intent intent = new Intent(this, ManagerActivityLollipop.class);
                     intent.setAction(ACTION_OVERQUOTA_STORAGE);

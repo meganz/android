@@ -453,7 +453,7 @@
     <!-- Menu option title -->
     <string name="context_clear_rubbish">Dọn Thùng Rác</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">Bạn có chắc muốn xóa vĩnh viễn các mục ở trong Thùng Rác không?</string>
+    <string name="clear_rubbish_confirmation">Bạn đang chuẩn bị tiến hành xóa vĩnh viễn các mục ở trong Thùng Rác.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Gửi</string>
     <!-- send the file to inbox -->
@@ -481,7 +481,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Thư mời đã được gửi lại lần nữa</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Lời mời đã được gửi tới %s thành công. Theo dõi tình trạng của lời mời trong tab Yêu Cầu Gửi Đi.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Đã xóa tên liên lạc</string>
     <!-- error message -->
@@ -2059,7 +2059,7 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Tới File System</string>
     <!-- Title of QR code section -->
-    <string name="section_my_code">Mã Hiện Tại</string>
+    <string name="section_my_code">Mã của tôi</string>
     <!-- Title of QR code scan section -->
     <string name="section_scan_code">Quét Mã</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
@@ -2101,7 +2101,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">Thư mời không gửi được. Có lỗi phát sinh.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Đang tạo ra mã ảnh QR&#8230;</string>
+    <string name="generatin_qr">Đang tạo ra mã QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Quét mã QR</string>
     <!-- get the contact link and copy it -->
@@ -2510,7 +2510,7 @@
         <item quantity="other">Tin nhắn chưa được chuyển tiếp</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Xem Trước Nội Dung URL</string>
+    <string name="title_confirmation_disable_rich_links">Xem trước nội dung URL</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
     <string name="text_confirmation_disable_rich_links">Sau khi tắt tính năng xem trước nội dụng URL. Nếu muốn bật lại sẽ cần phải vào phần Thiết Đặt. Có chắc muốn tắt tính này hay không?</string>
     <!-- Message shown when a call ends. -->
@@ -2524,7 +2524,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Cuộc gọi không có trả lời[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Email của tên liên lạc</string>
+    <string name="contact_email">Email của người muốn thêm</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Tên liên lạc này đã được thêm rồi.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2588,7 +2588,7 @@
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading_share">Đang tải các tên liên lạc&#8230;</string>
     <!-- Title of the screen New Group -->
-    <string name="title_new_group">Tạo Nhóm Mới</string>
+    <string name="title_new_group">Nhóm mới</string>
     <!-- Subtitle of the screen New Group -->
     <string name="subtitle_new_group">Điền tên cho nhóm</string>
     <!-- Hint of edittext shown when it is creating a new group to guide user to type the name of the group -->
@@ -3058,7 +3058,7 @@
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">Tin nhắn có chứa đựng siêu dữ liệu không hợp lệ</string>
     <!-- Title of the activity that sends a location -->
-    <string name="title_activity_maps">Gửi Vị Trí</string>
+    <string name="title_activity_maps">Gửi vị trí</string>
     <!-- Label layout on maps activity that permits send current location -->
     <string name="current_location_label">Gửi đi vị trí hiện tại</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
@@ -3881,4 +3881,20 @@
     <plurals name="cu_upload_progress">
         <item quantity="other">Việc tải lên đang được thực hiện, %1$d tệp đang chờ</item>
     </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Đổi máy chủ</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Hiện số dòng</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Ẩn số dòng</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">Trang %1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Chủ sở hữu dùng hết lượng băng thông.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Tệp tin không thể gửi tới người đã chọn vì họ đã dùng hết lượng băng thông lưu trữ của mình.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">Chúng tôi đang nâng cấp dịch vụ MEGAchát. Cuộc gọi của bạn có thể sẽ không kết nối được do bất đồng tương thích phiên bản khác nhau.</string>
 </resources>

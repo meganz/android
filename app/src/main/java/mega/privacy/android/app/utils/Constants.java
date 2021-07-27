@@ -73,6 +73,8 @@ public class Constants {
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
 
+    public static final String FROM_HOME_PAGE = "FROM_HOME_PAGE";
+
     public static final String RESULT = "RESULT";
     public static final String ACCOUNT_BLOCKED_STRING = "ACCOUNT_BLOCKED_STRING";
     public static final String ACTION_SHOW_WARNING_ACCOUNT_BLOCKED = "ACTION_SHOW_WARNING_ACCOUNT_BLOCKED";
@@ -549,6 +551,8 @@ public class Constants {
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
     public static final int PERMISSIONS_TYPE = 4;
     public static final int INVITE_CONTACT_TYPE = 5;
+    public static final int SNACKBAR_IMCOMPATIBILITY_TYPE = 6;
+    public static final int SNACKBAR_IMCOMPATIBILITY_BUTTON_TYPE = 7;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;

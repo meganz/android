@@ -187,6 +187,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -7557,7 +7558,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     public void showSnackbar(int type, String s, long idChat, String emailUser){
-        showSnackbar(type, fragmentContainer, s, idChat, emailUser);
+        showSnackbar(type, fragmentContainer, null, s, idChat, emailUser);
     }
 
     public void removeProgressDialog(){
@@ -8200,6 +8201,11 @@ public class ChatActivityLollipop extends PasscodeActivity
                 logDebug("e.getErrorCode() != MegaError.API_OK");
 
                 if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                    if (api.isForeignNode(request.getParentHandle())) {
+                        showForeignStorageOverQuotaWarningDialog(this);
+                        return;
+                    }
+
                     logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
                     Intent intent = new Intent(this, ManagerActivityLollipop.class);
                     intent.setAction(ACTION_OVERQUOTA_STORAGE);

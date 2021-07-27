@@ -831,7 +831,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
             handleSelectFolderToImportResult(resultCode, toHandle, node, this, this)
         } else {
-            viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
+            viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
         }
     }
 
