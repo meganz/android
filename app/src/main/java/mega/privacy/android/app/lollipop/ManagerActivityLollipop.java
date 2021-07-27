@@ -477,11 +477,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
 	private List<MegaSku> mSkuDetailsList;
+
+	private Boolean initFabButtonShow = false;
 	private Observer<Boolean> fabChangeObserver  = isShow -> {
-		if(isShow){
-			showFabButton();
-		} else {
-			hideFabButton();
+		if(initFabButtonShow) {
+			if (isShow) {
+				showFabButtonAfterScrolling();
+			} else {
+				hideFabButtonWhenScrolling();
+			}
 		}
 	};
 
@@ -13102,7 +13106,22 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void hideFabButton(){
+		initFabButtonShow = false;
 		fabButton.hide();
+	}
+
+	/**
+	 * Hides the fabButton icon when scrolling.
+	 */
+	public void hideFabButtonWhenScrolling() {
+		fabButton.hide();
+	}
+
+	/**
+	 * Shows the fabButton icon.
+	 */
+	public void showFabButtonAfterScrolling() {
+		fabButton.show();
 	}
 
 	/**
@@ -13117,6 +13136,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Shows or hides the fabButton depending on the current section.
 	 */
 	public void showFabButton() {
+		initFabButtonShow = true;
+
 		if (drawerItem == null) {
 			return;
 		}

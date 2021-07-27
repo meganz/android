@@ -70,7 +70,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
     private var openingNodeHandle = INVALID_HANDLE
 
     private val fabChangeObserver = androidx.lifecycle.Observer<Boolean> {
-        if (it) {
+        if (it && actionModeViewModel.selectedNodes.value.isNullOrEmpty()) {
             showFabButton()
         } else {
             hideFabButton()
