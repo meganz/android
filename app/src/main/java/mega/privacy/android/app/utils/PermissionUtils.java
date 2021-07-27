@@ -14,11 +14,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.view.View;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.providers.FileProviderActivity;
 
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
 import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE_FOR_LOGS;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 
@@ -109,7 +113,7 @@ public class PermissionUtils {
                     if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
                             permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                         if (!Environment.isExternalStorageManager()) {
-                            requestManageExternalStoragePermission(activity);
+                            requestManageExternalStoragePermission(activity, requestCode);
                             return;
                         }
                     }
@@ -126,9 +130,10 @@ public class PermissionUtils {
      * Ask for the MANAGE_EXTERNAL_STORAGE special permission required by the app since Android 11
      *
      * @param context Context
+     * @param requestCode request code of permission asking
      */
     @TargetApi(Build.VERSION_CODES.R)
-    public static void requestManageExternalStoragePermission(Context context) {
+    public static void requestManageExternalStoragePermission(Context context, int requestCode) {
         Intent intent = null;
         try {
             intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
@@ -138,10 +143,21 @@ public class PermissionUtils {
             intent = new Intent();
             intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
         } finally {
+            Activity activity = null;
             if (context instanceof ManagerActivityLollipop) {
-                ((ManagerActivityLollipop) context).startActivityForResult(intent, PERMISSIONS_FRAGMENT);
+                activity = ((ManagerActivityLollipop) context);
             } else if (context instanceof LoginActivityLollipop) {
-                ((LoginActivityLollipop) context).startActivityForResult(intent, REQUEST_WRITE_STORAGE_FOR_LOGS);
+                activity = ((LoginActivityLollipop) context);
+            } else if (context instanceof FileProviderActivity) {
+                activity = ((FileProviderActivity) context);
+            } else if (context instanceof CameraUploadsPreferencesActivity) {
+                activity = ((CameraUploadsPreferencesActivity) context);
+            } else if (context instanceof BaseActivity) {
+                activity = ((BaseActivity) context);
+            }
+
+            if (activity != null) {
+                activity.startActivityForResult(intent, requestCode);
             }
         }
     }

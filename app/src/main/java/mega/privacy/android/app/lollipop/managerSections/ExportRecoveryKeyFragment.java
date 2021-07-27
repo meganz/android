@@ -24,6 +24,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
@@ -110,7 +111,7 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
         }
     }
 
-    private void toFileSystem() {
+    public void toFileSystem() {
         hideMKLayout();
         AccountController aC = new AccountController(context);
         aC.saveRkToFileSystem();
@@ -119,7 +120,12 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
     private boolean checkStoragePermission() {
         boolean hasStoragePermission = hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (!hasStoragePermission) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                PermissionUtils.requestPermission((Activity) context,
+                        REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            } else {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
+            }
             return false;
         }
         return true;

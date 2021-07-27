@@ -67,6 +67,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1965,7 +1966,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         if (canRead) {
                             toSharePage();
                         } else {
-                            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_MEDIA_PERMISSION);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                PermissionUtils.requestPermission((LoginActivityLollipop) context,
+                                        READ_MEDIA_PERMISSION, Manifest.permission.READ_EXTERNAL_STORAGE);
+                            } else {
+                                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_MEDIA_PERMISSION);
+                            }
                         }
                         return;
                     }

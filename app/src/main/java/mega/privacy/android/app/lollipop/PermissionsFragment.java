@@ -244,7 +244,7 @@ public class PermissionsFragment extends Fragment implements View.OnClickListene
     void askForMediaPermissions () {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
-                requestManageExternalStoragePermission(context);
+                requestManageExternalStoragePermission(context, PERMISSIONS_FRAGMENT);
             }
         } else {
             if (!readGranted && !writeGranted) {

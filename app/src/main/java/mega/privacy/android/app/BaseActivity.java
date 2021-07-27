@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,11 +18,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Observer;
 
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -36,17 +37,20 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
 import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PermissionsFragment;
+import mega.privacy.android.app.lollipop.managerSections.ExportRecoveryKeyFragment;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.psa.Psa;
-import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
@@ -1187,5 +1191,42 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     @Override
     public void askPermissions(@NotNull String[] permissions, int requestCode) {
         requestPermission(this, requestCode, permissions);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
+
+        switch (requestCode) {
+            case REQUEST_WRITE_STORAGE_FOR_LOGS:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    onRequestWriteStorageForLogs(Environment.isExternalStorageManager());
+                }
+                break;
+
+            case REQUEST_WRITE_STORAGE:
+            case REQUEST_READ_WRITE_STORAGE:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    if (!Environment.isExternalStorageManager()) {
+                        Toast.makeText(this,
+                                StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (this instanceof ManagerActivityLollipop) {
+                            ExportRecoveryKeyFragment exportRecoveryKeyFragment =
+                                    (ExportRecoveryKeyFragment) getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.EXPORT_RECOVERY_KEY.getTag());
+                            if (exportRecoveryKeyFragment != null) {
+                                exportRecoveryKeyFragment.toFileSystem();
+                            }
+                        }
+                    }
+                }
+                break;
+
+            default:
+                logWarning("No request code processed");
+                super.onActivityResult(requestCode, resultCode, intent);
+                break;
+        }
     }
 }
