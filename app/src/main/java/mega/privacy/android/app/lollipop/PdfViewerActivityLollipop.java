@@ -102,6 +102,7 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
 import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
@@ -1925,6 +1926,8 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             if (e.getErrorCode() == MegaError.API_OK) {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_moved), -1);
                 finish();
+            } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+                showForeignStorageOverQuotaWarningDialog(this);
             } else {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), -1);
             }
@@ -1940,6 +1943,11 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                if (api.isForeignNode(request.getParentHandle())) {
+                    showForeignStorageOverQuotaWarningDialog(this);
+                    return;
+                }
+
                 logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -2076,6 +2084,10 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 
         if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
+            if (transfer.isForeignOverquota()) {
+                return;
+            }
+
             if (e.getValue() != 0) {
                 logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
                 showGeneralTransferOverQuotaWarning();

@@ -37,6 +37,7 @@ import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -468,6 +469,12 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                 requireActivity().overridePendingTransition(0, 0)
                 return
             }
+        } else if (MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)) {
+            manageTextFileIntent(
+                requireContext(),
+                node,
+                if (viewModel.searchMode) DOCUMENTS_SEARCH_ADAPTER else DOCUMENTS_BROWSE_ADAPTER
+            )
         }
     }
 

@@ -77,6 +77,13 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_line_numbers"
+        android:orderInCategory="110"
+        android:title="@string/action_show_line_numbers"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_move_to_trash"
         android:orderInCategory="120"
         android:title="@string/context_move_to_trash"

@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -65,7 +64,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
-import mega.privacy.android.app.textFileEditor.TextFileEditorActivity;
+import mega.privacy.android.app.textEditor.TextEditorActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
@@ -457,11 +456,18 @@ public class ChatUtil {
      * @param isFromKeyboard If it's from the keyboard.
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, Emoji emoji, boolean isFromKeyboard) {
-        if (!(context instanceof ChatActivityLollipop))
+        if (!(context instanceof ChatActivityLollipop)) {
+            logWarning("Incorrect context");
             return;
+        }
 
         EmojiEditText editText = new EmojiEditText(context);
         editText.input(emoji);
+        if (editText.getText() == null) {
+            logError("Text null");
+            return;
+        }
+
         String reaction = editText.getText().toString();
         addReactionInMsg(context, chatId, messageId, reaction, isFromKeyboard);
     }
@@ -476,16 +482,17 @@ public class ChatUtil {
      * @param isFromKeyboard If it's from the keyboard.
      */
     public static void addReactionInMsg(Context context, long chatId, long messageId, String reaction, boolean isFromKeyboard) {
-        if (!(context instanceof ChatActivityLollipop))
+        if (!(context instanceof ChatActivityLollipop)) {
+            logWarning("Incorrect context");
             return;
+        }
 
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-
-        if (isMyOwnReaction(chatId, messageId, reaction)) {
-            if (!isFromKeyboard) {
-                megaChatApi.delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
-            }
+        if (isMyOwnReaction(chatId, messageId, reaction) && !isFromKeyboard) {
+            logDebug("Removing reaction...");
+            megaChatApi.delReaction(chatId, messageId, reaction, new ManageReactionListener(context));
         } else {
+            logDebug("Adding reaction...");
             megaChatApi.addReaction(chatId, messageId, reaction, new ManageReactionListener(context));
         }
     }
@@ -1697,7 +1704,7 @@ public class ChatUtil {
      * @param chatId  Chat identifier.
      */
     public static void manageTextFileIntent(Context context, long msgId, long chatId) {
-        context.startActivity(new Intent(context, TextFileEditorActivity.class)
+        context.startActivity(new Intent(context, TextEditorActivity.class)
                 .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
                 .putExtra(MESSAGE_ID, msgId)
                 .putExtra(CHAT_ID, chatId));

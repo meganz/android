@@ -652,6 +652,10 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void updateFastScrollerVisibility() {
+        if (binding == null) {
+            return;
+        }
+
         boolean gridView = selectedView == ALL_VIEW;
         int visibility = (gridView && gridAdapter != null && gridAdapter.getItemCount() >= MIN_ITEMS_SCROLLBAR)
                 || (!gridView && cardAdapter != null && cardAdapter.getItemCount() >= MIN_ITEMS_SCROLLBAR)

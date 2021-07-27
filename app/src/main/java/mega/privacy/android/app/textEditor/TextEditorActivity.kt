@@ -1,60 +1,68 @@
-package mega.privacy.android.app.textFileEditor
+package mega.privacy.android.app.textEditor
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.view.Menu
 import android.view.MenuItem
+import android.view.ViewPropertyAnimator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
+import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.constants.EventConstants.EVENT_TEXT_FILE_UPLOADED
+import mega.privacy.android.app.constants.EventConstants.EVENT_PERFORM_SCROLL
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.NON_UPDATE_FINISH_ACTION
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.SUCCESS_FINISH_ACTION
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.VIEW_MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
+import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
-import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.Util.showKeyboardDelayed
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaShare
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
-class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
+class TextEditorActivity : PasscodeActivity(), SnackbarShower {
 
     companion object {
-        const val CURSOR_POSITION = "CURSOR_POSITION"
-        const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
-        const val RENAME_SHOWN = "RENAME_SHOWN"
-        const val FROM_HOME_PAGE = "FROM_HOME_PAGE"
+        private const val SCROLL_TEXT = "SCROLL_TEXT"
+        private const val CURSOR_POSITION = "CURSOR_POSITION"
+        private const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
+        private const val RENAME_SHOWN = "RENAME_SHOWN"
+        const val TIME_SHOWING_PAGINATION_UI = 4000L
+        private const val STATE = "STATE"
+        private const val STATE_SHOWN = 0
+        private const val STATE_HIDDEN = 1
     }
 
-    private val viewModel by viewModels<TextFileEditorViewModel>()
+    private val viewModel by viewModels<TextEditorViewModel>()
 
     private lateinit var binding: ActivityTextFileEditorBinding
 
@@ -64,25 +72,22 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     private var renameDialog: AlertDialog? = null
     private var errorReadingContentDialog: AlertDialog? = null
 
+    private var currentUIState = STATE_SHOWN
+    private var animator: ViewPropertyAnimator? = null
+    private var countDownTimer: CountDownTimer? = null
+
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
     private val nodeSaver by lazy {
         NodeSaver(this, this, this, showSaveToDeviceConfirmDialog(this))
     }
 
-    private val completedEditionObserver = Observer<Long> { completedTransferId ->
-        val result = viewModel.finishCreationOrEdition(completedTransferId)
-
-        if (result != NON_UPDATE_FINISH_ACTION) {
-            showCreationOrEditionResult(result)
-        }
+    private val performScrollObserver = Observer<Int> { scrollY ->
+        binding.fileEditorScrollView.scrollY = scrollY
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long::class.java)
-            .observeForever(completedEditionObserver)
 
         binding = ActivityTextFileEditorBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -93,7 +98,11 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         if (savedInstanceState == null) {
             val mi = ActivityManager.MemoryInfo()
             (getSystemService(ACTIVITY_SERVICE) as ActivityManager).getMemoryInfo(mi)
-            viewModel.setValuesFromIntent(intent, mi)
+            viewModel.setInitialValues(
+                intent,
+                mi,
+                PreferenceManager.getDefaultSharedPreferences(this)
+            )
         } else if (viewModel.thereIsErrorSettingContent()) {
             binding.editFab.hide()
             showErrorReadingContentDialog()
@@ -118,6 +127,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putFloat(SCROLL_TEXT, getScrollSpot())
+        outState.putInt(STATE, currentUIState)
         outState.putInt(CURSOR_POSITION, binding.contentEditText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
         outState.putBoolean(RENAME_SHOWN, isRenameDialogShown())
@@ -135,6 +146,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onDestroy() {
+        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java).removeObserver(performScrollObserver)
+
         if (isDiscardChangesConfirmationDialogShown()) {
             discardChangesDialog?.dismiss()
         }
@@ -147,19 +160,17 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             errorReadingContentDialog?.dismiss()
         }
 
-        LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long::class.java)
-            .removeObserver(completedEditionObserver)
-
         super.onDestroy()
     }
 
     override fun onBackPressed() {
         if (psaWebBrowser.consumeBack()) return
-        if (viewModel.isFileEdited()) {
+        if (!viewModel.isViewMode() && viewModel.isFileEdited()) {
+            binding.contentEditText.hideKeyboard()
             showDiscardChangesConfirmationDialog()
         } else {
             if (viewModel.isCreateMode()) {
-                viewModel.saveFile(this)
+                viewModel.saveFile(this, intent.getBooleanExtra(FROM_HOME_PAGE, false))
             } else if (viewModel.isReadingContent()) {
                 viewModel.checkIfNeedsStopHttpServer()
             }
@@ -171,7 +182,10 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
-            R.id.action_save -> viewModel.saveFile(this)
+            R.id.action_save -> viewModel.saveFile(
+                this,
+                intent.getBooleanExtra(FROM_HOME_PAGE, false)
+            )
             R.id.action_download -> viewModel.downloadFile(nodeSaver)
             R.id.action_get_link, R.id.action_remove_link -> viewModel.manageLink(this)
             R.id.action_send_to_chat -> nodeAttacher.attachNode(viewModel.getNode()!!)
@@ -179,6 +193,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             R.id.action_rename -> renameNode()
             R.id.action_move -> selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
             R.id.action_copy -> selectFolderToCopy(this, longArrayOf(viewModel.getNode()!!.handle))
+            R.id.action_line_numbers -> updateLineNumbers()
             R.id.action_move_to_trash, R.id.action_remove -> moveToRubbishOrRemove(
                 viewModel.getNode()!!.handle,
                 this,
@@ -212,7 +227,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
-        viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
+        viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -232,6 +247,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
         if (!isOnline(this)) {
             menu.toggleAllMenuItemsVisibility(false)
+            updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
             return
         }
 
@@ -239,11 +255,13 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
             if (viewModel.getAdapterType() == OFFLINE_ADAPTER) {
                 menu.toggleAllMenuItemsVisibility(false)
                 menu.findItem(R.id.action_share).isVisible = true
+                updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 return
             }
 
             if (viewModel.getNode() == null || viewModel.getNode()!!.isFolder) {
                 menu.toggleAllMenuItemsVisibility(false)
+                updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 return
             }
 
@@ -251,19 +269,23 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 RUBBISH_BIN_ADAPTER -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_remove).isVisible = true
+                    updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
                 FILE_LINK_ADAPTER, ZIP_ADAPTER -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
                     menu.findItem(R.id.action_share).isVisible = true
+                    updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
                 FOLDER_LINK_ADAPTER -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
+                    updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
                 FROM_CHAT -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
+                    updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
 
                     if (megaChatApi.initState != MegaChatApi.INIT_ANONYMOUS) {
                         menu.findItem(R.id.chat_action_import).isVisible = true
@@ -280,6 +302,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                     if (megaApi.isInRubbish(viewModel.getNode())) {
                         menu.toggleAllMenuItemsVisibility(false)
                         menu.findItem(R.id.action_remove).isVisible = true
+                        updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                         return
                     }
 
@@ -302,6 +325,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
                     menu.findItem(R.id.action_copy).isVisible =
                         viewModel.getAdapterType() != FOLDER_LINK_ADAPTER
+                    updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                     menu.findItem(R.id.chat_action_import).isVisible = false
                     menu.findItem(R.id.action_remove).isVisible = false
                     menu.findItem(R.id.chat_action_save_for_offline).isVisible = false
@@ -312,6 +336,17 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         } else {
             menu.toggleAllMenuItemsVisibility(false)
             menu.findItem(R.id.action_save).isVisible = true
+            updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
+        }
+    }
+
+    private fun updateLineNumbersMenuOption(lineNumbersOption: MenuItem) {
+        lineNumbersOption.apply {
+            isVisible = true
+            title = StringResourcesUtils.getString(
+                if (viewModel.shouldShowLineNumbers()) R.string.action_hide_line_numbers
+                else R.string.action_show_line_numbers
+            )
         }
     }
 
@@ -326,13 +361,37 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 viewModel.setEditedText(editable?.toString())
             }
 
-            if (savedInstanceState != null && viewModel.thereIsNoErrorSettingContent()) {
-                if (viewModel.needsReadOrIsReadingContent()) {
-                    return@apply
-                }
+            setLineNumberEnabled(viewModel.shouldShowLineNumbers())
+        }
 
-                setText(viewModel.getEditedText())
+        binding.contentText.apply {
+            setLineNumberEnabled(viewModel.shouldShowLineNumbers())
+            setOnClickListener { if (viewModel.isViewMode()) animateUI() }
+        }
+
+        if (savedInstanceState != null && viewModel.thereIsNoErrorSettingContent()
+            && !viewModel.needsReadOrIsReadingContent()
+        ) {
+            currentUIState = savedInstanceState.getInt(STATE, STATE_SHOWN)
+
+            if (currentUIState == STATE_HIDDEN) {
+                animateToolbar(false, 0)
+                animateBottom(false, 0)
+            }
+
+            val text = viewModel.getCurrentText()
+            val firstLineNumber = viewModel.getPagination()?.getFirstLineNumber() ?: 1
+
+            binding.contentEditText.apply {
+                setText(text, firstLineNumber)
                 setSelection(savedInstanceState.getInt(CURSOR_POSITION))
+            }
+
+            binding.contentText.setText(text, firstLineNumber)
+
+            val scrollSpot = savedInstanceState.getFloat(SCROLL_TEXT, INVALID_VALUE.toFloat())
+            if (scrollSpot != INVALID_VALUE.toFloat()) {
+                binding.fileEditorScrollView.post { setScrollSpot(scrollSpot) }
             }
         }
 
@@ -341,7 +400,33 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
 
             setOnClickListener {
                 viewModel.setEditMode()
+                binding.previous.hide()
+                binding.next.hide()
             }
+        }
+
+        binding.previous.apply {
+            hide()
+            setOnClickListener { viewModel.previousClicked() }
+        }
+
+        binding.next.apply {
+            hide()
+            setOnClickListener { viewModel.nextClicked() }
+        }
+
+        ListenScrollChangesHelper().addViewToListen(
+            binding.fileEditorScrollView
+        ) { _, _, _, _, _ ->
+            val scrolling = binding.fileEditorScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
+
+            binding.fileEditorToolbar.elevation = if (scrolling) {
+                dp2px(4F, resources.displayMetrics).toFloat()
+            } else 0F
+
+            hideUI()
+            animatePaginationUI()
+            changeStatusBarColorForElevation(this, scrolling)
         }
     }
 
@@ -349,8 +434,8 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         viewModel.onTextFileEditorDataUpdate().observe(this) { refreshMenuOptionsVisibility() }
         viewModel.getFileName().observe(this, ::showFileName)
         viewModel.getMode().observe(this, ::showMode)
-        viewModel.onSavingMode().observe(this, ::showSavingMode)
         viewModel.onContentTextRead().observe(this, ::showContentRead)
+        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java).observeForever(performScrollObserver)
     }
 
     /**
@@ -369,7 +454,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         if (viewModel.needsReadOrIsReadingContent()) {
             showLoadingView()
         }
-        
+
         if (mode == VIEW_MODE) {
             supportActionBar?.title = null
             binding.nameText.isVisible = true
@@ -384,7 +469,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
                 text = binding.contentEditText.text
             }
 
-            if (viewModel.canShowEditFab()) {
+            if (viewModel.canShowEditFab() && currentUIState == STATE_SHOWN) {
                 binding.editFab.show()
             }
         } else {
@@ -406,19 +491,7 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun showLoadingView() {
         binding.fileEditorScrollView.isVisible = false
-        binding.loadingImage.isVisible = true
-        binding.loadingProgressBar.isVisible = true
-    }
-
-    /**
-     * Updates the UI by setting the saving mode.
-     *
-     * @param savingMode The pre-saving mode.
-     */
-    private fun showSavingMode(savingMode: String?) {
-        if (savingMode != null) {
-            binding.nameText.text = StringResourcesUtils.getString(R.string.saving_file)
-        }
+        binding.loadingLayout.isVisible = true
     }
 
     /**
@@ -434,79 +507,34 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
     /**
      * Updates the UI and shows the read content.
      *
-     * @param contentRead Read content.
+     * @param content Pagination object with the read content.
      */
-    private fun showContentRead(contentRead: String) {
+    private fun showContentRead(content: Pagination) {
+        val currentContent = content.getCurrentPageText()
+
         if (viewModel.needsReadOrIsReadingContent()
-            || (contentRead.isNotEmpty() && contentRead == binding.contentText.text.toString())
+            || (content.isNotEmpty() && currentContent == binding.contentText.text.toString())
         ) {
             return
         }
 
-        val lines = contentRead.split("(?<=\\G.{" + 1000 + "})")
-        for (line in lines) {
-            try {
-                binding.contentText.append(line)
-                binding.contentEditText.append(line)
-            } catch (t: Throwable) {
-                viewModel.errorSettingContent()
-                binding.contentText.text = null
-                binding.contentEditText.text = null
-                showErrorReadingContentDialog()
-                logError("Error setting content.", t)
-                break
-            }
+        if (binding.contentEditText.text?.isNotEmpty() == true) {
+            countDownTimer?.cancel()
+            countDownTimer = null
+            animatePaginationUI()
         }
 
+        val firstLineNumber = content.getFirstLineNumber()
+        binding.contentText.setText(currentContent, firstLineNumber)
+        binding.contentEditText.setText(currentContent, firstLineNumber)
         binding.fileEditorScrollView.isVisible = true
-        binding.loadingImage.isVisible = false
-        binding.loadingProgressBar.isVisible = false
+        binding.fileEditorScrollView.smoothScrollTo(0, 0)
+        binding.loadingLayout.isVisible = false
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-        if (viewModel.canShowEditFab()) {
+        if (viewModel.canShowEditFab() && currentUIState == STATE_SHOWN) {
             binding.editFab.show()
         }
-    }
-
-    /**
-     * Shows the result of a create or edit action.
-     *
-     * @param success SUCCESS_FINISH_ACTION if the action finished with success,
-     *  ERROR_FINISH_ACTION otherwise.
-     */
-    private fun showCreationOrEditionResult(success: Int) {
-        refreshMenuOptionsVisibility()
-
-        val successful = success == SUCCESS_FINISH_ACTION
-
-        if (successful) {
-            binding.nameText.apply {
-                isVisible = true
-                text = viewModel.getNameOfFile()
-            }
-
-            binding.editFab.apply {
-                //Necessary to call hide first to avoid not being shown because the view doesn't exist yet
-                hide()
-                show()
-            }
-        }
-
-        showSnackbar(
-            when {
-                viewModel.isSavingModeEdit() -> StringResourcesUtils.getString(if (successful) R.string.file_updated else R.string.file_update_failed)
-                intent.getBooleanExtra(
-                    FROM_HOME_PAGE,
-                    false
-                ) -> StringResourcesUtils.getString(
-                    if (successful) R.string.file_saved_to else R.string.file_saved_to_failed,
-                    StringResourcesUtils.getString(R.string.section_cloud_drive)
-                )
-                else -> StringResourcesUtils.getString(if (successful) R.string.file_created else R.string.file_creation_failed)
-            }
-        )
-
-        viewModel.resetSavingMode()
     }
 
     /**
@@ -569,6 +597,13 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
         startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
     }
 
+    private fun updateLineNumbers() {
+        val enabled = viewModel.setShowLineNumbers()
+        menu?.findItem(R.id.action_line_numbers)?.let { updateLineNumbersMenuOption(it) }
+        binding.contentText.setLineNumberEnabled(enabled)
+        binding.contentEditText.setLineNumberEnabled(enabled)
+    }
+
     /**
      * Shows a warning due to an error reading content.
      */
@@ -594,6 +629,166 @@ class TextFileEditorActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun isErrorReadingContentDialogShown(): Boolean =
         errorReadingContentDialog?.isShowing ?: false
+
+    /**
+     * Hides some UI elements: Toolbar, bottom view and edit button.
+     */
+    private fun hideUI() {
+        if (currentUIState == STATE_HIDDEN || !viewModel.isViewMode()) {
+            return
+        }
+
+        animateUI()
+    }
+
+    /**
+     * Shows or hides some UI elements: Toolbar, bottom view and edit button.
+     * The action depends on the current UI state:
+     *  - STATE_SHOWN: Hides de UI.
+     *  - STATE_HIDDEN: Shows the UI.
+     */
+    private fun animateUI() {
+        if (isFinishing || animator != null) {
+            return
+        }
+
+        if (currentUIState == STATE_SHOWN) {
+            currentUIState = STATE_HIDDEN
+            binding.editFab.hide()
+            animateToolbar(false, ANIMATION_DURATION)
+            animateBottom(false, ANIMATION_DURATION)
+        } else {
+            currentUIState = STATE_SHOWN
+            binding.editFab.show()
+            animateToolbar(true, ANIMATION_DURATION)
+            animateBottom(true, ANIMATION_DURATION)
+        }
+    }
+
+    /**
+     * Shows or hides toolbar with animation.
+     *
+     * @param show     True if should show it, false if should hide it.
+     * @param duration Animation duration.
+     */
+    private fun animateToolbar(show: Boolean, duration: Long) {
+        animator = binding.appBar
+            .animate()
+            .translationY(if (show) 0F else -binding.fileEditorToolbar.height.toFloat())
+            .setInterpolator(FAST_OUT_LINEAR_IN_INTERPOLATOR)
+            .setDuration(duration)
+            .setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    animator = null
+                }
+            })
+
+        if (show) {
+            animator?.withStartAction { binding.appBar.isVisible = true }
+        } else {
+            animator?.withEndAction { binding.appBar.isVisible = false }
+        }
+    }
+
+    /**
+     * Shows or hides bottom view with animation.
+     *
+     * @param show     True if should show it, false if should hide it.
+     * @param duration Animation duration.
+     */
+    private fun animateBottom(show: Boolean, duration: Long) {
+        val animator = binding.nameText
+            .animate()
+            .translationY(if (show) 0F else binding.nameText.height.toFloat())
+            .setInterpolator(FAST_OUT_LINEAR_IN_INTERPOLATOR)
+            .setDuration(duration)
+
+        if (show) {
+            animator.withStartAction { binding.nameText.isVisible = true }
+        } else {
+            animator.withEndAction { binding.nameText.isVisible = false }
+        }
+    }
+
+    /**
+     * Shows pagination UI elements and leaves them visible for TIME_SHOWING_PAGINATION_UI.
+     */
+    private fun animatePaginationUI() {
+        if (!viewModel.isViewMode() || countDownTimer != null) {
+            return
+        }
+
+        val pagination = viewModel.getPagination()
+
+        if (pagination == null || pagination.size() <= 1) {
+            return
+        }
+
+        binding.paginationIndicator.apply {
+            text = StringResourcesUtils.getString(
+                R.string.pagination_progress,
+                pagination.getCurrentPage() + 1,
+                pagination.size()
+            )
+
+            isVisible = true
+        }
+
+        if (pagination.shouldShowNext()) {
+            binding.next.show()
+        }
+
+        if (pagination.shouldShowPrevious()) {
+            binding.previous.show()
+        }
+
+        countDownTimer = object :
+            CountDownTimer(TIME_SHOWING_PAGINATION_UI, TIME_SHOWING_PAGINATION_UI) {
+            override fun onTick(millisUntilFinished: Long) {
+            }
+
+            override fun onFinish() {
+                binding.paginationIndicator.isVisible = false
+                binding.next.hide()
+                binding.previous.hide()
+                countDownTimer = null
+            }
+        }.start()
+    }
+
+    /**
+     * Gets the scroll spot to restore it after rotate the screen.
+     *
+     * @return The scroll spot.
+     */
+    private fun getScrollSpot(): Float {
+        val y = binding.fileEditorScrollView.scrollY
+        val layout = binding.contentText.layout
+        val topPadding = -layout.topPadding
+
+        if (y <= topPadding) {
+            return (topPadding - y).toFloat() / binding.contentText.lineHeight
+        }
+
+        val line = layout.getLineForVertical(y - 1) + 1
+        val offset = layout.getLineStart(line)
+        val above = layout.getLineTop(line) - y
+        return offset + above.toFloat() / binding.contentText.lineHeight
+    }
+
+    /**
+     * Sets the scroll spot to restore it after rotate the screen.
+     *
+     * @param spot The scroll spot.
+     */
+    private fun setScrollSpot(spot: Float) {
+        val offset = spot.roundToInt()
+        val above = ((spot - offset) * binding.contentText.lineHeight).roundToInt()
+        val layout = binding.contentText.layout
+        val line = layout.getLineForOffset(offset)
+        val y = (if (line == 0) -layout.topPadding else layout.getLineTop(line)) - above
+        binding.fileEditorScrollView.scrollTo(0, y)
+    }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.textFileEditorContainer, content, chatId)
