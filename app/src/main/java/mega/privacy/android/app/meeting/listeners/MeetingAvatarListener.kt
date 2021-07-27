@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting.listeners
 
 import android.content.Context
+import android.text.TextUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -19,7 +20,7 @@ class MeetingAvatarListener(private val context: Context, private val peerId: Lo
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         if (e.errorCode == MegaError.API_OK) {
-            if (request.email.isNotEmpty()) {
+            if (TextUtils.isEmpty(request.email)) {
                 val avatar = CacheFolderManager.buildAvatarFile(context, request.email + ".jpg")
                 if (FileUtil.isFileAvailable(avatar)) {
                     LiveEventBus.get(
