@@ -8692,68 +8692,50 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void showConfirmationRemoveFromOffline(MegaOffline node, Runnable onConfirmed) {
 		logDebug("showConfirmationRemoveFromOffline");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE: {
-						NodeController nC = new NodeController(managerActivity);
-						nC.deleteOffline(node);
+
+		new MaterialAlertDialogBuilder(this)
+				.setMessage(R.string.confirmation_delete_from_save_for_offline)
+				.setPositiveButton(R.string.general_remove, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						removeOffline(node, dbH, managerActivity);
 						onConfirmed.run();
 						refreshOfflineNodes();
 
-                        if(isCloudAdded()){
-                            String handle = node.getHandle();
-                            if(handle != null && !handle.equals("")){
-                                fbFLol.refresh(Long.parseLong(handle));
-                            }
-                        }
+						if (isCloudAdded()) {
+							String handle = node.getHandle();
+							if (handle != null && !handle.equals("")) {
+								fbFLol.refresh(Long.parseLong(handle));
+							}
+						}
 
 						onNodesSharedUpdate();
 						LiveEventBus.get(EVENT_NODES_CHANGE).post(false);
-						break;
 					}
-					case DialogInterface.BUTTON_NEGATIVE: {
-						//No button clicked
-						break;
-					}
-				}
-			}
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-
-		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+				})
+				.setNegativeButton(R.string.general_cancel, null)
+				.show();
 	}
 
 	public void showConfirmationRemoveSomeFromOffline(List<MegaOffline> documents,
-			Runnable onConfirmed) {
+													  Runnable onConfirmed) {
 		logDebug("showConfirmationRemoveSomeFromOffline");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which) {
-					case DialogInterface.BUTTON_POSITIVE: {
-						NodeController nC = new NodeController(managerActivity);
-						for (int i=0;i<documents.size();i++) {
-							nC.deleteOffline(documents.get(i));
+
+		new MaterialAlertDialogBuilder(this)
+				.setMessage(R.string.confirmation_delete_from_save_for_offline)
+				.setPositiveButton(R.string.general_remove, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						for (MegaOffline node : documents) {
+							removeOffline(node, dbH, managerActivity);
 						}
+
 						refreshOfflineNodes();
 						onConfirmed.run();
-						break;
 					}
-					case DialogInterface.BUTTON_NEGATIVE: {
-						break;
-					}
-				}
-			}
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-
-		builder.setMessage(R.string.confirmation_delete_from_save_for_offline).setPositiveButton(R.string.general_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
+				})
+				.setNegativeButton(R.string.general_cancel, null)
+				.show();
 	}
 
 	@Override

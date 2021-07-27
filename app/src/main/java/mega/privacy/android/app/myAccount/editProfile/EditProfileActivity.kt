@@ -25,25 +25,22 @@ import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_2FA
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.PROCESSING_FILE
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
 import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
 import mega.privacy.android.app.utils.AvatarUtil.getColorAvatar
 import mega.privacy.android.app.utils.AvatarUtil.getDominantColor
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
-import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
@@ -221,6 +218,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         binding.recoveryKeyButton.setOnClickListener { viewModel.exportMK(this) }
 
         binding.logoutButton.setOnClickListener { viewModel.logout(this@EditProfileActivity) }
+
+        setupLogoutWarnings()
     }
 
     private fun setupObservers() {
@@ -465,6 +464,26 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * Checks if there are offline files and transfers.
+     * If yes, shows the corresponding warning text at the end. If not, hides the text.
+     */
+    fun setupLogoutWarnings() {
+        val existOfflineFiles = OfflineUtils.existsOffline(this)
+        val existOutgoingTransfers = existOngoingTransfers(megaApi)
+
+        binding.logoutWarningText.apply {
+            isVisible = existOfflineFiles || existOutgoingTransfers
+            text = StringResourcesUtils.getString(
+                when {
+                    existOfflineFiles && existOutgoingTransfers -> R.string.logout_warning_offline_and_transfers
+                    existOfflineFiles -> R.string.logout_warning_offline
+                    else -> R.string.logout_warning_transfers
+                }
+            )
         }
     }
 
