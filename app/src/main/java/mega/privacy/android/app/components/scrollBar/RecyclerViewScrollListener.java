@@ -30,6 +30,7 @@ public class RecyclerViewScrollListener extends RecyclerView.OnScrollListener {
             scroller.showFabButton();
         } else if (newScrollState != RecyclerView.SCROLL_STATE_IDLE && oldScrollState == RecyclerView.SCROLL_STATE_IDLE) {
             scroller.getViewProvider().onScrollStarted();
+            scroller.hideFabButton();
         }
         oldScrollState = newScrollState;
     }
@@ -38,7 +39,6 @@ public class RecyclerViewScrollListener extends RecyclerView.OnScrollListener {
     public void onScrolled(@NotNull RecyclerView rv, int dx, int dy) {
         if (scroller.shouldUpdateHandlePosition()) {
             updateHandlePosition(rv);
-            scroller.hideFabButton();
         }
     }
 
