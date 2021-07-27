@@ -3,10 +3,12 @@ package mega.privacy.android.app.meeting
 import android.view.View
 import android.view.animation.TranslateAnimation
 import androidx.core.view.isVisible
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
 
 object AnimationTool {
 
+    @ExperimentalCoroutinesApi
     fun View.fadeInOut(dy: Float, duration: Long = InMeetingFragment.ANIMATION_DURATION, toTop: Boolean) {
       val animation = if (isVisible) TranslateAnimation(
             0f,
@@ -26,6 +28,7 @@ object AnimationTool {
         isVisible = !isVisible
     }
 
+    @ExperimentalCoroutinesApi
     fun View.moveY(dy: Float, duration: Long = InMeetingFragment.ANIMATION_DURATION) {
         animate().y(dy).setDuration(duration).start()
     }

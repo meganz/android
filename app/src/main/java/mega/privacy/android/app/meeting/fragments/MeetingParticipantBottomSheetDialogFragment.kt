@@ -8,6 +8,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingParticipantBinding
 import mega.privacy.android.app.lollipop.controllers.ChatController
@@ -26,6 +27,7 @@ import nz.mega.sdk.*
 class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private val bottomViewModel: MeetingParticipantBottomSheetDialogViewModel by viewModels()
     private val sharedViewModel: MeetingActivityViewModel by activityViewModels()
+    @ExperimentalCoroutinesApi
     private val inMeetingViewModel: InMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
 
     // Get from activity
@@ -40,6 +42,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     private lateinit var participantItem: Participant
     private lateinit var binding: BottomSheetMeetingParticipantBinding
 
+    @ExperimentalCoroutinesApi
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
@@ -82,6 +85,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     /**
      * Init the action for different items
      */
+    @ExperimentalCoroutinesApi
     private fun initItemAction(binding: BottomSheetMeetingParticipantBinding) {
         listenAction(binding.addContact) {
             (parentFragment as InMeetingFragment).addContact(participantItem.peerId)
@@ -176,6 +180,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
      *
      * @param participant the target participant
      */
+    @ExperimentalCoroutinesApi
     private fun initAvatar(participant: Participant) {
         binding.avatar.setImageBitmap(inMeetingViewModel.getAvatarBitmapByPeerId(participant.peerId))
     }

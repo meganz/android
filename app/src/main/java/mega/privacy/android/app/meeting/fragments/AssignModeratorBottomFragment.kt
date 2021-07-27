@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.ActivityAssignModeratorBinding
@@ -29,8 +30,10 @@ class AssignModeratorBottomFragment(
 
     private lateinit var participantsAdapter: AssignParticipantsAdapter
     private lateinit var selectedParticipantsAdapter: SelectedParticipantsAdapter
+    @ExperimentalCoroutinesApi
     private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
 
+    @ExperimentalCoroutinesApi
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
@@ -75,6 +78,7 @@ class AssignModeratorBottomFragment(
         }
     }
 
+    @ExperimentalCoroutinesApi
     private fun initRecyclerview() {
         participantsAdapter = AssignParticipantsAdapter(inMeetingViewModel, selectCallback)
         selectedParticipantsAdapter =
@@ -190,6 +194,7 @@ class AssignModeratorBottomFragment(
     /**
      * Make selected participants to moderator
      */
+    @ExperimentalCoroutinesApi
     private fun makeModerators() {
         // Get the list and assign the user in the list to moderator
         selectedParticipants.forEach {

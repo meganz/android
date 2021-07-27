@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -885,6 +886,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param list list of participants
      * @param status if it's grid view or speaker view
      */
+    @ExperimentalCoroutinesApi
     fun createCurrentParticipants(list: MegaHandleList, status: String) {
         _callLiveData.value = inMeetingRepository.getMeeting(currentChatId)
         for (i in 0 until list.size()) {
@@ -906,6 +908,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
+    @ExperimentalCoroutinesApi
     fun addParticipant(session: MegaChatSession, status: String): Int? {
         createParticipant(session, status)?.let { participantCreated ->
             participants.value?.add(participantCreated)
@@ -924,6 +927,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
+    @ExperimentalCoroutinesApi
     private fun createParticipant(session: MegaChatSession, status: String): Participant? {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value?.let { listParticipants ->
@@ -1055,6 +1059,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param status if it's grid view or speaker view
      * @return True, if should be high. False, otherwise
      */
+    @ExperimentalCoroutinesApi
     private fun needHiRes(status: String): Boolean =
         participants.value?.let { status != TYPE_IN_SPEAKER_VIEW } ?: false
 
@@ -1075,6 +1080,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param status if it's Speaker view or Grid view
      */
+    @ExperimentalCoroutinesApi
     fun checkParticipantsResolution(status: String) {
         logDebug("Check participants resolution")
         participants.value?.let { listParticipants ->
@@ -1594,7 +1600,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                 currentChatId
             )
         } else {
-            // I commented out these codes to solve a bug at it will crash when pin to speaker view quickly, if there are some bugs releated to this,
+            // I commented out these codes to solve a bug at it will crash when pin to speaker view quickly, if there are some bugs related to this,
             // Please open that
 //            if (!isSpeaker) {
 //                logDebug("Remove highRes before request lowRes of ${participant.clientId}")
@@ -1652,6 +1658,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @param status if it's Speaker view or Grid view
      */
+    @ExperimentalCoroutinesApi
     fun removeParticipantResolution(status: String) {
         logDebug("Changing the resolution of participants when the UI changes")
         participants.value?.let { listParticipants ->

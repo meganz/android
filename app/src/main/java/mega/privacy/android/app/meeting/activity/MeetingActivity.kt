@@ -11,6 +11,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -189,6 +190,7 @@ class MeetingActivity : PasscodeActivity() {
         navController.setGraph(navGraph, bundle)
     }
 
+    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -221,6 +223,7 @@ class MeetingActivity : PasscodeActivity() {
         sendQuitCallEvent()
     }
 
+    @ExperimentalCoroutinesApi
     override fun onResume() {
         super.onResume()
 
@@ -230,6 +233,7 @@ class MeetingActivity : PasscodeActivity() {
         }
     }
 
+    @ExperimentalCoroutinesApi
     override fun onBackPressed() {
         val currentFragment = getCurrentFragment()
 

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.android.synthetic.main.speaker_view_call_fragment.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
@@ -91,6 +92,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         }
     }
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         inMeetingViewModel = (parentFragment as InMeetingFragment).inMeetingViewModel

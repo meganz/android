@@ -16,6 +16,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.individual_call_fragment.view.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
@@ -53,6 +54,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private lateinit var avatarImageView: RoundedImageView
     private lateinit var onHoldImageView: ImageView
 
+    @ExperimentalCoroutinesApi
     private lateinit var inMeetingFragment: InMeetingFragment
 
     private lateinit var inMeetingViewModel: InMeetingViewModel
@@ -112,6 +114,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
     }
 
+    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -187,6 +190,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         return binding.root
     }
 
+    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

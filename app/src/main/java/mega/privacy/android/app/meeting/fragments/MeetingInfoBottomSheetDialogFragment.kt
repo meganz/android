@@ -22,6 +22,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.FragmentMeetingInfoBinding
@@ -37,6 +38,7 @@ import mega.privacy.android.app.utils.Util.showSnackbar
  */
 class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
     private lateinit var binding: FragmentMeetingInfoBinding
+    @ExperimentalCoroutinesApi
     private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
     private val shareViewModel: MeetingActivityViewModel by activityViewModels()
     private var changeTitleDialog: AlertDialog? = null
@@ -51,6 +53,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
         dialog.setContentView(binding.root)
     }
 
+    @ExperimentalCoroutinesApi
     override fun onResume() {
         super.onResume()
         initView()
@@ -59,6 +62,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
     /**
      * Init views
      */
+    @ExperimentalCoroutinesApi
     private fun initView() {
         inMeetingViewModel.chatTitle.observe(this) {
             chatTitle = it
@@ -100,6 +104,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
     /**
      * Update views when the meeting is ready
      */
+    @ExperimentalCoroutinesApi
     fun updateView() {
         binding.edit.isVisible = inMeetingViewModel.isModerator()
         binding.shareLink.isVisible = inMeetingViewModel.isChatRoomPublic()
@@ -109,6 +114,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
     /**
      * Init the click listener for buttons
      */
+    @ExperimentalCoroutinesApi
     fun initAction() {
         listenAction(binding.shareLink) {
             (parentFragment as InMeetingFragment).onShareLink(true)
@@ -137,6 +143,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
     /**
      * Show dialog for changing the meeting name, only for moderator
      */
+    @ExperimentalCoroutinesApi
     fun showRenameGroupDialog() {
         val activity = requireActivity()
         val layout = LinearLayout(requireActivity())
@@ -204,6 +211,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
      *
      * @param input the edit view
      */
+    @ExperimentalCoroutinesApi
     private fun changeTitle(input: EmojiEditText) {
         val title = input.text.toString()
         when {
