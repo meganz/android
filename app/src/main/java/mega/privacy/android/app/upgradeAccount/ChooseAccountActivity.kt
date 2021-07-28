@@ -1,5 +1,6 @@
 package mega.privacy.android.app.upgradeAccount
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -17,20 +18,19 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION
+import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityChooseUpgradeAccountBinding
 import mega.privacy.android.app.fragments.homepage.Scrollable
-import mega.privacy.android.app.service.iab.BillingManagerImpl
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import nz.mega.sdk.MegaApiJava
 
-open class ChooseAccountActivity: PasscodeActivity(), Scrollable {
+open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
     protected lateinit var binding: ActivityChooseUpgradeAccountBinding
     protected val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
-
-    private var displayedAccountType = INVALID_VALUE
 
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -66,6 +66,11 @@ open class ChooseAccountActivity: PasscodeActivity(), Scrollable {
         viewModel.destroyPayments()
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        onFreeClick()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             onBackPressed()
@@ -92,7 +97,7 @@ open class ChooseAccountActivity: PasscodeActivity(), Scrollable {
             checkScroll()
         }
 
-        binding.chooseAccountFreeLayout.setOnClickListener {  }
+        binding.chooseAccountFreeLayout.setOnClickListener { onFreeClick() }
         binding.upgradeProliteLayout.setOnClickListener { onUpgradeClick(PRO_LITE) }
         binding.upgradeProILayout.setOnClickListener { onUpgradeClick(PRO_I) }
         binding.upgradeProIiLayout.setOnClickListener { onUpgradeClick(PRO_II) }
@@ -130,20 +135,6 @@ open class ChooseAccountActivity: PasscodeActivity(), Scrollable {
         checkScroll()
     }
 
-    /**
-     * Hides the current selected payment plan.
-     */
-    private fun cancelClick() {
-        checkScroll()
-
-        if (!Util.isDarkMode(this)) {
-            window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
-        }
-
-        binding.semitransparentLayer.isVisible = false
-        binding.availablePaymentMethods.isVisible = false
-    }
-
     private fun setupObservers() {
         registerReceiver(
             updateMyAccountReceiver,
@@ -152,6 +143,20 @@ open class ChooseAccountActivity: PasscodeActivity(), Scrollable {
 
         viewModel.getQueryPurchasesMessage().observe(this, ::showQueryPurchasesResult)
         viewModel.onUpdatePricing().observe(this, ::updatePricing)
+    }
+
+    /**
+     * Hides the current selected payment plan.
+     */
+    protected fun cancelClick() {
+        checkScroll()
+
+        if (!Util.isDarkMode(this)) {
+            window.statusBarColor = ContextCompat.getColor(this, android.R.color.transparent)
+        }
+
+        binding.semitransparentLayer.isVisible = false
+        binding.availablePaymentMethods.isVisible = false
     }
 
     /**
@@ -202,7 +207,7 @@ open class ChooseAccountActivity: PasscodeActivity(), Scrollable {
         }
     }
 
-    private fun setPricingInfo() {
+    protected open fun setPricingInfo() {
         val productAccounts = viewModel.getProductAccounts()
 
         if (productAccounts == null) {
@@ -210,6 +215,8 @@ open class ChooseAccountActivity: PasscodeActivity(), Scrollable {
             app.askForPricing()
             return
         }
+
+        setFreePlan()
 
         for (i in productAccounts.indices) {
             val account = productAccounts[i]
@@ -252,271 +259,70 @@ open class ChooseAccountActivity: PasscodeActivity(), Scrollable {
                 }
             }
         }
+    }
 
-        if (displayedAccountType != INVALID_VALUE) {
-            onUpgradeClick(displayedAccountType)
+    @SuppressLint("SetTextI18n")
+    private fun setFreePlan() {
+        //Currently the API side doesn't return this value, so we have to hardcode.
+        var textToShowFreeStorage = "[A] 20 GB+ [/A]" +
+                StringResourcesUtils.getString(R.string.label_storage_upgrade_account) + " "
+
+        try {
+            textToShowFreeStorage = textToShowFreeStorage.replace(
+                "[A]", "<font color='"
+                        + getColorHexString(this, R.color.grey_900_grey_100)
+                        + "'>"
+            ).replace("[/A]", "</font>")
+        } catch (e: Exception) {
+            LogUtil.logWarning("Exception formatting string", e)
         }
+
+        binding.storageFree.text =
+            "$textToShowFreeStorage<sup><small><font color='#ff333a'>1</font></small></sup>"
+                .toSpannedHtmlText()
+
+        var textToShowFreeBandwidth = "[A] " +
+                StringResourcesUtils.getString(R.string.limited_bandwith) +
+                "[/A] " +
+                StringResourcesUtils.getString(R.string.label_transfer_quota_upgrade_account)
+
+        try {
+            textToShowFreeBandwidth = textToShowFreeBandwidth
+                .replace(
+                    "[A]", "<font color='"
+                            + getColorHexString(this, R.color.grey_900_grey_100)
+                            + "'>"
+                ).replace("[/A]", "</font>")
+        } catch (e: Exception) {
+            LogUtil.logWarning("Exception formatting string", e)
+        }
+
+        binding.bandwidthFree.text = textToShowFreeBandwidth.toSpannedHtmlText()
+        binding.achievementsFree.text = "<sup><small><font color='#ff333a'>1</font></small></sup> ${
+            StringResourcesUtils.getString(
+                R.string.footnote_achievements
+            )
+        }".toSpannedHtmlText()
+    }
+
+    private fun onFreeClick() {
+        onUpgradeClick(FREE)
     }
 
     /**
-     * Shows the selected payment plan.
+     * Select a payment for the new acco
      *
      * @param upgradeType Selected payment plan.
      */
-    private fun onUpgradeClick(upgradeType: Int) {
-        if (viewModel.getPaymentBitSet() == null) {
-            LogUtil.logWarning("PaymentBitSet Null")
-            return
-        }
+    protected open fun onUpgradeClick(upgradeType: Int) {
+        val intent = Intent(this, ManagerActivityLollipop::class.java)
+            .putExtra(IntentConstants.EXTRA_FIRST_LOGIN, true)
+            .putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
+            .putExtra(ManagerActivityLollipop.NEW_CREATION_ACCOUNT, true)
+            .putExtra(IntentConstants.EXTRA_UPGRADE_ACCOUNT, upgradeType != FREE)
+            .putExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, upgradeType)
 
-        binding.availablePaymentMethods.isVisible = true
-
-        var color = 0
-        var title = 0
-
-        when (upgradeType) {
-            PRO_LITE -> {
-                color = R.color.lite_account
-                title = R.string.prolite_account
-            }
-            PRO_I -> {
-                color = R.color.red_600_red_300
-                title = R.string.pro1_account
-            }
-            PRO_II -> {
-                color = R.color.red_600_red_300
-                title = R.string.pro2_account
-            }
-            PRO_III -> {
-                color = R.color.red_600_red_300
-                title = R.string.pro3_account
-            }
-        }
-
-        binding.paymentTextPaymentTitle.apply {
-            setTextColor(ContextCompat.getColor(this@ChooseAccountActivity, color))
-            text = StringResourcesUtils.getString(title)
-        }
-
-        binding.paymentMethodGoogleWalletLayer.isVisible = false
-
-        var textGoogleWallet = StringResourcesUtils.getString(BillingManagerImpl.PAY_METHOD_RES_ID)
-
-        try {
-            textGoogleWallet = textGoogleWallet.replace(
-                "[A]", "<font color='"
-                        + ColorUtils.getColorHexString(this, R.color.grey_900_grey_100)
-                        + "'>"
-            )
-            textGoogleWallet = textGoogleWallet.replace("[/A]", "</font>")
-        } catch (e: java.lang.Exception) {
-            LogUtil.logError("Exception formatting string", e)
-        }
-
-        binding.paymentMethodGoogleWalletText.text =
-            HtmlCompat.fromHtml(textGoogleWallet, HtmlCompat.FROM_HTML_MODE_LEGACY)
-
-        binding.paymentMethodGoogleWalletIcon.setImageResource(BillingManagerImpl.PAY_METHOD_ICON_RES_ID)
-        binding.options.isVisible = false
-        binding.layoutButtons.isVisible = false
-
-        binding.cancelButton.setOnClickListener {
-            cancelClick()
-        }
-
-        binding.continueButton.apply {
-            setOnClickListener {
-                when (displayedAccountType) {
-                    PRO_I -> viewModel.launchPayment(
-                        if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_I_MONTH
-                        else BillingManagerImpl.SKU_PRO_I_YEAR
-                    )
-                    PRO_II -> viewModel.launchPayment(
-                        if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_II_MONTH
-                        else BillingManagerImpl.SKU_PRO_II_YEAR
-                    )
-                    PRO_III -> viewModel.launchPayment(
-                        if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_III_MONTH
-                        else BillingManagerImpl.SKU_PRO_III_YEAR
-                    )
-                    PRO_LITE -> viewModel.launchPayment(
-                        if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_LITE_MONTH
-                        else BillingManagerImpl.SKU_PRO_LITE_YEAR
-                    )
-                }
-            }
-
-            isEnabled = false
-
-            setTextColor(
-                ContextCompat.getColor(
-                    this@ChooseAccountActivity,
-                    R.color.grey_700_026_grey_300_026
-                )
-            )
-        }
-
-        showPaymentMethods()
-        refreshAccountInfo()
-
-        if (!viewModel.isInventoryFinished()) {
-            LogUtil.logDebug("if (!myAccountInfo.isInventoryFinished())")
-            binding.paymentMethodGoogleWallet.isVisible = false
-        }
-
-        binding.paymentMethodGoogleWalletIcon.isVisible = true
-        binding.semitransparentLayer.isVisible = true
-        window.statusBarColor = ContextCompat.getColor(this, R.color.grey_020_white_020)
-        binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.white_dark_grey))
-        binding.toolbar.elevation = 0F
-        displayedAccountType = upgradeType
-        showDisplayedAccount()
-    }
-
-    private fun showPaymentMethods() {
-        viewModel.checkProductAccounts() ?: return
-        val paymentBitSet = viewModel.getPaymentBitSet()
-
-        if (paymentBitSet == null) {
-            LogUtil.logWarning("Not payment bit set received!!!")
-            binding.paymentTextPaymentMethod.text =
-                StringResourcesUtils.getString(R.string.no_available_payment_method)
-            binding.paymentMethodGoogleWallet.isVisible = false
-            return
-        }
-
-        if (!viewModel.isInventoryFinished()) {
-            LogUtil.logDebug("if (!myAccountInfo.isInventoryFinished())")
-            binding.paymentMethodGoogleWallet.isVisible = false
-        } else if (Util.isPaymentMethodAvailable(
-                paymentBitSet,
-                MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET
-            )
-        ) {
-            binding.paymentMethodGoogleWallet.isVisible = true
-            binding.layoutButtons.isVisible = true
-            binding.options.isVisible = true
-
-            binding.continueButton.apply {
-                isEnabled = true
-                setTextColor(
-                    ColorUtils.getThemeColor(
-                        this@ChooseAccountActivity,
-                        R.attr.colorSecondary
-                    )
-                )
-            }
-
-            binding.billedMonthly.isVisible = true
-            binding.billedYearly.isVisible = true
-            binding.paymentTextPaymentMethod.text =
-                StringResourcesUtils.getString(R.string.payment_method)
-        } else {
-            binding.paymentMethodGoogleWallet.isVisible = false
-            binding.layoutButtons.isVisible = false
-            binding.options.isVisible = false
-            binding.billedMonthly.isVisible = false
-            binding.billedYearly.isVisible = false
-            binding.paymentTextPaymentMethod.text =
-                StringResourcesUtils.getString(R.string.no_available_payment_method)
-        }
-    }
-
-    private fun showDisplayedAccount() {
-        val accounts = viewModel.checkProductAccounts() ?: return
-
-        for (i in accounts.indices) {
-            val account = accounts[i]
-
-            if (account.level == displayedAccountType) {
-                val textToShow: Spanned = viewModel.getPriceString(this, account, false)
-
-                if (account.months == 1) {
-                    binding.billedMonthly.text = textToShow
-                } else if (account.months == 12) {
-                    binding.billedYearly.text = textToShow
-                }
-            }
-        }
-
-        when (displayedAccountType) {
-            PRO_I -> {
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_I_MONTH)) {
-                    if (isMonthlyBillingPeriodSelected()) {
-                        binding.billedYearly.isChecked = true
-                    }
-
-                    binding.billedMonthly.isVisible = false
-                }
-
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_I_YEAR)) {
-                    if (!isMonthlyBillingPeriodSelected()) {
-                        binding.billedMonthly.isChecked = true
-                    }
-
-                    binding.billedYearly.isVisible = false
-                }
-            }
-            PRO_II -> {
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_II_MONTH)) {
-                    if (isMonthlyBillingPeriodSelected()) {
-                        binding.billedYearly.isChecked = true
-                    }
-
-                    binding.billedMonthly.isVisible = false
-                }
-
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_II_YEAR)) {
-                    if (!isMonthlyBillingPeriodSelected()) {
-                        binding.billedMonthly.isChecked = true
-                    }
-
-                    binding.billedYearly.isVisible = false
-                }
-            }
-            PRO_III -> {
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_III_MONTH)) {
-                    if (isMonthlyBillingPeriodSelected()) {
-                        binding.billedYearly.isChecked = true
-                    }
-
-                    binding.billedMonthly.isVisible = false
-                }
-
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_III_YEAR)) {
-                    if (!isMonthlyBillingPeriodSelected()) {
-                        binding.billedMonthly.isChecked = true
-                    }
-
-                    binding.billedYearly.isVisible = false
-                }
-            }
-            PRO_LITE -> {
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_MONTH)) {
-                    if (isMonthlyBillingPeriodSelected()) {
-                        binding.billedYearly.isChecked = true
-                    }
-
-                    binding.billedMonthly.isVisible = false
-                }
-
-                if (viewModel.isPurchasedAlready(BillingManagerImpl.SKU_PRO_LITE_YEAR)) {
-                    if (!isMonthlyBillingPeriodSelected()) {
-                        binding.billedMonthly.isChecked = true
-                    }
-
-                    binding.billedYearly.isVisible = false
-                }
-            }
-        }
-    }
-
-    /**
-     * Method to check if monthly billing period has been selected
-     *
-     * @return True if monthly billing period has been selected or false otherwise.
-     */
-    private fun isMonthlyBillingPeriodSelected(): Boolean {
-        return binding.billingPeriod.checkedRadioButtonId == R.id.billed_monthly
+        startActivity(intent)
+        finish()
     }
 }

@@ -66,6 +66,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
+import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1774,8 +1775,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 MegaApplication.getChatManagement().setPendingJoinLink(null);
                 loginActivityLollipop.finish();
-            } else {
-                loginActivityLollipop.showFragment(CHOOSE_ACCOUNT_FRAGMENT);
+            } else if (dbH.getCredentials() != null) {
+                startActivity(new Intent(loginActivityLollipop, ChooseAccountActivity.class));
+                loginActivityLollipop.finish();
             }
         }
     }

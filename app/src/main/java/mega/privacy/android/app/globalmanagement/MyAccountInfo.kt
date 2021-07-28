@@ -232,8 +232,8 @@ class MyAccountInfo @Inject constructor(
      * @param newName   New firstName/lastName text.
      * @param e         MegaError of the request.
      */
-    fun updateMyData(firstName: Boolean, newName: String, e: MegaError) {
-        if (e.errorCode != MegaError.API_OK) {
+    fun updateMyData(firstName: Boolean, newName: String?, e: MegaError) {
+        if (e.errorCode != MegaError.API_OK || newName == null) {
             logError("ERROR - request.getText(): $newName")
 
             if (firstName) {

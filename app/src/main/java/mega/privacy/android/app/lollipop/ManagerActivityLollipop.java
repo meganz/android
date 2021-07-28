@@ -10780,11 +10780,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (myAccountInfo != null) {
 			myAccountInfo.updateMyData(firstName, newName, e);
 			updateUserNameNavigationView(myAccountInfo.getFullName());
-
-//			if (getMyAccountFragment() != null) {
-//				logDebug("Update the account fragment");
-//				maF.updateNameView(myAccountInfo.getFullName());
-//			}
 		}
 	}
 

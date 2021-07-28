@@ -123,7 +123,6 @@ public class Constants {
     public static final int TOUR_FRAGMENT = 6000;
     public static final int LOGIN_FRAGMENT = 6001;
     public static final int CONFIRM_EMAIL_FRAGMENT = 6002;
-    public static final int CHOOSE_ACCOUNT_FRAGMENT = 6003;
     public static final int CREATE_ACCOUNT_FRAGMENT = 604;
 
     public static final int ACHIEVEMENTS_FRAGMENT = 8000;
