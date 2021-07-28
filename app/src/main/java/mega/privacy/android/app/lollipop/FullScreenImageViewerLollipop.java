@@ -199,6 +199,8 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 
 	private long parentNodeHandle = INVALID_HANDLE;
 
+	private boolean needStopHttpServer;
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null){
@@ -211,6 +213,11 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		nodeSaver.destroy();
 
 		dragToExit.showPreviousHiddenThumbnail();
+
+		if (needStopHttpServer) {
+			MegaApiAndroid api = isFolderLink() ? megaApiFolder : megaApi;
+			api.httpServerStop();
+		}
 
 		super.onDestroy();
 	}
@@ -1603,6 +1610,11 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			startActivity(mediaIntent);
 			overridePendingTransition(0, 0);
 		}
+	}
+
+	@Override
+	public void onStartHttpServer() {
+		needStopHttpServer = true;
 	}
 
 	protected void hideActionBar(){

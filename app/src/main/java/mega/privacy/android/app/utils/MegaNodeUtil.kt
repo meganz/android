@@ -924,6 +924,7 @@ object MegaNodeUtil {
      * @param context Android context
      * @return whether this function call really starts SDK HTTP streaming server
      */
+    @JvmStatic
     fun setupStreamingServer(api: MegaApiAndroid, context: Context): Boolean {
         if (api.httpServerIsRunning() == 0) {
             api.httpServerStart()

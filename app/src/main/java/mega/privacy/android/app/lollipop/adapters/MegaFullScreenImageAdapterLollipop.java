@@ -56,6 +56,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.FrescoUtils.loadGif;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -487,45 +488,11 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
                     if (dbH == null) {
                         dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                     }
-                    String url = null;
-                    if (dbH != null && dbH.getCredentials() != null) {
-                        if (megaApi.httpServerIsRunning() == 0) {
-                            megaApi.httpServerStart();
-                        }
 
-                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                        activityManager.getMemoryInfo(mi);
-
-                        if (mi.totalMem > BUFFER_COMP) {
-							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                        }
-                        else {
-							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-                        }
-                        url = megaApi.httpServerGetLocalLink(node);
-                    }
-                    else if (isFolderLink){
-                        if (megaApiFolder.httpServerIsRunning() == 0) {
-                            megaApiFolder.httpServerStart();
-                        }
-
-                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                        activityManager.getMemoryInfo(mi);
-
-                        if (mi.totalMem > BUFFER_COMP) {
-							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-                            megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                        }
-                        else {
-							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-                            megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-                        }
-                        url = megaApiFolder.httpServerGetLocalLink(node);
-                    }
+                    MegaApiAndroid api = isFolderLink ? megaApiFolder : megaApi;
+					setupStreamingServer(api, context);
+					callback.onStartHttpServer();
+					String url = api.httpServerGetLocalLink(node);
 
                     if (url != null) {
                         loadGif(holder.gifImgDisplay, pb, drawable, Uri.parse(url));
@@ -875,7 +842,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 
 	public interface FullScreenCallback {
 		void onTouchImage();
-
 		void onPlayVideo();
+		void onStartHttpServer();
 	}
 }
