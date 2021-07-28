@@ -276,4 +276,8 @@
 
     <color name="white_teal_100">@color/teal_100</color>
 
+    <!-- For fast scroller -->
+    <color name="scroll_handle">@color/teal_100</color>
+    <color name="scroll_bubble_text_color">@color/dark_grey</color>
+
 </resources>
