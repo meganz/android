@@ -478,6 +478,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private BillingManager mBillingManager;
 	private List<MegaSku> mSkuDetailsList;
 
+	private Boolean initFabButtonShow = false;
+	private Observer<Boolean> fabChangeObserver  = isShow -> {
+		if(initFabButtonShow) {
+			if (isShow) {
+				showFabButtonAfterScrolling();
+			} else {
+				hideFabButtonWhenScrolling();
+			}
+		}
+	};
+
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
 
@@ -3305,6 +3316,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (miniAudioPlayerController != null) {
 			miniAudioPlayerController.onResume();
 		}
+
+		LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -4183,6 +4196,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		logDebug("onPause");
     	managerActivity = null;
     	MegaApplication.getTransfersManagement().setIsOnTransfersSection(false);
+		LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
     	super.onPause();
     }
 
@@ -13092,7 +13106,22 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void hideFabButton(){
+		initFabButtonShow = false;
 		fabButton.hide();
+	}
+
+	/**
+	 * Hides the fabButton icon when scrolling.
+	 */
+	public void hideFabButtonWhenScrolling() {
+		fabButton.hide();
+	}
+
+	/**
+	 * Shows the fabButton icon.
+	 */
+	public void showFabButtonAfterScrolling() {
+		fabButton.show();
 	}
 
 	/**
@@ -13107,6 +13136,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Shows or hides the fabButton depending on the current section.
 	 */
 	public void showFabButton() {
+		initFabButtonShow = true;
+
 		if (drawerItem == null) {
 			return;
 		}

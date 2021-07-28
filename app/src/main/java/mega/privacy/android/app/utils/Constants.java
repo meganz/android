@@ -488,6 +488,7 @@ public class Constants {
     public static final int MIN_ITEMS_SCROLLBAR = 30;
     public static final int MIN_ITEMS_SCROLLBAR_GRID = 200;
     public static final int MIN_ITEMS_SCROLLBAR_CHAT = 20;
+    public static final int MIN_ITEMS_SCROLLBAR_CONTACT = 20;
 
     public static final long BUFFER_COMP = 1073741824;      // 1 GB
     public static final int MAX_BUFFER_16MB = 16777216; // 16 MB
@@ -834,6 +835,8 @@ public class Constants {
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";
     public static final String EVENT_DRAG_TO_EXIT_SCROLL = "drag_to_exit_scroll";
+
+    public static final String EVENT_FAB_CHANGE = "fab_change";
 
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";
