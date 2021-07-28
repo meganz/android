@@ -9,7 +9,6 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.FlowableEmitter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.contacts.group.data.ContactGroupUser
@@ -17,6 +16,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.view.TextDrawable
@@ -32,12 +32,8 @@ class GetContactGroupsUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid
 ) {
 
-    companion object {
-        private const val NOT_FOUND = -1
-    }
-
     fun get(): Flowable<List<ContactGroupItem>> =
-        Flowable.create({ emitter: FlowableEmitter<List<ContactGroupItem>> ->
+        Flowable.create({ emitter ->
             val groups = mutableListOf<ContactGroupItem>()
 
             val userAttrsListener = OptionalMegaRequestListenerInterface(
@@ -50,7 +46,7 @@ class GetContactGroupsUseCase @Inject constructor(
                                     || request.email == it.firstUser.email || request.email == it.lastUser.email
                         }
 
-                        if (index != NOT_FOUND) {
+                        if (index != INVALID_POSITION) {
                             val currentGroup = groups[index]
                             when (request.paramType) {
                                 TYPE_GET_USER_EMAIL -> {

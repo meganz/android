@@ -33,7 +33,6 @@ class ContactListViewModel @ViewModelInject constructor(
 ) : BaseRxViewModel() {
 
     companion object {
-        private const val TAG = "ContactListViewModel"
         private const val REQUEST_TIMEOUT_IN_MS = 100L
     }
 

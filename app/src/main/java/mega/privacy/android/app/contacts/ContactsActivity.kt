@@ -83,26 +83,22 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
         binding = ActivityContactsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-        setupNavigation(savedInstanceState == null)
+        setupNavigation()
     }
 
-    override fun onSupportNavigateUp(): Boolean =
-        getNavController().navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-
-    private fun setupNavigation(overrideNavGraph: Boolean) {
+    private fun setupNavigation() {
         val navController = getNavController()
 
-        if (overrideNavGraph) {
-            val defaultDestination = when {
-                showGroups -> R.id.contact_groups
-                showSentRequests || showReceivedRequests -> R.id.contact_requests
-                else -> R.id.contact_list
-            }
-            navController.setGraph(
-                navController.graph.apply { startDestination = defaultDestination },
-                intent.extras
-            )
-        }
+        navController.setGraph(
+            navController.navInflater.inflate(R.navigation.nav_contacts).apply {
+                startDestination = when {
+                    showGroups -> R.id.contact_groups
+                    showSentRequests || showReceivedRequests -> R.id.contact_requests
+                    else -> R.id.contact_list
+                }
+            },
+            intent.extras
+        )
 
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
     }
@@ -118,6 +114,9 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
             window.statusBarColor = ContextCompat.getColor(this, color)
         }
     }
+
+    override fun onSupportNavigateUp(): Boolean =
+        getNavController().navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
 
     private fun getNavController(): NavController =
         (supportFragmentManager.findFragmentById(R.id.contacts_nav_host_fragment) as NavHostFragment).navController

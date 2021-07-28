@@ -11,13 +11,15 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import mega.privacy.android.app.R
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.listeners.OptionalMegaGlobalListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
+import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.*
 import mega.privacy.android.app.utils.AvatarUtil
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.view.TextDrawable
@@ -33,12 +35,9 @@ import javax.inject.Inject
 class GetContactRequestsUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid
+    private val megaChatApi: MegaChatApiAndroid,
+    private val getGlobalChangesUseCase: GetGlobalChangesUseCase
 ) {
-
-    companion object {
-        private const val NOT_FOUND = -1
-    }
 
     fun get(): Flowable<List<ContactRequestItem>> =
         Flowable.create({ emitter ->
@@ -60,7 +59,7 @@ class GetContactRequestsUseCase @Inject constructor(
 
                     if (error.errorCode == MegaError.API_OK) {
                         val index = requestItems.indexOfFirst { it.email == request.email }
-                        if (index != NOT_FOUND) {
+                        if (index != INVALID_POSITION) {
                             val currentContact = requestItems[index]
 
                             when (request.paramType) {
@@ -85,35 +84,37 @@ class GetContactRequestsUseCase @Inject constructor(
                 }
             )
 
-            val globalListener = OptionalMegaGlobalListenerInterface(
-                onContactRequestsUpdate = { updatedRequests ->
-                    updatedRequests.forEach { request ->
-                        when (request.status) {
-                            STATUS_UNRESOLVED -> {
-                                if (requestItems.any { it.handle == request.handle }) return@forEach
+            val globalSubscription = getGlobalChangesUseCase.get().subscribeBy(
+                onNext = { change ->
+                    if (emitter.isCancelled) return@subscribeBy
 
-                                val newRequestItem = request.toContactRequestItem().apply {
-                                    val userImageFile = AvatarUtil.getUserAvatarFile(context, email)?.absolutePath
-                                    megaApi.getUserAvatar(email, userImageFile, userAttrsListener)
-                                    megaApi.getUserAttribute(email, USER_ATTR_FIRSTNAME, userAttrsListener)
+                    if (change is Result.OnContactRequestsUpdate) {
+                        change.contactRequests.forEach { request ->
+                            when (request.status) {
+                                STATUS_UNRESOLVED -> {
+                                    if (requestItems.any { it.handle == request.handle }) return@forEach
+
+                                    val newRequestItem = request.toContactRequestItem().apply {
+                                        val userImageFile = AvatarUtil.getUserAvatarFile(context, email)?.absolutePath
+                                        megaApi.getUserAvatar(email, userImageFile, userAttrsListener)
+                                        megaApi.getUserAttribute(email, USER_ATTR_FIRSTNAME, userAttrsListener)
+                                    }
+
+                                    requestItems.add(newRequestItem)
                                 }
-
-                                requestItems.add(newRequestItem)
-                            }
-                            STATUS_REMINDED -> {
-                                // do nothing
-                            }
-                            else -> {
-                                requestItems.removeIf { it.handle == request.handle }
+                                STATUS_REMINDED -> {
+                                    // do nothing
+                                }
+                                else -> {
+                                    requestItems.removeIf { it.handle == request.handle }
+                                }
                             }
                         }
-                    }
 
-                    emitter.onNext(requestItems)
+                        emitter.onNext(requestItems)
+                    }
                 }
             )
-
-            megaApi.addGlobalListener(globalListener)
 
             requestItems.forEach { request ->
                 if (request.avatarUri == null) {
@@ -126,26 +127,28 @@ class GetContactRequestsUseCase @Inject constructor(
                 }
             }
 
-            emitter.setDisposable(Disposable.fromAction {
-                megaApi.removeGlobalListener(globalListener)
-            })
+            emitter.setCancellable {
+                globalSubscription.dispose()
+            }
         }, BackpressureStrategy.LATEST)
 
     fun getIncomingRequestsSize(): Flowable<Int> =
         Flowable.create({ emitter ->
             emitter.onNext(megaApi.incomingContactRequests.size)
 
-            val globalListener = OptionalMegaGlobalListenerInterface(
-                onContactRequestsUpdate = {
-                    emitter.onNext(megaApi.incomingContactRequests.size)
+            val globalSubscription = getGlobalChangesUseCase.get().subscribeBy(
+                onNext = { change ->
+                    if (emitter.isCancelled) return@subscribeBy
+
+                    if (change is Result.OnContactRequestsUpdate) {
+                        emitter.onNext(megaApi.incomingContactRequests.size)
+                    }
                 }
             )
 
-            megaApi.addGlobalListener(globalListener)
-
-            emitter.setDisposable(Disposable.fromAction {
-                megaApi.removeGlobalListener(globalListener)
-            })
+            emitter.setCancellable {
+                globalSubscription.dispose()
+            }
         }, BackpressureStrategy.LATEST)
 
     private fun MegaContactRequest.toContactRequestItem(): ContactRequestItem {

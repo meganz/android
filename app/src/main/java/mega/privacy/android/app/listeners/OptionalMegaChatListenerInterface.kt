@@ -30,11 +30,11 @@ class OptionalMegaChatListenerInterface(
 
     override fun onChatOnlineStatusUpdate(
         api: MegaChatApiJava,
-        userhandle: Long,
+        userHandle: Long,
         status: Int,
         inProgress: Boolean
     ) {
-        onChatOnlineStatusUpdate?.invoke(userhandle, status, inProgress)
+        onChatOnlineStatusUpdate?.invoke(userHandle, status, inProgress)
     }
 
     override fun onChatPresenceConfigUpdate(
@@ -54,9 +54,9 @@ class OptionalMegaChatListenerInterface(
 
     override fun onChatPresenceLastGreen(
         api: MegaChatApiJava,
-        userhandle: Long,
+        userHandle: Long,
         lastGreen: Int
     ) {
-        onChatPresenceLastGreen?.invoke(userhandle, lastGreen)
+        onChatPresenceLastGreen?.invoke(userHandle, lastGreen)
     }
 }
