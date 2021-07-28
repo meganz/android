@@ -1442,11 +1442,12 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			return;
 		}
 
-		if (intent == null) {
-			return;
-		}
-
 		if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
+			if (intent == null) {
+				logWarning("Intent is null");
+				return;
+			}
+
 			boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			if (!hasStoragePermission) {
 				requestPermission(this,
@@ -1478,6 +1479,10 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+			if (intent == null) {
+				logWarning("Intent is null");
+				return;
+			}
 
 			if(!isOnline(this)){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
@@ -1506,6 +1511,11 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+			if (intent == null) {
+				logWarning("Intent is null");
+				return;
+			}
+
 			if(!isOnline(this)){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return;
@@ -1541,6 +1551,16 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 					}
 					catch (Exception ex) {}
 				}
+			}
+		} else if (requestCode == REQUEST_WRITE_STORAGE) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (Environment.isExternalStorageManager()) {
+					nodeSaver.handleRequestPermissionsResult(requestCode);
+				} else {
+					super.onActivityResult(requestCode, resultCode, intent);
+				}
+			} else {
+				super.onActivityResult(requestCode, resultCode, intent);
 			}
 		}
 	}

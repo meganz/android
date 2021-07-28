@@ -25,6 +25,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
@@ -6864,8 +6865,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        case R.id.action_add:{
 				if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 					requestPermission(this,
-							REQUEST_WRITE_STORAGE,
-							Manifest.permission.WRITE_EXTERNAL_STORAGE);
+							REQUEST_READ_WRITE_STORAGE,
+							Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
 					return true;
 				}
 
@@ -10338,10 +10339,38 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
 							Toast.LENGTH_SHORT).show();
 				} else {
-					if (isMkLayoutVisible()) {
-						if (getExportRecoveryKeyFragment() != null) {
-							eRKeyF.toFileSystem();
-						}
+					switch (requestCode) {
+						case REQUEST_WRITE_STORAGE:
+							// Download RK scenario
+							if (isMkLayoutVisible()) {
+								if (getExportRecoveryKeyFragment() != null) {
+									eRKeyF.toFileSystem();
+								}
+							} else {
+								// Take picture scenarios
+								if (typesCameraPermission == TAKE_PICTURE_OPTION || typesCameraPermission == TAKE_PROFILE_PICTURE) {
+									if (!hasPermissions(this, Manifest.permission.CAMERA)) {
+										requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
+									} else {
+										if (typesCameraPermission == TAKE_PICTURE_OPTION) {
+											checkTakePicture(this, TAKE_PHOTO_CODE);
+										} else if (typesCameraPermission == TAKE_PROFILE_PICTURE) {
+											this.takeProfilePicture();
+										}
+										typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+									}
+									break;
+								}
+
+								// General download scenario
+								nodeSaver.handleRequestPermissionsResult(requestCode);
+							}
+							break;
+
+						case REQUEST_READ_WRITE_STORAGE:
+							// Upload scenario
+							new Handler(Looper.getMainLooper()).post(this::showUploadPanel);
+							break;
 					}
 				}
 			}
