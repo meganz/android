@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
@@ -29,6 +30,8 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        displayedAccountType = intent.getIntExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
 
         setupView()
     }

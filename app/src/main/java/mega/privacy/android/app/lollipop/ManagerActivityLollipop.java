@@ -368,8 +368,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Inject
 	MyAccountInfo myAccountInfo;
 
-	public int accountFragment;
-
 	private long handleInviteContact = -1;
 
 	public ArrayList<Integer> transfersInProgress;
@@ -425,7 +423,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     AppBarLayout abL;
 
 	int selectedAccountType;
-	int displayedAccountType;
 
 	ShareInfo infoManager;
 	MegaNode parentNodeManager;
@@ -1486,7 +1483,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			indexContacts = savedInstanceState.getInt("indexContacts", 0);
 			pathNavigationOffline = savedInstanceState.getString("pathNavigationOffline", pathNavigationOffline);
 			logDebug("savedInstanceState -> pathNavigationOffline: " + pathNavigationOffline);
-			accountFragment = savedInstanceState.getInt("accountFragment", -1);
 			selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1);
 			searchQuery = savedInstanceState.getString("searchQuery");
 			textsearchQuery = savedInstanceState.getBoolean("textsearchQuery");
@@ -2467,7 +2463,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						logDebug("Intent from chat - show my account");
 
 						drawerItem=DrawerItem.ACCOUNT;
-						accountFragment=MY_ACCOUNT_FRAGMENT;
 						selectDrawerItemLollipop(drawerItem);
 						selectDrawerItemPending=false;
 					}
@@ -2568,52 +2563,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        			drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
-						switch (accountType){
-							case FREE:{
-								if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
-									logDebug("First login. Go to Camera Uploads configuration.");
-									drawerItem = DrawerItem.CAMERA_UPLOADS;
-								} else {
-									drawerItem = DrawerItem.ACCOUNT;
-									accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-									displayedAccountType = -1;
-								}
-								setIntent(null);
-								selectDrawerItemLollipop(drawerItem);
-								return;
-							}
-							case PRO_I:{
-								drawerItem = DrawerItem.ACCOUNT;
-								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-								displayedAccountType = PRO_I;
-								selectDrawerItemLollipop(drawerItem);
-								selectDrawerItemPending=false;
-								return;
-							}
-							case PRO_II:{
-								drawerItem = DrawerItem.ACCOUNT;
-								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-								selectDrawerItemPending=false;
-								displayedAccountType = PRO_II;
-								selectDrawerItemLollipop(drawerItem);
-								return;
-							}
-							case PRO_III:{
-								drawerItem = DrawerItem.ACCOUNT;
-								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-								selectDrawerItemPending=false;
-								displayedAccountType = PRO_III;
-								selectDrawerItemLollipop(drawerItem);
-								return;
-							}
-							case PRO_LITE:{
-								drawerItem = DrawerItem.ACCOUNT;
-								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-								selectDrawerItemPending=false;
-								displayedAccountType = PRO_LITE;
-								selectDrawerItemLollipop(drawerItem);
-								return;
-							}
+						if (accountType != FREE) {
+							showMyAccount(true, accountType);
+						} else if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+							drawerItem = DrawerItem.CAMERA_UPLOADS;
+						} else {
+							showMyAccount();
 						}
 	        		}
 	        		else{
@@ -2641,60 +2596,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
-						switch (accountType){
-							case FREE:{
-								if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
-									logDebug("First login. Go to Camera Uploads configuration.");
-									drawerItem = DrawerItem.CAMERA_UPLOADS;
-								} else {
-									drawerItem = DrawerItem.ACCOUNT;
-									accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-									displayedAccountType = -1;
-								}
-								setIntent(null);
-								selectDrawerItemLollipop(drawerItem);
-								return;
-							}
-							case PRO_I:{
-								drawerItem = DrawerItem.ACCOUNT;
-								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-								selectDrawerItemPending=false;
-								displayedAccountType = PRO_I;
-								selectDrawerItemLollipop(drawerItem);
-								return;
-							}
-							case PRO_II:{
-								drawerItem = DrawerItem.ACCOUNT;
-								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-								selectDrawerItemPending=false;
-								displayedAccountType = PRO_II;
-								selectDrawerItemLollipop(drawerItem);
-								return;
-							}
-							case PRO_III:{
-								drawerItem = DrawerItem.ACCOUNT;
-								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-								selectDrawerItemPending=false;
-								displayedAccountType = PRO_III;
-								selectDrawerItemLollipop(drawerItem);
-								return;
-							}
-							case PRO_LITE:{
-								drawerItem = DrawerItem.ACCOUNT;
-								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-								selectDrawerItemPending=false;
-								displayedAccountType = PRO_LITE;
-								selectDrawerItemLollipop(drawerItem);
-								return;
-							}
-							case BUSINESS:{
-								drawerItem = DrawerItem.ACCOUNT;
-								accountFragment = UPGRADE_ACCOUNT_FRAGMENT;
-								selectDrawerItemPending=false;
-								displayedAccountType = BUSINESS;
-								selectDrawerItemLollipop(drawerItem);
-								return;
-							}
+						if (accountType != FREE) {
+							showMyAccount(true, accountType);
+						} else if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
+							drawerItem = DrawerItem.CAMERA_UPLOADS;
+						} else {
+							showMyAccount();
 						}
 					}
 					else{
@@ -5420,12 +5327,22 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void showMyAccount(){
+	public void showMyAccount() {
+		showMyAccount(false, INVALID_VALUE);
+	}
+
+	public void showMyAccount(boolean openUpgrade, int accountType){
 		if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
 			drawerLayout.closeDrawer(Gravity.LEFT);
 		}
 
-		startActivity(new Intent(this, MyAccountActivity.class));
+		Intent intent = new Intent(this, MyAccountActivity.class);
+
+		if (openUpgrade) {
+			intent.putExtra(EXTRA_ACCOUNT_TYPE, accountType);
+		}
+
+		startActivity(intent);
 	}
 
 	private void closeSearchSection() {
@@ -8546,8 +8463,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		drawerItem = DrawerItem.ACCOUNT;
 		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 		getProLayout.setVisibility(View.GONE);
-		accountFragment = MY_ACCOUNT_FRAGMENT;
-		displayedAccountType = -1;
 		selectDrawerItemLollipop(drawerItem);
 
 		Intent intent = new Intent(this, AchievementsActivity.class);
@@ -8565,8 +8480,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		drawerItem = DrawerItem.ACCOUNT;
 		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 		getProLayout.setVisibility(View.GONE);
-		accountFragment = MY_ACCOUNT_FRAGMENT;
-		displayedAccountType = -1;
 		comesFromNotifications = true;
 		selectDrawerItemLollipop(drawerItem);
 	}
@@ -11698,15 +11611,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void setSelectedAccountType(int selectedAccountType) {
 		this.selectedAccountType = selectedAccountType;
-	}
-
-
-	public int getDisplayedAccountType() {
-		return displayedAccountType;
-	}
-
-	public void setDisplayedAccountType(int displayedAccountType) {
-		this.displayedAccountType = displayedAccountType;
 	}
 
 	@Override

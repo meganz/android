@@ -21,7 +21,9 @@ import kotlinx.android.synthetic.main.dialog_general_confirmation.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
@@ -75,6 +77,16 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
         setupView()
         setupObservers()
+
+        val accountType = intent.getIntExtra(EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
+        if (accountType != INVALID_VALUE) {
+            startActivity(
+                Intent(this, UpgradeAccountActivity::class.java)
+                    .putExtra(EXTRA_ACCOUNT_TYPE, accountType)
+            )
+
+            intent.removeExtra(EXTRA_ACCOUNT_TYPE)
+        }
 
         if (savedInstanceState != null) {
             when {
