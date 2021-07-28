@@ -1211,14 +1211,6 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                         Toast.makeText(this,
                                 StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
                                 Toast.LENGTH_SHORT).show();
-                    } else {
-                        if (this instanceof ManagerActivityLollipop) {
-                            ExportRecoveryKeyFragment exportRecoveryKeyFragment =
-                                    (ExportRecoveryKeyFragment) getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.EXPORT_RECOVERY_KEY.getTag());
-                            if (exportRecoveryKeyFragment != null) {
-                                exportRecoveryKeyFragment.toFileSystem();
-                            }
-                        }
                     }
                 }
                 break;

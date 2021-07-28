@@ -1451,8 +1451,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 break;
 
 			case PERMISSIONS_FRAGMENT: {
-				pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
-				if (pF != null) {
+				if (getPermissionsFragment() != null) {
 					pF.setNextPermission();
 				}
 				break;
@@ -7283,6 +7282,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		hideFabButton();
 	}
 
+	public boolean isMkLayoutVisible() {
+		return mkLayoutVisible;
+	}
+
 	public void refreshAfterMovingToRubbish(){
 		logDebug("refreshAfterMovingToRubbish");
 
@@ -10317,20 +10320,33 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 logWarning("cancel subscribe");
             }
         } else if (requestCode == PERMISSIONS_FRAGMENT) {
-        	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        		if (!Environment.isExternalStorageManager()) {
-        			Toast.makeText(this,
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (!Environment.isExternalStorageManager()) {
+					Toast.makeText(this,
 							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
 							Toast.LENGTH_SHORT).show();
-        		}
+				}
 
-        		pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
-        		if (pF != null) {
-        			pF.setNextPermission();
-        		}
-        	}
+				if (getPermissionsFragment() != null) {
+					pF.setNextPermission();
+				}
+			}
+		} else if (requestCode == REQUEST_WRITE_STORAGE || requestCode == REQUEST_READ_WRITE_STORAGE) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (!Environment.isExternalStorageManager()) {
+					Toast.makeText(this,
+							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+							Toast.LENGTH_SHORT).show();
+				} else {
+					if (isMkLayoutVisible()) {
+						if (getExportRecoveryKeyFragment() != null) {
+							eRKeyF.toFileSystem();
+						}
+					}
+				}
+			}
         } else {
-			logWarning("No requestcode");
+			logWarning("No request code processed");
 			super.onActivityResult(requestCode, resultCode, intent);
 		}
 	}
@@ -14148,6 +14164,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private RecentChatsFragmentLollipop getChatsFragment() {
 		return rChatFL = (RecentChatsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.RECENT_CHAT.getTag());
+	}
+
+	private PermissionsFragment getPermissionsFragment() {
+		return pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
+	}
+
+	private ExportRecoveryKeyFragment getExportRecoveryKeyFragment() {
+		return eRKeyF = (ExportRecoveryKeyFragment) getSupportFragmentManager().findFragmentByTag(ManagerActivityLollipop.FragmentTag.EXPORT_RECOVERY_KEY.getTag());
 	}
 
 	@Override
