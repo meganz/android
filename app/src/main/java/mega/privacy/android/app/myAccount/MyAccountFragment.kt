@@ -22,7 +22,9 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
-import mega.privacy.android.app.constants.EventConstants
+import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
+import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
+import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
@@ -37,6 +39,7 @@ import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaUser
@@ -68,7 +71,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
     private var phoneNumberBottomSheet: PhoneNumberBottomSheetDialogFragment? = null
 
-    private var gettingInfo = StringResourcesUtils.getString(R.string.recovering_info)
+    private val gettingInfo by lazy { StringResourcesUtils.getString(R.string.recovering_info) }
 
     private val profileAvatarUpdatedObserver = Observer<Boolean> { setupAvatar(false) }
 
@@ -120,6 +123,10 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         binding.myAccountThumbnail.setOnClickListener { viewModel.openQR(requireActivity()) }
 
+        binding.myAccountTextInfoLayout.setOnClickListener {
+            startActivity(Intent(requireContext(), EditProfileActivity::class.java))
+        }
+
         binding.nameText.text = viewModel.getName()
         binding.emailText.text = viewModel.getEmail()
 
@@ -137,21 +144,21 @@ class MyAccountFragment : Fragment(), Scrollable {
         if (!this::binding.isInitialized)
             return
 
-        val withElevation = binding.scrollView.canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
+        val withElevation = binding.scrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
         viewModel.setElevation(withElevation)
     }
 
     private fun setupObservers() {
-        LiveEventBus.get(Constants.EVENT_AVATAR_CHANGE, Boolean::class.java)
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .observeForever(profileAvatarUpdatedObserver)
 
-        LiveEventBus.get(EventConstants.EVENT_USER_NAME_UPDATED, Boolean::class.java)
+        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
             .observeForever(nameUpdatedObserver)
 
-        LiveEventBus.get(EventConstants.EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
+        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
             .observeForever(emailUpdatedObserver)
 
-        LiveEventBus.get(EventConstants.EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
+        LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
             .observeForever(phoneNumberObserver)
 
         viewModel.onUpdateAccountDetails().observe(viewLifecycleOwner) { setupAccountDetails() }
@@ -165,16 +172,16 @@ class MyAccountFragment : Fragment(), Scrollable {
     override fun onDestroy() {
         super.onDestroy()
 
-        LiveEventBus.get(Constants.EVENT_AVATAR_CHANGE, Boolean::class.java)
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .removeObserver(profileAvatarUpdatedObserver)
 
-        LiveEventBus.get(EventConstants.EVENT_USER_NAME_UPDATED, Boolean::class.java)
+        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
             .removeObserver(nameUpdatedObserver)
 
-        LiveEventBus.get(EventConstants.EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
+        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
             .removeObserver(emailUpdatedObserver)
 
-        LiveEventBus.get(Constants.EVENT_AVATAR_CHANGE, Boolean::class.java)
+        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .removeObserver(profileAvatarUpdatedObserver)
 
         changeApiServerDialog?.dismiss()
@@ -230,7 +237,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             AvatarUtil.getDefaultAvatar(
                 AvatarUtil.getColorAvatar(megaApi.myUser),
                 viewModel.getName(),
-                Constants.AVATAR_SIZE,
+                AVATAR_SIZE,
                 true
             )
         )
@@ -299,26 +306,6 @@ class MyAccountFragment : Fragment(), Scrollable {
         )
     }
 
-    /**
-     * Updates the edit view.
-     *
-     * @param editable True if the account can be edited, false otherwise.
-     */
-    private fun setupEditProfile(editable: Boolean) {
-        binding.nameText.setCompoundDrawablesWithIntrinsicBounds(
-            0,
-            0,
-            if (editable) R.drawable.ic_view_edit_profile else 0,
-            0
-        )
-
-        binding.myAccountTextInfoLayout.setOnClickListener {
-            if (editable) {
-                startActivity(Intent(requireContext(), EditProfileActivity::class.java))
-            }
-        }
-    }
-
     fun setupAccountDetails() {
         binding.lastSessionSubtitle.text =
             if (viewModel.getLastSession().isNotEmpty()) viewModel.getLastSession()
@@ -338,8 +325,6 @@ class MyAccountFragment : Fragment(), Scrollable {
             return
         }
 
-        setupEditProfile(true)
-
         binding.upgradeButton.apply {
             isEnabled = true
             text = StringResourcesUtils.getString(R.string.my_account_upgrade_pro)
@@ -352,11 +337,11 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         binding.accountTypeText.text = StringResourcesUtils.getString(
             when (viewModel.getAccountType()) {
-                Constants.FREE -> R.string.free_account
-                Constants.PRO_I -> R.string.pro1_account
-                Constants.PRO_II -> R.string.pro2_account
-                Constants.PRO_III -> R.string.pro3_account
-                Constants.PRO_LITE -> R.string.prolite_account
+                FREE -> R.string.free_account
+                PRO_I -> R.string.pro1_account
+                PRO_II -> R.string.pro2_account
+                PRO_III -> R.string.pro3_account
+                PRO_LITE -> R.string.prolite_account
                 else -> R.string.recovering_info
             }
         )
@@ -365,9 +350,9 @@ class MyAccountFragment : Fragment(), Scrollable {
             requireContext(), R.drawable.background_account_type, ContextCompat.getColor(
                 requireContext(),
                 when (viewModel.getAccountType()) {
-                    Constants.FREE -> R.color.green_400_green_300
-                    Constants.PRO_I -> R.color.orange_600_orange_300
-                    Constants.PRO_II, Constants.PRO_III, Constants.PRO_LITE -> R.color.red_300_red_200
+                    FREE -> R.color.green_400_green_300
+                    PRO_LITE -> R.color.orange_600_orange_300
+                    PRO_I, PRO_II, PRO_III -> R.color.red_300_red_200
                     else -> R.color.white_black
                 }
             )
@@ -407,10 +392,8 @@ class MyAccountFragment : Fragment(), Scrollable {
             }
 
             binding.businessAccountManagementText.isVisible = true
-            setupEditProfile(true)
         } else {
             binding.businessAccountManagementText.isVisible = false
-            setupEditProfile(false)
         }
 
         usageBinding.businessUpdate(viewModel)

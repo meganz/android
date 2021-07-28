@@ -209,6 +209,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             showChangeEmailDialog(null)
         }
 
+        permitEditNameAndEmail()
+
         binding.changePassword.setOnClickListener {
             startActivity(Intent(this, ChangePasswordActivityLollipop::class.java))
         }
@@ -220,6 +222,14 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         binding.logoutButton.setOnClickListener { viewModel.logout(this@EditProfileActivity) }
 
         setupLogoutWarnings()
+    }
+
+    private fun permitEditNameAndEmail() {
+        val permitEditNameAndEmail = !megaApi.isBusinessAccount || megaApi.isMasterBusinessAccount
+        binding.changeName.isVisible = permitEditNameAndEmail
+        binding.changeNameSeparator.separator.isVisible = permitEditNameAndEmail
+        binding.changeEmail.isVisible = permitEditNameAndEmail
+        binding.changeEmailSeparator.separator.isVisible = permitEditNameAndEmail
     }
 
     private fun setupObservers() {

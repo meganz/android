@@ -32,7 +32,9 @@
                 android:text="@string/change_name_action"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
-            <include layout="@layout/view_linear_layout_separator_16" />
+            <include
+                android:id="@+id/change_name_separator"
+                layout="@layout/view_linear_layout_separator_16" />
 
             <TextView
                 android:id="@+id/add_photo"
@@ -52,7 +54,9 @@
                 android:text="@string/change_mail_title_last_step"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
-            <include layout="@layout/view_linear_layout_separator_16" />
+            <include
+                android:id="@+id/change_email_separator"
+                layout="@layout/view_linear_layout_separator_16" />
 
             <TextView
                 android:id="@+id/change_password"
@@ -163,6 +167,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

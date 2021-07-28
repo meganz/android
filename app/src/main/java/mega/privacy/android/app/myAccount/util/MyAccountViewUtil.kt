@@ -12,7 +12,7 @@ import nz.mega.sdk.MegaApiJava
 
 object MyAccountViewUtil {
 
-    private val gettingInfo = getString(R.string.recovering_info)
+    private val gettingInfo by lazy { getString(R.string.recovering_info) }
 
     /**
      * Updates the views related to usage of storage and transfers
