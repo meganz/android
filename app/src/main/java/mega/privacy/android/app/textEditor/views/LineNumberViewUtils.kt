@@ -23,6 +23,7 @@ object LineNumberViewUtils {
             color = ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary)
             typeface = Typeface.create("sans-serif", Typeface.NORMAL)
             textSize = resources.getDimensionPixelSize(R.dimen.line_number_size).toFloat()
+            isAntiAlias = true
         }
     }
 
