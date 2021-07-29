@@ -22,7 +22,7 @@
 
     <TextView
         android:id="@+id/btn_accept"
-        style="@style/BottomSheetOption.Request"
+        style="@style/BottomSheetOption"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:text="@string/contact_accept"
@@ -43,7 +43,7 @@
 
     <TextView
         android:id="@+id/btn_ignore"
-        style="@style/BottomSheetOption.Request"
+        style="@style/BottomSheetOption"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:text="@string/contact_ignore"
@@ -64,7 +64,7 @@
 
     <TextView
         android:id="@+id/btn_decline"
-        style="@style/BottomSheetOption.Request.Red"
+        style="@style/BottomSheetOption.Red"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:text="@string/contact_decline"
@@ -81,7 +81,7 @@
 
     <TextView
         android:id="@+id/btn_reinvite"
-        style="@style/BottomSheetOption.Request"
+        style="@style/BottomSheetOption"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:text="@string/contact_reinvite"
@@ -102,7 +102,7 @@
 
     <TextView
         android:id="@+id/btn_remove"
-        style="@style/BottomSheetOption.Request.Red"
+        style="@style/BottomSheetOption.Red"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:text="@string/general_remove"
