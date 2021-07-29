@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.CountDownTimer
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -48,6 +49,12 @@ class InMeetingViewModel @ViewModelInject constructor(
     var isSpeakerSelectionAutomatic: Boolean = true
     var isFromReconnectingStatus: Boolean = false
     var isReconnectingStatus: Boolean = false
+
+    private var currentTimer = WAITING_TIME
+    var countDownTimer: CountDownTimer? = null
+    private val _updateUI: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    val updateUI: LiveData<Boolean> = _updateUI
+
     private var haveConnection: Boolean = false
 
     private val _pinItemEvent = MutableLiveData<Event<Participant>>()
@@ -2066,23 +2073,52 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     /**
      * Method to check if warning message should be displayed
-     *
-     * @return True, if warning message must be shown. False, if not.
+     * STATE_NEW = 0
+     * STATE_RESUME = 1
+     * STATE_INVITE = 2
+     * STATE_CANCEL = 3
+     * STATE_FINISH = 4
+     * @return {STATE_NEW, STATE_RESUME, STATE_INVITE, STATE_CANCEL, STATE_FINISH}
      */
-    fun shouldShowWarningMessage(): Boolean =
-        !MegaApplication.getInstance().applicationContext.defaultSharedPreferences
-            .getBoolean(KEY_IS_SHOWED_WARNING_MESSAGE + getChatId(), false)
+    fun shouldShowWarningMessage(): Int =
+        MegaApplication.getInstance().applicationContext.defaultSharedPreferences
+            .getInt(KEY_IS_SHOWED_WARNING_MESSAGE + getChatId(), STATE_NEW)
 
     /**
      * Update whether or not to display warning message
+     *
+     * @param state {STATE_NEW, STATE_RESUME, STATE_INVITE, STATE_CANCEL, STATE_FINISH}
      */
-    fun updateShowWarningMessage() {
+    fun updateShowWarningMessage(state: Int) {
         MegaApplication.getInstance().applicationContext.defaultSharedPreferences.edit()
-            .putBoolean(KEY_IS_SHOWED_WARNING_MESSAGE + getChatId(), true).apply()
+            .putInt(KEY_IS_SHOWED_WARNING_MESSAGE + getChatId(), state).apply()
+
+        when (state) {
+            STATE_NEW, STATE_FINISH -> MegaApplication.getInstance().applicationContext.defaultSharedPreferences.edit()
+                .putLong(LAST_TIMER, WAITING_TIME).apply()
+            STATE_RESUME, STATE_INVITE -> MegaApplication.getInstance().applicationContext.defaultSharedPreferences.edit()
+                .putLong(LAST_TIMER, currentTimer).apply()
+        }
+    }
+
+    /**
+     * Get current timer for countdown
+     */
+    fun restoreCurrentTimer(): Long {
+        currentTimer = MegaApplication.getInstance().applicationContext.defaultSharedPreferences
+            .getLong(LAST_TIMER, WAITING_TIME)
+        return currentTimer
     }
 
     companion object {
         const val IS_SHOWED_TIPS = "is_showed_meeting_bottom_tips"
+        const val LAST_TIMER = "last_timer"
+        const val WAITING_TIME = 26000L // 26 seconds
+        const val STATE_NEW = 0
+        const val STATE_RESUME = 1
+        const val STATE_INVITE = 2
+        const val STATE_CANCEL = 3
+        const val STATE_FINISH = 4
     }
 
     override fun onCallHungUp(callId: Long) {
@@ -2147,7 +2183,6 @@ class InMeetingViewModel @ViewModelInject constructor(
 
         return nameList
     }
-
     /**
      * Send add contact invitation
      *
@@ -2166,6 +2201,34 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun getRemoteAvatar(peerId: Long) {
         inMeetingRepository.getRemoteAvatar(peerId)
+    }
+
+    /**
+     * Countdown Timer for showing warning message
+     */
+    fun startCountDown() {
+        countDownTimer?.cancel()
+        countDownTimer = object : CountDownTimer(currentTimer, 1000) {
+
+            override fun onTick(millisUntilFinished: Long) {
+                currentTimer = millisUntilFinished
+            }
+
+            override fun onFinish() {
+                if (STATE_FINISH != shouldShowWarningMessage()) {
+                    // After 26 seconds if the call is still not answered, they will see a message
+                    _updateUI.value = true
+                }
+            }
+        }
+        countDownTimer?.start()
+    }
+
+    /**
+     * Cancel the Countdown Timer
+     */
+    fun cancelCountDownTimer() {
+        countDownTimer?.cancel()
     }
 }
 

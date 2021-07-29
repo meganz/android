@@ -18,18 +18,14 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_assign_moderator.view.*
 import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -77,6 +73,10 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_IS_GUEST
 import mega.privacy.android.app.meeting.adapter.Participant
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_CANCEL
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_FINISH
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_INVITE
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_RESUME
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener
@@ -95,7 +95,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     StartChatCallListener.StartChatCallCallback, AnswerChatCallListener.OnCallAnsweredCallback,
     AutoJoinPublicChatListener.OnJoinedChatCallback {
 
-    private var bShowImcompatibility: Boolean = false
+    private var bCountDownTimerStart: Boolean = false
     private var bInviteSent: Boolean = false
     val args: InMeetingFragmentArgs by navArgs()
 
@@ -151,9 +151,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private lateinit var binding: InMeetingFragmentBinding
 
     val inMeetingViewModel by viewModels<InMeetingViewModel>()
-
-    // Create Timer
-    var channel = Channel<Int>(capacity = 1)
 
     private val proximitySensorChangeObserver = Observer<Boolean> {
         val chatId = inMeetingViewModel.getChatId()
@@ -490,7 +487,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         Observer<Boolean> { invite ->
             if (invite && !bInviteSent){
                 bInviteSent = true
-                launchTimer()
+
+                if(STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
+                    inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
+                    launchTimer()
+                }
             }
         }
 
@@ -947,10 +948,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 if (count != null) {
                     val participantsCount = getparticipantsCount()
                     if(participantsCount == 0L && count.size == 0){
-                        launchTimer()
+                        if(STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
+                            logDebug("launchTimer() for no participant join in after Invite")
+                            inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
+                            launchTimer()
+                        }
                     } else if (participantsCount > 0 && count.size < participantsCount.toInt()) {
-                        // start timer
-                        launchTimer()
+                        if(STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
+                            logDebug("launchTimer() for not all participants join in after Invite")
+                            inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
+                            launchTimer()
+                        }
                     } else {
                         logDebug("noting to do")
                     }
@@ -969,6 +977,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.notificationNetworkState.observe(viewLifecycleOwner) { haveConnection ->
             inMeetingViewModel.updateNetworkStatus(haveConnection)
             checkInfoBanner(TYPE_NO_CONNECTION)
+        }
+
+        inMeetingViewModel.updateUI.observe(viewLifecycleOwner) {
+            if(it) {
+                inMeetingViewModel.updateShowWarningMessage(STATE_FINISH)
+                showSnackbar(
+                    SNACKBAR_IMCOMPATIBILITY_TYPE,
+                    StringResourcesUtils.getString(
+                        R.string.version_incompatibility
+                    ),
+                    MEGACHAT_INVALID_HANDLE
+                )
+            }
         }
     }
 
@@ -1585,10 +1606,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     toolbarSubtitle?.let {
                         it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
                     }
+                    logDebug("launchTimer() for chatroom that is not a meeting")
                     launchTimer()
                 } else {
                     if (chatRoom != null && !chatRoom.isMeeting) {
-                        channel.cancel()
+                        logDebug("cancel launchTimer() for chatroom is meeting")
+                        cancelCountDownTimer()
                         meetingActivity.snackbar?.dismiss()
                     }
                     toolbarSubtitle?.let {
@@ -1605,41 +1628,30 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Start Timer for 26s and show snackbar for version incompatibility
      */
     private fun launchTimer() {
-        if(!inMeetingViewModel.isModerator())
-            return
-        if(!bShowImcompatibility) {
-            bShowImcompatibility = true
-            lifecycleScope.launch {
-                launch(Dispatchers.IO) {
-                    logDebug("launchTimer() will send after 26s")
-                    delay(WAITING_TIME)
-                    if(!channel.isClosedForSend) {
-                        logDebug("launchTimer() send and then close")
-                        channel.send(WAITING_TIME.toInt())
-                        channel.close()
-                    }
-                }
-                launch(Dispatchers.IO) {
-                    for (element in channel) {
-                        logDebug("launchTimer() receive $element")
-                        if (inMeetingViewModel.shouldShowWarningMessage()) {
-                            // After 26 seconds if the call is still not answered, they will see a message
-                            activity?.runOnUiThread {
-                                showSnackbar(
-                                    SNACKBAR_IMCOMPATIBILITY_TYPE,
-                                    StringResourcesUtils.getString(
-                                        R.string.version_incompatibility
-                                    ),
-                                    MEGACHAT_INVALID_HANDLE
-                                )
-                            }
-
-                            inMeetingViewModel.updateShowWarningMessage()
-                        }
-                    }
-                }
+        if (!bCountDownTimerStart) {
+            // Not a moderator, need not show warning message
+            if (!inMeetingViewModel.isModerator()) {
+                logDebug("launchTimer - Not a moderator, need not show warning message")
+                return
             }
+            // Message has been shown, no duplicate count down
+            val state = inMeetingViewModel.shouldShowWarningMessage()
+            if (STATE_FINISH == state || STATE_CANCEL == state) {
+                logDebug("launchTimer - Message has been shown or canceled, state = $state")
+                return
+            }
+            val timer = inMeetingViewModel.restoreCurrentTimer()
+            logDebug("launchTimer - restoreCurrentTimer to $timer")
+            bCountDownTimerStart = true
+            inMeetingViewModel.startCountDown()
         }
+    }
+
+    /**
+     * Cancel the countdown timer for incompatibility warning display
+     */
+    private fun cancelCountDownTimer() {
+        inMeetingViewModel.cancelCountDownTimer()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -1772,12 +1784,24 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 val participantsCount = getparticipantsCount()
                 val count = it.size
                 if (participantsCount > 0 && count == participantsCount.toInt()) {
-                    // all participants in and stop timer and remove snackbar
-                    channel.cancel()
+                    // If all participants in, stop timer and save config to prevent new warning msg for this chatID
+                    logDebug("Cancel launchTimer when all participants in")
+                    cancelCountDownTimer()
+
+                    if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
+                        bCountDownTimerStart = false
+                        inMeetingViewModel.updateShowWarningMessage(STATE_CANCEL)
+                    }
+
+                    // Remove snackbar
                     meetingActivity.snackbar?.dismiss()
                 }
                 if(participantsCount > 0 && count < participantsCount.toInt()){
-                    launchTimer()
+                    if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()
+                        && STATE_CANCEL != inMeetingViewModel.shouldShowWarningMessage()) {
+                        logDebug("launchTimer - when not all participants in")
+                        launchTimer()
+                    }
                 }
             }
         }
@@ -2417,7 +2441,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         const val TYPE_IN_SPEAKER_VIEW = "TYPE_IN_SPEAKER_VIEW"
 
         const val MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC = 6
-        const val WAITING_TIME = 26000L // 26 seconds
+
     }
 
     /**
@@ -2454,6 +2478,23 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onResume()
         MegaApplication.getInstance().startProximitySensor()
         checkChildFragments()
+
+        // The same chatId and the timer is paused, so resume it
+        if (STATE_RESUME == inMeetingViewModel.shouldShowWarningMessage()) {
+            logDebug("launchTimer when onResume")
+            launchTimer()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        logDebug("Cancel launchTimer when onPause and update STATE_RESUME")
+        cancelCountDownTimer()
+
+        val state = inMeetingViewModel.shouldShowWarningMessage()
+        if(state != STATE_FINISH && state != STATE_CANCEL) {
+            inMeetingViewModel.updateShowWarningMessage(STATE_RESUME)
+        }
     }
 
     override fun onCallAnswered(chatId: Long, flag: Boolean) {
