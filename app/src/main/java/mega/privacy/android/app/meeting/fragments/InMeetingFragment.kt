@@ -25,6 +25,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
+import kotlinx.android.synthetic.main.in_meeting_fragment.*
+import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import kotlinx.coroutines.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -39,6 +41,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CA
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_GET_AVATAR
+import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INCOMPATIBILITY_SHOW
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
@@ -989,6 +992,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     ),
                     MEGACHAT_INVALID_HANDLE
                 )
+                LiveEventBus.get(EVENT_MEETING_INCOMPATIBILITY_SHOW, Boolean::class.java)
+                    .post(true)
             }
         }
     }
