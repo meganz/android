@@ -8462,86 +8462,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		startActivityForResult(in, REQUEST_INVITE_CONTACT_FROM_DEVICE);
 	}
 
-	public void showConfirmationRemoveContacts(final ArrayList<MegaUser> c){
-		logDebug("showConfirmationRemoveContacts");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						cC.removeMultipleContacts(c);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		String title = getResources().getQuantityString(R.plurals.title_confirmation_remove_contact, c.size());
-		builder.setTitle(title);
-		String message= getResources().getQuantityString(R.plurals.confirmation_remove_contact, c.size());
-		builder.setMessage(message).setPositiveButton(R.string.general_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
-	}
-
-	public void showConfirmationRemoveContactRequest(final MegaContactRequest r){
-		logDebug("showConfirmationRemoveContactRequest");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						cC.removeInvitationContact(r);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		String message= getResources().getString(R.string.confirmation_delete_contact_request,r.getTargetEmail());
-		builder.setMessage(message).setPositiveButton(R.string.context_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
-	}
-
-	public void showConfirmationRemoveContactRequests(final List<MegaContactRequest> r){
-		logDebug("showConfirmationRemoveContactRequests");
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						cC.deleteMultipleSentRequestContacts(r);
-						break;
-
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		String message="";
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		if(r.size()==1){
-			message= getResources().getString(R.string.confirmation_delete_contact_request,r.get(0).getTargetEmail());
-		}else{
-			message= getResources().getString(R.string.confirmation_remove_multiple_contact_request,r.size());
-		}
-
-		builder.setMessage(message).setPositiveButton(R.string.context_remove, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-
-	}
-
 	public void showConfirmationRemoveAllSharingContacts(final List<MegaNode> shares) {
 		if (shares.size() == 1) {
 			showConfirmationRemoveAllSharingContacts(megaApi.getOutShares(shares.get(0)), shares.get(0));
@@ -11613,39 +11533,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error), -1);
 					}
 				}
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_REPLY_CONTACT_REQUEST){
-			logDebug("MegaRequest.TYPE_REPLY_CONTACT_REQUEST finished: " + request.getType());
-
-			if (e.getErrorCode() == MegaError.API_OK){
-
-				if(request.getNumber()==MegaContactRequest.REPLY_ACTION_ACCEPT){
-					logDebug("I've accepted the invitation");
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_invitacion_reply_accepted), -1);
-					MegaContactRequest contactRequest = megaApi.getContactRequestByHandle(request.getNodeHandle());
-					logDebug("Handle of the request: " + request.getNodeHandle());
-					if(contactRequest!=null){
-						//Get the data of the user (avatar and name)
-						MegaContactDB contactDB = dbH.findContactByEmail(contactRequest.getSourceEmail());
-						if(contactDB==null){
-							logWarning("Contact " + contactRequest.getHandle() + " not found! Will be added to DB!");
-							cC.addContactDB(contactRequest.getSourceEmail());
-						}
-					}
-					else{
-						logError("ContactRequest is NULL");
-					}
-				}
-				else if(request.getNumber()==MegaContactRequest.REPLY_ACTION_DENY){
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_invitacion_reply_declined), -1);
-				}
-				else if(request.getNumber()==MegaContactRequest.REPLY_ACTION_IGNORE){
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_invitacion_reply_ignored), -1);
-				}
-			}
-			else{
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error), -1);
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
