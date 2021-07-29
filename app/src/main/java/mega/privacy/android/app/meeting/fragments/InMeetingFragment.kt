@@ -129,7 +129,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private var micIsEnable = false
     private var camIsEnable = false
-    private var meetinglink: String = ""
+    private var meetingLink: String = ""
     private var inTemporaryState = false
     private var isManualModeView = false
     private var isWaitingForAnswerCall = false
@@ -448,14 +448,49 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private val sessionLowResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                if (callAndSession.second.canRecvVideoLowRes()) {
-                    logDebug("Can receive low-resolution video")
-                } else {
-                    logDebug("Can not receive low-resolution video")
-                    //Check list of participants
-                    if (inMeetingViewModel.changesInLowRes(callAndSession.second)) {
-                        updateLowOrHiResolution(false, callAndSession.second)
+            if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.isOneToOneCall()) {
+                inMeetingViewModel.getParticipant(
+                    callAndSession.second.peerid,
+                    callAndSession.second.clientid
+                )?.let { participant ->
+                    if (callAndSession.second.canRecvVideoLowRes()) {
+                        if (!participant.hasHiRes) {
+                            if (inMeetingViewModel.sessionHasVideo(participant.clientId)) {
+                                logDebug("Checking if the listener should be added...")
+                                checkVideoListener(
+                                    participant,
+                                    shouldAddListener = true,
+                                    isHiRes = false
+                                )
+                            }
+                        }
+                    } else if (!participant.hasHiRes) {
+                        logDebug("Checking if the listener should be removed...")
+                        checkVideoListener(
+                            participant,
+                            shouldAddListener = false,
+                            isHiRes = false
+                        )
+
+                        //I have stopped receiving LowResolution. I have to verify that I no longer need it.
+                        if (callAndSession.second.hasVideo() && !inMeetingViewModel.isCallOrSessionOnHold(
+                                callAndSession.second.clientid
+                            )
+                        ) {
+                            inMeetingViewModel.getSession(callAndSession.second.clientid)
+                                ?.let { session ->
+                                    if (session.status == MegaChatSession.SESSION_STATUS_IN_PROGRESS && inMeetingViewModel.isParticipantVisible(
+                                            participant
+                                        )
+                                    ) {
+                                        logDebug("Asking for low-resolution video")
+                                        inMeetingViewModel.requestLowResVideo(
+                                            session,
+                                            inMeetingViewModel.getChatId()
+                                        )
+                                    }
+                                }
+                        }
                     }
                 }
             }
@@ -463,24 +498,63 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private val sessionHiResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first)) {
-                if (callAndSession.second.canRecvVideoHiRes()) {
-                    logDebug("Can receive high-resolution video")
-                } else {
-                    logDebug("Can not receive high-resolution video")
-                    //Check individual call
-                    individualCallFragment?.let {
-                        if (it.isAdded) {
-                            it.updateResolution(
-                                callAndSession.second.peerid,
+            if (inMeetingViewModel.isSameCall(callAndSession.first) && !inMeetingViewModel.isOneToOneCall()) {
+                inMeetingViewModel.getParticipant(
+                    callAndSession.second.peerid,
+                    callAndSession.second.clientid
+                )?.let { participant ->
+                    if (callAndSession.second.canRecvVideoHiRes()) {
+                        if (participant.hasHiRes) {
+                            if (inMeetingViewModel.sessionHasVideo(participant.clientId)) {
+                                logDebug("Checking if the listener should be added...")
+                                checkVideoListener(
+                                    participant,
+                                    shouldAddListener = true,
+                                    isHiRes = true
+                                )
+                            }
+                        } else {
+                            if (inMeetingViewModel.sessionHasVideo(participant.clientId)) {
+                                logDebug("Checking if the speaker listener should be added...")
+                                checkSpeakerVideoListener(
+                                    callAndSession.second.peerid, callAndSession.second.clientid,
+                                    shouldAddListener = true
+                                )
+                            }
+                        }
+                    } else if (participant.hasHiRes) {
+                        logDebug("Checking if the listener should be removed...")
+                        checkVideoListener(
+                            participant,
+                            shouldAddListener = false,
+                            isHiRes = true
+                        )
+
+                        //I have stopped receiving HiResolution. I have to verify that I no longer need it.
+                        if (callAndSession.second.hasVideo() && !inMeetingViewModel.isCallOrSessionOnHold(
                                 callAndSession.second.clientid
                             )
+                        ) {
+                            inMeetingViewModel.getSession(callAndSession.second.clientid)
+                                ?.let { session ->
+                                    if (session.status == MegaChatSession.SESSION_STATUS_IN_PROGRESS && inMeetingViewModel.isParticipantVisible(
+                                            participant
+                                        )
+                                    ) {
+                                        logDebug("Asking for high-resolution video")
+                                        inMeetingViewModel.requestHiResVideo(
+                                            session,
+                                            inMeetingViewModel.getChatId()
+                                        )
+                                    }
+                                }
                         }
-                    }
-
-                    //Check list of participants
-                    if (inMeetingViewModel.changesInHiRes(callAndSession.second)) {
-                        updateLowOrHiResolution(true, callAndSession.second)
+                    } else {
+                        logDebug("Checking if the speaker listener should be removed...")
+                        checkSpeakerVideoListener(
+                            callAndSession.second.peerid, callAndSession.second.clientid,
+                            shouldAddListener = false
+                        )
                     }
                 }
             }
@@ -488,7 +562,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private val inviteObserver =
         Observer<Boolean> { invite ->
-            if (invite && !bInviteSent){
+            if (invite && !bInviteSent) {
                 bInviteSent = true
                 launchTimer()
             }
@@ -544,7 +618,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         // Get meeting link from the arguments supplied when the fragment was instantiated
-        meetinglink = args.meetingLink
+        meetingLink = args.meetingLink
 
         val isAudioEnable: Boolean? =
             arguments?.getBoolean(MeetingActivity.MEETING_AUDIO_ENABLE, false)
@@ -618,40 +692,54 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
             MEETING_ACTION_GUEST -> {
                 logDebug("Action guest")
-                inMeetingViewModel.chatLogout(SimpleChatRequestListener(MegaChatRequest.TYPE_LOGOUT, onSuccess = { _, _, _ ->
-                    inMeetingViewModel.createEphemeralAccountAndJoinChat(
-                        args.firstName,
-                        args.lastName,
-                        SimpleMegaRequestListener(MegaRequest.TYPE_CREATE_ACCOUNT, onSuccess = { _, _, _ ->
-                            inMeetingViewModel.chatConnect(SimpleChatRequestListener(MegaChatRequest.TYPE_CONNECT, onSuccess = { _, _, _ ->
-                                inMeetingViewModel.openChatPreview(
-                                    meetinglink,
-                                    SimpleChatRequestListener(MegaChatRequest.TYPE_LOAD_PREVIEW, onSuccess = { _, request, _ ->
-                                        logDebug(
-                                            "Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
-                                                request.megaHandleList?.get(
-                                                    0
-                                                )
-                                            }"
-                                        )
-                                        MegaApplication.getChatManagement().setOpeningMeetingLink(
-                                            request.chatHandle,
-                                            true
-                                        )
-                                        camIsEnable = sharedModel.cameraLiveData.value!!
-                                        inMeetingViewModel.joinPublicChat(
-                                            args.chatId,
-                                            AutoJoinPublicChatListener(
-                                                context,
-                                                this@InMeetingFragment
-                                            )
+                inMeetingViewModel.chatLogout(
+                    SimpleChatRequestListener(
+                        MegaChatRequest.TYPE_LOGOUT,
+                        onSuccess = { _, _, _ ->
+                            inMeetingViewModel.createEphemeralAccountAndJoinChat(
+                                args.firstName,
+                                args.lastName,
+                                SimpleMegaRequestListener(
+                                    MegaRequest.TYPE_CREATE_ACCOUNT,
+                                    onSuccess = { _, _, _ ->
+                                        inMeetingViewModel.chatConnect(
+                                            SimpleChatRequestListener(
+                                                MegaChatRequest.TYPE_CONNECT,
+                                                onSuccess = { _, _, _ ->
+                                                    inMeetingViewModel.openChatPreview(
+                                                        meetingLink,
+                                                        SimpleChatRequestListener(
+                                                            MegaChatRequest.TYPE_LOAD_PREVIEW,
+                                                            onSuccess = { _, request, _ ->
+                                                                logDebug(
+                                                                    "Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
+                                                                        request.megaHandleList?.get(
+                                                                            0
+                                                                        )
+                                                                    }"
+                                                                )
+                                                                MegaApplication.getChatManagement()
+                                                                    .setOpeningMeetingLink(
+                                                                        request.chatHandle,
+                                                                        true
+                                                                    )
+                                                                camIsEnable =
+                                                                    sharedModel.cameraLiveData.value!!
+                                                                inMeetingViewModel.joinPublicChat(
+                                                                    args.chatId,
+                                                                    AutoJoinPublicChatListener(
+                                                                        context,
+                                                                        this@InMeetingFragment
+                                                                    )
+                                                                )
+                                                            })
+                                                    )
+                                                })
                                         )
                                     })
-                                )
-                            }))
+                            )
                         })
-                    )
-                }))
+                )
             }
             MEETING_ACTION_RINGING_VIDEO_ON -> {
                 logDebug("Action ringing with video on")
@@ -847,7 +935,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.meetingLinkLiveData.observe(viewLifecycleOwner) {
             if (!it.isNullOrEmpty()) {
                 logDebug("Link has changed")
-                meetinglink = it
+                meetingLink = it
                 inMeetingViewModel.getCall()?.let {
                     if (inMeetingViewModel.isWaitingForLink()) {
                         inMeetingViewModel.setWaitingForLink(false)
@@ -946,7 +1034,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 val count = inMeetingViewModel.participants.value
                 if (count != null) {
                     val participantsCount = getparticipantsCount()
-                    if(participantsCount == 0L && count.size == 0){
+                    if (participantsCount == 0L && count.size == 0) {
                         launchTimer()
                     } else if (participantsCount > 0 && count.size < participantsCount.toInt()) {
                         // start timer
@@ -1445,7 +1533,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
         }
 
-        inMeetingViewModel.removeParticipantResolution(status)
+        inMeetingViewModel.updateParticipantResolution(status)
         checkGridSpeakerViewMenuItemVisibility()
     }
 
@@ -1482,7 +1570,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             )
         }
 
-        inMeetingViewModel.removeParticipantResolution(status)
+        inMeetingViewModel.updateParticipantResolution(status)
         checkGridSpeakerViewMenuItemVisibility()
     }
 
@@ -1605,15 +1693,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Start Timer for 26s and show snackbar for version incompatibility
      */
     private fun launchTimer() {
-        if(!inMeetingViewModel.isModerator())
+        if (!inMeetingViewModel.isModerator())
             return
-        if(!bShowImcompatibility) {
+        if (!bShowImcompatibility) {
             bShowImcompatibility = true
             lifecycleScope.launch {
                 launch(Dispatchers.IO) {
                     logDebug("launchTimer() will send after 26s")
                     delay(WAITING_TIME)
-                    if(!channel.isClosedForSend) {
+                    if (!channel.isClosedForSend) {
                         logDebug("launchTimer() send and then close")
                         channel.send(WAITING_TIME.toInt())
                         channel.close()
@@ -1776,7 +1864,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     channel.cancel()
                     meetingActivity.snackbar?.dismiss()
                 }
-                if(participantsCount > 0 && count < participantsCount.toInt()){
+                if (participantsCount > 0 && count < participantsCount.toInt()) {
                     launchTimer()
                 }
             }
@@ -2067,24 +2155,43 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Method that controls when the resolution of a participant's video has changed
+     * Method that controls when the resolution of a participant's video has changed and should add or remove the listener
      *
+     * @param participant The participant whose listener of the video is to be added or deleted
+     * @param shouldAddListener True, should add the listener. False, should remove the listener
      * @param isHiRes True, if is High resolution. False, if is Low resolution
-     * @param session The session of a participant
      */
-    private fun updateLowOrHiResolution(isHiRes: Boolean, session: MegaChatSession) {
-        logDebug("The resolution of a participant needs to be updated")
-        inMeetingViewModel.getParticipant(session.peerid, session.clientid)?.let {
-            val speakerParticipant = inMeetingViewModel.speakerParticipant.value
-            val isSpeaker =
-                speakerParticipant != null && speakerParticipant.peerId == it.peerId && speakerParticipant.clientId == it.clientId
-
-            inMeetingViewModel.onActivateVideo(it, isSpeaker)
+    private fun checkVideoListener(
+        participant: Participant,
+        shouldAddListener: Boolean,
+        isHiRes: Boolean
+    ) {
+        gridViewCallFragment?.let {
+            if (it.isAdded) {
+                it.updateListener(participant, shouldAddListener, isHiRes)
+            }
         }
-
         speakerViewCallFragment?.let {
             if (it.isAdded) {
-                it.updateRemoteResolutionOfSpeaker(isHiRes, session)
+                it.updateListener(participant, shouldAddListener, isHiRes)
+            }
+        }
+    }
+
+    /**
+     * Method that controls when the resolution of a speaker's video has changed and should add or remove the listener
+     *
+     * @param peerId Peer ID of participant whose listener of the video is to be added or deleted
+     * @param clientId Client ID of participant whose listener of the video is to be added or deleted
+     * @param shouldAddListener True, should add the listener. False, should remove the listener
+     */
+    private fun checkSpeakerVideoListener(
+        peerId: Long, clientId: Long,
+        shouldAddListener: Boolean,
+    ) {
+        speakerViewCallFragment?.let {
+            if (it.isAdded) {
+                it.updateListenerSpeaker(peerId, clientId, shouldAddListener)
             }
         }
     }
@@ -2104,6 +2211,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     it.updateRemoteAudioVideo(TYPE_AUDIO, session)
                 }
                 if (isVideoChange) {
+                    logDebug("Remote AVFlag")
                     it.updateRemoteAudioVideo(TYPE_VIDEO, session)
                 }
             }
@@ -2143,7 +2251,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        inMeetingViewModel.checkParticipantsResolution(status)
+        inMeetingViewModel.updateParticipantResolution(status)
     }
 
     /**
@@ -2170,15 +2278,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         bottomFloatingPanelViewHolder.updateParticipantInfo(peerId, type)
 
-        if (type == AVATAR_CHANGE){
+        if (type == AVATAR_CHANGE) {
             individualCallFragment?.let {
-                if (it.isAdded && inMeetingViewModel.isMe(peerId)){
+                if (it.isAdded && inMeetingViewModel.isMe(peerId)) {
                     it.updateMyAvatar()
                 }
             }
 
             floatingWindowFragment?.let {
-                if (it.isAdded && inMeetingViewModel.isMe(peerId)){
+                if (it.isAdded && inMeetingViewModel.isMe(peerId)) {
                     it.updateMyAvatar()
                 }
             }
@@ -2306,6 +2414,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to control when I leave the call
      */
     private fun leaveMeeting() {
+        logDebug("Leaving meeting")
+        if (inMeetingViewModel.amIAGuest()) {
+            removeUI()
+        }
+
         inMeetingViewModel.leaveMeeting()
         if (inMeetingViewModel.amIAGuest()) {
             AccountController.logout(meetingActivity, MegaApplication.getInstance().megaApi)
@@ -2334,7 +2447,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             return
         }
 
-        if (meetinglink.isEmpty()) {
+        if (meetingLink.isEmpty()) {
             inMeetingViewModel.setWaitingForLink(sendLink)
             sharedModel.createChatLink(
                 inMeetingViewModel.getChatId(),
@@ -2355,7 +2468,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Share the link")
         meetingActivity.startActivity(Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, meetinglink)
+            putExtra(Intent.EXTRA_TEXT, meetingLink)
             type = "text/plain"
         })
     }

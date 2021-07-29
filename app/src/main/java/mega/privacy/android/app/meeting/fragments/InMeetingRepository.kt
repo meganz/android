@@ -299,15 +299,15 @@ class InMeetingRepository @Inject constructor(
      * @param chatId chat ID
      * @param clientId client ID of a participant
      * @param hiRes If it's has High resolution
-     * @param listener MeetingVideoListener
+     * @param listener MegaChatVideoListenerInterface
      */
-    fun addRemoteVideoOneToOneCall(
+    fun addChatRemoteVideoListener(
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
-        listener: MeetingVideoListener
+        listener: MegaChatVideoListenerInterface
     ) {
-        logDebug("Add Chat remote video listener of $clientId")
+        logDebug("Add Chat remote video listener of client $clientId , with HiRes $hiRes")
         megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
     }
 
@@ -317,51 +317,15 @@ class InMeetingRepository @Inject constructor(
      * @param chatId chat ID
      * @param clientId client ID of a participant
      * @param hiRes If it's has High resolution
-     * @param listener MeetingVideoListener
+     * @param listener MegaChatVideoListenerInterface
      */
-    fun removeRemoteVideoOneToOneCall(
+    fun removeChatRemoteVideoListener(
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
-        listener: MeetingVideoListener
+        listener: MegaChatVideoListenerInterface
     ) {
-        logDebug("Remove chat video listener of $clientId")
-        megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
-    }
-
-    /**
-     * Method of obtaining the remote video
-     *
-     * @param chatId chat ID
-     * @param clientId client ID of a participant
-     * @param hiRes If it's has High resolution
-     * @param listener GroupVideoListener
-     */
-    fun addRemoteVideo(
-        chatId: Long,
-        clientId: Long,
-        hiRes: Boolean,
-        listener: GroupVideoListener
-    ) {
-        logDebug("Add Chat remote video listener of client $clientId")
-        megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
-    }
-
-    /**
-     * Method of remove the remote video
-     *
-     * @param chatId chat ID
-     * @param clientId client ID of a participant
-     * @param hiRes If it's has High resolution
-     * @param listener GroupVideoListener
-     */
-    fun removeRemoteVideo(
-        chatId: Long,
-        clientId: Long,
-        hiRes: Boolean,
-        listener: GroupVideoListener
-    ) {
-        logDebug("Remove Chat remote video listener of client $clientId")
+        logDebug("Remove Chat remote video listener of client $clientId, with isHiRes $hiRes")
         megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
     }
 
@@ -562,11 +526,13 @@ class InMeetingRepository @Inject constructor(
         }
 
         if (bitmap == null) {
-            megaApi.getUserAvatar(mail,
+            megaApi.getUserAvatar(
+                mail,
                 CacheFolderManager.buildAvatarFile(
                     context,
                     mail + FileUtil.JPG_EXTENSION
-                ).absolutePath, MeetingAvatarListener(context, peerId))
+                ).absolutePath, MeetingAvatarListener(context, peerId)
+            )
             bitmap = CallUtil.getDefaultAvatarCall(
                 MegaApplication.getInstance().applicationContext,
                 peerId
@@ -612,12 +578,14 @@ class InMeetingRepository @Inject constructor(
      *
      * @param peerId the peerId of participant
      */
-    fun getRemoteAvatar(peerId: Long){
+    fun getRemoteAvatar(peerId: Long) {
         val email = ChatController(context).getParticipantEmail(peerId)
-        megaApi.getUserAvatar(email,
+        megaApi.getUserAvatar(
+            email,
             CacheFolderManager.buildAvatarFile(
                 context,
                 email + FileUtil.JPG_EXTENSION
-            ).absolutePath, MeetingAvatarListener(context, peerId))
+            ).absolutePath, MeetingAvatarListener(context, peerId)
+        )
     }
 }

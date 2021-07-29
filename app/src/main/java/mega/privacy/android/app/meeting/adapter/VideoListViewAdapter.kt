@@ -20,7 +20,7 @@ class VideoListViewAdapter(
     override fun onViewRecycled(holder: VideoMeetingViewHolder) {
         super.onViewRecycled(holder)
 
-        if(holder.adapterPosition == INVALID_POSITION)
+        if (holder.adapterPosition == INVALID_POSITION)
             return
 
         holder.onRecycle()
@@ -130,6 +130,23 @@ class VideoListViewAdapter(
         val position = getParticipantPosition(participant.peerId, participant.clientId)
         getHolder(position)?.let {
             it.updateSessionOnHold(participant, isOnHold)
+            return
+        }
+
+        notifyItemChanged(position)
+    }
+
+    /**
+     * Method to control when the video listener should be added or removed.
+     *
+     * @param participant The participant whose listener of the video is to be added or deleted
+     * @param shouldAddListener True, should add the listener. False, should remove the listener
+     * @param isHiRes True, if is High resolution. False, if is Low resolution
+     */
+    fun updateListener(participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean) {
+        val position = getParticipantPosition(participant.peerId, participant.clientId)
+        getHolder(position)?.let {
+            it.updateListener(participant, shouldAddListener, isHiRes)
             return
         }
 
