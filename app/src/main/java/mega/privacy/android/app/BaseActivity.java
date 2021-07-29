@@ -59,6 +59,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INCOMPATIBILITY_SHOW;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
@@ -772,10 +773,12 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 break;
 
             case SNACKBAR_IMCOMPATIBILITY_TYPE: {
-                this.snackbar = snackbar;
                 TextView snackbarTextView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
                 snackbarTextView.setMaxLines(5);
-                snackbar.setAction(R.string.general_ok, v -> {snackbar.dismiss();});
+                snackbar.setAction(R.string.general_ok, v -> {
+                    snackbar.dismiss();
+                    LiveEventBus.get(EVENT_MEETING_INCOMPATIBILITY_SHOW, Boolean.class).post(false);
+                });
                 snackbar.show();
                 break;
             }

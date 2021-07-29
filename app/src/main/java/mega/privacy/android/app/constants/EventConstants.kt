@@ -11,7 +11,7 @@ object EventConstants {
 
     /** Event Keys related to calls*/
     const val EVENT_ERROR_STARTING_CALL = "error_starting_call"
-    const val EVENT_UPDATE_CALL = "update_call";
+    const val EVENT_UPDATE_CALL = "update_call"
     const val EVENT_CALL_STATUS_CHANGE = "call_status_change"
     const val EVENT_LOCAL_AVFLAGS_CHANGE = "local_avflags_change"
     const val EVENT_RINGING_STATUS_CHANGE = "ringing_status_change"
@@ -28,6 +28,7 @@ object EventConstants {
     const val EVENT_MEETING_CREATED = "meeting_created"
     const val EVENT_LINK_RECOVERED = "meeting_link_recovered"
     const val EVENT_MEETING_INVITE = "meeting_invite"
+    const val EVENT_MEETING_INCOMPATIBILITY_SHOW = "meeting_incompatibility"
 
     /** Event Keys related to sessions*/
     const val EVENT_SESSION_STATUS_CHANGE = "session_status_change"
