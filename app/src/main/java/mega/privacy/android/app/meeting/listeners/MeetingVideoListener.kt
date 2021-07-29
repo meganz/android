@@ -22,7 +22,7 @@ class MeetingVideoListener(
     outMetrics: DisplayMetrics?,
     clientId: Long,
     isFloatingWindow: Boolean = true,
-    isOneToOneCall:Boolean = true
+    isOneToOneCall: Boolean = true
 ) : MegaChatVideoListenerInterface {
 
     var width = 0
@@ -33,6 +33,7 @@ class MeetingVideoListener(
     private var bitmap: Bitmap? = null
     private var viewWidth = 0
     private var viewHeight = 0
+    private var isFrontCameraInUse = true
 
     fun setAlpha(alpha: Int) {
         renderer.setAlpha(alpha)
@@ -53,9 +54,14 @@ class MeetingVideoListener(
         // viewWidth != surfaceView.width || viewHeight != surfaceView.height
         // Re-calculate the camera preview ratio when surface view size changed
         if (this.width != width || this.height != height
-            || viewWidth != surfaceView.width || viewHeight != surfaceView.height) {
+            || viewWidth != surfaceView.width || viewHeight != surfaceView.height
+        ) {
             this.width = width
             this.height = height
+
+            viewWidth = surfaceView.width
+            viewHeight = surfaceView.height
+
             val holder = surfaceView.holder
             if (holder != null) {
                 val viewWidth = surfaceView.width
@@ -72,21 +78,23 @@ class MeetingVideoListener(
 
                     bitmap = renderer.createBitmap(width, height)
 
-                   if(!isLocal){
-                       holder.setFixedSize(holderWidth, holderHeight)
-                   }
+                    if (!isLocal) {
+                        holder.setFixedSize(holderWidth, holderHeight)
+                    }
                 } else {
                     this.width = INVALID_DIMENSION
                     this.height = INVALID_DIMENSION
                 }
             }
+
+            isFrontCameraInUse = VideoCaptureUtils.isFrontCameraInUse()
         }
 
         if (bitmap == null) return
 
         bitmap!!.copyPixelsFromBuffer(ByteBuffer.wrap(byteBuffer))
         if (VideoCaptureUtils.isVideoAllowed()) {
-            renderer.drawBitmap(isLocal, false)
+            renderer.drawBitmapForMeeting(false, isLocal && isFrontCameraInUse)
         }
     }
 
