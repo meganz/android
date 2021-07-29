@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -21,10 +22,15 @@ import kotlinx.android.synthetic.main.dialog_general_confirmation.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.constants.IntentConstants.Companion.ACTION_OPEN_ACHIEVEMENTS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
+import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
+import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
+import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -32,6 +38,7 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.Util.showAlert
 import org.jetbrains.anko.contentView
 
 class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback {
@@ -41,6 +48,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         private const val CANCEL_SUBSCRIPTIONS_SHOWN = "CANCEL_SUBSCRIPTIONS_SHOWN"
         private const val TYPED_FEEDBACK = "TYPED_FEEDBACK"
         private const val CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN = "CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN"
+        private const val CONFIRM_CANCEL_ACCOUNT_SHOWN = "CONFIRM_CANCEL_ACCOUNT_SHOWN"
     }
 
     private val viewModel: MyAccountViewModel by viewModels()
@@ -53,7 +61,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     private var killSessionsConfirmationDialog: AlertDialog? = null
     private var cancelSubscriptionsDialog: AlertDialog? = null
     private var cancelSubscriptionsConfirmationDialog: AlertDialog? = null
-
+    private var confirmCancelAccountDialog: AlertDialog? = null
     private var cancelSubscriptionsFeedback: String? = null
 
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -91,11 +99,27 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 savedInstanceState.getBoolean(CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN, false) -> {
                     showConfirmationCancelSubscriptions()
                 }
+                savedInstanceState.getBoolean(CONFIRM_CANCEL_ACCOUNT_SHOWN, false) -> {
+                    showConfirmCancelAccountDialog()
+                }
             }
         }
     }
 
     private fun manageIntentExtras() {
+        when (intent.action) {
+            ACTION_OPEN_ACHIEVEMENTS -> {
+                startActivity(Intent(this, AchievementsActivity::class.java))
+                return
+            }
+            ACTION_CANCEL_ACCOUNT -> {
+                viewModel.confirmCancelAccount(intent.data.toString()) { result ->
+                    showConfirmCancelAccountQueryResult(result)
+                }
+                return
+            }
+        }
+
         val accountType = intent.getIntExtra(EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
         if (accountType != INVALID_VALUE) {
             startActivity(
@@ -118,6 +142,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         outState.putBoolean(
             CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN,
             isAlertDialogShown(cancelSubscriptionsConfirmationDialog)
+        )
+
+        outState.putBoolean(
+            CONFIRM_CANCEL_ACCOUNT_SHOWN,
+            isAlertDialogShown(confirmCancelAccountDialog)
         )
 
         super.onSaveInstanceState(outState)
@@ -157,6 +186,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         killSessionsConfirmationDialog?.dismiss()
         cancelSubscriptionsDialog?.dismiss()
         cancelSubscriptionsConfirmationDialog?.dismiss()
+        confirmCancelAccountDialog?.dismiss()
         super.onDestroy()
     }
 
@@ -408,6 +438,71 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 }
             }.setNegativeButton(StringResourcesUtils.getString(R.string.general_no), null)
             .show()
+    }
+
+    private fun showConfirmCancelAccountQueryResult(result: String) {
+        if (Util.matchRegexs(result, CANCEL_ACCOUNT_LINK_REGEXS)) {
+            showConfirmCancelAccountDialog()
+        } else {
+            showAlert(this, result, StringResourcesUtils.getString(R.string.general_error_word))
+        }
+    }
+
+    private fun showConfirmCancelAccountDialog() {
+        val errorInputBinding = DialogErrorInputEditTextBinding.inflate(layoutInflater)
+        confirmCancelAccountDialog = MaterialAlertDialogBuilder(this)
+            .setTitle(StringResourcesUtils.getString(R.string.delete_account))
+            .setMessage(StringResourcesUtils.getString(R.string.delete_account_text_last_step))
+            .setView(errorInputBinding.root)
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.delete_account), null)
+            .create()
+
+        confirmCancelAccountDialog?.apply {
+            setOnShowListener {
+                errorInputBinding.textField.apply {
+                    hint = StringResourcesUtils.getString(R.string.edit_text_insert_pass)
+                    setOnEditorActionListener { _, actionId, _ ->
+                        if (actionId == EditorInfo.IME_ACTION_DONE) {
+                            confirmCancelAccount(errorInputBinding)
+                        }
+
+                        true
+                    }
+
+                    doAfterTextChanged {
+                        quitEditTextError(errorInputBinding.editLayout, errorInputBinding.errorIcon)
+                    }
+
+                    requestFocus()
+                }
+
+                positive_button.setOnClickListener { confirmCancelAccount(errorInputBinding) }
+            }
+
+            show()
+        }
+    }
+
+    private fun confirmCancelAccount(binding: DialogErrorInputEditTextBinding) {
+        val password = binding.textField.text.toString()
+        if (password.isEmpty()) {
+            setEditTextError(
+                StringResourcesUtils.getString(R.string.invalid_string),
+                binding.editLayout,
+                binding.errorIcon
+            )
+        } else {
+            viewModel.finishConfirmCancelAccount(password) { message -> showErrorAlert(message) }
+        }
+    }
+
+    private fun showErrorAlert(message: String) {
+        showAlert(
+            this,
+            message,
+            StringResourcesUtils.getString(R.string.general_error_word)
+        )
     }
 
     fun showSnackbar(text: String) {

@@ -313,12 +313,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
 	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
 	private static final String DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE = "DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE";
-	public static final String OFFLINE_SEARCH_QUERY = "OFFLINE_SEARCH_QUERY:";
 
     private static final String BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN";
 	private static final String BUSINESS_CU_ALERT_SHOWN = "BUSINESS_CU_ALERT_SHOWN";
-	public static final String BUSINESS_CU_FRAGMENT_SETTINGS = "BUSINESS_CU_FRAGMENT_SETTINGS";
-	public static final String BUSINESS_CU_FRAGMENT_CU = "BUSINESS_CU_FRAGMENT_CU";
 
 	private static final String DEEP_BROWSER_TREE_LINKS = "DEEP_BROWSER_TREE_LINKS";
     private static final String PARENT_HANDLE_LINKS = "PARENT_HANDLE_LINKS";
@@ -345,7 +342,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private static final int CHAT_BNV = 3;
 	private static final int SHARED_BNV = 4;
 	private static final int HIDDEN_BNV = 5;
-	private static final int MEDIA_UPLOADS_BNV = 6;
 	// 8dp + 56dp(Fab's size) + 8dp
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
 
@@ -384,8 +380,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	TextView addPhoneNumberLabel;
 	FloatingActionButton fabButton;
 
-	AlertDialog evaluateAppDialog;
-
 	MegaNode inboxNode = null;
 
 	MegaNode rootNode = null;
@@ -416,7 +410,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	MegaChatApiAndroid megaChatApi;
 	Handler handler;
 	DisplayMetrics outMetrics;
-    float scaleText;
 	FragmentContainerView fragmentContainer;
     ActionBar aB;
     MaterialToolbar toolbar;
@@ -448,9 +441,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private boolean isTransferOverQuotaWarningShown;
 	private AlertDialog transferOverQuotaWarning;
 	private AlertDialog confirmationTransfersDialog;
-
-	private boolean userNameChanged;
-	private boolean userEmailChanged;
 
 	private AlertDialog reconnectDialog;
 
@@ -496,10 +486,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, CAMERA_UPLOADS, HOMEPAGE, CHAT, SHARED_ITEMS,
-		ACCOUNT, CONTACTS, NOTIFICATIONS, SETTINGS,
-		INBOX, SEARCH, TRANSFERS, RUBBISH_BIN,
-		ASK_PERMISSIONS;
+		CLOUD_DRIVE, CAMERA_UPLOADS, HOMEPAGE, CHAT, SHARED_ITEMS, CONTACTS, NOTIFICATIONS,
+		SETTINGS, INBOX, SEARCH, TRANSFERS, RUBBISH_BIN, ASK_PERMISSIONS;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -512,7 +500,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					context.getString(R.string.section_contacts);
 				}
 				case SETTINGS: return context.getString(R.string.action_settings);
-				case ACCOUNT: return context.getString(R.string.section_account);
 				case SEARCH: return context.getString(R.string.action_search);
 				case TRANSFERS: return context.getString(R.string.section_transfers);
 				case CHAT: return context.getString(R.string.section_chat);
@@ -591,7 +578,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private boolean restoreFromRubbish = false;
 
 	boolean megaContacts = true;
-	String feedback;
 
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
 
@@ -1080,19 +1066,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private final Observer<Boolean> finishObserver = finish -> {
 		if (finish) finish();
 	};
-
-	private MegaSku getSkuDetails(List<MegaSku> list, String key) {
-		if (list == null || list.isEmpty()) {
-			return null;
-		}
-
-		for (MegaSku details : list) {
-			if (details.getSku().equals(key)) {
-				return details;
-			}
-		}
-		return null;
-	}
 
 	/**
 	 * Method for updating the visible elements related to a call.
@@ -2269,22 +2242,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						return;
 					}
 					else if(getIntent().getAction().equals(ACTION_CANCEL_ACCOUNT)){
-						String link = getIntent().getDataString();
+						Uri link = getIntent().getData();
 						if(link!=null){
 							logDebug("Link to cancel: " + link);
-							drawerItem=DrawerItem.ACCOUNT;
-							selectDrawerItemLollipop(drawerItem);
+							showMyAccount(ACTION_CANCEL_ACCOUNT, link);
 							selectDrawerItemPending=false;
-							megaApi.queryCancelLink(link, this);
 						}
 					}
 					else if(getIntent().getAction().equals(ACTION_CHANGE_MAIL)){
 						String link = getIntent().getDataString();
 						if(link!=null){
 							logDebug("Link to change mail: " + link);
-							drawerItem=DrawerItem.ACCOUNT;
-							selectDrawerItemLollipop(drawerItem);
-							selectDrawerItemPending=false;
+//							drawerItem=DrawerItem.ACCOUNT;
 							showDialogInsertPassword(link, false);
 						}
 					}
@@ -2351,22 +2320,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					else if(getIntent().getAction().equals(ACTION_PASS_CHANGED)){
 						int result = getIntent().getIntExtra(RESULT, MegaError.API_OK);
 						if (result == MegaError.API_OK) {
-							drawerItem=DrawerItem.ACCOUNT;
-							selectDrawerItemLollipop(drawerItem);
+//							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemPending=false;
-							logDebug("Show success mesage");
+							logDebug("Show success message");
 							showAlert(this, getString(R.string.pass_changed_alert), null);
 						}
 						else if(result==MegaError.API_EARGS){
-							drawerItem=DrawerItem.ACCOUNT;
-							selectDrawerItemLollipop(drawerItem);
+//							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemPending=false;
 							logWarning("Error when changing pass - the current password is not correct");
 							showAlert(this,getString(R.string.old_password_provided_incorrect), getString(R.string.general_error_word));
 						}
 						else{
-							drawerItem=DrawerItem.ACCOUNT;
-							selectDrawerItemLollipop(drawerItem);
+//							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemPending=false;
 							logError("Error when changing pass - show error message");
 							showAlert(this,getString(R.string.general_text_error), getString(R.string.general_error_word));
@@ -2376,8 +2342,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						String link = getIntent().getDataString();
 						if(link!=null){
 							logDebug("Link to resetPass: " + link);
-							drawerItem=DrawerItem.ACCOUNT;
-							selectDrawerItemLollipop(drawerItem);
+//							drawerItem=DrawerItem.ACCOUNT;
 							selectDrawerItemPending=false;
 							showConfirmationResetPassword(link);
 						}
@@ -2461,9 +2426,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_MY_ACCOUNT)){
 						logDebug("Intent from chat - show my account");
-
-						drawerItem=DrawerItem.ACCOUNT;
-						selectDrawerItemLollipop(drawerItem);
+						showMyAccount();
 						selectDrawerItemPending=false;
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_UPGRADE_ACCOUNT)){
@@ -2954,14 +2917,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (contactStatus != null) {
 			ChatUtil.setContactStatus(chatStatus, contactStatus, StatusIconLocation.DRAWER);
 		}
-	}
-
-	void passwordReminderDialogBlocked(){
-		megaApi.passwordReminderDialogBlocked(this);
-	}
-
-	void passwordReminderDialogSkiped(){
-		megaApi.passwordReminderDialogSkipped(this);
 	}
 
 	@Override
@@ -4768,9 +4723,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	if (item == null) {
     		logWarning("The selected DrawerItem is NULL. Using latest or default value.");
     		item = drawerItem != null ? drawerItem : DrawerItem.CLOUD_DRIVE;
-		} else if (item == DrawerItem.ACCOUNT) {
-			showMyAccount();
-			return;
 		}
 
     	logDebug("Selected DrawerItem: " + item.name());
@@ -5331,12 +5283,26 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		showMyAccount(false, INVALID_VALUE);
 	}
 
-	public void showMyAccount(boolean openUpgrade, int accountType){
+	private void showMyAccount(boolean openUpgrade, int accountType){
+		showMyAccount(openUpgrade, accountType, null, null);
+	}
+
+	private void showMyAccount(String action){
+		showMyAccount(false, INVALID_VALUE, action, null);
+	}
+
+	private void showMyAccount(String action, Uri data){
+		showMyAccount(false, INVALID_VALUE, action, data);
+	}
+
+	private void showMyAccount(boolean openUpgrade, int accountType, String action, Uri data) {
 		if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
 			drawerLayout.closeDrawer(Gravity.LEFT);
 		}
 
-		Intent intent = new Intent(this, MyAccountActivity.class);
+		Intent intent = new Intent(this, MyAccountActivity.class)
+				.setAction(action)
+				.setData(data);
 
 		if (openUpgrade) {
 			intent.putExtra(EXTRA_ACCOUNT_TYPE, accountType);
@@ -5864,17 +5830,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH){
 					if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS
 							|| drawerItem == DrawerItem.NOTIFICATIONS|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.TRANSFERS) {
-						if (drawerItem == DrawerItem.ACCOUNT && comesFromNotifications) {
-							comesFromNotifications = false;
-							selectDrawerItemLollipop(DrawerItem.NOTIFICATIONS);
+						if (drawerItem == DrawerItem.SETTINGS) {
+							resetSettingsScrollIfNecessary();
 						}
-						else {
-							if (drawerItem == DrawerItem.SETTINGS) {
-								resetSettingsScrollIfNecessary();
-							}
 
-							backToDrawerItem(bottomNavigationCurrentItem);
-						}
+						backToDrawerItem(bottomNavigationCurrentItem);
 					} else {
 						drawerLayout.openDrawer(nV);
 					}
@@ -8460,13 +8420,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void navigateToAchievements(){
 		logDebug("navigateToAchievements");
-		drawerItem = DrawerItem.ACCOUNT;
-		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 		getProLayout.setVisibility(View.GONE);
-		selectDrawerItemLollipop(drawerItem);
-
-		Intent intent = new Intent(this, AchievementsActivity.class);
-		startActivity(intent);
+		showMyAccount(ACTION_OPEN_ACHIEVEMENTS);
 	}
 
 	public void navigateToContacts(int index){
@@ -8477,11 +8432,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void navigateToMyAccount(){
 		logDebug("navigateToMyAccount");
-		drawerItem = DrawerItem.ACCOUNT;
-		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 		getProLayout.setVisibility(View.GONE);
-		comesFromNotifications = true;
-		selectDrawerItemLollipop(drawerItem);
+		showMyAccount();
 	}
 
 	@Override
@@ -9092,20 +9044,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	private long[] getChatHandles(ArrayList<MegaChatRoom> chats, long[] _chatHandles) {
-		if (_chatHandles != null && chats == null) {
-			return _chatHandles;
-		}
-
-		long[] chatHandles = new long[chats.size()];
-
-		for (int i = 0; i < chats.size(); i++) {
-			chatHandles[i] = chats.get(i).getChatId();
-		}
-
-		return chatHandles;
-	}
-
 	public void startOneToOneChat(MegaUser user){
 		logDebug("User Handle: " + user.getHandle());
 		MegaChatRoom chat = megaChatApi.getChatRoomByUser(user.getHandle());
@@ -9123,20 +9061,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			this.startActivity(intentOpenChat);
 		}
 	}
-
-
-	public void startGroupConversation(ArrayList<Long> userHandles){
-		logDebug("startGroupConversation");
-		MegaChatPeerList peers = MegaChatPeerList.createInstance();
-
-		for(int i=0;i<userHandles.size();i++){
-			long handle = userHandles.get(i);
-			peers.addPeer(handle, MegaChatPeerList.PRIV_STANDARD);
-		}
-
-		megaChatApi.createChat(false, peers, this);
-	}
-
 
 	/*
 	 * Background task to get files on a folder for uploading
@@ -10241,10 +10165,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
-
-//				if (getMyAccountFragment() != null) {
-//					maF.refreshVersionsInfo();
-//				}
 			}
         }
 		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CHANGE_EMAIL_LINK){
@@ -10927,10 +10847,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		dbH.saveMyEmail(email);
-
-//		if(getMyAccountFragment()!=null){
-//			maF.updateMailView(email);
-//		}
 	}
 
 	public void onNodesCloudDriveUpdate() {
@@ -11460,11 +11376,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		nVDisplayName.setText(fullName);
 		setProfileAvatar();
-	}
-
-	public void updateMailNavigationView(String email){
-		logDebug("updateMailNavigationView");
-		nVEmail.setText(megaApi.getMyEmail());
 	}
 
 	public void hideFabButton(){
@@ -12159,10 +12070,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     private void refreshAddPhoneNumberButton(){
         navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
-
-//        if(getMyAccountFragment() != null){
-//            maF.updateAddPhoneNumberLabel();
-//        }
     }
 
     public void showAddPhoneNumberInMenu(){

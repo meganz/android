@@ -60,7 +60,9 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     private val resetPhoneNumberUseCase: ResetPhoneNumberUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
-    private val getFileVersionsOptionUseCase: GetFileVersionsOptionUseCase
+    private val getFileVersionsOptionUseCase: GetFileVersionsOptionUseCase,
+    private val queryRecoveryLinkUseCase: QueryRecoveryLinkUseCase,
+    private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase
 ) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
 
     companion object {
@@ -95,6 +97,8 @@ class MyAccountViewModel @ViewModelInject constructor(
     private var numOfClicksLastSession = 0
 
     private var setAvatarAction: ((Pair<Boolean, Boolean>) -> Unit)? = null
+
+    private var confirmationLink: String? = null
 
     fun getFirstName(): String = myAccountInfo.getFirstNameText()
 
@@ -671,5 +675,40 @@ class MyAccountViewModel @ViewModelInject constructor(
                 onComplete = { setVersionsInfo() },
                 onError = { error -> logWarning(error.message) })
             .addTo(composite)
+    }
+
+    /**
+     * Queries if the cancel account provided is the right one before cancel the account.
+     *
+     * @param link   Confirmation link for cancel account.
+     * @param action Action to perform after query confirmation link.
+     */
+    fun confirmCancelAccount(link: String, action: (String) -> Unit) {
+        queryRecoveryLinkUseCase.queryCancelAccount(link)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy { result ->
+                confirmationLink = result
+                action.invoke(result)
+            }
+            .addTo(composite)
+    }
+
+    /**
+     * Confirms the account cancellation.
+     *
+     * @param password Password typed to cancel the account.
+     * @param action   Action to perform after confirm the account cancellation if it failed.
+     */
+    fun finishConfirmCancelAccount(password: String, action: (String) -> Unit) {
+        confirmationLink?.let { link ->
+            confirmCancelAccountUseCase.confirm(link, password)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = { logDebug("ACCOUNT CANCELED") },
+                    onError = { error -> error.message?.let { message -> action.invoke(message) } })
+                .addTo(composite)
+        }
     }
 }
