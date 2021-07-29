@@ -1,18 +1,16 @@
 package mega.privacy.android.app.upgradeAccount
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.os.Bundle
 import android.text.Spanned
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.ListenScrollChangesHelper
@@ -141,7 +139,6 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
         )
 
-        viewModel.getQueryPurchasesMessage().observe(this, ::showQueryPurchasesResult)
         viewModel.onUpdatePricing().observe(this, ::updatePricing)
     }
 
@@ -157,20 +154,6 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
         binding.semitransparentLayer.isVisible = false
         binding.availablePaymentMethods.isVisible = false
-    }
-
-    /**
-     * Shows the result of a purchase as an alert.
-     *
-     * @param message String to show as message alert.
-     */
-    private fun showQueryPurchasesResult(message: String?) {
-        if (TextUtil.isTextEmpty(message)) {
-            return
-        }
-
-        Util.showAlert(this, message, null)
-        viewModel.resetQueryPurchasesMessage()
     }
 
     /**

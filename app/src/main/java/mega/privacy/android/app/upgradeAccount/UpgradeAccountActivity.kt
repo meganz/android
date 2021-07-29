@@ -2,23 +2,24 @@ package mega.privacy.android.app.upgradeAccount
 
 import android.os.Bundle
 import android.text.Spanned
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.service.iab.BillingManagerImpl
-import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LogUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 
 class UpgradeAccountActivity : ChooseAccountActivity() {
 
     private var displayedAccountType = INVALID_VALUE
+
+    private var upgradeAlert: AlertDialog? = null
 
     override fun manageUpdateReceiver(action: Int) {
         super.manageUpdateReceiver(action)
@@ -34,6 +35,13 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
         displayedAccountType = intent.getIntExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
 
         setupView()
+        setupObservers()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        upgradeAlert?.dismiss()
     }
 
     override fun onBackPressed() {
@@ -46,6 +54,10 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
 
         setAccountDetails()
         showAvailableAccount()
+    }
+
+    private fun setupObservers() {
+        viewModel.getQueryPurchasesMessage().observe(this, ::showQueryPurchasesResult)
     }
 
     override fun setPricingInfo() {
@@ -376,6 +388,23 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * Shows the result of a purchase as an alert.
+     *
+     * @param message String to show as message alert.
+     */
+    private fun showQueryPurchasesResult(message: String?) {
+        if (TextUtil.isTextEmpty(message)) {
+            return
+        }
+
+        upgradeAlert = MaterialAlertDialogBuilder(this)
+            .setTitle(StringResourcesUtils.getString(R.string.my_account_upgrade_pro))
+            .setMessage(message)
+            .setPositiveButton("Got it!") { _, _ -> viewModel.resetQueryPurchasesMessage() }
+            .show()
     }
 
     /**

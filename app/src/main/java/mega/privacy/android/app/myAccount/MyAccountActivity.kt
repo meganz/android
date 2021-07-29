@@ -77,16 +77,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
         setupView()
         setupObservers()
-
-        val accountType = intent.getIntExtra(EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
-        if (accountType != INVALID_VALUE) {
-            startActivity(
-                Intent(this, UpgradeAccountActivity::class.java)
-                    .putExtra(EXTRA_ACCOUNT_TYPE, accountType)
-            )
-
-            intent.removeExtra(EXTRA_ACCOUNT_TYPE)
-        }
+        manageIntentExtras()
 
         if (savedInstanceState != null) {
             when {
@@ -101,6 +92,18 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                     showConfirmationCancelSubscriptions()
                 }
             }
+        }
+    }
+
+    private fun manageIntentExtras() {
+        val accountType = intent.getIntExtra(EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
+        if (accountType != INVALID_VALUE) {
+            startActivity(
+                Intent(this, UpgradeAccountActivity::class.java)
+                    .putExtra(EXTRA_ACCOUNT_TYPE, accountType)
+            )
+
+            intent.removeExtra(EXTRA_ACCOUNT_TYPE)
         }
     }
 
