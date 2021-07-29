@@ -758,6 +758,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		setupMegaApiFolder();
 		setupMegaChatApi();
 
+		LiveEventBus.config().enableLogger(false);
+
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
