@@ -13,6 +13,14 @@ import javax.inject.Inject
 class ConfirmCancelAccountUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
+
+    /**
+     * Launches a request to confirm an account cancellation.
+     *
+     * @param link     The account cancellation link.
+     * @param password The password of the account to cancel.
+     * @return onComplete if success, the corresponding error if not.
+     */
     fun confirm(link: String, password: String): Completable =
         Completable.create { emitter ->
             megaApi.confirmCancelAccount(

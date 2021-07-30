@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -17,6 +18,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.activity_my_account.*
 import kotlinx.android.synthetic.main.dialog_general_confirmation.*
 import mega.privacy.android.app.R
@@ -25,6 +27,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.IntentConstants.Companion.ACTION_OPEN_ACHIEVEMENTS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
+import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -37,7 +40,7 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.*
-import org.jetbrains.anko.contentView
+import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
 import java.util.*
 
 class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback {
@@ -48,6 +51,9 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         private const val TYPED_FEEDBACK = "TYPED_FEEDBACK"
         private const val CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN = "CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN"
         private const val CONFIRM_CANCEL_ACCOUNT_SHOWN = "CONFIRM_CANCEL_ACCOUNT_SHOWN"
+        private const val CONFIRM_CHANGE_EMAIL_SHOWN = "CONFIRM_CHANGE_EMAIL_SHOWN"
+        private const val TYPE_CHANGE_EMAIL = 1
+        private const val TYPE_CANCEL_ACCOUNT = 2
     }
 
     private val viewModel: MyAccountViewModel by viewModels()
@@ -61,6 +67,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     private var cancelSubscriptionsDialog: AlertDialog? = null
     private var cancelSubscriptionsConfirmationDialog: AlertDialog? = null
     private var confirmCancelAccountDialog: AlertDialog? = null
+    private var confirmChangeEmailDialog: AlertDialog? = null
     private var cancelSubscriptionsFeedback: String? = null
 
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -101,6 +108,9 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 savedInstanceState.getBoolean(CONFIRM_CANCEL_ACCOUNT_SHOWN, false) -> {
                     showConfirmCancelAccountDialog()
                 }
+                savedInstanceState.getBoolean(CONFIRM_CHANGE_EMAIL_SHOWN, false) -> {
+                    showConfirmChangeEmailDialog()
+                }
             }
         }
     }
@@ -112,8 +122,22 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 return
             }
             ACTION_CANCEL_ACCOUNT -> {
-                viewModel.confirmCancelAccount(intent.data.toString()) { result ->
-                    showConfirmCancelAccountQueryResult(result)
+                intent.dataString?.let {
+                    viewModel.confirmCancelAccount(it) { result ->
+                        showConfirmCancelAccountQueryResult(result)
+                    }
+
+                    intent.data = null
+                }
+                return
+            }
+            ACTION_CHANGE_MAIL -> {
+                intent.dataString?.let {
+                    viewModel.confirmChangeEmail(it) { result ->
+                        showConfirmChangeEmailQueryResult(result)
+                    }
+
+                    intent.data = null
                 }
                 return
             }
@@ -146,6 +170,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         outState.putBoolean(
             CONFIRM_CANCEL_ACCOUNT_SHOWN,
             isAlertDialogShown(confirmCancelAccountDialog)
+        )
+
+        outState.putBoolean(
+            CONFIRM_CHANGE_EMAIL_SHOWN,
+            isAlertDialogShown(confirmChangeEmailDialog)
         )
 
         super.onSaveInstanceState(outState)
@@ -186,6 +215,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         cancelSubscriptionsDialog?.dismiss()
         cancelSubscriptionsConfirmationDialog?.dismiss()
         confirmCancelAccountDialog?.dismiss()
+        confirmChangeEmailDialog?.dismiss()
         super.onDestroy()
     }
 
@@ -443,7 +473,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         if (matchRegexs(result, CANCEL_ACCOUNT_LINK_REGEXS)) {
             showConfirmCancelAccountDialog()
         } else {
-            showAlert(this, result, StringResourcesUtils.getString(R.string.general_error_word))
+            showErrorAlert(StringResourcesUtils.getString(R.string.general_error_word))
         }
     }
 
@@ -457,15 +487,58 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             .setPositiveButton(StringResourcesUtils.getString(R.string.delete_account), null)
             .create()
 
-        confirmCancelAccountDialog?.apply {
-            setOnShowListener {
-                quitEditTextError(errorInputBinding.editLayout, errorInputBinding.errorIcon)
+        showConfirmDialog(
+            confirmCancelAccountDialog,
+            TYPE_CANCEL_ACCOUNT,
+            errorInputBinding.editLayout,
+            errorInputBinding.textField,
+            errorInputBinding.errorIcon
+        )
+    }
 
-                errorInputBinding.editLayout.hint =
+    private fun showConfirmChangeEmailQueryResult(result: String) {
+        if (matchRegexs(result, VERIFY_CHANGE_MAIL_LINK_REGEXS)) {
+            showConfirmChangeEmailDialog()
+        } else {
+            showErrorAlert(StringResourcesUtils.getString(R.string.general_error_word))
+        }
+    }
+
+    private fun showConfirmChangeEmailDialog() {
+        val errorInputBinding = DialogErrorInputEditTextBinding.inflate(layoutInflater)
+        confirmChangeEmailDialog = MaterialAlertDialogBuilder(this)
+            .setTitle(StringResourcesUtils.getString(R.string.change_mail_title_last_step))
+            .setMessage(StringResourcesUtils.getString(R.string.change_mail_text_last_step))
+            .setView(errorInputBinding.root)
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.change_pass), null)
+            .create()
+
+        showConfirmDialog(
+            confirmChangeEmailDialog,
+            TYPE_CHANGE_EMAIL,
+            errorInputBinding.editLayout,
+            errorInputBinding.textField,
+            errorInputBinding.errorIcon
+        )
+    }
+
+    private fun showConfirmDialog(
+        dialog: AlertDialog?,
+        dialogType: Int,
+        editLayout: TextInputLayout,
+        textField: EditText,
+        errorIcon: ImageView
+    ) {
+        dialog?.apply {
+            setOnShowListener {
+                quitEditTextError(editLayout, errorIcon)
+
+                editLayout.hint =
                     StringResourcesUtils.getString(R.string.edit_text_insert_pass)
                         .capitalize(Locale.ROOT)
 
-                errorInputBinding.textField.apply {
+                textField.apply {
                     setOnEditorActionListener { _, actionId, _ ->
                         if (actionId == EditorInfo.IME_ACTION_DONE) {
                             getButton(AlertDialog.BUTTON_POSITIVE).performClick()
@@ -475,7 +548,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                     }
 
                     doAfterTextChanged {
-                        quitEditTextError(errorInputBinding.editLayout, errorInputBinding.errorIcon)
+                        quitEditTextError(editLayout, errorIcon)
                     }
 
                     requestFocus()
@@ -483,24 +556,42 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 }
 
                 getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                    val password = errorInputBinding.textField.text.toString()
+                    val password = textField.text.toString()
 
                     if (password.isEmpty()) {
                         setEditTextError(
                             StringResourcesUtils.getString(R.string.invalid_string),
-                            errorInputBinding.editLayout,
-                            errorInputBinding.errorIcon
+                            editLayout,
+                            errorIcon
                         )
                     } else {
-                        viewModel.finishConfirmCancelAccount(password) { message ->
-                            showErrorAlert(message)
+                        when (dialogType) {
+                            TYPE_CANCEL_ACCOUNT -> {
+                                viewModel.finishConfirmCancelAccount(password) { message ->
+                                    showErrorAlert(message)
+                                }
+                            }
+                            TYPE_CHANGE_EMAIL -> {
+                                viewModel.finishConfirmChangeEmail(
+                                    password,
+                                    ::showEmailChangeSuccess,
+                                    ::showErrorAlert
+                                )
+                            }
                         }
+
+                        textField.hideKeyboard()
+                        dismiss()
                     }
                 }
             }
 
             show()
         }
+    }
+
+    private fun showEmailChangeSuccess(newEmail: String) {
+        showSnackbar(StringResourcesUtils.getString(R.string.email_changed, newEmail))
     }
 
     private fun showErrorAlert(message: String) {
@@ -512,7 +603,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     }
 
     fun showSnackbar(text: String) {
-        showSnackbar(contentView?.findViewById(R.id.container), text)
+        showSnackbar(binding.root, text)
     }
 
     override fun show(message: String) {

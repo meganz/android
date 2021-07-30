@@ -14,10 +14,10 @@ class QueryRecoveryLinkUseCase @Inject constructor(
 ) {
 
     /**
-     * Launches a request to get the current account user data.
-     * Launches a broadcast to update user data if finishes with success.
+     * Launches a request to query an account cancellation link.
      *
-     * @return Single<Boolean> True if the request finished with success, false if not.
+     * @param link The account cancellation link.
+     * @return Single<String> The link if success, the corresponding error if not.
      */
     fun queryCancelAccount(link: String): Single<String> =
         Single.create { emitter ->
@@ -29,6 +29,28 @@ class QueryRecoveryLinkUseCase @Inject constructor(
                             API_OK -> request.link
                             API_EACCESS -> getString(R.string.error_not_logged_with_correct_account)
                             API_EEXPIRED -> getString(R.string.cancel_link_expired)
+                            else -> getString(R.string.invalid_link)
+                        }
+                    )
+                })
+            )
+        }
+
+    /**
+     * Launches a request to query an email change link.
+     *
+     * @param link The email change link.
+     * @return The link if success, the corresponding error if not.
+     */
+    fun queryChangeEmail(link: String): Single<String> =
+        Single.create { emitter ->
+            megaApi.queryChangeEmailLink(
+                link,
+                OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
+                    emitter.onSuccess(
+                        when (error.errorCode) {
+                            API_OK -> request.link
+                            API_EACCESS -> getString(R.string.error_not_logged_with_correct_account)
                             else -> getString(R.string.invalid_link)
                         }
                     )

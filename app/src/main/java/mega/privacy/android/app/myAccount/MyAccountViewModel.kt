@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Patterns
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.ViewModelInject
@@ -62,7 +63,8 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getFileVersionsOptionUseCase: GetFileVersionsOptionUseCase,
     private val queryRecoveryLinkUseCase: QueryRecoveryLinkUseCase,
-    private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase
+    private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase,
+    private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase
 ) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
 
     companion object {
@@ -678,9 +680,9 @@ class MyAccountViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Queries if the cancel account provided is the right one before cancel the account.
+     * Queries if the provided account cancellation link is the right one before cancel it.
      *
-     * @param link   Confirmation link for cancel account.
+     * @param link   Confirmation link for the account cancellation.
      * @param action Action to perform after query confirmation link.
      */
     fun confirmCancelAccount(link: String, action: (String) -> Unit) {
@@ -708,6 +710,51 @@ class MyAccountViewModel @ViewModelInject constructor(
                 .subscribeBy(
                     onComplete = { logDebug("ACCOUNT CANCELED") },
                     onError = { error -> error.message?.let { message -> action.invoke(message) } })
+                .addTo(composite)
+        }
+    }
+
+    /**
+     * Queries if the provided email change link is the right one before change it.
+     *
+     * @param link   Confirmation link for the email change.
+     * @param action Action to perform after query confirmation link.
+     */
+    fun confirmChangeEmail(link: String, action: (String) -> Unit) {
+        queryRecoveryLinkUseCase.queryChangeEmail(link)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy { result ->
+                confirmationLink = result
+                action.invoke(result)
+            }
+            .addTo(composite)
+    }
+
+    /**
+     * Confirms the email change.
+     *
+     * @param password      Password typed to change the email.
+     * @param actionSuccess Action to perform after confirm the email change finished with success.
+     * @param actionError   Action to perform after confirm the email change if it failed.
+     */
+    fun finishConfirmChangeEmail(
+        password: String,
+        actionSuccess: (String) -> Unit,
+        actionError: (String) -> Unit
+    ) {
+        confirmationLink?.let { link ->
+            confirmChangeEmailUseCase.confirm(link, password)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { result ->
+                    if (Patterns.EMAIL_ADDRESS.matcher(result).find()) {
+                        logDebug("EMAIL_CHANGED")
+                        actionSuccess.invoke(result)
+                    } else {
+                        actionError.invoke(result)
+                    }
+                }
                 .addTo(composite)
         }
     }

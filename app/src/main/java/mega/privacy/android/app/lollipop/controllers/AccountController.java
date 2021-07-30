@@ -103,11 +103,6 @@ public class AccountController {
         }
     }
 
-    public void confirmChangeMail(String link, String pass){
-        logDebug("confirmChangeMail");
-        megaApi.confirmChangeEmail(link, pass, (ManagerActivityLollipop)context);
-    }
-
     public boolean existsAvatar() {
         File avatar = buildAvatarFile(context,megaApi.getMyEmail() + ".jpg");
         if (isFileAvailable(avatar)) {

@@ -2246,15 +2246,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						if(link!=null){
 							logDebug("Link to cancel: " + link);
 							showMyAccount(ACTION_CANCEL_ACCOUNT, link);
-							selectDrawerItemPending=false;
 						}
 					}
 					else if(getIntent().getAction().equals(ACTION_CHANGE_MAIL)){
-						String link = getIntent().getDataString();
+						Uri link = getIntent().getData();
 						if(link!=null){
 							logDebug("Link to change mail: " + link);
-//							drawerItem=DrawerItem.ACCOUNT;
-							showDialogInsertPassword(link);
+							showMyAccount(ACTION_CHANGE_MAIL, link);
 						}
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
@@ -6906,90 +6904,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	}
 
-	public void showDialogInsertPassword(String link){
-		logDebug("showDialogInsertPassword");
-
-		final String confirmationLink = link;
-		LinearLayout layout = new LinearLayout(this);
-		layout.setOrientation(LinearLayout.VERTICAL);
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.setMargins(scaleWidthPx(20, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(17, outMetrics), 0);
-
-		final EditText input = new EditText(this);
-		layout.addView(input, params);
-
-//		input.setId(EDIT_TEXT_ID);
-		input.setSingleLine();
-		input.setHint(getString(R.string.edit_text_insert_pass));
-		input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-		input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-//		input.setSelectAllOnFocus(true);
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-		input.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-
-		logDebug("changeMail action");
-		input.setOnEditorActionListener(new OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String pass = input.getText().toString().trim();
-					if (pass.equals("") || pass.isEmpty()) {
-						logWarning("Input is empty");
-						input.setError(getString(R.string.invalid_string));
-						input.requestFocus();
-					} else {
-						logDebug("Action DONE ime - change mail");
-						aC.confirmChangeMail(confirmationLink, pass);
-						insertPassDialog.dismiss();
-					}
-				} else {
-					logDebug("Other IME" + actionId);
-				}
-				return false;
-			}
-		});
-		input.setImeActionLabel(getString(R.string.change_pass), EditorInfo.IME_ACTION_DONE);
-		builder.setTitle(getString(R.string.change_mail_title_last_step));
-		builder.setMessage(getString(R.string.change_mail_text_last_step));
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		builder.setPositiveButton(getString(R.string.change_pass),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-
-					}
-				});
-
-		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				hideKeyboard(managerActivity, InputMethodManager.HIDE_NOT_ALWAYS);
-			}
-		});
-
-		builder.setView(layout);
-		insertPassDialog = builder.create();
-		insertPassDialog.show();
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		insertPassDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				logDebug("OK BTTN PASSWORD");
-				String pass = input.getText().toString().trim();
-				if (pass.equals("") || pass.isEmpty()) {
-					logWarning("Input is empty");
-					input.setError(getString(R.string.invalid_string));
-					input.requestFocus();
-				} else {
-					logDebug("Positive button pressed - change mail");
-					aC.confirmChangeMail(confirmationLink, pass);
-					insertPassDialog.dismiss();
-				}
-			}
-		});
-	}
-
 	public void askConfirmationDeleteAccount(){
 		logDebug("askConfirmationDeleteAccount");
 		megaApi.multiFactorAuthCheck(megaApi.getMyEmail(), this);
@@ -10105,27 +10019,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             else if(request.getParamType() == MegaApiJava.USER_ATTR_DISABLE_VERSIONS){
 				MegaApplication.setDisableFileVersions(request.getFlag());
 			}
-        }
-		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CHANGE_EMAIL_LINK){
-			logDebug("CONFIRM_CHANGE_EMAIL_LINK: " + request.getEmail());
-			if(e.getErrorCode() == MegaError.API_OK){
-				logDebug("Email changed");
-				updateMyEmail(request.getEmail());
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.email_changed, request.getEmail()), INVALID_HANDLE);
-			}
-			else if(e.getErrorCode() == MegaError.API_EEXIST){
-				logWarning("The new mail already exists");
-				showAlert(this, getString(R.string.mail_already_used), getString(R.string.general_error_word));
-			}
-			else if(e.getErrorCode() == MegaError.API_ENOENT){
-				logError("Email not changed -- API_ENOENT");
-				showAlert(this, "Email not changed!" + getString(R.string.old_password_provided_incorrect), getString(R.string.general_error_word));
-			}
-			else{
-				logError("Error when asking for change mail link: " + e.getErrorString() + "___" + e.getErrorCode());
-				showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
-			}
-		} else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
+        } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
             logDebug("TYPE_GET_CANCEL_LINK");
             hideKeyboard(managerActivity, 0);
 
