@@ -579,7 +579,14 @@ class InMeetingRepository @Inject constructor(
      * @param peerId the peerId of participant
      */
     fun getRemoteAvatar(peerId: Long) {
-        val email = ChatController(context).getParticipantEmail(peerId)
+        var email = ChatController(context).getParticipantEmail(peerId)
+
+        if(email == null) {
+            email = MegaApiJava.handleToBase64(peerId)
+        }
+
+        if (email == null) return
+
         megaApi.getUserAvatar(
             email,
             CacheFolderManager.buildAvatarFile(
