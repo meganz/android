@@ -102,9 +102,9 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                                 message = getString(R.string.nodes_correctly_and_nodes_incorrectly_moved_to_rubbish, success_items, error);
                             }
                         } else if (error > 0) {
-                            message = getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error);
+                            message = getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error, error);
                         } else {
-                            message = getQuantityString(R.string.number_correctly_moved_to_rubbish, success_items);
+                            message = getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items);
                         }
 
                         if (context instanceof ManagerActivityLollipop) {
@@ -128,9 +128,9 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                                 message = getString(R.string.nodes_correctly_and_nodes_incorrectly_restored_from_rubbish, success_items, error);
                             }
                         } else if (error > 0) {
-                            message = getQuantityString(R.plurals.number_incorrectly_restored_from_rubbish, error);
+                            message = getQuantityString(R.plurals.number_incorrectly_restored_from_rubbish, error, error);
                         } else {
-                            message = getQuantityString(R.string.number_correctly_restored_from_rubbish, success_items);
+                            message = getQuantityString(R.plurals.number_correctly_restored_from_rubbish, success_items, success_items);
                         }
 
                         ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
