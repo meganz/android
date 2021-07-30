@@ -13,7 +13,7 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest
 import mega.privacy.android.app.utils.MegaNodeUtil.getDlList
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
+import mega.privacy.android.app.utils.StringResourcesUtils.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.io.File
@@ -173,17 +173,40 @@ class MegaNodeSaving(
 
         val message = if (numberOfNodesPending == 0 && numberOfNodesAlreadyDownloaded == 0) {
             getQuantityString(R.plurals.empty_folders, emptyFolders)
-        } else if (numberOfNodesAlreadyDownloaded == 0) {
-            getQuantityString(R.plurals.download_began, numberOfNodesPending, numberOfNodesPending)
-        } else if (numberOfNodesPending > 0) {
-            getQuantityString(
-                R.plurals.file_pending_download, numberOfNodesPending, numberOfNodesPending
-            )
         } else {
-            getQuantityString(
-                R.plurals.file_already_downloaded, numberOfNodesAlreadyDownloaded,
-                numberOfNodesAlreadyDownloaded
-            )
+            if (numberOfNodesAlreadyDownloaded > 0 && numberOfNodesPending > 0) {
+                if (numberOfNodesAlreadyDownloaded == 1 && numberOfNodesPending == 1) {
+                    getString(R.string.file_already_downloaded_and_file_pending_download)
+                } else if (numberOfNodesAlreadyDownloaded == 1) {
+                    getString(
+                        R.string.file_already_downloaded_and_files_pending_download,
+                        numberOfNodesPending
+                    )
+                } else if (numberOfNodesPending == 1) {
+                    getString(
+                        R.string.files_already_downloaded_and_file_pending_download,
+                        numberOfNodesAlreadyDownloaded
+                    )
+                } else {
+                    getString(
+                        R.string.files_already_downloaded_and_files_pending_download,
+                        numberOfNodesAlreadyDownloaded,
+                        numberOfNodesPending
+                    )
+                }
+            } else if (numberOfNodesAlreadyDownloaded > 0) {
+                getQuantityString(
+                    R.plurals.file_already_downloaded,
+                    numberOfNodesAlreadyDownloaded,
+                    numberOfNodesAlreadyDownloaded
+                )
+            } else {
+                getQuantityString(
+                    R.plurals.download_began,
+                    numberOfNodesPending,
+                    numberOfNodesPending
+                )
+            }
         }
 
         snackbarShower?.showSnackbar(message)
