@@ -11,6 +11,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class DownloadUtil {
@@ -81,15 +82,26 @@ public class DownloadUtil {
 
         if (numberOfNodesPending == 0 && numberOfNodesAlreadyDownloaded == 0) {
             showSnackbar(context, context.getResources().getQuantityString(R.plurals.empty_folders, emptyFolders));
-        } else if (numberOfNodesAlreadyDownloaded == 0) {
-            showSnackbar(context, context.getResources().getQuantityString(R.plurals.download_began, numberOfNodesPending, numberOfNodesPending));
         } else {
             String msg;
-            msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded, numberOfNodesAlreadyDownloaded, numberOfNodesAlreadyDownloaded);
-            if (numberOfNodesPending > 0) {
-                msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download, numberOfNodesPending, numberOfNodesPending);
+            if (numberOfNodesAlreadyDownloaded > 0 && numberOfNodesPending > 0) {
+                if (numberOfNodesAlreadyDownloaded == 1 && numberOfNodesPending == 1) {
+                    msg = getString(R.string.file_already_downloaded_and_file_pending_download);
+                } else if (numberOfNodesAlreadyDownloaded == 1) {
+                    msg = getString(R.string.file_already_downloaded_and_files_pending_download, numberOfNodesPending);
+                } else if (numberOfNodesPending == 1) {
+                    msg = getString(R.string.files_already_downloaded_and_file_pending_download, numberOfNodesAlreadyDownloaded);
+                } else {
+                    msg = getString(R.string.files_already_downloaded_and_files_pending_download, numberOfNodesAlreadyDownloaded, numberOfNodesPending);
+                }
+            } else if (numberOfNodesAlreadyDownloaded > 0) {
+                msg = getQuantityString(R.plurals.file_already_downloaded, numberOfNodesAlreadyDownloaded, numberOfNodesAlreadyDownloaded);
+            } else {
+                msg = getQuantityString(R.plurals.download_began, numberOfNodesPending, numberOfNodesPending);
             }
-            showSnackbar(context, msg);
+            if (msg != null) {
+                showSnackbar(context, msg);
+            }
         }
     }
 }
