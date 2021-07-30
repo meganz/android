@@ -103,11 +103,6 @@ public class AccountController {
         }
     }
 
-    public void confirmDeleteAccount(String link, String pass){
-        logDebug("confirmDeleteAccount");
-        megaApi.confirmCancelAccount(link, pass, (ManagerActivityLollipop)context);
-    }
-
     public void confirmChangeMail(String link, String pass){
         logDebug("confirmChangeMail");
         megaApi.confirmChangeEmail(link, pass, (ManagerActivityLollipop)context);

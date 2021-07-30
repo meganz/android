@@ -2254,7 +2254,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						if(link!=null){
 							logDebug("Link to change mail: " + link);
 //							drawerItem=DrawerItem.ACCOUNT;
-							showDialogInsertPassword(link, false);
+							showDialogInsertPassword(link);
 						}
 					}
 					else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
@@ -6906,7 +6906,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	}
 
-	public void showDialogInsertPassword(String link, boolean cancelAccount){
+	public void showDialogInsertPassword(String link){
 		logDebug("showDialogInsertPassword");
 
 		final String confirmationLink = link;
@@ -6928,76 +6928,38 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		input.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
 		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		if(cancelAccount){
-			logDebug("cancelAccount action");
-			input.setOnEditorActionListener(new OnEditorActionListener() {
-				@Override
-				public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-					if (actionId == EditorInfo.IME_ACTION_DONE) {
-						String pass = input.getText().toString().trim();
-						if(pass.equals("")||pass.isEmpty()){
-							logWarning("Input is empty");
-							input.setError(getString(R.string.invalid_string));
-							input.requestFocus();
-						}
-						else {
-							logDebug("Action DONE ime - cancel account");
-							aC.confirmDeleteAccount(confirmationLink, pass);
-							insertPassDialog.dismiss();
-						}
-					}
-					else{
-						logDebug("Other IME" + actionId);
-					}
-					return false;
-				}
-			});
-			input.setImeActionLabel(getString(R.string.delete_account),EditorInfo.IME_ACTION_DONE);
-			builder.setTitle(getString(R.string.delete_account));
-			builder.setMessage(getString(R.string.delete_account_text_last_step));
-			builder.setNegativeButton(getString(R.string.general_dismiss), null);
-			builder.setPositiveButton(getString(R.string.delete_account),
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
 
-						}
-					});
-		}
-		else{
-			logDebug("changeMail action");
-			input.setOnEditorActionListener(new OnEditorActionListener() {
-				@Override
-				public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
-					if (actionId == EditorInfo.IME_ACTION_DONE) {
-						String pass = input.getText().toString().trim();
-						if(pass.equals("")||pass.isEmpty()){
-							logWarning("Input is empty");
-							input.setError(getString(R.string.invalid_string));
-							input.requestFocus();
-						}
-						else {
-							logDebug("Action DONE ime - change mail");
-							aC.confirmChangeMail(confirmationLink, pass);
-							insertPassDialog.dismiss();
-						}
+		logDebug("changeMail action");
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String pass = input.getText().toString().trim();
+					if (pass.equals("") || pass.isEmpty()) {
+						logWarning("Input is empty");
+						input.setError(getString(R.string.invalid_string));
+						input.requestFocus();
+					} else {
+						logDebug("Action DONE ime - change mail");
+						aC.confirmChangeMail(confirmationLink, pass);
+						insertPassDialog.dismiss();
 					}
-					else{
-						logDebug("Other IME" + actionId);
-					}
-					return false;
+				} else {
+					logDebug("Other IME" + actionId);
 				}
-			});
-			input.setImeActionLabel(getString(R.string.change_pass),EditorInfo.IME_ACTION_DONE);
-			builder.setTitle(getString(R.string.change_mail_title_last_step));
-			builder.setMessage(getString(R.string.change_mail_text_last_step));
-			builder.setNegativeButton(getString(android.R.string.cancel), null);
-			builder.setPositiveButton(getString(R.string.change_pass),
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.change_pass), EditorInfo.IME_ACTION_DONE);
+		builder.setTitle(getString(R.string.change_mail_title_last_step));
+		builder.setMessage(getString(R.string.change_mail_text_last_step));
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setPositiveButton(getString(R.string.change_pass),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
 
-						}
-					});
-		}
+					}
+				});
 
 		builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 			@Override
@@ -7009,46 +6971,23 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		builder.setView(layout);
 		insertPassDialog = builder.create();
 		insertPassDialog.show();
-		if(cancelAccount){
-			builder.setNegativeButton(getString(R.string.general_dismiss), null);
-			insertPassDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					logDebug("OK BTTN PASSWORD");
-					String pass = input.getText().toString().trim();
-					if(pass.equals("")||pass.isEmpty()){
-						logWarning("Input is empty");
-						input.setError(getString(R.string.invalid_string));
-						input.requestFocus();
-					}
-					else {
-						logDebug("Positive button pressed - cancel account");
-						aC.confirmDeleteAccount(confirmationLink, pass);
-						insertPassDialog.dismiss();
-					}
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		insertPassDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				logDebug("OK BTTN PASSWORD");
+				String pass = input.getText().toString().trim();
+				if (pass.equals("") || pass.isEmpty()) {
+					logWarning("Input is empty");
+					input.setError(getString(R.string.invalid_string));
+					input.requestFocus();
+				} else {
+					logDebug("Positive button pressed - change mail");
+					aC.confirmChangeMail(confirmationLink, pass);
+					insertPassDialog.dismiss();
 				}
-			});
-		}
-		else{
-			builder.setNegativeButton(getString(android.R.string.cancel), null);
-			insertPassDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					logDebug("OK BTTN PASSWORD");
-					String pass = input.getText().toString().trim();
-					if(pass.equals("")||pass.isEmpty()){
-						logWarning("Input is empty");
-						input.setError(getString(R.string.invalid_string));
-						input.requestFocus();
-					}
-					else {
-						logDebug("Positive button pressed - change mail");
-						aC.confirmChangeMail(confirmationLink, pass);
-						insertPassDialog.dismiss();
-					}
-				}
-			});
-		}
+			}
+		});
 	}
 
 	public void askConfirmationDeleteAccount(){
@@ -10186,36 +10125,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				logError("Error when asking for change mail link: " + e.getErrorString() + "___" + e.getErrorCode());
 				showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
 			}
-		}
-		else if(request.getType() == MegaRequest.TYPE_QUERY_RECOVERY_LINK) {
-			logDebug("TYPE_GET_RECOVERY_LINK");
-			if (e.getErrorCode() == MegaError.API_OK){
-				String url = request.getLink();
-				logDebug("Cancel account url");
-				String myEmail = request.getEmail();
-				if(myEmail!=null){
-					if(myEmail.equals(megaApi.getMyEmail())){
-						logDebug("The email matchs!!!");
-						showDialogInsertPassword(url, true);
-					}
-					else{
-						logWarning("Not logged with the correct account: " + e.getErrorString() + "___" + e.getErrorCode());
-						showAlert(this, getString(R.string.error_not_logged_with_correct_account), getString(R.string.general_error_word));
-					}
-				}
-				else{
-					logError("My email is NULL in the request");
-				}
-			}
-			else if(e.getErrorCode() == MegaError.API_EEXPIRED){
-				logError("Error expired link: " + e.getErrorString() + "___" + e.getErrorCode());
-				showAlert(this, getString(R.string.cancel_link_expired), getString(R.string.general_error_word));
-			}
-			else{
-				logError("Error when asking for recovery pass link: " + e.getErrorString() + "___" + e.getErrorCode());
-				showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
-			}
-        } else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
+		} else if (request.getType() == MegaRequest.TYPE_GET_CANCEL_LINK) {
             logDebug("TYPE_GET_CANCEL_LINK");
             hideKeyboard(managerActivity, 0);
 
@@ -10227,19 +10137,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
             }
         }
-		else if(request.getType() == MegaRequest.TYPE_CONFIRM_CANCEL_LINK){
-			if (e.getErrorCode() == MegaError.API_OK){
-				logDebug("ACCOUNT CANCELED");
-			}
-			else if (e.getErrorCode() == MegaError.API_ENOENT){
-				logError("Error cancelling account - API_ENOENT: " + e.getErrorString() + "___" + e.getErrorCode());
-				showAlert(this, getString(R.string.old_password_provided_incorrect), getString(R.string.general_error_word));
-			}
-			else{
-				logError("Error cancelling account: " + e.getErrorString() + "___" + e.getErrorCode());
-				showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
-			}
-		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
 
 			if (e.getErrorCode() == MegaError.API_OK) {

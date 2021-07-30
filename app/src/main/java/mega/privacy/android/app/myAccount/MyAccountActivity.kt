@@ -25,7 +25,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.IntentConstants.Companion.ACTION_OPEN_ACHIEVEMENTS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
-import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
+import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -36,10 +36,9 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.isOnline
-import mega.privacy.android.app.utils.Util.showAlert
+import mega.privacy.android.app.utils.Util.*
 import org.jetbrains.anko.contentView
+import java.util.*
 
 class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback {
 
@@ -281,7 +280,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
      * @param background Color to set as background.
      */
     private fun updateActionBar(background: Int) {
-        if (!Util.isDarkMode(this)) {
+        if (!isDarkMode(this)) {
             window?.statusBarColor = background
             toolbar.setBackgroundColor(background)
         }
@@ -293,7 +292,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
      * @param withElevation True if should set elevation, false otherwise.
      */
     private fun changeElevation(withElevation: Boolean) {
-        val isDark = Util.isDarkMode(this)
+        val isDark = isDarkMode(this)
         val darkAndElevation = withElevation && isDark
         val background = ContextCompat.getColor(this, R.color.grey_020_grey_087)
 
@@ -441,7 +440,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     }
 
     private fun showConfirmCancelAccountQueryResult(result: String) {
-        if (Util.matchRegexs(result, CANCEL_ACCOUNT_LINK_REGEXS)) {
+        if (matchRegexs(result, CANCEL_ACCOUNT_LINK_REGEXS)) {
             showConfirmCancelAccountDialog()
         } else {
             showAlert(this, result, StringResourcesUtils.getString(R.string.general_error_word))
@@ -449,7 +448,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     }
 
     private fun showConfirmCancelAccountDialog() {
-        val errorInputBinding = DialogErrorInputEditTextBinding.inflate(layoutInflater)
+        val errorInputBinding = DialogErrorPasswordInputEditTextBinding.inflate(layoutInflater)
         confirmCancelAccountDialog = MaterialAlertDialogBuilder(this)
             .setTitle(StringResourcesUtils.getString(R.string.delete_account))
             .setMessage(StringResourcesUtils.getString(R.string.delete_account_text_last_step))
@@ -460,11 +459,16 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
         confirmCancelAccountDialog?.apply {
             setOnShowListener {
+                quitEditTextError(errorInputBinding.editLayout, errorInputBinding.errorIcon)
+
+                errorInputBinding.editLayout.hint =
+                    StringResourcesUtils.getString(R.string.edit_text_insert_pass)
+                        .capitalize(Locale.ROOT)
+
                 errorInputBinding.textField.apply {
-                    hint = StringResourcesUtils.getString(R.string.edit_text_insert_pass)
                     setOnEditorActionListener { _, actionId, _ ->
                         if (actionId == EditorInfo.IME_ACTION_DONE) {
-                            confirmCancelAccount(errorInputBinding)
+                            getButton(AlertDialog.BUTTON_POSITIVE).performClick()
                         }
 
                         true
@@ -475,25 +479,27 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                     }
 
                     requestFocus()
+                    showKeyboardDelayed(this)
                 }
 
-                positive_button.setOnClickListener { confirmCancelAccount(errorInputBinding) }
+                getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                    val password = errorInputBinding.textField.text.toString()
+
+                    if (password.isEmpty()) {
+                        setEditTextError(
+                            StringResourcesUtils.getString(R.string.invalid_string),
+                            errorInputBinding.editLayout,
+                            errorInputBinding.errorIcon
+                        )
+                    } else {
+                        viewModel.finishConfirmCancelAccount(password) { message ->
+                            showErrorAlert(message)
+                        }
+                    }
+                }
             }
 
             show()
-        }
-    }
-
-    private fun confirmCancelAccount(binding: DialogErrorInputEditTextBinding) {
-        val password = binding.textField.text.toString()
-        if (password.isEmpty()) {
-            setEditTextError(
-                StringResourcesUtils.getString(R.string.invalid_string),
-                binding.editLayout,
-                binding.errorIcon
-            )
-        } else {
-            viewModel.finishConfirmCancelAccount(password) { message -> showErrorAlert(message) }
         }
     }
 

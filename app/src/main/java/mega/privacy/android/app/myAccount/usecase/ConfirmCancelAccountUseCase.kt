@@ -7,8 +7,7 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.toThrowable
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaError.API_ENOENT
-import nz.mega.sdk.MegaError.API_OK
+import nz.mega.sdk.MegaError.*
 import javax.inject.Inject
 
 class ConfirmCancelAccountUseCase @Inject constructor(
@@ -25,7 +24,7 @@ class ConfirmCancelAccountUseCase @Inject constructor(
                         API_ENOENT ->
                             emitter.onError(getString(R.string.old_password_provided_incorrect).toThrowable())
                         else ->
-                            emitter.onError(getString(R.string.old_password_provided_incorrect).toThrowable())
+                            emitter.onError(getString(R.string.general_text_error).toThrowable())
                     }
                 })
             )
