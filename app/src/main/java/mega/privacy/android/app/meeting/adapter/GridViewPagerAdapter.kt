@@ -145,7 +145,7 @@ class GridViewPagerAdapter(
                             when {
                                 it.currentList.size <= 3 -> {
                                     logDebug("Update only the adapter in the pager")
-                                    if (isLandscape()){
+                                    if (isLandscape()) {
                                         notifyItemChanged(pageWithChange)
                                     } else {
                                         it.notifyDataSetChanged()
@@ -157,7 +157,7 @@ class GridViewPagerAdapter(
                                 }
                                 it.currentList.size == 5 -> {
                                     logDebug("Update position only")
-                                    if (isLandscape()){
+                                    if (isLandscape()) {
                                         notifyItemChanged(pageWithChange)
                                     } else {
                                         it.notifyItemInserted(position)
@@ -166,7 +166,7 @@ class GridViewPagerAdapter(
                                 else -> {
                                     logDebug("update the position and the previous position")
                                     it.notifyItemInserted(position)
-                                    if (isLandscape()){
+                                    if (isLandscape()) {
                                         it.notifyItemRangeChanged(position - 2, it.currentList.size)
                                     } else {
                                         it.notifyItemRangeChanged(position - 1, it.currentList.size)
@@ -358,16 +358,20 @@ class GridViewPagerAdapter(
         notifyItemChanged(currentPage)
     }
 
-
     /**
      * Update participant name
      *
      * @param participant the target participant
      * @param currentPage the current page number
      * @param pager the ViewPager2
-     * @param type the type of change, name or avatar
+     * @param typeChange the type of change, name or avatar
      */
-    fun updateParticipantNameOrAvatar(participant: Participant, currentPage: Int, pager: ViewPager2, typeChange: Int) {
+    fun updateParticipantNameOrAvatar(
+        participant: Participant,
+        currentPage: Int,
+        pager: ViewPager2,
+        typeChange: Int
+    ) {
         val holder = getHolder(currentPage, pager)
         holder?.let {
             adapterList.let {
@@ -378,6 +382,32 @@ class GridViewPagerAdapter(
                     adapterList[i]?.updateParticipantNameOrAvatar(participant, typeChange)
                 }
 
+            }
+            return
+        }
+
+        notifyItemChanged(currentPage)
+    }
+
+    /**
+     * Method to control when the video listener should be added or removed.
+     *
+     * @param participant The participant whose listener of the video is to be added or deleted
+     * @param shouldAddListener True, should add the listener. False, should remove the listener
+     * @param isHiRes True, if is High resolution. False, if is Low resolution
+     * @param currentPage the current page number
+     * @param pager the ViewPager2
+     */
+    fun updateListener(
+        participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean, currentPage: Int,
+        pager: ViewPager2
+    ) {
+        val holder = getHolder(currentPage, pager)
+        holder?.let {
+            adapterList.let {
+                for (i in 0 until adapterList.size) {
+                    adapterList[i]?.updateListener(participant, shouldAddListener, isHiRes)
+                }
             }
             return
         }
@@ -526,7 +556,6 @@ class GridViewPagerAdapter(
                 for (i in 0 until adapterList.size) {
                     adapterList[i]?.removeTextureView(participant)
                 }
-
             }
             return
         }

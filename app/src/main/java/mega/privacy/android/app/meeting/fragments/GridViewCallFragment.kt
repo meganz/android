@@ -236,6 +236,23 @@ class GridViewCallFragment : MeetingBaseFragment() {
     }
 
     /**
+     * Method to control when the video listener should be added or removed.
+     *
+     * @param participant The participant whose listener of the video is to be added or deleted
+     * @param shouldAddListener True, should add the listener. False, should remove the listener
+     * @param isHiRes True, if is High resolution. False, if is Low resolution
+     */
+    fun updateListener(participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean) {
+        adapterPager.updateListener(
+            participant,
+            shouldAddListener,
+            isHiRes,
+            currentPage,
+            viewDataBinding.gridViewPager
+        )
+    }
+
+    /**
      * Check changes session on hold
      *
      * @param session MegaChatSession
@@ -347,8 +364,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
     private fun removeTextureView() {
         val iterator = participants.iterator()
         iterator.forEach {
-            (parentFragment as InMeetingFragment).inMeetingViewModel.onCloseVideo(it)
-            logDebug("Remove texture view")
             adapterPager.removeTextureView(it, currentPage, viewDataBinding.gridViewPager)
         }
     }
