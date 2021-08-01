@@ -15,4 +15,7 @@
     <external-cache-path
         name="external_cache"
         path="." />
+    <root-path
+        name="root"
+        path="storage"/>
 </paths>
