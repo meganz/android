@@ -324,4 +324,22 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     public interface MegaSurfaceRendererListener {
         void resetSize(long peerId, long clientId);
     }
+
+    /**
+     * Get the width of the surface view
+     *
+     * @return the width
+     */
+    public int getSurfaceWidth() {
+        return surfaceWidth;
+    }
+
+    /**
+     * Get the height of the surface view
+     *
+     * @return the height
+     */
+    public int getSurfaceHeight() {
+        return surfaceHeight;
+    }
 }

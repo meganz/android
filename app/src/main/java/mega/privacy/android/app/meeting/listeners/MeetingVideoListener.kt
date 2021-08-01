@@ -54,13 +54,13 @@ class MeetingVideoListener(
         // viewWidth != surfaceView.width || viewHeight != surfaceView.height
         // Re-calculate the camera preview ratio when surface view size changed
         if (this.width != width || this.height != height
-            || viewWidth != surfaceView.width || viewHeight != surfaceView.height
+            || viewWidth != renderer.surfaceWidth || viewHeight != renderer.surfaceHeight
         ) {
             this.width = width
             this.height = height
 
-            viewWidth = surfaceView.width
-            viewHeight = surfaceView.height
+            viewWidth = renderer.surfaceWidth
+            viewHeight = renderer.surfaceHeight
 
             val holder = surfaceView.holder
             if (holder != null) {
