@@ -17,5 +17,5 @@
         path="." />
     <root-path
         name="root"
-        path="." />
+        path="storage"/>
 </paths>
