@@ -132,33 +132,34 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
         MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
 
         if (!shouldReactionBeClicked(chatRoom)) {
+            logDebug("No privileges to add a reaction");
             return;
         }
 
         switch (view.getId()) {
             case R.id.first_emoji_layout:
             case R.id.first_emoji_image:
-                addReaction(view.findViewById(R.id.first_emoji_image));
+                addReaction(firstEmoji.getEmoji());
                 break;
 
             case R.id.second_emoji_layout:
             case R.id.second_emoji_image:
-                addReaction(view.findViewById(R.id.second_emoji_image));
+                addReaction(secondEmoji.getEmoji());
                 break;
 
             case R.id.third_emoji_layout:
             case R.id.third_emoji_image:
-                addReaction(view.findViewById(R.id.third_emoji_image));
+                addReaction(thirdEmoji.getEmoji());
                 break;
 
             case R.id.fourth_emoji_layout:
             case R.id.fourth_emoji_image:
-                addReaction(view.findViewById(R.id.fourth_emoji_image));
+                addReaction(fourthEmoji.getEmoji());
                 break;
 
             case R.id.fifth_emoji_layout:
             case R.id.fifth_emoji_image:
-                addReaction(view.findViewById(R.id.fifth_emoji_image));
+                addReaction(fifthEmoji.getEmoji());
                 break;
 
             case R.id.icon_more_reactions:
@@ -170,18 +171,19 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
     /**
      * Method for adding a reaction in the dialog.
      *
-     * @param imageEmoji The image Emoji.
+     * @param emoji The Emoji.
      */
-    private void addReaction(EmojiImageView imageEmoji) {
-        if(imageEmoji == null){
+    private void addReaction(Emoji emoji) {
+        if(emoji == null){
             closeDialog();
             return;
         }
 
         if (recentEmoji != null ) {
-            recentEmoji.addEmoji(imageEmoji.getEmoji());
+            recentEmoji.addEmoji(emoji);
         }
-        addReactionInMsg(context, chatId, message.getMessage().getMsgId(), imageEmoji.getEmoji(), true);
+
+        addReactionInMsg(context, chatId, message.getMessage().getMsgId(), emoji, true);
         closeDialog();
     }
 

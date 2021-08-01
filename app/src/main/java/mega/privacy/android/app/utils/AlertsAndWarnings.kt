@@ -7,6 +7,8 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
@@ -174,6 +176,46 @@ class AlertsAndWarnings {
                     .create()
                     .show()
             }
+        }
+
+        @JvmStatic
+        fun isAlertDialogShown(dialog: AlertDialog?): Boolean = dialog?.isShowing == true
+
+        @JvmStatic
+        fun dismissAlertDialogIfShown(dialog: AlertDialog?) {
+            dialog?.dismiss()
+        }
+
+        /**
+         * Enables or disabled a dialog button in a customized way.
+         *
+         * @param context Current context.
+         * @param enable  True if should enable, false if should disable.
+         * @param button  The button to enable or disable.
+         */
+        @JvmStatic
+        fun enableOrDisableDialogButton(context: Context, enable: Boolean, button: Button) {
+            button.isEnabled = enable
+            button.setTextColor(
+                if (enable) ColorUtils.getThemeColor(
+                    context,
+                    R.attr.colorSecondary
+                ) else ContextCompat.getColor(context, R.color.teal_300_alpha_038)
+            )
+        }
+
+        /**
+         * Shows a warning indicating something can not be added to an incoming share because the
+         * owner is on storage over quota state.
+         */
+        @JvmStatic
+        fun showForeignStorageOverQuotaWarningDialog(context: Context) {
+            MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                .setMessage(getString(R.string.warning_share_owner_storage_quota))
+                .setPositiveButton(getString(R.string.general_ok), null)
+                .setCancelable(false)
+                .create()
+                .show()
         }
     }
 }

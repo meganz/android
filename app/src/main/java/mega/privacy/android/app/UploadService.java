@@ -25,7 +25,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
 
-import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
@@ -39,6 +38,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -52,9 +52,9 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_TEXT_FILE_UPLOADED;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
+import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
@@ -126,6 +126,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
     private BroadcastReceiver pauseBroadcastReceiver;
 
     private CompositeDisposable rxSubscriptions = new CompositeDisposable();
+
+    // the flag to determine the rating dialog is showed for this upload action
+    private boolean isRatingShowed;
 
     @SuppressLint("NewApi")
 	@Override
@@ -341,7 +344,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         final File file = new File(filePath);
         logDebug("File to manage: " + file.getAbsolutePath());
 
-        boolean isTextFile = intent.getBooleanExtra(EXTRA_UPLOAD_TXT, false);
+        String textFileMode = intent.getStringExtra(EXTRA_UPLOAD_TXT);
         long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
         String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
         String nameInMEGAEdited = intent.getStringExtra(EXTRA_NAME_EDITED);
@@ -352,8 +355,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
         MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 
-        if (isTextFile) {
-            megaApi.startUploadWithTopPriority(file.getAbsolutePath(), parentNode, APP_DATA_TXT_FILE, true, nameInMEGA);
+        if (!isTextEmpty(textFileMode)) {
+            boolean fromHome = intent.getBooleanExtra(FROM_HOME_PAGE, false);
+            String appData = APP_DATA_TXT_FILE + APP_DATA_INDICATOR + textFileMode
+                    + APP_DATA_INDICATOR + fromHome;
+
+            megaApi.startUploadWithTopPriority(file.getAbsolutePath(), parentNode, appData, true, nameInMEGA);
         } else if (file.isDirectory()) {
             // Folder upload
             totalFolderUploads++;
@@ -678,6 +685,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         if (total > 0) {
             inProgressTemp = inProgress * 100;
             progressPercent = (int)(inProgressTemp / total);
+
+            showRating(total, megaApi.getCurrentUploadSpeed());
         }
 
         String message = getMessageForProgressNotification(inProgress,isFolderTransfer);
@@ -690,6 +699,19 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             notifyProgressNotification(progressPercent, message, info, actionString, NOTIFICATION_UPLOAD_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_ID_FOLDER, NOTIFICATION_CHANNEL_UPLOAD_NAME_FOLDER);
         } else {
             notifyProgressNotification(progressPercent, message, info, actionString, NOTIFICATION_UPLOAD, NOTIFICATION_CHANNEL_UPLOAD_ID, NOTIFICATION_CHANNEL_UPLOAD_NAME);
+        }
+    }
+
+    /**
+     * Determine if should show the rating page to users
+     *
+     * @param total the total size of uploading file
+     * @param currentUploadSpeed current uploading speed
+     */
+    private void showRating(long total, int currentUploadSpeed) {
+        if (!isRatingShowed) {
+            new RatingHandlerImpl(this)
+                    .showRatingBaseOnSpeedAndSize(total, currentUploadSpeed, () -> isRatingShowed = true);
         }
     }
 
@@ -804,9 +826,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		        AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
                 addCompletedTransfer(completedTransfer);
 
-                if (APP_DATA_TXT_FILE.equals(transfer.getAppData())) {
-                    LiveEventBus.get(EVENT_TEXT_FILE_UPLOADED, Long.class)
-                            .post(completedTransfer.getId());
+                String appData = transfer.getAppData();
+
+                if (!isTextEmpty(appData) && appData.contains(APP_DATA_TXT_FILE)) {
+                    sendBroadcast(new Intent(BROADCAST_ACTION_SHOW_SNACKBAR)
+                            .putExtra(SNACKBAR_TEXT, getCreationOrEditorText(transfer, error)));
                 }
 
                 if (transfer.getState() == MegaTransfer.STATE_FAILED) {
@@ -1004,7 +1028,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				} else {
 					logError("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 
-					if (error.getErrorCode() == MegaError.API_EOVERQUOTA) {
+					if (error.getErrorCode() == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota()) {
 						isOverquota = OVERQUOTA_STORAGE_STATE;
 					}
 					else if (error.getErrorCode() == MegaError.API_EGOINGOVERQUOTA) {
@@ -1114,6 +1138,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			{
 				case MegaError.API_EOVERQUOTA:
 				case MegaError.API_EGOINGOVERQUOTA:
+				    if (transfer.isForeignOverquota()) {
+				        break;
+                    }
+
 					if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
 						isOverquota = OVERQUOTA_STORAGE_STATE;
 					}

@@ -481,7 +481,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">重新发送邀请</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">请求正确发送给%s。状态可以在发送请求标签中查阅。</string>
+    <string name="context_contact_request_sent">请求已成功发送给%s。请在发送请求中查看。</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">联系人已移除</string>
     <!-- error message -->
@@ -577,7 +577,7 @@
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">已成功与%d 联系人分享文件夹</string>
     <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">文件无法与%d联系人共享</string>
+    <string name="number_contact_file_not_shared_">无法与%d位联系人共享文件</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d文件夹共享成功</string>
     <!-- error message when sharing multiple files -->
@@ -587,13 +587,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">此文件夹已无共享者</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">错误。此文件夹仍与其他联系人共享</string>
+    <string name="context_no_removed_sharing_contacts">错误。该文件夹正在与其他联系人共享</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">只选一个文件</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">已成功清空垃圾桶</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">错误。 垃圾桶没有被清空</string>
+    <string name="rubbish_bin_no_emptied">错误。垃圾桶尚未清空</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">您将取消订阅MEGA。如果我们可以做些什么以改变您的心意，请让我们知道。</string>
     <!-- hint cancel subscriptions dialog -->
@@ -601,7 +601,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">发送</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">感谢您的建议！您确定要取消MEGA订阅吗？</string>
+    <string name="confirmation_cancel_subscriptions">感谢您的反馈。您确定要取消MEGA订阅吗？</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">您的签约未取消。请告诉我们您要取消签约的原因。</string>
     <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
@@ -655,11 +655,11 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">文件系统问题</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">执行操作时出错</string>
+    <string name="general_error">浏览本地文件时发生错误。</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">图像浏览器</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">已用空间</string>
+    <string name="my_account_used_space">已使用存储空间</string>
     <!-- menu item -->
     <string name="my_account_change_password">更改密码</string>
     <!-- Dialog text overquota error -->
@@ -683,7 +683,7 @@
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">按月或按年度订阅</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">这个方案暂时无适用的付款方式</string>
+    <string name="no_available_payment_method">您尚未为此Pro方案设置付款方式。请选择一项。</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">每月*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -693,7 +693,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">预览尚未载入，请稍等</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">内存不足，无法加载预览。请稍后再试。</string>
+    <string name="not_load_preview_low_memory">无可用内存显示预览。请稍后再试。</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">请在创建帐户前登出</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -707,9 +707,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">允许接收MEGA来电通知</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA需要您的授权才能允许呼叫界面从后台弹出。</string>
+    <string name="ask_for_display_over_msg">请允许MEGA在其他应用程序上显示通话的权限。</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">别担心，您仍然可以从设备的设置中手动授予权限。</string>
+    <string name="ask_for_display_over_explain">您仍然可以在设备设置中手动授予权限。</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">仅限Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -741,9 +741,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">密码锁选项</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">压缩视频会消耗电池电量，当压缩的视频大于%s时，MEGA会提醒您需为设备充电。</string>
+    <string name="settings_camera_upload_charging_helper_label">视频压缩需要消耗电池电量，若压缩的视频大于%s时，请为您的设备充电。</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">开启后，您的相关照片的拍摄地点信息会被上传，分享前请谨慎选择。</string>
+    <string name="settings_camera_upload_include_gps_helper_label">开启后，您的位置信息将包含在您的图片中。请谨慎选择。</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">高级</string>
     <!-- Settings preference title for cache -->
@@ -2039,7 +2039,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">高级选项</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA需要允许下载文件</string>
+    <string name="download_requires_permission">MEGA需要外部存储的读写权限才能下载文件。</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">无法使用旧版SD卡，请设置新的下载位置。</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2057,11 +2057,11 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
     <string name="save_cloud_drive">存至云盘</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
-    <string name="save_file_system">存至文件系统</string>
+    <string name="save_file_system">到文件系统</string>
     <!-- Title of QR code section -->
     <string name="section_my_code">我的二维码</string>
     <!-- Title of QR code scan section -->
-    <string name="section_scan_code">扫码</string>
+    <string name="section_scan_code">扫描二维码</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
     <string name="settings_qrcode_autoaccept">自动接受</string>
     <!-- Subtitle of QR code settings auto-accept -->
@@ -2099,9 +2099,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">邀请尚未发送。%s已在您的联系人列表中。</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">邀请未发送成功，发送过程出错了。</string>
+    <string name="invite_not_sent_text_error">发生错误，邀请未发送。</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">正在生成二维码&#8230;</string>
+    <string name="generatin_qr">正在生成二维码&#8230;&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">扫描二维码</string>
     <!-- get the contact link and copy it -->
@@ -2124,8 +2124,6 @@
     <string name="label_set_period">设定期限</string>
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]邀请朋友加入[/B][A]聊天[/A][B]享受我们私密安全的加密服务[/B]</string>
-    <!-- Text of the empty screen when there are not elements in Camera Uploads -->
-    <string name="context_empty_camera_uploads">[A]相机上传[/A]中[B]无文件[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]垃圾桶[/A]中[B]无文件[/B]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2191,7 +2189,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">由于多次违反MEGA的服务条款，您的账户已被暂停。请检查您的电子邮件收件箱。</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">您的账户因违反MEGA的服务条款而被终止，如侵害他人权利;共享和/或导入非法数据;或侵害系统。</string>
+    <string name="account_suspended_breache_ToS">您的帐户因违反《MEGA服务条款》而被终止，包括但不限于第15条。</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">正在加载文件</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2500,11 +2498,11 @@
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">预览内容</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">无法执行流式传输，文件未下载</string>
+    <string name="no_network_connection_on_play_file">无网络连接。文件未下载且无法进行流式传输。</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">无法打开此文件。</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">由于无网络连接，无法打开此文件。</string>
+    <string name="error_fail_to_open_file_no_network">无网络连接。文件无法打开。</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">文件已存于离线储存</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2512,9 +2510,9 @@
         <item quantity="other">信息未转发</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">丰富的网址预览</string>
+    <string name="title_confirmation_disable_rich_links">扩展网址预览</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">您正在永久禁用扩展网址预览。您可以在设置中重新启用扩展网址预览。你想继续吗？</string>
+    <string name="text_confirmation_disable_rich_links">扩展网址预览已禁用。您可以在“设置”中重新开启。您想继续吗？</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]未接来电[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2540,7 +2538,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">还原至%s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">错误。未还原</string>
+    <string name="context_no_restored">发生错误。项目未还原。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">发送信息</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -2556,7 +2554,7 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">归档聊天(%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">归档聊天记录</string>
+    <string name="archive_chat_option">归档聊天</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
     <string name="unarchive_chat_option">取消归档聊天</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -2590,7 +2588,7 @@
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading_share">正在加载联系人&#8230;&#8230;</string>
     <!-- Title of the screen New Group -->
-    <string name="title_new_group">新分组</string>
+    <string name="title_new_group">新群组</string>
     <!-- Subtitle of the screen New Group -->
     <string name="subtitle_new_group">输入分组名称</string>
     <!-- Hint of edittext shown when it is creating a new group to guide user to type the name of the group -->
@@ -2978,11 +2976,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">设置MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA需要访问您的照片，媒体内容和文件，方便您与朋友进行分享，交换加密信息和安全通话。</string>
+    <string name="setup_mega_explanation">MEGA需要开启权限才能访问并共享您的媒体和文件。收发加密消息和安全通话可能需要开启其他访问权限。</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">允许访问照片、媒体内容和文件。</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">MEGA需要您的权限以分享照片、媒体内容和文件。</string>
+    <string name="allow_acces_media_subtitle">MEGA需要开启权限才能共享文件。</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">开启相机功能</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -2990,7 +2988,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">开启通话功能</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">开启允许访问通讯录</string>
+    <string name="allow_acces_contact_title">请授予 MEGA 访问您的联系人的权限</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">在您的MEGA通讯录中轻松找到联系人。</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -2998,9 +2996,9 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">允许访问您的麦克风以进行加密通话</string>
     <!-- General enable access -->
-    <string name="general_enable_access">允许访问</string>
+    <string name="general_enable_access">授予权限</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
-    <string name="title_chat_shared_files_info">已共享文件</string>
+    <string name="title_chat_shared_files_info">已分享文件</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">附件已发送</string>
     <!-- Message shown when a group call ends. -->
@@ -3042,17 +3040,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s已离开通话</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">由于参与人数已达上限，您无法开始通话。</string>
+    <string name="call_error_too_many_participants_start">由于参与者人数已达上限，无法开始通话。</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">参与人数已达上限，您无法加入此通话。</string>
+    <string name="call_error_too_many_participants">由于参与者人数已达上限，无法加入通话。</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">由于参与人数已达上限，您无法加入通话。</string>
+    <string name="call_error_too_many_participants_join">由于参与者人数已达上限，无法加入群组通话。</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">已使用视频的参与人数已达上限，您无法开启视频。</string>
+    <string name="call_error_too_many_video">由于参与者人数已达上限，无法加入视频通话。</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">您无法保留通话。</string>
+    <string name="call_error_call_on_hold">通话无法保留。</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">错误。此文件无法打开。</string>
+    <string name="error_open_file_with">发生错误，无法使用该应用程序打开此文件。</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">来电&#8230;&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3372,7 +3370,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">您无法删除联系人%1$s，因为它们是您的企业帐户的一部分。</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">您的上一次付款有问题。请使用桌面浏览器访问MEGA获取更多信息。</string>
+    <string name="grace_period_admin_alert">您的上一笔付款未成功。请使用网络浏览器登录MEGA后获取详情。</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">您的企业帐户已到期</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3380,7 +3378,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">当前您的帐户已被[B]禁用[/B]。您只能浏览数据。</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA无法访问您的数据，而您的企业帐户管理员有权控制并查看用户帐户中的“相机上传”文件。</string>
+    <string name="camera_uploads_business_alert">MEGA无法访问您的数据，而您的企业帐户管理员可以查看并删除您的相机上传文件。</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">出错了</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3712,7 +3710,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">链接：%1$s\n\n密码：%2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA需要您的授权才能共享文件。</string>
+    <string name="files_required_permissions_warning">MEGA需要开启权限才能共享文件。</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">收藏</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3857,4 +3855,46 @@
     <string name="general_info">信息</string>
     <!-- Item menu option upon right click on one image or video to save it to device gallery -->
     <string name="general_save_to_gallery">保存到图库</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">媒体</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">音频文件</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">后台播放</string>
+    <!-- Text of the empty screen when there are no elements in Photos -->
+    <string name="photos_empty">[B]无[/B][A]照片[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="enable_cu_subtitle">自动备份您的照片和视频到您的云盘。</string>
+    <!-- Text of a button on Camera Uploads section to show all the content of the section-->
+    <string name="all_view_button">全部</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
+    <string name="days_view_button">天</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
+    <string name="months_view_button">月</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
+    <string name="years_view_button">年</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
+    <string name="cu_month_year_date">[B]%1$s[/B]%2$s</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
+    <string name="cu_day_month_year_date">[B]%1$s%2$s[/B]%3$s</string>
+    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
+    <plurals name="cu_upload_progress">
+        <item quantity="other">正在上传，%1$d个文件待上传</item>
+    </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">更改服务器</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">显示行数</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">隐藏行数</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">共享所有者帐户已超出存储空间。</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">由于目标用户帐户已超出其存储空间，无法发送此文件。</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">我们正在升级MEGAchat。您的通话可能由于版本不兼容问题导致无法连接。</string>
 </resources>

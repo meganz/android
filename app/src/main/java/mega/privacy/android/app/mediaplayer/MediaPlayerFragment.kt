@@ -255,8 +255,6 @@ class MediaPlayerFragment : Fragment() {
 
         playerView.controllerHideOnTouch = videoPlayer
         playerView.setShowShuffleButton(!videoPlayer)
-        playerView.setShowFastForwardButton(!videoPlayer)
-        playerView.setShowRewindButton(!videoPlayer)
 
         playerView.showController()
 

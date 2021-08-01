@@ -13,6 +13,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -107,6 +108,10 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     else if (actionListener== MULTIPLE_RESTORED_FROM_RUBBISH){
                         logDebug("Restore nodes from rubbish request finished");
                         if(error>0){
+                            if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+                                showForeignStorageOverQuotaWarningDialog(context);
+                            }
+
                             message = context.getString(R.string.number_correctly_restored_from_rubbish, max_items-error) + context.getString(R.string.number_incorrectly_restored_from_rubbish, error);
                         }
                         else{
@@ -120,6 +125,10 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     else{
                         logDebug("Move nodes request finished");
                         if(error>0){
+                            if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+                                showForeignStorageOverQuotaWarningDialog(context);
+                            }
+
                             message = context.getString(R.string.number_correctly_moved, max_items-error) + context.getString(R.string.number_incorrectly_moved, error);
                         }
                         else{
@@ -205,6 +214,10 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     else{
                         logDebug("Copy request finished");
                         if(error>0){
+                            if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+                                showForeignStorageOverQuotaWarningDialog(context);
+                            }
+
                             message = context.getString(R.string.number_correctly_copied, max_items-error) + context.getString(R.string.number_no_copied, error);
                         }
                         else{

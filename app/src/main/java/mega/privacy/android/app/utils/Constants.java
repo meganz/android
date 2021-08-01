@@ -41,7 +41,7 @@ public class Constants {
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;
     public static final int REQUEST_CODE_GET_CONTACTS = 1026;
     public static final int REQUEST_CODE_FILE_INFO = 1027;
-    public static final int REQUEST_CODE_REFRESH_STAGING = 1028;
+    public static final int REQUEST_CODE_REFRESH_API_SERVER = 1028;
     public static final int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
     public static final int REQUEST_CODE_SEND_LOCATION = 1030;
     public static final int REQUEST_CODE_COUNTRY_PICKER = 1031;
@@ -53,7 +53,7 @@ public class Constants {
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
-    public static final String ACTION_REFRESH_STAGING = "ACTION_REFRESH_STAGING";
+    public static final String ACTION_REFRESH_API_SERVER = "ACTION_REFRESH_API_SERVER";
     public static final String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
@@ -72,6 +72,8 @@ public class Constants {
     public static final String EXTRA_RESULT_TRANSFER = "RESULT_TRANSFER";
     public static final String EXTRA_TRANSFER_TYPE = "TRANSFER_TYPE";
     public static final String EXTRA_USER_NICKNAME = "EXTRA_USER_NICKNAME";
+
+    public static final String FROM_HOME_PAGE = "FROM_HOME_PAGE";
 
     public static final String RESULT = "RESULT";
     public static final String ACCOUNT_BLOCKED_STRING = "ACCOUNT_BLOCKED_STRING";
@@ -486,6 +488,7 @@ public class Constants {
     public static final int MIN_ITEMS_SCROLLBAR = 30;
     public static final int MIN_ITEMS_SCROLLBAR_GRID = 200;
     public static final int MIN_ITEMS_SCROLLBAR_CHAT = 20;
+    public static final int MIN_ITEMS_SCROLLBAR_CONTACT = 20;
 
     public static final long BUFFER_COMP = 1073741824;      // 1 GB
     public static final int MAX_BUFFER_16MB = 16777216; // 16 MB
@@ -549,6 +552,8 @@ public class Constants {
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
     public static final int PERMISSIONS_TYPE = 4;
     public static final int INVITE_CONTACT_TYPE = 5;
+    public static final int SNACKBAR_IMCOMPATIBILITY_TYPE = 6;
+    public static final int SNACKBAR_IMCOMPATIBILITY_BUTTON_TYPE = 7;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -646,6 +651,10 @@ public class Constants {
     public static final int THUMB_MARGIN_DP = 16;
     public static final int ICON_SIZE_DP = 48;
     public static final int ICON_MARGIN_DP = 12;
+
+    // Thumbnail dimens for Browse file page
+    public static final int THUMBNAIL_SIZE_DP = 36;
+    public static final int THUMBNAIL_MARGIN_DP = 18;
 
     public static final String SEPARATOR = File.separator;
 
@@ -826,6 +835,8 @@ public class Constants {
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";
     public static final String EVENT_DRAG_TO_EXIT_SCROLL = "drag_to_exit_scroll";
+
+    public static final String EVENT_FAB_CHANGE = "fab_change";
 
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";

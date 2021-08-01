@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -18,11 +19,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.OpenableColumns;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -37,6 +33,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -54,7 +56,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,13 +68,12 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
-
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
-import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -100,17 +100,60 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN;
+import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
+import static mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING;
+import static mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
+import static mega.privacy.android.app.utils.Constants.FROM_INBOX;
+import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
+import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
+import static mega.privacy.android.app.utils.Constants.INBOX_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB;
+import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
+import static mega.privacy.android.app.utils.Constants.NAME;
+import static mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.URL_FILE_LINK;
+import static mega.privacy.android.app.utils.Constants.WRITE_SD_CARD_REQUEST_CODE;
+import static mega.privacy.android.app.utils.Constants.ZIP_ADAPTER;
+import static mega.privacy.android.app.utils.FileUtil.addPdfFileExtension;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
+import static mega.privacy.android.app.utils.FileUtil.getUriForFile;
+import static mega.privacy.android.app.utils.FileUtil.shareFile;
+import static mega.privacy.android.app.utils.FileUtil.shareWithUri;
+import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
-import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.shareLink;
+import static mega.privacy.android.app.utils.MegaNodeUtil.shareNode;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showShareOption;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownAlert;
+import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog;
+import static mega.privacy.android.app.utils.Util.getExternalCardPath;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -133,7 +176,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
     Toolbar tB;
     public ActionBar aB;
-    private String gSession;
     UserCredentials credentials;
     private String lastEmail;
     DatabaseHandler dbH = null;
@@ -156,21 +198,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
     ProgressDialog statusDialog;
 
-    private MenuItem shareMenuItem;
-    private MenuItem downloadMenuItem;
-    private MenuItem propertiesMenuItem;
-    private MenuItem chatMenuItem;
-    private MenuItem getlinkMenuItem;
-    private MenuItem renameMenuItem;
-    private MenuItem moveMenuItem;
-    private MenuItem copyMenuItem;
-    private MenuItem moveToTrashMenuItem;
-    private MenuItem removeMenuItem;
-    private MenuItem removelinkMenuItem;
-    private MenuItem importMenuItem;
-    private MenuItem saveForOfflineMenuItem;
-    private MenuItem chatRemoveMenuItem;
-
     private boolean renamed = false;
     private String path;
     private String pathNavigation;
@@ -190,10 +217,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     int typeExport = -1;
     private Handler handler;
 
-    private TextView actualPage;
-    private TextView totalPages;
-    private RelativeLayout pageNumber;
-
     boolean toolbarVisible = true;
     boolean fromChat = false;
     boolean isDeleteDialogShow = false;
@@ -208,7 +231,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     boolean notChangePage = false;
     MegaNode currentDocument;
 
-    private BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
+    private final BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
@@ -393,7 +416,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                 }
 
                 if (savedInstanceState != null && ! isFolderLink) {
-                    MegaNode node = null;
+                    MegaNode node;
 
                     if (fromChat) {
                         node = nodeChat;
@@ -455,16 +478,13 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-        aB.setHomeButtonEnabled(true);
-        aB.setDisplayHomeAsUpEnabled(true);
-
+        if (aB != null) {
+            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+            aB.setHomeButtonEnabled(true);
+            aB.setDisplayHomeAsUpEnabled(true);
+        }
         bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
         fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
-        actualPage = (TextView) findViewById(R.id.pdf_viewer_actual_page_number);
-        actualPage.setText(""+currentPage);
-        totalPages = (TextView) findViewById(R.id.pdf_viewer_total_page_number);
-        pageNumber = (RelativeLayout) findViewById(R.id.pdf_viewer_page_number);
         progressBar = (ProgressBar) findViewById(R.id.pdf_viewer_progress_bar);
 
         pdfView = (PDFView) findViewById(R.id.pdfView);
@@ -499,26 +519,21 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             aB.setTitle(pdfFileName);
             uploadContainer.setVisibility(View.VISIBLE);
             bottomLayout.setVisibility(View.GONE);
-            pageNumber.animate().translationY(-150).start();
         }
         else {
             aB.setTitle(" ");
             uploadContainer.setVisibility(View.GONE);
             bottomLayout.setVisibility(View.VISIBLE);
-            pageNumber.animate().translationY(-100).start();
         }
 
-        uploadContainer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logDebug("onClick uploadContainer");
-                Intent intent1 = new Intent(PdfViewerActivityLollipop.this, FileExplorerActivityLollipop.class);
-                intent1.setAction(Intent.ACTION_SEND);
-                intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent1.setDataAndType(uri, "application/pdf");
-                startActivity(intent1);
-                finish();
-            }
+        uploadContainer.setOnClickListener(v -> {
+            logDebug("onClick uploadContainer");
+            Intent intent1 = new Intent(PdfViewerActivityLollipop.this, FileExplorerActivityLollipop.class);
+            intent1.setAction(Intent.ACTION_SEND);
+            intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent1.setDataAndType(uri, "application/pdf");
+            startActivity(intent1);
+            finish();
         });
 
         if (!toolbarVisible) {
@@ -641,17 +656,14 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             tB.setVisibility(View.VISIBLE);
             setSupportActionBar(tB);
             aB = getSupportActionBar();
-            aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-            aB.setHomeButtonEnabled(true);
-            aB.setDisplayHomeAsUpEnabled(true);
+            if (aB != null) {
+                aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+                aB.setHomeButtonEnabled(true);
+                aB.setDisplayHomeAsUpEnabled(true);
+            }
 
             bottomLayout = (RelativeLayout) findViewById(R.id.pdf_viewer_layout_bottom);
             fileNameTextView = (TextView) findViewById(R.id.pdf_viewer_file_name);
-            actualPage = (TextView) findViewById(R.id.pdf_viewer_actual_page_number);
-            actualPage.setText(""+currentPage);
-            totalPages = (TextView) findViewById(R.id.pdf_viewer_total_page_number);
-            pageNumber = (RelativeLayout) findViewById(R.id.pdf_viewer_page_number);
-            pageNumber.animate().translationY(-150).start();
             progressBar = (ProgressBar) findViewById(R.id.pdf_viewer_progress_bar);
 
             pdfView = (PDFView) findViewById(R.id.pdfView);
@@ -678,17 +690,14 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             uploadContainer = (RelativeLayout) findViewById(R.id.upload_container_layout_bottom);
             uploadContainer.setVisibility(View.VISIBLE);
             bottomLayout.setVisibility(View.GONE);
-            uploadContainer.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    logDebug("onClick uploadContainer");
-                    Intent intent1 = new Intent(PdfViewerActivityLollipop.this, FileExplorerActivityLollipop.class);
-                    intent1.setAction(Intent.ACTION_SEND);
-                    intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent1.setDataAndType(uri, "application/pdf");
-                    startActivity(intent1);
-                    finish();
-                }
+            uploadContainer.setOnClickListener(v -> {
+                logDebug("onClick uploadContainer");
+                Intent intent1 = new Intent(PdfViewerActivityLollipop.this, FileExplorerActivityLollipop.class);
+                intent1.setAction(Intent.ACTION_SEND);
+                intent1.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent1.setDataAndType(uri, "application/pdf");
+                startActivity(intent1);
+                finish();
             });
 
             pdfviewerContainer = (RelativeLayout) findViewById(R.id.pdf_viewer_container);
@@ -707,7 +716,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                         tB.animate().translationY(-220).setDuration(0).withEndAction(aB::hide).start();
                         bottomLayout.animate().translationY(220).setDuration(0).start();
                         uploadContainer.animate().translationY(220).setDuration(0).start();
-                        pageNumber.animate().translationY(0).setDuration(0).start();
                     } else {
                         aB.hide();
                     }
@@ -721,7 +729,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NotNull Bundle outState) {
         logDebug("onSaveInstanceState");
         super.onSaveInstanceState(outState);
 
@@ -798,7 +806,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         //No action needed
     }
 
-    class LoadPDFStream extends AsyncTask<String, Void, InputStream> {
+    private class LoadPDFStream extends AsyncTask<String, Void, InputStream> {
 
         @Override
         protected InputStream doInBackground(String... strings) {
@@ -810,9 +818,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                 if (httpURLConnection.getResponseCode() == 200) {
                     inputStream = new BufferedInputStream( (httpURLConnection.getInputStream()));
                 }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return null;
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
@@ -835,7 +840,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                         .password(password)
                         .load();
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
 
             if (loading && !transferOverquota){
@@ -876,7 +881,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                     .password(password)
                     .load();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -907,15 +912,15 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         if (statusDialog != null) {
             try {
                 statusDialog.dismiss();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-            catch(Exception ex){}
         }
 
         logDebug("Intent processed!");
 
         if (infos == null) {
             logError("Error: infos is NULL");
-            return;
         } else {
             if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
                 showOverDiskQuotaPaywallWarning();
@@ -955,12 +960,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             tB.animate().translationY(0).setDuration(200L).start();
             bottomLayout.animate().translationY(0).setDuration(200L).start();
             uploadContainer.animate().translationY(0).setDuration(200L).start();
-            if (inside){
-                pageNumber.animate().translationY(-100).setDuration(200L).start();
-            }
-            else {
-                pageNumber.animate().translationY(-150).setDuration(200L).start();
-            }
         }
     }
 
@@ -968,15 +967,9 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         logDebug("Duration: " + duration);
         toolbarVisible = false;
         if(tB != null) {
-            tB.animate().translationY(-220).setDuration(duration).withEndAction(new Runnable() {
-                @Override
-                public void run() {
-                    aB.hide();
-                }
-            }).start();
+            tB.animate().translationY(-220).setDuration(duration).withEndAction(() -> aB.hide()).start();
             bottomLayout.animate().translationY(220).setDuration(duration).start();
             uploadContainer.animate().translationY(220).setDuration(duration).start();
-            pageNumber.animate().translationY(0).setDuration(duration).start();
         }
         else {
             aB.hide();
@@ -1005,10 +998,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
     boolean queryIfPdfIsHorizontal(int page){
         SizeF sizeF = pdfView.getPageSize(page);
-        if (sizeF.getWidth() > sizeF.getHeight()){
-            return true;
-        }
-        return false;
+        return sizeF.getWidth() > sizeF.getHeight();
     }
 
     @Override
@@ -1018,20 +1008,20 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_pdfviewer, menu);
 
-        shareMenuItem = menu.findItem(R.id.pdf_viewer_share);
-        downloadMenuItem = menu.findItem(R.id.pdf_viewer_download);
-        chatMenuItem = menu.findItem(R.id.pdf_viewer_chat);
-        propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties);
-        getlinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link);
-        renameMenuItem = menu.findItem(R.id.pdf_viewer_rename);
-        moveMenuItem = menu.findItem(R.id.pdf_viewer_move);
-        copyMenuItem = menu.findItem(R.id.pdf_viewer_copy);
-        moveToTrashMenuItem = menu.findItem(R.id.pdf_viewer_move_to_trash);
-        removeMenuItem = menu.findItem(R.id.pdf_viewer_remove);
-        removelinkMenuItem = menu.findItem(R.id.pdf_viewer_remove_link);
-        importMenuItem = menu.findItem(R.id.chat_pdf_viewer_import);
-        saveForOfflineMenuItem = menu.findItem(R.id.chat_pdf_viewer_save_for_offline);
-        chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove);
+        MenuItem shareMenuItem = menu.findItem(R.id.pdf_viewer_share);
+        MenuItem downloadMenuItem = menu.findItem(R.id.pdf_viewer_download);
+        MenuItem chatMenuItem = menu.findItem(R.id.pdf_viewer_chat);
+        MenuItem propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties);
+        MenuItem getlinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link);
+        MenuItem renameMenuItem = menu.findItem(R.id.pdf_viewer_rename);
+        MenuItem moveMenuItem = menu.findItem(R.id.pdf_viewer_move);
+        MenuItem copyMenuItem = menu.findItem(R.id.pdf_viewer_copy);
+        MenuItem moveToTrashMenuItem = menu.findItem(R.id.pdf_viewer_move_to_trash);
+        MenuItem removeMenuItem = menu.findItem(R.id.pdf_viewer_remove);
+        MenuItem removelinkMenuItem = menu.findItem(R.id.pdf_viewer_remove_link);
+        MenuItem importMenuItem = menu.findItem(R.id.chat_pdf_viewer_import);
+        MenuItem saveForOfflineMenuItem = menu.findItem(R.id.chat_pdf_viewer_save_for_offline);
+        MenuItem chatRemoveMenuItem = menu.findItem(R.id.chat_pdf_viewer_remove);
 
         if (!inside){
             propertiesMenuItem.setVisible(false);
@@ -1140,13 +1130,8 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                     importMenuItem.setVisible(false);
                     saveForOfflineMenuItem.setVisible(false);
 
-                    if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle()
-                            && msgChat.isDeletable()) {
-                        chatRemoveMenuItem.setVisible(true);
-                    }
-                    else {
-                        chatRemoveMenuItem.setVisible(false);
-                    }
+                    chatRemoveMenuItem.setVisible(msgChat.getUserHandle() == megaChatApi.getMyUserHandle()
+                            && msgChat.isDeletable());
                 }
                 else if (nodeChat != null){
                     downloadMenuItem.setVisible(true);
@@ -1159,12 +1144,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                         saveForOfflineMenuItem.setVisible(true);
                     }
 
-                    if (msgChat.getUserHandle() == megaChatApi.getMyUserHandle() && msgChat.isDeletable()) {
-                        chatRemoveMenuItem.setVisible(true);
-                    }
-                    else {
-                        chatRemoveMenuItem.setVisible(false);
-                    }
+                    chatRemoveMenuItem.setVisible(msgChat.getUserHandle() == megaChatApi.getMyUserHandle() && msgChat.isDeletable());
                 }
                 else {
                     downloadMenuItem.setVisible(false);
@@ -1375,6 +1355,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         return super.onCreateOptionsMenu(menu);
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         logDebug("onOptionsItemSelected");
@@ -1478,23 +1459,20 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
     public void showConfirmationDeleteNode(final long chatId, final MegaChatMessage message){
         logDebug("showConfirmationDeleteNode");
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which){
-                    case DialogInterface.BUTTON_POSITIVE:
-                        if (chatC == null){
-                            chatC = new ChatController(PdfViewerActivityLollipop.this);
-                        }
-                        chatC.deleteMessage(message, chatId);
-                        isDeleteDialogShow = false;
-                        finish();
-                        break;
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //No button clicked
-                        isDeleteDialogShow = false;
-                        break;
-                }
+        DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    if (chatC == null){
+                        chatC = new ChatController(PdfViewerActivityLollipop.this);
+                    }
+                    chatC.deleteMessage(message, chatId);
+                    isDeleteDialogShow = false;
+                    finish();
+                    break;
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    isDeleteDialogShow = false;
+                    break;
             }
         };
 
@@ -1505,18 +1483,13 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
         isDeleteDialogShow = true;
 
-        builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                isDeleteDialogShow = false;
-            }
-        });
+        builder.setOnDismissListener(dialog -> isDeleteDialogShow = false);
     }
 
     public void showCopy(){
         logDebug("showCopy");
 
-        ArrayList<Long> handleList = new ArrayList<Long>();
+        ArrayList<Long> handleList = new ArrayList<>();
         handleList.add(handle);
 
         Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
@@ -1532,7 +1505,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     public void showMove(){
         logDebug("showMove");
 
-        ArrayList<Long> handleList = new ArrayList<Long>();
+        ArrayList<Long> handleList = new ArrayList<>();
         handleList.add(handle);
 
         Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
@@ -1612,7 +1585,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         float density = getResources().getDisplayMetrics().density;
 
         float scaleW = getScaleW(outMetrics, density);
-        float scaleH = getScaleH(outMetrics, density);
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (10*scaleW));
         }else{
@@ -1622,21 +1594,13 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
         builder.setView(dialoglayout);
 
-        builder.setPositiveButton(getString(R.string.context_remove), new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                typeExport=TYPE_EXPORT_REMOVE;
-                megaApi.disableExport(megaApi.getNodeByHandle(handle), PdfViewerActivityLollipop.this);
-            }
+        builder.setPositiveButton(getString(R.string.context_remove), (dialog, which) -> {
+            typeExport=TYPE_EXPORT_REMOVE;
+            megaApi.disableExport(megaApi.getNodeByHandle(handle), PdfViewerActivityLollipop.this);
         });
 
-        builder.setNegativeButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getString(R.string.general_cancel), (dialog, which) -> {
 
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
         });
 
         removeLinkDialog = builder.create();
@@ -1644,7 +1608,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     }
 
     public void updateFile (){
-        MegaNode file = null;
+        MegaNode file;
         if (pdfFileName != null && handle != -1 ) {
             file = megaApi.getNodeByHandle(handle);
             if (file != null){
@@ -1663,7 +1627,9 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                         setSupportActionBar(tB);
                         aB = getSupportActionBar();
                     }
-                    aB.setTitle(" ");
+                    if (aB != null) {
+                        aB.setTitle(" ");
+                    }
                     setTitle(pdfFileName);
                     fileNameTextView.setText(pdfFileName);
                     supportInvalidateOptionsMenu();
@@ -1736,7 +1702,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
             MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
-            ProgressDialog temp = null;
+            ProgressDialog temp;
             try{
                 temp = new ProgressDialog(this);
                 temp.setMessage(getString(R.string.context_moving));
@@ -1747,8 +1713,10 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             }
             statusDialog = temp;
 
-            for(int i=0; i<moveHandles.length;i++){
-                megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
+            if (moveHandles != null) {
+                for (long moveHandle : moveHandles) {
+                    megaApi.moveNode(megaApi.getNodeByHandle(moveHandle), parent, this);
+                }
             }
         }
         else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK){
@@ -1760,7 +1728,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
-            ProgressDialog temp = null;
+            ProgressDialog temp;
             try{
                 temp = new ProgressDialog(this);
                 temp.setMessage(getString(R.string.context_copying));
@@ -1772,19 +1740,23 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             statusDialog = temp;
 
             MegaNode parent = megaApi.getNodeByHandle(toHandle);
-            for(int i=0; i<copyHandles.length;i++){
-                MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
-                if (cN != null){
-                    logDebug("cN != null, i = " + i + " of " + copyHandles.length);
-                    megaApi.copyNode(cN, parent, this);
-                }
-                else{
-                    logWarning("cN == null, i = " + i + " of " + copyHandles.length);
-                    try {
-                        statusDialog.dismiss();
-                        showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
+            if (copyHandles != null) {
+                for(int i=0; i<copyHandles.length;i++){
+                    MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
+                    if (cN != null){
+                        logDebug("cN != null, i = " + i + " of " + copyHandles.length);
+                        megaApi.copyNode(cN, parent, this);
                     }
-                    catch (Exception ex) {}
+                    else{
+                        logWarning("cN == null, i = " + i + " of " + copyHandles.length);
+                        try {
+                            statusDialog.dismiss();
+                            showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
+                        }
+                        catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
                 }
             }
         }
@@ -1794,13 +1766,15 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             if(!isOnline(this)||megaApi==null) {
                 try{
                     statusDialog.dismiss();
-                } catch(Exception ex) {};
+                } catch(Exception ex) {
+                    ex.printStackTrace();
+                }
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
 
             final long toHandle = intent.getLongExtra("IMPORT_TO", 0);
-            MegaNode target = null;
+            MegaNode target;
             target = megaApi.getNodeByHandle(toHandle);
             if(target == null){
                 target = megaApi.getRootNode();
@@ -1808,12 +1782,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             logDebug("TARGET: " + target.getName() + "and handle: " + target.getHandle());
             if (nodeChat != null) {
                 logDebug("DOCUMENT: " + nodeChat.getName() + "_" + nodeChat.getHandle());
-                if (target != null) {
-                    megaApi.copyNode(nodeChat, target, this);
-                } else {
-                    logError("TARGET: null");
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), -1);
-                }
+                megaApi.copyNode(nodeChat, target, this);
             }
             else{
                 logError("DOCUMENT: null");
@@ -1827,7 +1796,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         logDebug("page: " + page + ", pageCount: " + pageCount);
         if (!notChangePage) {
             currentPage = page+1;
-            actualPage.setText(String.valueOf(currentPage));
             setTitle(String.format("%s %s / %s", pdfFileName, currentPage, pageCount));
         }
         else {
@@ -1842,7 +1810,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
     @Override
     public void loadComplete(int nbPages) {
-        totalPages.setText(""+nbPages);
+        defaultScrollHandle.setTotalPages(nbPages);
         PdfDocument.Meta meta = pdfView.getDocumentMeta();
         logDebug("Title = " + meta.getTitle());
         logDebug("Author = " + meta.getAuthor());
@@ -1854,15 +1822,13 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         logDebug("Mod. Date = " + meta.getModDate());
         printBookmarksTree(pdfView.getTableOfContents(), "-");
 
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (toolbarVisible)
-                    setToolbarVisibilityHide(200L);
-            }
+        handler.postDelayed(() -> {
+            if (toolbarVisible)
+                setToolbarVisibilityHide(200L);
         }, 2000);
     }
 
+    @SuppressLint("DefaultLocale")
     public void printBookmarksTree(List<PdfDocument.Bookmark> tree, String sep) {
         for (PdfDocument.Bookmark b : tree) {
 
@@ -1914,6 +1880,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("onRequestFinish");
 
+        String gSession;
         if (request.getType() == MegaRequest.TYPE_LOGIN){
 
             if (e.getErrorCode() != MegaError.API_OK) {
@@ -1959,6 +1926,8 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             if (e.getErrorCode() == MegaError.API_OK) {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_moved), -1);
                 finish();
+            } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+                showForeignStorageOverQuotaWarningDialog(this);
             } else {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), -1);
             }
@@ -1966,12 +1935,19 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             try {
                 statusDialog.dismiss();
             }
-            catch (Exception ex) {}
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
 
             if (e.getErrorCode() == MegaError.API_OK){
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
             }
             else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                if (api.isForeignNode(request.getParentHandle())) {
+                    showForeignStorageOverQuotaWarningDialog(this);
+                    return;
+                }
+
                 logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
                 Intent intent = new Intent(this, ManagerActivityLollipop.class);
                 intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -2108,6 +2084,10 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     public void onTransferTemporaryError(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 
         if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
+            if (transfer.isForeignOverquota()) {
+                return;
+            }
+
             if (e.getValue() != 0) {
                 logWarning("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
                 showGeneralTransferOverQuotaWarning();

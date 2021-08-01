@@ -148,8 +148,9 @@
     <!-- For fast scroller -->
     <color name="scroll_bubble">#90727272</color>
 
-    <color name="scroll_handle">#90d90007</color>
+    <color name="scroll_handle">@color/grey_010</color>
 
+    <color name="scroll_bubble_text_color">@color/grey_alpha_050</color>
     <!-- ======================== Color pair: light_dark ================== -->
 
     <color name="black_white">@color/black</color>
@@ -222,7 +223,7 @@
     <color name="grey_038_white_038">@color/grey_alpha_038</color>
 
     <!-- AudioPlayer playlist position and duration  -->
-    <color name="grey_038_white">@color/grey_alpha_038</color>
+    <color name="grey_038_white_alpha_038">@color/grey_alpha_038</color>
 
     <!-- Bottom navigation menu disabled tint color  -->
     <color name="grey_016_white_016">@color/grey_alpha_016</color>
@@ -438,4 +439,8 @@
     <color name="grey_054_white_060">@color/grey_alpha_054</color>
     <color name="grey_012_white_020">@color/grey_alpha_012</color>
 
+    <color name="black_grey_alpha_012">@color/black</color>
+    <color name="grey_alpha_012_black">@color/grey_alpha_012</color>
+
+    <color name="white_teal_100">@color/white</color>
 </resources>

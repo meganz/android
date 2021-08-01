@@ -87,7 +87,7 @@
     <!-- Error getting the root node -->
     <string name="error_general_nodes">Eroate. Te rugăm să încerci din nou.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
-    <string name="general_rk">CHEIEDERECUPERARE-MEGA</string>
+    <string name="general_rk">MEGA-CHEIEDERECUPERARE</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">Folderul media secundar nu există, te rugăm să alegi un folder nou</string>
     <!-- when no external card exists -->
@@ -497,7 +497,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Cerere retrimisă</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Cererea trimisă cu succes la %s. Starea poate fi consultată în fila Cereri trimise.</string>
+    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contact eliminat</string>
     <!-- error message -->
@@ -660,9 +660,8 @@
     <string name="upload_uploaded">încărcat</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
-        <item quantity="one">Se procesează fișierul</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se procesează fișierele</item>
+        <item quantity="one">Processing file</item>
+        <item quantity="other">Processing files</item>
     </plurals>
     <!-- error message when downloading a file -->
     <string name="error_temporary_unavaible">Resursă temporar indisponibilă, te rugăm să reîncerci mai târziu</string>
@@ -1229,8 +1228,8 @@
     <!-- Confirmation before removing the outgoing shares of a folder -->
     <plurals name="confirmation_remove_outgoing_shares">
         <item quantity="one">Folderul este partajat cu %1$d contact. Elimini partajarea?</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Folderul este partajat cu %1$d contacte. Elimini partajarea?</item>
+        <item quantity="few">Folderul este partajat cu %1$d contacte. Elimini toate partajările?</item>
+        <item quantity="other">Folderul este partajat cu %1$d de contacte. Elimini toate partajările?</item>
     </plurals>
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">E-mail și/sau parolă nevalide. Te rugăm să încerci din nou.</string>
@@ -1251,7 +1250,7 @@
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
     <string name="link_broken">Acest URL este corupt sau deformat. Linkul pe care încerci să îl accesezi nu există.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
-    <string name="confirm_email_text">Se așteaptă confirmarea e-mailului</string>
+    <string name="confirm_email_text">În așteptarea confirmării e-mailului.</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
     <string name="confirm_email_explanation">Te rugăm să verifici e-mailul și să dai clic pe link pentru a confirma contul.</string>
     <!-- Plural of items which contains a folder. 2 items -->
@@ -2207,8 +2206,6 @@
     <string name="label_set_period">Setează perioada</string>
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]Invită-ți prietenii să intre pe [/B][A]Chat[/A][B] și bucură-te de platforma noastră criptată cu intimitate și securitate[/B]</string>
-    <!-- Text of the empty screen when there are not elements in Camera Uploads -->
-    <string name="context_empty_camera_uploads">[B]Niciun conținut media în [/B][A]Încărcări cameră[/A]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]Coș de gunoi[/A] [B]gol[/B]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
@@ -2631,7 +2628,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Nu s-a răspuns la apel[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">E-mailul contactului</string>
+    <string name="contact_email">E-mail de contact</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Ai adăugat deja acest contact.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -4022,4 +4019,47 @@
     <string name="general_info">Informații</string>
     <!-- Item menu option upon right click on one image or video to save it to device gallery -->
     <string name="general_save_to_gallery">Save to gallery</string>
+    <!-- settings of the Media section -->
+    <string name="settings_media">Mass-media</string>
+    <!-- settings title of the Media section -->
+    <string name="settings_media_audio_files">Audio files</string>
+    <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
+    <string name="settings_background_play_hint">Playing on the background</string>
+    <!-- Text of the empty screen when there are no elements in Photos -->
+    <string name="photos_empty">[B]No[/B] [A]Photos[/A]</string>
+    <!-- Text to show as subtitle of Enable camera uploads screen -->
+    <string name="enable_cu_subtitle">Fă backup automat fotografiilor și videoclipurilor în unitatea cloud.</string>
+    <!-- Text of a button on Camera Uploads section to show all the content of the section-->
+    <string name="all_view_button">Toate</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
+    <string name="days_view_button">Days</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
+    <string name="months_view_button">Months</string>
+    <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
+    <string name="years_view_button">Years</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
+    <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
+    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
+    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
+    <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
+    <plurals name="cu_upload_progress">
+        <item quantity="one">Upload in progress, 1 file pending</item>
+        <item quantity="other">Upload in progress, %1$d files pending</item>
+    </plurals>
+    <!-- Text to show as production api server option -->
+    <string name="production_api_server">Production</string>
+    <!-- Title to show in a dialog to change api server -->
+    <string name="title_change_server">Change server</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Show line numbers</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Hide line numbers</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Proprietarul partajării depăște cota de stocare.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Fișierul nu poate fi trimis deoarece utilizatorul țintă și-a depășit cota sa de stocare.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues.</string>
 </resources>
