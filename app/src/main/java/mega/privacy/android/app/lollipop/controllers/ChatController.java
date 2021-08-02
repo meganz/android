@@ -175,14 +175,14 @@ public class ChatController {
 
     public void deleteMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chat){
         logDebug("Messages to delete: " + messages.size());
-        for(int i=0; i<messages.size();i++){
+        for (int i = 0; i < messages.size(); i++) {
             deleteMessage(messages.get(i), chat.getChatId());
         }
     }
 
     public void deleteAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){
         logDebug("Messages to delete: " + messages.size());
-        for(int i=0; i<messages.size();i++){
+        for (int i = 0; i < messages.size(); i++) {
             deleteMessage(messages.get(i).getMessage(), chat.getChatId());
         }
     }
@@ -290,8 +290,8 @@ public class ChatController {
         String text = createManagementString(androidMessage.getMessage(), chatRoom);
         if((text!=null) && (!text.isEmpty())){
             text = text.substring(text.indexOf(":")+2);
-            String strEdited  = " " + StringResourcesUtils.getString(R.string.edited_message_text);
-            if(text.contains(strEdited)){
+            String strEdited = " " + StringResourcesUtils.getString(R.string.edited_message_text);
+            if (text.contains(strEdited)) {
                 int index = text.indexOf(strEdited);
                 text = text.substring(0, index);
             }
@@ -898,31 +898,31 @@ public class ChatController {
         return nonContact != null ? nonContact.getEmail() : "";
     }
 
-    public String getMyFullName(){
+    public String getMyFullName() {
 
         String fullName = megaChatApi.getMyFullname();
 
-        if(fullName!=null){
-            if(fullName.isEmpty()){
+        if (fullName != null) {
+            if (fullName.isEmpty()) {
                 logDebug("Put MY email as fullname");
                 String myEmail = megaChatApi.getMyEmail();
                 String[] splitEmail = myEmail.split("[@._]");
                 fullName = splitEmail[0];
-            }
-            else{
-                if (fullName.trim().length() <= 0){
+            } else {
+                if (fullName.trim().length() <= 0) {
                     logDebug("Put MY email as fullname");
                     String myEmail = megaChatApi.getMyEmail();
                     String[] splitEmail = myEmail.split("[@._]");
                     fullName = splitEmail[0];
                 }
             }
-        } else{
+        } else {
             logDebug("Put MY email as fullname");
             String myEmail = megaChatApi.getMyEmail();
             String[] splitEmail = myEmail.split("[@._]");
             fullName = splitEmail[0];
         }
+
         return fullName;
     }
 
@@ -978,7 +978,7 @@ public class ChatController {
                 }
                 else{
                     logError("Destination ERROR");
-                }            assert destination != null;
+                }
             }
         }
 
