@@ -192,7 +192,7 @@ class MyAccountFragment : Fragment(), Scrollable {
      *
      * @param retry True if should request for avatar if it's not available, false otherwise.
      */
-    fun setupAvatar(retry: Boolean) {
+    private fun setupAvatar(retry: Boolean) {
         val avatar =
             CacheFolderManager.buildAvatarFile(
                 requireContext(),
@@ -210,7 +210,7 @@ class MyAccountFragment : Fragment(), Scrollable {
      * Sets the avatar file if available.
      * If not, requests it if should retry, sets the default one if not.
      */
-    fun setProfileAvatar(avatar: File, retry: Boolean) {
+    private fun setProfileAvatar(avatar: File, retry: Boolean) {
         val avatarBitmap: Bitmap?
 
         if (avatar.exists() && avatar.length() > 0) {
@@ -287,7 +287,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             ChangeApiServerUtil.showChangeApiServerDialog(requireActivity(), megaApi)
     }
 
-    fun setupContactConnections() {
+    private fun setupContactConnections() {
         val contacts = megaApi.contacts
         val visibleContacts = ArrayList<MegaUser>()
 
@@ -306,7 +306,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         )
     }
 
-    fun setupAccountDetails() {
+    private fun setupAccountDetails() {
         binding.lastSessionSubtitle.text =
             if (viewModel.getLastSession().isNotEmpty()) viewModel.getLastSession()
             else gettingInfo
@@ -410,7 +410,7 @@ class MyAccountFragment : Fragment(), Scrollable {
     /**
      * Shows the payment info if the subscriptions is almost to renew or expiry.
      */
-    fun expandPaymentInfoIfNeeded() {
+    private fun expandPaymentInfoIfNeeded() {
         if (!viewModel.shouldShowPaymentInfo())
             return
 

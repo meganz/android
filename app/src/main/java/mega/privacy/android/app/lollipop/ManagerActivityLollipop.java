@@ -5261,18 +5261,39 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	selectDrawerItemLollipop(drawerItem);
 	}
 
+	/**
+	 * Launches a MyAccountActivity intent without any intent action, data and extra.
+	 */
 	public void showMyAccount() {
 		showMyAccount(null, null, null);
 	}
 
-	private void showMyAccount(String action, Uri data){
+	/**
+	 * Launches a MyAccountActivity intent without any extra.
+	 *
+	 * @param action The intent action.
+	 * @param data   The intent data.
+	 */
+	private void showMyAccount(String action, Uri data) {
 		showMyAccount(action, data, null);
 	}
 
-	private void showMyAccount(Pair<String, Integer> extra){
+	/**
+	 * Launches a MyAccountActivity intent without any intent action and data.
+	 *
+	 * @param extra Pair<String, Integer> The intent extra. First is the extra key, second the value.
+	 */
+	private void showMyAccount(Pair<String, Integer> extra) {
 		showMyAccount(null, null, extra);
 	}
 
+	/**
+	 * Launches a MyAccountActivity intent.
+	 *
+	 * @param action The intent action.
+	 * @param data   The intent data.
+	 * @param extra  Pair<String, Integer> The intent extra. First is the extra key, second the value.
+	 */
 	private void showMyAccount(String action, Uri data, Pair<String, Integer> extra) {
 		if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
 			drawerLayout.closeDrawer(Gravity.LEFT);
@@ -10365,11 +10386,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param e         MegaError of the request.
 	 */
 	private void updateMyData(boolean firstName, String newName, MegaError e) {
-		if (myAccountInfo != null) {
-			myAccountInfo.updateMyData(firstName, newName, e);
-			updateUserNameNavigationView(myAccountInfo.getFullName());
-		}
-
+		myAccountInfo.updateMyData(firstName, newName, e);
+		updateUserNameNavigationView(myAccountInfo.getFullName());
 		LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean.class).post(true);
 	}
 
