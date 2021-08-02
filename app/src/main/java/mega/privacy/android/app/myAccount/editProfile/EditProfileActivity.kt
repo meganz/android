@@ -20,6 +20,8 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
+import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
+import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
@@ -88,6 +90,16 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar() }
 
     private val phoneNumberObserver = Observer<Boolean> { setupPhoneNumber() }
+
+    private val nameUpdatedObserver =
+        Observer<Boolean> {
+            binding.headerLayout.firstLineToolbar.text =
+                viewModel.getName().toUpperCase(Locale.getDefault())
+        }
+
+    private val emailUpdatedObserver =
+        Observer<Boolean> { binding.headerLayout.secondLineToolbar.text = viewModel.getEmail() }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -161,6 +173,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
             .removeObserver(phoneNumberObserver)
+
+        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
+            .removeObserver(nameUpdatedObserver)
+
+        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
+            .removeObserver(emailUpdatedObserver)
 
         changeNameDialog?.dismiss()
         changeEmailDialog?.dismiss()
@@ -238,6 +256,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
             .observeForever(phoneNumberObserver)
+
+        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
+            .removeObserver(nameUpdatedObserver)
+
+        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
+            .removeObserver(emailUpdatedObserver)
     }
 
     /**

@@ -255,6 +255,8 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan;
@@ -10367,6 +10369,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			myAccountInfo.updateMyData(firstName, newName, e);
 			updateUserNameNavigationView(myAccountInfo.getFullName());
 		}
+
+		LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean.class).post(true);
 	}
 
 	public void updateAccountStorageInfo(){
@@ -10573,7 +10577,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	}
 
-	public void updateMyEmail(String email){
+	public void updateMyEmail(String email) {
+		LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean.class).post(true);
+
 		logDebug("New email: " + email);
 		nVEmail.setText(email);
 		String oldEmail = dbH.getMyEmail();
