@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -97,6 +98,14 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    private val fabChangeObserver = androidx.lifecycle.Observer<Boolean> {
+        if (it) {
+            showFabButton()
+        } else {
+            hideFabButton()
+        }
+    }
+
     var isFabExpanded = false
 
     /** The broadcast receiver for network connectivity.
@@ -138,6 +147,9 @@ class HomepageFragment : Fragment() {
 
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .observeForever(homepageVisibilityChangeObserver)
+
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
+            .observeForever(fabChangeObserver)
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
@@ -197,6 +209,9 @@ class HomepageFragment : Fragment() {
 
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .removeObserver(homepageVisibilityChangeObserver)
+
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
+            .removeObserver(fabChangeObserver)
     }
 
     /**
@@ -492,6 +507,7 @@ class HomepageFragment : Fragment() {
         bottomSheetBehavior.addBottomSheetCallback(object :
             HomepageBottomSheetBehavior.BottomSheetCallback() {
 
+            @SuppressLint("StaticFieldLeak")
             val backgroundMask = viewDataBinding.backgroundMask
             val dividend = 1.0f - SLIDE_OFFSET_CHANGE_BACKGROUND
             val bottomSheet = viewDataBinding.homepageBottomSheet
@@ -768,6 +784,22 @@ class HomepageFragment : Fragment() {
             playTogether(rotateAnim, backgroundTintAnim, tintAnim)
             start()
         }
+    }
+
+    /**
+     * Hides the fabButton
+     */
+    private fun hideFabButton() {
+        fabMain.hide()
+        fabMaskMain.hide()
+    }
+
+    /**
+     * Shows the fabButton
+     */
+    private fun showFabButton() {
+        fabMain.show()
+        fabMaskMain.show()
     }
 
     companion object {

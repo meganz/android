@@ -753,7 +753,7 @@
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
     <string name="settings_camera_upload_charging_helper_label">Videocompressie gebruikt aanzienlijke hoeveelheden stroom. Sluit uw apparaat aan om op te laden als de te comprimeren video’s groter zijn dan %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Indien ingeschakeld, worden uw locatiegegevens bij uw foto’s gevoegd. Wees voorzichtig bij het delen ervan.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">Indien ingeschakeld, wordt locatie-informatie bij uw foto’s gevoegd. Wees voorzichtig bij het delen ervan.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Geavanceerd</string>
     <!-- Settings preference title for cache -->
@@ -2084,7 +2084,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Geavanceerde opties</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA heeft uw toestemming nodig om bestanden te downloaden</string>
+    <string name="download_requires_permission">MEGA heeft lees- en schrijfrechten nodig voor uw externe opslag om daar bestanden te downloaden.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">Oude SD-kaart is niet beschikbaar, stel een nieuwe downloadlocatie in.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2102,13 +2102,13 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
     <string name="save_cloud_drive">Naar Cloud Schijf</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
-    <string name="save_file_system">Naar Bestand Systeem</string>
+    <string name="save_file_system">Naar bestandssysteem</string>
     <!-- Title of QR code section -->
-    <string name="section_my_code">Mijn Code</string>
+    <string name="section_my_code">Mijn code</string>
     <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Code Scannen</string>
+    <string name="section_scan_code">Code scannen</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">Automatisch-Accepteren</string>
+    <string name="settings_qrcode_autoaccept">Automatisch accepteren</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">MEGA gebruikers die uw QR code scannen, worden automatisch toegevoegd aan uw lijst met contactpersonen.</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2144,9 +2144,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">De uitnodiging was niet verstuurd. %s is al in uw contactlijst.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">De uitnodiging was niet verzonden. Een fout heeft opgetreden tijdens de verwerking ervan.</string>
+    <string name="invite_not_sent_text_error">Er is een fout opgetreden en de uitnodiging is niet verzonden.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">QR Code genereren&#8230;</string>
+    <string name="generatin_qr">QR-code genereren&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">QR code scannen</string>
     <!-- get the contact link and copy it -->
@@ -2551,9 +2551,9 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d bestanden waren niet gedeeld</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Inhoud Weergeven</string>
+    <string name="preview_content">Voorbeeld van inhoud bekijken</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">Het streamen kan niet uitgevoerd worden en het bestand was niet gedownload</string>
+    <string name="no_network_connection_on_play_file">Geen netwerkverbinding. Bestand is niet gedownload en kan niet worden gestreamd.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Kan bestand niet openen.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
@@ -2566,9 +2566,9 @@
         <item quantity="other">Berichten niet doorgestuurd</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Rijke URL Weergave</string>
+    <string name="title_confirmation_disable_rich_links">Rijke URL weergave</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">U schakelt uitgebreide URL-voorbeelden uit. U kunt uitgebreide URL-voorbeelden opnieuw inschakelen in uw instellingen. Wilt u doorgaan?</string>
+    <string name="text_confirmation_disable_rich_links">U schakelt uitgebreide URL-voorbeelden uit. U kunt ze opnieuw inschakelen in Instellingen. Wilt u doorgaan?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Gemiste oproep[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2580,7 +2580,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Oproep was niet beantwoord[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Contact’s E-mail</string>
+    <string name="contact_email">Contact email</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">U heeft dit contact al toegevoegd.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -2594,7 +2594,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Hersteld naar %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Fout. Niet hersteld</string>
+    <string name="context_no_restored">Er is een fout opgetreden. Artikel niet hersteld.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Bericht Versturen</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -3042,11 +3042,11 @@
     <!-- Permissions screen title -->
     <string name="general_setup_mega">MEGA Instellen</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA heeft toegang nodig tot uw foto’s, media en bestanden, zodat u ze kunt delen met vrienden, gecodeerde berichten kunt uitwisselen en veilig kunt bellen.</string>
+    <string name="setup_mega_explanation">MEGA heeft uw toestemming nodig om toegang te krijgen tot uw media en bestanden om te delen. Andere toegangsrechten kunnen nodig zijn voor het uitwisselen van versleutelde berichten en om veilig te bellen.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Toegang tot foto’s, media en bestanden toestaan.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">Voor het delen van foto’s, video’s en bestanden heeft MEGA uw toestemming nodig.</string>
+    <string name="allow_acces_media_subtitle">MEGA heeft uw toestemming nodig voor toegang tot uw bestanden voor deling.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Camera inschakelen</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -3054,7 +3054,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Oproepen inschakelen</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Schakel Toegang tot Uw Adresboek in</string>
+    <string name="allow_acces_contact_title">Verleen MEGA toestemming voor toegang tot uw contacten</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Ontdek gemakkelijk contacten uit uw adresboek op MEGA</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3062,9 +3062,9 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Bied toegang tot uw microfoon om gecodeerde oproepen te maken.</string>
     <!-- General enable access -->
-    <string name="general_enable_access">Toegang Toestaan</string>
+    <string name="general_enable_access">Toegang verlenen</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
-    <string name="title_chat_shared_files_info">Gedeelde Bestanden</string>
+    <string name="title_chat_shared_files_info">Gedeelde bestanden</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">Bijlage al verzonden</string>
     <!-- Message shown when a group call ends. -->
@@ -3109,17 +3109,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s heeft de oproep verlaten</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">U mag geen gesprek starten omdat de deelnemerslimiet is overschreden.</string>
+    <string name="call_error_too_many_participants_start">Oproep kan niet starten omdat het maximum aantal deelnemers is overschreden.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">U mag niet deelnemen aan deze oproep omdat deze het maximale aantal deelnemers heeft bereikt.</string>
+    <string name="call_error_too_many_participants">Er kan niet worden deelgenomen aan het gesprek omdat het maximum aantal deelnemers is overschreden.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">U mag niet deelnemen aan dit gesprek omdat de groep het maximale aantal deelnemers aan de chat heeft bereikt.</string>
+    <string name="call_error_too_many_participants_join">Groepsoproep kan niet worden toegevoegd omdat het maximum aantal deelnemers is overschreden.</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">U mag geen video inschakelen omdat deze oproep het maximale aantal deelnemers heeft bereikt dat video gebruikt.</string>
+    <string name="call_error_too_many_video">Er kan niet worden deelgenomen aan een videogesprek omdat het maximum aantal deelnemers is overschreden.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">U mag het gesprek niet in de wacht zetten.</string>
+    <string name="call_error_call_on_hold">Oproep kan niet in de wacht worden gezet.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Fout. Het bestand kan niet geopend worden.</string>
+    <string name="error_open_file_with">Er is een fout opgetreden en het bestand kan niet worden geopend met deze applicatie.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">Binnenkomende oproep&#8230;.</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3440,7 +3440,7 @@
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Verbruik</string>
     <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Opslag verbruik details</string>
+    <string name="usage_storage_details_label">Uitsplitsing van opslaggebruik</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Totaal gebruik</string>
     <!-- Title of transfer section in Storage -->
@@ -3456,7 +3456,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Uw account is momenteel [B]geschorst[/B]. U kunt alleen door uw gegevens bladeren.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA heeft geen toegang tot uw gegevens, maar uw zakelijke accountbeheerder kan uw Camera Uploads bekijken en verwijderen.</string>
+    <string name="camera_uploads_business_alert">MEGA heeft geen toegang tot uw gegevens. Uw zakelijke accountbeheerder heeft echter wel toegang tot uw camera-uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Er is iets fout gegaan</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3797,7 +3797,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Link:%1$s\n\n Wachtwoord:%2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA heeft uw toestemming nodig om bestanden te delen.</string>
+    <string name="files_required_permissions_warning">MEGA heeft uw toestemming nodig om toegang te krijgen tot uw bestanden om te delen.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Favoriet</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3973,4 +3973,16 @@
     <string name="production_api_server">Productie</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Wijzig server</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Regelnummers weergeven</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Regelnummers verbergen</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">Gedeelde gebruiker is over opslag tegoed.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Het bestand kan niet worden verstuurd omdat de doelgebruiker zijn opslagtegoed heeft overschreden.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">We upgraden MEGAchat. Uw oproep is mogelijk niet verbonden vanwege incompatibiliteitsproblemen met de versie.</string>
 </resources>

@@ -48,6 +48,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -158,6 +160,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean resumeSesion = false;
 
     private MegaApiAndroid megaApi;
+    private MegaApiAndroid megaApiFolder;
     private MegaChatApiAndroid megaChatApi;
     private String confirmLink;
 
@@ -1523,7 +1526,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
@@ -1534,25 +1537,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
+        if (megaApiFolder == null){
+            megaApiFolder = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
+        }
+
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
-        }
-    }
-
-    @Override
-    public void onAttach(Activity context) {
-        logDebug("onAttach Activity");
-        super.onAttach(context);
-        this.context = context;
-
-        dbH = DatabaseHandler.getDbHandler(context);
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) context.getApplication()).getMegaApi();
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) context.getApplication()).getMegaChatApi();
         }
     }
 
@@ -1903,6 +1893,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 returnToLogin();
             } else {
+                logDebug("Logged in. Setting account auth token for folder links.");
+                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
+
                 if (is2FAEnabled){
                     loginVerificationLayout.setVisibility(View.GONE);
                     ((LoginActivityLollipop) context).hideAB();

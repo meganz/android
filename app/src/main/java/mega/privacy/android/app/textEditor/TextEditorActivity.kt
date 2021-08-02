@@ -227,7 +227,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
-        viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
+        viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -384,7 +384,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
 
             binding.contentEditText.apply {
                 setText(text, firstLineNumber)
-                setSelection(savedInstanceState.getInt(CURSOR_POSITION))
+
+                val cursorPosition = savedInstanceState.getInt(CURSOR_POSITION, INVALID_VALUE)
+                if (text != null && cursorPosition >= 0 && cursorPosition < text.length) {
+                    setSelection(cursorPosition)
+                }
             }
 
             binding.contentText.setText(text, firstLineNumber)

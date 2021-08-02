@@ -167,6 +167,20 @@ object AlertsAndWarnings {
         }
     }
 
+    /**
+     * Shows a warning indicating something can not be added to an incoming share because the
+     * owner is on storage over quota state.
+     */
+    @JvmStatic
+    fun showForeignStorageOverQuotaWarningDialog(context: Context) {
+        MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            .setMessage(getString(R.string.warning_share_owner_storage_quota))
+            .setPositiveButton(getString(R.string.general_ok), null)
+            .setCancelable(false)
+            .create()
+            .show()
+    }
+
     @JvmStatic
     fun askForCustomizedPlan(context: Context, myEmail:String, accountType: Int) {
         LogUtil.logDebug("askForCustomizedPlan")

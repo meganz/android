@@ -12,6 +12,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
@@ -38,6 +40,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -883,6 +887,13 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					super.onScrolled(recyclerView, dx, dy);
 					checkScroll();
 				}
+
+				@Override
+				public void onScrollStateChanged(@NonNull @NotNull RecyclerView recyclerView, int newState) {
+					super.onScrollStateChanged(recyclerView, newState);
+					controlFabButton(newState);
+				}
+
 			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
@@ -974,6 +985,12 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 					super.onScrolled(recyclerView, dx, dy);
 					checkScroll();
 				}
+
+				@Override
+				public void onScrollStateChanged(@NonNull @NotNull RecyclerView recyclerView, int newState) {
+					super.onScrollStateChanged(recyclerView, newState);
+					controlFabButton(newState);
+				}
 			});
 
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
@@ -1042,6 +1059,20 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
             showAskForDisplayOverDialog();
 			return v;
 		}			
+	}
+
+	/**
+	 * Show or hide the fab button
+	 * @param newState The updated scroll state. One of SCROLL_STATE_IDLE, SCROLL_STATE_DRAGGING or SCROLL_STATE_SETTLING.
+	 */
+	private void controlFabButton(int newState) {
+		if (adapter != null && !adapter.isMultipleSelect()) {
+			if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+				((ManagerActivityLollipop) context).showFabButton();
+			} else {
+				((ManagerActivityLollipop) context).hideFabButton();
+			}
+		}
 	}
 
 	private void showAskForDisplayOverDialog() {

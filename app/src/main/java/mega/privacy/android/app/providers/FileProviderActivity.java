@@ -143,6 +143,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	private Button bLoginLol;
 
 	private MegaApiAndroid megaApi;
+	private MegaApiAndroid megaApiFolder;
 	private MegaChatApiAndroid megaChatApi;
 
 	private boolean folderSelected = false;
@@ -233,6 +234,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		}
 
 		megaApi = MegaApplication.getInstance().getMegaApi();
+		megaApiFolder = MegaApplication.getInstance().getMegaApiFolder();
 		megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 
 		megaApi.addGlobalListener(this);
@@ -924,6 +926,12 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		if (hashes != null && hashes.length > 0) {
 			for (long hash : hashes) {
 				MegaNode tempNode = megaApi.getNodeByHandle(hash);
+				// If node doesn't exist continue to the next one
+				if (tempNode == null) {
+					logWarning("Temp node is null");
+					continue;
+				}
+
 				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
 				if(localPath != null){
 					try {
@@ -1418,6 +1426,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 					stopRunningCameraUploadService(this);
 				}
 			} else {
+				logDebug("Logged in. Setting account auth token for folder links.");
+				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
+
 				if (is2FAEnabled) {
 					is2FAEnabled = false;
 					loginVerificationLayout.setVisibility(View.GONE);

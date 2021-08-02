@@ -304,8 +304,11 @@ public class AccountController {
         builder.show();
     }
 
-    static public void localLogoutApp(Context context){
-        logDebug("localLogoutApp");
+    static public void localLogoutApp(Context context) {
+        MegaApplication app = MegaApplication.getInstance();
+
+        logDebug("Logged out. Resetting account auth token for folder links.");
+        app.getMegaApiFolder().setAccountAuth(null);
 
         try {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -399,7 +402,6 @@ public class AccountController {
         PsaManager.INSTANCE.stopChecking();
 
         //Clear MyAccountInfo
-        MegaApplication app = MegaApplication.getInstance();
         app.resetMyAccountInfo();
         app.setStorageState(MegaApiJava.STORAGE_STATE_UNKNOWN);
 

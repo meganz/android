@@ -1810,6 +1810,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
+				logDebug("Logged in. Setting account auth token for folder links.");
+				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
 				logDebug("Fast login OK, Calling fetchNodes from CameraSyncService");
 				megaApi.fetchNodes();
 			}

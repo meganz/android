@@ -257,6 +257,8 @@ class TextEditorViewModel @ViewModelInject constructor(
         if (isViewMode() || isEditMode()) {
             needsReadContent = true
             initializeReadParams(mi)
+        } else {
+            pagination.value = Pagination()
         }
 
         setEditableAdapter()
@@ -366,7 +368,7 @@ class TextEditorViewModel @ViewModelInject constructor(
             }
 
 
-            pagination.postValue(Pagination(sb.toString(), 0))
+            pagination.postValue(Pagination(sb.toString()))
             sb.clear()
         }
     }
@@ -434,6 +436,7 @@ class TextEditorViewModel @ViewModelInject constructor(
     /**
      * Handle activity result.
      *
+     * @param context          Current Context
      * @param requestCode      RequestCode of onActivityResult
      * @param resultCode       ResultCode of onActivityResult
      * @param data             Intent of onActivityResult
@@ -441,6 +444,7 @@ class TextEditorViewModel @ViewModelInject constructor(
      * @param activityLauncher Interface to start activity
      */
     fun handleActivityResult(
+        context: Context,
         requestCode: Int,
         resultCode: Int,
         data: Intent?,
@@ -467,12 +471,14 @@ class TextEditorViewModel @ViewModelInject constructor(
                 )
             }
             REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> handleSelectFolderToMoveResult(
+                context,
                 requestCode,
                 resultCode,
                 data,
                 snackbarShower
             )
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> handleSelectFolderToCopyResult(
+                context,
                 requestCode,
                 resultCode,
                 data,

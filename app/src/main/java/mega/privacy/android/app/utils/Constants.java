@@ -483,6 +483,7 @@ public class Constants {
     public static final int MIN_ITEMS_SCROLLBAR = 30;
     public static final int MIN_ITEMS_SCROLLBAR_GRID = 200;
     public static final int MIN_ITEMS_SCROLLBAR_CHAT = 20;
+    public static final int MIN_ITEMS_SCROLLBAR_CONTACT = 20;
 
     public static final long BUFFER_COMP = 1073741824;      // 1 GB
     public static final int MAX_BUFFER_16MB = 16777216; // 16 MB
@@ -546,6 +547,8 @@ public class Constants {
     public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
     public static final int PERMISSIONS_TYPE = 4;
     public static final int INVITE_CONTACT_TYPE = 5;
+    public static final int SNACKBAR_IMCOMPATIBILITY_TYPE = 6;
+    public static final int SNACKBAR_IMCOMPATIBILITY_BUTTON_TYPE = 7;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -827,6 +830,8 @@ public class Constants {
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_VISIBILITY = "drag_to_exit_thumbnail_visibility";
     public static final String EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION = "drag_to_exit_thumbnail_location";
     public static final String EVENT_DRAG_TO_EXIT_SCROLL = "drag_to_exit_scroll";
+
+    public static final String EVENT_FAB_CHANGE = "fab_change";
 
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";

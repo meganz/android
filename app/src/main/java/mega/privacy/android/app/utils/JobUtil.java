@@ -24,7 +24,6 @@ import mega.privacy.android.app.jobservices.CuSyncInactiveHeartbeatService;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import nz.mega.sdk.MegaApiJava;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_ENABLE_CU_SETTING;
 import static mega.privacy.android.app.jobservices.CameraUploadsService.EXTRA_IGNORE_ATTR_CHECK;
 import static mega.privacy.android.app.utils.Constants.CU_SYNC_INACTIVE_HEARTBEAT_JOB_ID;
 import static mega.privacy.android.app.utils.Constants.PHOTOS_UPLOAD_JOB_ID;
@@ -106,7 +105,6 @@ public class JobUtil {
 
     public static synchronized void startCameraUploadService(Context context) {
         start(context, false);
-        context.sendBroadcast(new Intent(ACTION_UPDATE_ENABLE_CU_SETTING));
     }
 
     public static synchronized void startCameraUploadServiceIgnoreAttr(final Context context) {

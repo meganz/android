@@ -28,6 +28,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CREATE_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
@@ -653,13 +654,13 @@ object MegaNodeDialogUtil {
 
                     megaApi.moveNode(
                         node, rubbishNode,
-                        MoveListener {
+                        MoveListener { success, isForeignOverQuota ->
                             progress.dismiss()
 
-                            if (it) {
-                                activity.finish()
-                            } else {
-                                snackbarShower.showSnackbar(getString(R.string.context_no_moved))
+                            when {
+                                success -> activity.finish()
+                                isForeignOverQuota -> showForeignStorageOverQuotaWarningDialog(activity)
+                                else -> snackbarShower.showSnackbar(getString(R.string.context_no_moved))
                             }
                         })
 

@@ -2234,7 +2234,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">A sua conta foi suspensa devido a múltiplas infrações dos Termos de serviço do MEGA. Verifique a caixa de entrada do seu email para mais detalhes.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">A sua conta foi encerrada por infringir os Termos de serviço do MEGA, como o desrespeito aos direitos de terceiros, compartilhamento e/ou importação de dados ilegais ou abusos do sistema.</string>
+    <string name="account_suspended_breache_ToS">A sua conta foi encerrada por infringir os Termos de Serviço do MEGA, incluindo a cláusula 15, mas não se limitando à mesma.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Carregando arquivos</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2580,7 +2580,7 @@
     <!-- Message shown when a call ends. -->
     <string name="call_not_answered_messages">[A]Chamada não atendida[/A]</string>
     <!-- Indicates that can type a contact email -->
-    <string name="contact_email">Email do seu contato</string>
+    <string name="contact_email">Email do contato</string>
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Você já adicionou este contato.</string>
     <!-- Content of a normal message that cannot be recognized -->
@@ -3973,4 +3973,16 @@
     <string name="production_api_server">Produção</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">Alterar servidor</string>
+    <!-- Show line numbers action -->
+    <string name="action_show_line_numbers">Mostrar os números das linhas</string>
+    <!-- Hide line numbers action -->
+    <string name="action_hide_line_numbers">Ocultar os números das linhas</string>
+    <!-- Indicates pagination progress. E.g.: 3/49 -->
+    <string name="pagination_progress">%1$s/%2$s</string>
+    <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="error_share_owner_storage_quota">O proprietário da pasta compartilhada excedeu a cota de armazenamento disponível</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="warning_share_owner_storage_quota">Não foi possível enviar o arquivo porque destinatário ultrapassou o seu limite de armazenamento.</string>
+    <!-- Content to show in a Snackbar to tip the incompatibility-->
+    <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues.</string>
 </resources>
