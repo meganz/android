@@ -24,6 +24,11 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Class to manage account details.
+ *
+ * @see resetDefaults before adding any new property.
+ */
 @Singleton
 class MyAccountInfo @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
