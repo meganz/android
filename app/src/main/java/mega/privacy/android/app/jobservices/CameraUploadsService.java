@@ -152,6 +152,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private boolean isLoggingIn;
 
     private MegaApiAndroid megaApi;
+    private MegaApiAndroid megaApiFolder;
     private MegaChatApiAndroid megaChatApi;
     private MegaApplication app;
 
@@ -1233,6 +1234,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         megaApi = app.getMegaApi();
+        megaApiFolder = app.getMegaApiFolder();
         megaChatApi = app.getMegaChatApi();
 
         if (megaApi == null) {
@@ -1378,6 +1380,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private synchronized void requestFinished(MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
             if (e.getErrorCode() == MegaError.API_OK) {
+                logDebug("Logged in. Setting account auth token for folder links.");
+                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
                 logDebug("Fast login OK, Calling fetchNodes from CameraSyncService");
                 megaApi.fetchNodes(this);
             } else {

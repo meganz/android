@@ -44,6 +44,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
     private MegaApplication app;
 
     private MegaApiAndroid megaApi;
+    private MegaApiAndroid megaApiFolder;
 
     private MegaChatApiAndroid megaChatApi;
 
@@ -63,6 +64,7 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
     public PushMessageHanlder() {
         app = MegaApplication.getInstance();
         megaApi = app.getMegaApi();
+        megaApiFolder = app.getMegaApiFolder();
         megaChatApi = app.getMegaChatApi();
         dbH = DatabaseHandler.getDbHandler(app);
     }
@@ -287,6 +289,8 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
 
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("Fast login OK");
+                logDebug("Logged in. Setting account auth token for folder links.");
+                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
                 logDebug("Calling fetchNodes from MegaFireBaseMessagingService");
                 megaApi.fetchNodes(this);
             } else {
