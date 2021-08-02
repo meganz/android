@@ -403,7 +403,10 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
         upgradeAlert = MaterialAlertDialogBuilder(this)
             .setTitle(StringResourcesUtils.getString(R.string.my_account_upgrade_pro))
             .setMessage(message)
-            .setPositiveButton("Got it!") { _, _ -> viewModel.resetQueryPurchasesMessage() }
+            .setPositiveButton("Got it!") { _, _ ->
+                viewModel.resetQueryPurchasesMessage()
+                finish()
+            }
             .show()
     }
 
