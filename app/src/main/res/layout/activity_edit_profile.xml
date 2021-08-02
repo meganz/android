@@ -140,7 +140,7 @@
 
             <Button
                 android:id="@+id/logout_button"
-                style="@style/Widget.Mega.Button.Variant3"
+                style="@style/Widget.Mega.Button.Variant1"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="18dp"
                 android:layout_marginEnd="20dp"

@@ -135,7 +135,7 @@
 
                 <Button
                     android:id="@+id/upgrade_button"
-                    style="@style/Widget.Mega.Button.Variant4"
+                    style="@style/Widget.Mega.Button.Variant2"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:text="@string/my_account_upgrade_pro" />

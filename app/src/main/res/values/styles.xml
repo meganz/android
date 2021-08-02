@@ -205,26 +205,8 @@
         <item name="colorOnSecondary">@color/teal_300_black</item>
     </style>
 
-    <!-- My Account "UPGRADE" Button, outlined in Light, solid white in Dark -->
-    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton" >
-        <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
-        <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
-        <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
-    </style>
-
-    <!-- My Account "CHANGE PASSWORD" Button, solid white in Light, outlined in Dark -->
-    <style name="Widget.Mega.Button.Variant2">
-        <item name="strokeColor">@color/white</item>
-        <item name="backgroundTint">@color/white</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:elevation">2dp</item>
-        <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
-        <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
-    </style>
-
     <!-- My Account, Edit profile "LOGOUT" Button -->
-    <style name="Widget.Mega.Button.Variant3" parent="Widget.Mega.Button.OutlinedButton">
+    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="strokeColor">@color/grey_012_white_012</item>
@@ -235,8 +217,9 @@
         <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
         <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
     </style>
-    
-    <style name="Widget.Mega.Button.Variant4" parent="Widget.Mega.Button.OutlinedButton">
+
+    <!-- My Account "UPGRADE" Button -->
+    <style name="Widget.Mega.Button.Variant2" parent="Widget.Mega.Button.OutlinedButton">
         <item name="strokeColor">@android:color/transparent</item>
         <item name="backgroundTint">@android:color/transparent</item>
         <item name="android:textColor">@color/white_black</item>
