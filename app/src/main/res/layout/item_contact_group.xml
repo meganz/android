@@ -55,7 +55,8 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_ekr"
+        android:src="@drawable/ic_private_chat"
+        app:tint="@color/teal_300"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

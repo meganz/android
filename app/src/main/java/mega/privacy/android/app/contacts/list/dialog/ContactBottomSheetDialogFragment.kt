@@ -144,8 +144,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionSendMessage.setOnClickListener {
-            viewModel.
-            getChatRoomId(megaUser.handle).observe(viewLifecycleOwner) { chatId ->
+            viewModel.getChatRoomId(megaUser.handle).observe(viewLifecycleOwner) { chatId ->
                 val intent = Intent(requireContext(), ChatActivityLollipop::class.java).apply {
                     action = ACTION_CHAT_SHOW_MESSAGES
                     putExtra(CHAT_ID, chatId)

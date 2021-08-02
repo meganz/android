@@ -23,14 +23,11 @@
 
     <TextView
         android:id="@+id/view_empty"
+        style="@style/Widget.Mega.EmptyTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:drawablePadding="12dp"
-        android:gravity="center"
         android:text="@string/context_empty_contacts"
-        android:textAllCaps="true"
-        android:textAppearance="@style/TextAppearance.Mega.Body2"
         android:visibility="gone"
         app:drawableTopCompat="@drawable/ic_zero_contacts"
         tools:visibility="visible" />

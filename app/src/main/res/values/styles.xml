@@ -594,4 +594,16 @@
         <item name="maxHeight">4dp</item>
     </style>
 
+    <style name="Widget.Mega.SearchView" parent="Widget.AppCompat.SearchView.ActionBar">
+        <item name="background">@null</item>
+    </style>
+
+    <style name="Widget.Mega.EmptyTextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:drawablePadding">12dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Body2</item>
+        <item name="drawableTint">@color/grey_300_grey_600</item>
+    </style>
+
 </resources>
