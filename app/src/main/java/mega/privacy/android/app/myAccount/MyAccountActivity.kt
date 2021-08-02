@@ -1,10 +1,7 @@
 package mega.privacy.android.app.myAccount
 
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -26,9 +23,11 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.IntentConstants.Companion.ACTION_OPEN_ACHIEVEMENTS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
+import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_MASTER_KEY
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
+import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -41,6 +40,7 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.*
 import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
+import nz.mega.sdk.MegaError.API_OK
 import java.util.*
 
 class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback {
@@ -52,6 +52,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         private const val CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN = "CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN"
         private const val CONFIRM_CANCEL_ACCOUNT_SHOWN = "CONFIRM_CANCEL_ACCOUNT_SHOWN"
         private const val CONFIRM_CHANGE_EMAIL_SHOWN = "CONFIRM_CHANGE_EMAIL_SHOWN"
+        private const val CONFIRM_RESET_PASSWORD_SHOWN = "CONFIRM_RESET_PASSWORD_SHOWN"
         private const val TYPE_CHANGE_EMAIL = 1
         private const val TYPE_CANCEL_ACCOUNT = 2
     }
@@ -68,6 +69,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     private var cancelSubscriptionsConfirmationDialog: AlertDialog? = null
     private var confirmCancelAccountDialog: AlertDialog? = null
     private var confirmChangeEmailDialog: AlertDialog? = null
+    private var confirmResetPasswordDialog: AlertDialog? = null
     private var cancelSubscriptionsFeedback: String? = null
 
     private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -111,38 +113,14 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 savedInstanceState.getBoolean(CONFIRM_CHANGE_EMAIL_SHOWN, false) -> {
                     showConfirmChangeEmailDialog()
                 }
+                savedInstanceState.getBoolean(CONFIRM_RESET_PASSWORD_SHOWN, false) -> {
+                    showConfirmResetPasswordDialog()
+                }
             }
         }
     }
 
     private fun manageIntentExtras() {
-        when (intent.action) {
-            ACTION_OPEN_ACHIEVEMENTS -> {
-                startActivity(Intent(this, AchievementsActivity::class.java))
-                return
-            }
-            ACTION_CANCEL_ACCOUNT -> {
-                intent.dataString?.let {
-                    viewModel.confirmCancelAccount(it) { result ->
-                        showConfirmCancelAccountQueryResult(result)
-                    }
-
-                    intent.data = null
-                }
-                return
-            }
-            ACTION_CHANGE_MAIL -> {
-                intent.dataString?.let {
-                    viewModel.confirmChangeEmail(it) { result ->
-                        showConfirmChangeEmailQueryResult(result)
-                    }
-
-                    intent.data = null
-                }
-                return
-            }
-        }
-
         val accountType = intent.getIntExtra(EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
         if (accountType != INVALID_VALUE) {
             startActivity(
@@ -151,6 +129,44 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             )
 
             intent.removeExtra(EXTRA_ACCOUNT_TYPE)
+        }
+
+        when (intent.action) {
+            ACTION_OPEN_ACHIEVEMENTS -> {
+                startActivity(Intent(this, AchievementsActivity::class.java))
+                intent.action = null
+            }
+            ACTION_CANCEL_ACCOUNT -> {
+                intent.dataString?.let { link ->
+                    viewModel.confirmCancelAccount(link) { result ->
+                        showConfirmCancelAccountQueryResult(result)
+                    }
+                }
+
+                intent.action = null
+            }
+            ACTION_CHANGE_MAIL -> {
+                intent.dataString?.let { link ->
+                    viewModel.confirmChangeEmail(link) { result ->
+                        showConfirmChangeEmailQueryResult(result)
+                    }
+                }
+
+                intent.action = null
+            }
+            ACTION_RESET_PASS -> {
+                showConfirmResetPasswordDialog()
+                intent.action = null
+            }
+            ACTION_PASS_CHANGED -> {
+                viewModel.finishPasswordChange(
+                    intent.getIntExtra(RESULT, API_OK),
+                    ::showGeneralAlert,
+                    ::showErrorAlert
+                )
+
+                intent.action = null
+            }
         }
     }
 
@@ -175,6 +191,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         outState.putBoolean(
             CONFIRM_CHANGE_EMAIL_SHOWN,
             isAlertDialogShown(confirmChangeEmailDialog)
+        )
+
+        outState.putBoolean(
+            CONFIRM_RESET_PASSWORD_SHOWN,
+            isAlertDialogShown(confirmResetPasswordDialog)
         )
 
         super.onSaveInstanceState(outState)
@@ -216,6 +237,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         cancelSubscriptionsConfirmationDialog?.dismiss()
         confirmCancelAccountDialog?.dismiss()
         confirmChangeEmailDialog?.dismiss()
+        confirmResetPasswordDialog?.dismiss()
         super.onDestroy()
     }
 
@@ -262,7 +284,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                     menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
                 }
 
-                if (megaApi.isBusinessAccount) {
+                if (viewModel.isBusinessAccount()) {
                     menu.findItem(R.id.action_upgrade_account).isVisible = false
                 }
 
@@ -592,6 +614,28 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     private fun showEmailChangeSuccess(newEmail: String) {
         showSnackbar(StringResourcesUtils.getString(R.string.email_changed, newEmail))
+    }
+
+    private fun showConfirmResetPasswordDialog() {
+        confirmResetPasswordDialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.title_dialog_insert_MK)
+            .setMessage(R.string.text_reset_pass_logged_in)
+            .setPositiveButton(
+                R.string.pin_lock_enter
+            ) { _, _ ->
+                startActivity(
+                    Intent(this, ChangePasswordActivityLollipop::class.java)
+                        .setAction(ACTION_RESET_PASS_FROM_LINK)
+                        .setData(intent.data)
+                        .putExtra(EXTRA_MASTER_KEY, viewModel.getMasterKey())
+                )
+            }
+            .setNegativeButton(R.string.general_cancel, null)
+            .show()
+    }
+
+    private fun showGeneralAlert(message: String) {
+        showAlert(this, message, null)
     }
 
     private fun showErrorAlert(message: String) {

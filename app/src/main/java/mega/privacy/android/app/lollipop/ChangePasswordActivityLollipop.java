@@ -26,7 +26,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
@@ -41,6 +40,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -244,7 +244,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 						logWarning("link is NULL - close activity");
 						finish();
 					}
-					mk = getIntent().getStringExtra("MK");
+					mk = getIntent().getStringExtra(EXTRA_MASTER_KEY);
 					if(mk==null){
 						logWarning("MK is NULL - close activity");
 						showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));

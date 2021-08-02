@@ -43,6 +43,8 @@ import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
+import nz.mega.sdk.MegaError.API_EARGS
+import nz.mega.sdk.MegaError.API_OK
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -152,6 +154,10 @@ class MyAccountViewModel @ViewModelInject constructor(
     fun getIncomingStorage(): String = myAccountInfo.formattedUsedIncoming
 
     fun getRubbishStorage(): String = myAccountInfo.formattedUsedRubbish
+
+    fun isBusinessAccount(): Boolean = megaApi.isBusinessAccount
+
+    fun getMasterKey(): String = megaApi.exportMasterKey()
 
     /**
      * Checks versions info.
@@ -756,6 +762,25 @@ class MyAccountViewModel @ViewModelInject constructor(
                     }
                 }
                 .addTo(composite)
+        }
+    }
+
+    /**
+     * Checks the result of a password change.
+     *
+     * @param result        Result of the password change.
+     * @param actionSuccess Action to perform after confirm the password change finished with success.
+     * @param actionError   Action to perform after confirm the password change if it failed.
+     */
+    fun finishPasswordChange(
+        result: Int,
+        actionSuccess: (String) -> Unit,
+        actionError: (String) -> Unit
+    ) {
+        when(result) {
+            API_OK -> actionSuccess.invoke(getString(R.string.pass_changed_alert))
+            API_EARGS -> actionError.invoke(getString(R.string.old_password_provided_incorrect))
+            else -> actionError.invoke(getString(R.string.general_text_error))
         }
     }
 }

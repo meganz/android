@@ -63,12 +63,10 @@ import androidx.appcompat.widget.SearchView;
 
 import android.text.Editable;
 import android.text.Html;
-import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Pair;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -186,7 +184,6 @@ import mega.privacy.android.app.lollipop.managerSections.SentRequestsFragmentLol
 import mega.privacy.android.app.lollipop.managerSections.SettingsFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TransfersFragmentLollipop;
 import mega.privacy.android.app.lollipop.managerSections.TurnOnNotificationsFragment;
-import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity;
 import mega.privacy.android.app.lollipop.megachat.BadgeDrawerArrowDrawable;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
@@ -195,7 +192,6 @@ import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
-import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.modalbottomsheet.ContactsBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -2331,33 +2327,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						setIntent(null);
 					}
 					else if(getIntent().getAction().equals(ACTION_PASS_CHANGED)){
-						int result = getIntent().getIntExtra(RESULT, MegaError.API_OK);
-						if (result == MegaError.API_OK) {
-//							drawerItem=DrawerItem.ACCOUNT;
-							selectDrawerItemPending=false;
-							logDebug("Show success message");
-							showAlert(this, getString(R.string.pass_changed_alert), null);
-						}
-						else if(result==MegaError.API_EARGS){
-//							drawerItem=DrawerItem.ACCOUNT;
-							selectDrawerItemPending=false;
-							logWarning("Error when changing pass - the current password is not correct");
-							showAlert(this,getString(R.string.old_password_provided_incorrect), getString(R.string.general_error_word));
-						}
-						else{
-//							drawerItem=DrawerItem.ACCOUNT;
-							selectDrawerItemPending=false;
-							logError("Error when changing pass - show error message");
-							showAlert(this,getString(R.string.general_text_error), getString(R.string.general_error_word));
-						}
+						showMyAccount(ACTION_PASS_CHANGED, null,
+								new Pair<>(RESULT, getIntent().getIntExtra(RESULT, MegaError.API_OK)));
 					}
 					else if(getIntent().getAction().equals(ACTION_RESET_PASS)){
-						String link = getIntent().getDataString();
+						Uri link = getIntent().getData();
 						if(link!=null){
-							logDebug("Link to resetPass: " + link);
-//							drawerItem=DrawerItem.ACCOUNT;
-							selectDrawerItemPending=false;
-							showConfirmationResetPassword(link);
+							showMyAccount(ACTION_RESET_PASS, link);
 						}
 					}
 					else if(getIntent().getAction().equals(ACTION_IPC)){
@@ -2536,11 +2512,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					getIntent().removeExtra(EXTRA_FIRST_LOGIN);
 					getIntent().removeExtra(EXTRA_ASK_PERMISSIONS);
 	        		if(upgradeAccount){
-	        			drawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
 						if (accountType != FREE) {
-							showMyAccount(true, accountType);
+							showMyAccount(new Pair<>(EXTRA_ACCOUNT_TYPE, accountType));
 						} else if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 						} else {
@@ -2573,7 +2548,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						int accountType = getIntent().getIntExtra(EXTRA_ACCOUNT_TYPE, 0);
 
 						if (accountType != FREE) {
-							showMyAccount(true, accountType);
+							showMyAccount(new Pair<>(EXTRA_ACCOUNT_TYPE, accountType));
 						} else if (firstLogin && app.getStorageState() != STORAGE_STATE_PAYWALL) {
 							drawerItem = DrawerItem.CAMERA_UPLOADS;
 						} else {
@@ -5285,22 +5260,18 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void showMyAccount() {
-		showMyAccount(false, INVALID_VALUE);
-	}
-
-	private void showMyAccount(boolean openUpgrade, int accountType){
-		showMyAccount(openUpgrade, accountType, null, null);
-	}
-
-	private void showMyAccount(String action){
-		showMyAccount(false, INVALID_VALUE, action, null);
+		showMyAccount(null, null, null);
 	}
 
 	private void showMyAccount(String action, Uri data){
-		showMyAccount(false, INVALID_VALUE, action, data);
+		showMyAccount(action, data, null);
 	}
 
-	private void showMyAccount(boolean openUpgrade, int accountType, String action, Uri data) {
+	private void showMyAccount(Pair<String, Integer> extra){
+		showMyAccount(null, null, extra);
+	}
+
+	private void showMyAccount(String action, Uri data, Pair<String, Integer> extra) {
 		if (nV != null && drawerLayout != null && drawerLayout.isDrawerOpen(nV)) {
 			drawerLayout.closeDrawer(Gravity.LEFT);
 		}
@@ -5309,8 +5280,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				.setAction(action)
 				.setData(data);
 
-		if (openUpgrade) {
-			intent.putExtra(EXTRA_ACCOUNT_TYPE, accountType);
+		if (extra != null) {
+			intent.putExtra(extra.first, extra.second);
 		}
 
 		startActivity(intent);
@@ -7704,36 +7675,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		// No update needed.
 	}
 
-	public void showConfirmationResetPassword (final String link){
-		logDebug("Link: " + link);
-
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which){
-					case DialogInterface.BUTTON_POSITIVE: {
-						Intent intent = new Intent(managerActivity, ChangePasswordActivityLollipop.class);
-						intent.setAction(ACTION_RESET_PASS_FROM_LINK);
-						intent.setData(Uri.parse(link));
-						String key = megaApi.exportMasterKey();
-						intent.putExtra("MK", key);
-						startActivity(intent);
-						break;
-					}
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
-			}
-		};
-
-		MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-		builder.setTitle(getResources().getString(R.string.title_dialog_insert_MK));
-		String message= getResources().getString(R.string.text_reset_pass_logged_in);
-		builder.setMessage(message).setPositiveButton(R.string.pin_lock_enter, dialogClickListener)
-				.setNegativeButton(R.string.general_cancel, dialogClickListener).show();
-	}
-
 	public void cameraUploadsClicked(){
 		logDebug("cameraUplaodsClicked");
 		drawerItem = DrawerItem.CAMERA_UPLOADS;
@@ -8281,7 +8222,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void navigateToAchievements(){
 		logDebug("navigateToAchievements");
 		getProLayout.setVisibility(View.GONE);
-		showMyAccount(ACTION_OPEN_ACHIEVEMENTS);
+		showMyAccount(ACTION_OPEN_ACHIEVEMENTS, null, null);
 	}
 
 	public void navigateToContacts(int index){

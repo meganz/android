@@ -9,6 +9,7 @@ class IntentConstants {
         const val EXTRA_FIRST_LOGIN = "EXTRA_FIRST_LOGIN"
         const val EXTRA_NEW_ACCOUNT = "EXTRA_NEW_ACCOUNT"
         const val EXTRA_UPGRADE_ACCOUNT = "EXTRA_UPGRADE_ACCOUNT"
+        const val EXTRA_MASTER_KEY = "EXTRA_MASTER_KEY"
 
         const val ACTION_OPEN_ACHIEVEMENTS = "ACTION_OPEN_ACHIEVEMENTS"
     }
