@@ -6,8 +6,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.android.synthetic.main.alert_dialog.*
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.utils.*
@@ -20,6 +24,9 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     private var displayedAccountType = INVALID_VALUE
 
     private var upgradeAlert: AlertDialog? = null
+
+    private val purchaseResultObserver =
+        Observer<String> { message -> showQueryPurchasesResult(message) }
 
     override fun manageUpdateReceiver(action: Int) {
         super.manageUpdateReceiver(action)
@@ -35,12 +42,16 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
         displayedAccountType = intent.getIntExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
 
         setupView()
+        setupObservers()
     }
 
     override fun onDestroy() {
         super.onDestroy()
 
         upgradeAlert?.dismiss()
+
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED, String::class.java)
+            .removeObserver(purchaseResultObserver)
     }
 
     override fun onBackPressed() {
@@ -53,6 +64,11 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
 
         setAccountDetails()
         showAvailableAccount()
+    }
+
+    private fun setupObservers() {
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED, String::class.java)
+            .observeForever(purchaseResultObserver)
     }
 
     override fun setPricingInfo() {

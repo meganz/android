@@ -70,6 +70,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
@@ -1302,7 +1303,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription_down_grade);
         }
 
-        showAlert(this, message, null);
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED, String.class).post(message);
     }
 
     @Override
