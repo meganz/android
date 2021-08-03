@@ -109,6 +109,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
 
                         if (context instanceof ManagerActivityLollipop) {
                             ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
+                            managerActivity.setMoveToRubbish(false);
                             managerActivity.refreshAfterMovingToRubbish();
                             resetAccountDetailsTimeStamp();
                         } else {
@@ -134,6 +135,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         }
 
                         ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
+                        managerActivity.setRestoreFromRubbish(false);
                         managerActivity.refreshAfterMovingToRubbish();
                         resetAccountDetailsTimeStamp();
                     } else {
