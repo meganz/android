@@ -99,7 +99,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     }
                 } else {
                     logDebug("Can not receive high-resolution video")
-                    removeListener(callAndSession.second)
+                    removeRemoteListener(callAndSession.second)
 
                     //Ask for high resolution, if necessary
                     if (inMeetingViewModel.sessionHasVideo(callAndSession.second.clientid)) {
@@ -140,11 +140,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     }
 
     private val floatingWindowObserver = Observer<Boolean> {
-        if(it){
-            videoSurfaceView.visibility = View.GONE
-        } else{
-            videoSurfaceView.visibility = View.VISIBLE
-        }
+        videoSurfaceView.visibility = if (it) View.GONE else View.VISIBLE
     }
 
     @ExperimentalCoroutinesApi
@@ -196,6 +192,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
             .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
+        @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EventConstants.EVENT_MEETING_INCOMPATIBILITY_SHOW)
             .observeSticky(this, floatingWindowObserver as Observer<Any>)
     }
@@ -262,7 +259,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
      *
      * @param session The session of paticipant whose listener of the video is to be added
      */
-    fun addListener(session: MegaChatSession) {
+    private fun addListener(session: MegaChatSession) {
         if (videoListener == null) {
             videoListener = MeetingVideoListener(
                 videoSurfaceView,
@@ -288,7 +285,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
      *
      * @param session The session of paticipant whose listener of the video is to be removed
      */
-    fun removeListener(session: MegaChatSession) {
+    private fun removeRemoteListener(session: MegaChatSession) {
         if (videoListener != null) {
             inMeetingViewModel.removeChatRemoteVideoListener(
                 videoListener!!,
@@ -419,8 +416,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 sharedModel.removeLocalVideo(chatId, videoListener!!)
             }
 
-            this.videoListener = null
-
+            videoListener = null
         } else {
             inMeetingViewModel.getSession(clientId)?.let { session ->
                 videoListener?.let {
@@ -535,11 +531,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     isFloatingWindow,
                     isOneToOneChat
                 )
-
-                sharedModel.addLocalVideo(chatId, videoListener)
-
                 // Check bottom panel's expanding state, if it's expanded, video should invisible.
                 videoListener?.setAlpha(videoAlphaFloating)
+
+                sharedModel.addLocalVideo(chatId, videoListener)
             }
             else -> {
                 logDebug("Video listener is null")
@@ -570,30 +565,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
         rootLayout.isVisible = true
         videoSurfaceView.isVisible = true
         rootLayout.background = null
-    }
-
-    /**
-     * Method that controls when we have lost the video in the resolution we were receiving it.
-     * Need to close video and activate it again
-     *
-     * @param peerId User handle of a participant
-     * @param clientId Client ID of a participant
-     */
-    fun updateResolution(peerId: Long, clientId: Long) {
-        if (isInvalid(peerId, clientId)) return
-
-        if (!isFloatingWindow && inMeetingViewModel.isOneToOneCall() && !inMeetingViewModel.isMe(
-                peerId
-            )
-        ) {
-            inMeetingViewModel.getSession(clientId)?.let {
-                if (it.status == SESSION_STATUS_IN_PROGRESS && it.hasVideo()) {
-                    logDebug("Update resolution")
-                    closeVideo(peerId, clientId)
-                    checkVideoOn(peerId, clientId)
-                }
-            }
-        }
     }
 
     /**
@@ -698,14 +669,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
         logDebug("View destroyed")
-        closeVideo(peerId, clientId)
+        removeChatVideoListener(peerId, clientId)
         inMeetingViewModel.getSession(clientId)?.let {
-            removeListener(it)
+            removeRemoteListener(it)
         }
-
         avatarImageView.setImageBitmap(null)
+        super.onDestroyView()
     }
 }

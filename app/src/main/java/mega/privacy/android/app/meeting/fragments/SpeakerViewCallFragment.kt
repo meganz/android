@@ -331,7 +331,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * @param speaker The current participant selected as speaker
      */
     private fun closeVideo(speaker: Participant) {
-        if (isSpeakerInvalid(speaker)) return
+        if (isSpeakerInvalid(speaker) || speaker.videoListener == null) return
 
         surfaceContainer.isVisible = false
 
@@ -341,8 +341,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         } else {
             logDebug("Close remote video")
             inMeetingViewModel.removeResolutionAndListener(speaker)
-            removeSpeakerListener()
         }
+
+        removeSpeakerListener()
     }
 
     /**

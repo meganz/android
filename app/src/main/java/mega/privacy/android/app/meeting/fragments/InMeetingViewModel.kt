@@ -1378,6 +1378,9 @@ class InMeetingViewModel @ViewModelInject constructor(
         chatId: Long,
         isHiRes: Boolean
     ) {
+        if (listener == null)
+            return
+
         logDebug("Adding remote video listener, clientId $clientId, isHiRes $isHiRes")
         inMeetingRepository.addChatRemoteVideoListener(
             chatId,
@@ -1401,6 +1404,9 @@ class InMeetingViewModel @ViewModelInject constructor(
         chatId: Long,
         isHiRes: Boolean
     ) {
+        if (listener == null)
+            return
+
         logDebug("Removing remote video listener, clientId $clientId, isHiRes $isHiRes")
         inMeetingRepository.removeChatRemoteVideoListener(
             chatId,

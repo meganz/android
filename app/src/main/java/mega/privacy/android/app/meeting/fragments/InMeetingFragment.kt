@@ -565,7 +565,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             if (invite && !bInviteSent) {
                 bInviteSent = true
 
-                if(STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
+                if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
                     inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
                     launchTimer()
                 }
@@ -1038,14 +1038,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 val count = inMeetingViewModel.participants.value
                 if (count != null) {
                     val participantsCount = getparticipantsCount()
-                    if(participantsCount == 0L && count.size == 0){
-                        if(STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
+                    if (participantsCount == 0L && count.size == 0) {
+                        if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
                             logDebug("launchTimer() for no participant join in after Invite")
                             inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
                             launchTimer()
                         }
                     } else if (participantsCount > 0 && count.size < participantsCount.toInt()) {
-                        if(STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
+                        if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
                             logDebug("launchTimer() for not all participants join in after Invite")
                             inMeetingViewModel.updateShowWarningMessage(STATE_INVITE)
                             launchTimer()
@@ -1071,7 +1071,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         inMeetingViewModel.updateUI.observe(viewLifecycleOwner) {
-            if(it) {
+            if (it) {
                 inMeetingViewModel.updateShowWarningMessage(STATE_FINISH)
                 showSnackbar(
                     SNACKBAR_IMCOMPATIBILITY_TYPE,
@@ -1889,9 +1889,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     // Remove snackbar
                     meetingActivity.snackbar?.dismiss()
                 }
-                if(participantsCount > 0 && count < participantsCount.toInt()){
+                if (participantsCount > 0 && count < participantsCount.toInt()) {
                     if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()
-                        && STATE_CANCEL != inMeetingViewModel.shouldShowWarningMessage()) {
+                        && STATE_CANCEL != inMeetingViewModel.shouldShowWarningMessage()
+                    ) {
                         logDebug("launchTimer - when not all participants in")
                         launchTimer()
                     }
@@ -2111,6 +2112,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onChangeCamState(camOn: Boolean) {
         logDebug("Change in camera state")
         sharedModel.clickCamera(!camOn)
+    }
+
+    /**
+     * Method to disable the local camera
+     */
+    private fun disableCamera() {
+        if (camIsEnable) {
+            sharedModel.clickCamera(false)
+        }
     }
 
     /**
@@ -2399,9 +2409,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onEndMeeting() {
         if (inMeetingViewModel.isOneToOneCall() || inMeetingViewModel.isGroupCall()) {
             logDebug("End the one to one or group call")
+            disableCamera()
             inMeetingViewModel.leaveMeeting()
             checkIfAnotherCallShouldBeShown()
         } else if (inMeetingViewModel.shouldAssignModerator()) {
+            disableCamera()
             EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId())
                 .run {
                     setAssignCallBack(showAssignModeratorFragment)
@@ -2444,6 +2456,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun leaveMeeting() {
         logDebug("Leaving meeting")
+        disableCamera()
+
         if (inMeetingViewModel.amIAGuest()) {
             removeUI()
         }
@@ -2610,7 +2624,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         cancelCountDownTimer()
 
         val state = inMeetingViewModel.shouldShowWarningMessage()
-        if(state != STATE_FINISH && state != STATE_CANCEL) {
+        if (state != STATE_FINISH && state != STATE_CANCEL) {
             inMeetingViewModel.updateShowWarningMessage(STATE_RESUME)
         }
     }
