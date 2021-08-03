@@ -52,7 +52,8 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         binding = ActivityChooseUpgradeAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel.initPayments(this)
+        viewModel.refreshAccountInfo()
+        initPayments()
         setupView()
         setupObservers()
     }
@@ -61,7 +62,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         super.onDestroy()
 
         unregisterReceiver(updateMyAccountReceiver)
-        viewModel.destroyPayments()
+        destroyPayments()
     }
 
     override fun onBackPressed() {
@@ -75,11 +76,6 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         }
 
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        viewModel.manageActivityResult(requestCode, resultCode, intent)
     }
 
     private fun setupView() {
@@ -138,8 +134,6 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
             updateMyAccountReceiver,
             IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
         )
-
-        viewModel.onUpdatePricing().observe(this, ::updatePricing)
     }
 
     /**
@@ -154,18 +148,6 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
         binding.semitransparentLayer.isVisible = false
         binding.availablePaymentMethods.isVisible = false
-    }
-
-    /**
-     * Updates the pricing info if needed.
-     *
-     * @param update True if should update, false otherwise.
-     */
-    private fun updatePricing(update: Boolean) {
-        if (update) {
-            setPricingInfo()
-            viewModel.resetUpdatePricing()
-        }
     }
 
     override fun checkScroll() {

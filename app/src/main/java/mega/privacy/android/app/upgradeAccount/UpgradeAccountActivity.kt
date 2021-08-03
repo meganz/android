@@ -35,7 +35,6 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
         displayedAccountType = intent.getIntExtra(IntentConstants.EXTRA_ACCOUNT_TYPE, INVALID_VALUE)
 
         setupView()
-        setupObservers()
     }
 
     override fun onDestroy() {
@@ -54,10 +53,6 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
 
         setAccountDetails()
         showAvailableAccount()
-    }
-
-    private fun setupObservers() {
-        viewModel.getQueryPurchasesMessage().observe(this, ::showQueryPurchasesResult)
     }
 
     override fun setPricingInfo() {
@@ -206,19 +201,19 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
         binding.continueButton.apply {
             setOnClickListener {
                 when (displayedAccountType) {
-                    PRO_I -> viewModel.launchPayment(
+                    PRO_I -> launchPayment(
                         if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_I_MONTH
                         else BillingManagerImpl.SKU_PRO_I_YEAR
                     )
-                    PRO_II -> viewModel.launchPayment(
+                    PRO_II -> launchPayment(
                         if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_II_MONTH
                         else BillingManagerImpl.SKU_PRO_II_YEAR
                     )
-                    PRO_III -> viewModel.launchPayment(
+                    PRO_III -> launchPayment(
                         if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_III_MONTH
                         else BillingManagerImpl.SKU_PRO_III_YEAR
                     )
-                    PRO_LITE -> viewModel.launchPayment(
+                    PRO_LITE -> launchPayment(
                         if (isMonthlyBillingPeriodSelected()) BillingManagerImpl.SKU_PRO_LITE_MONTH
                         else BillingManagerImpl.SKU_PRO_LITE_YEAR
                     )
@@ -236,7 +231,7 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
         }
 
         showPaymentMethods()
-        refreshAccountInfo()
+        viewModel.refreshAccountInfo()
 
         if (!viewModel.isInventoryFinished()) {
             LogUtil.logDebug("if (!myAccountInfo.isInventoryFinished())")
@@ -404,7 +399,6 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
             .setTitle(StringResourcesUtils.getString(R.string.my_account_upgrade_pro))
             .setMessage(message)
             .setPositiveButton("Got it!") { _, _ ->
-                viewModel.resetQueryPurchasesMessage()
                 finish()
             }
             .show()

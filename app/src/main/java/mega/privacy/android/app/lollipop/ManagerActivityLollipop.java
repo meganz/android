@@ -2237,6 +2237,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			this.setProfileAvatar();
 
+			initPayments();
+
 			megaApi.addGlobalListener(this);
 			megaApi.isGeolocationEnabled(this);
 
@@ -3530,6 +3532,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(updateCUSettingsReceiver);
 		unregisterReceiver(cuUpdateReceiver);
 		LiveEventBus.get(EVENT_FINISH_ACTIVITY, Boolean.class).removeObserver(finishObserver);
+
+		destroyPayments();
 
 		cancelSearch();
         if(reconnectDialog != null) {

@@ -1,28 +1,15 @@
 package mega.privacy.android.app.upgradeAccount
 
-import android.app.Activity
-import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.content.Intent
 import android.text.Spanned
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import mega.privacy.android.app.*
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.middlelayer.iab.BillingManager
-import mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode
-import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener
-import mega.privacy.android.app.middlelayer.iab.MegaPurchase
-import mega.privacy.android.app.middlelayer.iab.MegaSku
-import mega.privacy.android.app.service.iab.BillingManagerImpl
-import mega.privacy.android.app.service.iab.BillingManagerImpl.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.DBUtil.callToPaymentMethods
 import mega.privacy.android.app.utils.DBUtil.callToPricing
@@ -30,39 +17,18 @@ import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
-import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionRenewalType
-import mega.privacy.android.app.utils.billing.PaymentUtils.getSubscriptionType
-import mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel
+import mega.privacy.android.app.utils.billing.PaymentUtils.getSkuDetails
 import nz.mega.sdk.MegaApiAndroid
 import java.text.NumberFormat
 import java.util.*
 
 class ChooseUpgradeAccountViewModel @ViewModelInject constructor(
-    private val myAccountInfo: MyAccountInfo,
-    @MegaApi private val megaApi: MegaApiAndroid,
-    private val dbH: DatabaseHandler
-) : BaseRxViewModel(), BillingUpdatesListener {
+    private val myAccountInfo: MyAccountInfo
+) : BaseRxViewModel(){
 
     companion object {
         const val TYPE_STORAGE_LABEL = 0
         const val TYPE_TRANSFER_LABEL = 1
-    }
-
-    private val queryPurchasesMessage: MutableLiveData<String?> = MutableLiveData()
-    private val updatePricing: MutableLiveData<Boolean> = MutableLiveData()
-
-    private lateinit var billingManager: BillingManager
-    private lateinit var skuDetailsList: List<MegaSku>
-
-    fun getQueryPurchasesMessage(): LiveData<String?> = queryPurchasesMessage
-    fun onUpdatePricing(): LiveData<Boolean> = updatePricing
-
-    fun resetQueryPurchasesMessage() {
-        queryPurchasesMessage.value = null
-    }
-
-    fun resetUpdatePricing() {
-        updatePricing.value = false
     }
 
     fun isGettingInfo(): Boolean =
@@ -200,193 +166,6 @@ class ChooseUpgradeAccountViewModel @ViewModelInject constructor(
             TYPE_STORAGE_LABEL -> getString(R.string.label_storage_upgrade_account)
             TYPE_TRANSFER_LABEL -> getString(R.string.label_transfer_quota_upgrade_account)
             else -> ""
-        }
-    }
-
-    /**
-     * Initializes BillingManager.
-     *
-     * @param activity Current activity.
-     */
-    fun initPayments(activity: Activity) {
-        billingManager = BillingManagerImpl(activity, this)
-    }
-
-    /**
-     * Removes BillingManager.
-     */
-    fun destroyPayments() {
-        if (this::billingManager.isInitialized) {
-            billingManager.destroy()
-        }
-    }
-
-    /**
-     * Starts purchase/subscription flow
-     *
-     * @param productId Selected subscription.
-     */
-    fun launchPayment(productId: String) {
-        val skuDetails = getSkuDetails(skuDetailsList, productId) ?: return
-        val purchase = myAccountInfo.activeSubscription
-        val oldSku = purchase?.sku
-        val token = purchase?.token
-
-        if (this::billingManager.isInitialized) {
-            billingManager.initiatePurchaseFlow(oldSku, token, skuDetails)
-        }
-    }
-
-    /**
-     * Gets SKU details of the key received.
-     *
-     * @param list List of MegaSku objects.
-     * @param key  Product key of which the details should to be get.
-     * @return SKU details if exist, null otherwise.
-     */
-    private fun getSkuDetails(list: List<MegaSku>?, key: String): MegaSku? {
-        if (list == null || list.isEmpty()) {
-            return null
-        }
-
-        for (details in list) {
-            if (details.sku == key) {
-                return details
-            }
-        }
-
-        return null
-    }
-
-    override fun onBillingClientSetupFinished() {
-        billingManager.getInventory { skuList ->
-            skuDetailsList = skuList
-            myAccountInfo.availableSkus = skuList
-        }
-    }
-
-    override fun onPurchasesUpdated(
-        isFailed: Boolean,
-        resultCode: Int,
-        purchases: MutableList<MegaPurchase>?
-    ) {
-        if (isFailed) {
-            logWarning("Update purchase failed, with result code: $resultCode")
-            return
-        }
-
-        val message: String
-
-        if (purchases != null && purchases.isNotEmpty()) {
-            val purchase = purchases[0]
-            //payment may take time to process, we will not give privilege until it has been fully processed
-            val sku = purchase.sku
-            val subscriptionType = getSubscriptionType(sku)
-            val subscriptionRenewalType = getSubscriptionRenewalType(sku)
-
-            if (billingManager.isPurchased(purchase)) {
-                //payment has been processed
-                updateAccountInfo(purchases)
-                logDebug("Purchase $sku successfully, subscription type is: $subscriptionType, subscription renewal type is: $subscriptionRenewalType")
-
-                message = getString(
-                    R.string.message_user_purchased_subscription,
-                    subscriptionType,
-                    subscriptionRenewalType
-                )
-
-                updateSubscriptionLevel(myAccountInfo, dbH, megaApi)
-            } else {
-                //payment is being processed or in unknown state
-                logDebug("Purchase $sku is being processed or in unknown state.")
-                message = getString(R.string.message_user_payment_pending)
-            }
-        } else {
-            //down grade case
-            logDebug("Downgrade, the new subscription takes effect when the old one expires.")
-            message = getString(R.string.message_user_purchased_subscription_down_grade)
-        }
-
-        queryPurchasesMessage.value = message
-    }
-
-    override fun onQueryPurchasesFinished(
-        isFailed: Boolean,
-        resultCode: Int,
-        purchases: MutableList<MegaPurchase>?
-    ) {
-        if (isFailed || purchases == null) {
-            logWarning("Query of purchases failed, result code is " + resultCode + ", is purchase null: " + (purchases == null))
-            return
-        }
-
-        updateAccountInfo(purchases)
-        updateSubscriptionLevel(myAccountInfo, dbH, megaApi)
-    }
-
-    /**
-     * Updates the account info after a purchase finished.
-     *
-     * @param purchases List of purchases
-     */
-    private fun updateAccountInfo(purchases: List<MegaPurchase>) {
-        var highest = INVALID_VALUE
-        var temp = INVALID_VALUE
-        var max: MegaPurchase? = null
-
-        for (purchase in purchases) {
-            when (purchase.sku) {
-                SKU_PRO_LITE_MONTH, SKU_PRO_LITE_YEAR -> temp = 0
-                SKU_PRO_I_MONTH, SKU_PRO_I_YEAR -> temp = 1
-                SKU_PRO_II_MONTH, SKU_PRO_II_YEAR -> temp = 2
-                SKU_PRO_III_MONTH, SKU_PRO_III_YEAR -> temp = 3
-            }
-
-            if (temp >= highest) {
-                highest = temp
-                max = purchase
-            }
-        }
-
-        if (max != null) {
-            logDebug("Set current max subscription: $max")
-            myAccountInfo.activeSubscription = max
-        } else {
-            myAccountInfo.activeSubscription = null
-        }
-
-        myAccountInfo.levelInventory = highest
-        myAccountInfo.isInventoryFinished = true
-        updatePricing.value = true
-    }
-
-    /**
-     *
-     * Manages onActivityResult.
-     *
-     * @param requestCode The integer request code originally supplied to
-     *                    startActivityForResult(), allowing you to identify who this
-     *                    result came from.
-     * @param resultCode  The integer result code returned by the child activity
-     *                    through its setResult().
-     * @param intent      An Intent, which can return result data to the caller
-     *                    (various data can be attached to Intent "extras").
-     */
-    fun manageActivityResult(requestCode: Int, resultCode: Int, intent: Intent) {
-        if (requestCode == RequestCode.REQ_CODE_BUY) {
-            // For HMS purchase only
-            if (resultCode != RESULT_OK) {
-                logWarning("Cancel subscribe")
-                return
-            }
-
-            val purchaseResult = billingManager.getPurchaseResult(intent)
-
-            if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
-                billingManager.updatePurchase()
-            } else {
-                logWarning("Purchase failed, error code: $purchaseResult")
-            }
         }
     }
 }

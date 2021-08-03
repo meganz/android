@@ -1,16 +1,18 @@
 package mega.privacy.android.app.utils.billing
 
+import android.content.Context
+import android.content.Intent
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaAttributes
 import mega.privacy.android.app.Product
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import mega.privacy.android.app.middlelayer.iab.MegaPurchase
 import mega.privacy.android.app.middlelayer.iab.MegaSku
-import mega.privacy.android.app.service.iab.BillingManagerImpl
 import mega.privacy.android.app.service.iab.BillingManagerImpl.*
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -81,10 +83,10 @@ object PaymentUtils {
     @JvmStatic
     fun getSku(product: Product?): String {
         return when (product?.level) {
-            Constants.PRO_LITE -> if (product.months == 1) SKU_PRO_LITE_MONTH else SKU_PRO_LITE_YEAR
-            Constants.PRO_I -> if (product.months == 1) SKU_PRO_I_MONTH else SKU_PRO_I_YEAR
-            Constants.PRO_II -> if (product.months == 1) SKU_PRO_II_MONTH else SKU_PRO_II_YEAR
-            Constants.PRO_III -> if (product.months == 1) SKU_PRO_III_MONTH else SKU_PRO_III_YEAR
+            PRO_LITE -> if (product.months == 1) SKU_PRO_LITE_MONTH else SKU_PRO_LITE_YEAR
+            PRO_I -> if (product.months == 1) SKU_PRO_I_MONTH else SKU_PRO_I_YEAR
+            PRO_II -> if (product.months == 1) SKU_PRO_II_MONTH else SKU_PRO_II_YEAR
+            PRO_III -> if (product.months == 1) SKU_PRO_III_MONTH else SKU_PRO_III_YEAR
             else -> ""
         }
     }
@@ -152,5 +154,57 @@ object PaymentUtils {
                 )
             }
         }
+    }
+
+    /**
+     * Updates the account info after a purchase finished.
+     *
+     * @param context       Current Context.
+     * @param purchases     List of purchases
+     * @param myAccountInfo MyAccountInfo object.
+     */
+    @JvmStatic
+    fun updateAccountInfo(context: Context, purchases: List<MegaPurchase>, myAccountInfo: MyAccountInfo) {
+        var highest = INVALID_VALUE
+        var temp = INVALID_VALUE
+        var max: MegaPurchase? = null
+
+        for (purchase in purchases) {
+            when (purchase.sku) {
+                SKU_PRO_LITE_MONTH, SKU_PRO_LITE_YEAR -> temp = 0
+                SKU_PRO_I_MONTH, SKU_PRO_I_YEAR -> temp = 1
+                SKU_PRO_II_MONTH, SKU_PRO_II_YEAR -> temp = 2
+                SKU_PRO_III_MONTH, SKU_PRO_III_YEAR -> temp = 3
+            }
+
+            if (temp >= highest) {
+                highest = temp
+                max = purchase
+            }
+        }
+
+        if (max != null) {
+            logDebug("Set current max subscription: $max")
+            myAccountInfo.activeSubscription = max
+        } else {
+            myAccountInfo.activeSubscription = null
+        }
+
+        myAccountInfo.levelInventory = highest
+        myAccountInfo.isInventoryFinished = true
+        updatePricing(context)
+    }
+
+    /**
+     * Launches a broadcast to update pricing info.
+     *
+     * @param context Current Context.
+     */
+    @JvmStatic
+    fun updatePricing(context: Context) {
+        context.sendBroadcast(
+            Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+                .putExtra(ACTION_TYPE, UPDATE_GET_PRICING)
+        )
     }
 }

@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -49,8 +51,13 @@ import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.middlelayer.iab.BillingManager;
+import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
+import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
+import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaWebBrowser;
+import mega.privacy.android.app.service.iab.BillingManagerImpl;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
@@ -65,6 +72,7 @@ import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_IMCOMPATIBILITY_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -74,11 +82,15 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import java.util.List;
+
 @AndroidEntryPoint
-public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester {
+public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester,
+        BillingUpdatesListener {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
@@ -86,6 +98,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Inject
     MyAccountInfo myAccountInfo;
+
+    private BillingManager billingManager;
+    private List<MegaSku> skuDetailsList;
 
     private BaseActivity baseActivity;
 
@@ -1195,5 +1210,109 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     @Override
     public void askPermissions(@NotNull String[] permissions, int requestCode) {
         ActivityCompat.requestPermissions(this, permissions, requestCode);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQ_CODE_BUY) {
+            // for HMS purchase only
+            if (resultCode == Activity.RESULT_OK) {
+                int purchaseResult = billingManager.getPurchaseResult(data);
+
+                if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
+                    billingManager.updatePurchase();
+                } else {
+                    logWarning("Purchase failed, error code: " + purchaseResult);
+                }
+            } else {
+                logWarning("cancel subscribe");
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    protected void initPayments() {
+        billingManager = new BillingManagerImpl(this, this);
+    }
+
+    protected void destroyPayments() {
+        if (billingManager != null) {
+            billingManager.destroy();
+        }
+    }
+
+    protected void launchPayment(String productId) {
+        MegaSku skuDetails = getSkuDetails(skuDetailsList, productId);
+        if (skuDetails == null) {
+            logError("Cannot launch payment, MegaSku is null.");
+            return;
+        }
+
+        MegaPurchase purchase = myAccountInfo.getActiveSubscription();
+        String oldSku = purchase == null ? null : purchase.getSku();
+        String token = purchase == null ? null : purchase.getToken();
+
+        if (billingManager != null) {
+            billingManager.initiatePurchaseFlow(oldSku, token, skuDetails);
+        }
+    }
+
+    @Override
+    public void onBillingClientSetupFinished() {
+        logInfo("Billing client setup finished");
+
+        billingManager.getInventory(skuList -> {
+            skuDetailsList = skuList;
+            myAccountInfo.setAvailableSkus(skuList);
+            updatePricing(this);
+        });
+    }
+
+    @Override
+    public void onPurchasesUpdated(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
+        if (isFailed) {
+            logWarning("Update purchase failed, with result code: " + resultCode);
+            return;
+        }
+
+        String message;
+
+        if (purchases != null && !purchases.isEmpty()) {
+            MegaPurchase purchase = purchases.get(0);
+            //payment may take time to process, we will not give privilege until it has been fully processed
+            String sku = purchase.getSku();
+            String subscriptionType = getSubscriptionType(sku);
+            String subscriptionRenewalType = getSubscriptionRenewalType(sku);
+
+            if (billingManager.isPurchased(purchase)) {
+                //payment has been processed
+                updateAccountInfo(this, purchases, myAccountInfo);
+                logDebug("Purchase " + sku + " successfully, subscription type is: " + subscriptionType + ", subscription renewal type is: " + subscriptionRenewalType);
+                message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription, subscriptionType, subscriptionRenewalType);
+                updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
+            } else {
+                //payment is being processed or in unknown state
+                logDebug("Purchase " + sku + " is being processed or in unknown state.");
+                message = StringResourcesUtils.getString(R.string.message_user_payment_pending);
+            }
+        } else {
+            //down grade case
+            logDebug("Downgrade, the new subscription takes effect when the old one expires.");
+            message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription_down_grade);
+        }
+
+        showAlert(this, message, null);
+    }
+
+    @Override
+    public void onQueryPurchasesFinished(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
+        if (isFailed || purchases == null) {
+            logWarning("Query of purchases failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
+            return;
+        }
+
+        updateAccountInfo(this, purchases, myAccountInfo);
+        updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
     }
 }
