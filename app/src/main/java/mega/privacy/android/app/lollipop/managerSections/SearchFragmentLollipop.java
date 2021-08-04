@@ -58,7 +58,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SearchNodesTask;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
@@ -70,15 +69,20 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.search.SearchNodesTask;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.LINKS_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OUTGOING_TAB;
+import static mega.privacy.android.app.search.SearchNodesTask.TYPE_GENERAL;
+import static mega.privacy.android.app.search.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -87,7 +91,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
-public class SearchFragmentLollipop extends RotatableFragment{
+public class SearchFragmentLollipop extends RotatableFragment implements SearchNodesTask.Callback {
 
 	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
@@ -161,6 +165,12 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		clearSelections();
 		hideMultipleSelect();
 		resetSelectedItems();
+	}
+
+	@Override
+	public void finishSearchNodes(@NonNull ArrayList<MegaNode> nodes) {
+		setProgressView(false);
+		setNodes(nodes);
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -645,9 +655,44 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	public void newSearchNodesTask() {
 		setProgressView(true);
 		cancelPreviousAsyncTask();
-		searchNodesTask = new SearchNodesTask(context, this, ((ManagerActivityLollipop) context).getSearchQuery(),
-				((ManagerActivityLollipop) context).getParentHandleSearch(), nodes, sortOrderManagement);
+		String query = ((ManagerActivityLollipop) context).getSearchQuery();
+		long parentHandleSearch = ((ManagerActivityLollipop) context).getParentHandleSearch();
+		ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+		int sharesTab = ((ManagerActivityLollipop) context).getSearchSharedTab();
+		boolean isFirstNavigationLevel = ((ManagerActivityLollipop) context).isFirstNavigationLevel();
+
+		searchNodesTask = new SearchNodesTask(megaApi, sortOrderManagement, query,
+				parentHandleSearch, getParentHandleForSearch(drawerItem), nodes, this,
+				TYPE_GENERAL, drawerItem, sharesTab, isFirstNavigationLevel);
+
 		searchNodesTask.execute();
+	}
+
+	private long getParentHandleForSearch(ManagerActivityLollipop.DrawerItem drawerItem) {
+		switch (drawerItem) {
+			case CLOUD_DRIVE:
+				return ((ManagerActivityLollipop) context).getParentHandleBrowser();
+
+			case SHARED_ITEMS:
+				switch (((ManagerActivityLollipop) context).getSearchSharedTab()) {
+					case OUTGOING_TAB:
+						return ((ManagerActivityLollipop) context).getParentHandleOutgoing();
+					case LINKS_TAB:
+						return ((ManagerActivityLollipop) context).getParentHandleLinks();
+					case INCOMING_TAB:
+					default:
+						return ((ManagerActivityLollipop) context).getParentHandleIncoming();
+				}
+
+			case RUBBISH_BIN:
+				return ((ManagerActivityLollipop) context).getParentHandleRubbish();
+
+			case INBOX:
+				return ((ManagerActivityLollipop) context).getParentHandleInbox();
+
+			default:
+				return megaApi.getRootNode().getHandle();
+		}
 	}
 
 	public void cancelPreviousAsyncTask() {

@@ -48,7 +48,6 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SearchNodesTask;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
@@ -58,14 +57,16 @@ import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.search.SearchNodesTask;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.CLOUD_FRAGMENT;
+import static mega.privacy.android.app.search.SearchNodesTask.TYPE_CLOUD_EXPLORER;
+import static mega.privacy.android.app.search.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.*;
@@ -73,7 +74,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements
-		OnClickListener, CheckScrollInterface {
+		OnClickListener, CheckScrollInterface, SearchNodesTask.Callback {
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
@@ -151,6 +152,12 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 	@Override
 	public void reselectUnHandledSingleItem(int position) {
+	}
+
+	@Override
+	public void finishSearchNodes(@NonNull ArrayList<MegaNode> nodes) {
+		setProgressView(false);
+		setSearchNodes(nodes);
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -879,7 +886,9 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 		setProgressView(true);
 		cancelPreviousAsyncTask();
-		searchNodesTask = new SearchNodesTask(context, this, s, INVALID_HANDLE, nodes, sortOrderManagement);
+		searchNodesTask = new SearchNodesTask(megaApi, sortOrderManagement, s, INVALID_HANDLE,
+				getParentHandle(), nodes, this, TYPE_CLOUD_EXPLORER);
+
 		searchNodesTask.execute();
 	}
 
