@@ -4033,7 +4033,6 @@
         <item quantity="one">1 item was not restored successfully</item>
         <item quantity="other">%d items were not restored successfully</item>
     </plurals>
-    <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues.</string>
     <!-- Section name for the “Requests” section.Preferably one word. There is little space for this word. -->
     <string name="section_requests">Requests</string>
     <!-- Section name for the “Groups” section.Preferably one word. There is little space for this word. -->
