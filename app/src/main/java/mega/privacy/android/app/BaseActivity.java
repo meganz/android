@@ -44,6 +44,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import kotlin.Pair;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
@@ -1277,20 +1278,23 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
             return;
         }
 
+        String title;
         String message;
 
         if (purchases != null && !purchases.isEmpty()) {
             MegaPurchase purchase = purchases.get(0);
             //payment may take time to process, we will not give privilege until it has been fully processed
             String sku = purchase.getSku();
-            String subscriptionType = getSubscriptionType(sku);
-            String subscriptionRenewalType = getSubscriptionRenewalType(sku);
+            title = StringResourcesUtils.getString(R.string.title_user_purchased_subscription);
 
             if (billingManager.isPurchased(purchase)) {
                 //payment has been processed
+                logDebug("Purchase " + sku + " successfully, subscription type is: "
+                        + getSubscriptionType(sku) + ", subscription renewal type is: "
+                        + getSubscriptionRenewalType(sku));
+
                 updateAccountInfo(this, purchases, myAccountInfo);
-                logDebug("Purchase " + sku + " successfully, subscription type is: " + subscriptionType + ", subscription renewal type is: " + subscriptionRenewalType);
-                message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription, subscriptionType, subscriptionRenewalType);
+                message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription);
                 updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
             } else {
                 //payment is being processed or in unknown state
@@ -1300,10 +1304,11 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         } else {
             //down grade case
             logDebug("Downgrade, the new subscription takes effect when the old one expires.");
+            title = StringResourcesUtils.getString(R.string.my_account_upgrade_pro);
             message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription_down_grade);
         }
 
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED, String.class).post(message);
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED, Pair.class).post(new Pair<>(title, message));
     }
 
     @Override

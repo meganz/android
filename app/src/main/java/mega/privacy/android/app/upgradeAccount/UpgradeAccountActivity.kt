@@ -26,7 +26,7 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     private var upgradeAlert: AlertDialog? = null
 
     private val purchaseResultObserver =
-        Observer<String> { message -> showQueryPurchasesResult(message) }
+        Observer<Pair<String, String>> { content -> showQueryPurchasesResult(content) }
 
     override fun manageUpdateReceiver(action: Int) {
         super.manageUpdateReceiver(action)
@@ -50,8 +50,9 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
 
         upgradeAlert?.dismiss()
 
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED, String::class.java)
-            .removeObserver(purchaseResultObserver)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED)
+            .removeObserver(purchaseResultObserver as Observer<Any>)
     }
 
     override fun onBackPressed() {
@@ -67,8 +68,9 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     }
 
     private fun setupObservers() {
-        LiveEventBus.get(EVENT_PURCHASES_UPDATED, String::class.java)
-            .observeForever(purchaseResultObserver)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED)
+            .observeForever(purchaseResultObserver as Observer<Any>)
     }
 
     override fun setPricingInfo() {
@@ -404,17 +406,17 @@ class UpgradeAccountActivity : ChooseAccountActivity() {
     /**
      * Shows the result of a purchase as an alert.
      *
-     * @param message String to show as message alert.
+     * @param content First String to show as title alert, second String to show as message alert.
      */
-    private fun showQueryPurchasesResult(message: String?) {
-        if (TextUtil.isTextEmpty(message)) {
+    private fun showQueryPurchasesResult(content: Pair<String, String>?) {
+        if (content == null) {
             return
         }
 
         upgradeAlert = MaterialAlertDialogBuilder(this)
-            .setTitle(StringResourcesUtils.getString(R.string.my_account_upgrade_pro))
-            .setMessage(message)
-            .setPositiveButton("Got it!") { _, _ ->
+            .setTitle(content.first)
+            .setMessage(content.second)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.general_ok)) { _, _ ->
                 finish()
             }
             .show()

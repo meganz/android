@@ -613,8 +613,8 @@
     <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Your subscription has not been cancelled. Please provide a reason for your cancellation</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">Thank you for subscribing to %1$s %2$s!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">Thanks. Your payment is processing. Please email us at support&#64;mega.co.nz if you have not received your upgrade within 24 hours.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Your new subscription will take effect once the current one expires, the new price will be charged at that time.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -3562,7 +3562,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">The folder does not exist.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">The file does not exist in the Cloud Drive.</string>
+    <string name="warning_node_not_exists_in_cloud">The file cannot be found in your Cloud Drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Storage Full</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3616,7 +3616,7 @@
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">Your phone number has been removed successfully.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
-    <string name="remove_phone_number_fail">Your phone number removal failed.</string>
+    <string name="remove_phone_number_fail">Failed to remove your phone number.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">Search in MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
@@ -4007,6 +4007,8 @@
     <string name="denied_write_permissions">MEGA needs write permissions to your device storage to continue.</string>
     <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
     <string name="tomorrow_date">Tomorrow, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">Awaiting confirmation</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
         <item quantity="one">1 connection</item>
