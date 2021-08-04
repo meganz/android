@@ -590,14 +590,14 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 	public void itemClick(int position) {
 		logDebug("Position: " + position);
 
+		MegaNode vNode = nodeVersions.get(position);
 		if (adapter.isMultipleSelect()) {
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
-		} else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
-			manageTextFileIntent(this, node, VERSIONS_ADAPTER);
+		} else if (MimeTypeList.typeForName(vNode.getName()).isOpenableTextFile(vNode.getSize())) {
+			manageTextFileIntent(this, vNode, VERSIONS_ADAPTER);
 		} else {
-			MegaNode n = nodeVersions.get(position);
-			showOptionsPanel(n, position);
+			showOptionsPanel(vNode, position);
 		}
 	}
 	
