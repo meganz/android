@@ -603,7 +603,7 @@
         <item name="android:drawablePadding">12dp</item>
         <item name="android:gravity">center</item>
         <item name="android:textAppearance">@style/TextAppearance.Mega.Body2</item>
-        <item name="drawableTint">@color/grey_300_grey_600</item>
+        <item name="drawableTint">@color/grey_100_grey_600</item>
     </style>
 
 </resources>
