@@ -657,7 +657,7 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchN
 		cancelPreviousAsyncTask();
 		String query = ((ManagerActivityLollipop) context).getSearchQuery();
 		long parentHandleSearch = ((ManagerActivityLollipop) context).getParentHandleSearch();
-		ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
+		ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getSearchDrawerItem();
 		int sharesTab = ((ManagerActivityLollipop) context).getSearchSharedTab();
 		boolean isFirstNavigationLevel = ((ManagerActivityLollipop) context).isFirstNavigationLevel();
 
