@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -56,6 +57,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaShare.*;
@@ -587,11 +589,13 @@ public class VersionsFileActivity extends PasscodeActivity implements MegaReques
 
 	public void itemClick(int position) {
 		logDebug("Position: " + position);
-		if (adapter.isMultipleSelect()){
+
+		if (adapter.isMultipleSelect()) {
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
-		}
-		else{
+		} else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+			manageTextFileIntent(this, node, VERSIONS_ADAPTER);
+		} else {
 			MegaNode n = nodeVersions.get(position);
 			showOptionsPanel(n, position);
 		}

@@ -146,7 +146,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onDestroy() {
-        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java).removeObserver(performScrollObserver)
+        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java)
+            .removeObserver(performScrollObserver)
 
         if (isDiscardChangesConfirmationDialogShown()) {
             discardChangesDialog?.dismiss()
@@ -277,7 +278,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
                     menu.findItem(R.id.action_share).isVisible = true
                     updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
-                FOLDER_LINK_ADAPTER -> {
+                FOLDER_LINK_ADAPTER, VERSIONS_ADAPTER -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
                     updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
@@ -439,7 +440,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
         viewModel.getFileName().observe(this, ::showFileName)
         viewModel.getMode().observe(this, ::showMode)
         viewModel.onContentTextRead().observe(this, ::showContentRead)
-        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java).observeForever(performScrollObserver)
+
+        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java)
+            .observeForever(performScrollObserver)
     }
 
     /**
