@@ -26,16 +26,15 @@ import mega.privacy.android.app.listeners.TruncateHistoryListener;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity;
-import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.NonContactInfo;
 import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -66,7 +65,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class ChatController {
 
-    private Context context;
+    private final Context context;
     private MegaApiAndroid megaApi;
     private MegaChatApiAndroid megaChatApi;
     private DatabaseHandler dbH;
@@ -136,20 +135,10 @@ public class ChatController {
     public void archiveChat(MegaChatListItem chatItem){
         logDebug("Chat ID: " + chatItem.getChatId());
         if(context instanceof ManagerActivityLollipop){
-            if(chatItem.isArchived()){
-                megaChatApi.archiveChat(chatItem.getChatId(), false, (ManagerActivityLollipop) context);
-            }
-            else{
-                megaChatApi.archiveChat(chatItem.getChatId(), true, (ManagerActivityLollipop) context);
-            }
+            megaChatApi.archiveChat(chatItem.getChatId(), !chatItem.isArchived(), (ManagerActivityLollipop) context);
         }
         else if(context instanceof ArchivedChatsActivity){
-            if(chatItem.isArchived()){
-                megaChatApi.archiveChat(chatItem.getChatId(), false, (ArchivedChatsActivity) context);
-            }
-            else{
-                megaChatApi.archiveChat(chatItem.getChatId(), true, (ArchivedChatsActivity) context);
-            }
+            megaChatApi.archiveChat(chatItem.getChatId(), !chatItem.isArchived(), (ArchivedChatsActivity) context);
         }
     }
 
@@ -157,20 +146,10 @@ public class ChatController {
         logDebug("Chat ID: " + chat.getChatId());
         if(context instanceof GroupChatInfoActivityLollipop){
 
-            if(chat.isArchived()){
-                megaChatApi.archiveChat(chat.getChatId(), false,(GroupChatInfoActivityLollipop) context);
-            }
-            else{
-                megaChatApi.archiveChat(chat.getChatId(), true, (GroupChatInfoActivityLollipop) context);
-            }
+            megaChatApi.archiveChat(chat.getChatId(), !chat.isArchived(),(GroupChatInfoActivityLollipop) context);
         }
         else if(context instanceof ChatActivityLollipop){
-            if(chat.isArchived()){
-                megaChatApi.archiveChat(chat.getChatId(), false,(ChatActivityLollipop) context);
-            }
-            else{
-                megaChatApi.archiveChat(chat.getChatId(), true, (ChatActivityLollipop) context);
-            }
+            megaChatApi.archiveChat(chat.getChatId(), !chat.isArchived(),(ChatActivityLollipop) context);
         }
     }
 
@@ -178,41 +157,27 @@ public class ChatController {
         logDebug("Chat ID: " + chats.size());
         if(context instanceof ManagerActivityLollipop){
             for(int i=0; i<chats.size(); i++){
-                if(chats.get(i).isArchived()){
-                    megaChatApi.archiveChat(chats.get(i).getChatId(), false,null);
-                }
-                else{
-                    megaChatApi.archiveChat(chats.get(i).getChatId(), true, null);
-                }
+                megaChatApi.archiveChat(chats.get(i).getChatId(), !chats.get(i).isArchived(),null);
             }
         }
         else if(context instanceof ArchivedChatsActivity){
             for(int i=0; i<chats.size(); i++){
-                if(chats.get(i).isArchived()){
-                    megaChatApi.archiveChat(chats.get(i).getChatId(), false, null);
-                }
-                else{
-                    megaChatApi.archiveChat(chats.get(i).getChatId(), true, null);
-                }
+                megaChatApi.archiveChat(chats.get(i).getChatId(), !chats.get(i).isArchived(), null);
             }
         }
     }
 
     public void deleteMessages(ArrayList<MegaChatMessage> messages, MegaChatRoom chat){
         logDebug("Messages to delete: " + messages.size());
-        if(messages!=null){
-            for(int i=0; i<messages.size();i++){
-                deleteMessage(messages.get(i), chat.getChatId());
-            }
+        for (int i = 0; i < messages.size(); i++) {
+            deleteMessage(messages.get(i), chat.getChatId());
         }
     }
 
     public void deleteAndroidMessages(ArrayList<AndroidMegaChatMessage> messages, MegaChatRoom chat){
         logDebug("Messages to delete: " + messages.size());
-        if(messages!=null){
-            for(int i=0; i<messages.size();i++){
-                deleteMessage(messages.get(i).getMessage(), chat.getChatId());
-            }
+        for (int i = 0; i < messages.size(); i++) {
+            deleteMessage(messages.get(i).getMessage(), chat.getChatId());
         }
     }
 
@@ -228,7 +193,6 @@ public class ChatController {
     public void deleteMessage(MegaChatMessage message, long chatId) {
         logDebug("Message : " + message.getMsgId() + ", Chat ID: " + chatId);
         MegaChatMessage messageToDelete;
-        if (message == null) return;
         if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
             logDebug("Delete node attachment message or voice clip message");
             if (message.getType() == MegaChatMessage.TYPE_VOICE_CLIP && message.getMegaNodeList() != null && message.getMegaNodeList().size() > 0 && message.getMegaNodeList().get(0) != null) {
@@ -320,6 +284,11 @@ public class ChatController {
         String text = createManagementString(androidMessage.getMessage(), chatRoom);
         if((text!=null) && (!text.isEmpty())){
             text = text.substring(text.indexOf(":")+2);
+            String strEdited = " " + StringResourcesUtils.getString(R.string.edited_message_text);
+            if (text.contains(strEdited)) {
+                int index = text.indexOf(strEdited);
+                text = text.substring(0, index);
+            }
         }else{
             text = "";
 
@@ -339,11 +308,11 @@ public class ChatController {
                 logDebug("Me alter participant");
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(megaChatApi.getMyFullname() + ": ");
+                builder.append(megaChatApi.getMyFullname()).append(": ");
 
                 int privilege = message.getPrivilege();
                 logDebug("Privilege of me: " + privilege);
-                String textToShow = "";
+                String textToShow;
                 String fullNameAction = getParticipantFullName(message.getUserHandle());
 
                 if (privilege != MegaChatRoom.PRIV_RM) {
@@ -372,7 +341,7 @@ public class ChatController {
                 String fullNameTitle = getParticipantFullName(message.getHandleOfAction());
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(fullNameTitle + ": ");
+                builder.append(fullNameTitle).append(": ");
 
                 String textToShow = "";
                 if (privilege != MegaChatRoom.PRIV_RM) {
@@ -417,7 +386,7 @@ public class ChatController {
                 logDebug("Privilege of the user: " + privilege);
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(megaChatApi.getMyFullname() + ": ");
+                builder.append(megaChatApi.getMyFullname()).append(": ");
 
                 String privilegeString = "";
                 if (privilege == MegaChatRoom.PRIV_MODERATOR) {
@@ -431,7 +400,7 @@ public class ChatController {
                     privilegeString = "Unknow";
                 }
 
-                String textToShow = "";
+                String textToShow;
 
                 if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
                     logDebug("I changed my own permission");
@@ -450,7 +419,7 @@ public class ChatController {
 
                 String fullNameTitle = getParticipantFullName(message.getHandleOfAction());
                 StringBuilder builder = new StringBuilder();
-                builder.append(fullNameTitle + ": ");
+                builder.append(fullNameTitle).append(": ");
 
                 int privilege = message.getPrivilege();
                 String privilegeString = "";
@@ -465,7 +434,7 @@ public class ChatController {
                     privilegeString = "Unknow";
                 }
 
-                String textToShow = "";
+                String textToShow;
                 if (message.getUserHandle() == megaApi.getMyUser().getHandle()) {
                     logDebug("The privilege was change by me");
                     textToShow = String.format(context.getString(R.string.non_format_message_permissions_changed), fullNameTitle, privilegeString, megaChatApi.getMyFullname());
@@ -486,7 +455,7 @@ public class ChatController {
                 logDebug("MY message ID: " + message.getMsgId());
 
                 StringBuilder builder = new StringBuilder();
-                builder.append(megaChatApi.getMyFullname() + ": ");
+                builder.append(megaChatApi.getMyFullname()).append(": ");
 
                 if (message.getType() == MegaChatMessage.TYPE_NORMAL) {
                     logDebug("Message type NORMAL");
@@ -522,8 +491,10 @@ public class ChatController {
                         textToShow = textToShow.replace("[B]", "<font color=\'#00BFA5\'>");
                         textToShow = textToShow.replace("[/B]", "</font>");
                     }
-                    catch (Exception e){}
-                    Spanned result = null;
+                    catch (Exception e){
+                        logError("Exception: " + e.getMessage());
+                    }
+                    Spanned result;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                         result = Html.fromHtml(textToShow,Html.FROM_HTML_MODE_LEGACY);
                     } else {
@@ -600,6 +571,7 @@ public class ChatController {
                                 textToShow = textToShow.replace("[C]", "");
                                 textToShow = textToShow.replace("[/C]", "");
                             }catch (Exception e){
+                                logError("Exception: " + e.getMessage());
                             }
 
                             break;
@@ -613,6 +585,7 @@ public class ChatController {
                                 textToShow = textToShow.replace("[B]", "");
                                 textToShow = textToShow.replace("[/B]", "");
                             } catch (Exception e) {
+                                logError("Exception: " + e.getMessage());
                             }
 
                             break;
@@ -640,6 +613,7 @@ public class ChatController {
                                 textToShow = textToShow.replace("[B]", "");
                                 textToShow = textToShow.replace("[/B]", "");
                             } catch (Exception e) {
+                                logError("Exception: " + e.getMessage());
                             }
 
                             break;
@@ -653,6 +627,7 @@ public class ChatController {
                                 textToShow = textToShow.replace("[B]", "");
                                 textToShow = textToShow.replace("[/B]", "");
                             } catch (Exception e) {
+                                logError("Exception: " + e.getMessage());
                             }
 
                             break;
@@ -670,7 +645,7 @@ public class ChatController {
 
                 String fullNameTitle = getParticipantFullName(userHandle);
                 StringBuilder builder = new StringBuilder();
-                builder.append(fullNameTitle + ": ");
+                builder.append(fullNameTitle).append(": ");
 
                 if (message.getType() == MegaChatMessage.TYPE_NORMAL) {
 
@@ -735,7 +710,7 @@ public class ChatController {
                 else if(message.getType() == MegaChatMessage.TYPE_CALL_ENDED){
                     String textToShow = "";
                     switch(message.getTermCode()){
-                        case MegaChatMessage.END_CALL_REASON_ENDED:{
+                        case MegaChatMessage.END_CALL_REASON_ENDED: {
 
                             int hours = message.getDuration() / 3600;
                             int minutes = (message.getDuration() % 3600) / 60;
@@ -744,40 +719,41 @@ public class ChatController {
                             textToShow = chatRoom.isGroup() ? context.getString(R.string.group_call_ended_message) :
                                     context.getString(R.string.call_ended_message);
 
-                            if(hours != 0){
+                            if (hours != 0) {
                                 String textHours = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_hours, hours, hours);
                                 textToShow = textToShow + textHours;
-                                if((minutes != 0)||(seconds != 0)){
-                                    textToShow = textToShow+", ";
+                                if ((minutes != 0) || (seconds != 0)) {
+                                    textToShow = textToShow + ", ";
                                 }
                             }
 
-                            if(minutes != 0){
+                            if (minutes != 0) {
                                 String textMinutes = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_minutes, minutes, minutes);
                                 textToShow = textToShow + textMinutes;
-                                if(seconds != 0){
-                                    textToShow = textToShow+", ";
+                                if (seconds != 0) {
+                                    textToShow = textToShow + ", ";
                                 }
                             }
 
-                            if(seconds != 0){
+                            if (seconds != 0) {
                                 String textSeconds = context.getResources().getQuantityString(R.plurals.plural_call_ended_messages_seconds, seconds, seconds);
                                 textToShow = textToShow + textSeconds;
                             }
 
-                            try{
+                            try {
                                 textToShow = textToShow.replace("[A]", "");
                                 textToShow = textToShow.replace("[/A]", "");
                                 textToShow = textToShow.replace("[B]", "");
                                 textToShow = textToShow.replace("[/B]", "");
                                 textToShow = textToShow.replace("[C]", "");
                                 textToShow = textToShow.replace("[/C]", "");
-                            }catch (Exception e){
+                            } catch (Exception e) {
+                                logError("Exception: " + e.getMessage());
                             }
 
                             break;
                         }
-                        case MegaChatMessage.END_CALL_REASON_REJECTED:{
+                        case MegaChatMessage.END_CALL_REASON_REJECTED: {
 
                             textToShow = String.format(context.getString(R.string.call_rejected_messages));
                             try {
@@ -786,11 +762,12 @@ public class ChatController {
                                 textToShow = textToShow.replace("[B]", "");
                                 textToShow = textToShow.replace("[/B]", "");
                             } catch (Exception e) {
+                                logError("Exception: " + e.getMessage());
                             }
 
                             break;
                         }
-                        case MegaChatMessage.END_CALL_REASON_NO_ANSWER:{
+                        case MegaChatMessage.END_CALL_REASON_NO_ANSWER: {
 
                             textToShow = String.format(context.getString(R.string.call_missed_messages));
 
@@ -804,7 +781,7 @@ public class ChatController {
 
                             break;
                         }
-                        case MegaChatMessage.END_CALL_REASON_FAILED:{
+                        case MegaChatMessage.END_CALL_REASON_FAILED: {
 
                             textToShow = String.format(context.getString(R.string.call_failed_messages));
                             try {
@@ -813,11 +790,12 @@ public class ChatController {
                                 textToShow = textToShow.replace("[B]", "");
                                 textToShow = textToShow.replace("[/B]", "");
                             } catch (Exception e) {
+                                logError("Exception: " + e.getMessage());
                             }
 
                             break;
                         }
-                        case MegaChatMessage.END_CALL_REASON_CANCELLED:{
+                        case MegaChatMessage.END_CALL_REASON_CANCELLED: {
 
                             textToShow = String.format(context.getString(R.string.call_missed_messages));
                             try {
@@ -826,6 +804,7 @@ public class ChatController {
                                 textToShow = textToShow.replace("[B]", "");
                                 textToShow = textToShow.replace("[/B]", "");
                             } catch (Exception e) {
+                                logError("Exception: " + e.getMessage());
                             }
 
                             break;
@@ -913,38 +892,32 @@ public class ChatController {
         return nonContact != null ? nonContact.getEmail() : "";
     }
 
-    public String getMyFullName(){
+    public String getMyFullName() {
 
         String fullName = megaChatApi.getMyFullname();
 
-        if(fullName!=null){
-            if(fullName.isEmpty()){
+        if (fullName != null) {
+            if (fullName.isEmpty()) {
                 logDebug("Put MY email as fullname");
                 String myEmail = megaChatApi.getMyEmail();
                 String[] splitEmail = myEmail.split("[@._]");
                 fullName = splitEmail[0];
-                return fullName;
-            }
-            else{
-                if (fullName.trim().length() <= 0){
+            } else {
+                if (fullName.trim().length() <= 0) {
                     logDebug("Put MY email as fullname");
                     String myEmail = megaChatApi.getMyEmail();
                     String[] splitEmail = myEmail.split("[@._]");
                     fullName = splitEmail[0];
-                    return fullName;
-                }
-                else{
-                    return fullName;
                 }
             }
-        }
-        else{
+        } else {
             logDebug("Put MY email as fullname");
             String myEmail = megaChatApi.getMyEmail();
             String[] splitEmail = myEmail.split("[@._]");
             fullName = splitEmail[0];
-            return fullName;
         }
+
+        return fullName;
     }
 
     public void saveForOfflineWithMessages(ArrayList<MegaChatMessage> messages,
@@ -1006,9 +979,11 @@ public class ChatController {
         double availableFreeSpace = Double.MAX_VALUE;
         try{
             StatFs stat = new StatFs(destination.getAbsolutePath());
-            availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+            availableFreeSpace = (double)stat.getAvailableBlocksLong() * (double)stat.getBlockSize();
         }
-        catch(Exception ex){}
+        catch(Exception ex){
+            logError("Exception: " + ex.getMessage());
+        }
 
         for (MegaNode document : dlFiles.keySet()) {
 
@@ -1259,11 +1234,7 @@ public class ChatController {
     }
 
     public boolean isInAnonymousMode () {
-        if (megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS) {
-            return true;
-        }
-
-        return false;
+        return megaChatApi.getInitState() == MegaChatApi.INIT_ANONYMOUS;
     }
 
     public boolean isPreview (MegaChatRoom chatRoom) {
