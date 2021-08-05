@@ -66,7 +66,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	ArrayList<MegaNode> nodes;
 
     DatabaseHandler dbH = null;
-	private ArrayList<Long> disabledNodes;
 
 	Object fragment;
 
@@ -248,17 +247,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             setImageParams(holder.imageView, ICON_SIZE_DP, ICON_MARGIN_DP);
 
             holder.itemView.setOnLongClickListener(null);
-
-            if (disabledNodes != null && disabledNodes.contains(node.getHandle())) {
-                holder.imageView.setAlpha(.4f);
-                holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-                holder.permissionsIcon.setAlpha(.2f);
-                holder.itemView.setOnClickListener(null);
-            } else {
-                holder.imageView.setAlpha(1.0f);
-                holder.itemView.setOnClickListener(this);
-            }
-
+            holder.itemView.setOnClickListener(this);
             holder.permissionsIcon.setVisibility(View.GONE);
             holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
             holder.imageView.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
@@ -380,16 +369,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.itemView.setOnLongClickListener(null);
 
             holder.folderIcon.setImageResource(getFolderIcon(node, ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
-
-            if (disabledNodes != null && disabledNodes.contains(node.getHandle())) {
-                holder.folderIcon.setAlpha(.4f);
-                holder.folderName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-                holder.itemView.setOnClickListener(null);
-            } else {
-                holder.folderIcon.setAlpha(1.0f);
-                holder.itemView.setOnClickListener(this);
-                holder.folderName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
-            }
+            holder.itemView.setOnClickListener(this);
+            holder.folderName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
         }
         else{
             holder.folderLayout.setVisibility(View.GONE);
@@ -700,13 +681,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
-	}
-
-	/*
-	 * Set provided nodes disabled
-	 */
-	public void setDisableNodes(ArrayList<Long> disabledNodes) {
-		this.disabledNodes = disabledNodes;
 	}
 
 	public boolean isSelectFile() {
