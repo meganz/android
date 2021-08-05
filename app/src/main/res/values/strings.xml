@@ -4001,9 +4001,9 @@
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Change the meeting name</string>
     <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">Participants : %d</string>
+    <string name="info_participants_number">Participants: %d</string>
     <!-- The name of moderators in the meeting on meeting info page-->
-    <string name="info_moderator_name">Moderator : %s</string>
+    <string name="info_moderator_name">Moderator: %s</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Meeting link</string>
     <!-- Subtitle of the meeting screen-->
