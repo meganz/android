@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
@@ -152,6 +153,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var bannerShouldBeShown = false
 
     private lateinit var binding: InMeetingFragmentBinding
+
+    // Leave Meeting Dialog
+    private var leaveDialog: Dialog? = null
+    // Meeting failed Dialog
+    private var failedDialog: Dialog? = null
 
     val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
@@ -2440,15 +2446,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Dialog for confirming leave meeting action
      */
     private fun askConfirmationEndMeetingForUser() {
-        MaterialAlertDialogBuilder(
+        leaveDialog = MaterialAlertDialogBuilder(
             requireContext(),
             R.style.ThemeOverlay_Mega_MaterialAlertDialog
-        ).apply {
-            setMessage(StringResourcesUtils.getString(R.string.title_end_meeting))
-            setPositiveButton(R.string.general_ok) { _, _ -> leaveMeeting() }
-            setNegativeButton(R.string.general_cancel, null)
-            show()
-        }
+        ).setMessage(StringResourcesUtils.getString(R.string.title_end_meeting))
+            .setPositiveButton(R.string.general_ok) { _, _ -> leaveMeeting() }
+            .setNegativeButton(R.string.general_cancel, null)
+            .show()
     }
 
     /**
@@ -2629,6 +2633,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        dismissDialog(leaveDialog)
+        dismissDialog(failedDialog)
+    }
+
     override fun onCallAnswered(chatId: Long, flag: Boolean) {
         if (chatId == inMeetingViewModel.getChatId()) {
             logDebug("Call answered")
@@ -2743,18 +2753,15 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * The dialog for alerting the meeting is failed to created
      */
     private fun showMeetingFailedDialog() {
-        MaterialAlertDialogBuilder(
+        failedDialog = MaterialAlertDialogBuilder(
             requireContext(),
             R.style.ThemeOverlay_Mega_MaterialAlertDialog
-        ).apply {
-            setMessage(StringResourcesUtils.getString(R.string.meeting_is_failed_content))
-            setCancelable(false)
-            setPositiveButton(R.string.general_ok) { _, _ ->
+        ).setMessage(StringResourcesUtils.getString(R.string.meeting_is_failed_content))
+            .setCancelable(false)
+            .setPositiveButton(R.string.general_ok) { _, _ ->
                 MegaApplication.getInstance().removeRTCAudioManager()
                 finishActivity()
-            }
-            show()
-        }
+            }.show()
     }
 
     /**
@@ -2765,6 +2772,17 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     fun addContact(peerId: Long) {
         inMeetingViewModel.addContact(requireContext(), peerId) { content ->
             sharedModel.showSnackBar(content)
+        }
+    }
+
+    /**
+     * Dismiss the dialog
+     *
+     * @param dialog the dialog should be dismiss
+     */
+    fun dismissDialog(dialog: Dialog?) {
+        dialog?.let {
+            if (it.isShowing) it.dismiss()
         }
     }
 
