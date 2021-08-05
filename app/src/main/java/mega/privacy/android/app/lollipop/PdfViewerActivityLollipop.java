@@ -295,6 +295,11 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         }
         fromDownload = intent.getBooleanExtra("fromDownloadService", false);
         inside = intent.getBooleanExtra("inside", false);
+
+        if (!inside) {
+            disablePasscode();
+        }
+
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
@@ -566,6 +571,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             }
         }
         else {
+            disablePasscode();
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
             currentPage = 1;
