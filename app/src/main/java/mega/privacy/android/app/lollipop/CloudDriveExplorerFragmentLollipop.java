@@ -93,7 +93,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	private boolean selectFile=false;
 	private MegaPreferences prefs;
 	private DatabaseHandler dbH;
-	private  ActionMode actionMode;
+	private ActionMode actionMode;
 
 	private RelativeLayout contentLayout;
 	private LinearLayout optionsBar;
@@ -316,7 +316,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			recyclerView.setLayoutManager(mLayoutManager);
 		}
 		else {
-			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			recyclerView = v.findViewById(R.id.file_grid_view_browser);
 			v.findViewById(R.id.file_list_view_browser).setVisibility(View.GONE);
 			gridLayoutManager = (CustomizedGridLayoutManager) recyclerView.getLayoutManager();
 		}

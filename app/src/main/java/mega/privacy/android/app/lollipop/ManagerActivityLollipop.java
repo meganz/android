@@ -6840,8 +6840,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		this.isClearRubbishBin = value;
 	}
 
-	public void setMoveToRubbish(boolean value){
+	public void setMoveToRubbish(boolean value) {
 		this.moveToRubbish = value;
+	}
+
+	public void setRestoreFromRubbish(boolean value) {
+		this.restoreFromRubbish = value;
 	}
 
 	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){

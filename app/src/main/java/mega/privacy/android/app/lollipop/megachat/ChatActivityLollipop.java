@@ -8320,6 +8320,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         logDebug("onIntentProcessedLollipop");
 
         if (infos == null) {
+            statusDialog.dismiss();
             showSnackbar(SNACKBAR_TYPE, getString(R.string.upload_can_not_open), -1);
         }
         else {

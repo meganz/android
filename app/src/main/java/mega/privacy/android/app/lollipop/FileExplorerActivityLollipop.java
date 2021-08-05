@@ -1693,6 +1693,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 
 		if (infos == null) {
+			statusDialog.dismiss();
 			showSnackbar(getString(R.string.upload_can_not_open));
 		} else if (existsMyChatFilesFolder()) {
 			setMyChatFilesFolder(getMyChatFilesFolder());
