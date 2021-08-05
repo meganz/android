@@ -6,7 +6,7 @@ import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiJava
