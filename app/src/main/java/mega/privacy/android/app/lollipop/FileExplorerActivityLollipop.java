@@ -1693,6 +1693,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 
 		if (infos == null) {
+			statusDialog.dismiss();
 			showSnackbar(getString(R.string.upload_can_not_open));
 		} else if (existsMyChatFilesFolder()) {
 			setMyChatFilesFolder(getMyChatFilesFolder());
@@ -2146,6 +2147,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
                 credentials = new UserCredentials(lastEmail, gSession, "", "", "");
                 dbH.saveCredentials(credentials);
 				logDebug("Logged in with session");
+				logDebug("Setting account auth token for folder links.");
+				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
 				megaApi.fetchNodes(this);
 			}
 		}

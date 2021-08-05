@@ -94,6 +94,9 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
                 richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
 
+                logDebug("Logged in. Setting account auth token for folder links.");
+                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
+
                 megaApiFolder.fetchNodes(this);
             }
             else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){

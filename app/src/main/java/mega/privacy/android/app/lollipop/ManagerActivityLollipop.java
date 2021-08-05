@@ -788,6 +788,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     drawerLayout.closeDrawer(Gravity.LEFT);
                 }
                 refreshAddPhoneNumberButton();
+				app.askForAccountDetails();
             }
         }
     };
@@ -1967,6 +1968,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			@Override
 			public void onDrawerOpened(@NonNull View drawerView) {
 				refreshDrawerInfo(storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN);
+
+				// Sync the account info after changing account information settings to keep the data the same
+				updateAccountDetailsVisibleInfo();
 			}
 
 			@Override
@@ -4761,16 +4765,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 
 					supportInvalidateOptionsMenu();
-
-//					if (rChatFL != null) {
-//						if (rChatFL.isAdded()) {
-//							logDebug("ONLINE: Update screen RecentChats");
-//							if (!isChatEnabled()) {
-//								rChatFL.showDisableChatScreen();
-//							}
-//						}
-//					}		updateAccountDetailsVisibleInfo();
-
 					updateAccountDetailsVisibleInfo();
 					checkCurrentStorageStatus(false);
 				} else {
@@ -7856,8 +7850,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		this.isClearRubbishBin = value;
 	}
 
-	public void setMoveToRubbish(boolean value){
+	public void setMoveToRubbish(boolean value) {
 		this.moveToRubbish = value;
+	}
+
+	public void setRestoreFromRubbish(boolean value) {
+		this.restoreFromRubbish = value;
 	}
 
 	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){
