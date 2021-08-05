@@ -5028,7 +5028,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                         mediaIntent.putExtra("chatId", idChat);
                                         mediaIntent.putExtra("FILENAME", node.getName());
 
-                                        String localPath = getLocalFile(this, node.getName(), node.getSize());
+                                        String localPath = getLocalFile(node);
 
                                         if (localPath != null){
                                             logDebug("localPath != null");
@@ -5127,7 +5127,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                         pdfIntent.putExtra("msgId", m.getMessage().getMsgId());
                                         pdfIntent.putExtra("chatId", idChat);
 
-                                        String localPath = getLocalFile(this, node.getName(), node.getSize());
+                                        String localPath = getLocalFile(node);
 
                                         if (localPath != null){
                                             File mediaFile = new File(localPath);

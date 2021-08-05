@@ -1634,7 +1634,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                     fileNameTextView.setText(pdfFileName);
                     supportInvalidateOptionsMenu();
 
-                    String localPath = getLocalFile(this, file.getName(), file.getSize());
+                    String localPath = getLocalFile(file);
 
                     if (localPath != null){
                         File mediaFile = new File(localPath);

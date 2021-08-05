@@ -932,7 +932,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 					continue;
 				}
 
-				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
+				String localPath = getLocalFile(tempNode);
 				if(localPath != null){
 					try {
 						logDebug("COPY_FILE");
