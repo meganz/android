@@ -243,6 +243,9 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
         holder.textViewFileName.setText(node.getName());
 
+        holder.imageView.setAlpha(1.0f);
+        holder.textViewFileName.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorPrimary));
+
         if (node.isFolder()){
             setImageParams(holder.imageView, ICON_SIZE_DP, ICON_MARGIN_DP);
 
@@ -298,7 +301,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             setImageParams(holder.imageView, ICON_SIZE_DP, ICON_MARGIN_DP);
 
             if(selectFile){
-                holder.imageView.setAlpha(1.0f);
                 holder.itemView.setOnClickListener(this);
                 holder.itemView.setOnLongClickListener(this);
 
