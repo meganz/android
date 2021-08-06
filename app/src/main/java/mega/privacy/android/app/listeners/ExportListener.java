@@ -19,7 +19,7 @@ import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-import mega.privacy.android.app.activities.GetLinkActivity;
+import mega.privacy.android.app.getLink.GetLinkActivity;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;

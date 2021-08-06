@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.activities.GetLinkActivity;
+import mega.privacy.android.app.getLink.GetLinkActivity;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 
 import static mega.privacy.android.app.utils.Constants.HANDLE;

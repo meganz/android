@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.getLinkFragments
+package mega.privacy.android.app.getLink
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -18,7 +18,6 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.listeners.PasswordLinkListener
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util.setPasswordToggle
 import nz.mega.sdk.MegaApiJava
 
 class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment() {

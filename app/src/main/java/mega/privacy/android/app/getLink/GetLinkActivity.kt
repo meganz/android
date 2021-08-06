@@ -1,4 +1,4 @@
-package mega.privacy.android.app.activities
+package mega.privacy.android.app.getLink
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -9,12 +9,9 @@ import android.view.MenuItem
 import android.view.View.GONE
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
-import mega.privacy.android.app.fragments.getLinkFragments.CopyrightFragment
-import mega.privacy.android.app.fragments.getLinkFragments.DecryptionKeyFragment
-import mega.privacy.android.app.fragments.getLinkFragments.LinkFragment
-import mega.privacy.android.app.fragments.getLinkFragments.LinkPasswordFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity

@@ -1,10 +1,10 @@
-package mega.privacy.android.app.fragments.getLinkFragments
+package mega.privacy.android.app.getLink
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import mega.privacy.android.app.activities.GetLinkActivity.Companion.GET_LINK_FRAGMENT
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.GET_LINK_FRAGMENT
 import mega.privacy.android.app.databinding.FragmentCopyrightBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface

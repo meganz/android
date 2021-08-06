@@ -2,7 +2,7 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import mega.privacy.android.app.OpenPasswordLinkActivity
-import mega.privacy.android.app.activities.GetLinkActivity
+import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.getLinkFragments
+package mega.privacy.android.app.getLink
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
@@ -17,8 +17,8 @@ import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.GetLinkActivity.Companion.DECRYPTION_KEY_FRAGMENT
-import mega.privacy.android.app.activities.GetLinkActivity.Companion.PASSWORD_FRAGMENT
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.DECRYPTION_KEY_FRAGMENT
+import mega.privacy.android.app.getLink.GetLinkActivity.Companion.PASSWORD_FRAGMENT
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.GetLinkInterface

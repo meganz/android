@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.getLinkFragments
+package mega.privacy.android.app.getLink
 
 import android.os.Bundle
 import android.view.LayoutInflater
