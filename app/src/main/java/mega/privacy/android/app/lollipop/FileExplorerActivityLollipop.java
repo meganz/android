@@ -2744,7 +2744,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		if (cDriveExplorer != null) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.detach(cDriveExplorer);
-			cDriveExplorer.setHeaderItemDecoration(null);
 			ft.attach(cDriveExplorer);
 			ft.commitAllowingStateLoss();
 		}

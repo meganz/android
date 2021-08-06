@@ -4297,23 +4297,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			ft.detach(f);
 			if (fTag.equals(FragmentTag.CLOUD_DRIVE.getTag())) {
 				((FileBrowserFragmentLollipop) f).headerItemDecoration = null;
-			}
-			else if (fTag.equals(FragmentTag.RUBBISH_BIN.getTag())) {
+			} else if (fTag.equals(FragmentTag.RUBBISH_BIN.getTag())) {
 				((RubbishBinFragmentLollipop) f).headerItemDecoration = null;
-			}
-			else if (fTag.equals(FragmentTag.INCOMING_SHARES.getTag())) {
-				((IncomingSharesFragmentLollipop) f).headerItemDecoration = null;
-			}
-			else if (fTag.equals(FragmentTag.OUTGOING_SHARES.getTag())) {
-				((OutgoingSharesFragmentLollipop) f).headerItemDecoration = null;
-			}
-            else if (fTag.equals(FragmentTag.LINKS.getTag())) {
-                ((LinksFragment) f).headerItemDecoration = null;
-            }
-			else if (fTag.equals(FragmentTag.INBOX.getTag())) {
+			} else if (fTag.equals(FragmentTag.INBOX.getTag())) {
 				((InboxFragmentLollipop) f).headerItemDecoration = null;
-			}
-			else if (fTag.equals(FragmentTag.SEARCH.getTag())) {
+			} else if (fTag.equals(FragmentTag.SEARCH.getTag())) {
 				((SearchFragmentLollipop) f).setHeaderItemDecoration(null);
 			}
 

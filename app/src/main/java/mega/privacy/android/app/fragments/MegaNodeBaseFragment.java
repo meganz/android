@@ -51,8 +51,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.NewHeaderItemDecoration;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
@@ -109,9 +108,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected RecyclerView recyclerView;
     protected LinearLayoutManager mLayoutManager;
     protected CustomizedGridLayoutManager gridLayoutManager;
-
-    public NewHeaderItemDecoration headerItemDecoration;
-    protected int placeholderCount;
 
     protected ImageView emptyImageView;
     protected LinearLayout emptyLinearLayout;
@@ -416,63 +412,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         }
     }
 
-    public void addSectionTitle(List<MegaNode> nodes, int type) {
-        Map<Integer, String> sections = new HashMap<>();
-        int folderCount = 0;
-        int fileCount = 0;
-        for (MegaNode node : nodes) {
-            if (node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-            if (node.isFile()) {
-                fileCount++;
-            }
-        }
-
-        if (type == ITEM_VIEW_TYPE_GRID) {
-            int spanCount = 2;
-            if (recyclerView instanceof NewGridRecyclerView) {
-                spanCount = ((NewGridRecyclerView) recyclerView).getSpanCount();
-            }
-            if (folderCount > 0) {
-                for (int i = 0; i < spanCount; i++) {
-                    sections.put(i, getString(R.string.general_folders));
-                }
-            }
-
-            if (fileCount > 0) {
-                placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
-                if (placeholderCount == 0) {
-                    for (int i = 0; i < spanCount; i++) {
-                        sections.put(folderCount + i, getString(R.string.general_files));
-                    }
-                } else {
-                    for (int i = 0; i < spanCount; i++) {
-                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
-                    }
-                }
-            }
-        } else {
-            placeholderCount = 0;
-            sections.put(0, getString(R.string.general_folders));
-            sections.put(folderCount, getString(R.string.general_files));
-        }
-
-        if (headerItemDecoration == null) {
-            logDebug("Create new decoration");
-            headerItemDecoration = new NewHeaderItemDecoration(context);
-        } else {
-            logDebug("Remove old decoration");
-            recyclerView.removeItemDecoration(headerItemDecoration);
-        }
-        headerItemDecoration.setType(type);
-        headerItemDecoration.setKeys(sections);
-        recyclerView.addItemDecoration(headerItemDecoration);
-    }
-
     public void checkScroll() {
         if (recyclerView != null) {
             if ((recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE) || (adapter != null && adapter.isMultipleSelect())) {
@@ -504,7 +443,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         if (mimeType.isImage()) {
             internalIntent = true;
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
-            intent.putExtra("placeholder", placeholderCount);
             intent.putExtra("position", position);
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("isFolderLink", false);
@@ -525,7 +463,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             }
 
             intent.putExtra("position", position);
-            intent.putExtra("placeholder", placeholderCount);
             intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
             intent.putExtra("adapterType", fragmentAdapter);
@@ -719,6 +656,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         recyclerView = v.findViewById(R.id.file_list_view_browser);
         mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
         recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());

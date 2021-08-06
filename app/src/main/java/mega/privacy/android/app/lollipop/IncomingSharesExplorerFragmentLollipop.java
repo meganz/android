@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,7 +27,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,6 +51,7 @@ import mega.privacy.android.app.SearchNodesTask;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.NewHeaderItemDecoration;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
@@ -295,6 +294,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
 		}
 		else {
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
@@ -399,14 +399,8 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 				StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)),
 				HtmlCompat.FROM_HTML_MODE_LEGACY);
 
-		super.onViewCreated(view, savedInstanceState);
-	}
-
-	@Override
-	public void onConfigurationChanged(@NonNull Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-
 		updateEmptyScreen();
+		super.onViewCreated(view, savedInstanceState);
 	}
 
 	private void setOptionsBarVisibility() {
@@ -754,7 +748,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	private void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		if (adapter != null){
-			addSectionTitle(nodes, ((FileExplorerActivityLollipop) context).getItemType());
 			adapter.setNodes(nodes);
 			showEmptyScreen();
 		}
@@ -889,7 +882,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 		searchNodes = nodes;
 		((FileExplorerActivityLollipop) context).setShouldRestartSearch(true);
-		addSectionTitle(searchNodes, ((FileExplorerActivityLollipop) context).getItemType());
 		adapter.setNodes(searchNodes);
 		showEmptyScreen();
 
@@ -908,62 +900,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			getNodes();
 			setNodes(nodes);
 		}
-	}
-
-	private void addSectionTitle(List<MegaNode> nodes,int type) {
-		Map<Integer, String> sections = new HashMap<>();
-		int placeholderCount;
-		int folderCount = 0;
-		int fileCount = 0;
-		for (MegaNode node : nodes) {
-			if(node == null) {
-				continue;
-			}
-			if (node.isFolder()) {
-				folderCount++;
-			}
-			if (node.isFile()) {
-				fileCount++;
-			}
-		}
-
-		if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
-			int spanCount = 2;
-			if (recyclerView instanceof NewGridRecyclerView) {
-				spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
-			}
-			if(folderCount > 0) {
-				for (int i = 0;i < spanCount;i++) {
-					sections.put(i,getString(R.string.general_folders));
-				}
-			}
-
-			if(fileCount > 0 ) {
-				placeholderCount = (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
-				if (placeholderCount == 0) {
-					for (int i = 0;i < spanCount;i++) {
-						sections.put(folderCount + i,getString(R.string.general_files));
-					}
-				} else {
-					for (int i = 0;i < spanCount;i++) {
-						sections.put(folderCount + placeholderCount + i,getString(R.string.general_files));
-					}
-				}
-			}
-		} else {
-			sections.put(0,getString(R.string.general_folders));
-			sections.put(folderCount,getString(R.string.general_files));
-		}
-
-		if (headerItemDecoration == null) {
-			headerItemDecoration = new NewHeaderItemDecoration(context);
-		} else {
-			recyclerView.removeItemDecoration(headerItemDecoration);
-		}
-
-		headerItemDecoration.setType(type);
-		headerItemDecoration.setKeys(sections);
-		recyclerView.addItemDecoration(headerItemDecoration);
 	}
 
 	public FastScroller getFastScroller() {
