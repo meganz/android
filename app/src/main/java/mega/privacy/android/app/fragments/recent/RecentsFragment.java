@@ -350,7 +350,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             return;
         }
 
-        String localPath = getLocalFile(context, node.getName(), node.getSize());
+        String localPath = getLocalFile(node);
         boolean paramsSetSuccessfully = false;
 
         if (isAudioOrVideo(node)) {

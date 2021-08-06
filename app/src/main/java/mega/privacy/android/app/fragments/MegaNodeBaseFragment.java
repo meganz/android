@@ -532,7 +532,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("HANDLE", node.getHandle());
             intent.putExtra("FILENAME", node.getName());
 
-            String localPath = getLocalFile(context, node.getName(), node.getSize());
+            String localPath = getLocalFile(node);
             if (localPath != null) {
                 File mediaFile = new File(localPath);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -581,7 +581,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             }
         } else if (mimeType.isURL()) {
             logDebug("Is URL file");
-            String localPath = getLocalFile(context, node.getName(), node.getSize());
+            String localPath = getLocalFile(node);
             
             if (localPath != null) {
                 File f = new File(localPath);
@@ -633,7 +633,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("HANDLE", node.getHandle());
 
-            String localPath = getLocalFile(context, node.getName(), node.getSize());
+            String localPath = getLocalFile(node);
             if (localPath != null) {
                 File mediaFile = new File(localPath);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

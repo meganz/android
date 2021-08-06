@@ -1341,7 +1341,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 						mediaIntent.putExtra("parentNodeHandle", megaApiFolder.getParentNode(nodes.get(position)).getHandle());
 					}
 
-					String localPath = getLocalFile(this, file.getName(), file.getSize());
+					String localPath = getLocalFile(file);
 
 					MegaApiAndroid api = dbH.getCredentials() != null ? megaApi : megaApiFolder;
 
@@ -1385,7 +1385,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					pdfIntent.putExtra("APP", true);
 					pdfIntent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
 
-					String localPath = getLocalFile(this, file.getName(), file.getSize());
+					String localPath = getLocalFile(file);
 
 					MegaApiAndroid api = dbH.getCredentials() != null ? megaApi : megaApiFolder;
 

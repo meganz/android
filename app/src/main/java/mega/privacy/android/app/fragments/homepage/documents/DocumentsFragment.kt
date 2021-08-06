@@ -437,7 +437,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             return
         }
 
-        val localPath = FileUtil.getLocalFile(context, node.name, node.size)
+        val localPath = FileUtil.getLocalFile(node)
 
         if (MimeTypeList.typeForName(node.name).isPdf) {
             val intent = Intent(context, PdfViewerActivityLollipop::class.java)

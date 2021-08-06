@@ -700,7 +700,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 			mediaIntent.putExtra("FILENAME", file.getName());
 
-			String localPath = getLocalFile(context, file.getName(), file.getSize());
+			String localPath = getLocalFile(file);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);
@@ -784,7 +784,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			logDebug("Is URL file");
 			MegaNode file = node;
 
-			String localPath = getLocalFile(context, file.getName(), file.getSize());
+			String localPath = getLocalFile(file);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);
@@ -869,7 +869,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			pdfIntent.putExtra("inside", true);
 			pdfIntent.putExtra("adapterType", FILE_BROWSER_ADAPTER);
 
-			String localPath = getLocalFile(context, file.getName(), file.getSize());
+			String localPath = getLocalFile(file);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);

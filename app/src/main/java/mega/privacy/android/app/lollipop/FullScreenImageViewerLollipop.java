@@ -236,7 +236,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 	boolean isDownloaded(MegaNode node) {
 		logDebug("Node Handle: " + node.getHandle());
 
-		return getLocalFile(this, node.getName(), node.getSize()) != null;
+		return getLocalFile(node) != null;
 	}
 
 	@Override
