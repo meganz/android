@@ -35,10 +35,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Stack;
 
 import javax.inject.Inject;
@@ -50,12 +48,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.SearchNodesTask;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.NewHeaderItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
-import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -117,8 +113,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 	private int orderParent = megaApi.ORDER_DEFAULT_ASC;
 	private int order = megaApi.ORDER_DEFAULT_ASC;
-
-	private NewHeaderItemDecoration headerItemDecoration;
 
 	private SearchNodesTask searchNodesTask;
 	private ProgressBar searchProgressBar;
@@ -905,10 +899,6 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 	public FastScroller getFastScroller() {
 	    return fastScroller;
     }
-
-	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
-		this.headerItemDecoration = headerItemDecoration;
-	}
 
 	public boolean isFolderEmpty() {
 		return adapter == null || adapter.getItemCount() <= 0;

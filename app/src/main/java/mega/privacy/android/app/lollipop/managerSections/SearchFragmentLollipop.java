@@ -61,7 +61,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.SearchNodesTask;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.NewHeaderItemDecoration;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -122,10 +122,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 
 	private boolean allFiles = true;
 	private String downloadLocationDefaultPath;
-
-    private int placeholderCount;
-
-	private NewHeaderItemDecoration headerItemDecoration;
 
 	private SearchNodesTask searchNodesTask;
 	private RelativeLayout contentLayout;
@@ -474,62 +470,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			}
 		}
 	}
-
-    public void addSectionTitle(List<MegaNode> nodes,int type) {
-        Map<Integer, String> sections = new HashMap<>();
-        int folderCount = 0;
-        int fileCount = 0;
-        for (MegaNode node : nodes) {
-            if(node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-            if (node.isFile()) {
-                fileCount++;
-            }
-        }
-
-        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
-            int spanCount = 2;
-            if (recyclerView instanceof NewGridRecyclerView) {
-                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
-            }
-            if(folderCount > 0) {
-                for (int i = 0;i < spanCount;i++) {
-                    sections.put(i, getString(R.string.general_folders));
-                }
-            }
-
-            if(fileCount > 0 ) {
-                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
-                if (placeholderCount == 0) {
-                    for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + i, getString(R.string.general_files));
-                    }
-                } else {
-                    for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
-                    }
-                }
-            }
-        } else {
-            placeholderCount = 0;
-            sections.put(0, context.getString(R.string.general_folders));
-            sections.put(folderCount, context.getString(R.string.general_files));
-        }
-		if (headerItemDecoration == null) {
-			logDebug("Create new decoration");
-			headerItemDecoration = new NewHeaderItemDecoration(context);
-		} else {
-			logDebug("Remove old decoration");
-			recyclerView.removeItemDecoration(headerItemDecoration);
-		}
-		headerItemDecoration.setType(type);
-		headerItemDecoration.setKeys(sections);
-		recyclerView.addItemDecoration(headerItemDecoration);
-    }
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -564,6 +504,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
 			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -726,7 +667,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
                     //Put flag to notify FullScreenImageViewerLollipop.
-                    intent.putExtra("placeholder", placeholderCount);
+                    intent.putExtra("placeholder", adapter.getPlaceholderCount());
 					intent.putExtra("position", position);
 					intent.putExtra("searchQuery", ((ManagerActivityLollipop)context).getSearchQuery());
 					intent.putExtra("adapterType", SEARCH_ADAPTER);
@@ -768,7 +709,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
 						mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 					}
-                    mediaIntent.putExtra("placeholder", placeholderCount);
+                    mediaIntent.putExtra("placeholder", adapter.getPlaceholderCount());
 					mediaIntent.putExtra("position", position);
 					mediaIntent.putExtra("searchQuery", ((ManagerActivityLollipop)context).getSearchQuery());
 					mediaIntent.putExtra("adapterType", SEARCH_ADAPTER);
@@ -1178,7 +1119,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			return;
 		}
 
-		addSectionTitle(nodes, adapter.getAdapterType());
 		adapter.setNodes(nodes);
 		visibilityFastScroller();
 
@@ -1281,10 +1221,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				fastScroller.setVisibility(View.VISIBLE);
 			}
 		}
-	}
-
-	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
-		this.headerItemDecoration = headerItemDecoration;
 	}
 
 	/**

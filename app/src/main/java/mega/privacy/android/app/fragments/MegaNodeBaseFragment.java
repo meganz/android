@@ -443,6 +443,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         if (mimeType.isImage()) {
             internalIntent = true;
             intent = new Intent(context, FullScreenImageViewerLollipop.class);
+            intent.putExtra("placeholder", adapter.getPlaceholderCount());
             intent.putExtra("position", position);
             intent.putExtra("adapterType", fragmentAdapter);
             intent.putExtra("isFolderLink", false);
@@ -463,6 +464,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             }
 
             intent.putExtra("position", position);
+            intent.putExtra("placeholder", adapter.getPlaceholderCount());
             intent.putExtra("parentNodeHandle", getParentHandle(fragmentAdapter));
             intent.putExtra("orderGetChildren", getIntentOrder(fragmentAdapter));
             intent.putExtra("adapterType", fragmentAdapter);
