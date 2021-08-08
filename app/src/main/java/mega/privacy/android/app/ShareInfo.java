@@ -39,6 +39,9 @@ import static mega.privacy.android.app.utils.LogUtil.*;
  */
 public class ShareInfo implements Serializable {
 
+	private static final String APP_PRIVATE_DIR1 = "/data/data/mega.privacy.android.app";
+	private static final String APP_PRIVATE_DIR2 = "/data/user/0/mega.privacy.android.app";
+
 	public String title = null;
 	private long lastModified;
 	public transient InputStream inputStream = null;
@@ -145,6 +148,12 @@ public class ShareInfo implements Serializable {
 //				}
 				return null;
 			}
+
+			if (isPathInsecure(dataUri.getPath())) {
+				logWarning("Data uri is insecure");
+				return null;
+			}
+
 			shareInfo.processUri(dataUri, context);
 		}
 		if (shareInfo.file == null) {
@@ -156,6 +165,11 @@ public class ShareInfo implements Serializable {
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
 		result.add(shareInfo);
 		return result;
+	}
+
+	private static boolean isPathInsecure(String path) {
+		return path.contains("../") || path.contains(APP_PRIVATE_DIR1)
+				|| path.contains(APP_PRIVATE_DIR2);
 	}
 	
 	/*
