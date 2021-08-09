@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import mega.privacy.android.app.getLink.GetLinkActivity.Companion.GET_LINK_FRAGMENT
+import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.databinding.FragmentCopyrightBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.interfaces.GetLinkInterface
 
-class CopyrightFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment() {
+class CopyrightFragment : BaseFragment() {
+
+    private val viewModel: GetLinkViewModel by activityViewModels()
 
     private lateinit var binding: FragmentCopyrightBinding
 
@@ -23,16 +24,19 @@ class CopyrightFragment(private val getLinkInterface: GetLinkInterface) : BaseFr
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setupView()
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun setupView() {
         binding.agreeButton.setOnClickListener {
-            dbH.setShowCopyright(false)
-            getLinkInterface.showFragment(GET_LINK_FRAGMENT)
+            viewModel.updateShowCopyRight(false)
+            requireActivity().onBackPressed()
         }
 
         binding.disagreeButton.setOnClickListener {
-            dbH.setShowCopyright(true)
+            viewModel.updateShowCopyRight(true)
             activity?.finish()
         }
-
-        super.onViewCreated(view, savedInstanceState)
     }
 }

@@ -264,7 +264,6 @@ public class Constants {
     public static final String ACTION_SHARE_MSG = "ACTION_SHARE_MSG";
     public static final String ACTION_SHARE_NODE = "ACTION_SHARE_NODE";
     public static final String ACTION_REMOVE_LINK = "ACTION_REMOVE_LINK";
-    public static final String ACTION_GET_LINK = "ACTION_GET_LINK";
 
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";

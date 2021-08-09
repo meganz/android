@@ -7,53 +7,43 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
+import androidx.activity.viewModels
+import androidx.lifecycle.Observer
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
+import mega.privacy.android.app.constants.EventConstants.EVENT_COPY_LINK_TO_CLIPBOARD
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
-import mega.privacy.android.app.interfaces.GetLinkInterface
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.LinksUtil.getKeyLink
-import mega.privacy.android.app.utils.LinksUtil.getLinkWithoutKey
+import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaNode
 import java.util.*
 
-class GetLinkActivity : PasscodeActivity(), GetLinkInterface, SnackbarShower {
+class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     companion object {
-        const val GET_LINK_FRAGMENT = 0
-        const val COPYRIGHT_FRAGMENT = 1
-        const val DECRYPTION_KEY_FRAGMENT = 2
-        const val PASSWORD_FRAGMENT = 3
-
-        const val COPY_LINK = 0
-        const val COPY_KEY = 1
-        const val COPY_PASSWORD = 2
-
         const val SHARE = 0
         const val SEND_TO_CHAT = 1
     }
 
+    private val viewModel: GetLinkViewModel by viewModels()
+
     private lateinit var binding: GetLinkActivityLayoutBinding
+    private lateinit var navController: NavController
 
-    private lateinit var linkFragmentTitle: String
-    private lateinit var linkFragment: LinkFragment
-    private lateinit var copyrightFragment: CopyrightFragment
-    private lateinit var decryptionKeyFragment: DecryptionKeyFragment
-    private lateinit var passwordFragment: LinkPasswordFragment
+    private var menu: Menu? = null
 
-    private lateinit var node: MegaNode
-    private lateinit var linkWithoutKey: String
-    private lateinit var key: String
-    private var linkWithPassword: String? = null
-    private var passwordLink: String? = null
-
-    private var visibleFragment = COPYRIGHT_FRAGMENT
+    private val copyLinkObserver = Observer<Pair<String, String>> { copyInfo ->
+        copyToClipboard(copyInfo)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,227 +54,86 @@ class GetLinkActivity : PasscodeActivity(), GetLinkInterface, SnackbarShower {
             return
         }
 
+        setupView()
+        setupObservers()
+    }
+
+    override fun onDestroy() {
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_COPY_LINK_TO_CLIPBOARD)
+            .removeObserver(copyLinkObserver as Observer<Any>)
+
+        super.onDestroy()
+    }
+
+    private fun setupView() {
         val handle = intent.getLongExtra(HANDLE, INVALID_HANDLE)
         if (handle == INVALID_HANDLE) {
             finish()
             return
         }
 
-        setLink(handle)
+        viewModel.setLink(handle)
 
         binding.toolbarGetLink.visibility = GONE
         setSupportActionBar(binding.toolbarGetLink)
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        visibleFragment =
-            if (dbH.showCopyright.toBoolean() && (megaApi.publicLinks == null || megaApi.publicLinks.size == 0)) COPYRIGHT_FRAGMENT
-            else GET_LINK_FRAGMENT
-
-        showFragment(visibleFragment)
+        setupNavController()
     }
 
-    override fun showFragment(visibleFragment: Int) {
-        this.visibleFragment = visibleFragment
+    private fun setupObservers() {
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_COPY_LINK_TO_CLIPBOARD)
+            .observeForever(copyLinkObserver as Observer<Any>)
+    }
 
-        val ft = supportFragmentManager.beginTransaction()
+    private fun setupNavController() {
+        navController =
+            (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+                .navController
 
-        when (visibleFragment) {
-            GET_LINK_FRAGMENT -> {
-                if (!this::linkFragmentTitle.isInitialized) {
-                    linkFragmentTitle =
-                        if (node.isExported) getString(R.string.edit_link_option).toUpperCase(
-                            Locale.getDefault()
-                        )
-                        else getString(R.string.context_get_link_menu).toUpperCase(
-                            Locale.getDefault()
-                        )
+        navController.addOnDestinationChangedListener { _, _, _ ->
+            when (navController.currentDestination?.id) {
+                R.id.main_get_link -> {
+                    supportActionBar?.apply {
+                        title = viewModel.getLinkFragmentTitle()
+                        show()
+                    }
                 }
-
-                supportActionBar?.title = linkFragmentTitle
-                supportActionBar?.show()
-
-                if (!this::linkFragment.isInitialized) {
-                    linkFragment = LinkFragment(this)
+                R.id.copyright -> supportActionBar?.hide()
+                R.id.decryption_key -> {
+                    supportActionBar?.title =
+                        StringResourcesUtils.getString(R.string.option_decryption_key)
+                            .toUpperCase(Locale.getDefault())
                 }
-
-                ft.replace(R.id.fragment_container_get_link, linkFragment)
+                R.id.password -> {
+                    supportActionBar?.title = StringResourcesUtils.getString(
+                        if (viewModel.getLinkPassword() == null) R.string.set_password_protection_dialog
+                        else R.string.reset_password_label
+                    ).toUpperCase(Locale.getDefault())
+                }
             }
-            COPYRIGHT_FRAGMENT -> {
-                supportActionBar?.hide()
 
-                if (!this::copyrightFragment.isInitialized) {
-                    copyrightFragment = CopyrightFragment(this)
-                }
-
-                ft.replace(R.id.fragment_container_get_link, copyrightFragment)
-            }
-            DECRYPTION_KEY_FRAGMENT -> {
-                supportActionBar?.title = getString(R.string.option_decryption_key).toUpperCase(
-                    Locale.getDefault()
-                )
-
-                if (!this::decryptionKeyFragment.isInitialized) {
-                    decryptionKeyFragment = DecryptionKeyFragment()
-                }
-
-                ft.replace(R.id.fragment_container_get_link, decryptionKeyFragment)
-            }
-            PASSWORD_FRAGMENT -> {
-                supportActionBar?.title =
-                    if (linkWithPassword == null) getString(R.string.set_password_protection_dialog).toUpperCase(
-                        Locale.getDefault()
-                    ) else getString(R.string.reset_password_label).toUpperCase(
-                        Locale.getDefault()
-                    )
-
-                if (!this::passwordFragment.isInitialized) {
-                    passwordFragment = LinkPasswordFragment(this)
-                }
-
-                ft.replace(R.id.fragment_container_get_link, passwordFragment)
-            }
+            refreshMenuOptionsVisibility()
         }
 
-        ft.commitNowAllowingStateLoss()
-        invalidateOptionsMenu()
-    }
-
-    override fun getNode(): MegaNode {
-        return node
-    }
-
-    override fun getLinkWithoutKey(): String {
-        return linkWithoutKey
-    }
-
-    override fun getLinkKey(): String {
-        return key
-    }
-
-    override fun copyLink(link: String) {
-        copyToClipboard(link, COPY_LINK)
-    }
-
-    override fun copyLinkKey() {
-        copyToClipboard(key, COPY_KEY)
-    }
-
-    override fun copyLinkPassword() {
-        if (isTextEmpty(passwordLink)) {
-            return
+        if (viewModel.shouldShowCopyright()) {
+            navController.navigate(R.id.copyright)
         }
-
-        copyToClipboard(passwordLink!!, COPY_PASSWORD)
-    }
-
-    override fun showUpgradeToProWarning() {
-        val upgradeToProDialogBuilder = MaterialAlertDialogBuilder(
-            this,
-            R.style.ThemeOverlay_Mega_MaterialAlertDialog
-        )
-
-        upgradeToProDialogBuilder.setTitle(R.string.upgrade_pro)
-            .setMessage(getString(R.string.link_upgrade_pro_explanation) + "\n")
-            .setCancelable(false)
-            .setPositiveButton(R.string.button_plans_almost_full_warning) { _, _ ->
-                navigateToUpgradeAccount()
-                finish()
-            }
-            .setNegativeButton(R.string.verify_account_not_now_button) { dialog, _ ->
-                dialog.dismiss()
-            }
-
-        upgradeToProDialogBuilder.create().show()
-    }
-
-    override fun getLinkWithPassword(): String? {
-        return linkWithPassword
-    }
-
-    override fun getLinkPassword(): String? {
-        return passwordLink
-    }
-
-    override fun removeLinkWithPassword() {
-        linkWithPassword = null
-        passwordLink = null
-    }
-
-    override fun setLinkPassword(passwordLink: String) {
-        this.passwordLink = passwordLink
     }
 
     /**
      * Copies a link, decryption key or password into clipboard and shows a snackbar.
      *
-     * @param textToCopy The content to copy.
-     * @param type       The type of content to copy. It can be: COPY_KEY, COPY_PASSWORD or COPY_LINK.
+     * @param copyInfo First is the  content to copy, second the text to show as confirmation.
      */
-    private fun copyToClipboard(textToCopy: String, type: Int) {
+    private fun copyToClipboard(copyInfo: Pair<String, String>) {
         val clipManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, textToCopy)
+        val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, copyInfo.first)
         clipManager.setPrimaryClip(clip)
 
-        showSnackbar(
-            SNACKBAR_TYPE, getString(
-                when (type) {
-                    COPY_KEY -> R.string.key_copied_clipboard
-                    COPY_PASSWORD -> R.string.password_copied_clipboard
-                    else -> R.string.link_copied_clipboard
-                }
-            ), MEGACHAT_INVALID_HANDLE
-        )
-    }
-
-    /**
-     * Launches an intent to share the link outside the app.
-     *
-     * @param link The link to share.
-     */
-    private fun shareLink(link: String) {
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = PLAIN_TEXT_SHARE_TYPE
-        intent.putExtra(Intent.EXTRA_TEXT, link)
-        startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)))
-    }
-
-    /**
-     * Updates the node from which the link is getting or managing, its link and key separately.
-     * Updates the UI of linkFragment.
-     */
-    fun setLink() {
-        setLink(node.handle)
-        linkFragment.updateLink()
-    }
-
-    /**
-     * Updates the node from which the link is getting or managing.
-     * Gets the link without its decryption key and the key separately if the node
-     * it's already exported.
-     */
-    fun setLink(handle: Long) {
-        node = megaApi.getNodeByHandle(handle)
-
-        if (node.isExported) {
-            invalidateOptionsMenu()
-            linkWithoutKey = getLinkWithoutKey(node.publicLink)
-            key = getKeyLink(node.publicLink)
-        }
-    }
-
-    /**
-     * Finish the action of set or reset the password protection, updates the UI resetting the set
-     * passwordFragment view and showing again the linkFragment view with the password protection
-     * enabled.
-     *
-     * @param linkWithPassword Link with password protection.
-     */
-    fun setLinkWithPassword(linkWithPassword: String) {
-        this.linkWithPassword = linkWithPassword
-        passwordFragment.resetView()
-        showFragment(GET_LINK_FRAGMENT)
-        linkFragment.updatePasswordLayouts()
+        showSnackbar(SNACKBAR_TYPE, copyInfo.second, MEGACHAT_INVALID_HANDLE)
     }
 
     /**
@@ -300,117 +149,78 @@ class GetLinkActivity : PasscodeActivity(), GetLinkInterface, SnackbarShower {
 
         shareKeyDialogBuilder.setMessage(
             getString(
-                if (!isTextEmpty(linkWithPassword)) R.string.share_password_warning
+                if (!isTextEmpty(viewModel.getLinkPassword())) R.string.share_password_warning
                 else R.string.share_key_warning
             ) + "\n"
         )
             .setCancelable(false)
             .setPositiveButton(
-                if (!isTextEmpty(linkWithPassword)) R.string.button_share_password
+                if (!isTextEmpty(viewModel.getLinkPassword())) R.string.button_share_password
                 else R.string.button_share_key
             ) { _, _ ->
                 if (type == SHARE) {
-                    shareLink(getLinkAndKeyOrPasswordToShare())
+                    viewModel.shareLinkAndKeyOrPassword { intent -> startActivity(intent) }
                 } else if (type == SEND_TO_CHAT) {
-                    sendToChat(data, getLinkToShare(), true)
+                    viewModel.sendLinkToChat(data, true) { intent ->
+                        handleActivityResult(intent)
+                    }
                 }
             }
             .setNegativeButton(R.string.general_dismiss) { _, _ ->
                 if (type == SHARE) {
-                    shareLink(getLinkToShare())
+                    viewModel.shareCompleteLink { intent -> startActivity(intent) }
                 } else if (type == SEND_TO_CHAT) {
-                    sendToChat(data, getLinkToShare(), false)
+                    viewModel.sendLinkToChat(data, false) { intent ->
+                        handleActivityResult(intent)
+                    }
                 }
             }
 
         shareKeyDialogBuilder.create().show()
     }
 
-    /**
-     * Gets the string containing the link without its key and its key separately or the link
-     * protected with password and the password depending on the current enabled option.
-     *
-     * @return The string with the info described.
-     */
-    private fun getLinkAndKeyOrPasswordToShare(): String {
-        return if (!isTextEmpty(linkWithPassword)) getString(
-            R.string.share_link_with_password,
-            linkWithPassword,
-            passwordLink
-        )
-        else getString(
-            R.string.share_link_with_key,
-            getLinkWithoutKey(node.publicLink),
-            getKeyLink(node.publicLink)
-        )
-    }
-
-    /**
-     * Gets the link to share depending on the current enabled option. It can be:
-     * - The link along with its decryption key
-     * - The link without the decryption key
-     * - The link along with its decryption key and with password protection
-     *
-     * @return The string with the info described.
-     */
-    private fun getLinkToShare(): String {
-        return if (!isTextEmpty(linkWithPassword)) linkWithPassword!!
-        else if (linkFragment.isSendDecryptedKeySeparatelyEnabled()) getLinkWithoutKey(node.publicLink)
-        else node.publicLink
-    }
-
-    /**
-     * Checks if should show the warning to share the decryption key or password protection.
-     *
-     * @return True if password protection or send decryption key separately option is enabled.
-     *         False otherwise.
-     */
-    private fun shouldShowShareKeyOrPasswordDialog(): Boolean {
-        return !isTextEmpty(linkWithPassword) || linkFragment.isSendDecryptedKeySeparatelyEnabled()
-    }
-
-    /**
-     * Shares the link and extra content if enabled (decryption key or password) to chat.
-     *
-     * @param data                      Intent containing the info to share the content to chats.
-     * @param link                      The link to share.
-     * @param shouldAttachKeyOrPassword True if should share the decryption key or password. False otherwise.
-     */
-    private fun sendToChat(data: Intent?, link: String, shouldAttachKeyOrPassword: Boolean) {
-        data?.putExtra(EXTRA_LINK, link)
-
-        if (shouldAttachKeyOrPassword) {
-            if (!isTextEmpty(linkWithPassword)) {
-                data?.putExtra(EXTRA_PASSWORD, passwordLink)
-            } else {
-                data?.putExtra(EXTRA_KEY, getKeyLink(node.publicLink))
-            }
-        }
-
-        MegaAttacher(this).handleActivityResult(REQUEST_CODE_SELECT_CHAT, RESULT_OK, data, this)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
-            if (shouldShowShareKeyOrPasswordDialog()) {
+            if (viewModel.shouldShowShareKeyOrPasswordDialog()) {
                 showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
             } else {
-                sendToChat(data, node.publicLink, false)
+                viewModel.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
+                    handleActivityResult(intent)
+                }
             }
         }
     }
 
+    private fun handleActivityResult(data: Intent?) {
+        MegaAttacher(this).handleActivityResult(
+            REQUEST_CODE_SELECT_CHAT,
+            RESULT_OK,
+            data,
+            this
+        )
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_get_link, menu)
+        this.menu = menu
 
-        val visible = node.isExported && visibleFragment == GET_LINK_FRAGMENT
-
-        menu?.findItem(R.id.action_share)?.isVisible = visible
-        menu?.findItem(R.id.action_chat)?.isVisible = visible
+        refreshMenuOptionsVisibility()
 
         return super.onCreateOptionsMenu(menu)
+    }
+
+    /**
+     * Sets the right Toolbar options depending on current situation.
+     */
+    private fun refreshMenuOptionsVisibility() {
+        val menu = this.menu ?: return
+
+        when (navController.currentDestination?.id) {
+            R.id.main_get_link -> menu.toggleAllMenuItemsVisibility(true)
+            else -> menu.toggleAllMenuItemsVisibility(false)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -419,10 +229,10 @@ class GetLinkActivity : PasscodeActivity(), GetLinkInterface, SnackbarShower {
                 onBackPressed()
             }
             R.id.action_share -> {
-                if (shouldShowShareKeyOrPasswordDialog()) {
+                if (viewModel.shouldShowShareKeyOrPasswordDialog()) {
                     showShareKeyOrPasswordDialog(SHARE, null)
                 } else {
-                    shareLink(node.publicLink)
+                    viewModel.shareLink { intent -> startActivity(intent) }
                 }
             }
             R.id.action_chat -> {
@@ -438,15 +248,19 @@ class GetLinkActivity : PasscodeActivity(), GetLinkInterface, SnackbarShower {
 
     override fun onBackPressed() {
         if (psaWebBrowser.consumeBack()) return
-        if (visibleFragment == DECRYPTION_KEY_FRAGMENT || visibleFragment == PASSWORD_FRAGMENT) {
-            if (visibleFragment == PASSWORD_FRAGMENT) {
-                passwordFragment.resetView()
-            }
 
-            showFragment(GET_LINK_FRAGMENT)
-        } else {
+        if (!navController.navigateUp()) {
             finish()
         }
+//        if (visibleFragment == DECRYPTION_KEY_FRAGMENT || visibleFragment == PASSWORD_FRAGMENT) {
+//            if (visibleFragment == PASSWORD_FRAGMENT) {
+//                passwordFragment.resetView()
+//            }
+//
+//            showFragment(GET_LINK_FRAGMENT)
+//        } else {
+//            finish()
+//        }
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

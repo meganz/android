@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/get_link"
+    app:startDestination="@id/main_get_link">
+
+    <fragment
+        android:id="@+id/main_get_link"
+        android:name="mega.privacy.android.app.getLink.LinkFragment"
+        android:label=""
+        tools:layout="@layout/fragment_get_link">
+
+        <action
+            android:id="@+id/learn_more"
+            app:destination="@id/decryption_key" />
+
+        <action
+            android:id="@+id/reset_password"
+            app:destination="@id/password" />
+
+        <action
+            android:id="@+id/set_password"
+            app:destination="@id/password" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/copyright"
+        android:name="mega.privacy.android.app.getLink.CopyrightFragment"
+        android:label=""
+        tools:layout="@layout/fragment_copyright"/>
+
+    <fragment
+        android:id="@+id/decryption_key"
+        android:name="mega.privacy.android.app.getLink.DecryptionKeyFragment"
+        android:label=""
+        tools:layout="@layout/fragment_decryption_key" />
+
+    <fragment
+        android:id="@+id/password"
+        android:name="mega.privacy.android.app.getLink.LinkPasswordFragment"
+        android:label=""
+        tools:layout="@layout/fragment_set_link_password" />
+
+</navigation>

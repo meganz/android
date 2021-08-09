@@ -22,9 +22,9 @@ class PasswordLinkListener(context: Context) : BaseListener(context) {
                 return
             }
 
-            if (context is GetLinkActivity) {
-                (context as GetLinkActivity).setLinkWithPassword(request.text)
-            }
+//            if (context is GetLinkActivity) {
+//                (context as GetLinkActivity).setLinkWithPassword(request.text)
+//            }
         } else {
             logError("Error encrypting link: " + getTranslatedErrorString(e))
         }

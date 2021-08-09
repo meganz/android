@@ -12,15 +12,16 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentSetLinkPasswordBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.interfaces.GetLinkInterface
-import mega.privacy.android.app.listeners.PasswordLinkListener
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import nz.mega.sdk.MegaApiJava
 
-class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment() {
+class LinkPasswordFragment : BaseFragment() {
+
+    private val viewModel: GetLinkViewModel by activityViewModels()
 
     private lateinit var binding: FragmentSetLinkPasswordBinding
 
@@ -129,7 +130,7 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
 
         binding.buttonConfirmPassword.setOnClickListener { confirmClick() }
         binding.buttonConfirmPassword.text = getString(
-            if (isTextEmpty(getLinkInterface.getLinkPassword())) R.string.button_set
+            if (isTextEmpty(viewModel.getLinkPassword())) R.string.button_set
             else R.string.action_reset
         )
 
@@ -336,14 +337,7 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
      */
     private fun confirmClick() {
         if (validateForm()) {
-            val password = binding.passwordText.text.toString();
-            getLinkInterface.setLinkPassword(password)
-
-            megaApi.encryptLinkWithPassword(
-                getLinkInterface.getNode().publicLink,
-                password,
-                PasswordLinkListener(context)
-            )
+            viewModel.encryptLink(binding.passwordText.text.toString())
         }
     }
 

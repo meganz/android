@@ -14,15 +14,15 @@ import android.view.ViewGroup
 import android.widget.DatePicker
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.getLink.GetLinkActivity.Companion.DECRYPTION_KEY_FRAGMENT
-import mega.privacy.android.app.getLink.GetLinkActivity.Companion.PASSWORD_FRAGMENT
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.interfaces.GetLinkInterface
-import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
@@ -30,14 +30,11 @@ import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap
 import mega.privacy.android.app.utils.Util.*
-import nz.mega.sdk.MegaAccountDetails.ACCOUNT_TYPE_FREE
-import nz.mega.sdk.MegaNode
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment(),
-    DatePickerDialog.OnDateSetListener {
+class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener {
 
     companion object {
         private const val ALPHA_VIEW_DISABLED = 0.3f
@@ -46,16 +43,9 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         private const val LAST_MINUTE = "2359"
     }
 
+    private val viewModel: GetLinkViewModel by activityViewModels()
+
     private lateinit var binding: FragmentGetLinkBinding
-
-    private lateinit var linkWithKey: String
-    private lateinit var linkWithoutKey: String
-    private lateinit var key: String
-
-    private var isPro = false
-    private lateinit var node: MegaNode
-
-    private lateinit var nC: NodeController
 
     private var passwordVisible = false
 
@@ -69,13 +59,9 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        isPro = app.myAccountInfo.accountType > ACCOUNT_TYPE_FREE
-
-        node = getLinkInterface.getNode()
-
-        nC = NodeController(activity)
-
         setThumbnail()
+
+        val node = viewModel.getNode()
         binding.nodeName.text = node.name
         binding.nodeInfo.text =
             if (node.isFolder) getMegaNodeFolderInfo(node)
@@ -83,18 +69,14 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
 
         binding.learnMoreTextButton.setOnClickListener {
             checkIfShouldHidePassword()
-            getLinkInterface.showFragment(
-                DECRYPTION_KEY_FRAGMENT
-            )
+            findNavController().navigate(R.id.decryption_key)
         }
 
         binding.passwordProtectionSetToggle.setOnClickListener { toggleClick() }
 
         binding.resetPasswordButton.setOnClickListener {
             checkIfShouldHidePassword()
-            getLinkInterface.showFragment(
-                PASSWORD_FRAGMENT
-            )
+            findNavController().navigate(R.id.password)
         }
 
         binding.removePasswordButton.setOnClickListener { removePasswordClick() }
@@ -104,32 +86,32 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
 
         binding.copyLinkButton.setOnClickListener {
             checkIfShouldHidePassword()
-            val linkWithPassword = getLinkInterface.getLinkWithPassword()
-
-            getLinkInterface.copyLink(
-                if (binding.decryptedKeySwitch.isChecked) linkWithoutKey
-                else if (!isTextEmpty(linkWithPassword)) linkWithPassword!!
-                else linkWithKey
-            )
+            viewModel.copyLink()
         }
 
-        binding.copyKeyButton.setOnClickListener { getLinkInterface.copyLinkKey() }
+        binding.copyKeyButton.setOnClickListener { viewModel.copyLinkKey() }
+
         binding.copyKeyButton.visibility = GONE
 
         binding.copyPasswordButton.setOnClickListener {
             checkIfShouldHidePassword()
-            getLinkInterface.copyLinkPassword()
+            viewModel.copyLinkPassword()
         }
 
-        updateLink()
+        viewModel.updateLink()
+        setAvailableLayouts()
 
         if (!node.isExported) {
-            nC.exportLink(node)
+            viewModel.export()
         } else {
-            updateLinkText()
+            updateLinkText(viewModel.getLinkTextValue())
         }
 
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun setupView() {
+
     }
 
     override fun onResume() {
@@ -143,22 +125,16 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
      */
     private fun removePasswordClick() {
         checkIfShouldHidePassword()
-        getLinkInterface.removeLinkWithPassword()
+        viewModel.removeLinkWithPassword()
         updatePasswordLayouts()
-        updateLinkText()
+        updateLinkText(viewModel.getLinkTextValue())
     }
 
     /**
      * Updates the text of the link depending on the enabled options.
      */
-    private fun updateLinkText() {
-        val linkWithPassword = getLinkInterface.getLinkWithPassword();
-
-        binding.linkText.text =
-            if (!getLinkInterface.getNode().isExported) getString(R.string.link_request_status)
-            else if (binding.decryptedKeySwitch.isChecked) linkWithoutKey
-            else if (!isTextEmpty(linkWithPassword)) linkWithPassword
-            else linkWithKey
+    private fun updateLinkText(text: String) {
+        binding.linkText.text = text
     }
 
     /**
@@ -166,6 +142,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
      */
     private fun setThumbnail() {
         var thumb: Bitmap? = null
+        val node = viewModel.getNode()
 
         if (node.isFolder) {
             binding.nodeThumbnail.setImageDrawable(
@@ -202,6 +179,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
      * and if the node is exported or not.
      */
     private fun setAvailableLayouts() {
+        val node = viewModel.getNode()
         val alpha = if (node.isExported) ALPHA_VIEW_ENABLED else ALPHA_VIEW_DISABLED
 
         binding.decryptedKeyLayout.alpha = alpha
@@ -210,8 +188,13 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
 
         if (node.isExported) {
             binding.decryptedKeyLayout.setOnClickListener { sendDecryptedKeySeparatelyClick(false) }
-            binding.decryptedKeySwitch.setOnClickListener { sendDecryptedKeySeparatelyClick(true) }
-            binding.decryptedKeySwitch.isEnabled = true
+            binding.decryptedKeySwitch.apply {
+                setOnClickListener { sendDecryptedKeySeparatelyClick(true) }
+                isEnabled = true
+                setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.updateSendDecryptedKeySeparatelyEnabled(isChecked)
+                }
+            }
 
             binding.expiryDateLayout.setOnClickListener { setExpiryDateClick(false) }
             binding.expiryDateSwitch.setOnClickListener { setExpiryDateClick(true) }
@@ -245,7 +228,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
 
         updatePasswordLayouts()
 
-        if (isPro) {
+        if (viewModel.isPro()) {
             binding.expiryDateProOnlyText.visibility = GONE
 
             binding.passwordProtectionProOnlyText.visibility = GONE
@@ -263,7 +246,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
      */
     private fun getExpiredDateText(): String {
         val df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault())
-        val cal = calculateDateFromTimestamp(node.expirationTime)
+        val cal = calculateDateFromTimestamp(viewModel.getNode().expirationTime)
         val tz = cal.timeZone
         df.timeZone = tz
         val date = cal.time
@@ -280,7 +263,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
             binding.decryptedKeySwitch.isChecked = !binding.decryptedKeySwitch.isChecked
         }
 
-        if (binding.decryptedKeySwitch.isChecked && !isTextEmpty(getLinkInterface.getLinkWithPassword())) {
+        if (binding.decryptedKeySwitch.isChecked && !isTextEmpty(viewModel.getLinkWithPasswordText())) {
             removePasswordClick()
         }
 
@@ -297,9 +280,9 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         binding.keySeparator.visibility = visibility
         binding.copyKeyButton.visibility = visibility
 
-        updateLinkText()
+        updateLinkText(viewModel.getLinkTextValue())
 
-        binding.keyText.text = if (binding.decryptedKeySwitch.isChecked) key else null
+        binding.keyText.text = if (binding.decryptedKeySwitch.isChecked) viewModel.getLinkKey() else null
     }
 
     /**
@@ -309,13 +292,15 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
      */
     private fun setExpiryDateClick(isSwitchClick: Boolean) {
         checkIfShouldHidePassword()
+        val node = viewModel.getNode()
+        val isPro = viewModel.isPro()
 
         if (!isPro || (isSwitchClick && node.expirationTime <= 0)) {
             binding.expiryDateSwitch.isChecked = false
         }
 
         if (!isPro) {
-            getLinkInterface.showUpgradeToProWarning()
+            showUpgradeToProWarning()
             return
         }
 
@@ -325,14 +310,37 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
                 text = null
             }
 
-            nC.exportLink(node)
+            viewModel.export()
         } else {
             showDatePicker()
         }
     }
 
+    private fun showUpgradeToProWarning() {
+        val upgradeToProDialogBuilder = MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        )
+
+        upgradeToProDialogBuilder.setTitle(R.string.upgrade_pro)
+            .setMessage(getString(R.string.link_upgrade_pro_explanation) + "\n")
+            .setCancelable(false)
+            .setPositiveButton(R.string.button_plans_almost_full_warning) { _, _ ->
+                (requireActivity() as BaseActivity).apply {
+                    navigateToUpgradeAccount()
+                    finish()
+                }
+            }
+            .setNegativeButton(R.string.verify_account_not_now_button) { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        upgradeToProDialogBuilder.create().show()
+    }
+
     @SuppressLint("RestrictedApi")
     private fun showDatePicker() {
+        val node = viewModel.getNode()
         val calendar =
             if (node.expirationTime == INVALID_EXPIRATION_TIME) Calendar.getInstance()
             else calculateDateFromTimestamp(node.expirationTime)
@@ -341,9 +349,11 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        val datePickerDialog = MaterialStyledDatePickerDialog(context,
+        val datePickerDialog = MaterialStyledDatePickerDialog(
+            context,
             R.style.Widget_Mega_DatePickerDialog,
-            this, year, month, day)
+            this, year, month, day
+        )
         datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
         datePickerDialog.show()
     }
@@ -352,11 +362,11 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
      * Manages the click on set password protection option.
      */
     private fun setPasswordProtectionClick() {
-        if (isPro) {
+        if (viewModel.isPro()) {
             checkIfShouldHidePassword()
-            getLinkInterface.showFragment(PASSWORD_FRAGMENT)
+            findNavController().navigate(R.id.password)
         } else {
-            getLinkInterface.showUpgradeToProWarning()
+            showUpgradeToProWarning()
         }
     }
 
@@ -364,7 +374,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
      * Updates the UI of password protection option.
      */
     fun updatePasswordLayouts() {
-        val password = getLinkInterface.getLinkPassword();
+        val password = viewModel.getLinkPassword();
         val isPasswordSet = !isTextEmpty(password)
         val visibility = if (isPasswordSet) VISIBLE else GONE
 
@@ -385,7 +395,7 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
 
         binding.copyPasswordButton.visibility = visibility
 
-        if (isPasswordSet || !node.isExported) {
+        if (isPasswordSet || !viewModel.getNode().isExported) {
             binding.passwordProtectionLayout.setOnClickListener(null)
         } else {
             binding.passwordProtectionLayout.setOnClickListener { setPasswordProtectionClick() }
@@ -420,24 +430,6 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         passwordVisible = !passwordVisible
     }
 
-    fun updateLink() {
-        node = getLinkInterface.getNode()
-
-        if (node.isExported) {
-            linkWithKey = node.publicLink
-            linkWithoutKey = getLinkInterface.getLinkWithoutKey()
-            key = getLinkInterface.getLinkKey()
-
-            updateLinkText()
-        }
-
-        setAvailableLayouts()
-    }
-
-    fun isSendDecryptedKeySeparatelyEnabled(): Boolean {
-        return binding.decryptedKeySwitch.isChecked
-    }
-
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
         val cal = Calendar.getInstance()
         cal.set(year, month, dayOfMonth)
@@ -447,6 +439,6 @@ class LinkFragment(private val getLinkInterface: GetLinkInterface) : BaseFragmen
         val dateString = dfTimestamp.format(date) + LAST_MINUTE
         val timestamp = calculateTimestamp(dateString).toInt()
 
-        nC.exportLinkTimestamp(node, timestamp)
+        viewModel.exportWithTimestamp(timestamp)
     }
 }
