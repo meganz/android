@@ -297,7 +297,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         inside = intent.getBooleanExtra("inside", false);
 
         if (!inside) {
-            disablePasscode();
+            MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
         }
 
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
@@ -571,7 +571,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             }
         }
         else {
-            disablePasscode();
+            MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
             currentPage = 1;

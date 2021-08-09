@@ -29,12 +29,6 @@ open class PasscodeActivity : BaseActivity() {
      */
     private var isScreenRotation = false
 
-    /**
-     * Used to disable passcode.
-     * E.g.: PdfViewerActivityLollipop when it is opened from outside the app.
-     */
-    private var isDisabled = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,20 +47,12 @@ open class PasscodeActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
 
-        if (isDisabled) {
-            return
-        }
-
         passcodeUtil.pause()
         lastStart = System.currentTimeMillis()
     }
 
     override fun onResume() {
         super.onResume()
-
-        if (isDisabled) {
-            return
-        }
 
         setAppFontSize(this)
 
@@ -81,9 +67,5 @@ open class PasscodeActivity : BaseActivity() {
         ) {
             JobUtil.startCameraUploadServiceIgnoreAttr(this@PasscodeActivity)
         }
-    }
-
-    protected fun disablePasscode() {
-        isDisabled = true
     }
 }
