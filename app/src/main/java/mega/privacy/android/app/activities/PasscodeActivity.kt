@@ -47,7 +47,7 @@ open class PasscodeActivity : BaseActivity() {
     override fun onPause() {
         super.onPause()
 
-        passcodeUtil.pause()
+        passcodeUtil.pauseUpdate()
         lastStart = System.currentTimeMillis()
     }
 

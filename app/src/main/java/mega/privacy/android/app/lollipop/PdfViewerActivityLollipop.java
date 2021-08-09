@@ -947,17 +947,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         }
     }
 
-    public void backToCloud(long handle){
-        logDebug("Handle: "+handle);
-        Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
-        if(handle!=-1){
-            startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startIntent.setAction(ACTION_OPEN_FOLDER);
-            startIntent.putExtra("PARENT_HANDLE", handle);
-        }
-        startActivity(startIntent);
-    }
-
     public  void setToolbarVisibilityShow () {
         logDebug("setToolbarVisibilityShow");
         toolbarVisible = true;
@@ -2035,12 +2024,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             }
             updateFile();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        logDebug("onPause");
     }
 
     @Override

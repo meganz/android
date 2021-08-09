@@ -441,7 +441,7 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun confirmUnlockPasscode() {
         if (sbFirst.toString() == dbH.preferences.passcodeLockCode) {
-            passcodeUtil.update()
+            passcodeUtil.pauseUpdate()
             resetAttempts()
             finish()
         } else {
