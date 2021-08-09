@@ -15,7 +15,7 @@ object AlertDialogUtil {
     fun isAlertDialogShown(dialog: AlertDialog?): Boolean = dialog?.isShowing == true
 
     @JvmStatic
-    fun dismissAlertDialogIfShown(dialog: AlertDialog?) {
+    fun dismissAlertDialogIfExists(dialog: AlertDialog?) {
         dialog?.dismiss()
     }
 

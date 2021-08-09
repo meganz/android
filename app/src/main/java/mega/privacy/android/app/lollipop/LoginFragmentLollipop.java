@@ -95,7 +95,7 @@ import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
-import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfShown;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
@@ -2331,7 +2331,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         closeCancelDialog();
-        dismissAlertDialogIfShown(changeApiServerDialog);
+        dismissAlertDialogIfExists(changeApiServerDialog);
         super.onDestroy();
     }
 
