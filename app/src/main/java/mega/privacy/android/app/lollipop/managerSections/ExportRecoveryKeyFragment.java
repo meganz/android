@@ -10,14 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -28,7 +26,6 @@ import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickListener{
 
@@ -78,6 +75,12 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
 
         saveMK = v.findViewById(R.id.save_MK_button);
         saveMK.setOnClickListener(this);
+
+        saveMK.post(() -> {
+            float saveTextSize = saveMK.getTextSize();
+            copyMK.setTextSize(TypedValue.COMPLEX_UNIT_PX, saveTextSize);
+            printMK.setTextSize(TypedValue.COMPLEX_UNIT_PX, saveTextSize);
+        });
 
         return v;
     }

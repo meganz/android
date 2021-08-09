@@ -2,7 +2,8 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:id="@+id/export_MK_fragment_container"
@@ -78,7 +79,7 @@
                 android:layout_below="@id/action_export_MK_layout"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
-                android:gravity="start"
+                android:gravity="start|center_vertical"
                 android:orientation="horizontal">
 
                 <Button
@@ -105,7 +106,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:text="@string/save_action"
-                    android:textSize="14sp" />
+                    android:maxLines="1"
+                    app:autoSizeMaxTextSize="14sp"
+                    app:autoSizeMinTextSize="8sp"
+                    app:autoSizeStepGranularity="1sp"
+                    app:autoSizeTextType="uniform" />
             </LinearLayout>
 
         </RelativeLayout>
