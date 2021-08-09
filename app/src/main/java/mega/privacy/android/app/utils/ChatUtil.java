@@ -1542,7 +1542,7 @@ public class ChatUtil {
             return;
         }
 
-        String path = getLocalFile(context, node.getName(), node.getSize());
+        String path = getLocalFile(node);
         if (!isTextEmpty(path)) {
             logDebug("Node is downloaded, so share the file");
             shareFile(context, new File(path));

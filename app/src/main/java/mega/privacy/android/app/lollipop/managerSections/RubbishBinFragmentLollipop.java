@@ -731,7 +731,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 						mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
 
-					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					String localPath = getLocalFile(file);
 
 					if (localPath != null){
 						File mediaFile = new File(localPath);
@@ -801,7 +801,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("APP", true);
 
-					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					String localPath = getLocalFile(file);
 
 					if (localPath != null){
 						File mediaFile = new File(localPath);
@@ -853,7 +853,7 @@ public class RubbishBinFragmentLollipop extends Fragment{
 					logDebug("Is URL file");
 					MegaNode file = nodes.get(position);
 
-					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					String localPath = getLocalFile(file);
 
 					if (localPath != null) {
 						File mediaFile = new File(localPath);

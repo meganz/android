@@ -5151,7 +5151,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @return  The Uri if success, null otherwise.
      */
     private Uri getUri(MegaNode node) {
-        String localPath = getLocalFile(context, node.getName(), node.getSize());
+        String localPath = getLocalFile(node);
         if (localPath != null) {
             return UriUtil.getUriForFile(new File(localPath));
         } else {

@@ -307,7 +307,7 @@ public class MegaChatFullScreenImageAdapter extends PagerAdapter implements OnCl
 				drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 			}
 
-			String localPath = getLocalFile(context, node.getName(), node.getSize());
+			String localPath = getLocalFile(node);
 
             if (localPath != null) {
                 loadGif(holder.gifImgDisplay, pb, drawable, UriUtil.getUriForFile(new File(localPath)));

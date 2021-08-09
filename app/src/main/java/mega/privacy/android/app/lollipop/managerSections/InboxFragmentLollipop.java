@@ -637,7 +637,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			mediaIntent.putExtra("FILENAME", file.getName());
 			mediaIntent.putExtra("adapterType", INBOX_ADAPTER);
 
-			String localPath = getLocalFile(context, file.getName(), file.getSize());
+			String localPath = getLocalFile(file);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);
@@ -697,7 +697,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			pdfIntent.putExtra("inside", true);
 			pdfIntent.putExtra("adapterType", INBOX_ADAPTER);
 
-			String localPath = getLocalFile(context, file.getName(), file.getSize());
+			String localPath = getLocalFile(file);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);
@@ -744,7 +744,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			logDebug("Is URL file");
 			MegaNode file = node;
 
-			String localPath = getLocalFile(context, file.getName(), file.getSize());
+			String localPath = getLocalFile(file);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);

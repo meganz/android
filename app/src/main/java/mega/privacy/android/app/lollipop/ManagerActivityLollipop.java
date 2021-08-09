@@ -311,7 +311,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
 	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
-	private static final String DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE = "DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE";
+	private static final String BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE = "BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE";
 
     private static final String BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN";
 	private static final String BUSINESS_CU_ALERT_SHOWN = "BUSINESS_CU_ALERT_SHOWN";
@@ -638,7 +638,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private SMSVerificationFragment svF;
 
 	private boolean mStopped = true;
-	private DrawerItem drawerItemBeforeOpenFullscreenOffline = null;
+	private int bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
 	private OfflineFragment fullscreenOfflineFragment;
 	private OfflineFragment pagerOfflineFragment;
 	private RecentsFragment pagerRecentsFragment;
@@ -1298,8 +1298,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
-		outState.putSerializable(DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
-				drawerItemBeforeOpenFullscreenOffline);
+		outState.putInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
+				bottomItemBeforeOpenFullscreenOffline);
 		outState.putSerializable(SEARCH_DRAWER_ITEM, searchDrawerItem);
 		outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
 		outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
@@ -1457,8 +1457,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
 			askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
-			drawerItemBeforeOpenFullscreenOffline
-					= (DrawerItem) savedInstanceState.getSerializable(DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE);
+			bottomItemBeforeOpenFullscreenOffline = savedInstanceState.getInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE);
 			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
 			searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
@@ -4977,11 +4976,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void fullscreenOfflineFragmentClosed(OfflineFragment fragment) {
 		if (fragment == fullscreenOfflineFragment) {
-			if (drawerItemBeforeOpenFullscreenOffline != null && !mStopped) {
-				if (drawerItem != drawerItemBeforeOpenFullscreenOffline) {
-					selectDrawerItemLollipop(drawerItemBeforeOpenFullscreenOffline);
-				}
-				drawerItemBeforeOpenFullscreenOffline = null;
+			if (bottomItemBeforeOpenFullscreenOffline != INVALID_VALUE && !mStopped) {
+				backToDrawerItem(bottomItemBeforeOpenFullscreenOffline);
+				bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
 			}
 
 			setPathNavigationOffline("/");
@@ -8332,7 +8329,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case R.id.offline_section: {
 				sectionClicked = true;
-				drawerItemBeforeOpenFullscreenOffline = drawerItem;
+				bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem;
 				openFullscreenOfflineFragment(getPathNavigationOffline());
 				break;
 			}

@@ -319,23 +319,29 @@ public class FileUtil {
     }
 
     /**
-     * Checks if a local file exists
+     * Checks if the received MegaNode exists in local.
      *
-     * @param context  the current context
-     * @param fileName name of the file
-     * @param fileSize size of the file
-     * @return The path of the file if the local file exists, null otherwise
+     * @param node MegaNode to check.
+     * @return The path of the file if the local file exists, null otherwise.
      */
-    public static String getLocalFile(Context context, String fileName, long fileSize) {
-        if (context == null) {
-            context = MegaApplication.getInstance();
+    public static String getLocalFile(MegaNode node) {
+        if (node == null) {
+            logWarning("Node is null");
+            return null;
         }
 
+        String path;
+        Context context = MegaApplication.getInstance();
         String data = MediaStore.Files.FileColumns.DATA;
         final String[] projection = {data};
-        final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND " + MediaStore.Files.FileColumns.SIZE + " = ?";
-        final String[] selectionArgs = {fileName, String.valueOf(fileSize)};
-        String path;
+        final String selection = MediaStore.Files.FileColumns.DISPLAY_NAME + " = ? AND "
+                + MediaStore.Files.FileColumns.SIZE + " = ? AND "
+                + MediaStore.Files.FileColumns.DATE_MODIFIED + " = ?";
+
+        final String[] selectionArgs = {
+                node.getName(),
+                String.valueOf(node.getSize()),
+                String.valueOf(node.getModificationTime())};
 
         try {
             Cursor cursor = context.getContentResolver().query(
@@ -343,6 +349,7 @@ public class FileUtil {
                     selectionArgs, null);
 
             path = checkFileInStorage(cursor, data);
+
             if (path == null) {
                 cursor = context.getContentResolver().query(
                         MediaStore.Files.getContentUri(VOLUME_INTERNAL), projection, selection,
