@@ -37,22 +37,22 @@ class GetLinkViewModel @ViewModelInject constructor(
 ) : BaseRxViewModel() {
 
     private val linkText: MutableLiveData<String> = MutableLiveData()
-    private val linkWithPassword: MutableLiveData<String> = MutableLiveData()
+    private val password: MutableLiveData<String> = MutableLiveData()
     private val expiryDate: MutableLiveData<String> = MutableLiveData()
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
 
     private lateinit var linkFragmentTitle: String
     private lateinit var node: MegaNode
+    private var linkWithPassword: String? = null
     private lateinit var linkWithoutKey: String
     private lateinit var key: String
-    private var passwordLink: String? = null
     private var isSendDecryptedKeySeparatelyEnabled = false
 
     fun getLink(): LiveData<String> = linkText
     fun getLinkText(): String = linkText.value ?: ""
 
-    fun getLinkWithPassword(): LiveData<String> = linkWithPassword
-    fun getLinkWithPasswordText(): String = linkWithPassword.value ?: ""
+    fun getPassword(): LiveData<String> = password
+    fun getPasswordText(): String? = password.value
 
     fun getExpiryDate(): LiveData<String> = expiryDate
 
@@ -77,6 +77,15 @@ class GetLinkViewModel @ViewModelInject constructor(
     fun getLinkWithoutKey(): String = linkWithoutKey
 
     fun getLinkKey(): String = key
+
+    private fun resetLinkWithPassword() {
+        password.value = null
+        linkWithPassword = null
+    }
+
+    fun getLinkWithPassword(): String? = linkWithPassword
+
+    fun isPasswordSet(): Boolean = !linkWithPassword.isNullOrEmpty()
 
     fun export() {
         exportNodeUseCase.export(node)
@@ -109,7 +118,7 @@ class GetLinkViewModel @ViewModelInject constructor(
             Pair(
                 when {
                     isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
-                    !isTextEmpty(getLinkWithPasswordText()) -> getLinkWithPasswordText()
+                    !linkWithPassword.isNullOrEmpty() -> linkWithPassword
                     else -> node.publicLink
                 }, getString(R.string.link_copied_clipboard)
             )
@@ -122,25 +131,16 @@ class GetLinkViewModel @ViewModelInject constructor(
     }
 
     fun copyLinkPassword() {
-        if (isTextEmpty(passwordLink)) {
+        if (linkWithPassword.isNullOrEmpty()) {
             return
         }
         LiveEventBus.get(EVENT_COPY_LINK_TO_CLIPBOARD, Pair::class.java)
-            .post(Pair(key, getString(R.string.password_copied_clipboard)))
-    }
-
-    fun getLinkPassword(): String? {
-        return passwordLink
+            .post(Pair(getPasswordText(), getString(R.string.password_copied_clipboard)))
     }
 
     fun removeLinkWithPassword() {
-        linkWithPassword.value = null
-        passwordLink = null
+        resetLinkWithPassword()
         updateLink()
-    }
-
-    fun setLinkPassword(passwordLink: String) {
-        this.passwordLink = passwordLink
     }
 
     fun shouldShowCopyright(): Boolean =
@@ -158,6 +158,11 @@ class GetLinkViewModel @ViewModelInject constructor(
     fun isPro(): Boolean =
         MegaApplication.getInstance().myAccountInfo.accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE
 
+    fun initNode(handle: Long) {
+        updateLink(handle)
+        resetLinkWithPassword()
+    }
+
     /**
      * Updates the node from which the link is getting or managing.
      * Gets the link without its decryption key and the key separately if the node
@@ -165,7 +170,7 @@ class GetLinkViewModel @ViewModelInject constructor(
      *
      * @param handle The identifier of the MegaNode from which the link has to be managed.
      */
-    fun updateLink(handle: Long) {
+    private fun updateLink(handle: Long) {
         node = megaApi.getNodeByHandle(handle)
 
         if (node.isExported) {
@@ -186,7 +191,7 @@ class GetLinkViewModel @ViewModelInject constructor(
         linkText.value = when {
             !node.isExported -> getString(R.string.link_request_status)
             isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
-            !isTextEmpty(getLinkWithPasswordText()) -> getLinkWithPasswordText()
+            !linkWithPassword.isNullOrEmpty() -> linkWithPassword
             else -> node.publicLink
         }
     }
@@ -209,20 +214,6 @@ class GetLinkViewModel @ViewModelInject constructor(
         intent.type = Constants.PLAIN_TEXT_SHARE_TYPE
         intent.putExtra(Intent.EXTRA_TEXT, link ?: node.publicLink)
         action.invoke(Intent.createChooser(intent, getString(R.string.context_get_link)))
-    }
-
-    /**
-     * Finish the action of set or reset the password protection, updates the UI resetting the set
-     * passwordFragment view and showing again the linkFragment view with the password protection
-     * enabled.
-     *
-     * @param linkWithPassword Link with password protection.
-     */
-    fun setLinkWithPassword(linkWithPassword: String) {
-        this.linkWithPassword.value = linkWithPassword
-//        passwordFragment.resetView()
-//        showFragment(GetLinkActivity.GET_LINK_FRAGMENT)
-//        linkFragment.updatePasswordLayouts()
     }
 
     fun sendLinkToChat(
@@ -249,8 +240,8 @@ class GetLinkViewModel @ViewModelInject constructor(
         data?.putExtra(Constants.EXTRA_LINK, link ?: node.publicLink)
 
         if (shouldAttachKeyOrPassword) {
-            if (!isTextEmpty(getLinkWithPasswordText())) {
-                data?.putExtra(Constants.EXTRA_PASSWORD, passwordLink)
+            if (!linkWithPassword.isNullOrEmpty()) {
+                data?.putExtra(Constants.EXTRA_PASSWORD, linkWithPassword)
             } else {
                 data?.putExtra(Constants.EXTRA_KEY, LinksUtil.getKeyLink(node.publicLink))
             }
@@ -266,10 +257,10 @@ class GetLinkViewModel @ViewModelInject constructor(
      * @return The string with the info described.
      */
     private fun getLinkAndKeyOrPasswordToShare(): String =
-        if (!isTextEmpty(getLinkPassword())) getString(
+        if (!linkWithPassword.isNullOrEmpty()) getString(
             R.string.share_link_with_password,
-            getLinkPassword(),
-            getLinkPassword()
+            linkWithPassword,
+            getPasswordText()
         )
         else getString(
             R.string.share_link_with_key,
@@ -286,7 +277,7 @@ class GetLinkViewModel @ViewModelInject constructor(
      * @return The string with the info described.
      */
     fun getLinkToShare(): String = when {
-        !isTextEmpty(getLinkWithPasswordText()) -> getLinkWithPasswordText()!!
+        !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
         isSendDecryptedKeySeparatelyEnabled -> LinksUtil.getLinkWithoutKey(node.publicLink)
         else -> node.publicLink
     }
@@ -298,15 +289,18 @@ class GetLinkViewModel @ViewModelInject constructor(
      *         False otherwise.
      */
     fun shouldShowShareKeyOrPasswordDialog(): Boolean =
-        !isTextEmpty(getLinkWithPasswordText()) || isSendDecryptedKeySeparatelyEnabled
+        !linkWithPassword.isNullOrEmpty() || isSendDecryptedKeySeparatelyEnabled
 
-    fun encryptLink(passwordLink: String) {
-        setLinkPassword(passwordLink)
-        encryptLinkWithPasswordUseCase.encrypt(node.publicLink, passwordLink)
+    fun encryptLink(password: String) {
+        encryptLinkWithPasswordUseCase.encrypt(node.publicLink, password)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { link -> linkWithPassword.value = link },
+                onSuccess = { link ->
+                    this.password.value = password
+                    this.linkWithPassword = link
+                    updateLink()
+                },
                 onError = { error ->
                     logWarning(error.message)
                 }

@@ -80,7 +80,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
-        viewModel.updateLink(handle)
+        viewModel.initNode(handle)
 
         setSupportActionBar(binding.toolbarGetLink)
         supportActionBar?.apply {
@@ -120,7 +120,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                 }
                 R.id.password -> {
                     supportActionBar?.title = StringResourcesUtils.getString(
-                        if (viewModel.getLinkPassword() == null) R.string.set_password_protection_dialog
+                        if (viewModel.getPasswordText().isNullOrEmpty()) R.string.set_password_protection_dialog
                         else R.string.reset_password_label
                     ).toUpperCase(Locale.getDefault())
                 }
@@ -183,13 +183,13 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
         shareKeyDialogBuilder.setMessage(
             getString(
-                if (!isTextEmpty(viewModel.getLinkPassword())) R.string.share_password_warning
+                if (viewModel.isPasswordSet()) R.string.share_password_warning
                 else R.string.share_key_warning
             ) + "\n"
         )
             .setCancelable(false)
             .setPositiveButton(
-                if (!isTextEmpty(viewModel.getLinkPassword())) R.string.button_share_password
+                if (viewModel.isPasswordSet()) R.string.button_share_password
                 else R.string.button_share_key
             ) { _, _ ->
                 if (type == SHARE) {
@@ -286,15 +286,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         if (!navController.navigateUp()) {
             finish()
         }
-//        if (visibleFragment == DECRYPTION_KEY_FRAGMENT || visibleFragment == PASSWORD_FRAGMENT) {
-//            if (visibleFragment == PASSWORD_FRAGMENT) {
-//                passwordFragment.resetView()
-//            }
-//
-//            showFragment(GET_LINK_FRAGMENT)
-//        } else {
-//            finish()
-//        }
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

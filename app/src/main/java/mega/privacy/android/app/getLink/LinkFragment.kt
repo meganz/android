@@ -84,14 +84,14 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
 
         binding.learnMoreTextButton.setOnClickListener {
             checkIfShouldHidePassword()
-            findNavController().navigate(R.id.decryption_key)
+            findNavController().navigate(R.id.learn_more)
         }
 
         binding.passwordProtectionSetToggle.setOnClickListener { toggleClick() }
 
         binding.resetPasswordButton.setOnClickListener {
             checkIfShouldHidePassword()
-            findNavController().navigate(R.id.password)
+            findNavController().navigate(LinkFragmentDirections.setPassword(true))
         }
 
         binding.removePasswordButton.setOnClickListener { removePasswordClick() }
@@ -123,6 +123,7 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
     private fun setupObservers() {
         viewModel.getLink().observe(viewLifecycleOwner, ::updateLinkText)
         viewModel.getExpiryDate().observe(viewLifecycleOwner, ::updateExpiryDate)
+        viewModel.getPassword().observe(viewLifecycleOwner, ::updatePassword)
     }
 
     override fun onResume() {
@@ -137,7 +138,6 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
     private fun removePasswordClick() {
         checkIfShouldHidePassword()
         viewModel.removeLinkWithPassword()
-        updatePasswordLayouts()
     }
 
     /**
@@ -163,6 +163,39 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
             binding.expiryDateSwitch.isChecked = false
             binding.expiryDateSetText.isVisible = false
             binding.expiryDateSetText.text = null
+        }
+    }
+
+    /**
+     * Updates the UI of password protection option.
+     *
+     * @param password The link with password if set, null otherwise.
+     */
+    private fun updatePassword(password: String?) {
+        val isPasswordSet = !isTextEmpty(password)
+        val visibility = if (isPasswordSet) VISIBLE else GONE
+
+        if (isPasswordSet) {
+            if (binding.decryptedKeySwitch.isChecked) {
+                sendDecryptedKeySeparatelyClick(false)
+            }
+
+            binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
+        }
+
+        binding.passwordProtectionSetText.visibility = visibility
+        binding.passwordProtectionSetText.text = if (isPasswordSet) password else null
+        binding.passwordProtectionSetToggle.visibility = visibility
+
+        binding.resetPasswordButton.visibility = visibility
+        binding.removePasswordButton.visibility = visibility
+
+        binding.copyPasswordButton.visibility = visibility
+
+        if (isPasswordSet || !viewModel.getNode().isExported) {
+            binding.passwordProtectionLayout.setOnClickListener(null)
+        } else {
+            binding.passwordProtectionLayout.setOnClickListener { setPasswordProtectionClick() }
         }
     }
 
@@ -244,8 +277,6 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
             binding.copyKeyButton.isVisible = false
         }
 
-        updatePasswordLayouts()
-
         if (viewModel.isPro()) {
             binding.expiryDateProOnlyText.isVisible = false
 
@@ -267,7 +298,7 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
             binding.decryptedKeySwitch.isChecked = !binding.decryptedKeySwitch.isChecked
         }
 
-        if (binding.decryptedKeySwitch.isChecked && !isTextEmpty(viewModel.getLinkWithPasswordText())) {
+        if (binding.decryptedKeySwitch.isChecked && !viewModel.getLinkWithPassword().isNullOrEmpty()) {
             removePasswordClick()
         }
 
@@ -367,41 +398,9 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
     private fun setPasswordProtectionClick() {
         if (viewModel.isPro()) {
             checkIfShouldHidePassword()
-            findNavController().navigate(R.id.password)
+            findNavController().navigate(LinkFragmentDirections.setPassword(false))
         } else {
             showUpgradeToProWarning()
-        }
-    }
-
-    /**
-     * Updates the UI of password protection option.
-     */
-    fun updatePasswordLayouts() {
-        val password = viewModel.getLinkPassword();
-        val isPasswordSet = !isTextEmpty(password)
-        val visibility = if (isPasswordSet) VISIBLE else GONE
-
-        if (isPasswordSet) {
-            if (binding.decryptedKeySwitch.isChecked) {
-                sendDecryptedKeySeparatelyClick(false)
-            }
-
-            binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
-        }
-
-        binding.passwordProtectionSetText.visibility = visibility
-        binding.passwordProtectionSetText.text = if (isPasswordSet) password else null
-        binding.passwordProtectionSetToggle.visibility = visibility
-
-        binding.resetPasswordButton.visibility = visibility
-        binding.removePasswordButton.visibility = visibility
-
-        binding.copyPasswordButton.visibility = visibility
-
-        if (isPasswordSet || !viewModel.getNode().isExported) {
-            binding.passwordProtectionLayout.setOnClickListener(null)
-        } else {
-            binding.passwordProtectionLayout.setOnClickListener { setPasswordProtectionClick() }
         }
     }
 

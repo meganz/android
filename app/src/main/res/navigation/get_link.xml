@@ -16,10 +16,6 @@
             app:destination="@id/decryption_key" />
 
         <action
-            android:id="@+id/reset_password"
-            app:destination="@id/password" />
-
-        <action
             android:id="@+id/set_password"
             app:destination="@id/password" />
 
@@ -41,6 +37,13 @@
         android:id="@+id/password"
         android:name="mega.privacy.android.app.getLink.LinkPasswordFragment"
         android:label=""
-        tools:layout="@layout/fragment_set_link_password" />
+        tools:layout="@layout/fragment_set_link_password" >
+
+        <argument
+            android:name="isReset"
+            app:argType="boolean"
+            android:defaultValue="false"/>
+
+    </fragment>
 
 </navigation>

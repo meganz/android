@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.navArgs
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentSetLinkPasswordBinding
@@ -23,11 +24,17 @@ import nz.mega.sdk.MegaApiJava
 
 class LinkPasswordFragment : BaseFragment(), Scrollable {
 
+    companion object {
+        private const val ALREADY_RESET = "ALREADY_RESET"
+    }
+
     private val viewModel: GetLinkViewModel by activityViewModels()
+    private val args: LinkPasswordFragmentArgs by navArgs()
 
     private lateinit var binding: FragmentSetLinkPasswordBinding
 
     private var isPasswordValid = false
+    private var alreadyReset = false
 
     private val veryWeakShape by lazy {
         ContextCompat.getDrawable(
@@ -57,8 +64,15 @@ class LinkPasswordFragment : BaseFragment(), Scrollable {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        alreadyReset = savedInstanceState?.getBoolean(ALREADY_RESET, false) ?: false
         setupView()
+        setupObservers()
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(ALREADY_RESET, alreadyReset)
+        super.onSaveInstanceState(outState)
     }
 
     private fun setupView() {
@@ -112,11 +126,26 @@ class LinkPasswordFragment : BaseFragment(), Scrollable {
 
         binding.buttonConfirmPassword.setOnClickListener { confirmClick() }
         binding.buttonConfirmPassword.text = getString(
-            if (isTextEmpty(viewModel.getLinkPassword())) R.string.button_set
+            if (!viewModel.isPasswordSet()) R.string.button_set
             else R.string.action_reset
         )
 
-        binding.buttonCancel.setOnClickListener { cancelClick() }
+        binding.buttonCancel.setOnClickListener {
+            resetView()
+            requireActivity().onBackPressed()
+        }
+    }
+
+    private fun setupObservers() {
+        viewModel.getPassword().observe(viewLifecycleOwner, ::onPasswordSet)
+    }
+
+    private fun onPasswordSet(password: String?) {
+        resetView()
+        
+        if (!password.isNullOrEmpty() && (!args.isReset || alreadyReset)) {
+            requireActivity().onBackPressed()
+        }
     }
 
     /**
@@ -317,16 +346,9 @@ class LinkPasswordFragment : BaseFragment(), Scrollable {
      */
     private fun confirmClick() {
         if (validateForm()) {
+            alreadyReset = true
             viewModel.encryptLink(binding.passwordText.text.toString())
         }
-    }
-
-    /**
-     * Manages the click on cancel button by resetting the screen.
-     */
-    private fun cancelClick() {
-        resetView()
-        activity?.onBackPressed()
     }
 
     /**
