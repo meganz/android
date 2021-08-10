@@ -23,9 +23,9 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.isDarkMode
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -35,18 +35,29 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     companion object {
         const val SHARE = 0
         const val SEND_TO_CHAT = 1
+
+        private const val TYPE_NODE = 1
+        private const val TYPE_LIST = 2
     }
 
-    private val viewModel: GetLinkViewModel by viewModels()
+    private val viewModelNode: GetLinkViewModel by viewModels()
+    private val viewModelList: GetSeveralLinksViewModel by viewModels()
 
     private lateinit var binding: GetLinkActivityLayoutBinding
     private lateinit var navController: NavController
 
     private var menu: Menu? = null
 
-    private val transparentColor by lazy { ContextCompat.getColor(this, android.R.color.transparent) }
+    private val transparentColor by lazy {
+        ContextCompat.getColor(
+            this,
+            android.R.color.transparent
+        )
+    }
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
+
+    private var viewType = TYPE_NODE
 
     private val copyLinkObserver = Observer<Pair<String, String>> { copyInfo ->
         copyToClipboard(copyInfo)
@@ -75,12 +86,21 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
     private fun setupView() {
         val handle = intent.getLongExtra(HANDLE, INVALID_HANDLE)
-        if (handle == INVALID_HANDLE) {
+        val handleList = intent.getLongArrayExtra(HANDLE_LIST)
+
+        if (handle == INVALID_HANDLE && handleList == null) {
+            logError("No extras to manage.")
             finish()
             return
         }
 
-        viewModel.initNode(handle)
+        if (handle != INVALID_HANDLE) {
+            viewModelNode.initNode(handle)
+            viewType = TYPE_NODE
+        } else if (handleList != null) {
+            viewModelList.initNodes(handleList)
+            viewType = TYPE_LIST
+        }
 
         setSupportActionBar(binding.toolbarGetLink)
         supportActionBar?.apply {
@@ -96,19 +116,26 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         LiveEventBus.get(EVENT_COPY_LINK_TO_CLIPBOARD)
             .observeForever(copyLinkObserver as Observer<Any>)
 
-        viewModel.checkElevation().observe(this, ::changeElevation)
+        viewModelNode.checkElevation().observe(this, ::changeElevation)
     }
 
     private fun setupNavController() {
-        navController =
-            (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
-                .navController
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+
+        navHostFragment.navController.graph =
+            navHostFragment.navController.navInflater.inflate(
+                if (viewType == TYPE_LIST) R.navigation.get_several_links
+                else R.navigation.get_link
+            )
+
+        navController = navHostFragment.navController
 
         navController.addOnDestinationChangedListener { _, _, _ ->
             when (navController.currentDestination?.id) {
                 R.id.main_get_link -> {
                     supportActionBar?.apply {
-                        title = viewModel.getLinkFragmentTitle()
+                        title = viewModelNode.getLinkFragmentTitle()
                         if (!isShowing) show()
                     }
                 }
@@ -120,17 +147,25 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                 }
                 R.id.password -> {
                     supportActionBar?.title = StringResourcesUtils.getString(
-                        if (viewModel.getPasswordText().isNullOrEmpty()) R.string.set_password_protection_dialog
+                        if (viewModelNode.getPasswordText()
+                                .isNullOrEmpty()
+                        ) R.string.set_password_protection_dialog
                         else R.string.reset_password_label
                     ).toUpperCase(Locale.getDefault())
+                }
+                R.id.main_get_several_links -> {
+                    supportActionBar?.apply {
+                        title = StringResourcesUtils.getString(R.string.context_get_link_menu)
+                        if (!isShowing) show()
+                    }
                 }
             }
 
             refreshMenuOptionsVisibility()
         }
 
-        if (viewModel.shouldShowCopyright()) {
-            navController.navigate(R.id.copyright)
+        if (viewModelNode.shouldShowCopyright()) {
+            navController.navigate(R.id.show_copyright)
         }
     }
 
@@ -183,28 +218,28 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
         shareKeyDialogBuilder.setMessage(
             getString(
-                if (viewModel.isPasswordSet()) R.string.share_password_warning
+                if (viewModelNode.isPasswordSet()) R.string.share_password_warning
                 else R.string.share_key_warning
             ) + "\n"
         )
             .setCancelable(false)
             .setPositiveButton(
-                if (viewModel.isPasswordSet()) R.string.button_share_password
+                if (viewModelNode.isPasswordSet()) R.string.button_share_password
                 else R.string.button_share_key
             ) { _, _ ->
                 if (type == SHARE) {
-                    viewModel.shareLinkAndKeyOrPassword { intent -> startActivity(intent) }
+                    viewModelNode.shareLinkAndKeyOrPassword { intent -> startActivity(intent) }
                 } else if (type == SEND_TO_CHAT) {
-                    viewModel.sendLinkToChat(data, true) { intent ->
+                    viewModelNode.sendLinkToChat(data, true) { intent ->
                         handleActivityResult(intent)
                     }
                 }
             }
             .setNegativeButton(R.string.general_dismiss) { _, _ ->
                 if (type == SHARE) {
-                    viewModel.shareCompleteLink { intent -> startActivity(intent) }
+                    viewModelNode.shareCompleteLink { intent -> startActivity(intent) }
                 } else if (type == SEND_TO_CHAT) {
-                    viewModel.sendLinkToChat(data, false) { intent ->
+                    viewModelNode.sendLinkToChat(data, false) { intent ->
                         handleActivityResult(intent)
                     }
                 }
@@ -217,10 +252,10 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
-            if (viewModel.shouldShowShareKeyOrPasswordDialog()) {
+            if (viewModelNode.shouldShowShareKeyOrPasswordDialog()) {
                 showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
             } else {
-                viewModel.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
+                viewModelNode.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
                     handleActivityResult(intent)
                 }
             }
@@ -252,7 +287,8 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         val menu = this.menu ?: return
 
         when (navController.currentDestination?.id) {
-            R.id.main_get_link -> menu.toggleAllMenuItemsVisibility(true)
+            R.id.main_get_link, R.id.main_get_several_links ->
+                menu.toggleAllMenuItemsVisibility(true)
             else -> menu.toggleAllMenuItemsVisibility(false)
         }
     }
@@ -263,10 +299,10 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                 onBackPressed()
             }
             R.id.action_share -> {
-                if (viewModel.shouldShowShareKeyOrPasswordDialog()) {
+                if (viewModelNode.shouldShowShareKeyOrPasswordDialog()) {
                     showShareKeyOrPasswordDialog(SHARE, null)
                 } else {
-                    viewModel.shareLink { intent -> startActivity(intent) }
+                    viewModelNode.shareLink { intent -> startActivity(intent) }
                 }
             }
             R.id.action_chat -> {

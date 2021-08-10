@@ -12,6 +12,10 @@
         tools:layout="@layout/fragment_get_link">
 
         <action
+            android:id="@+id/show_copyright"
+            app:destination="@id/copyright" />
+
+        <action
             android:id="@+id/learn_more"
             app:destination="@id/decryption_key" />
 
