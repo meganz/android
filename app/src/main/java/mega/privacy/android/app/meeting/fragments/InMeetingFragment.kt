@@ -578,6 +578,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+    private val floatingWindowObserver = Observer<Boolean> {
+        floatingWindowContainer.visibility = if (it) View.GONE else View.VISIBLE
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -880,6 +884,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_MEETING_INVITE)
             .observe(this, inviteObserver as Observer<Any>)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_MEETING_INCOMPATIBILITY_SHOW)
+            .observeSticky(this, floatingWindowObserver as Observer<Any>)
     }
 
     private fun initToolbar() {
