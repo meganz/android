@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.DatePicker
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
@@ -95,8 +96,8 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
 
         binding.removePasswordButton.setOnClickListener { removePasswordClick() }
 
-        binding.keyLayout.visibility = GONE
-        binding.keySeparator.visibility = GONE
+        binding.keyLayout.isVisible = false
+        binding.keySeparator.isVisible = false
 
         binding.copyLinkButton.setOnClickListener {
             checkIfShouldHidePassword()
@@ -105,7 +106,7 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
 
         binding.copyKeyButton.setOnClickListener { viewModel.copyLinkKey() }
 
-        binding.copyKeyButton.visibility = GONE
+        binding.copyKeyButton.isVisible = false
 
         binding.copyPasswordButton.setOnClickListener {
             checkIfShouldHidePassword()
@@ -121,6 +122,7 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
 
     private fun setupObservers() {
         viewModel.getLink().observe(viewLifecycleOwner, ::updateLinkText)
+        viewModel.getExpiryDate().observe(viewLifecycleOwner, ::updateExpiryDate)
     }
 
     override fun onResume() {
@@ -145,6 +147,23 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
      */
     private fun updateLinkText(text: String) {
         binding.linkText.text = text
+    }
+
+    /**
+     * Updates the expiry date views.
+     *
+     * @param date Text to show as link text.
+     */
+    private fun updateExpiryDate(date: String) {
+        if (date.isNotEmpty()) {
+            binding.expiryDateSwitch.isChecked = true
+            binding.expiryDateSetText.isVisible = true
+            binding.expiryDateSetText.text = date
+        } else {
+            binding.expiryDateSwitch.isChecked = false
+            binding.expiryDateSetText.isVisible = false
+            binding.expiryDateSetText.text = null
+        }
     }
 
     /**
@@ -209,18 +228,7 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
             binding.expiryDateLayout.setOnClickListener { setExpiryDateClick(false) }
             binding.expiryDateSwitch.setOnClickListener { setExpiryDateClick(true) }
             binding.expiryDateSwitch.isEnabled = true
-
-            if (node.expirationTime > 0) {
-                binding.expiryDateSwitch.isChecked = true
-                binding.expiryDateSetText.visibility = VISIBLE
-                binding.expiryDateSetText.text = getExpiredDateText()
-            } else {
-                binding.expiryDateSwitch.isChecked = false
-                binding.expiryDateSetText.visibility = GONE
-                binding.expiryDateSetText.text = null
-            }
-
-            binding.copyLinkButton.visibility = VISIBLE
+            binding.copyLinkButton.isVisible = true
         } else {
             binding.decryptedKeyLayout.setOnClickListener(null)
             binding.decryptedKeySwitch.setOnClickListener(null)
@@ -230,37 +238,23 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
             binding.expiryDateSwitch.setOnClickListener(null)
             binding.expiryDateSwitch.isEnabled = false
 
-            binding.keySeparator.visibility = GONE
+            binding.keySeparator.isVisible = false
 
-            binding.copyLinkButton.visibility = GONE
-            binding.copyKeyButton.visibility = GONE
+            binding.copyLinkButton.isVisible = false
+            binding.copyKeyButton.isVisible = false
         }
 
         updatePasswordLayouts()
 
         if (viewModel.isPro()) {
-            binding.expiryDateProOnlyText.visibility = GONE
+            binding.expiryDateProOnlyText.isVisible = false
 
-            binding.passwordProtectionProOnlyText.visibility = GONE
+            binding.passwordProtectionProOnlyText.isVisible = false
         } else {
-            binding.expiryDateProOnlyText.visibility = VISIBLE
+            binding.expiryDateProOnlyText.isVisible = true
 
-            binding.passwordProtectionProOnlyText.visibility = VISIBLE
+            binding.passwordProtectionProOnlyText.isVisible = true
         }
-    }
-
-    /**
-     * Gets the expired date formatted.
-     *
-     * @return The formatted date.
-     */
-    private fun getExpiredDateText(): String {
-        val df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault())
-        val cal = calculateDateFromTimestamp(viewModel.getNode().expirationTime)
-        val tz = cal.timeZone
-        df.timeZone = tz
-        val date = cal.time
-        return df.format(date)
     }
 
     /**
@@ -315,7 +309,7 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
 
         if (isSwitchClick && node.expirationTime > 0) {
             binding.expiryDateSetText.apply {
-                visibility = GONE
+                isVisible = false
                 text = null
             }
 

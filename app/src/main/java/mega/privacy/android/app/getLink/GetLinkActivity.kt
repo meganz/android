@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View.GONE
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -83,10 +82,12 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
         viewModel.updateLink(handle)
 
-        binding.toolbarGetLink.visibility = GONE
         setSupportActionBar(binding.toolbarGetLink)
-        supportActionBar?.setHomeButtonEnabled(true)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.apply {
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+        }
+
         setupNavController()
     }
 
@@ -108,7 +109,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                 R.id.main_get_link -> {
                     supportActionBar?.apply {
                         title = viewModel.getLinkFragmentTitle()
-                        show()
+                        if (!isShowing) show()
                     }
                 }
                 R.id.copyright -> supportActionBar?.hide()
@@ -153,7 +154,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
             if (darkAndElevation) toolbarElevationColor else transparentColor
         )
 
-        supportActionBar?.elevation = if (withElevation && !isDark) elevation else 0F
+        binding.appBarGetLink.elevation = if (withElevation && !isDark) elevation else 0F
     }
 
     /**

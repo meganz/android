@@ -22,9 +22,11 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
+import java.text.SimpleDateFormat
 import java.util.*
 
 class GetLinkViewModel @ViewModelInject constructor(
@@ -36,6 +38,7 @@ class GetLinkViewModel @ViewModelInject constructor(
 
     private val linkText: MutableLiveData<String> = MutableLiveData()
     private val linkWithPassword: MutableLiveData<String> = MutableLiveData()
+    private val expiryDate: MutableLiveData<String> = MutableLiveData()
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
 
     private lateinit var linkFragmentTitle: String
@@ -50,6 +53,8 @@ class GetLinkViewModel @ViewModelInject constructor(
 
     fun getLinkWithPassword(): LiveData<String> = linkWithPassword
     fun getLinkWithPasswordText(): String = linkWithPassword.value ?: ""
+
+    fun getExpiryDate(): LiveData<String> = expiryDate
 
     fun checkElevation(): LiveData<Boolean> = withElevation
 
@@ -170,6 +175,8 @@ class GetLinkViewModel @ViewModelInject constructor(
         }
 
         updateLink()
+
+        expiryDate.value = if (node.expirationTime > 0) getExpiredDateText() else ""
     }
 
     /**
@@ -305,5 +312,19 @@ class GetLinkViewModel @ViewModelInject constructor(
                 }
             )
             .addTo(composite)
+    }
+
+    /**
+     * Gets the expired date formatted.
+     *
+     * @return The formatted date.
+     */
+    private fun getExpiredDateText(): String {
+        val df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault())
+        val cal = Util.calculateDateFromTimestamp(node.expirationTime)
+        val tz = cal.timeZone
+        df.timeZone = tz
+        val date = cal.time
+        return df.format(date)
     }
 }
