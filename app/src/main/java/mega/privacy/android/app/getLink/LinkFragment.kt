@@ -113,7 +113,13 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
             viewModel.copyLinkPassword()
         }
 
-        setAvailableLayouts()
+        if (viewModel.isPro()) {
+            binding.expiryDateProOnlyText.isVisible = false
+            binding.passwordProtectionProOnlyText.isVisible = false
+        } else {
+            binding.expiryDateProOnlyText.isVisible = true
+            binding.passwordProtectionProOnlyText.isVisible = true
+        }
 
         if (!node.isExported) {
             viewModel.export()
@@ -121,7 +127,7 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
     }
 
     private fun setupObservers() {
-        viewModel.getLink().observe(viewLifecycleOwner, ::updateLinkText)
+        viewModel.getLink().observe(viewLifecycleOwner, ::updateLink)
         viewModel.getExpiryDate().observe(viewLifecycleOwner, ::updateExpiryDate)
         viewModel.getPassword().observe(viewLifecycleOwner, ::updatePassword)
     }
@@ -141,12 +147,48 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
     }
 
     /**
-     * Updates the text of the link depending on the enabled options.
+     * Updates the entire view depending on the enabled options.
      *
      * @param text Text to show as link text.
      */
-    private fun updateLinkText(text: String) {
+    private fun updateLink(text: String) {
         binding.linkText.text = text
+
+        val node = viewModel.getNode()
+        val alpha = if (node.isExported) ALPHA_VIEW_ENABLED else ALPHA_VIEW_DISABLED
+
+        binding.decryptedKeyLayout.alpha = alpha
+        binding.expiryDateLayout.alpha = alpha
+        binding.passwordProtectionLayout.alpha = alpha
+
+        if (node.isExported) {
+            binding.decryptedKeyLayout.setOnClickListener { sendDecryptedKeySeparatelyClick(false) }
+            binding.decryptedKeySwitch.apply {
+                setOnClickListener { sendDecryptedKeySeparatelyClick(true) }
+                isEnabled = true
+                setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.updateSendDecryptedKeySeparatelyEnabled(isChecked)
+                }
+            }
+
+            binding.expiryDateLayout.setOnClickListener { setExpiryDateClick(false) }
+            binding.expiryDateSwitch.setOnClickListener { setExpiryDateClick(true) }
+            binding.expiryDateSwitch.isEnabled = true
+            binding.copyLinkButton.isVisible = true
+        } else {
+            binding.decryptedKeyLayout.setOnClickListener(null)
+            binding.decryptedKeySwitch.setOnClickListener(null)
+            binding.decryptedKeySwitch.isEnabled = false
+
+            binding.expiryDateLayout.setOnClickListener(null)
+            binding.expiryDateSwitch.setOnClickListener(null)
+            binding.expiryDateSwitch.isEnabled = false
+
+            binding.keySeparator.isVisible = false
+
+            binding.copyLinkButton.isVisible = false
+            binding.copyKeyButton.isVisible = false
+        }
     }
 
     /**
@@ -233,58 +275,6 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
             )
         } else {
             binding.nodeThumbnail.setImageResource(typeForName(node.name).iconResourceId)
-        }
-    }
-
-    /**
-     * Sets the options enabled/disabled depending on the type of the account
-     * and if the node is exported or not.
-     */
-    private fun setAvailableLayouts() {
-        val node = viewModel.getNode()
-        val alpha = if (node.isExported) ALPHA_VIEW_ENABLED else ALPHA_VIEW_DISABLED
-
-        binding.decryptedKeyLayout.alpha = alpha
-        binding.expiryDateLayout.alpha = alpha
-        binding.passwordProtectionLayout.alpha = alpha
-
-        if (node.isExported) {
-            binding.decryptedKeyLayout.setOnClickListener { sendDecryptedKeySeparatelyClick(false) }
-            binding.decryptedKeySwitch.apply {
-                setOnClickListener { sendDecryptedKeySeparatelyClick(true) }
-                isEnabled = true
-                setOnCheckedChangeListener { _, isChecked ->
-                    viewModel.updateSendDecryptedKeySeparatelyEnabled(isChecked)
-                }
-            }
-
-            binding.expiryDateLayout.setOnClickListener { setExpiryDateClick(false) }
-            binding.expiryDateSwitch.setOnClickListener { setExpiryDateClick(true) }
-            binding.expiryDateSwitch.isEnabled = true
-            binding.copyLinkButton.isVisible = true
-        } else {
-            binding.decryptedKeyLayout.setOnClickListener(null)
-            binding.decryptedKeySwitch.setOnClickListener(null)
-            binding.decryptedKeySwitch.isEnabled = false
-
-            binding.expiryDateLayout.setOnClickListener(null)
-            binding.expiryDateSwitch.setOnClickListener(null)
-            binding.expiryDateSwitch.isEnabled = false
-
-            binding.keySeparator.isVisible = false
-
-            binding.copyLinkButton.isVisible = false
-            binding.copyKeyButton.isVisible = false
-        }
-
-        if (viewModel.isPro()) {
-            binding.expiryDateProOnlyText.isVisible = false
-
-            binding.passwordProtectionProOnlyText.isVisible = false
-        } else {
-            binding.expiryDateProOnlyText.isVisible = true
-
-            binding.passwordProtectionProOnlyText.isVisible = true
         }
     }
 

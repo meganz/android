@@ -241,9 +241,9 @@ class GetLinkViewModel @ViewModelInject constructor(
 
         if (shouldAttachKeyOrPassword) {
             if (!linkWithPassword.isNullOrEmpty()) {
-                data?.putExtra(Constants.EXTRA_PASSWORD, linkWithPassword)
+                data?.putExtra(Constants.EXTRA_PASSWORD, getPasswordText())
             } else {
-                data?.putExtra(Constants.EXTRA_KEY, LinksUtil.getKeyLink(node.publicLink))
+                data?.putExtra(Constants.EXTRA_KEY, key)
             }
         }
 
@@ -258,15 +258,9 @@ class GetLinkViewModel @ViewModelInject constructor(
      */
     private fun getLinkAndKeyOrPasswordToShare(): String =
         if (!linkWithPassword.isNullOrEmpty()) getString(
-            R.string.share_link_with_password,
-            linkWithPassword,
-            getPasswordText()
+            R.string.share_link_with_password, linkWithPassword, getPasswordText()
         )
-        else getString(
-            R.string.share_link_with_key,
-            LinksUtil.getLinkWithoutKey(node.publicLink),
-            LinksUtil.getKeyLink(node.publicLink)
-        )
+        else getString(R.string.share_link_with_key, linkWithoutKey, key)
 
     /**
      * Gets the link to share depending on the current enabled option. It can be:
@@ -278,7 +272,7 @@ class GetLinkViewModel @ViewModelInject constructor(
      */
     fun getLinkToShare(): String = when {
         !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
-        isSendDecryptedKeySeparatelyEnabled -> LinksUtil.getLinkWithoutKey(node.publicLink)
+        isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
         else -> node.publicLink
     }
 
