@@ -5,10 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentCopyrightBinding
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.interfaces.Scrollable
+import mega.privacy.android.app.utils.Constants
 
-class CopyrightFragment : BaseFragment() {
+class CopyrightFragment : BaseFragment(), Scrollable {
 
     private val viewModel: GetLinkViewModel by activityViewModels()
 
@@ -29,6 +32,12 @@ class CopyrightFragment : BaseFragment() {
     }
 
     private fun setupView() {
+        ListenScrollChangesHelper().addViewToListen(
+            binding.scrollViewCopyright
+        ) { _, _, _, _, _ -> checkScroll() }
+
+        checkScroll()
+
         binding.agreeButton.setOnClickListener {
             viewModel.updateShowCopyRight(false)
             requireActivity().onBackPressed()
@@ -36,7 +45,18 @@ class CopyrightFragment : BaseFragment() {
 
         binding.disagreeButton.setOnClickListener {
             viewModel.updateShowCopyRight(true)
-            activity?.finish()
+            requireActivity().finish()
         }
+    }
+
+    override fun checkScroll() {
+        if (!this::binding.isInitialized) {
+            return
+        }
+
+        val withElevation = binding.scrollViewCopyright
+            .canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
+
+        viewModel.setElevation(withElevation)
     }
 }

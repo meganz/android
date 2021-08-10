@@ -36,20 +36,26 @@ class GetLinkViewModel @ViewModelInject constructor(
 
     private val linkText: MutableLiveData<String> = MutableLiveData()
     private val linkWithPassword: MutableLiveData<String> = MutableLiveData()
+    private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
 
     private lateinit var linkFragmentTitle: String
     private lateinit var node: MegaNode
-    private lateinit var linkWithKey: String
     private lateinit var linkWithoutKey: String
     private lateinit var key: String
     private var passwordLink: String? = null
     private var isSendDecryptedKeySeparatelyEnabled = false
 
-    fun getLinkText(): LiveData<String> = linkText
-    fun getLinkTextValue(): String = linkText.value ?: ""
+    fun getLink(): LiveData<String> = linkText
+    fun getLinkText(): String = linkText.value ?: ""
 
     fun getLinkWithPassword(): LiveData<String> = linkWithPassword
     fun getLinkWithPasswordText(): String = linkWithPassword.value ?: ""
+
+    fun checkElevation(): LiveData<Boolean> = withElevation
+
+    fun setElevation(withElevation: Boolean) {
+        this.withElevation.value = withElevation
+    }
 
     fun getLinkFragmentTitle(): String {
         if (!this::linkFragmentTitle.isInitialized) {
@@ -63,8 +69,6 @@ class GetLinkViewModel @ViewModelInject constructor(
 
     fun getNode(): MegaNode = node
 
-    fun getLinkWithKey(): String = linkWithKey
-
     fun getLinkWithoutKey(): String = linkWithoutKey
 
     fun getLinkKey(): String = key
@@ -74,7 +78,7 @@ class GetLinkViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { setLink() },
+                onSuccess = { updateLink(node.handle) },
                 onError = { error ->
                     logWarning(error.message)
                 }
@@ -87,7 +91,7 @@ class GetLinkViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { setLink() },
+                onSuccess = { updateLink(node.handle) },
                 onError = { error ->
                     logWarning(error.message)
                 }
@@ -101,7 +105,7 @@ class GetLinkViewModel @ViewModelInject constructor(
                 when {
                     isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
                     !isTextEmpty(getLinkWithPasswordText()) -> getLinkWithPasswordText()
-                    else -> linkWithKey
+                    else -> node.publicLink
                 }, getString(R.string.link_copied_clipboard)
             )
         )
@@ -127,6 +131,7 @@ class GetLinkViewModel @ViewModelInject constructor(
     fun removeLinkWithPassword() {
         linkWithPassword.value = null
         passwordLink = null
+        updateLink()
     }
 
     fun setLinkPassword(passwordLink: String) {
@@ -142,46 +147,40 @@ class GetLinkViewModel @ViewModelInject constructor(
 
     fun updateSendDecryptedKeySeparatelyEnabled(enabled: Boolean) {
         isSendDecryptedKeySeparatelyEnabled = enabled
+        updateLink()
     }
 
     fun isPro(): Boolean =
         MegaApplication.getInstance().myAccountInfo.accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE
 
     /**
-     * Updates the node from which the link is getting or managing, its link and key separately.
-     * Updates the UI of linkFragment.
+     * Updates the node from which the link is getting or managing.
+     * Gets the link without its decryption key and the key separately if the node
+     * it's already exported.
+     *
+     * @param handle The identifier of the MegaNode from which the link has to be managed.
      */
-    fun setLink() {
-        setLink(node.handle)
+    fun updateLink(handle: Long) {
+        node = megaApi.getNodeByHandle(handle)
+
+        if (node.isExported) {
+            val link = node.publicLink
+            linkWithoutKey = LinksUtil.getLinkWithoutKey(link)
+            key = LinksUtil.getKeyLink(link)
+        }
+
         updateLink()
     }
 
     /**
-     * Updates the node from which the link is getting or managing.
-     * Gets the link without its decryption key and the key separately if the node
-     * it's already exported.
+     * Updates the text to show as link value.
      */
-    fun setLink(handle: Long) {
-        node = megaApi.getNodeByHandle(handle)
-
-        if (node.isExported) {
-            linkWithoutKey = LinksUtil.getLinkWithoutKey(node.publicLink)
-            key = LinksUtil.getKeyLink(node.publicLink)
-        }
-    }
-
-    fun updateLink() {
-        if (node.isExported) {
-            linkWithKey = node.publicLink
-            linkWithoutKey = getLinkWithoutKey()
-            key = getLinkKey()
-        }
-
+    private fun updateLink() {
         linkText.value = when {
             !node.isExported -> getString(R.string.link_request_status)
             isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
             !isTextEmpty(getLinkWithPasswordText()) -> getLinkWithPasswordText()
-            else -> linkWithKey
+            else -> node.publicLink
         }
     }
 

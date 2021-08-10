@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/get_link_coordinator_layout"
     android:layout_width="match_parent"
@@ -7,20 +7,19 @@
     android:layout_below="@id/toolbar"
     android:fitsSystemWindows="true">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar_get_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar_get_link"
         app:defaultNavHost="true"
         app:navGraph="@navigation/get_link" />
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar_get_link"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="0dp"
-        android:fitsSystemWindows="true"
-        android:minHeight="?attr/actionBarSize" />
-
-</FrameLayout>
+</RelativeLayout>

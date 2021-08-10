@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View.GONE
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -20,10 +21,13 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_COPY_LINK_TO_CLIP
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
+import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.Util.isDarkMode
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.util.*
@@ -40,6 +44,10 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     private lateinit var navController: NavController
 
     private var menu: Menu? = null
+
+    private val transparentColor by lazy { ContextCompat.getColor(this, android.R.color.transparent) }
+    private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+    private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
 
     private val copyLinkObserver = Observer<Pair<String, String>> { copyInfo ->
         copyToClipboard(copyInfo)
@@ -73,7 +81,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
-        viewModel.setLink(handle)
+        viewModel.updateLink(handle)
 
         binding.toolbarGetLink.visibility = GONE
         setSupportActionBar(binding.toolbarGetLink)
@@ -86,6 +94,8 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_COPY_LINK_TO_CLIPBOARD)
             .observeForever(copyLinkObserver as Observer<Any>)
+
+        viewModel.checkElevation().observe(this, ::changeElevation)
     }
 
     private fun setupNavController() {
@@ -121,6 +131,29 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         if (viewModel.shouldShowCopyright()) {
             navController.navigate(R.id.copyright)
         }
+    }
+
+
+    /**
+     * Changes the ActionBar elevation depending on the withElevation value received.
+     *
+     * @param withElevation True if should set elevation, false otherwise.
+     */
+    private fun changeElevation(withElevation: Boolean) {
+        val isDark = isDarkMode(this)
+        val darkAndElevation = withElevation && isDark
+
+        if (darkAndElevation) {
+            ColorUtils.changeStatusBarColorForElevation(this, true)
+        } else {
+            window?.statusBarColor = transparentColor
+        }
+
+        binding.toolbarGetLink.setBackgroundColor(
+            if (darkAndElevation) toolbarElevationColor else transparentColor
+        )
+
+        supportActionBar?.elevation = if (withElevation && !isDark) elevation else 0F
     }
 
     /**

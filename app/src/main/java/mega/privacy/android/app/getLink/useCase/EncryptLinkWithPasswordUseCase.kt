@@ -11,8 +11,6 @@ import javax.inject.Inject
 class EncryptLinkWithPasswordUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
-
-
     /**
      * Launches a request to encrypt a link with a password.
      *

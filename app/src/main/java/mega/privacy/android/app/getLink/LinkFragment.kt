@@ -21,10 +21,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
@@ -34,7 +37,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener {
+class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrollable {
 
     companion object {
         private const val ALPHA_VIEW_DISABLED = 0.3f
@@ -59,6 +62,17 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setupView()
+        setupObservers()
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun setupView() {
+        ListenScrollChangesHelper().addViewToListen(
+            binding.scrollViewGetLink
+        ) { _, _, _, _, _ -> checkScroll() }
+
+        checkScroll()
         setThumbnail()
 
         val node = viewModel.getNode()
@@ -98,20 +112,15 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener {
             viewModel.copyLinkPassword()
         }
 
-        viewModel.updateLink()
         setAvailableLayouts()
 
         if (!node.isExported) {
             viewModel.export()
-        } else {
-            updateLinkText(viewModel.getLinkTextValue())
         }
-
-        super.onViewCreated(view, savedInstanceState)
     }
 
-    private fun setupView() {
-
+    private fun setupObservers() {
+        viewModel.getLink().observe(viewLifecycleOwner, ::updateLinkText)
     }
 
     override fun onResume() {
@@ -127,11 +136,12 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener {
         checkIfShouldHidePassword()
         viewModel.removeLinkWithPassword()
         updatePasswordLayouts()
-        updateLinkText(viewModel.getLinkTextValue())
     }
 
     /**
      * Updates the text of the link depending on the enabled options.
+     *
+     * @param text Text to show as link text.
      */
     private fun updateLinkText(text: String) {
         binding.linkText.text = text
@@ -280,9 +290,8 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener {
         binding.keySeparator.visibility = visibility
         binding.copyKeyButton.visibility = visibility
 
-        updateLinkText(viewModel.getLinkTextValue())
-
-        binding.keyText.text = if (binding.decryptedKeySwitch.isChecked) viewModel.getLinkKey() else null
+        binding.keyText.text =
+            if (binding.decryptedKeySwitch.isChecked) viewModel.getLinkKey() else null
     }
 
     /**
@@ -440,5 +449,14 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener {
         val timestamp = calculateTimestamp(dateString).toInt()
 
         viewModel.exportWithTimestamp(timestamp)
+    }
+
+    override fun checkScroll() {
+        if (!this::binding.isInitialized) {
+            return
+        }
+
+        val withElevation = binding.scrollViewGetLink.canScrollVertically(SCROLLING_UP_DIRECTION)
+        viewModel.setElevation(withElevation)
     }
 }

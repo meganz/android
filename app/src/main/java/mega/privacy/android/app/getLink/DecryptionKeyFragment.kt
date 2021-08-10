@@ -5,9 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentDecryptionKeyBinding
+import mega.privacy.android.app.interfaces.Scrollable
+import mega.privacy.android.app.utils.Constants
 
-class DecryptionKeyFragment : Fragment() {
+class DecryptionKeyFragment : Fragment(), Scrollable {
+
+    private val viewModel: GetLinkViewModel by activityViewModels()
 
     private lateinit var binding: FragmentDecryptionKeyBinding
 
@@ -18,5 +24,29 @@ class DecryptionKeyFragment : Fragment() {
     ): View {
         binding = FragmentDecryptionKeyBinding.inflate(layoutInflater)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setupView()
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    private fun setupView() {
+        ListenScrollChangesHelper().addViewToListen(
+            binding.scrollViewDecryption
+        ) { _, _, _, _, _ -> checkScroll() }
+
+        checkScroll()
+    }
+
+    override fun checkScroll() {
+        if (!this::binding.isInitialized) {
+            return
+        }
+
+        val withElevation = binding.scrollViewDecryption
+            .canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
+
+        viewModel.setElevation(withElevation)
     }
 }
