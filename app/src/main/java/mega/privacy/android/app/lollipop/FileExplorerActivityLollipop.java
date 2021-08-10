@@ -2744,7 +2744,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		if (cDriveExplorer != null) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.detach(cDriveExplorer);
-			cDriveExplorer.setHeaderItemDecoration(null);
 			ft.attach(cDriveExplorer);
 			ft.commitAllowingStateLoss();
 		}
@@ -2752,7 +2751,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		if (iSharesExplorer != null) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.detach(iSharesExplorer);
-			iSharesExplorer.setHeaderItemDecoration(null);
 			ft.attach(iSharesExplorer);
 			ft.commitAllowingStateLoss();
 		}
