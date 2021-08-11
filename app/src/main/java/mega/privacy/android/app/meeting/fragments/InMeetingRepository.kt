@@ -394,28 +394,6 @@ class InMeetingRepository @Inject constructor(
     }
 
     /**
-     * Method of obtaining the local video
-     *
-     * @param chatId chat ID
-     * @param listener GroupVideoListener
-     */
-    fun addLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener) {
-        logDebug("Add chat local video listener")
-        megaChatApi.addChatLocalVideoListener(chatId, listener)
-    }
-
-    /**
-     * Method of remove the local video
-     *
-     * @param chatId chat ID
-     * @param listener GroupVideoListener
-     */
-    fun removeLocalVideoSpeaker(chatId: Long, listener: GroupVideoListener) {
-        logDebug("Remove chat video listener")
-        megaChatApi.removeChatVideoListener(chatId, MEGACHAT_INVALID_HANDLE, false, listener)
-    }
-
-    /**
      * Method to get own privileges in a chat
      *
      * @param chatId chat ID

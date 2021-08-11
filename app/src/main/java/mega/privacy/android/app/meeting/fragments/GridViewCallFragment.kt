@@ -361,7 +361,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * Method to delete the videos and texture views of participants
      */
     @ExperimentalCoroutinesApi
-    private fun removeTextureView() {
+    fun removeTextureView() {
         val iterator = participants.iterator()
         iterator.forEach {
             adapterPager.removeTextureView(it, currentPage, viewDataBinding.gridViewPager)

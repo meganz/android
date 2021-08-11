@@ -632,8 +632,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				stopService(new Intent(getInstance(), IncomingCallService.class));
 				removeRTCAudioManagerRingIn();
 				LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long.class).post(call.getChatid());
-			} else if (chatRoom.isMeeting()) {
-				removeRTCAudioManagerRingIn();
 			}
 		}
 	};

@@ -51,13 +51,13 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Local audio/video flags has changed
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) {
-            logDebug("Changes in local av flags:: isAudioEnable? "+call.hasLocalAudio()+", isVideoEnable? "+call.hasLocalVideo())
+            logDebug("Changes in local av flags:: isAudioEnable? ${call.hasLocalAudio()}, isVideoEnable? ${call.hasLocalVideo()}")
             sendCallEvent(EVENT_LOCAL_AVFLAGS_CHANGE, call)
         }
 
         // Peer has changed its ringing state
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_RINGING_STATUS)) {
-            logDebug("Changes in ringing status call. Call is Ringing $call.isRinging")
+            logDebug("Changes in ringing status call. Call is ${call.callId}. Call is Ringing ${call.isRinging}")
             sendCallEvent(EVENT_RINGING_STATUS_CHANGE, call)
         }
 

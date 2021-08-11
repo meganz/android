@@ -393,7 +393,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             if (!inMeetingViewModel.isOneToOneCall()) {
                 when (callAndSession.second.status) {
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
-                        logDebug("Session in progress")
+                        logDebug("Session in progress, clientID = ${callAndSession.second.clientid}")
                         val position =
                             inMeetingViewModel.addParticipant(
                                 callAndSession.second,
@@ -407,7 +407,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         }
                     }
                     MegaChatSession.SESSION_STATUS_DESTROYED -> {
-                        logDebug("Session destroyed")
+                        logDebug("Session destroyed, clientID = ${callAndSession.second.clientid}")
                         val position =
                             inMeetingViewModel.removeParticipant(callAndSession.second)
                         position?.let {
@@ -462,16 +462,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     if (callAndSession.second.canRecvVideoLowRes()) {
                         if (!participant.hasHiRes) {
                             if (inMeetingViewModel.sessionHasVideo(participant.clientId)) {
-                                logDebug("Checking if the listener should be added...")
+                                logDebug("Client ID ${callAndSession.second.clientid} can receive lowRes, has lowRes, video on, checking if listener should be added...")
                                 checkVideoListener(
                                     participant,
                                     shouldAddListener = true,
                                     isHiRes = false
                                 )
+                            } else {
+                                logDebug("Client ID ${callAndSession.second.clientid} can receive lowRes, has lowRes, video off")
                             }
                         }
                     } else if (!participant.hasHiRes) {
-                        logDebug("Checking if the listener should be removed...")
+                        logDebug("Client ID ${callAndSession.second.clientid} can not receive lowRes, has lowRes, checking if listener should be removed...")
                         checkVideoListener(
                             participant,
                             shouldAddListener = false,
@@ -489,7 +491,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                             participant
                                         )
                                     ) {
-                                        logDebug("Asking for low-resolution video")
+                                        logDebug("Client ID ${callAndSession.second.clientid} can not receive lowRes, has lowRes, asking for low-resolution video...")
                                         inMeetingViewModel.requestLowResVideo(
                                             session,
                                             inMeetingViewModel.getChatId()
@@ -497,6 +499,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     }
                                 }
                         }
+                    } else {
+                        logDebug("Client ID ${callAndSession.second.clientid} can not receive lowRes, has hiRes")
                     }
                 }
             }
@@ -512,24 +516,28 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     if (callAndSession.second.canRecvVideoHiRes()) {
                         if (participant.hasHiRes) {
                             if (inMeetingViewModel.sessionHasVideo(participant.clientId)) {
-                                logDebug("Checking if the listener should be added...")
+                                logDebug("Client ID ${callAndSession.second.clientid} can receive hiRes, has hiRes, video on, checking if listener should be added...")
                                 checkVideoListener(
                                     participant,
                                     shouldAddListener = true,
                                     isHiRes = true
                                 )
+                            } else {
+                                logDebug("Client ID ${callAndSession.second.clientid} can receive hiRes, has hiRes, video off")
                             }
                         } else {
                             if (inMeetingViewModel.sessionHasVideo(participant.clientId)) {
-                                logDebug("Checking if the speaker listener should be added...")
+                                logDebug("Client ID ${callAndSession.second.clientid} can receive hiRes, has lowRes, video on, checking if listener should be added for speaker...")
                                 checkSpeakerVideoListener(
                                     callAndSession.second.peerid, callAndSession.second.clientid,
                                     shouldAddListener = true
                                 )
+                            } else {
+                                logDebug("Client ID ${callAndSession.second.clientid} can receive hiRes, has lowRes, video off")
                             }
                         }
                     } else if (participant.hasHiRes) {
-                        logDebug("Checking if the listener should be removed...")
+                        logDebug("Client ID ${callAndSession.second.clientid} can not receive hiRes, has hiRes, checking if listener should be removed...")
                         checkVideoListener(
                             participant,
                             shouldAddListener = false,
@@ -547,7 +555,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                             participant
                                         )
                                     ) {
-                                        logDebug("Asking for high-resolution video")
+                                        logDebug("Client ID ${callAndSession.second.clientid} can not receive hiRes, has hiRes, asking for high-resolution video...")
                                         inMeetingViewModel.requestHiResVideo(
                                             session,
                                             inMeetingViewModel.getChatId()
@@ -556,7 +564,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                 }
                         }
                     } else {
-                        logDebug("Checking if the speaker listener should be removed...")
+                        logDebug("Client ID ${callAndSession.second.clientid} can not receive hiRes, has lowRes, checking if listener of speaker should be removed...")
                         checkSpeakerVideoListener(
                             callAndSession.second.peerid, callAndSession.second.clientid,
                             shouldAddListener = false
@@ -577,10 +585,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
         }
-
-    private val floatingWindowObserver = Observer<Boolean> {
-        floatingWindowContainer.visibility = if (it) View.GONE else View.VISIBLE
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -884,9 +888,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_MEETING_INVITE)
             .observe(this, inviteObserver as Observer<Any>)
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_MEETING_INCOMPATIBILITY_SHOW)
-            .observeSticky(this, floatingWindowObserver as Observer<Any>)
     }
 
     private fun initToolbar() {
@@ -1355,32 +1356,42 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Show reconnecting UI
+     * Method to remove all video listeners
      */
-    private fun reconnecting() {
-        logDebug("Show reconnecting UI")
-        removeUI()
-        binding.reconnecting.isVisible = true
-        checkInfoBanner(TYPE_RECONNECTING)
-    }
-
-    /**
-     * Remove fragments
-     */
-    private fun removeUI() {
-        if (status == NOT_TYPE)
-            return
-
-        status = NOT_TYPE
-        MegaApplication.getInstance().unregisterProximitySensor()
-
+    private fun removeAllListeners() {
+        logDebug("Remove all listeners")
         individualCallFragment?.let {
             if (it.isAdded) {
-                removeChildFragment(it)
-                individualCallFragment = null
+                it.removeChatVideoListener()
             }
         }
 
+        floatingWindowFragment?.let {
+            if (it.isAdded) {
+                it.removeChatVideoListener()
+            }
+        }
+
+        speakerViewCallFragment?.let {
+            if (it.isAdded) {
+                it.removeTextureView()
+            }
+        }
+
+        gridViewCallFragment?.let {
+            if (it.isAdded) {
+                it.removeTextureView()
+            }
+        }
+
+        inMeetingViewModel.removeListeners()
+    }
+
+    /**
+     * Method to remove all child fragments
+     */
+    private fun removeAllFragments() {
+        logDebug("Remove all fragments")
         floatingWindowFragment?.let {
             if (it.isAdded) {
                 removeChildFragment(it)
@@ -1388,10 +1399,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        speakerViewCallFragment?.let {
+        individualCallFragment?.let {
             if (it.isAdded) {
                 removeChildFragment(it)
-                speakerViewCallFragment = null
+                individualCallFragment = null
             }
         }
 
@@ -1401,6 +1412,43 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 gridViewCallFragment = null
             }
         }
+
+        speakerViewCallFragment?.let {
+            if (it.isAdded) {
+                removeChildFragment(it)
+                speakerViewCallFragment = null
+            }
+        }
+    }
+
+    /**
+     * Show reconnecting UI
+     */
+    private fun reconnecting() {
+        logDebug("Show reconnecting UI")
+        if (status == NOT_TYPE)
+            return
+
+        status = NOT_TYPE
+
+        removeAllListeners()
+        removeAllFragments()
+        binding.reconnecting.isVisible = true
+        checkInfoBanner(TYPE_RECONNECTING)
+    }
+
+    /**
+     * Remove fragments
+     */
+    fun removeUI() {
+        if (status == NOT_TYPE)
+            return
+
+        status = NOT_TYPE
+
+        removeAllListeners()
+        MegaApplication.getInstance().unregisterProximitySensor()
+        removeAllFragments()
     }
 
     private fun checkMenuItemsVisibility() {
@@ -1447,6 +1495,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                 individualCallFragment?.let {
                     if (it.isAdded) {
+                        it.removeChatVideoListener()
                         removeChildFragment(it)
                         individualCallFragment = null
                     }
@@ -1484,19 +1533,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         status = TYPE_WAITING_CONNECTION
         checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
-        floatingWindowFragment?.let {
-            if (it.isAdded) {
-                removeChildFragment(it)
-                floatingWindowFragment = null
-            }
-        }
-
-        individualCallFragment?.let {
-            if (it.isAdded) {
-                removeChildFragment(it)
-                individualCallFragment = null
-            }
-        }
+        removeAllListeners()
+        removeAllFragments()
 
         individualCallFragment = IndividualCallFragment.newInstance(
             chatId,
@@ -1522,13 +1560,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun initLocal(chatId: Long) {
         logDebug("Init local fragment")
-        if (floatingWindowFragment == null) {
-            floatingWindowFragment = IndividualCallFragment.newInstance(
-                chatId,
-                megaApi.myUserHandleBinary,
-                true
-            )
+        floatingWindowFragment?.let {
+            if (it.isAdded) {
+                it.removeChatVideoListener()
+                removeChildFragment(it)
+                floatingWindowFragment = null
+            }
         }
+
+        floatingWindowFragment = IndividualCallFragment.newInstance(
+            chatId,
+            megaApi.myUserHandleBinary,
+            true
+        )
 
         floatingWindowFragment?.let {
             loadChildFragment(
@@ -1551,6 +1595,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         gridViewCallFragment?.let {
             if (it.isAdded) {
+                it.removeTextureView()
                 removeChildFragment(it)
                 gridViewCallFragment = null
             }
@@ -1558,6 +1603,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         speakerViewCallFragment?.let {
             if (it.isAdded) {
+                it.removeTextureView()
                 removeChildFragment(it)
                 speakerViewCallFragment = null
             }
@@ -1588,6 +1634,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         speakerViewCallFragment?.let {
             if (it.isAdded) {
+                it.removeTextureView()
                 removeChildFragment(it)
                 speakerViewCallFragment = null
             }
@@ -1595,6 +1642,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         gridViewCallFragment?.let {
             if (it.isAdded) {
+                it.removeTextureView()
                 removeChildFragment(it)
                 gridViewCallFragment = null
             }
@@ -2467,11 +2515,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun leaveMeeting() {
         logDebug("Leaving meeting")
-        disableCamera()
-
-        if (inMeetingViewModel.amIAGuest()) {
-            removeUI()
-        }
+        removeUI()
 
         inMeetingViewModel.leaveMeeting()
         if (inMeetingViewModel.amIAGuest()) {

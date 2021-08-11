@@ -104,31 +104,8 @@ class VideoMeetingViewHolder(
 
         if (isGrid || isDrawing) {
             inMeetingViewModel.getSession(participant.clientId)?.let {
-                participant.videoListener?.let { listener ->
-                    if (it.canRecvVideoHiRes()) {
-                        logDebug("Remove the video listener(HiRes) initially... clientID ${participant.clientId}")
-                        inMeetingViewModel.removeChatRemoteVideoListener(
-                            listener,
-                            participant.clientId,
-                            inMeetingViewModel.getChatId(),
-                            true
-                        )
-                    } else if (it.canRecvVideoLowRes()) {
-                        logDebug("Remove the video listener(LowRes) initially... clientID ${participant.clientId}")
-                        inMeetingViewModel.removeChatRemoteVideoListener(
-                            listener,
-                            participant.clientId,
-                            inMeetingViewModel.getChatId(),
-                            false
-                        )
-                    }
-
-                    if (binding.parentTextureView.childCount > 0) {
-                        binding.parentTextureView.removeAllViews()
-                        binding.parentTextureView.removeAllViewsInLayout()
-                    }
-
-                    removeListener(participant)
+                participant.videoListener?.let {
+                    closeVideo(participant)
                 }
             }
         }
@@ -262,18 +239,17 @@ class VideoMeetingViewHolder(
     private fun removeResolutionAndListener(participant: Participant) {
         if (participant.videoListener == null) return
 
-        inMeetingViewModel.getSession(participant.clientId)?.let {
-            logDebug("Close video of ${participant.clientId}")
-            participant.videoListener?.let {
-                inMeetingViewModel.removeResolutionAndListener(participant)
+        logDebug("Close video of ${participant.clientId}")
+        binding.parentTextureView.isVisible = false
+        participant.videoListener?.let {
+            inMeetingViewModel.removeResolutionAndListener(participant, it)
 
-                if (binding.parentTextureView.childCount > 0) {
-                    binding.parentTextureView.removeAllViews()
-                    binding.parentTextureView.removeAllViewsInLayout()
-                }
-
-                removeListener(participant)
+            if (binding.parentTextureView.childCount > 0) {
+                binding.parentTextureView.removeAllViews()
+                binding.parentTextureView.removeAllViewsInLayout()
             }
+
+            removeListener(participant)
         }
     }
 
@@ -313,7 +289,7 @@ class VideoMeetingViewHolder(
 
         logDebug("Close video of ${participant.clientId}")
         binding.parentTextureView.isVisible = false
-        removeResolutionAndListener(participant)
+        inMeetingViewModel.removeRemoteVideoResolution(participant)
     }
 
     /**
@@ -326,8 +302,10 @@ class VideoMeetingViewHolder(
 
         participant.videoListener =
             inMeetingViewModel.createVideoListener(participant, AVATAR_VIDEO_VISIBLE, ROTATION)
-        binding.parentTextureView.addView(participant.videoListener!!.textureView)
-        participant.videoListener!!.localRenderer?.addListener(listenerRenderer)
+        participant.videoListener?.let { listener ->
+            binding.parentTextureView.addView(listener.textureView)
+            listener.localRenderer?.addListener(listenerRenderer)
+        }
     }
 
     /**
@@ -367,24 +345,27 @@ class VideoMeetingViewHolder(
     fun updateListener(participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean) {
         if (isInvalid(participant)) return
 
+        binding.parentTextureView.isVisible = shouldAddListener
         if (shouldAddListener) {
             if (participant.isVideoOn && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)) {
                 if (participant.videoListener == null) {
                     createListener(participant)
                 }
-                logDebug("Adding listener, clientID ${participant.clientId}")
-                inMeetingViewModel.addChatRemoteVideoListener(
-                    participant.videoListener!!,
-                    participant.clientId,
-                    inMeetingViewModel.getChatId(), isHiRes
-                )
+
+                participant.videoListener?.let { listener ->
+                    logDebug("Adding listener, clientID ${participant.clientId}")
+                    inMeetingViewModel.addChatRemoteVideoListener(
+                        listener,
+                        participant.clientId,
+                        inMeetingViewModel.getChatId(), isHiRes
+                    )
+                }
             }
         } else {
-
-            participant.videoListener?.let {
+            participant.videoListener?.let { listener ->
                 logDebug("Removing listener, clientID ${participant.clientId}")
                 inMeetingViewModel.removeChatRemoteVideoListener(
-                    participant.videoListener!!,
+                    listener,
                     participant.clientId,
                     inMeetingViewModel.getChatId(),
                     participant.hasHiRes
@@ -543,22 +524,6 @@ class VideoMeetingViewHolder(
 
         logDebug("Removing texture view of ${participant.clientId} when fragment is destroyed")
         removeResolutionAndListener(participant)
-
-        participant.videoListener?.let {
-            inMeetingViewModel.removeChatRemoteVideoListener(
-                participant.videoListener!!,
-                participant.clientId,
-                inMeetingViewModel.getChatId(),
-                participant.hasHiRes
-            )
-
-            if (binding.parentTextureView.childCount > 0) {
-                binding.parentTextureView.removeAllViews()
-                binding.parentTextureView.removeAllViewsInLayout()
-            }
-
-            removeListener(participant)
-        }
     }
 
     /**
@@ -819,11 +784,14 @@ class VideoMeetingViewHolder(
         if (isGrid) return
 
         isDrawing = false
-        inMeetingViewModel.getParticipant(peerId, clientId)?.let {
-            if (it.isVideoOn) {
-                logDebug("Recycle participant in the list, participant clientId is ${it.clientId}")
-                inMeetingViewModel.removeParticipantVisible(it)
-                removeResolutionAndListener(it)
+        inMeetingViewModel.getParticipant(peerId, clientId)?.let { participant ->
+            if (participant.isVideoOn) {
+                logDebug("Recycle participant in the list, participant clientId is ${participant.clientId}")
+
+                inMeetingViewModel.removeParticipantVisible(participant)
+                participant.videoListener?.let {
+                    removeResolutionAndListener(participant)
+                }
             }
         }
     }

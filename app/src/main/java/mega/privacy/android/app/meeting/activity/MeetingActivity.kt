@@ -251,6 +251,7 @@ class MeetingActivity : PasscodeActivity() {
                 removeRTCAudioManager()
             }
             is InMeetingFragment -> {
+                currentFragment.removeUI()
                 sendQuitCallEvent()
             }
         }

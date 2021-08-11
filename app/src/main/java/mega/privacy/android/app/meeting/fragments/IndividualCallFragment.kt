@@ -94,16 +94,19 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     logDebug("Can receive high-resolution video")
 
                     if (inMeetingViewModel.sessionHasVideo(callAndSession.second.clientid)) {
-                        logDebug("Session has video")
-                        addListener(callAndSession.second)
+                        logDebug("Session has video of client ID ${callAndSession.second.clientid}")
+                        addListener(callAndSession.second.clientid)
                     }
                 } else {
-                    logDebug("Can not receive high-resolution video")
-                    removeRemoteListener(callAndSession.second)
+                    logDebug("Can not receive high-resolution video of client ID ${callAndSession.second.clientid}")
+                    removeRemoteListener(
+                        callAndSession.second.peerid,
+                        callAndSession.second.clientid
+                    )
 
                     //Ask for high resolution, if necessary
                     if (inMeetingViewModel.sessionHasVideo(callAndSession.second.clientid)) {
-                        logDebug("Asking for HiRes video")
+                        logDebug("Asking for HiRes video of client ID ${callAndSession.second.clientid}")
                         inMeetingViewModel.requestHiResVideo(callAndSession.second, chatId)
                     }
                 }
@@ -137,6 +140,10 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 session.isOnHold
             )
         }
+    }
+
+    private val floatingWindowObserver = Observer<Boolean> {
+        videoSurfaceView.visibility = if (it) View.GONE else View.VISIBLE
     }
 
     @ExperimentalCoroutinesApi
@@ -188,6 +195,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
             .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EventConstants.EVENT_MEETING_INCOMPATIBILITY_SHOW)
+            .observeSticky(this, floatingWindowObserver as Observer<Any>)
     }
 
     override fun onCreateView(
@@ -250,9 +260,9 @@ class IndividualCallFragment : MeetingBaseFragment() {
     /**
      * Method to add video listener
      *
-     * @param session The session of paticipant whose listener of the video is to be added
+     * @param clientId Client ID of participant
      */
-    private fun addListener(session: MegaChatSession) {
+    private fun addListener(clientId: Long) {
         if (videoListener == null) {
             videoListener = MeetingVideoListener(
                 videoSurfaceView,
@@ -265,32 +275,12 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
 
         videoListener?.setAlpha(videoAlpha)
-
+        logDebug("Add remote video listener of client ID $clientId")
         inMeetingViewModel.addChatRemoteVideoListener(
             videoListener!!,
-            session.clientid,
+            clientId,
             chatId, true
         )
-    }
-
-    /**
-     * Method to remove video listener
-     *
-     * @param session The session of paticipant whose listener of the video is to be removed
-     */
-    private fun removeRemoteListener(session: MegaChatSession) {
-        if (videoListener != null) {
-            inMeetingViewModel.removeChatRemoteVideoListener(
-                videoListener!!,
-                session.clientid,
-                chatId,
-                true
-            )
-
-            videoListener = null
-
-            logDebug("Participant $clientId video listener null")
-        }
     }
 
     /**
@@ -391,35 +381,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             )
         }
 
-        removeChatVideoListener(peerId, clientId)
-    }
-
-    /**
-     * Remove chat video listener
-     *
-     * @param peerId User handle of a participant
-     * @param clientId Client ID of a participant
-     */
-    private fun removeChatVideoListener(peerId: Long, clientId: Long) {
-        if (isInvalid(peerId, clientId)) return
-
-        if (inMeetingViewModel.isMe(this.peerId)) {
-            videoListener?.let {
-                logDebug("Remove local video listener")
-                sharedModel.removeLocalVideo(chatId, videoListener!!)
-            }
-
-            videoListener = null
-        } else {
-            inMeetingViewModel.getSession(clientId)?.let { session ->
-                videoListener?.let {
-                    if (session.canRecvVideoHiRes()) {
-                        logDebug("Removing HiRes video")
-                        inMeetingViewModel.stopHiResVideo(session, chatId)
-                    }
-                }
-            }
-        }
+        removeChatVideoListener()
     }
 
     /**
@@ -526,7 +488,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 )
                 // Check bottom panel's expanding state, if it's expanded, video should invisible.
                 videoListener?.setAlpha(videoAlphaFloating)
-
+                logDebug("Add local video listener")
                 sharedModel.addLocalVideo(chatId, videoListener)
             }
             else -> {
@@ -542,13 +504,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
                 inMeetingViewModel.getSession(clientId)?.let {
                     if (!it.canRecvVideoHiRes()) {
-                        logDebug("Asking for HiRes video")
+                        logDebug("Asking for HiRes video of client ID $clientId")
                         inMeetingViewModel.requestHiResVideo(it, this.chatId)
                     } else {
                         logDebug("I am already receiving the HiRes video")
                         if (inMeetingViewModel.sessionHasVideo(it.clientid)) {
                             logDebug("Session has video")
-                            addListener(it)
+                            addListener(it.clientid)
                         }
                     }
                 }
@@ -620,6 +582,69 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
     }
 
+    /**
+     * Remove chat video listener
+     */
+    fun removeChatVideoListener() {
+        videoListener?.let {
+            removeResolutionOrLocalListener(this.peerId, this.clientId)
+            removeRemoteListener(this.peerId, this.clientId)
+        }
+    }
+
+    /**
+     * Remove chat video listener
+     *
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
+     */
+    private fun removeResolutionOrLocalListener(peerId: Long, clientId: Long) {
+        if (isInvalid(peerId, clientId)) return
+
+        if (inMeetingViewModel.isMe(this.peerId)) {
+            videoListener?.let {
+                logDebug("Remove local video listener")
+                sharedModel.removeLocalVideo(chatId, videoListener!!)
+            }
+
+            videoListener = null
+        } else {
+            inMeetingViewModel.getSession(clientId)?.let { session ->
+                videoListener?.let {
+                    if (session.canRecvVideoHiRes()) {
+                        logDebug("Removing HiRes video of client ID $clientId")
+                        inMeetingViewModel.stopHiResVideo(session, chatId)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to remove video listener
+     *
+     * @param peerId User handle of a participant
+     * @param clientId Client ID of a participant
+     */
+    private fun removeRemoteListener(peerId: Long, clientId: Long) {
+        if (isInvalid(
+                peerId,
+                clientId
+            ) || videoListener == null || inMeetingViewModel.isMe(this.peerId)
+        ) return
+
+        logDebug("Remove remove video listener of client ID $clientId")
+        inMeetingViewModel.removeChatRemoteVideoListener(
+            videoListener!!,
+            clientId,
+            chatId,
+            true
+        )
+
+        videoListener = null
+        logDebug("Participant $clientId video listener null")
+    }
+
     companion object {
 
         const val TAG = "IndividualCallFragment"
@@ -664,10 +689,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     override fun onDestroyView() {
         logDebug("View destroyed")
-        removeChatVideoListener(peerId, clientId)
-        inMeetingViewModel.getSession(clientId)?.let {
-            removeRemoteListener(it)
-        }
+        removeChatVideoListener()
         avatarImageView.setImageBitmap(null)
         super.onDestroyView()
     }
