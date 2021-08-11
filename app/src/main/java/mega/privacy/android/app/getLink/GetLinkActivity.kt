@@ -38,6 +38,8 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
         private const val TYPE_NODE = 1
         private const val TYPE_LIST = 2
+
+        private const val VIEW_TYPE = "VIEW_TYPE"
     }
 
     private val viewModelNode: GetLinkViewModel by viewModels()
@@ -57,7 +59,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
 
-    private var viewType = TYPE_NODE
+    private var viewType = INVALID_VALUE
 
     private val copyLinkObserver = Observer<Pair<String, String>> { copyInfo ->
         copyToClipboard(copyInfo)
@@ -72,8 +74,21 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
             return
         }
 
+        if (savedInstanceState != null) {
+            viewType = savedInstanceState.getInt(VIEW_TYPE, INVALID_VALUE)
+        }
+
+        if (viewType == INVALID_VALUE) {
+            handleIntent()
+        }
+
         setupView()
         setupObservers()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(VIEW_TYPE, viewType)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
@@ -84,7 +99,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         super.onDestroy()
     }
 
-    private fun setupView() {
+    private fun handleIntent() {
         val handle = intent.getLongExtra(HANDLE, INVALID_HANDLE)
         val handleList = intent.getLongArrayExtra(HANDLE_LIST)
 
@@ -101,7 +116,9 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
             viewModelList.initNodes(handleList)
             viewType = TYPE_LIST
         }
+    }
 
+    private fun setupView() {
         setSupportActionBar(binding.toolbarGetLink)
         supportActionBar?.apply {
             setHomeButtonEnabled(true)
@@ -155,7 +172,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                 }
                 R.id.main_get_several_links -> {
                     supportActionBar?.apply {
-                        title = StringResourcesUtils.getString(R.string.context_get_link_menu)
+                        title = StringResourcesUtils.getString(R.string.title_get_links)
                         if (!isShowing) show()
                     }
                 }
@@ -252,12 +269,16 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
-            if (viewModelNode.shouldShowShareKeyOrPasswordDialog()) {
-                showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
-            } else {
-                viewModelNode.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
-                    handleActivityResult(intent)
+            when {
+                viewType == TYPE_LIST -> {
+
                 }
+                viewModelNode.shouldShowShareKeyOrPasswordDialog() ->
+                    showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
+                else ->
+                    viewModelNode.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
+                        handleActivityResult(intent)
+                    }
             }
         }
     }
@@ -299,10 +320,13 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                 onBackPressed()
             }
             R.id.action_share -> {
-                if (viewModelNode.shouldShowShareKeyOrPasswordDialog()) {
-                    showShareKeyOrPasswordDialog(SHARE, null)
-                } else {
-                    viewModelNode.shareLink { intent -> startActivity(intent) }
+                when {
+                    viewType == TYPE_LIST -> {
+
+                    }
+                    viewModelNode.shouldShowShareKeyOrPasswordDialog() ->
+                        showShareKeyOrPasswordDialog(SHARE, null)
+                    else -> viewModelNode.shareLink { intent -> startActivity(intent) }
                 }
             }
             R.id.action_chat -> {

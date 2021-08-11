@@ -222,20 +222,18 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_share_link:
-				case R.id.cab_menu_edit_link: {
-
+				case R.id.cab_menu_edit_link:
 					logDebug("Public link option");
 					if (documents.get(0) == null) {
 						logWarning("The selected node is NULL");
 						break;
 					}
-					((ManagerActivityLollipop) context).showGetLinkActivity(
-							documents.get(0).getHandle());
+
+					((ManagerActivityLollipop) context).showGetLinkActivity(documents);
 					clearSelections();
 					hideMultipleSelect();
-
 					break;
-				}
+
 				case R.id.cab_menu_remove_link:{
 
 					logDebug("Remove public link option");

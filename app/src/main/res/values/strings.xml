@@ -531,10 +531,6 @@
     <string name="number_incorrectly_moved">%d items were not moved successfully</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Moved to the Rubbish Bin successfully</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved_to_rubbish">%d items moved to the Rubbish Bin successfully</string>
-    <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved_to_rubbish">&#160;and %d items were not sent successfully</string>
     <!-- error message -->
     <string name="context_no_moved">Error. Not moved</string>
     <!-- success message when sharing a folder -->
@@ -1140,7 +1136,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Upgrade now</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Grow your cloud.[A]Get larger storage and transfer quotas with a Pro account.</string>
+    <string name="get_pro_account">Grow your cloud.[A]Get increased storage and transfer quotas with a Pro account.</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s.[A]You can find the file with your Recovery Key in the Saved for Offline section.[A]Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -1474,7 +1470,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Copied to the clipboard</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Chat Error!</string>
+    <string name="chat_error_open_title">Chat error</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">The chat could not be opened successfully</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -1928,7 +1924,7 @@
     <string name="unlocked_storage_title">Storage quota</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Invitation bonuses</string>
-    <!-- Title of the section for install a mobile app in achivements section (maximum 30 chars) -->
+    <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Install a MEGA Mobile App</string>
     <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
     <string name="title_add_phone">Add phone number</string>
@@ -1951,7 +1947,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">How it works</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every successful signup and app installation.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a MEGA Free account and to install a MEGA Mobile App. You will receive free storage as a bonus for every successful signup and app installation.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Free storage bonus applicable to new invitations only and where MEGA Mobile App or MEGA Desktop App is installed.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
@@ -2557,7 +2553,7 @@
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Unable to open file.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">No network connection. File cannot be opened.</string>
+    <string name="error_fail_to_open_file_no_network">No network connection. Please reconnect to open the file.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">File already exists in Saved for Offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2632,10 +2628,6 @@
     <string name="inactive_chat">Inactive chat</string>
     <!-- Subtitle of chat screen when the chat is archived -->
     <string name="archived_chat">Archived chat</string>
-    <!-- error message when restoring several nodes from rubbish -->
-    <string name="number_incorrectly_restored_from_rubbish">%d items were not restored successfully</string>
-    <!-- success message when restoring several nodes from rubbish -->
-    <string name="number_correctly_restored_from_rubbish">%d items restored successfully</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Tap to join the call</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -3036,7 +3028,7 @@
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">SSL key error</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGA is unable to connect securely through SSL. You might be on public Wi-Fi with additional requirements.</string>
+    <string name="ssl_error_dialog_text">MEGA is unable to establish a secure connection using SSL. You may be on a public Wi-Fi network with additional requirements.</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]No [/B][A]Notifications[/A]</string>
     <!-- Permissions screen title -->
@@ -3113,7 +3105,7 @@
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Group call cannot be joined as the maximum number of participants has been exceeded.</string>
+    <string name="call_error_too_many_participants_join">Unable to join the group call due to the maximum number of participants reached</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
     <string name="call_error_too_many_video">Video call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a user cannot put the call on hold -->
@@ -3562,7 +3554,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">The folder does not exist.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">The file does not exist in the Cloud Drive.</string>
+    <string name="warning_node_not_exists_in_cloud">The file cannot be found in your Cloud Drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Storage Full</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3616,7 +3608,7 @@
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">Your phone number has been removed successfully.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
-    <string name="remove_phone_number_fail">Your phone number removal failed.</string>
+    <string name="remove_phone_number_fail">Failed to remove your phone number.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">Search in MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
@@ -3881,7 +3873,7 @@
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
     <string name="menu_scan_document">Scan document</string>
     <!-- Message displayed when clicking on a contact attached to the chat that is not my contact -->
-    <string name="user_is_not_contact">%s is not in your contacts list</string>
+    <string name="user_is_not_contact">%s is not in your contact list</string>
     <!-- Option of color theme, light mode. -->
     <string name="theme_light">Light</string>
     <!-- Option of color theme, dark mode. -->
@@ -4006,8 +3998,8 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item was not moved to the Rubbis Bin successfully</item>
-        <item quantity="other">%d items were not moved to the Rubbis Bin successfully</item>
+        <item quantity="one">1 item was not moved to the Rubbish Bin successfully</item>
+        <item quantity="other">%d items were not moved to the Rubbish Bin successfully</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -4019,4 +4011,10 @@
         <item quantity="one">1 item was not restored successfully</item>
         <item quantity="other">%d items were not restored successfully</item>
     </plurals>
+    <!-- Title of the screen to get several links at the same time. -->
+    <string name="title_get_links">Get Links</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Options such as Send decryption key separately, Set expiry date or Set password protection are only available for single items.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Copy all</string>
 </resources>

@@ -7784,6 +7784,30 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		showRenameNodeDialog(this, document, this, this);
 	}
 
+	public void showGetLinkActivity(List<MegaNode> nodes) {
+    	if (nodes == null || nodes.isEmpty()) {
+    		showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+			return;
+		}
+
+    	if (nodes.size() == 1) {
+    		showGetLinkActivity(nodes.get(0).getHandle());
+    		return;
+		}
+
+    	long[] handles = new long[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++) {
+			MegaNode node = nodes.get(i);
+			if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
+				return;
+			}
+
+			handles[i] = node.getHandle();
+		}
+
+		LinksUtil.showGetLinkActivity(this, handles);
+	}
+
 	public void showGetLinkActivity(long handle){
 		logDebug("Handle: " + handle);
 		MegaNode node = megaApi.getNodeByHandle(handle);

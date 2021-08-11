@@ -70,11 +70,7 @@ class CuActionModeCallback implements ActionMode.Callback {
             case R.id.cab_menu_edit_link:
                 logDebug("Public link option");
                 mViewModel.clearSelection();
-                if (documents.size() == 1
-                        && documents.get(0).getHandle() != MegaApiJava.INVALID_HANDLE) {
-                    ((ManagerActivityLollipop) mContext)
-                            .showGetLinkActivity(documents.get(0).getHandle());
-                }
+                ((ManagerActivityLollipop) mContext).showGetLinkActivity(documents);
                 break;
             case R.id.cab_menu_remove_link:
                 logDebug("Remove public link option");

@@ -204,16 +204,11 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					closeSelectMode();
 					break;
 				}
-				case R.id.cab_menu_share_link:{
-
-					if (documents.size()==1){
-//						NodeController nC = new NodeController(context);
-//						nC.exportLink(documents.get(0));
-						((ManagerActivityLollipop) context).showGetLinkActivity(documents.get(0).getHandle());
-						closeSelectMode();
-					}
+				case R.id.cab_menu_share_link:
+					((ManagerActivityLollipop) context).showGetLinkActivity(documents);
+					closeSelectMode();
 					break;
-				}
+
 				case R.id.cab_menu_share_link_remove:{
 
 					logDebug("Remove public link option");

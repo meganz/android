@@ -16,6 +16,7 @@ import mega.privacy.android.app.getLink.GetLinkActivity;
 import mega.privacy.android.app.listeners.SessionTransferURLListener;
 
 import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.Constants.HANDLE_LIST;
 import static mega.privacy.android.app.utils.Constants.MEGA_REGEXS;
 import static mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -180,5 +181,16 @@ public class LinksUtil {
     public static void showGetLinkActivity(Activity activity, long handle) {
         activity.startActivity(new Intent(activity, GetLinkActivity.class)
                 .putExtra(HANDLE, handle));
+    }
+
+    /**
+     * Launches an intent to show get link activity and get several links.
+     *
+     * @param activity Activity which launches the intent.
+     * @param handles  List of handles to get their link.
+     */
+    public static void showGetLinkActivity(Activity activity, long[] handles) {
+        activity.startActivity(new Intent(activity, GetLinkActivity.class)
+                .putExtra(HANDLE_LIST, handles));
     }
 }

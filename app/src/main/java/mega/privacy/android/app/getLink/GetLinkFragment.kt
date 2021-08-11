@@ -38,7 +38,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrollable {
+class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrollable {
 
     companion object {
         private const val ALPHA_VIEW_DISABLED = 0.3f
@@ -91,7 +91,7 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
 
         binding.resetPasswordButton.setOnClickListener {
             checkIfShouldHidePassword()
-            findNavController().navigate(LinkFragmentDirections.setPassword(true))
+            findNavController().navigate(GetLinkFragmentDirections.setPassword(true))
         }
 
         binding.removePasswordButton.setOnClickListener { removePasswordClick() }
@@ -388,7 +388,7 @@ class LinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrolla
     private fun setPasswordProtectionClick() {
         if (viewModel.isPro()) {
             checkIfShouldHidePassword()
-            findNavController().navigate(LinkFragmentDirections.setPassword(false))
+            findNavController().navigate(GetLinkFragmentDirections.setPassword(false))
         } else {
             showUpgradeToProWarning()
         }
