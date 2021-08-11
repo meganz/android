@@ -357,9 +357,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 				MegaNode parentMove= ((FileExplorerActivityLollipop) context).parentMoveCopy();
 				activateButton(parentMove == null || parentMove.getHandle() != parentHandle);
-
-				nodeHandleMoveCopy = ((FileExplorerActivityLollipop) context).getNodeHandleMoveCopy();
-				setDisableNodes(nodeHandleMoveCopy);
 				break;
 
 			case FileExplorerActivityLollipop.COPY:
@@ -694,19 +691,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		else{
 			return 0;
 		}
-	}
-
-	/*
-	 * Disable nodes from the list
-	 */
-	public void setDisableNodes(ArrayList<Long> disabledNodes) {
-		logDebug("Disabled nodes: " + disabledNodes.size());
-		if (adapter == null){
-			logWarning("Adapter is NULL");
-			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, recyclerView, selectFile);
-		}
-		adapter.setDisableNodes(disabledNodes);
-		adapter.setSelectFile(selectFile);
 	}
 
 	public long getParentHandle() {
