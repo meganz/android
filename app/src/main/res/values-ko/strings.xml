@@ -3847,6 +3847,140 @@
     <string name="action_keep_empty_old_extension">공백 유지</string>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
     <string name="action_keep_old_extension">.%1$s 유지</string>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">현재 혼자 뿐입니다.</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">회의</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">회의 시작/참가</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">새 회의</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">회의 참가</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">회의 시작</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">손님으로 참가</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">%s님의 회의</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">종료</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">마이크</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">마이크가 꺼져 있습니다</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">마이크가 켜져 있습니다</string>
+    <!-- General label for camera -->
+    <string name="general_camera">카메라</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">카메라가 켜져 있습니다.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">카메라가 꺼져 있습니다.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">보류</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">스피커</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">헤드폰</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">헤드폰이 활성화 되었습니다</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">스피커가 켜져 있습니다</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">스피커가 꺼져 있습니다</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">종료</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">참가자 초대</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">참가자 (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">메인 보기에 표시</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">중재자 임명</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">회의를 떠날까요?</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">중재자 없음</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">떠나기 전에, 회의에 1명 이상의 중재자를 임명하세요.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">중재자 임명</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">어쨌든 떠나기</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">1명 이상의 중재자를 임명하세요.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">회의 이름 변경</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">참가자: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">중재자: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">회의 링크</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">시간</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">손님으로 회의에 참가</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">회의에 초대 되었습니다.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">받은 회의 링크를 탭하거나 여기에 붙여넣으세요.</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">안 좋은 연결 품질</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">회의가 종료되었습니다</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">잘못된 회의 링크</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">MEGA에 접근 권한이 필요합니다</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">회의를 하려면 MEGA에 마이크와 카메라에 접근 권한이 필요합니다.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">알겠습니다</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">설정에 가서 MEGA에 카메라와 마이크에 대한 접근을 허용해주세요.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">회의 대화 보기</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">회의에 더 많은 참가자를 초대합니다. 초대하려면 위로 올리세요.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">새 회의를 만들려면 탭 하세요</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">우리의 새 암호화 회의 기능으로 MEGA 회의를 빠르게 설정하세요</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">당신은 새 중재자입니다.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">회의 링크 복사됨</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%s님이 회의를 시작하였습니다. 참가하려면 탭하세요.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA 회의</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">종단간 암호화 영상 회의</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">올바른 회의 링크를 입력하세요</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">회의 이상의 것</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">당신의 프라이버시가 중요합니다</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">세계에서 가장 큰 안전한 클라우드 저장소와 협업 플랫폼에 가입하세요.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">20GB를 무료로 받으세요</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">지금 가입하고 고급 협업 기능을 무료로 즐기세요.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">다른 통화가 진행 중입니다. 다른 통화를 하기 전에 현재 통화를 종료하세요.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">새 회의 이름</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">회의 생성 실패</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](나)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">메인 보기</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">같은 이름의 파일이 존재합니다</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
