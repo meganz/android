@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -99,6 +100,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
@@ -1431,7 +1433,16 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 try {
                     Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(RECOVERY_URL));
+
+                    if (et_user != null && et_user.getText() != null && !isTextEmpty(et_user.getText().toString())) {
+                        String typedEmail = et_user.getText().toString();
+                        String encodedEmail = Base64.encodeToString(typedEmail.getBytes(), Base64.DEFAULT);
+                        encodedEmail = encodedEmail.replace("\n", "");
+                        openTermsIntent.setData(Uri.parse(RECOVERY_URL_EMAIL + encodedEmail));
+                    } else {
+                        openTermsIntent.setData(Uri.parse(RECOVERY_URL));
+                    }
+
                     startActivity(openTermsIntent);
                 }
                 catch (Exception e){

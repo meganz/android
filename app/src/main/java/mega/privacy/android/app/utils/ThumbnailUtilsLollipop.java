@@ -1140,8 +1140,8 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
-		if(localPath != null) //Si la tengo en el sistema de ficheros
+		String localPath = getLocalFile(document); //if file already exists returns != null
+		if(localPath != null)
 		{
 			ResizerParams params = new ResizerParams();
 			params.document = document;
@@ -1158,8 +1158,8 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
-		if(localPath != null) //Si la tengo en el sistema de ficheros
+		String localPath = getLocalFile(document); //if file already exists returns != null
+		if(localPath != null)
 		{
 			logDebug("localPath is not null: " + localPath);
 			ResizerParams params = new ResizerParams();
@@ -1178,8 +1178,8 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
-		if(localPath != null) //Si la tengo en el sistema de ficheros
+		String localPath = getLocalFile(document); //if file already exists returns != null
+		if(localPath != null)
 		{
 			logDebug("localPath is not null: " + localPath);
 			ResizerParams params = new ResizerParams();
@@ -1236,8 +1236,8 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
-		if(localPath != null) //Si la tengo en el sistema de ficheros
+		String localPath = getLocalFile(document); //if file already exists returns != null
+		if(localPath != null)
 		{
 			logDebug("localPath is not null: " + localPath);
 			ResizerParams params = new ResizerParams();

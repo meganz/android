@@ -171,7 +171,7 @@ class RecentsBucketFragment : BaseFragment() {
     ) {
         val mime = MimeTypeList.typeForName(node.name)
         val localPath =
-            FileUtil.getLocalFile(activity, node.name, node.size)
+            FileUtil.getLocalFile(node)
         logDebug("Open node: ${node.name} which mime is: ${mime.type}, local path is: $localPath")
 
         when {

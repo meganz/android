@@ -278,7 +278,7 @@ class TextEditorViewModel @ViewModelInject constructor(
     private fun initializeReadParams(mi: ActivityManager.MemoryInfo) {
         localFileUri =
             if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
-            else getLocalFile(null, getNode()?.name, getNode()?.size ?: 0)
+            else getLocalFile(getNode())
 
         if (isTextEmpty(localFileUri)) {
             val api = textEditorData.value?.api ?: return

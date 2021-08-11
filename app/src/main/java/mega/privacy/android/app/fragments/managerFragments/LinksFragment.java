@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,7 +135,6 @@ public class LinksFragment extends MegaNodeBaseFragment {
             nodes = megaApi.getChildren(parentNode, getLinksOrderCloud(
                     sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel()));
 
-            addSectionTitle(nodes, adapter.getAdapterType());
             adapter.setNodes(nodes);
         }
 
@@ -154,7 +152,6 @@ public class LinksFragment extends MegaNodeBaseFragment {
     @Override
     public void setNodes(ArrayList<MegaNode> nodes) {
         this.nodes = nodes;
-        addSectionTitle(nodes, ITEM_VIEW_TYPE_LIST);
         adapter.setNodes(nodes);
         setEmptyView();
         visibilityFastScroller();

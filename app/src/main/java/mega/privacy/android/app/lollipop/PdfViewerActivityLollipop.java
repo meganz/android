@@ -295,6 +295,11 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         }
         fromDownload = intent.getBooleanExtra("fromDownloadService", false);
         inside = intent.getBooleanExtra("inside", false);
+
+        if (!inside) {
+            disablePasscode();
+        }
+
         isFolderLink = intent.getBooleanExtra("isFolderLink", false);
         type = intent.getIntExtra("adapterType", 0);
         path = intent.getStringExtra("path");
@@ -566,6 +571,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             }
         }
         else {
+            disablePasscode();
             type = intent.getIntExtra("adapterType", 0);
             path = intent.getStringExtra("path");
             currentPage = 1;
@@ -939,17 +945,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                 startService(intent);
             }
         }
-    }
-
-    public void backToCloud(long handle){
-        logDebug("Handle: "+handle);
-        Intent startIntent = new Intent(this, ManagerActivityLollipop.class);
-        if(handle!=-1){
-            startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startIntent.setAction(ACTION_OPEN_FOLDER);
-            startIntent.putExtra("PARENT_HANDLE", handle);
-        }
-        startActivity(startIntent);
     }
 
     public  void setToolbarVisibilityShow () {
@@ -1634,7 +1629,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                     fileNameTextView.setText(pdfFileName);
                     supportInvalidateOptionsMenu();
 
-                    String localPath = getLocalFile(this, file.getName(), file.getSize());
+                    String localPath = getLocalFile(file);
 
                     if (localPath != null){
                         File mediaFile = new File(localPath);
@@ -2029,12 +2024,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             }
             updateFile();
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        logDebug("onPause");
     }
 
     @Override

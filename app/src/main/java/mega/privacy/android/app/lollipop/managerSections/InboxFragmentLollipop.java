@@ -60,7 +60,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.NewHeaderItemDecoration;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -94,8 +94,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	LinearLayoutManager mLayoutManager;
 	CustomizedGridLayoutManager gridLayoutManager;
 	MegaNodeAdapter adapter;
-    public NewHeaderItemDecoration headerItemDecoration;
-    private int placeholderCount;
 	MegaNode inboxNode;
 
 	ArrayList<MegaNode> nodes;
@@ -139,63 +137,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	@Override
 	public void reselectUnHandledSingleItem(int position) {
 	}
-
-    public void addSectionTitle(List<MegaNode> nodes,int type) {
-        Map<Integer, String> sections = new HashMap<>();
-        int folderCount = 0;
-        int fileCount = 0;
-        for (MegaNode node : nodes) {
-            if(node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-            if (node.isFile()) {
-                fileCount++;
-            }
-        }
-
-        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
-            int spanCount = 2;
-            if (recyclerView instanceof NewGridRecyclerView) {
-                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
-            }
-            if(folderCount > 0) {
-                for (int i = 0;i < spanCount;i++) {
-                    sections.put(i, getString(R.string.general_folders));
-                }
-            }
-    
-            if(fileCount > 0 ) {
-                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
-                if (placeholderCount == 0) {
-                    for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + i, getString(R.string.general_files));
-                    }
-                } else {
-                    for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
-                    }
-                }
-            }
-        } else {
-            placeholderCount = 0;
-            sections.put(0, getString(R.string.general_folders));
-            sections.put(folderCount, getString(R.string.general_files));
-        }
-
-		if (headerItemDecoration == null) {
-			logDebug("Create new decoration");
-			headerItemDecoration = new NewHeaderItemDecoration(context);
-		} else {
-			logDebug("Remove old decoration");
-			recyclerView.removeItemDecoration(headerItemDecoration);
-		}
-		headerItemDecoration.setType(type);
-		headerItemDecoration.setKeys(sections);
-		recyclerView.addItemDecoration(headerItemDecoration);
-    }
 
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -485,6 +426,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			recyclerView.setClipToPadding(false);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -588,7 +530,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 		if (MimeTypeList.typeForName(node.getName()).isImage()) {
 			Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 			//Put flag to notify FullScreenImageViewerLollipop.
-			intent.putExtra("placeholder", placeholderCount);
+			intent.putExtra("placeholder", adapter.getPlaceholderCount());
 			intent.putExtra("position", position);
 			intent.putExtra("adapterType", INBOX_ADAPTER);
 			if (megaApi.getParentNode(node).getType() == MegaNode.TYPE_RUBBISH) {
@@ -632,12 +574,12 @@ public class InboxFragmentLollipop extends RotatableFragment{
 
 			mediaIntent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
 			putThumbnailLocation(mediaIntent, recyclerView, position, VIEWER_FROM_INBOX, adapter);
-			mediaIntent.putExtra("placeholder", placeholderCount);
+			mediaIntent.putExtra("placeholder", adapter.getPlaceholderCount());
 			mediaIntent.putExtra("HANDLE", file.getHandle());
 			mediaIntent.putExtra("FILENAME", file.getName());
 			mediaIntent.putExtra("adapterType", INBOX_ADAPTER);
 
-			String localPath = getLocalFile(context, file.getName(), file.getSize());
+			String localPath = getLocalFile(file);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);
@@ -697,7 +639,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			pdfIntent.putExtra("inside", true);
 			pdfIntent.putExtra("adapterType", INBOX_ADAPTER);
 
-			String localPath = getLocalFile(context, file.getName(), file.getSize());
+			String localPath = getLocalFile(file);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);
@@ -744,7 +686,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			logDebug("Is URL file");
 			MegaNode file = node;
 
-			String localPath = getLocalFile(context, file.getName(), file.getSize());
+			String localPath = getLocalFile(file);
 
 			if (localPath != null) {
 				File mediaFile = new File(localPath);
@@ -865,7 +807,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 				((ManagerActivityLollipop) context).setToolbarTitle();
 
 				nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
-				addSectionTitle(nodes, adapter.getAdapterType());
 				adapter.setNodes(nodes);
 
 				setContentText();
@@ -1034,7 +975,6 @@ public class InboxFragmentLollipop extends RotatableFragment{
 		logDebug("setNodes");
 		this.nodes = nodes;
 		if (adapter != null){
-            addSectionTitle(nodes,adapter.getAdapterType());
 			adapter.setNodes(nodes);
 			setContentText();
 		}	
