@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -13,13 +12,13 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.constants.EventConstants.EVENT_COPY_LINK_TO_CLIPBOARD
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.getLink.useCase.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaAccountDetails
@@ -112,29 +111,28 @@ class GetLinkViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun copyLink() {
-        LiveEventBus.get(EVENT_COPY_LINK_TO_CLIPBOARD, Pair::class.java).post(
+    fun copyLink(action: (Pair<String, String>) -> Unit) {
+        action.invoke(
             Pair(
                 when {
                     isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
-                    !linkWithPassword.isNullOrEmpty() -> linkWithPassword
+                    !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
                     else -> node.publicLink
-                }, getString(R.string.link_copied_clipboard)
+                }, getQuantityString(R.plurals.links_copied_clipboard, 1)
             )
         )
     }
 
-    fun copyLinkKey() {
-        LiveEventBus.get(EVENT_COPY_LINK_TO_CLIPBOARD, Pair::class.java)
-            .post(Pair(key, getString(R.string.key_copied_clipboard)))
+    fun copyLinkKey(action: (Pair<String, String>) -> Unit) {
+        action.invoke(Pair(key, getString(R.string.key_copied_clipboard)))
     }
 
-    fun copyLinkPassword() {
+    fun copyLinkPassword(action: (Pair<String, String>) -> Unit) {
         if (linkWithPassword.isNullOrEmpty()) {
             return
         }
-        LiveEventBus.get(EVENT_COPY_LINK_TO_CLIPBOARD, Pair::class.java)
-            .post(Pair(getPasswordText(), getString(R.string.password_copied_clipboard)))
+
+        action.invoke(Pair(getPasswordText()!!, getString(R.string.password_copied_clipboard)))
     }
 
     fun removeLinkWithPassword() {

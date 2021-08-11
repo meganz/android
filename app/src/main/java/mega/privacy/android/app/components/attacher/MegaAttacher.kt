@@ -149,12 +149,13 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
 
         val nodeHandlesToAttach = data.getLongArrayExtra(NODE_HANDLES)
         val contactHandlesToAttach = data.getLongArrayExtra(USER_HANDLES)
+        val severalLinksToAttach = data.getStringArrayListExtra(EXTRA_SEVERAL_LINKS)
         val linkToAttach = data.getStringExtra(EXTRA_LINK)
         val linkKey = data.getStringExtra(EXTRA_KEY)
         val linkPassword = data.getStringExtra(EXTRA_PASSWORD)
 
-        processContactsAndChats(chatIds, contactEmails) {
-            if (it.isEmpty()) {
+        processContactsAndChats(chatIds, contactEmails) { managedChatIds ->
+            if (managedChatIds.isEmpty()) {
                 showAttachFailSnackbar(
                     nodeHandlesToAttach, contactHandlesToAttach,
                     (chatIds?.size ?: 0) + contactEmails.size, snackbarShower
@@ -166,13 +167,16 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
 
             when {
                 nodeHandlesToAttach != null && nodeHandlesToAttach.isNotEmpty() -> {
-                    attachNodesToChats(nodeHandlesToAttach, it, snackbarShower)
+                    attachNodesToChats(nodeHandlesToAttach, managedChatIds, snackbarShower)
                 }
                 contactHandlesToAttach != null && contactHandlesToAttach.isNotEmpty() -> {
-                    attachContactsToChats(contactHandlesToAttach, it, snackbarShower)
+                    attachContactsToChats(contactHandlesToAttach, managedChatIds, snackbarShower)
                 }
-                !TextUtils.isEmpty(linkToAttach) -> {
-                    attachLinkToChats(linkToAttach!!, linkKey, linkPassword, it, snackbarShower)
+                !linkToAttach.isNullOrEmpty() -> {
+                    attachLinkToChats(linkToAttach, linkKey, linkPassword, managedChatIds, snackbarShower)
+                }
+                !severalLinksToAttach.isNullOrEmpty() -> {
+                    attachSeveralLinksToChats(severalLinksToAttach, managedChatIds, snackbarShower)
                 }
                 else -> {
                     attaching = false
@@ -509,11 +513,28 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         } else if (!TextUtils.isEmpty(password)) {
             getString(R.string.link_and_password_sent)
         } else {
-            getString(R.string.link_sent)
+            getQuantityString(R.plurals.links_sent, 1)
         }
 
         snackbarShower.showSnackbarWithChat(
             message, if (chatIds.size == 1) chatIds[0] else MEGACHAT_INVALID_HANDLE
+        )
+    }
+
+    private fun attachSeveralLinksToChats(
+        links: List<String>,
+        chatIds: List<Long>,
+        snackbarShower: SnackbarShower
+    ) {
+        for (chatId in chatIds) {
+            for (link in links) {
+                megaChatApi.sendMessage(chatId, link)
+            }
+        }
+
+        snackbarShower.showSnackbarWithChat(
+            getQuantityString(R.plurals.links_sent, 2),
+            if (chatIds.size == 1) chatIds[0] else MEGACHAT_INVALID_HANDLE
         )
     }
 

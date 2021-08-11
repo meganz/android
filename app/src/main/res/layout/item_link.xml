@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <mega.privacy.android.app.components.RoundedImageView
+        android:id="@+id/thumbnail_image"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_image_list" />
+
+    <TextView
+        android:id="@+id/name_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey87White87"
+        app:layout_constraintStart_toEndOf="@+id/thumbnail_image"
+        app:layout_constraintTop_toTopOf="@+id/thumbnail_image"
+        tools:text="IMG_20171123_17220.jpg" />
+
+    <TextView
+        android:id="@+id/link_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintStart_toEndOf="@+id/thumbnail_image"
+        app:layout_constraintTop_toBottomOf="@+id/name_text"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey54White60"
+        tools:text="https://mega.nz/file/b0cXHSzJ#bmwrt…" />
+
+    <TextView
+        android:id="@+id/info_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintStart_toEndOf="@+id/thumbnail_image"
+        app:layout_constraintTop_toBottomOf="@+id/link_text"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87"
+        tools:text="6.5 MB" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

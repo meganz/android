@@ -1,22 +1,17 @@
 package mega.privacy.android.app.getLink
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
-import mega.privacy.android.app.constants.EventConstants.EVENT_COPY_LINK_TO_CLIPBOARD
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
@@ -28,7 +23,6 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.util.*
 
 class GetLinkActivity : PasscodeActivity(), SnackbarShower {
@@ -61,10 +55,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
     private var viewType = INVALID_VALUE
 
-    private val copyLinkObserver = Observer<Pair<String, String>> { copyInfo ->
-        copyToClipboard(copyInfo)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = GetLinkActivityLayoutBinding.inflate(layoutInflater)
@@ -89,14 +79,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(VIEW_TYPE, viewType)
         super.onSaveInstanceState(outState)
-    }
-
-    override fun onDestroy() {
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_COPY_LINK_TO_CLIPBOARD)
-            .removeObserver(copyLinkObserver as Observer<Any>)
-
-        super.onDestroy()
     }
 
     private fun handleIntent() {
@@ -129,10 +111,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     }
 
     private fun setupObservers() {
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_COPY_LINK_TO_CLIPBOARD)
-            .observeForever(copyLinkObserver as Observer<Any>)
-
         viewModelNode.checkElevation().observe(this, ::changeElevation)
     }
 
@@ -210,19 +188,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     }
 
     /**
-     * Copies a link, decryption key or password into clipboard and shows a snackbar.
-     *
-     * @param copyInfo First is the  content to copy, second the text to show as confirmation.
-     */
-    private fun copyToClipboard(copyInfo: Pair<String, String>) {
-        val clipManager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, copyInfo.first)
-        clipManager.setPrimaryClip(clip)
-
-        showSnackbar(SNACKBAR_TYPE, copyInfo.second, MEGACHAT_INVALID_HANDLE)
-    }
-
-    /**
      * Shows a warning before share link when the user has the Send decryption key separately or
      * the password protection enabled, asking if they want to share also the key or the password.
      *
@@ -270,11 +235,12 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
             when {
-                viewType == TYPE_LIST -> {
+                viewType == TYPE_LIST ->
+                    viewModelList.sendToChat(data) { intent -> handleActivityResult(intent) }
 
-                }
                 viewModelNode.shouldShowShareKeyOrPasswordDialog() ->
                     showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
+
                 else ->
                     viewModelNode.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
                         handleActivityResult(intent)
@@ -321,11 +287,12 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
             }
             R.id.action_share -> {
                 when {
-                    viewType == TYPE_LIST -> {
+                    viewType == TYPE_LIST ->
+                        viewModelList.shareLinks { intent -> startActivity(intent) }
 
-                    }
                     viewModelNode.shouldShowShareKeyOrPasswordDialog() ->
                         showShareKeyOrPasswordDialog(SHARE, null)
+
                     else -> viewModelNode.shareLink { intent -> startActivity(intent) }
                 }
             }

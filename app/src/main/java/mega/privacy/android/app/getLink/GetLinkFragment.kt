@@ -26,10 +26,13 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.Scrollable
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
+import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap
@@ -101,16 +104,20 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
 
         binding.copyLinkButton.setOnClickListener {
             checkIfShouldHidePassword()
-            viewModel.copyLink()
+            viewModel.copyLink { copyInfo -> copyToClipboard(copyInfo) }
         }
 
-        binding.copyKeyButton.setOnClickListener { viewModel.copyLinkKey() }
+        binding.copyKeyButton.setOnClickListener {
+            viewModel.copyLinkKey { copyInfo ->
+                copyToClipboard(copyInfo)
+            }
+        }
 
         binding.copyKeyButton.isVisible = false
 
         binding.copyPasswordButton.setOnClickListener {
             checkIfShouldHidePassword()
-            viewModel.copyLinkPassword()
+            viewModel.copyLinkPassword { copyInfo -> copyToClipboard(copyInfo) }
         }
 
         if (viewModel.isPro()) {
@@ -288,7 +295,9 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
             binding.decryptedKeySwitch.isChecked = !binding.decryptedKeySwitch.isChecked
         }
 
-        if (binding.decryptedKeySwitch.isChecked && !viewModel.getLinkWithPassword().isNullOrEmpty()) {
+        if (binding.decryptedKeySwitch.isChecked
+            && !viewModel.getLinkWithPassword().isNullOrEmpty()
+        ) {
             removePasswordClick()
         }
 
@@ -420,6 +429,16 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         }
 
         passwordVisible = !passwordVisible
+    }
+
+    /**
+     * Copies a link, decryption key or password into clipboard and shows a snackbar.
+     *
+     * @param copyInfo First is the  content to copy, second the text to show as confirmation.
+     */
+    private fun copyToClipboard(copyInfo: Pair<String, String>) {
+        TextUtil.copyToClipboard(requireActivity(), copyInfo.first)
+        (requireActivity() as SnackbarShower).showSnackbar(copyInfo.second)
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
