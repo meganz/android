@@ -20,6 +20,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
 
 class CuActionModeCallback implements ActionMode.Callback {
 
@@ -155,6 +156,8 @@ class CuActionModeCallback implements ActionMode.Callback {
                 control.getLink().setVisible(true)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
+        } else if (allHaveOwnerAccess(selected)) {
+            control.getLink().setVisible(true).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 
         control.sendToChat().setVisible(true)
@@ -167,7 +170,7 @@ class CuActionModeCallback implements ActionMode.Callback {
 
         control.move().setVisible(true);
         control.copy().setVisible(true);
-        if (selected.size() > 1) {
+        if (selected.size() > 1 && !control.getLink().isVisible()) {
             control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 

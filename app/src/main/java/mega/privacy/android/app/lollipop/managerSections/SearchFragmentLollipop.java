@@ -79,10 +79,13 @@ import nz.mega.sdk.MegaShare;
 import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.utils.CloudStorageOptionControlUtil.MAX_ACTION_COUNT;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
+import static mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodes;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -120,7 +123,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	private DisplayMetrics outMetrics;
 	private Display display;
 
-	private boolean allFiles = true;
 	private String downloadLocationDefaultPath;
 
     private int placeholderCount;
@@ -311,18 +313,15 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			
 			// Link
 			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-				if(selected.get(0).isExported()){
+				if (selected.get(0).isExported()) {
 					//Node has public link
-					showRemoveLink=true;
-					showLink=false;
+					showRemoveLink = true;
 					showEditLink = true;
-
+				} else {
+					showLink = true;
 				}
-				else{
-					showRemoveLink=false;
-					showLink=true;
-					showEditLink = false;
-				}
+			} else if (allHaveOwnerAccess(selected)) {
+				showLink = true;
 			}
 
 
@@ -331,7 +330,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				showTrash = true;
 				showMove = true;
 				showCopy = true;
-				allFiles = true;
 
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -341,13 +339,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 					}
 				}
 				//showSendToChat
-				for(int i=0; i<selected.size();i++)	{
-					if(!selected.get(i).isFile()){
-						allFiles = false;
-					}
-				}
-
-				showSendToChat = allFiles;
+				showSendToChat = areAllFileNodes(selected);
 
 				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -400,23 +392,40 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
-			
-			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 
-			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat);
-			menu.findItem(R.id.cab_menu_send_to_chat).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			int alwaysCount = 0;
 
-			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-			if(showLink){
+			if (showDownload) alwaysCount++;
+			menu.findItem(R.id.cab_menu_download).setVisible(showDownload)
+					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+			if (showSendToChat) alwaysCount++;
+			menu.findItem(R.id.cab_menu_send_to_chat).setVisible(showSendToChat)
+					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+			if (showLink) {
+				alwaysCount++;
 				menu.findItem(R.id.cab_menu_share_link_remove).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-			}else{
+			} else {
 				menu.findItem(R.id.cab_menu_share_link).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-
 			}
+
+			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+
+			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+
+			if (showMove) alwaysCount++;
+			menu.findItem(R.id.cab_menu_move).setVisible(showMove)
+					.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+
+			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			menu.findItem(R.id.cab_menu_copy).setShowAsAction(showCopy && alwaysCount < MAX_ACTION_COUNT
+					? MenuItem.SHOW_AS_ACTION_ALWAYS
+					: MenuItem.SHOW_AS_ACTION_NEVER);
+
+
 
 			menu.findItem(R.id.cab_menu_share_link_remove).setVisible(showRemoveLink);
 			if(showRemoveLink){

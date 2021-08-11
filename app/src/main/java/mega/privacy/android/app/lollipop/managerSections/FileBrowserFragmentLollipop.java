@@ -85,6 +85,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -342,6 +343,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						== MegaError.API_OK) {
 					control.rename().setVisible(true);
 				}
+			} else if (allHaveOwnerAccess(selected)) {
+				control.getLink().setVisible(true).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
 			boolean showSendToChat = true;
@@ -395,12 +398,15 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 			control.trash().setVisible(showTrash);
 
-			control.shareOut().setVisible(true)
-					.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			control.shareOut().setVisible(true);
+			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+				control.shareOut().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 
 			control.move().setVisible(true);
 			control.copy().setVisible(true);
-			if (selected.size() > 1) {
+			if (selected.size() > 1
+					&& control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
 				control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
