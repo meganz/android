@@ -4,15 +4,20 @@ import android.content.Intent
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.utils.Constants.EXTRA_SEVERAL_LINKS
 import mega.privacy.android.app.utils.Constants.PLAIN_TEXT_SHARE_TYPE
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
+import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiAndroid
+import java.io.File
 
 class GetSeveralLinksViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
@@ -23,12 +28,24 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
 
     private val linksList = ArrayList<String>()
 
+    private val thumbFolder by lazy { getThumbFolder(MegaApplication.getInstance()) }
+
     fun initNodes(handlesList: LongArray) {
         val links = ArrayList<LinkItem>()
         for (handle in handlesList) {
             val node = megaApi.getNodeByHandle(handle)
             if (node != null) {
-                links.add(LinkItem(node, node.name, node.publicLink, Util.getSizeString(node.size)))
+                val thumbnail = File(thumbFolder, node.base64Handle + FileUtil.JPG_EXTENSION)
+                links.add(
+                    LinkItem(
+                        node,
+                        if (thumbnail.exists()) thumbnail else null,
+                        node.name,
+                        node.publicLink,
+                        if (node.isFolder) getMegaNodeFolderInfo(node) else getSizeString(node.size)
+                    )
+                )
+
                 linksList.add(node.publicLink)
             }
         }
@@ -60,9 +77,12 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
             .setType(PLAIN_TEXT_SHARE_TYPE)
             .putExtra(Intent.EXTRA_TEXT, getLinksString())
 
-        action.invoke(Intent.createChooser(intent,
-            StringResourcesUtils.getString(R.string.context_get_link)
-        ))
+        action.invoke(
+            Intent.createChooser(
+                intent,
+                StringResourcesUtils.getString(R.string.context_get_link)
+            )
+        )
     }
 
     /**

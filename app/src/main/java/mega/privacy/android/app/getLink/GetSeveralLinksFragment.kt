@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentGetSeveralLinksBinding
 import mega.privacy.android.app.getLink.adapter.LinksAdapter
 import mega.privacy.android.app.getLink.data.LinkItem
@@ -42,6 +43,7 @@ class GetSeveralLinksFragment : Fragment() {
         binding.linksList.apply {
             adapter = linksAdapter
             setHasFixedSize(true)
+            addItemDecoration(SimpleDividerItemDecoration(requireContext()))
         }
 
         binding.copyButton.setOnClickListener { viewModel.copyAll { links -> copyLinks(links) } }

@@ -3,16 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:padding="16dp">
 
-    <mega.privacy.android.app.components.RoundedImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/thumbnail_image"
         android:layout_width="48dp"
         android:layout_height="48dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_image_list" />
+        app:roundedCornerRadius="4dp"
+        tools:placeholderImage="@drawable/ic_image_list" />
 
     <TextView
         android:id="@+id/name_text"
