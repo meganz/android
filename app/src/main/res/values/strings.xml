@@ -3965,8 +3965,6 @@
     <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
     <!-- Content to show in a Snackbar to tip the incompatibility-->
     <string name="version_incompatibility">We are upgrading MEGAchat. Your calls might not be connected due to version incompatibility unless all parties update their MEGA apps to the latest version.</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
-    <string name="action_change_anyway">Change anyway</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">1 file already downloaded. 1 file pending.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -4011,13 +4009,15 @@
         <item quantity="one">1 item was not restored successfully</item>
         <item quantity="other">%d items were not restored successfully</item>
     </plurals>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
+    <string name="action_change_anyway">Change anyway</string>
     <!-- Title of the screen to get several links at the same time. -->
     <string name="title_get_links">Get Links</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">Options such as Send decryption key separately, Set expiry date or Set password protection are only available for single items.</string>
+    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
     <string name="action_copy_all">Copy all</string>
-    <!-- Text to show on Links section, indicating the links have been sent to the selected chats. -->
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
         <item quantity="one">Link successfully sent.</item>
         <item quantity="other">Links successfully sent.</item>

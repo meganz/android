@@ -654,6 +654,9 @@ public class Constants {
     public static final int ICON_SIZE_DP = 48;
     public static final int ICON_MARGIN_DP = 12;
 
+    public static final float ALPHA_VIEW_DISABLED = 0.3f;
+    public static final float ALPHA_VIEW_ENABLED = 1.0f;
+
     // Thumbnail dimens for Browse file page
     public static final int THUMBNAIL_SIZE_DP = 36;
     public static final int THUMBNAIL_MARGIN_DP = 18;

@@ -237,9 +237,9 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
             when {
                 viewType == TYPE_LIST -> handleActivityResult(
-                    data?.putExtra(
+                    data?.putStringArrayListExtra(
                         EXTRA_SEVERAL_LINKS,
-                        viewModelList.getLinksString()
+                        viewModelList.getLinksList()
                     )
                 )
 

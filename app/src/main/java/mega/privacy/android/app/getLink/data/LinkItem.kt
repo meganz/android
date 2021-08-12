@@ -8,7 +8,7 @@ data class LinkItem(
     val node: MegaNode,
     var thumbnail: File?,
     val name: String,
-    val link: String,
+    var link: String?,
     val info: String
 ) {
 

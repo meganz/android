@@ -4,6 +4,8 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
+import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.StringUtils.toThrowable
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -49,5 +51,34 @@ class ExportNodeUseCase @Inject constructor(
                     }
                 }
             ))
+        }
+
+    /**
+     * Launches a request to export a list of nodes.
+     *
+     * @param nodes List of nodes to export.
+     * @return Single<String> The links if the request finished with success, error if not.
+     */
+    fun export(nodes: List<MegaNode>): Single<HashMap<Long, String>> =
+        Single.create { emitter ->
+            val exported = HashMap<Long, String>()
+
+            for (node in nodes) {
+                megaApi.exportNode(node, OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode == MegaError.API_OK) {
+                            exported[request.nodeHandle] = request.link
+                        } else {
+                            logError("Error exporting ${node.handle}")
+                        }
+                    }
+                ))
+            }
+
+            if (exported.isNotEmpty()) {
+                emitter.onSuccess(exported)
+            } else {
+                emitter.onError("Error exporting nodes".toThrowable())
+            }
         }
 }

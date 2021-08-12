@@ -28,9 +28,8 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -44,8 +43,6 @@ import java.util.*
 class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrollable {
 
     companion object {
-        private const val ALPHA_VIEW_DISABLED = 0.3f
-        private const val ALPHA_VIEW_ENABLED = 1.0f
         private const val INVALID_EXPIRATION_TIME = -1L
         private const val LAST_MINUTE = "2359"
     }

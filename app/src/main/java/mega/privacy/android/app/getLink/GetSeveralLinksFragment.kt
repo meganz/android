@@ -13,6 +13,8 @@ import mega.privacy.android.app.getLink.adapter.LinksAdapter
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_DISABLED
+import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_ENABLED
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
 
@@ -45,15 +47,26 @@ class GetSeveralLinksFragment : Fragment() {
             addItemDecoration(SimpleDividerItemDecoration(requireContext()))
         }
 
-        binding.copyButton.setOnClickListener { copyLinks(viewModel.getLinksString()) }
+        binding.copyButton.apply {
+            isEnabled = false
+            setOnClickListener { copyLinks(viewModel.getLinksString()) }
+        }
     }
 
     private fun setupObservers() {
         viewModel.getLinkItems().observe(viewLifecycleOwner, ::showLinks)
+        viewModel.isExportingNodes().observe(viewLifecycleOwner, ::updateUI)
     }
 
     private fun showLinks(links: List<LinkItem>) {
         linksAdapter.submitList(links)
+    }
+
+    private fun updateUI(isExportingNodes: Boolean) {
+        binding.copyButton.apply {
+            isEnabled = !isExportingNodes
+            alpha = if (isExportingNodes) ALPHA_VIEW_DISABLED else ALPHA_VIEW_ENABLED
+        }
     }
 
     private fun copyLinks(links: String) {
