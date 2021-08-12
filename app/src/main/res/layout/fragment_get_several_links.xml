@@ -20,26 +20,14 @@
         android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.13sp.Grey54White60"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/links_section"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingTop="12dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="12dp"
-        android:text="@string/tab_links_shares"
-        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.AllCaps.Grey87White87"
-        app:layout_constraintTop_toBottomOf="@+id/get_links_warning" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/links_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
-        android:paddingBottom="50dp"
+        android:paddingBottom="70dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@+id/links_section"
+        app:layout_constraintTop_toBottomOf="@+id/get_links_warning"
         tools:listitem="@layout/item_link" />
 
 
@@ -56,9 +44,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="72dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="72dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="12dp"
             android:text="@string/action_copy_all"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/links_list" />

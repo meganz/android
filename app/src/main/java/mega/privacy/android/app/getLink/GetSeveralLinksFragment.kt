@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetSeveralLinksBinding
 import mega.privacy.android.app.getLink.adapter.LinksAdapter
@@ -105,7 +105,13 @@ class GetSeveralLinksFragment : Fragment() {
         binding.linksList.apply {
             adapter = linksAdapter
             setHasFixedSize(true)
-            addItemDecoration(SimpleDividerItemDecoration(requireContext()))
+            addItemDecoration(
+                PositionDividerItemDecoration(
+                    requireContext(),
+                    resources.displayMetrics,
+                    0
+                )
+            )
         }
 
         binding.copyButton.apply {

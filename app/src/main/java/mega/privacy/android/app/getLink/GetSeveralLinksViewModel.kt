@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.getLink.data.LinkItem
@@ -15,6 +16,7 @@ import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiAndroid
@@ -39,6 +41,8 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         val links = ArrayList<LinkItem>()
         val pendingExports = ArrayList<MegaNode>()
 
+        links.add(LinkItem.Header(getString(R.string.tab_links_shares)))
+
         for (handle in handlesList) {
             val node = megaApi.getNodeByHandle(handle)
             if (node != null) {
@@ -52,7 +56,7 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
                 val thumbnail = File(thumbFolder, node.base64Handle + FileUtil.JPG_EXTENSION)
 
                 links.add(
-                    LinkItem(
+                    LinkItem.Data(
                         node,
                         if (thumbnail.exists()) thumbnail else null,
                         node.name,
@@ -89,11 +93,11 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         for (item in links.indices) {
             val linkItem = links[item]
 
-            if (linkItem.link == null) {
+            if (linkItem is LinkItem.Data && linkItem.link == null) {
                 val link = exportedNodes[linkItem.node.handle]
 
                 if (link != null) {
-                    links[item] = LinkItem(
+                    links[item] = LinkItem.Data(
                         linkItem.node,
                         linkItem.thumbnail,
                         linkItem.name,
@@ -115,7 +119,8 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
             val linksList = list ?: return@let
 
             for (linkItem in linksList) {
-                linkItem.link?.let { link -> links.add(link) }
+                if (linkItem is LinkItem.Data)
+                    linkItem.link?.let { link -> links.add(link) }
             }
         }
 
@@ -129,7 +134,8 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
             val linksList = list ?: return@let
 
             for (linkItem in linksList) {
-                links += linkItem.link + "\n"
+                if (linkItem is LinkItem.Data)
+                    links += linkItem.link + "\n"
             }
         }
 

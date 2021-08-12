@@ -17,7 +17,7 @@ class LinkViewHolder(
 
     private val processing by lazy { getString(R.string.link_request_status) }
 
-    fun bind(item: LinkItem) {
+    fun bind(item: LinkItem.Data) {
         val thumbSize: Int
         val margin: Int
         val node = item.node
