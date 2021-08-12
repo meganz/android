@@ -13,8 +13,10 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
+import mega.privacy.android.app.getLink.useCase.GetThumbnailUseCase
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
@@ -25,7 +27,8 @@ import java.io.File
 
 class GetSeveralLinksViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val exportNodeUseCase: ExportNodeUseCase
+    private val exportNodeUseCase: ExportNodeUseCase,
+    private val getThumbnailUseCase: GetThumbnailUseCase
 ) : BaseRxViewModel() {
 
     private val linkItemsList: MutableLiveData<List<LinkItem>> = MutableLiveData()
@@ -40,6 +43,7 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
     fun initNodes(handlesList: LongArray) {
         val links = ArrayList<LinkItem>()
         val pendingExports = ArrayList<MegaNode>()
+        val pendingThumbnails = ArrayList<MegaNode>()
 
         links.add(LinkItem.Header(getString(R.string.tab_links_shares)))
 
@@ -53,12 +57,18 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
                 }
 
                 val link = if (isExported) node.publicLink else null
-                val thumbnail = File(thumbFolder, node.base64Handle + FileUtil.JPG_EXTENSION)
+                val thumbnail = if (node.isFile && node.hasThumbnail()) {
+                    File(thumbFolder, node.base64Handle + FileUtil.JPG_EXTENSION)
+                } else null
+
+                if (thumbnail != null && !thumbnail.exists()) {
+                    pendingThumbnails.add(node)
+                }
 
                 links.add(
                     LinkItem.Data(
                         node,
-                        if (thumbnail.exists()) thumbnail else null,
+                        if (thumbnail?.exists() == true) thumbnail else null,
                         node.name,
                         link,
                         if (node.isFolder) getMegaNodeFolderInfo(node) else getSizeString(node.size)
@@ -68,6 +78,7 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         }
 
         exportNodes(pendingExports)
+        requestThumbnails(pendingThumbnails)
         linkItemsList.value = links
     }
 
@@ -109,6 +120,41 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         }
 
         exportingNodes.value = false
+        linkItemsList.value = links
+    }
+
+    private fun requestThumbnails(pendingThumbnails: List<MegaNode>) {
+        if (pendingThumbnails.isNotEmpty()) {
+            getThumbnailUseCase.get(pendingThumbnails, thumbFolder)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = { handle -> notifyThumbnailUpdate(handle) },
+                    onError = { error -> logError(error.stackTraceToString()) }
+                )
+                .addTo(composite)
+        }
+    }
+
+    private fun notifyThumbnailUpdate(handle: Long) {
+        val links = (linkItemsList.value ?: return).toMutableList()
+
+        for (item in links.indices) {
+            val linkItem = links[item]
+
+            if (linkItem is LinkItem.Data && linkItem.id == handle) {
+                links[item] = LinkItem.Data(
+                    linkItem.node,
+                    File(thumbFolder, linkItem.node.base64Handle + FileUtil.JPG_EXTENSION),
+                    linkItem.name,
+                    linkItem.link,
+                    linkItem.info
+                )
+
+                break
+            }
+        }
+
         linkItemsList.value = links
     }
 
