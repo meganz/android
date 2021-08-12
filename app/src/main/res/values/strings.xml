@@ -4017,4 +4017,14 @@
     <string name="warning_get_links">Options such as Send decryption key separately, Set expiry date or Set password protection are only available for single items.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
     <string name="action_copy_all">Copy all</string>
+    <!-- Text to show on Links section, indicating the links have been sent to the selected chats. -->
+    <plurals name="links_sent">
+        <item quantity="one">Link successfully sent.</item>
+        <item quantity="other">Links successfully sent.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link copied to the clipboard.</item>
+        <item quantity="other">Links copied to the clipboard.</item>
+    </plurals>
 </resources>

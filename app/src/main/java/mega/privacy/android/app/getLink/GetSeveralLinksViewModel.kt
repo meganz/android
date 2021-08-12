@@ -50,7 +50,7 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
             }
         }
 
-        linkItemsList.value = links
+        linkItemsList.value = links.toList()
     }
 
     private fun getLinksString(): String {

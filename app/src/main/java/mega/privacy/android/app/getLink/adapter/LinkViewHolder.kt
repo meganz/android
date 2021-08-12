@@ -16,22 +16,22 @@ class LinkViewHolder(
 
     fun bind(item: LinkItem) {
         val thumbSize: Int
-        val marginStart: Int
+        val margin: Int
         val node = item.node
 
         if (node.isFolder || item.thumbnail == null) {
             thumbSize = dp2px(ICON_SIZE_DP.toFloat())
-            marginStart = dp2px(ICON_MARGIN_DP.toFloat())
+            margin = dp2px(ICON_MARGIN_DP.toFloat())
         } else {
             thumbSize = dp2px(THUMB_SIZE_DP.toFloat())
-            marginStart = dp2px(THUMB_MARGIN_DP.toFloat())
+            margin = dp2px(THUMB_MARGIN_DP.toFloat())
         }
 
-        binding.thumbnailImage.layoutParams.height = thumbSize
-        binding.thumbnailImage.layoutParams.width = thumbSize
-        (binding.nameText.layoutParams as ConstraintLayout.LayoutParams).marginStart = marginStart
-        (binding.linkText.layoutParams as ConstraintLayout.LayoutParams).marginStart = marginStart
-        (binding.infoText.layoutParams as ConstraintLayout.LayoutParams).marginStart = marginStart
+        (binding.thumbnailImage.layoutParams as ConstraintLayout.LayoutParams).apply {
+            height = thumbSize
+            width = thumbSize
+            setMargins(margin, margin, margin, margin)
+        }
 
         when {
             node.isFolder -> {

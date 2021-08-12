@@ -36,7 +36,6 @@ class GetSeveralLinksFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
-        super.onViewCreated(view, savedInstanceState)
     }
 
     private fun setupView() {

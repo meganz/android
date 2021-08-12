@@ -149,6 +149,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                     ).toUpperCase(Locale.getDefault())
                 }
                 R.id.main_get_several_links -> {
+                    viewModelNode.setElevation(true)
                     supportActionBar?.apply {
                         title = StringResourcesUtils.getString(R.string.title_get_links)
                         if (!isShowing) show()

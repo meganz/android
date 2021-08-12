@@ -19,7 +19,6 @@ class LinksAdapter : ListAdapter<LinkItem, LinkViewHolder>(LinkItem.DiffCallback
         holder.bind(getItem(position))
     }
 
-    override fun getItemId(position: Int): Long {
-        return getItem(position).node.handle
-    }
+    override fun getItemId(position: Int): Long =
+        getItem(position).node.handle
 }
