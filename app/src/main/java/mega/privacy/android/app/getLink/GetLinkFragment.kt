@@ -2,15 +2,14 @@ package mega.privacy.android.app.getLink
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.text.method.PasswordTransformationMethod
-import android.view.LayoutInflater
-import android.view.View
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.ViewGroup
 import android.widget.DatePicker
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -23,11 +22,14 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
+import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
@@ -43,6 +45,8 @@ import java.util.*
 class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrollable {
 
     companion object {
+        private const val SHARE = 0
+        private const val SEND_TO_CHAT = 1
         private const val INVALID_EXPIRATION_TIME = -1L
         private const val LAST_MINUTE = "2359"
     }
@@ -59,6 +63,7 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentGetLinkBinding.inflate(layoutInflater)
+        setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -66,6 +71,48 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         setupView()
         setupObservers()
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                requireActivity().onBackPressed()
+            }
+            R.id.action_share -> {
+                when {
+                    viewModel.shouldShowShareKeyOrPasswordDialog() ->
+                        showShareKeyOrPasswordDialog(SHARE)
+                    else -> viewModel.shareLink { intent -> startActivity(intent) }
+                }
+            }
+            R.id.action_chat -> {
+                startActivityForResult(
+                    Intent(requireContext(), ChatExplorerActivity::class.java),
+                    REQUEST_CODE_SEND_LINK
+                )
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == BaseActivity.RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
+            if (viewModel.shouldShowShareKeyOrPasswordDialog()) {
+                showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
+            } else {
+                viewModel.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
+                    handleActivityResult(intent)
+                }
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.activity_get_link, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun setupView() {
@@ -436,6 +483,61 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
     private fun copyToClipboard(copyInfo: Pair<String, String>) {
         TextUtil.copyToClipboard(requireActivity(), copyInfo.first)
         (requireActivity() as SnackbarShower).showSnackbar(copyInfo.second)
+    }
+
+    /**
+     * Shows a warning before share link when the user has the Send decryption key separately or
+     * the password protection enabled, asking if they want to share also the key or the password.
+     *
+     * @param type Indicates if the share is send to chat or share outside the app.
+     * @param data Intent containing the info to share to chat or null if is sharing outside the app.
+     */
+    private fun showShareKeyOrPasswordDialog(type: Int, data: Intent? = null) {
+        val shareKeyDialogBuilder =
+            MaterialAlertDialogBuilder(
+                requireContext(),
+                R.style.ThemeOverlay_Mega_MaterialAlertDialog
+            )
+
+        shareKeyDialogBuilder.setMessage(
+            getString(
+                if (viewModel.isPasswordSet()) R.string.share_password_warning
+                else R.string.share_key_warning
+            ) + "\n"
+        )
+            .setCancelable(false)
+            .setPositiveButton(
+                if (viewModel.isPasswordSet()) R.string.button_share_password
+                else R.string.button_share_key
+            ) { _, _ ->
+                if (type == SHARE) {
+                    viewModel.shareLinkAndKeyOrPassword { intent -> startActivity(intent) }
+                } else if (type == SEND_TO_CHAT) {
+                    viewModel.sendLinkToChat(data, true) { intent ->
+                        handleActivityResult(intent)
+                    }
+                }
+            }
+            .setNegativeButton(R.string.general_dismiss) { _, _ ->
+                if (type == SHARE) {
+                    viewModel.shareCompleteLink { intent -> startActivity(intent) }
+                } else if (type == SEND_TO_CHAT) {
+                    viewModel.sendLinkToChat(data, false) { intent ->
+                        handleActivityResult(intent)
+                    }
+                }
+            }
+
+        shareKeyDialogBuilder.create().show()
+    }
+
+    private fun handleActivityResult(data: Intent?) {
+        MegaAttacher(requireActivity() as ActivityLauncher).handleActivityResult(
+            REQUEST_CODE_SELECT_CHAT,
+            BaseActivity.RESULT_OK,
+            data,
+            requireActivity() as SnackbarShower
+        )
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {

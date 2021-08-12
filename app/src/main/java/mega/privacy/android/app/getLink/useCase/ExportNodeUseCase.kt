@@ -62,23 +62,28 @@ class ExportNodeUseCase @Inject constructor(
     fun export(nodes: List<MegaNode>): Single<HashMap<Long, String>> =
         Single.create { emitter ->
             val exported = HashMap<Long, String>()
+            var pending = nodes.size
 
             for (node in nodes) {
                 megaApi.exportNode(node, OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
+                        pending--
+
                         if (error.errorCode == MegaError.API_OK) {
                             exported[request.nodeHandle] = request.link
                         } else {
                             logError("Error exporting ${node.handle}")
                         }
+
+                        if (pending == 0) {
+                            if (exported.isNotEmpty()) {
+                                emitter.onSuccess(exported)
+                            } else {
+                                emitter.onError(error.toThrowable())
+                            }
+                        }
                     }
                 ))
-            }
-
-            if (exported.isNotEmpty()) {
-                emitter.onSuccess(exported)
-            } else {
-                emitter.onError("Error exporting nodes".toThrowable())
             }
         }
 }

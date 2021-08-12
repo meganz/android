@@ -9,10 +9,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemLinkBinding
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
 class LinkViewHolder(
     private val binding: ItemLinkBinding
 ) : RecyclerView.ViewHolder(binding.root) {
+
+    private val processing by lazy { getString(R.string.link_request_status) }
 
     fun bind(item: LinkItem) {
         val thumbSize: Int
@@ -45,8 +48,11 @@ class LinkViewHolder(
             }
         }
 
+        val link = item.link
+
         binding.nameText.text = item.name
-        binding.linkText.text = item.link
+        binding.linkText.text = link ?: processing
         binding.infoText.text = item.info
+        binding.root.alpha = if (link == null) ALPHA_VIEW_DISABLED else ALPHA_VIEW_ENABLED
     }
 }

@@ -30,7 +30,8 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
     fun getLinkItems(): LiveData<List<LinkItem>> = linkItemsList
 
     private val exportingNodes: MutableLiveData<Boolean> = MutableLiveData()
-    fun isExportingNodes(): LiveData<Boolean> = exportingNodes
+    fun getExportingNodes(): LiveData<Boolean> = exportingNodes
+    fun isExportingNodes(): Boolean = exportingNodes.value ?: true
 
     private val thumbFolder by lazy { getThumbFolder(MegaApplication.getInstance()) }
 
@@ -63,7 +64,7 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         }
 
         exportNodes(pendingExports)
-        linkItemsList.value = links.toList()
+        linkItemsList.value = links
     }
 
     private fun exportNodes(pendingExports: List<MegaNode>) {
@@ -79,23 +80,32 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
                     }
                 )
                 .addTo(composite)
-        }
+        } else exportingNodes.value = false
     }
 
     private fun notifyExportedNodes(exportedNodes: HashMap<Long, String>) {
-        val links = linkItemsList.value ?: return
+        val links = (linkItemsList.value ?: return).toMutableList()
 
-        for (linkItem in links) {
+        for (item in links.indices) {
+            val linkItem = links[item]
+
             if (linkItem.link == null) {
                 val link = exportedNodes[linkItem.node.handle]
+
                 if (link != null) {
-                    linkItem.link = link
+                    links[item] = LinkItem(
+                        linkItem.node,
+                        linkItem.thumbnail,
+                        linkItem.name,
+                        link,
+                        linkItem.info
+                    )
                 }
             }
         }
 
         exportingNodes.value = false
-        linkItemsList.value = links.toList()
+        linkItemsList.value = links
     }
 
     fun getLinksList(): ArrayList<String> {

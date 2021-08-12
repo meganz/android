@@ -1,25 +1,19 @@
 package mega.privacy.android.app.getLink
 
-import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -27,9 +21,6 @@ import java.util.*
 
 class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     companion object {
-        const val SHARE = 0
-        const val SEND_TO_CHAT = 1
-
         private const val TYPE_NODE = 1
         private const val TYPE_LIST = 2
 
@@ -41,8 +32,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
     private lateinit var binding: GetLinkActivityLayoutBinding
     private lateinit var navController: NavController
-
-    private var menu: Menu? = null
 
     private val transparentColor by lazy {
         ContextCompat.getColor(
@@ -156,8 +145,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                     }
                 }
             }
-
-            refreshMenuOptionsVisibility()
         }
 
         if (viewModelNode.shouldShowCopyright()) {
@@ -188,129 +175,9 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         binding.appBarGetLink.elevation = if (withElevation && !isDark) elevation else 0F
     }
 
-    /**
-     * Shows a warning before share link when the user has the Send decryption key separately or
-     * the password protection enabled, asking if they want to share also the key or the password.
-     *
-     * @param type Indicates if the share is send to chat or share outside the app.
-     * @param data Intent containing the info to share to chat or null if is sharing outside the app.
-     */
-    private fun showShareKeyOrPasswordDialog(type: Int, data: Intent?) {
-        val shareKeyDialogBuilder =
-            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-
-        shareKeyDialogBuilder.setMessage(
-            getString(
-                if (viewModelNode.isPasswordSet()) R.string.share_password_warning
-                else R.string.share_key_warning
-            ) + "\n"
-        )
-            .setCancelable(false)
-            .setPositiveButton(
-                if (viewModelNode.isPasswordSet()) R.string.button_share_password
-                else R.string.button_share_key
-            ) { _, _ ->
-                if (type == SHARE) {
-                    viewModelNode.shareLinkAndKeyOrPassword { intent -> startActivity(intent) }
-                } else if (type == SEND_TO_CHAT) {
-                    viewModelNode.sendLinkToChat(data, true) { intent ->
-                        handleActivityResult(intent)
-                    }
-                }
-            }
-            .setNegativeButton(R.string.general_dismiss) { _, _ ->
-                if (type == SHARE) {
-                    viewModelNode.shareCompleteLink { intent -> startActivity(intent) }
-                } else if (type == SEND_TO_CHAT) {
-                    viewModelNode.sendLinkToChat(data, false) { intent ->
-                        handleActivityResult(intent)
-                    }
-                }
-            }
-
-        shareKeyDialogBuilder.create().show()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
-            when {
-                viewType == TYPE_LIST -> handleActivityResult(
-                    data?.putStringArrayListExtra(
-                        EXTRA_SEVERAL_LINKS,
-                        viewModelList.getLinksList()
-                    )
-                )
-
-                viewModelNode.shouldShowShareKeyOrPasswordDialog() -> showShareKeyOrPasswordDialog(
-                    SEND_TO_CHAT,
-                    data
-                )
-                else -> viewModelNode.sendToChat(
-                    data,
-                    shouldAttachKeyOrPassword = false
-                ) { intent -> handleActivityResult(intent) }
-            }
-        }
-    }
-
-    private fun handleActivityResult(data: Intent?) {
-        MegaAttacher(this).handleActivityResult(
-            REQUEST_CODE_SELECT_CHAT,
-            RESULT_OK,
-            data,
-            this
-        )
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.activity_get_link, menu)
-        this.menu = menu
-
-        refreshMenuOptionsVisibility()
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    /**
-     * Sets the right Toolbar options depending on current situation.
-     */
-    private fun refreshMenuOptionsVisibility() {
-        val menu = this.menu ?: return
-
-        when (navController.currentDestination?.id) {
-            R.id.main_get_link, R.id.main_get_several_links ->
-                menu.toggleAllMenuItemsVisibility(true)
-            else -> menu.toggleAllMenuItemsVisibility(false)
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressed()
-            }
-            R.id.action_share -> {
-                when {
-                    viewType == TYPE_LIST -> startActivity(
-                        Intent(Intent.ACTION_SEND)
-                            .setType(PLAIN_TEXT_SHARE_TYPE)
-                            .putExtra(Intent.EXTRA_TEXT, viewModelList.getLinksString())
-                    )
-                    viewModelNode.shouldShowShareKeyOrPasswordDialog() -> showShareKeyOrPasswordDialog(
-                        SHARE,
-                        null
-                    )
-                    else -> viewModelNode.shareLink { intent -> startActivity(intent) }
-                }
-            }
-            R.id.action_chat -> {
-                startActivityForResult(
-                    Intent(this, ChatExplorerActivity::class.java),
-                    REQUEST_CODE_SEND_LINK
-                )
-            }
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
         }
 
         return super.onOptionsItemSelected(item)

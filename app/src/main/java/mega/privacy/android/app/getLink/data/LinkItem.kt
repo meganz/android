@@ -18,8 +18,8 @@ data class LinkItem(
             oldItem.node.handle == newItem.node.handle
 
         override fun areContentsTheSame(oldItem: LinkItem, newItem: LinkItem): Boolean =
-            areItemsTheSame(oldItem, newItem)
-                    && oldItem.thumbnail == newItem.thumbnail
+            areItemsTheSame(oldItem, newItem) &&
+                    oldItem.thumbnail == newItem.thumbnail
                     && oldItem.name == newItem.name
                     && oldItem.link == newItem.link
                     && oldItem.info == newItem.info

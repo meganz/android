@@ -36,21 +36,33 @@
         android:id="@+id/links_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingBottom="50dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@+id/links_section"
         tools:listitem="@layout/item_link" />
 
-    <Button
-        android:id="@+id/copy_button"
-        style="@style/Widget.Mega.Button.Variant1"
-        android:layout_width="wrap_content"
+
+    <FrameLayout
+        android:id="@+id/copy_all_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="72dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="72dp"
-        android:layout_marginBottom="24dp"
-        android:text="@string/action_copy_all"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/links_list" />
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/copy_button"
+            style="@style/Widget.Mega.Button.Variant1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="72dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="72dp"
+            android:layout_marginBottom="24dp"
+            android:text="@string/action_copy_all"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/links_list" />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

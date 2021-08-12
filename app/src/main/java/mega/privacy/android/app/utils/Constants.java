@@ -50,6 +50,7 @@ public class Constants {
     public static final int REQUEST_CODE_PICK_GIF = 1034;
     public static final int REQUEST_CODE_SEND_LINK = 1035;
     public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
+    public static final int REQUEST_CODE_SEND_SEVERAL_LINKS = 1037;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
