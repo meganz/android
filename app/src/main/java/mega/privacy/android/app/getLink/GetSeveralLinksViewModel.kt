@@ -26,8 +26,6 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
     private val linkItemsList: MutableLiveData<List<LinkItem>> = MutableLiveData()
     fun getLinkItems(): LiveData<List<LinkItem>> = linkItemsList
 
-    private val linksList = ArrayList<String>()
-
     private val thumbFolder by lazy { getThumbFolder(MegaApplication.getInstance()) }
 
     fun initNodes(handlesList: LongArray) {
@@ -35,65 +33,35 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         for (handle in handlesList) {
             val node = megaApi.getNodeByHandle(handle)
             if (node != null) {
+                val link = node.publicLink
                 val thumbnail = File(thumbFolder, node.base64Handle + FileUtil.JPG_EXTENSION)
+
                 links.add(
                     LinkItem(
                         node,
                         if (thumbnail.exists()) thumbnail else null,
                         node.name,
-                        node.publicLink,
+                        link,
                         if (node.isFolder) getMegaNodeFolderInfo(node) else getSizeString(node.size)
                     )
                 )
-
-                linksList.add(node.publicLink)
             }
         }
 
         linkItemsList.value = links.toList()
     }
 
-    private fun getLinksString(): String {
+    fun getLinksString(): String {
         var links = ""
 
-        for (link in linksList) {
-            links += link + "\n"
+        linkItemsList.value.let { list ->
+            val linksList = list ?: return@let
+
+            for (linkItem in linksList) {
+                links += linkItem.link + "\n"
+            }
         }
 
         return links
-    }
-
-    fun copyAll(action: (String) -> Unit) {
-        action.invoke(getLinksString())
-    }
-
-    /**
-     * Launches an intent to share the links outside the app.
-     *
-     * @param action Action to perform after manage data.
-     */
-    fun shareLinks(action: (Intent?) -> Unit) {
-        val intent = Intent(Intent.ACTION_SEND)
-            .setType(PLAIN_TEXT_SHARE_TYPE)
-            .putExtra(Intent.EXTRA_TEXT, getLinksString())
-
-        action.invoke(
-            Intent.createChooser(
-                intent,
-                StringResourcesUtils.getString(R.string.context_get_link)
-            )
-        )
-    }
-
-    /**
-     * Shares the links to chat.
-     *
-     * @param data Intent containing the info to share the content to chats.
-     */
-    fun sendToChat(
-        data: Intent?,
-        action: (Intent?) -> Unit
-    ) {
-        action.invoke(data?.putExtra(EXTRA_SEVERAL_LINKS, linksList))
     }
 }

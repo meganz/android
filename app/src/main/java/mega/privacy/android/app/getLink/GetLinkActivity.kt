@@ -236,16 +236,21 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_SEND_LINK) {
             when {
-                viewType == TYPE_LIST ->
-                    viewModelList.sendToChat(data) { intent -> handleActivityResult(intent) }
+                viewType == TYPE_LIST -> handleActivityResult(
+                    data?.putExtra(
+                        EXTRA_SEVERAL_LINKS,
+                        viewModelList.getLinksString()
+                    )
+                )
 
-                viewModelNode.shouldShowShareKeyOrPasswordDialog() ->
-                    showShareKeyOrPasswordDialog(SEND_TO_CHAT, data)
-
-                else ->
-                    viewModelNode.sendToChat(data, shouldAttachKeyOrPassword = false) { intent ->
-                        handleActivityResult(intent)
-                    }
+                viewModelNode.shouldShowShareKeyOrPasswordDialog() -> showShareKeyOrPasswordDialog(
+                    SEND_TO_CHAT,
+                    data
+                )
+                else -> viewModelNode.sendToChat(
+                    data,
+                    shouldAttachKeyOrPassword = false
+                ) { intent -> handleActivityResult(intent) }
             }
         }
     }
@@ -288,12 +293,15 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
             }
             R.id.action_share -> {
                 when {
-                    viewType == TYPE_LIST ->
-                        viewModelList.shareLinks { intent -> startActivity(intent) }
-
-                    viewModelNode.shouldShowShareKeyOrPasswordDialog() ->
-                        showShareKeyOrPasswordDialog(SHARE, null)
-
+                    viewType == TYPE_LIST -> startActivity(
+                        Intent(Intent.ACTION_SEND)
+                            .setType(PLAIN_TEXT_SHARE_TYPE)
+                            .putExtra(Intent.EXTRA_TEXT, viewModelList.getLinksString())
+                    )
+                    viewModelNode.shouldShowShareKeyOrPasswordDialog() -> showShareKeyOrPasswordDialog(
+                        SHARE,
+                        null
+                    )
                     else -> viewModelNode.shareLink { intent -> startActivity(intent) }
                 }
             }

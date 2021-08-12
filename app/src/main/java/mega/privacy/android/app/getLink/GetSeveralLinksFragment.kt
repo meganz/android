@@ -45,7 +45,7 @@ class GetSeveralLinksFragment : Fragment() {
             addItemDecoration(SimpleDividerItemDecoration(requireContext()))
         }
 
-        binding.copyButton.setOnClickListener { viewModel.copyAll { links -> copyLinks(links) } }
+        binding.copyButton.setOnClickListener { copyLinks(viewModel.getLinksString()) }
     }
 
     private fun setupObservers() {
