@@ -15,7 +15,7 @@ class ExportNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
     /**
-     * Launches a request to get the link of a node.
+     * Launches a request to export a node.
      *
      * @param node MegaNode to export.
      * @return Single<String> The link if the request finished with success, error if not.

@@ -70,6 +70,9 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         super.onSaveInstanceState(outState)
     }
 
+    /**
+     * Gets all the info from the Intent.
+     */
     private fun handleIntent() {
         val handle = intent.getLongExtra(HANDLE, INVALID_HANDLE)
         val handleList = intent.getLongArrayExtra(HANDLE_LIST)

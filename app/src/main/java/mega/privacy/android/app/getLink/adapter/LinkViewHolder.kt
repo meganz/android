@@ -11,12 +11,22 @@ import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
+/**
+ * RecyclerView.ViewHolder to draw data items in [LinksAdapter].
+ *
+ * @property binding ItemLinkBinding necessary to draw the data item.
+ */
 class LinkViewHolder(
     private val binding: ItemLinkBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val processing by lazy { getString(R.string.link_request_status) }
 
+    /**
+     * Draws the data item.
+     *
+     * @param item [LinkItem.Data] containing the data to draw.
+     */
     fun bind(item: LinkItem.Data) {
         val thumbSize: Int
         val margin: Int

@@ -245,7 +245,7 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
     /**
      * Updates the expiry date views.
      *
-     * @param date Text to show as link text.
+     * @param date Text to show as expiry date.
      */
     private fun updateExpiryDate(date: String) {
         if (date.isNotEmpty()) {
@@ -262,7 +262,7 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
     /**
      * Updates the UI of password protection option.
      *
-     * @param password The link with password if set, null otherwise.
+     * @param password The password if set, null otherwise.
      */
     private fun updatePassword(password: String?) {
         val isPasswordSet = !isTextEmpty(password)
@@ -393,6 +393,9 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         }
     }
 
+    /**
+     * Shows a warning for free users to upgrade to Pro.
+     */
     private fun showUpgradeToProWarning() {
         val upgradeToProDialogBuilder = MaterialAlertDialogBuilder(
             requireContext(),
@@ -415,6 +418,9 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         upgradeToProDialogBuilder.create().show()
     }
 
+    /**
+     * Shows data picker to choose an expiry date.
+     */
     @SuppressLint("RestrictedApi")
     private fun showDatePicker() {
         val node = viewModel.getNode()
@@ -478,7 +484,7 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
     /**
      * Copies a link, decryption key or password into clipboard and shows a snackbar.
      *
-     * @param copyInfo First is the  content to copy, second the text to show as confirmation.
+     * @param copyInfo First is the content to copy, second the text to show as confirmation.
      */
     private fun copyToClipboard(copyInfo: Pair<String, String>) {
         TextUtil.copyToClipboard(requireActivity(), copyInfo.first)
@@ -531,6 +537,11 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         shareKeyDialogBuilder.create().show()
     }
 
+    /**
+     * Finishes the send to chat action.
+     *
+     * @param data Intent containing the info to send.
+     */
     private fun handleActivityResult(data: Intent?) {
         MegaAttacher(requireActivity() as ActivityLauncher).handleActivityResult(
             REQUEST_CODE_SELECT_CHAT,

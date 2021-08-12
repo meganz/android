@@ -19,7 +19,7 @@ class GetThumbnailUseCase @Inject constructor(
      * Launches a request to get the thumbnails of a list of nodes.
      *
      * @param nodes List of nodes to get their thumbnail.
-     * @return Single<String> The encrypted link if the request finished with success, error if not.
+     * @return Flowable<Long> The node handle if the request finished with success, error if not.
      */
     fun get(nodes: List<MegaNode>, thumbFolder: File): Flowable<Long> =
         Flowable.create({ emitter ->

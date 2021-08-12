@@ -140,6 +140,11 @@ class LinkPasswordFragment : BaseFragment(), Scrollable {
         viewModel.getPassword().observe(viewLifecycleOwner, ::onPasswordSet)
     }
 
+    /**
+     * Updates the UI when the password has been set or removed.
+     *
+     * @param password The password if has been set, null if has been removed.
+     */
     private fun onPasswordSet(password: String?) {
         resetView()
         

@@ -521,6 +521,13 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         )
     }
 
+    /**
+     * Attach several links to a list of chats.
+     *
+     * @param links          List of links to be attached.
+     * @param chatIds        List of chat identifiers to attach the links.
+     * @param snackbarShower Callback to show Snackbars.
+     */
     private fun attachSeveralLinksToChats(
         links: List<String>,
         chatIds: List<Long>,

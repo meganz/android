@@ -8,6 +8,10 @@ import mega.privacy.android.app.databinding.ItemHeaderLinksBinding
 import mega.privacy.android.app.databinding.ItemLinkBinding
 import mega.privacy.android.app.getLink.data.LinkItem
 
+/**
+ * ListAdapter to show [LinkItem]s.
+ * Currently used in [mega.privacy.android.app.getLink.GetSeveralLinksFragment].
+ */
 class LinksAdapter : ListAdapter<LinkItem, RecyclerView.ViewHolder>(LinkItem.DiffCallback()) {
 
     companion object {

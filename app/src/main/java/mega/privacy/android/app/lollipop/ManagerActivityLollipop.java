@@ -7784,6 +7784,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		showRenameNodeDialog(this, document, this, this);
 	}
 
+	/**
+	 * Launches an intent to get the links of the nodes received.
+	 *
+	 * @param nodes List of nodes to get their links.
+	 */
 	public void showGetLinkActivity(List<MegaNode> nodes) {
     	if (nodes == null || nodes.isEmpty()) {
     		showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);

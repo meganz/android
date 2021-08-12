@@ -60,6 +60,29 @@ class GetLinkViewModel @ViewModelInject constructor(
         this.withElevation.value = withElevation
     }
 
+    fun getNode(): MegaNode = node
+
+    fun getLinkWithoutKey(): String = linkWithoutKey
+
+    fun getLinkKey(): String = key
+
+    fun getLinkWithPassword(): String? = linkWithPassword
+
+    /**
+     * Initializes the node and all the available info.
+     *
+     * @param handle MegaNode identifier.
+     */
+    fun initNode(handle: Long) {
+        updateLink(handle)
+        resetLinkWithPassword()
+    }
+
+    /**
+     * Gets the title to show as [GetLinkFragment] title.
+     *
+     * @return The title to show.
+     */
     fun getLinkFragmentTitle(): String {
         if (!this::linkFragmentTitle.isInitialized) {
             linkFragmentTitle =
@@ -70,21 +93,16 @@ class GetLinkViewModel @ViewModelInject constructor(
         return linkFragmentTitle
     }
 
-    fun getNode(): MegaNode = node
-
-    fun getLinkWithoutKey(): String = linkWithoutKey
-
-    fun getLinkKey(): String = key
-
-    private fun resetLinkWithPassword() {
-        password.value = null
-        linkWithPassword = null
-    }
-
-    fun getLinkWithPassword(): String? = linkWithPassword
-
+    /**
+     * Checks if is a password set.
+     *
+     * @return True if a password is set, false otherwise.
+     */
     fun isPasswordSet(): Boolean = !linkWithPassword.isNullOrEmpty()
 
+    /**
+     * Exports the node.
+     */
     fun export() {
         exportNodeUseCase.export(node)
             .subscribeOn(Schedulers.io())
@@ -98,6 +116,11 @@ class GetLinkViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Exports the node with an expiry date.
+     *
+     * @param expiryDate Expiry date to export.
+     */
     fun exportWithTimestamp(expiryDate: Int) {
         exportNodeUseCase.exportWithTimestamp(node, expiryDate)
             .subscribeOn(Schedulers.io())
@@ -111,6 +134,11 @@ class GetLinkViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    /**
+     * Copies the link depending on the current configuration.
+     *
+     * @param action Copy action to perform.
+     */
     fun copyLink(action: (Pair<String, String>) -> Unit) {
         action.invoke(
             Pair(
@@ -123,10 +151,20 @@ class GetLinkViewModel @ViewModelInject constructor(
         )
     }
 
+    /**
+     * Copies the key of the link.
+     *
+     * @param action Copy action to perform.
+     */
     fun copyLinkKey(action: (Pair<String, String>) -> Unit) {
         action.invoke(Pair(key, getString(R.string.key_copied_clipboard)))
     }
 
+    /**
+     * Copies the link encrypted with a password.
+     *
+     * @param action Copy action to perform.
+     */
     fun copyLinkPassword(action: (Pair<String, String>) -> Unit) {
         if (linkWithPassword.isNullOrEmpty()) {
             return
@@ -135,30 +173,55 @@ class GetLinkViewModel @ViewModelInject constructor(
         action.invoke(Pair(getPasswordText()!!, getString(R.string.password_copied_clipboard)))
     }
 
+    /**
+     * Reset the password values when password has been removed.
+     */
+    private fun resetLinkWithPassword() {
+        password.value = null
+        linkWithPassword = null
+    }
+
+    /**
+     * Removes the password of the link.
+     */
     fun removeLinkWithPassword() {
         resetLinkWithPassword()
         updateLink()
     }
 
+    /**
+     * Checks if should show [CopyrightFragment].
+     *
+     * @return True if should show it, false otherwise.
+     */
     fun shouldShowCopyright(): Boolean =
         dbH.showCopyright.toBoolean() && (megaApi.publicLinks == null || megaApi.publicLinks.size == 0)
 
+    /**
+     * Updates the flag to show or not [CopyrightFragment] in DB.
+     */
     fun updateShowCopyRight(show: Boolean) {
         dbH.setShowCopyright(show)
     }
 
+    /**
+     * Updates the link info depending on if send decrypted key separately
+     * has been enabled or disabled.
+     *
+     * @param enabled True if has been enabled, false otherwise.
+     */
     fun updateSendDecryptedKeySeparatelyEnabled(enabled: Boolean) {
         isSendDecryptedKeySeparatelyEnabled = enabled
         updateLink()
     }
 
+    /**
+     * Checks if the current account is Pro.
+     *
+     * @return True if the account is Pro, false otherwise.
+     */
     fun isPro(): Boolean =
         MegaApplication.getInstance().myAccountInfo.accountType > MegaAccountDetails.ACCOUNT_TYPE_FREE
-
-    fun initNode(handle: Long) {
-        updateLink(handle)
-        resetLinkWithPassword()
-    }
 
     /**
      * Updates the node from which the link is getting or managing.
@@ -227,6 +290,7 @@ class GetLinkViewModel @ViewModelInject constructor(
      * @param data                      Intent containing the info to share the content to chats.
      * @param link                      The link to share.
      * @param shouldAttachKeyOrPassword True if should share the decryption key or password. False otherwise.
+     * @param action                    Action to perform.
      */
     fun sendToChat(
         data: Intent?,
@@ -282,6 +346,11 @@ class GetLinkViewModel @ViewModelInject constructor(
     fun shouldShowShareKeyOrPasswordDialog(): Boolean =
         !linkWithPassword.isNullOrEmpty() || isSendDecryptedKeySeparatelyEnabled
 
+    /**
+     * Encrypts the link with a password.
+     *
+     * @param password Password to encrypt the link.
+     */
     fun encryptLink(password: String) {
         encryptLinkWithPasswordUseCase.encrypt(node.publicLink, password)
             .subscribeOn(Schedulers.io())

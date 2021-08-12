@@ -213,6 +213,12 @@ public class TextUtil {
         return isTextEmpty(text) ? text : text + STRING_SEPARATOR;
     }
 
+    /**
+     * Copies some content to the ClipBoard.
+     *
+     * @param activity   Activity from which the content has to be copied.
+     * @param textToCopy Content to copy.
+     */
     public static void copyToClipboard(Activity activity, String textToCopy) {
         ClipboardManager clipManager =
                 (ClipboardManager) activity.getSystemService(BaseActivity.CLIPBOARD_SERVICE);

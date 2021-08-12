@@ -40,6 +40,11 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
 
     private val thumbFolder by lazy { getThumbFolder(MegaApplication.getInstance()) }
 
+    /**
+     * Initializes the nodes and all the available info.
+     *
+     * @param handlesList List of MegaNode identifiers.
+     */
     fun initNodes(handlesList: LongArray) {
         val links = ArrayList<LinkItem>()
         val pendingExports = ArrayList<MegaNode>()
@@ -82,6 +87,11 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         linkItemsList.value = links
     }
 
+    /**
+     * Export a list of nodes.
+     *
+     * @param pendingExports List of nodes to export.
+     */
     private fun exportNodes(pendingExports: List<MegaNode>) {
         if (pendingExports.isNotEmpty()) {
             exportingNodes.value = true
@@ -98,6 +108,11 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         } else exportingNodes.value = false
     }
 
+    /**
+     * Updates the list of [LinkItem]s when the export actions have been finished.
+     *
+     * @param exportedNodes HashMap<Long, String> Key is the node handle, value the node link.
+     */
     private fun notifyExportedNodes(exportedNodes: HashMap<Long, String>) {
         val links = (linkItemsList.value ?: return).toMutableList()
 
@@ -123,6 +138,11 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         linkItemsList.value = links
     }
 
+    /**
+     * Request a list of thumbnails which have not been get yet.
+     *
+     * @param pendingThumbnails List of nodes to get their thumbnails.
+     */
     private fun requestThumbnails(pendingThumbnails: List<MegaNode>) {
         if (pendingThumbnails.isNotEmpty()) {
             getThumbnailUseCase.get(pendingThumbnails, thumbFolder)
@@ -136,6 +156,11 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         }
     }
 
+    /**
+     * Updates the list of [LinkItem]s with the thumbnail already get.
+     *
+     * @param handle Node identifier from which the thumbnail has been get.
+     */
     private fun notifyThumbnailUpdate(handle: Long) {
         val links = (linkItemsList.value ?: return).toMutableList()
 
@@ -158,6 +183,11 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         linkItemsList.value = links
     }
 
+    /**
+     * Gets a list of Strings containing all the links.
+     *
+     * @return The list of links.
+     */
     fun getLinksList(): ArrayList<String> {
         val links = ArrayList<String>()
 
@@ -173,6 +203,11 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
         return links
     }
 
+    /**
+     * Gets a unique String containing all the links.
+     *
+     * @return The links.
+     */
     fun getLinksString(): String {
         var links = ""
 

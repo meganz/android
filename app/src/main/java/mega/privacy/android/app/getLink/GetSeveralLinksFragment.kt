@@ -125,10 +125,20 @@ class GetSeveralLinksFragment : Fragment() {
         viewModel.getExportingNodes().observe(viewLifecycleOwner, ::updateUI)
     }
 
+    /**
+     * Shows the links in the list.
+     *
+     * @param links List of [LinkItem]s to show.
+     */
     private fun showLinks(links: List<LinkItem>) {
         linksAdapter.submitList(links)
     }
 
+    /**
+     * Updates the UI depending on if is exporting nodes yet or not.
+     *
+     * @param isExportingNodes True if is exporting nodes, false otherwise.
+     */
     private fun updateUI(isExportingNodes: Boolean) {
         binding.copyButton.apply {
             isEnabled = !isExportingNodes
@@ -138,6 +148,11 @@ class GetSeveralLinksFragment : Fragment() {
         refreshMenuOptionsVisibility()
     }
 
+    /**
+     * Copies to the clipboard all the links.
+     *
+     * @param links String containing all the links to copy.
+     */
     private fun copyLinks(links: String) {
         copyToClipboard(requireActivity(), links)
         (requireActivity() as SnackbarShower).showSnackbar(
