@@ -86,8 +86,11 @@ class GetLinkViewModel @ViewModelInject constructor(
     fun getLinkFragmentTitle(): String {
         if (!this::linkFragmentTitle.isInitialized) {
             linkFragmentTitle =
-                getString(if (node.isExported) R.string.edit_link_option else R.string.context_get_link_menu)
-                    .toUpperCase(Locale.getDefault())
+                if (node.isExported) {
+                    getString(R.string.edit_link_option).toUpperCase(Locale.getDefault())
+                } else {
+                    getQuantityString(R.plurals.get_links, 1)
+                }
         }
 
         return linkFragmentTitle
