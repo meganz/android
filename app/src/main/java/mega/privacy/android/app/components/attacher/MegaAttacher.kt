@@ -540,7 +540,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         }
 
         snackbarShower.showSnackbarWithChat(
-            getQuantityString(R.plurals.links_sent, 2),
+            getQuantityString(R.plurals.links_sent, links.size),
             if (chatIds.size == 1) chatIds[0] else MEGACHAT_INVALID_HANDLE
         )
     }

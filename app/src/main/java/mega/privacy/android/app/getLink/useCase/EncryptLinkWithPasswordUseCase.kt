@@ -8,6 +8,11 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import javax.inject.Inject
 
+/**
+ * Use case for encrypt a link of a node with a password.
+ *
+ * @property megaApi MegaApiAndroid instance to use.
+ */
 class EncryptLinkWithPasswordUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {

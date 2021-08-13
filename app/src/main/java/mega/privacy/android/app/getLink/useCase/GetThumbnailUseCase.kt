@@ -12,6 +12,11 @@ import nz.mega.sdk.MegaNode
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * Use case get thumbnails of nodes.
+ *
+ * @property megaApi MegaApiAndroid instance to use.
+ */
 class GetThumbnailUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {

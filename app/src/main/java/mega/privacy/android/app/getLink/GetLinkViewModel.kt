@@ -27,6 +27,16 @@ import nz.mega.sdk.MegaNode
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * View Model used for manage data related to get or manage a link.
+ * It is shared by the fragments [GetLinkFragment], [DecryptionKeyFragment], [CopyrightFragment],
+ * [LinkPasswordFragment] and their activity [GetLinkActivity].
+ *
+ * @property megaApi                        MegaApiAndroid instance to use.
+ * @property dbH                            DataBaseHandle instance to use.
+ * @property encryptLinkWithPasswordUseCase Use case to encrypt a link with a password.
+ * @property exportNodeUseCase              Use case to export a node.
+ */
 class GetLinkViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbH: DatabaseHandler,

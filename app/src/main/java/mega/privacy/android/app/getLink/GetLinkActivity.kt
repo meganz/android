@@ -19,13 +19,18 @@ import mega.privacy.android.app.utils.Util.isDarkMode
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.util.*
 
+/**
+ * Activity which allows create and manage a link of a node
+ * @see[GetLinkFragment], [CopyrightFragment], [DecryptionKeyFragment], [LinkPasswordFragment].
+ *
+ * Or the creation of multiple links @see[GetSeveralLinksFragment].
+ */
 class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     companion object {
         private const val TYPE_NODE = 1
         private const val TYPE_LIST = 2
 
         private const val VIEW_TYPE = "VIEW_TYPE"
-        private const val NUMBER_OF_LINKS = "NUMBER_OF_LINKS"
     }
 
     private val viewModelNode: GetLinkViewModel by viewModels()
@@ -44,7 +49,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
     private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
 
     private var viewType = INVALID_VALUE
-    private var numberOfLinks = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +61,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
         if (savedInstanceState != null) {
             viewType = savedInstanceState.getInt(VIEW_TYPE, INVALID_VALUE)
-            numberOfLinks = savedInstanceState.getInt(NUMBER_OF_LINKS)
         }
 
         if (viewType == INVALID_VALUE) {
@@ -70,7 +73,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(VIEW_TYPE, viewType)
-        outState.putInt(NUMBER_OF_LINKS, numberOfLinks)
         super.onSaveInstanceState(outState)
     }
 
@@ -93,7 +95,6 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         } else if (handleList != null) {
             viewModelList.initNodes(handleList)
             viewType = TYPE_LIST
-            numberOfLinks = handleList.size
         }
     }
 
@@ -148,7 +149,11 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                 R.id.main_get_several_links -> {
                     viewModelNode.setElevation(true)
                     supportActionBar?.apply {
-                        title = StringResourcesUtils.getQuantityString(R.plurals.get_links, numberOfLinks)
+                        title = StringResourcesUtils.getQuantityString(
+                            R.plurals.get_links,
+                            viewModelList.getLinksNumber()
+                        )
+
                         if (!isShowing) show()
                     }
                 }

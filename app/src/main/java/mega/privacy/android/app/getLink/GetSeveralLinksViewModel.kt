@@ -25,6 +25,14 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import java.io.File
 
+/**
+ * View Model used for manage data related to [GetSeveralLinksFragment].
+ * Its shared with its activity [GetLinkActivity].
+ *
+ * @property megaApi             MegaApiAndroid instance to use.
+ * @property exportNodeUseCase   Use case to export nodes.
+ * @property getThumbnailUseCase Use case to request thumbnails.
+ */
 class GetSeveralLinksViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val exportNodeUseCase: ExportNodeUseCase,
@@ -38,6 +46,9 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
     fun getExportingNodes(): LiveData<Boolean> = exportingNodes
     fun isExportingNodes(): Boolean = exportingNodes.value ?: true
 
+    private var linksNumber = 0
+    fun getLinksNumber(): Int = linksNumber
+
     private val thumbFolder by lazy { getThumbFolder(MegaApplication.getInstance()) }
 
     /**
@@ -46,6 +57,7 @@ class GetSeveralLinksViewModel @ViewModelInject constructor(
      * @param handlesList List of MegaNode identifiers.
      */
     fun initNodes(handlesList: LongArray) {
+        linksNumber = handlesList.size
         val links = ArrayList<LinkItem>()
         val pendingExports = ArrayList<MegaNode>()
         val pendingThumbnails = ArrayList<MegaNode>()

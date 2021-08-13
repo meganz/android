@@ -22,6 +22,9 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import nz.mega.sdk.MegaApiJava
 
+/**
+ * Fragment of [GetLinkActivity] to allow encrypt a link of a node with a password.
+ */
 class LinkPasswordFragment : BaseFragment(), Scrollable {
 
     companion object {

@@ -21,6 +21,9 @@ import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
 
+/**
+ * Fragment of [GetLinkActivity] to allow the creation of multiple links.
+ */
 class GetSeveralLinksFragment : Fragment() {
 
     private val viewModel: GetSeveralLinksViewModel by activityViewModels()
@@ -156,7 +159,7 @@ class GetSeveralLinksFragment : Fragment() {
     private fun copyLinks(links: String) {
         copyToClipboard(requireActivity(), links)
         (requireActivity() as SnackbarShower).showSnackbar(
-            StringResourcesUtils.getQuantityString(R.plurals.links_copied_clipboard, 2)
+            StringResourcesUtils.getQuantityString(R.plurals.links_copied_clipboard, viewModel.getLinksNumber())
         )
     }
 }

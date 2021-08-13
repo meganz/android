@@ -5,12 +5,16 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.StringUtils.toThrowable
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
+/**
+ * Use case for export nodes.
+ *
+ * @property megaApi MegaApiAndroid instance to use.
+ */
 class ExportNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {

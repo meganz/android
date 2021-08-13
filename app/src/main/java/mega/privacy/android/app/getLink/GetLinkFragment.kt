@@ -41,7 +41,9 @@ import mega.privacy.android.app.utils.Util.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-
+/**
+ * Fragment of [GetLinkActivity] to get or manage a link of a node.
+ */
 class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scrollable {
 
     companion object {

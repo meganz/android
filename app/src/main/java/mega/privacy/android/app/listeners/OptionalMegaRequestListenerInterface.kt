@@ -5,6 +5,14 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 
+/**
+ * Class which allows implement only the necessary callbacks of MegaRequestListenerInterface.
+ *
+ * @property onRequestStart          Action to perform on request start, null if not needed.
+ * @property onRequestUpdate         Action to perform on request update, null if not needed.
+ * @property onRequestTemporaryError Action to perform on request temporary error, null if not needed.
+ * @property onRequestFinish         Action to perform on request finish, null if not needed.
+ */
 class OptionalMegaRequestListenerInterface(
     private val onRequestStart: ((MegaRequest) -> Unit)? = null,
     private val onRequestUpdate: ((MegaRequest) -> Unit)? = null,

@@ -11,6 +11,9 @@ import mega.privacy.android.app.databinding.FragmentDecryptionKeyBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.utils.Constants
 
+/**
+ * Fragment of [GetLinkActivity] which shows info about the decryption key of a link.
+ */
 class DecryptionKeyFragment : Fragment(), Scrollable {
 
     private val viewModel: GetLinkViewModel by activityViewModels()
