@@ -83,7 +83,6 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
-import static mega.privacy.android.app.SearchNodesTask.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
@@ -1102,6 +1101,25 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			nodeAttacher.restoreState(savedInstanceState);
 			nodeSaver.restoreState(savedInstanceState);
 		}
+	}
+
+	/**
+	 * Gets a list of the searched MegaNode from the handles list received as param.
+	 *
+	 * @param handles List of searched node handles.
+	 * @return The list of the searched MegaNodes.
+	 */
+	private ArrayList<MegaNode> getSearchedNodes(ArrayList<String> handles) {
+		ArrayList<MegaNode> nodes = new ArrayList<>();
+
+		for (String handle : handles) {
+			MegaNode node = megaApi.getNodeByHandle(Long.parseLong(handle));
+			if (node != null) {
+				nodes.add(node);
+			}
+		}
+
+		return nodes;
 	}
 
 	/**

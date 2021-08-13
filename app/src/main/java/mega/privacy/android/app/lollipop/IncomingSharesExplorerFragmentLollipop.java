@@ -45,7 +45,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SearchNodesTask;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -54,6 +53,7 @@ import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
+import mega.privacy.android.app.search.SearchNodesTask;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -61,10 +61,11 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.COPY;
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.INCOMING_FRAGMENT;
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.MOVE;
+import static mega.privacy.android.app.search.SearchNodesTask.TYPE_INCOMING_EXPLORER;
+import static mega.privacy.android.app.search.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.getPreferences;
@@ -73,7 +74,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
-		implements OnClickListener, CheckScrollInterface{
+		implements OnClickListener, CheckScrollInterface, SearchNodesTask.Callback{
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
@@ -146,6 +147,12 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 	@Override
 	public void reselectUnHandledSingleItem(int position) {
+	}
+
+	@Override
+	public void finishSearchNodes(@NonNull ArrayList<MegaNode> nodes) {
+		setProgressView(false);
+		setSearchNodes(nodes);
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -855,8 +862,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 		setProgressView(true);
 		cancelPreviousAsyncTask();
-		searchNodesTask = new SearchNodesTask(context, this, s, INVALID_HANDLE,
-				nodes, sortOrderManagement);
+		searchNodesTask = new SearchNodesTask(megaApi, sortOrderManagement, s, INVALID_HANDLE,
+				getParentHandle(), nodes, this, TYPE_INCOMING_EXPLORER);
+
 		searchNodesTask.execute();
 	}
 
