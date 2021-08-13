@@ -156,6 +156,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     // Leave Meeting Dialog
     private var leaveDialog: Dialog? = null
+
     // Meeting failed Dialog
     private var failedDialog: Dialog? = null
 
@@ -410,7 +411,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         logDebug("Session destroyed, clientID = ${callAndSession.second.clientid}")
                         val position =
                             inMeetingViewModel.removeParticipant(callAndSession.second)
-                        position?.let {
+                        position.let {
                             if (position != INVALID_POSITION) {
                                 checkChildFragments()
                                 participantAddedOfLeftMeeting(false, it)
@@ -468,8 +469,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     shouldAddListener = true,
                                     isHiRes = false
                                 )
-                            } else {
-                                logDebug("Client ID ${callAndSession.second.clientid} can receive lowRes, has lowRes, video off")
                             }
                         }
                     } else if (!participant.hasHiRes) {
@@ -499,8 +498,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     }
                                 }
                         }
-                    } else {
-                        logDebug("Client ID ${callAndSession.second.clientid} can not receive lowRes, has hiRes")
                     }
                 }
             }
@@ -522,8 +519,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     shouldAddListener = true,
                                     isHiRes = true
                                 )
-                            } else {
-                                logDebug("Client ID ${callAndSession.second.clientid} can receive hiRes, has hiRes, video off")
                             }
                         } else {
                             if (inMeetingViewModel.sessionHasVideo(participant.clientId)) {
@@ -532,8 +527,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                     callAndSession.second.peerid, callAndSession.second.clientid,
                                     shouldAddListener = true
                                 )
-                            } else {
-                                logDebug("Client ID ${callAndSession.second.clientid} can receive hiRes, has lowRes, video off")
                             }
                         }
                     } else if (participant.hasHiRes) {

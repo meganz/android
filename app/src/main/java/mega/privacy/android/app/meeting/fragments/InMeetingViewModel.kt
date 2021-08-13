@@ -82,11 +82,12 @@ class InMeetingViewModel @ViewModelInject constructor(
     // List of participants in the meeting
     val participants: MutableLiveData<MutableList<Participant>> = MutableLiveData(mutableListOf())
 
+    // List of speaker participants in the meeting
+    val speakerParticipants: MutableLiveData<MutableList<Participant>> =
+        MutableLiveData(mutableListOf())
+
     // List of visible participants in the meeting
     var visibleParticipants: MutableList<Participant> = mutableListOf()
-
-    private val _speakerParticipant = MutableLiveData<Participant?>(null)
-    val speakerParticipant: LiveData<Participant?> = _speakerParticipant
 
     private val updateCallObserver =
         Observer<MegaChatCall> {
@@ -855,7 +856,7 @@ class InMeetingViewModel @ViewModelInject constructor(
             if (it.peerId == peerId && it.clientId == clientId) {
                 logDebug("New speaker selected found ${it.clientId}")
                 it.isSpeaker = true
-                _speakerParticipant.value = createSpeakerParticipant(it)
+                addSpeaker(it)
                 listWithChanges.add(it)
             } else if (it.isSpeaker) {
                 logDebug("Remove the last speaker ${it.clientId}")
@@ -879,11 +880,11 @@ class InMeetingViewModel @ViewModelInject constructor(
             participant.clientId,
             participant.name,
             participant.avatar,
-            isMe = false,
-            isModerator = false,
+            isMe = participant.isMe,
+            isModerator = participant.isModerator,
             isAudioOn = participant.isAudioOn,
             isVideoOn = participant.isVideoOn,
-            isContact = false,
+            isContact = participant.isContact,
             isSpeaker = true,
             hasHiRes = true,
             videoListener = null,
@@ -1011,37 +1012,36 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
-    fun removeParticipant(session: MegaChatSession): Int? {
+    fun removeParticipant(session: MegaChatSession): Int {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             val iterator = participants.value?.iterator()
             iterator?.let { list ->
                 list.forEach { participant ->
                     if (participant.peerId == session.peerid && participant.clientId == session.clientid) {
-                        if (participant.isSpeaker) {
-                            logDebug("The removed participant was speaker, clientID ${participant.clientId}")
-                            participant.isSpeaker = false
-                            removeSpeakerParticipant()
-                            _speakerParticipant.value = null
-                        }
-
                         val position = participants.value?.indexOf(participant)
                         val clientId = participant.clientId
+                        val isSpeaker = participant.isSpeaker
+                        participant.isSpeaker = false
 
-                        if (participant.isVideoOn) {
-                            participant.videoListener?.let { listener ->
-                                removeResolutionAndListener(participant, listener)
+                        if (position != null && position != INVALID_POSITION) {
+                            if (participant.isVideoOn) {
+                                participant.videoListener?.let { listener ->
+                                    removeResolutionAndListener(participant, listener)
+                                }
+                                participant.videoListener = null
                             }
-                            participant.videoListener = null
-                        }
 
-                        if (position != null) {
                             participants.value?.removeAt(position)
                             logDebug("Removing participant... $clientId")
+                            participants.value = participants.value
+                            logDebug("Num of participants: " + participants.value?.size)
+                            if (isSpeaker) {
+                                logDebug("The removed participant was speaker, clientID ${participant.clientId}")
+                                removePreviousSpeakers()
+                                removeCurrentSpeaker()
+                            }
+                            return position
                         }
-
-                        participants.value = participants.value
-                        logDebug("Num of participants: " + participants.value?.size)
-                        return position
                     }
                 }
             }
@@ -1174,19 +1174,6 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun getAvatarBitmap(peerId: Long): Bitmap? =
         inMeetingRepository.getChatRoom(currentChatId)
             ?.let { inMeetingRepository.getAvatarBitmap(it, peerId) }
-
-    /**
-     * Delete the video of the participant who has ceased to be a speaker
-     */
-    fun removeSpeakerParticipant() {
-        _speakerParticipant.value?.let {
-            it.videoListener?.let { listener ->
-                logDebug("Removing resolution and listener of speaker")
-                removeResolutionAndListener(it, listener)
-            }
-            it.videoListener = null
-        }
-    }
 
     /**
      * Method to get the first participant in the list, who will be the new speaker
@@ -2032,5 +2019,127 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun cancelCountDownTimer() {
         countDownTimer?.cancel()
+    }
+
+    /**
+     * Method for clearing the list of speakers
+     */
+    fun clearSpeakerParticipants() {
+        speakerParticipants.value?.clear()
+    }
+
+    /**
+     * Method to obtain the current speaker
+     *
+     * @return The speaker
+     */
+    fun getCurrentSpeakerParticipant(): Participant? {
+        if (speakerParticipants.value.isNullOrEmpty()) return null
+
+        speakerParticipants.value?.let { listSpeakerParticipants ->
+            val listFound = listSpeakerParticipants.filter { participant ->
+                participant.isSpeaker
+            }
+
+            if (!listFound.isNullOrEmpty()) {
+                return listFound[0]
+            }
+        }
+        return null
+    }
+
+    /**
+     * Method to remove the current speaker
+     */
+    private fun removeCurrentSpeaker() {
+        speakerParticipants.value?.let { listSpeakerParticipants ->
+            val listFound = listSpeakerParticipants.filter { speaker ->
+                speaker.isSpeaker
+            }
+
+            if (!listFound.isNullOrEmpty()) {
+                val iterator = listFound.iterator()
+                iterator.forEach { participant ->
+                    if (participant.videoListener != null) {
+                        removeResolutionAndListener(participant, participant.videoListener!!)
+                        participant.videoListener = null
+                    }
+                    val position = listSpeakerParticipants.indexOf(participant)
+                    if (position != INVALID_POSITION) {
+                        speakerParticipants.value?.removeAt(position)
+                        logDebug("Num of speaker participants: " + speakerParticipants.value?.size)
+                        speakerParticipants.value = speakerParticipants.value
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to eliminate which are no longer speakers
+     */
+    fun removePreviousSpeakers() {
+        speakerParticipants.value?.let { listSpeakerParticipants ->
+            val listFound = listSpeakerParticipants.filter { speaker ->
+                !speaker.isSpeaker
+            }
+
+            if (!listFound.isNullOrEmpty()) {
+                val iterator = listFound.iterator()
+                iterator.forEach { participant ->
+                    if (participant.videoListener != null) {
+                        removeResolutionAndListener(participant, participant.videoListener!!)
+                        participant.videoListener = null
+                    }
+                    val position = listSpeakerParticipants.indexOf(participant)
+                    if (position != INVALID_POSITION) {
+                        speakerParticipants.value?.removeAt(position)
+                        logDebug("Num of speaker participants: " + speakerParticipants.value?.size)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Method to add a new speaker to the list
+     *
+     * @param participant The participant who is chosen as speaker
+     */
+    fun addSpeaker(participant: Participant) {
+        if (speakerParticipants.value.isNullOrEmpty()) {
+            createSpeaker(participant)
+        } else {
+            speakerParticipants.value?.let { listParticipants ->
+                val iterator = listParticipants.iterator()
+                iterator.forEach { speaker ->
+                    speaker.isSpeaker =
+                        speaker.peerId == participant.peerId && speaker.clientId == participant.clientId
+                }
+            }
+
+            speakerParticipants.value?.let { listSpeakerParticipants ->
+                val listFound = listSpeakerParticipants.filter { speaker ->
+                    speaker.peerId == participant.peerId && speaker.clientId == participant.clientId
+                }
+
+                if (listFound.isNullOrEmpty()) {
+                    createSpeaker(participant)
+                }
+            }
+        }
+    }
+
+    /**
+     * Method for creating a participant speaker
+     *
+     * @param participant The participant who is chosen as speaker
+     */
+    private fun createSpeaker(participant: Participant) {
+        createSpeakerParticipant(participant).let { speakerParticipantCreated ->
+            speakerParticipants.value?.add(speakerParticipantCreated)
+            speakerParticipants.value = speakerParticipants.value
+            logDebug("Num of speaker participants: " + speakerParticipants.value?.size)
+        }
     }
 }
