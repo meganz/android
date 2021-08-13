@@ -49,6 +49,7 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         private const val SEND_TO_CHAT = 1
         private const val INVALID_EXPIRATION_TIME = -1L
         private const val LAST_MINUTE = "2359"
+        private const val POST_CHECK_SCROLL = 300L
     }
 
     private val viewModel: GetLinkViewModel by activityViewModels()
@@ -120,7 +121,6 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
             binding.scrollViewGetLink
         ) { _, _, _, _, _ -> checkScroll() }
 
-        checkScroll()
         setThumbnail()
 
         val node = viewModel.getNode()
@@ -175,6 +175,8 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
         if (!node.isExported) {
             viewModel.export()
         }
+
+        binding.scrollViewGetLink.postDelayed(::checkScroll, POST_CHECK_SCROLL)
     }
 
     private fun setupObservers() {
