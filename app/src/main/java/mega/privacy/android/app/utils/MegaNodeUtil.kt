@@ -3,6 +3,7 @@ package mega.privacy.android.app.utils
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.ActivityManager
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -19,6 +20,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
@@ -53,11 +58,12 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
-import mega.privacy.android.app.utils.Util.getMediaIntent
-import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import java.io.File
+import java.io.*
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -67,6 +73,8 @@ object MegaNodeUtil {
      * alertTakenDown is the dialog to be shown. It resides inside this static class to prevent multiple definition within the activity class
      */
     private var alertTakenDown: AlertDialog? = null
+
+    private const val URL_INDICATOR = "URL="
 
     /**
      * The method to calculate how many nodes are folders in array list
@@ -946,6 +954,19 @@ object MegaNodeUtil {
     }
 
     /**
+     * Stop SDK HTTP streaming server.
+     *
+     * @param shouldStopServer True if should stop the server, false otherwise.
+     * @param megaApi          MegaApiAndroid instance to use.
+     */
+    @JvmStatic
+    fun stopStreamingServerIfNeeded(shouldStopServer: Boolean, megaApi: MegaApiAndroid) {
+        if (shouldStopServer) {
+            megaApi.httpServerStop()
+        }
+    }
+
+    /**
      * Shows a taken down alert.
      *
      * @param activity the activity is the page where dialog is shown
@@ -1587,5 +1608,80 @@ object MegaNodeUtil {
         textFileIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
             .putExtra(MODE, mode)
         context.startActivity(textFileIntent)
+    }
+
+    /**
+     * Opens an URL node.
+     *
+     * @param context Current context.
+     * @param megaApi MegaApiAndroid instance to use.
+     * @param node    MegaNode which contains an URL to open.
+     */
+    @JvmStatic
+    fun manageURLNode(context: Context, megaApi: MegaApiAndroid, node: MegaNode) {
+        val progressDialog = ProgressDialog(context)
+        progressDialog.apply {
+            setMessage(getString(R.string.link_request_status))
+            setCancelable(false)
+            setCanceledOnTouchOutside(false)
+            show()
+        }
+
+        Completable.create { emitter ->
+            val localPath = getLocalFile(node)
+            var br: BufferedReader? = null
+            var shouldStopServer = false
+
+            if (localPath != null) {
+                //Read local file
+                val localFile = File(localPath)
+                br = BufferedReader(FileReader(localFile))
+            } else {
+                //Read streaming file
+                shouldStopServer = setupStreamingServer(megaApi, context)
+                val uri = megaApi.httpServerGetLocalLink(node)
+
+                if (!uri.isNullOrEmpty()) {
+                    val nodeURL = URL(uri)
+                    val connection = nodeURL.openConnection() as HttpURLConnection
+                    br = BufferedReader(InputStreamReader(connection.inputStream))
+                }
+            }
+
+            if (br != null) {
+                var line = br.readLine()
+
+                if (line != null) {
+                    line = br.readLine()
+                    val url = line.replace(URL_INDICATOR, "")
+                    val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(url))
+
+                    if (isIntentAvailable(context, intent)) {
+                        context.startActivity(intent)
+                    } else {
+                        showSnackbar(context, getString(R.string.intent_not_available_file))
+                    }
+
+                    stopStreamingServerIfNeeded(shouldStopServer, megaApi)
+                    emitter.onComplete()
+                    return@create
+                } else {
+                    logDebug("Not expected format: Exception on processing url file")
+                }
+            }
+
+            emitter.onError(Throwable("Error getting URL"))
+            stopStreamingServerIfNeeded(shouldStopServer, megaApi)
+            showSnackbar(context, getString(R.string.error_open_file_with))
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = { progressDialog.dismiss() },
+                onError = { error ->
+                    progressDialog.dismiss()
+                    LogUtil.logError(error.message)
+                }
+            )
     }
 }

@@ -79,6 +79,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
@@ -519,52 +520,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
         } else if (mimeType.isURL()) {
-            logDebug("Is URL file");
-            String localPath = getLocalFile(node);
-            
-            if (localPath != null) {
-                File f = new File(localPath);
-                InputStream instream = null;
-
-                try {
-                    // open the file for reading
-                    instream = new FileInputStream(f.getAbsolutePath());
-                    // prepare the file for reading
-                    InputStreamReader inputreader = new InputStreamReader(instream);
-                    BufferedReader buffreader = new BufferedReader(inputreader);
-
-                    String line1 = buffreader.readLine();
-                    if (line1 != null) {
-                        String line2 = buffreader.readLine();
-
-                        String url = line2.replace("URL=", "");
-
-                        logDebug("Is URL - launch browser intent");
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(url));
-                        startActivity(i);
-                        return;
-                    }
-                } catch (Exception ex) {
-                    logError("EXCEPTION reading file", ex);
-                } finally {
-                    try {
-                        if (instream != null) {
-                            instream.close();
-                        }
-                    } catch (IOException e) {
-                        logError("EXCEPTION closing InputStream", e);
-                    }
-                }
-
-                intent = new Intent(Intent.ACTION_VIEW);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    intent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, f), TYPE_TEXT_PLAIN);
-                } else {
-                    intent.setDataAndType(Uri.fromFile(f), TYPE_TEXT_PLAIN);
-                }
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
+            manageURLNode(requireContext(), megaApi, node);
+            return;
         } else if (mimeType.isPdf()) {
             logDebug("isFile:isPdf");
             intent = new Intent(context, PdfViewerActivityLollipop.class);
