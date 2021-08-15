@@ -37,13 +37,22 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        if(!isInitialized) {
-            initItemDecoration(c, parent);
-            isInitialized = true;
-        }
+        checkIfIsInitialized(c, parent);
 
         for (int i = 0; i < childCount; i++) {
             drawDivider(c, parent, parent.getChildAt(i));
+        }
+    }
+
+    /**
+     * initialize Item Decoration when it is not initialized.
+     * @param c         Canvas in which the dividers will be drawn.
+     * @param parent    RecyclerView in which the item decorations will be set.
+     */
+    protected void checkIfIsInitialized(Canvas c, RecyclerView parent) {
+        if (!isInitialized) {
+            initItemDecoration(c, parent);
+            isInitialized = true;
         }
     }
 
