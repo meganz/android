@@ -10,12 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
-import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -27,15 +27,18 @@ import nz.mega.sdk.MegaApiAndroid;
 import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
+import com.google.android.material.button.MaterialButton;
+
 public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickListener{
 
     private DatabaseHandler dbH;
     private MegaApiAndroid megaApi;
     private Context context;
 
-    private Button printMK;
-    private Button copyMK;
-    private Button saveMK;
+    private MaterialButton printMK;
+    private MaterialButton copyMK;
+    private MaterialButton saveMK;
+    private LinearLayout MKLayout;
 
     DisplayMetrics outMetrics;
 
@@ -76,10 +79,11 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
         saveMK = v.findViewById(R.id.save_MK_button);
         saveMK.setOnClickListener(this);
 
-        saveMK.post(() -> {
-            float saveTextSize = saveMK.getTextSize();
-            copyMK.setTextSize(TypedValue.COMPLEX_UNIT_PX, saveTextSize);
-            printMK.setTextSize(TypedValue.COMPLEX_UNIT_PX, saveTextSize);
+        MKLayout = v.findViewById(R.id.MK_buttons_layout);
+        MKLayout.post(() -> {
+            if (isOverOneLine()) {
+                verticalLayout();
+            }
         });
 
         return v;
@@ -144,5 +148,39 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
         if (context instanceof ManagerActivityLollipop) {
             ((ManagerActivityLollipop) context).hideMKLayout();
         }
+    }
+
+    /**
+     * Determine if ne of those button show the content in greater than one line
+     *
+     * @return if one of those button show the content in greater than one line return true, else false
+     */
+    private Boolean isOverOneLine() {
+        return printMK.getLineCount() > 1 || copyMK.getLineCount() > 1 || saveMK.getLineCount() > 1;
+    }
+
+    /**
+     * Change the layout to vertical
+     */
+    private void verticalLayout() {
+        MKLayout.setOrientation(LinearLayout.VERTICAL);
+        updateViewParam(copyMK);
+        updateViewParam(saveMK);
+        updateViewParam(printMK);
+    }
+
+    /**
+     * Update the param for the button
+     *
+     * @param view the target view need to update
+     */
+    private void updateViewParam(MaterialButton view) {
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+        params.setMarginStart(0);
+        view.setLayoutParams(params);
+        view.setStrokeWidth(0);
+        view.setPadding(0, 0, 0, 0);
+        view.setGravity(Gravity.START);
+        view.setGravity(Gravity.CENTER_VERTICAL);
     }
 }
