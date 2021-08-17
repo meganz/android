@@ -9108,7 +9108,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
         showCallInProgressLayout(text, true, call);
         callInProgressLayout.setOnClickListener(this);
-        if (chatRoom != null && chatRoom.isGroup()) {
+        if (chatRoom != null && chatRoom.isGroup() && megaChatApi.getChatCall(chatRoom.getChatId()) != null) {
             subtitleCall.setVisibility(View.VISIBLE);
             individualSubtitleToobar.setVisibility(View.GONE);
             setGroupalSubtitleToolbarVisibility(false);
