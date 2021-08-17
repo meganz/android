@@ -3,7 +3,6 @@ package mega.privacy.android.app.utils
 import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.ActivityManager
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -121,7 +120,7 @@ object MegaNodeUtil {
     fun showTakenDownNodeActionNotAvailableDialog(node: MegaNode?, context: Context): Boolean {
         return if (isNodeTakenDown(node)) {
             RunOnUIThreadUtils.post {
-                Util.showSnackbar(context, getString(R.string.error_download_takendown_node))
+                showSnackbar(context, getString(R.string.error_download_takendown_node))
             }
             true
         } else {
@@ -347,9 +346,9 @@ object MegaNodeUtil {
         if (node == null) {
             LogUtil.logError(error + "Node == NULL")
             return false
-        } else if (!Util.isOnline(context)) {
+        } else if (!isOnline(context)) {
             LogUtil.logError(error + "No network connection")
-            Util.showSnackbar(context, getString(R.string.error_server_connection_problem))
+            showSnackbar(context, getString(R.string.error_server_connection_problem))
             return false
         }
 
@@ -374,9 +373,9 @@ object MegaNodeUtil {
         if (nodes == null || nodes.isEmpty()) {
             LogUtil.logError(error + "no nodes")
             return false
-        } else if (!Util.isOnline(context)) {
+        } else if (!isOnline(context)) {
             LogUtil.logError(error + "No network connection")
-            Util.showSnackbar(context, getString(R.string.error_server_connection_problem))
+            showSnackbar(context, getString(R.string.error_server_connection_problem))
             return false
         }
 
@@ -422,7 +421,7 @@ object MegaNodeUtil {
     /**
      * Gets the node of the user attribute "My chat files" from the DB.
      *
-     * Before call this method is neccessary to call existsMyChatFilesFolder() method
+     * Before call this method is necessary to call existsMyChatFilesFolder() method
      *
      * @return "My chat files" folder node
      * @see MegaNodeUtil.existsMyChatFilesFolder
@@ -772,7 +771,7 @@ object MegaNodeUtil {
         snackbarShower: SnackbarShower,
         handles: List<Long>
     ) {
-        logDebug("Leaving ${handles.size} incoming shares");
+        logDebug("Leaving ${handles.size} incoming shares")
 
         val megaApi = MegaApplication.getInstance().megaApi
 
@@ -1044,7 +1043,7 @@ object MegaNodeUtil {
             listener.onDisputeClicked()
             val openTermsIntent = Intent(context, WebViewActivity::class.java)
             openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            openTermsIntent.data = Uri.parse(Constants.DISPUTE_URL)
+            openTermsIntent.data = Uri.parse(DISPUTE_URL)
             context.startActivity(openTermsIntent)
             dialog.dismiss()
         }
@@ -1618,8 +1617,9 @@ object MegaNodeUtil {
      * @param node    MegaNode which contains an URL to open.
      */
     @JvmStatic
+    @Suppress("DEPRECATION")
     fun manageURLNode(context: Context, megaApi: MegaApiAndroid, node: MegaNode) {
-        val progressDialog = ProgressDialog(context)
+        val progressDialog = android.app.ProgressDialog(context)
         progressDialog.apply {
             setMessage(getString(R.string.link_request_status))
             setCancelable(false)
