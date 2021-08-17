@@ -151,9 +151,9 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
     }
 
     /**
-     * Determine if ne of those button show the content in greater than one line
+     * Determine if one of those buttons show the content in greater than one line
      *
-     * @return if one of those button show the content in greater than one line return true, else false
+     * @return if one of those buttons show the content in greater than one line return true, else false
      */
     private Boolean isOverOneLine() {
         return printMK.getLineCount() > 1 || copyMK.getLineCount() > 1 || saveMK.getLineCount() > 1;
