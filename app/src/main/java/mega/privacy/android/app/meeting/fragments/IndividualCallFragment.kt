@@ -90,7 +90,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private val sessionHiResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
             if (inMeetingViewModel.isSameCall(callAndSession.first) && !isFloatingWindow && inMeetingViewModel.isOneToOneCall()) {
-                if (callAndSession.second.canRecvVideoHiRes()) {
+                if (callAndSession.second.canRecvVideoHiRes() && callAndSession.second.isHiResVideo) {
                     logDebug("Can receive high-resolution video")
 
                     if (inMeetingViewModel.sessionHasVideo(callAndSession.second.clientid)) {
@@ -503,7 +503,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                 logDebug("Participant $clientId video listener created")
 
                 inMeetingViewModel.getSession(clientId)?.let {
-                    if (!it.canRecvVideoHiRes()) {
+                    if (!it.canRecvVideoHiRes() && it.isHiResVideo) {
                         logDebug("Asking for HiRes video of client ID $clientId")
                         inMeetingViewModel.requestHiResVideo(it, this.chatId)
                     } else {
@@ -611,7 +611,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         } else {
             inMeetingViewModel.getSession(clientId)?.let { session ->
                 videoListener?.let {
-                    if (session.canRecvVideoHiRes()) {
+                    if (session.canRecvVideoHiRes() && session.isHiResVideo) {
                         logDebug("Removing HiRes video of client ID $clientId")
                         inMeetingViewModel.stopHiResVideo(session, chatId)
                     }

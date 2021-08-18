@@ -204,7 +204,7 @@ class VideoGridViewAdapter(
             return
 
         getHolderAtPosition(position)?.let { holder ->
-            holder.removeTextureView(participant)
+            holder.removeResolutionAndListener(participant)
             return
         }
     }

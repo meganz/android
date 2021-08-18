@@ -1051,7 +1051,7 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Close Video of participant in a meeting. Removing resolution and listener.
+     * Stop remote video resolution of participant in a meeting.
      *
      * @param participant The participant from whom the video is to be closed
      */
@@ -1059,15 +1059,33 @@ class InMeetingViewModel @ViewModelInject constructor(
         if (participant.videoListener == null) return
 
         getSession(participant.clientId)?.let {
-            if (participant.hasHiRes && it.canRecvVideoHiRes()) {
+            if (participant.hasHiRes && it.canRecvVideoHiRes() && it.isHiResVideo) {
                 logDebug("Stop HiResolution and remove listener, clientId = ${participant.clientId}")
                 stopHiResVideo(it, currentChatId)
 
-            } else if (!participant.hasHiRes && it.canRecvVideoLowRes()) {
+            } else if (!participant.hasHiRes && it.canRecvVideoLowRes() && it.isLowResVideo) {
                 logDebug("Stop LowResolution and remove listener, clientId = ${participant.clientId}")
                 stopLowResVideo(it, currentChatId)
             }
         }
+    }
+
+    /**
+     * Remove remote video listener of participant in a meeting.
+     *
+     * @param participant The participant from whom the video is to be closed
+     */
+    fun removeRemoteVideoListener(
+        participant: Participant,
+        listener: MegaChatVideoListenerInterface
+    ) {
+        logDebug("Remove the remote video listener of clientID ${participant.clientId}")
+        removeChatRemoteVideoListener(
+            listener,
+            participant.clientId,
+            currentChatId,
+            participant.hasHiRes
+        )
     }
 
     /**
@@ -1082,13 +1100,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         if (participant.videoListener == null) return
 
         removeRemoteVideoResolution(participant)
-        logDebug("Remove the remote video listener of clientID ${participant.clientId}")
-        removeChatRemoteVideoListener(
-            listener,
-            participant.clientId,
-            currentChatId,
-            participant.hasHiRes
-        )
+        removeRemoteVideoListener(participant, listener)
     }
 
     /**
@@ -1413,7 +1425,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         chatId: Long
     ) {
         session?.let { sessionParticipant ->
-            if (!sessionParticipant.canRecvVideoHiRes()) {
+            if (!sessionParticipant.canRecvVideoHiRes() && sessionParticipant.isHiResVideo) {
                 logDebug("Adding HiRes for remote video, clientId ${sessionParticipant.clientid}")
                 inMeetingRepository.requestHiResVideo(
                     chatId,
@@ -1435,7 +1447,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         chatId: Long
     ) {
         session?.let { sessionParticipant ->
-            if (sessionParticipant.canRecvVideoHiRes()) {
+            if (sessionParticipant.canRecvVideoHiRes() && sessionParticipant.isHiResVideo) {
                 logDebug("Removing HiRes for remote video, clientId ${sessionParticipant.clientid}")
                 val list: MegaHandleList = MegaHandleList.createInstance()
                 list.addMegaHandle(sessionParticipant.clientid)
@@ -1459,7 +1471,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         chatId: Long
     ) {
         session?.let { sessionParticipant ->
-            if (!sessionParticipant.canRecvVideoLowRes()) {
+            if (!sessionParticipant.canRecvVideoLowRes() && sessionParticipant.isLowResVideo) {
                 logDebug("Adding LowRes for remote video, clientId ${sessionParticipant.clientid}")
                 val list: MegaHandleList = MegaHandleList.createInstance()
                 list.addMegaHandle(sessionParticipant.clientid)
@@ -1483,7 +1495,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         chatId: Long
     ) {
         session?.let { sessionParticipant ->
-            if (sessionParticipant.canRecvVideoLowRes()) {
+            if (sessionParticipant.canRecvVideoLowRes() && sessionParticipant.isLowResVideo) {
                 logDebug("Removing LowRes for remote video, clientId ${sessionParticipant.clientid}")
                 val list: MegaHandleList = MegaHandleList.createInstance()
                 list.addMegaHandle(sessionParticipant.clientid)
