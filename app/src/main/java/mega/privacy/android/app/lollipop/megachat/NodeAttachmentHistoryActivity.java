@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,6 +49,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -148,7 +148,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     private ActionMode actionMode;
     DisplayMetrics outMetrics;
 
-    ProgressDialog statusDialog;
+    MegaProgressDialog statusDialog;
 
     MenuItem selectMenuItem;
     MenuItem unSelectMenuItem;
@@ -1158,7 +1158,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     public void showProgressForwarding() {
         logDebug("showProgressForwarding");
 
-        statusDialog = new ProgressDialog(this);
+        statusDialog = new MegaProgressDialog(this);
         statusDialog.setMessage(getString(R.string.general_forwarding));
         statusDialog.show();
     }
@@ -1167,12 +1167,12 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         try {
             statusDialog.dismiss();
         } catch (Exception ex) {
+            logError(ex.getMessage());
         }
-        ;
     }
 
     public void importNodes(final long toHandle, final long[] importMessagesHandles) {
-        statusDialog = new ProgressDialog(this);
+        statusDialog = new MegaProgressDialog(this);
         statusDialog.setMessage(getString(R.string.general_importing));
         statusDialog.show();
 

@@ -1,8 +1,55 @@
 package mega.privacy.android.app.lollipop;
 
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE;
+import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE;
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.HIGH_PRIORITY_TRANSFER;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.MULTIPLE_SEND_RUBBISH;
+import static mega.privacy.android.app.utils.Constants.NAME;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_LOCAL;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SCAN_DOCUMENT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_READ_WRITE_STORAGE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
+import static mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.WRITE_SD_CARD_REQUEST_CODE;
+import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.PermissionUtils.requestPermission;
+import static mega.privacy.android.app.utils.ProgressDialogUtil.getMegaProgressDialog;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
+import static mega.privacy.android.app.utils.UploadUtil.chooseFromDevice;
+import static mega.privacy.android.app.utils.UploadUtil.pickFileFromFileSystem;
+import static mega.privacy.android.app.utils.UploadUtil.uploadTakePicture;
+import static mega.privacy.android.app.utils.Util.checkTakePicture;
+import static mega.privacy.android.app.utils.Util.getExternalCardPath;
+import static mega.privacy.android.app.utils.Util.getScaleH;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,14 +59,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -31,8 +70,17 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import org.jetbrains.annotations.Nullable;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,9 +93,10 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.components.saver.NodeSaver;
-import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
@@ -72,23 +121,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
-
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
-import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.UploadUtil.*;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class ContactFileListActivityLollipop extends PasscodeActivity
 		implements MegaGlobalListenerInterface, MegaRequestListenerInterface,
@@ -126,11 +158,10 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	MenuItem createFolderMenuItem;
 	MenuItem startConversation;
-	private AlertDialog newFolderDialog;
 	DisplayMetrics outMetrics;
 
 	private androidx.appcompat.app.AlertDialog renameDialog;
-	ProgressDialog statusDialog;
+	MegaProgressDialog statusDialog;
 
 	MegaNode selectedNode = null;
 
@@ -141,7 +172,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	private AlertDialog newTextFileDialog;
 
-	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
+	private final BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null) return;
@@ -157,7 +188,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		}
 	};
 
-	private BroadcastReceiver destroyActionModeReceiver = new BroadcastReceiver() {
+	private final BroadcastReceiver destroyActionModeReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent == null || intent.getAction() == null
@@ -199,6 +230,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -251,7 +283,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Override
 	public void showNewFolderDialog() {
-		newFolderDialog = MegaNodeDialogUtil.showNewFolderDialog(this, this);
+		 MegaNodeDialogUtil.showNewFolderDialog(this, this);
 	}
 
 	@Override
@@ -290,7 +322,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			if (!exists) {
 				statusDialog = null;
 				try {
-					statusDialog = new ProgressDialog(this);
+					statusDialog = new MegaProgressDialog(this);
 					statusDialog.setMessage(getString(R.string.context_creating_folder));
 					statusDialog.show();
 				} catch (Exception e) {
@@ -317,7 +349,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				if (!exists) {
 					statusDialog = null;
 					try {
-						statusDialog = new ProgressDialog(this);
+						statusDialog = new MegaProgressDialog(this);
 						statusDialog.setMessage(getString(R.string.context_creating_folder));
 						statusDialog.show();
 					} catch (Exception e) {
@@ -329,7 +361,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_already_exists));
 				}
 			} else {
-				return;
 			}
 		}
 	}
@@ -401,9 +432,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		display.getMetrics(outMetrics);
 		float density = getResources().getDisplayMetrics().density;
 
-		float scaleW = getScaleW(outMetrics, density);
-		float scaleH = getScaleH(outMetrics, density);
-
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			userEmail = extras.getString(NAME);
@@ -411,7 +439,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 			setContentView(R.layout.activity_main_contact_properties);
 
-			coordinatorLayout = (CoordinatorLayout) findViewById(R.id.contact_properties_main_activity_layout);
+			coordinatorLayout = findViewById(R.id.contact_properties_main_activity_layout);
 			coordinatorLayout.setFitsSystemWindows(false);
 
 			//Set toolbar
@@ -592,7 +620,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			}
 		} else {
 			logWarning("handleList NULL");
-			return;
 		}
 	}
 
@@ -637,9 +664,9 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				return;
 			}
 
-			ProgressDialog temp = null;
+			MegaProgressDialog temp;
 			try {
-				temp = new ProgressDialog(this);
+				temp = new MegaProgressDialog(this);
 				temp.setMessage(getString(R.string.context_copying));
 				temp.show();
 			} catch (Exception e) {
@@ -652,13 +679,11 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			final int totalCopy = copyHandles.length;
 
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
-			for (int i = 0;
-				 i < copyHandles.length;
-				 i++) {
-				logDebug("NODE TO COPY: " + megaApi.getNodeByHandle(copyHandles[i]).getName());
+			for (long copyHandle : copyHandles) {
+				logDebug("NODE TO COPY: " + megaApi.getNodeByHandle(copyHandle).getName());
 				logDebug("WHERE: " + parent.getName());
-				logDebug("NODES: " + copyHandles[i] + "_" + parent.getHandle());
-				MegaNode cN = megaApi.getNodeByHandle(copyHandles[i]);
+				logDebug("NODES: " + copyHandle + "_" + parent.getHandle());
+				MegaNode cN = megaApi.getNodeByHandle(copyHandle);
 				if (cN != null) {
 					logDebug("cN != null");
 					megaApi.copyNode(cN, parent, this);
@@ -670,6 +695,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 							showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_sent_node));
 						}
 					} catch (Exception ex) {
+						logError(ex.getMessage());
 					}
 				}
 			}
@@ -687,9 +713,9 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			moveToRubbish = false;
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
-			ProgressDialog temp = null;
+			MegaProgressDialog temp;
 			try {
-				temp = new ProgressDialog(this);
+				temp = new MegaProgressDialog(this);
 				temp.setMessage(getString(R.string.context_moving));
 				temp.show();
 			} catch (Exception e) {
@@ -697,8 +723,8 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			}
 			statusDialog = temp;
 
-			for (int i = 0; i < moveHandles.length; i++) {
-				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
+			for (long moveHandle : moveHandles) {
+				megaApi.moveNode(megaApi.getNodeByHandle(moveHandle), parent, this);
 			}
 		} else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			if (intent == null) {
@@ -707,9 +733,9 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);
-			ProgressDialog temp = null;
+			MegaProgressDialog temp;
 			try {
-				temp = new ProgressDialog(this);
+				temp = new MegaProgressDialog(this);
 				temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
 				temp.show();
 			} catch (Exception e) {
@@ -735,7 +761,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
-					statusDialog = getProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
+					statusDialog = getMegaProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
 					permissionsDialog.dismiss();
 					new NodeController(this).shareFolder(parent, selectedContacts, item);
 				});
@@ -748,8 +774,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			}
 			String folderPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_FILES);
-
-			int i = 0;
 
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if (parentNode == null) {
@@ -788,7 +812,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				logDebug("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
 				startService(uploadServiceIntent);
-				i++;
 			}
 		} else if (requestCode == TAKE_PHOTO_CODE) {
 			logDebug("TAKE_PHOTO_CODE");
@@ -820,6 +843,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			try {
 				statusDialog.dismiss();
 			} catch (Exception ex) {
+				logError(ex.getMessage());
 			}
 		}
 
@@ -904,18 +928,15 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList) {
 		logDebug("askConfirmationMoveToRubbish");
 
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				switch (which) {
-					case DialogInterface.BUTTON_POSITIVE:
-						moveToTrash(handleList);
-						break;
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+			switch (which) {
+				case DialogInterface.BUTTON_POSITIVE:
+					moveToTrash(handleList);
+					break;
 
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-				}
+				case DialogInterface.BUTTON_NEGATIVE:
+					//No button clicked
+					break;
 			}
 		};
 
@@ -934,7 +955,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			}
 		} else {
 			logWarning("handleList NULL");
-			return;
 		}
 	}
 
@@ -951,6 +971,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			try {
 				statusDialog.dismiss();
 			} catch (Exception ex) {
+				logError(ex.getMessage());
 			}
 
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -968,6 +989,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			try {
 				statusDialog.dismiss();
 			} catch (Exception ex) {
+				logError(ex.getMessage());
 			}
 
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -1008,6 +1030,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			try {
 				statusDialog.dismiss();
 			} catch (Exception ex) {
+				logError(ex.getMessage());
 			}
 
 			if (cflF != null && cflF.isVisible()) {
@@ -1043,15 +1066,12 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api,
 			ArrayList<MegaContactRequest> requests) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -1069,7 +1089,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	}
 
 	public void showSnackbar(int type, String s) {
-		CoordinatorLayout coordinatorFragment = (CoordinatorLayout) findViewById(R.id.contact_file_list_coordinator_layout);
+		CoordinatorLayout coordinatorFragment = findViewById(R.id.contact_file_list_coordinator_layout);
 		cflF = (ContactFileListFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cflF");
 		if (cflF != null && cflF.isVisible()) {
 			if (coordinatorFragment != null) {

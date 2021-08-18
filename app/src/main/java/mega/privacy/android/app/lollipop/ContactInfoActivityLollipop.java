@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -69,6 +68,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.AppBarStateChangeListener;
 import mega.privacy.android.app.components.MarqueeTextView;
+import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
@@ -123,7 +123,6 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.getDescription;
 import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -153,7 +152,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 	RelativeLayout imageLayout;
 	AlertDialog permissionsDialog;
-	ProgressDialog statusDialog;
+	MegaProgressDialog statusDialog;
 	AlertDialog setNicknameDialog;
 	ContactInfoActivityLollipop contactInfoActivityLollipop;
 	CoordinatorLayout fragmentContainer;
@@ -1470,7 +1469,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						statusDialog = getProgressDialog(contactInfoActivityLollipop, getString(R.string.context_sharing_folder));
+						statusDialog = getMegaProgressDialog(contactInfoActivityLollipop, getString(R.string.context_sharing_folder));
 						permissionsDialog.dismiss();
 						nC.shareFolder(parent, selectedContacts, item);
 					}
@@ -1492,10 +1491,10 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
-            
-            ProgressDialog temp = null;
+
+			MegaProgressDialog temp;
             try {
-                temp = new ProgressDialog(this);
+                temp = new MegaProgressDialog(this);
                 temp.setMessage(getString(R.string.context_copying));
                 temp.show();
             } catch (Exception e) {

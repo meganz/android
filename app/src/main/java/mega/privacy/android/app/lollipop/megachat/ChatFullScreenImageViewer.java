@@ -1,9 +1,33 @@
 package mega.privacy.android.app.lollipop.megachat;
 
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.TRANSPARENT;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
+import static mega.privacy.android.app.utils.Constants.ANIMATION_DURATION;
+import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
+import static mega.privacy.android.app.utils.FileUtil.copyFile;
+import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.Util.getScaleH;
+import static mega.privacy.android.app.utils.Util.getScaleW;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,16 +37,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.viewpager.widget.ViewPager;
-import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -33,6 +47,17 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +72,9 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ExtendedViewPager;
+import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -55,7 +82,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -75,16 +101,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static android.graphics.Color.*;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-
 public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPageChangeListener,
 		MegaRequestListenerInterface, MegaGlobalListenerInterface,SnackbarShower {
 
@@ -92,11 +108,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 	RelativeLayout relativeImageViewerLayout;
 	private Handler handler;
 
-	private DisplayMetrics outMetrics;
-
-	private boolean aBshown = true;
-
-	ProgressDialog statusDialog;
+	MegaProgressDialog statusDialog;
 
 	float scaleText;
 	AppBarLayout appBarLayout;
@@ -110,7 +122,6 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 	private MegaChatFullScreenImageAdapter adapterMega;
 	private int positionG;
-	private ArrayList<Long> imageHandles;
 	private RelativeLayout fragmentContainer;
 	private TextView fileNameTextView;
 	private RelativeLayout bottomLayout;
@@ -186,13 +197,8 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
             importIcon.setVisible(false);
             saveForOfflineIcon.setVisible(false);
 
-            if (messages.get(positionG).getUserHandle() == megaChatApi.getMyUserHandle()
-					&& messages.get(positionG).isDeletable()) {
-                removeIcon.setVisible(true);
-            }
-            else{
-                removeIcon.setVisible(false);
-            }
+			removeIcon.setVisible(messages.get(positionG).getUserHandle() == megaChatApi.getMyUserHandle()
+					&& messages.get(positionG).isDeletable());
         }
         else if (node != null){
             downloadIcon.setVisible(true);
@@ -205,12 +211,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
                 saveForOfflineIcon.setVisible(true);
             }
 
-            if (messages.get(positionG).getUserHandle()==megaChatApi.getMyUserHandle() && messages.get(positionG).isDeletable()) {
-                removeIcon.setVisible(true);
-            }
-            else {
-                removeIcon.setVisible(false);
-            }
+			removeIcon.setVisible(messages.get(positionG).getUserHandle() == megaChatApi.getMyUserHandle() && messages.get(positionG).isDeletable());
         }
         else {
             downloadIcon.setVisible(false);
@@ -230,6 +231,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		nodeSaver.handleRequestPermissionsResult(requestCode);
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -296,18 +298,13 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		chatC = new ChatController(this);
 
 		Display display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
+		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 		float density  = getResources().getDisplayMetrics().density;
 
 		float scaleW = getScaleW(outMetrics, density);
 		float scaleH = getScaleH(outMetrics, density);
-		if (scaleH < scaleW){
-			scaleText = scaleH;
-		}
-		else{
-			scaleText = scaleW;
-		}
+		scaleText = Math.min(scaleH, scaleW);
 		if (savedInstanceState != null){
 			isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
 
@@ -359,10 +356,10 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 		setContentView(dragToExit.wrapContentView(R.layout.activity_chat_full_screen_image_viewer));
 
-		relativeImageViewerLayout = (RelativeLayout) findViewById(R.id.full_image_viewer_layout);
-		fragmentContainer = (RelativeLayout) findViewById(R.id.chat_full_image_viewer_parent_layout);
-		appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
-		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
+		relativeImageViewerLayout = findViewById(R.id.full_image_viewer_layout);
+		fragmentContainer = findViewById(R.id.chat_full_image_viewer_parent_layout);
+		appBarLayout = findViewById(R.id.app_bar);
+		viewPager = findViewById(R.id.image_viewer_pager);
 		viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
 			// optional
@@ -392,9 +389,11 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		aB.setHomeButtonEnabled(true);
-		aB.setDisplayHomeAsUpEnabled(true);
-		aB.setTitle(" ");
+		if (aB != null) {
+			aB.setHomeButtonEnabled(true);
+			aB.setDisplayHomeAsUpEnabled(true);
+			aB.setTitle(" ");
+		}
 
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
@@ -402,33 +401,31 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		messageIds = intent.getLongArrayExtra("messageIds");
 		chatId = intent.getLongExtra("chatId", -1);
 
-		messages = new ArrayList<MegaChatMessage>();
+		messages = new ArrayList<>();
 
-		imageHandles = new ArrayList<Long>();
+		ArrayList<Long> imageHandles = new ArrayList<Long>();
 
 		if(messageIds==null){
 			return;
 		}
 
-		for(int j=0; j<messageIds.length; j++){
-			MegaChatMessage message = megaChatApi.getMessage(chatId, messageIds[j]);
-			if(message==null){
-				message = megaChatApi.getMessageFromNodeHistory(chatId, messageIds[j]);
+		for (long messageId : messageIds) {
+			MegaChatMessage message = megaChatApi.getMessage(chatId, messageId);
+			if (message == null) {
+				message = megaChatApi.getMessageFromNodeHistory(chatId, messageId);
 			}
 
-			if(message!=null){
+			if (message != null) {
 				MegaNodeList list = message.getMegaNodeList();
-				if(list.size()==1){
+				if (list.size() == 1) {
 					MegaNode node = list.get(0);
-					if(MimeTypeList.typeForName(node.getName()).isImage()){
+					if (MimeTypeList.typeForName(node.getName()).isImage()) {
 						messages.add(message);
 					}
-				}
-				else{
+				} else {
 					logWarning("Messages with more than one attachment - do not supported");
 				}
-			}
-			else{
+			} else {
 				logError("ERROR - the message is NULL");
 			}
 		}
@@ -464,8 +461,8 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 		viewPager.setOnPageChangeListener(this);
 
-		bottomLayout = (RelativeLayout) findViewById(R.id.chat_image_viewer_layout_bottom);
-		fileNameTextView = (TextView) findViewById(R.id.chat_full_image_viewer_file_name);
+		bottomLayout = findViewById(R.id.chat_image_viewer_layout_bottom);
+		fileNameTextView = findViewById(R.id.chat_full_image_viewer_file_name);
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			fileNameTextView.setMaxWidth(scaleWidthPx(300, outMetrics));
 		}
@@ -499,12 +496,10 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 	@Override
 	public void onPageSelected(int position) {
-		return;
 	}
 
 	@Override
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-		return;
 	}
 
 	@Override
@@ -521,7 +516,9 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 					if (tIV != null){
 						tIV.setZoom(1);
 					}
-				}catch(Exception e){}
+				}catch(Exception e){
+					logError(e.getMessage());
+				}
 				fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 			}
 		}
@@ -553,7 +550,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 	public void onRestoreInstanceState (Bundle savedInstanceState){
 		super.onRestoreInstanceState(savedInstanceState);
 
-		aBshown = savedInstanceState.getBoolean("aBshown");
+		boolean aBshown = savedInstanceState.getBoolean("aBshown");
 		adapterMega.setaBshown(aBshown);
 	}
 
@@ -681,6 +678,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 				try {
 					statusDialog.dismiss();
 				} catch (Exception ex) {
+					logError(ex.getMessage());
 				}
 
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
@@ -725,7 +723,9 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		if(!isOnline(this)||megaApi==null) {
 			try{
 				statusDialog.dismiss();
-			} catch(Exception ex) {};
+			} catch(Exception ex) {
+				logError(ex.getMessage());
+			}
 
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 			return;
@@ -745,7 +745,9 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 			StatFs stat = new StatFs(parentPath);
 			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
 		}
-		catch(Exception ex){}
+		catch(Exception ex){
+			logError(ex.getMessage());
+		}
 		
 		
 		if (hashes == null){
@@ -773,7 +775,9 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 						try { 
 							copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 						}
-						catch(Exception e) {}
+						catch(Exception e) {
+							logError(e.getMessage());
+						}
 
 						try {
 
@@ -813,9 +817,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 				MegaNode node = megaApi.getNodeByHandle(hash);
 				if(node != null){
 					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-					if (node.getType() == MegaNode.TYPE_FOLDER) {
-//						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
-					} else {
+					if (node.getType() != MegaNode.TYPE_FOLDER) {
 						dlFiles.put(node, parentPath);
 					}
 					
@@ -875,12 +877,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
 				tB.animate().translationY(-220).setDuration(ANIMATION_DURATION)
-						.withEndAction(new Runnable() {
-							@Override
-							public void run() {
-								aB.hide();
-							}
-						}).start();
+						.withEndAction(() -> aB.hide()).start();
 				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
 			} else {
 				aB.hide();

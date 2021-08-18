@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
@@ -131,6 +130,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.fragments.managerFragments.cu.CustomHideBottomViewOnScrollBehaviour;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.activities.WebViewActivity;
@@ -685,7 +685,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private OfflineFragment pagerOfflineFragment;
 	private RecentsFragment pagerRecentsFragment;
 
-	ProgressDialog statusDialog;
+	MegaProgressDialog statusDialog;
 
 	private AlertDialog permissionsDialog;
 	private AlertDialog presenceStatusDialog;
@@ -8600,7 +8600,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		statusDialog = null;
 		try {
-			statusDialog = new ProgressDialog(this);
+			statusDialog = new MegaProgressDialog(this);
 			statusDialog.setMessage(getString(R.string.context_creating_folder));
 			statusDialog.show();
 		}
@@ -9427,9 +9427,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void showStatusDialog(String text){
-		ProgressDialog temp = null;
+		MegaProgressDialog temp = null;
 		try{
-			temp = new ProgressDialog(managerActivity);
+			temp = new MegaProgressDialog(managerActivity);
 			temp.setMessage(text);
 			temp.show();
 		}
@@ -9895,9 +9895,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 				filePrepareTask.execute(intent);
-				ProgressDialog temp = null;
+				MegaProgressDialog temp;
 				try{
-					temp = new ProgressDialog(this);
+					temp = new MegaProgressDialog(this);
 					temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
 					temp.show();
 				}

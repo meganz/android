@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.qrcode;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -55,6 +54,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
+import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -105,7 +105,7 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
     private Bitmap qrCodeBitmap;
     private File qrFile = null;
 
-    public static ProgressDialog processingDialog;
+    public static MegaProgressDialog processingDialog;
 
     private boolean copyLink = true;
     private boolean createQR = false;
@@ -446,13 +446,14 @@ public class MyCodeFragment extends Fragment implements View.OnClickListener{
         }
         else {
             megaApi.contactLinkCreate(false, (QRCodeActivity) context);
-            ProgressDialog temp = null;
+            MegaProgressDialog temp = null;
             try{
-                temp = new ProgressDialog(context);
+                temp = new MegaProgressDialog(context);
                 temp.setMessage(getString(R.string.generatin_qr));
                 temp.show();
             }
             catch(Exception e){
+                logError(e.getMessage());
             }
             processingDialog = temp;
         }

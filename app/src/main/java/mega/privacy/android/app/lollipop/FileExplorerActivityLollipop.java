@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -56,6 +57,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -168,18 +170,13 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	private static final int DEFAULT_TAB_TO_REMOVE = -1;
 
 	private DatabaseHandler dbH;
-	private MegaPreferences prefs;
 	private AppBarLayout abL;
 	private MaterialToolbar tB;
 	private ActionBar aB;
-	private DisplayMetrics outMetrics;
 	private RelativeLayout fragmentContainer;
 	private LinearLayout loginLoggingIn;
 	private ProgressBar loginProgressBar;
 	private ProgressBar loginFetchNodesProgressBar;
-	private TextView generatingKeysText;
-	private TextView queryingSignupLinkText;
-	private TextView confirmingAccountText;
 	private TextView loggingInText;
 	private TextView fetchingNodesText;
 	private TextView prepareNodesText;
@@ -217,18 +214,16 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	
 	private Handler handler;
 
-	private ChatSettings chatSettings;
-	
 	private int tabShown = CLOUD_TAB;
 
-	private ArrayList<MegaChatRoom> chatListItems = new ArrayList<>();
+	private final ArrayList<MegaChatRoom> chatListItems = new ArrayList<>();
 
 	private CloudDriveExplorerFragmentLollipop cDriveExplorer;
 	private IncomingSharesExplorerFragmentLollipop iSharesExplorer;
 	private ChatExplorerFragment chatExplorer;
 	private ImportFilesFragment importFileFragment;
 
-	private ProgressDialog statusDialog;
+	private MegaProgressDialog statusDialog;
 
 	private List<ShareInfo> filePreparedInfos;
 
@@ -236,8 +231,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	private TabLayout tabLayoutExplorer;
 	private FileExplorerPagerAdapter mTabsAdapterExplorer;
 	private CustomViewPager viewPagerExplorer;
-
-	private ArrayList<MegaNode> nodes;
 
 	private long parentHandleIncoming;
 	private long parentHandleCloud;
@@ -250,8 +243,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	private HashMap<String, String> nameFiles = new HashMap<>();
 
 	private MegaNode myChatFilesNode;
-	private ArrayList<MegaNode> attachNodes = new ArrayList<>();
-	private ArrayList<ShareInfo> uploadInfos = new ArrayList<>();
+	private final ArrayList<MegaNode> attachNodes = new ArrayList<>();
+	private final ArrayList<ShareInfo> uploadInfos = new ArrayList<>();
 	private int filesChecked;
 
 	private SearchView searchView;
@@ -341,6 +334,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	/*
 	 * Background task to process files for uploading
 	 */
+	@SuppressLint("StaticFieldLeak")
 	private class OwnFilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
 		Context context;
 		
@@ -466,7 +460,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		fileExplorerActivityLollipop = this;
 				
 		dbH = DatabaseHandler.getDbHandler(this);
-		prefs = dbH.getPreferences();
+		MegaPreferences prefs = dbH.getPreferences();
 		if (prefs == null || prefs.getPreferredViewList() == null) {
 			isList = true;
 		}
@@ -476,7 +470,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		credentials = dbH.getCredentials();
 		
 		Display display = getWindowManager().getDefaultDisplay();
-		outMetrics = new DisplayMetrics ();
+		DisplayMetrics outMetrics = new DisplayMetrics();
 	    display.getMetrics(outMetrics);
 		
 		if (credentials == null){
@@ -530,9 +524,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		loginLoggingIn = findViewById(R.id.file_logging_in_layout);
 		loginProgressBar = findViewById(R.id.file_login_progress_bar);
 		loginFetchNodesProgressBar = findViewById(R.id.file_login_fetching_nodes_bar);
-		generatingKeysText = findViewById(R.id.file_login_generating_keys_text);
-		queryingSignupLinkText = findViewById(R.id.file_login_query_signup_link_text);
-		confirmingAccountText =findViewById(R.id.file_login_confirm_account_text);
+		TextView generatingKeysText = findViewById(R.id.file_login_generating_keys_text);
+		TextView queryingSignupLinkText = findViewById(R.id.file_login_query_signup_link_text);
+		TextView confirmingAccountText = findViewById(R.id.file_login_confirm_account_text);
 		loggingInText = findViewById(R.id.file_login_logging_in_text);
 		fetchingNodesText = findViewById(R.id.file_login_fetch_nodes_text);
 		prepareNodesText = findViewById(R.id.file_login_prepare_nodes_text);
@@ -562,7 +556,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
 					ret = megaChatApi.init(gSession);
 					logDebug("Result of init ---> " + ret);
-					chatSettings = dbH.getChatSettings();
+					ChatSettings chatSettings = dbH.getChatSettings();
 					if (ret == MegaChatApi.INIT_NO_CACHE) {
 						logDebug("Condition ret == MegaChatApi.INIT_NO_CACHE");
 					} else if (ret == MegaChatApi.INIT_ERROR) {
@@ -848,7 +842,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		fabButton.setVisibility(show ? View.VISIBLE : View.GONE);
 	}
 
-    public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
+    @SuppressLint("ResourceAsColor")
+	public void changeActionBarElevation(boolean elevate, int fragmentIndex) {
         if (!isCurrentFragment(fragmentIndex)) return;
 
 		ColorUtils.changeStatusBarColorForElevation(this, elevate);
@@ -1631,7 +1626,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			try {
 				statusDialog.dismiss();
 			}
-			catch(Exception ex){}
+			catch(Exception ex){
+				logError(ex.getMessage());
+			}
 		}
 
 		filePreparedInfos = null;
@@ -1670,7 +1667,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	public void onIntentChatProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentChatProcessed");
 
-		if (getIntent() != null && getIntent().getAction() != ACTION_PROCESSED) {
+		if (getIntent() != null && !getIntent().getAction().equals(ACTION_PROCESSED)) {
 			getIntent().setAction(ACTION_PROCESSED);
 		}
 
@@ -1696,14 +1693,15 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			try {
 				statusDialog.dismiss();
 			}
-			catch(Exception ex){}
+			catch(Exception ex){
+				logError(ex.getMessage());
+			}
 		}
 
 		logDebug("intent processed!");
 		if (folderSelected) {
 			if (infos == null) {
 				showSnackbar(getString(R.string.upload_can_not_open));
-				return;
 			}
 			else {
 				if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
@@ -1758,9 +1756,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	 * @param message Message to display into the progress dialog
 	 */
 	private void createAndShowProgressDialog(boolean cancelable, String message) {
-		ProgressDialog temp;
+		MegaProgressDialog temp;
 		try {
-			temp = new ProgressDialog(this);
+			temp = new MegaProgressDialog(this);
 			temp.setMessage(message);
 			temp.setCancelable(cancelable);
 			temp.setCanceledOnTouchOutside(cancelable);
@@ -1788,8 +1786,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		this.parentHandleCloud = handle;
 		
 		if (mode == MOVE) {
-			long parentHandle = handle;
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			MegaNode parentNode = megaApi.getNodeByHandle(handle);
 			if(parentNode == null){
 				parentNode = megaApi.getRootNode();
 			}
@@ -1802,9 +1799,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			finishActivity();
 		}
 		else if (mode == COPY){
-			
-			long parentHandle = handle;
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+
+			MegaNode parentNode = megaApi.getNodeByHandle(handle);
 			if(parentNode == null){
 				parentNode = megaApi.getRootNode();
 			}
@@ -1882,8 +1878,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (mode == IMPORT){
-			long parentHandle = handle;
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			MegaNode parentNode = megaApi.getNodeByHandle(handle);
 			if(parentNode == null){
 				parentNode = megaApi.getRootNode();
 			}
@@ -1933,8 +1928,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 		else if (mode == SELECT_CAMERA_FOLDER){
 
-			long parentHandle = handle;
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			MegaNode parentNode = megaApi.getNodeByHandle(handle);
 			if(parentNode == null){
 				parentNode = megaApi.getRootNode();
 			}
@@ -2044,7 +2038,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			if (!exists){
 				statusDialog = null;
 				try {
-					statusDialog = new ProgressDialog(this);
+					statusDialog = new MegaProgressDialog(this);
 					statusDialog.setMessage(getString(R.string.context_creating_folder));
 					statusDialog.show();
 				}
@@ -2074,7 +2068,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				if (!exists){
 					statusDialog = null;
 					try {
-						statusDialog = new ProgressDialog(this);
+						statusDialog = new MegaProgressDialog(this);
 						statusDialog.setMessage(getString(R.string.context_creating_folder));
 						statusDialog.show();
 					}
@@ -2095,12 +2089,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	 * Display keyboard
 	 */
 	private void showKeyboardDelayed(final View view) {
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
+		handler.postDelayed(() -> {
+			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 		}, 50);
 	}
 
@@ -2215,6 +2206,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		logDebug("onNodesUpdate");
 		if (getCloudExplorerFragment() != null){
+			ArrayList<MegaNode> nodes;
 			if (megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()) != null){
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
 				cDriveExplorer.setNodes(nodes);
@@ -2283,8 +2275,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api,
 			ArrayList<MegaContactRequest> requests) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public void setToolbarSubtitle(String s) {
@@ -2293,6 +2283,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 	
+	@SuppressLint("NonConstantResourceId")
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -2467,6 +2458,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	@Override
 	public void onClick(View v) {
 		logDebug("onClick");
@@ -2515,7 +2507,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			try {
 				statusDialog.dismiss();
 			}
-			catch(Exception ex){}
+			catch(Exception ex){
+				logError(ex.getMessage());
+			}
 		}
 
 		chatListItems.addAll(chats);
@@ -2527,7 +2521,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				StringBuilder body = new StringBuilder();
 				String sharedText2 = intent.getStringExtra(Intent.EXTRA_SUBJECT);
 				if (sharedText2 != null) {
-					body.append(getString(R.string.new_file_subject_when_uploading) + ": ");
+					body.append(getString(R.string.new_file_subject_when_uploading)).append(": ");
 					body.append(sharedText2);
 				}
 				String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
@@ -2543,7 +2537,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					if(body.length()>0){
 						body.append("\n");
 					}
-					body.append(getString(R.string.new_file_email_when_uploading) + ": ");
+					body.append(getString(R.string.new_file_email_when_uploading)).append(": ");
 					body.append(sharedText3);
 				}
 
@@ -2554,7 +2548,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				if(chatListItems.size()==1){
 					MegaChatRoom chatItem = chatListItems.get(0);
 					long idChat = chatItem.getChatId();
-					if(chatItem!=null){
+					if (chatItem != null){
 						Intent intent = new Intent(this, ManagerActivityLollipop.class);
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
@@ -2874,7 +2868,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		try {
 			statusDialog.dismiss();
 		}
-		catch (Exception ex) {}
+		catch (Exception ex) {
+			logError(ex.getMessage());
+		}
 
 		if (success){
 			cDriveExplorer = getCloudExplorerFragment();

@@ -3,14 +3,12 @@ package mega.privacy.android.app.providers;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -67,6 +65,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
@@ -153,7 +152,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	private CloudDriveProviderFragmentLollipop cDriveProviderLol;
 	private IncomingSharesProviderFragmentLollipop iSharesProviderLol;
 
-	private ProgressDialog statusDialog;
+	private MegaProgressDialog statusDialog;
 
 	private Button cancelButton;
 	private Button attachButton;
@@ -877,9 +876,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	}
 
 	public void downloadAndAttachAfterClick(long size, long[] hashes) {
-		ProgressDialog temp = null;
+		MegaProgressDialog temp = null;
 		try {
-			temp = new ProgressDialog(this);
+			temp = new MegaProgressDialog(this);
 			temp.setMessage(getString(R.string.context_preparing_provider));
 			temp.show();
 		} catch (Exception e) {
@@ -1074,9 +1073,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				break;
 			}
 			case R.id.attach_button: {
-				ProgressDialog temp = null;
+				MegaProgressDialog temp;
 				try {
-					temp = new ProgressDialog(this);
+					temp = new MegaProgressDialog(this);
 					temp.setMessage(getString(R.string.context_preparing_provider));
 					temp.show();
 				} catch (Exception e) {
