@@ -145,6 +145,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMes
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -4971,6 +4972,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                     if(m.isUploading()){
                         showUploadingAttachmentBottomSheet(m, positionInMessages);
                     }else{
+                        if (!ChatUtil.shouldBottomDialogBeDisplayed(m.getMessage())) {
+                            return;
+                        }
+
                         if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
                             if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
                                 if (!(m.getMessage().isManagementMessage())) {

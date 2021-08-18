@@ -93,6 +93,7 @@ import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.megachat.RemovedMessage;
 import mega.privacy.android.app.objects.GifData;
 
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
@@ -8172,14 +8173,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public boolean onLongClick(View view) {
-
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
         ViewHolderMessageChat holder = (ViewHolderMessageChat) view.getTag();
         int currentPosition = holder.getAdapterPosition();
 
-        if (isMultipleSelect() || currentPosition < 1 || messages.get(currentPosition-1).isUploading())
+        if (isMultipleSelect() || currentPosition < 1 || messages.get(currentPosition - 1).isUploading() || !ChatUtil.shouldBottomDialogBeDisplayed(messages.get(currentPosition - 1).getMessage()))
             return true;
 
         if(MegaApplication.isShowInfoChatMessages()){
