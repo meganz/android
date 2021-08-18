@@ -240,7 +240,6 @@ class VideoMeetingViewHolder(
         if (participant.videoListener == null) return
 
         logDebug("Close video of ${participant.clientId}")
-        binding.parentTextureView.isVisible = false
         participant.videoListener?.let {
             inMeetingViewModel.removeResolutionAndListener(participant, it)
 
@@ -251,6 +250,8 @@ class VideoMeetingViewHolder(
 
             removeListener(participant)
         }
+
+        binding.parentTextureView.isVisible = false
     }
 
     /**
@@ -288,8 +289,8 @@ class VideoMeetingViewHolder(
         if (isInvalid(participant)) return
 
         logDebug("Close video of ${participant.clientId}")
-        binding.parentTextureView.isVisible = false
         inMeetingViewModel.removeRemoteVideoResolution(participant)
+        binding.parentTextureView.isVisible = false
     }
 
     /**
@@ -345,7 +346,6 @@ class VideoMeetingViewHolder(
     fun updateListener(participant: Participant, shouldAddListener: Boolean, isHiRes: Boolean) {
         if (isInvalid(participant)) return
 
-        binding.parentTextureView.isVisible = shouldAddListener
         if (shouldAddListener) {
             if (participant.isVideoOn && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)) {
                 if (participant.videoListener == null) {
