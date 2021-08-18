@@ -460,7 +460,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     callAndSession.second.peerid,
                     callAndSession.second.clientid
                 )?.let { participant ->
-                    if (callAndSession.second.canRecvVideoLowRes()) {
+                    if (callAndSession.second.canRecvVideoLowRes() && callAndSession.second.isLowResVideo) {
                         if (!participant.hasHiRes) {
                             if (inMeetingViewModel.sessionHasVideo(participant.clientId)) {
                                 logDebug("Client ID ${callAndSession.second.clientid} can receive lowRes, has lowRes, video on, checking if listener should be added...")
@@ -510,7 +510,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     callAndSession.second.peerid,
                     callAndSession.second.clientid
                 )?.let { participant ->
-                    if (callAndSession.second.canRecvVideoHiRes()) {
+                    if (callAndSession.second.canRecvVideoHiRes() && callAndSession.second.isHiResVideo) {
                         if (participant.hasHiRes) {
                             if (inMeetingViewModel.sessionHasVideo(participant.clientId)) {
                                 logDebug("Client ID ${callAndSession.second.clientid} can receive hiRes, has hiRes, video on, checking if listener should be added...")

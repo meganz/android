@@ -104,8 +104,15 @@ class VideoMeetingViewHolder(
 
         if (isGrid || isDrawing) {
             inMeetingViewModel.getSession(participant.clientId)?.let {
-                participant.videoListener?.let {
-                    closeVideo(participant)
+                participant.videoListener?.let { listener ->
+                    logDebug("Removing listener, clientID ${participant.clientId}")
+                    inMeetingViewModel.removeChatRemoteVideoListener(
+                        listener,
+                        participant.clientId,
+                        inMeetingViewModel.getChatId(),
+                        participant.hasHiRes
+                    )
+                    removeListener(participant)
                 }
             }
         }
@@ -161,7 +168,7 @@ class VideoMeetingViewHolder(
     private fun videoOnUI(participant: Participant) {
         if (isInvalid(participant)) return
 
-        logDebug("UI video on")
+        logDebug("UI video on for clientId ${participant.clientId}")
         hideAvatar(participant)
         activateVideo(participant)
     }
@@ -199,10 +206,10 @@ class VideoMeetingViewHolder(
             createListener(participant)
 
             inMeetingViewModel.getSession(participant.clientId)?.let {
-                if (participant.hasHiRes && !it.canRecvVideoHiRes()) {
+                if (participant.hasHiRes && !it.canRecvVideoHiRes() && it.isHiResVideo) {
                     logDebug("Asking for HiRes video, clientId ${participant.clientId}")
                     inMeetingViewModel.requestHiResVideo(it, inMeetingViewModel.currentChatId)
-                } else if (!participant.hasHiRes && !it.canRecvVideoLowRes()) {
+                } else if (!participant.hasHiRes && !it.canRecvVideoLowRes() && it.isLowResVideo) {
                     logDebug("Asking for LowRes video, clientId ${participant.clientId}")
                     inMeetingViewModel.requestLowResVideo(it, inMeetingViewModel.currentChatId)
                 } else {
@@ -236,7 +243,7 @@ class VideoMeetingViewHolder(
      *
      * @param participant The participant from whom the video is to be closed
      */
-    private fun removeResolutionAndListener(participant: Participant) {
+    fun removeResolutionAndListener(participant: Participant) {
         if (participant.videoListener == null) return
 
         logDebug("Close video of ${participant.clientId}")
@@ -364,13 +371,7 @@ class VideoMeetingViewHolder(
         } else {
             participant.videoListener?.let { listener ->
                 logDebug("Removing listener, clientID ${participant.clientId}")
-                inMeetingViewModel.removeChatRemoteVideoListener(
-                    listener,
-                    participant.clientId,
-                    inMeetingViewModel.getChatId(),
-                    participant.hasHiRes
-                )
-
+                inMeetingViewModel.removeRemoteVideoListener(participant, listener)
                 removeListener(participant)
             }
         }
@@ -512,18 +513,6 @@ class VideoMeetingViewHolder(
             logDebug("Participant is not selected")
             binding.selectedForeground.isVisible = false
         }
-    }
-
-    /**
-     * Remove Texture view when fragment is destroyed
-     *
-     * @param participant Participant from whom the texture view is to be deleted
-     */
-    fun removeTextureView(participant: Participant) {
-        if (isInvalid(participant)) return
-
-        logDebug("Removing texture view of ${participant.clientId} when fragment is destroyed")
-        removeResolutionAndListener(participant)
     }
 
     /**

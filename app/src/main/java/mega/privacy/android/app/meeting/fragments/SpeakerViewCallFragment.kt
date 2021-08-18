@@ -451,7 +451,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
             inMeetingViewModel.getSession(speaker.clientId)?.let { session ->
                 if (speaker.hasHiRes) {
-                    if (!session.canRecvVideoHiRes()) {
+                    if (!session.canRecvVideoHiRes() && session.isHiResVideo) {
                         inMeetingViewModel.requestHiResVideo(
                             session,
                             inMeetingViewModel.currentChatId

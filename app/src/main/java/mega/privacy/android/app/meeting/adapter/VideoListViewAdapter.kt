@@ -212,7 +212,7 @@ class VideoListViewAdapter(
             return
 
         getHolder(position)?.let { holder ->
-            holder.removeTextureView(participant)
+            holder.removeResolutionAndListener(participant)
             return
         }
     }
