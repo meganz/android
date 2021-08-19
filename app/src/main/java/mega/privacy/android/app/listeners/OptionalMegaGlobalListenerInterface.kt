@@ -2,6 +2,9 @@ package mega.privacy.android.app.listeners
 
 import nz.mega.sdk.*
 
+/**
+ * MegaGlobalListenerInterface with optional callbacks.
+ */
 class OptionalMegaGlobalListenerInterface(
     private val onUsersUpdate: ((ArrayList<MegaUser>) -> Unit)? = null,
     private val onUserAlertsUpdate: ((ArrayList<MegaUserAlert>) -> Unit)? = null,

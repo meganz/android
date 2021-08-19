@@ -7,6 +7,11 @@ import com.facebook.imagepipeline.request.ImageRequest
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.ItemContactDataBinding
 
+/**
+ * RecyclerView's ViewHolder to show ContactItem Data info.
+ *
+ * @property binding    Item's view binding
+ */
 class ContactListDataViewHolder(
     private val binding: ItemContactDataBinding
 ) : RecyclerView.ViewHolder(binding.root) {

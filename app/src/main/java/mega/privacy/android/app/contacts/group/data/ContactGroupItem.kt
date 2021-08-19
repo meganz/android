@@ -2,6 +2,15 @@ package mega.privacy.android.app.contacts.group.data
 
 import androidx.recyclerview.widget.DiffUtil
 
+/**
+ * View item that represents a Contact Group at UI level.
+ *
+ * @property chatId     Contact group Id
+ * @property title      Contact group Title
+ * @property firstUser  First contact of the group
+ * @property lastUser   Last contact of the group
+ * @property isPublic   Flag to know if the group is public
+ */
 data class ContactGroupItem constructor(
     val chatId: Long,
     val title: String,

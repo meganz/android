@@ -10,6 +10,11 @@ import nz.mega.sdk.MegaContactRequest.*
 import nz.mega.sdk.MegaError
 import javax.inject.Inject
 
+/**
+ * Use case to reply to existing contact requests for current user.
+ *
+ * @property megaApi    MegaApi required to call the SDK
+ */
 class ReplyContactRequestUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
 ) {

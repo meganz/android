@@ -39,6 +39,9 @@ import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import nz.mega.sdk.MegaUser
 
+/**
+ * Bottom Sheet Dialog that represents the UI for a dialog containing contact information.
+ */
 @AndroidEntryPoint
 class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
@@ -50,6 +53,12 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         private const val STATE_NODE_FOLDER = "STATE_NODE_FOLDER"
         private const val STATE_NODE_CONTACTS = "STATE_NODE_CONTACTS"
 
+        /**
+         * Main method to create a ContactBottomSheetDialogFragment.
+         *
+         * @param userHandle    User to show information about
+         * @return              ContactBottomSheetDialogFragment to be shown
+         */
         fun newInstance(userHandle: Long): ContactBottomSheetDialogFragment =
             ContactBottomSheetDialogFragment().apply {
                 arguments = Bundle().apply {
@@ -117,6 +126,11 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         super.onDestroyView()
     }
 
+    /**
+     * Show contact information on the UI.
+     *
+     * @param contact   Contact to be shown
+     */
     private fun showContactInfo(contact: ContactItem.Data?) {
         requireNotNull(contact) { "Contact not found" }
 
@@ -130,6 +144,11 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
     }
 
+    /**
+     * Setup option buttons according to the current MegaUser.
+     *
+     * @param megaUser  MegaUser to be shown
+     */
     private fun setupButtons(megaUser: MegaUser?) {
         requireNotNull(megaUser) { "MegaUser not found" }
 
@@ -172,6 +191,11 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.optionRemove.setOnClickListener { showRemoveContactDialog(megaUser) }
     }
 
+    /**
+     * Show remove contact dialog to allow contact removal.
+     *
+     * @param megaUser  MegaUser to be removed
+     */
     private fun showRemoveContactDialog(megaUser: MegaUser) {
         if (removeContactDialog?.isShowing == true) removeContactDialog?.dismiss()
 
@@ -186,6 +210,9 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             .show()
     }
 
+    /**
+     * Show node permission dialog to ask for Node permissions.
+     */
     private fun showNodePermissionsDialog() {
         if (nodePermissionsDialog?.isShowing == true) nodePermissionsDialog?.dismiss()
 

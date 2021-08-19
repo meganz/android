@@ -7,7 +7,14 @@ import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatPresenceConfig
 import javax.inject.Inject
+import javax.inject.Singleton
 
+/**
+ * Use case to subscribe to global events related to MegaChat.
+ *
+ * @property megaChatApi    MegaChatApi required to call the SDK
+ */
+@Singleton
 class GetChatChangesUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid
 ) {

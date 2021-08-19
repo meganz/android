@@ -32,6 +32,14 @@ import java.io.File
 import java.util.*
 import javax.inject.Inject
 
+/**
+ * Use case to retrieve contact requests for current user.
+ *
+ * @property context                    Application context required to get resources
+ * @property megaApi                    MegaApi required to call the SDK
+ * @property megaChatApi                MegaChatApi required to call the SDK
+ * @property getGlobalChangesUseCase    Use case required to get contact updates
+ */
 class GetContactRequestsUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
@@ -132,6 +140,11 @@ class GetContactRequestsUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
+    /**
+     * Get current number of incoming contact requests
+     *
+     * @return  Flowable with the number of requests
+     */
     fun getIncomingRequestsSize(): Flowable<Int> =
         Flowable.create({ emitter ->
             emitter.onNext(megaApi.incomingContactRequests.size)

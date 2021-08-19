@@ -27,6 +27,9 @@ import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
+/**
+ * Fragment that represents the UI showing the list of contact groups for the current user.
+ */
 @AndroidEntryPoint
 class ContactGroupsFragment : Fragment() {
 
@@ -97,12 +100,22 @@ class ContactGroupsFragment : Fragment() {
         viewModel.getGroups().observe(viewLifecycleOwner, ::showGroups)
     }
 
+    /**
+     * Show a list of Contact Group View Items on the current RecyclerView.
+     *
+     * @param items Contact Group View Items to be shown
+     */
     private fun showGroups(items: List<ContactGroupItem>) {
         binding.listScroller.isVisible = items.size >= MIN_ITEMS_SCROLLBAR
         binding.viewEmpty.isVisible = items.isNullOrEmpty()
         groupsAdapter.submitList(items)
     }
 
+    /**
+     * Callback method called when a Contact Group Item is clicked
+     *
+     * @param groupId   Group Id that has been clicked
+     */
     private fun onGroupClick(groupId: Long) {
         startActivity(Intent(context, GroupChatInfoActivityLollipop::class.java).apply {
             putExtra(Constants.HANDLE, groupId)

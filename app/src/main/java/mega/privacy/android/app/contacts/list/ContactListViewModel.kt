@@ -25,6 +25,14 @@ import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaUser
 import java.util.concurrent.TimeUnit
 
+/**
+ * ViewModel that handles all related logic to Contacts for the current user.
+ *
+ * @property getContactsUseCase         Use case to retrieve current contacts
+ * @property getContactRequestsUseCase  Use case to retrieve contact requests
+ * @property getChatRoomUseCase         Use case to get current chat room for existing user
+ * @property removeContactUseCase       Use case to remove existing contact
+ */
 class ContactListViewModel @ViewModelInject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val getContactRequestsUseCase: GetContactRequestsUseCase,

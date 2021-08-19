@@ -6,10 +6,30 @@ import androidx.annotation.ColorRes
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.utils.AvatarUtil
 
+/**
+ * View item that represents a Contact Item at UI level.
+ * This sealed class can be either a `Data` or a `Header` data class.
+ *
+ * @property id     Contact item Id.
+ */
 sealed class ContactItem(val id: Long) {
 
     abstract fun getSection(): String
 
+    /**
+     * View item that represents the data of a Contact at UI level.
+     *
+     * @property handle         User handle
+     * @property email          User email
+     * @property fullName       User email
+     * @property alias          User alias
+     * @property status         User status code
+     * @property statusColor    User status color
+     * @property avatarUri      User avatar uri
+     * @property placeholder    User avatar placehodler
+     * @property lastSeen       User last seen description
+     * @property isNew          User flag to know if it has been added recently
+     */
     data class Data constructor(
         val handle: Long,
         val email: String,
@@ -42,6 +62,11 @@ sealed class ContactItem(val id: Long) {
                     alias?.contains(queryString, true) == true
     }
 
+    /**
+     * View item that represents the item header at UI level.
+     *
+     * @property title  String to show as the header
+     */
     data class Header constructor(val title: String) : ContactItem(title.hashCode().toLong()) {
 
         override fun getSection(): String =

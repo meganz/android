@@ -6,6 +6,11 @@ import com.facebook.imagepipeline.request.ImageRequest
 import mega.privacy.android.app.contacts.group.data.ContactGroupItem
 import mega.privacy.android.app.databinding.ItemContactGroupBinding
 
+/**
+ * RecyclerView's ViewHolder to show ContactGroupItem.
+ *
+ * @property binding    Item's view binding
+ */
 class ContactGroupsViewHolder(
     private val binding: ItemContactGroupBinding
 ) : RecyclerView.ViewHolder(binding.root) {

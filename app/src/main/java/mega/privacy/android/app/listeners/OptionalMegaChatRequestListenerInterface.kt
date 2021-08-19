@@ -5,6 +5,9 @@ import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRequestListenerInterface
 
+/**
+ * MegaChatRequestListenerInterface with optional callbacks.
+ */
 class OptionalMegaChatRequestListenerInterface(
     private val onRequestStart: ((MegaChatRequest) -> Unit)? = null,
     private val onRequestUpdate: ((MegaChatRequest) -> Unit)? = null,

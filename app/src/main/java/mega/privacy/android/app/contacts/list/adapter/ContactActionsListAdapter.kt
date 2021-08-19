@@ -8,6 +8,12 @@ import mega.privacy.android.app.contacts.list.data.ContactActionItem
 import mega.privacy.android.app.databinding.ItemContactActionBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
+/**
+ * RecyclerView's ListAdapter to show ContactActionItem.
+ *
+ * @property onRequestsCallback     Callback to be called when Request item is clicked
+ * @property onGroupsCallback       Callback to be called when Group item is clicked
+ */
 class ContactActionsListAdapter(
     private val onRequestsCallback: () -> Unit,
     private val onGroupsCallback: () -> Unit

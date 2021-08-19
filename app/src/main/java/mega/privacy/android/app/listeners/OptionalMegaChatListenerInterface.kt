@@ -5,6 +5,9 @@ import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatListenerInterface
 import nz.mega.sdk.MegaChatPresenceConfig
 
+/**
+ * MegaChatListenerInterface with optional callbacks.
+ */
 class OptionalMegaChatListenerInterface(
     private val onChatListItemUpdate: ((MegaChatListItem) -> Unit)? = null,
     private val onChatInitStateUpdate: ((Int) -> Unit)? = null,

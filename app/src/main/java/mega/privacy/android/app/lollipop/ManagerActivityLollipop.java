@@ -3120,6 +3120,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				});
 	}
 
+	/**
+	 * Show contact invite dialog.
+	 *
+	 * @param linkHandle	User link handle for the invitation
+	 * @param fullName		User full name
+	 * @param email			User email
+	 * @param isContact		Flag to check wether is contact or not
+	 */
 	private void showContactInviteDialog(Long linkHandle, String fullName, String email, boolean isContact) {
 		if (inviteContactDialog != null && inviteContactDialog.isShowing()) return;
 
@@ -3152,6 +3160,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		inviteContactDialog.show();
 	}
 
+	/**
+	 * Send contact invitation to specific user and show specific SnackBar.
+	 *
+	 * @param contactLinkHandle	User link handle for invitation
+	 * @param email				User email
+	 */
 	private void sendContactInvitation(Long contactLinkHandle, String email) {
 		inviteContactUseCase.invite(contactLinkHandle, email)
 				.subscribeOn(Schedulers.io())

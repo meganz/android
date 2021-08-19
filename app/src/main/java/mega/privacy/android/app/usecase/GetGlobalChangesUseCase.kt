@@ -11,7 +11,14 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import javax.inject.Inject
+import javax.inject.Singleton
 
+/**
+ * Use case to subscribe to global events related to MegaApi.
+ *
+ * @property megaApi    MegaApi required to call the SDK
+ */
+@Singleton
 class GetGlobalChangesUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid
 ) {

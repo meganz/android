@@ -23,6 +23,9 @@ import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
+/**
+ * Fragment that represents the UI showing the list of contacts for the current user.
+ */
 @AndroidEntryPoint
 class ContactListFragment : Fragment() {
 

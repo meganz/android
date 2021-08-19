@@ -18,6 +18,14 @@ object StringUtils {
     fun String.isTextEmpty(): Boolean =
         TextUtil.isTextEmpty(this)
 
+    /**
+     * Format String with HTML color tags
+     *
+     * @param context   Context required to get resources
+     * @param tag       Tag to be replaced with font color
+     * @param color     Color to be colored with
+     * @return          New String with HTML
+     */
     @JvmStatic
     fun String.formatColorTag(context: Context, tag: Char, @ColorRes color: Int): String =
         replace("[$tag]", "<font color='${ColorUtils.getColorHexString(context, color)}'>")

@@ -19,6 +19,9 @@ import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.Util
 
+/**
+ * Fragment that represents the UI showing the contact requests for the current user.
+ */
 @AndroidEntryPoint
 class ContactRequestsFragment : Fragment() {
 
@@ -81,6 +84,11 @@ class ContactRequestsFragment : Fragment() {
         }
     }
 
+    /**
+     * Show toolbar elevation
+     *
+     * @param show  Flag to either show or hide toolbar elevation
+     */
     fun showElevation(show: Boolean) {
         binding.tabs.elevation = if (show) toolbarElevation else 0F
         if (Util.isDarkMode(requireContext())) {

@@ -9,6 +9,11 @@ import mega.privacy.android.app.databinding.ItemContactGroupBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 import mega.privacy.android.app.utils.AvatarUtil
 
+/**
+ * RecyclerView's ListAdapter to show ContactGroupItem.
+ *
+ * @property itemCallback   Callback to be called when an item is clicked.
+ */
 class ContactGroupsAdapter constructor(
     private val itemCallback: (Long) -> Unit
 ) : ListAdapter<ContactGroupItem, ContactGroupsViewHolder>(ContactGroupItem.DiffCallback()),

@@ -15,11 +15,25 @@ import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 
+/**
+ * Use case to invite contacts
+ *
+ * @property megaApi            MegaApi required to call the SDK
+ * @property databaseHandler    DatabaseHandler required to update public handle
+ */
 class InviteContactUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val databaseHandler: DatabaseHandler
 ) {
 
+    /**
+     * Contact link result for getContactLink() method.
+     *
+     * @property isContact          Flag to check wether is contact or not
+     * @property email              User email
+     * @property contactLinkHandle  Contact link handle
+     * @property fullName           User full name
+     */
     data class ContactLinkResult(
         val isContact: Boolean,
         val email: String? = null,
@@ -27,10 +41,19 @@ class InviteContactUseCase @Inject constructor(
         val fullName: String? = null
     )
 
+    /**
+     * Invite result for invite() method containing all possible states.
+     */
     enum class InviteResult {
         SENT, RESENT, DELETED, ALREADY_SENT, ALREADY_CONTACT, INVALID_EMAIL, UNKNOWN_ERROR
     }
 
+    /**
+     * Get information about a contact link
+     *
+     * @param userHandle    Handle of the contact link to check
+     * @return              ContactLinkResult
+     */
     fun getContactLink(userHandle: Long): Single<ContactLinkResult> =
         Single.create { emitter ->
             megaApi.contactLinkQuery(userHandle, OptionalMegaRequestListenerInterface(
@@ -71,6 +94,14 @@ class InviteContactUseCase @Inject constructor(
             ))
         }
 
+    /**
+     * Invite another person to be your MEGA contact using a contact link handle
+     *
+     * @param contactLinkHandle Contact link handle of the other account
+     * @param email             Email of the new contact
+     * @param message           Message for the user
+     * @return                  InviteResult
+     */
     @JvmOverloads
     fun invite(
         contactLinkHandle: Long,

@@ -18,6 +18,11 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.Util
 
+/**
+ * Activity that represents the entire UI around contacts for the current user.
+ * It includes the navigation between child fragments related to contacts and
+ * behaves as the start point for the navigation.
+ */
 @AndroidEntryPoint
 class ContactsActivity : PasscodeActivity(), SnackbarShower {
 
@@ -107,6 +112,11 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
         showSnackbar(type, binding.root, content, chatId)
     }
 
+    /**
+     * Show toolbar elevation
+     *
+     * @param show  Flag to either show or hide toolbar elevation
+     */
     fun showElevation(show: Boolean) {
         binding.toolbar.elevation = if (show) toolbarElevation else 0F
         if (Util.isDarkMode(this)) {

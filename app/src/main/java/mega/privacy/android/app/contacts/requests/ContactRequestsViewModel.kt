@@ -16,14 +16,16 @@ import mega.privacy.android.app.contacts.usecase.ReplyContactRequestUseCase
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.notifyObserver
 
+/**
+ * ViewModel that handles all related logic to Contact Groups for the current user.
+ *
+ * @param getContactRequestsUseCase     Use case to retrieve contact requests for current user
+ * @param replyContactRequestUseCase    Use case to reply to existing contact requests
+ */
 class ContactRequestsViewModel @ViewModelInject constructor(
     getContactRequestsUseCase: GetContactRequestsUseCase,
     private val replyContactRequestUseCase: ReplyContactRequestUseCase
 ) : BaseRxViewModel() {
-
-    companion object {
-        private const val TAG = "ContactRequestViewModel"
-    }
 
     private val contactRequests: MutableLiveData<List<ContactRequestItem>> = MutableLiveData()
     private var queryString: String? = null

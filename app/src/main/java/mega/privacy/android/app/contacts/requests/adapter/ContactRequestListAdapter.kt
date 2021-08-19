@@ -7,6 +7,11 @@ import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.databinding.ItemContactRequestBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
+/**
+ * RecyclerView's ListAdapter to show ContactRequestItem.
+ *
+ * @property itemCallback   Callback to be called when an item is clicked.
+ */
 class ContactRequestListAdapter constructor(
     private val itemCallback: (Long) -> Unit
 ) : ListAdapter<ContactRequestItem, ContactRequestListViewHolder>(ContactRequestItem.DiffCallback()) {

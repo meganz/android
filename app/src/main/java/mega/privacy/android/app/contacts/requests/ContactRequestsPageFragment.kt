@@ -20,6 +20,9 @@ import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
+/**
+ * Child fragment that represents the UI showing list of incoming/outgoing contact requests.
+ */
 @AndroidEntryPoint
 class ContactRequestsPageFragment : Fragment() {
 
@@ -88,6 +91,12 @@ class ContactRequestsPageFragment : Fragment() {
         })
     }
 
+    /**
+     * Show empty view required when there are no elements.
+     *
+     * @param show          Flag to either show or hide empty view
+     * @param isOutgoing    Flag to show incoming/outgoing empty text
+     */
     private fun showEmptyView(show: Boolean, isOutgoing: Boolean = false) {
         if (!show) {
             binding.viewEmpty.isVisible = false

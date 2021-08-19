@@ -5,6 +5,11 @@ import com.facebook.imagepipeline.request.ImageRequest
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.databinding.ItemContactRequestBinding
 
+/**
+ * RecyclerView's ViewHolder to show ContactRequestItem.
+ *
+ * @property binding    Item's view binding
+ */
 class ContactRequestListViewHolder(
     private val binding: ItemContactRequestBinding
 ) : RecyclerView.ViewHolder(binding.root) {

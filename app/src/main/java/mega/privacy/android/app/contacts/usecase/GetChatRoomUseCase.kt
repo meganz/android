@@ -11,6 +11,12 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError.API_OK
 import javax.inject.Inject
 
+/**
+ * Use Case to retrieve chat room for specific user.
+ * If there is no existing chat room it will create a new one.
+ *
+ * @property megaChatApi    MegaChatApi required to call the SDK
+ */
 class GetChatRoomUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid
 ) {

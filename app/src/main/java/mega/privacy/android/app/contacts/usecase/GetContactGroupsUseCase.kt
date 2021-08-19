@@ -26,6 +26,13 @@ import nz.mega.sdk.MegaRequest.TYPE_GET_USER_EMAIL
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * Use Case to retrieve contact groups for current user.
+ *
+ * @property context        Application context required to get resources
+ * @property megaApi        MegaApi required to call the SDK
+ * @property megaChatApi    MegaChatApi required to call the SDK
+ */
 class GetContactGroupsUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,

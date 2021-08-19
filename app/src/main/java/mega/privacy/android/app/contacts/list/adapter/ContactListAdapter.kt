@@ -10,6 +10,12 @@ import mega.privacy.android.app.databinding.ItemContactDataBinding
 import mega.privacy.android.app.databinding.ItemContactHeaderBinding
 import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 
+/**
+ * RecyclerView's ListAdapter to show ContactItem.
+ *
+ * @property itemCallback       Callback to be called when the view item is clicked.
+ * @property itemInfoCallback   Callback to be called when the "more button" is clicked.
+ */
 class ContactListAdapter(
     private val itemCallback: (String) -> Unit,
     private val itemInfoCallback: (Long) -> Unit

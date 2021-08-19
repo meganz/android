@@ -17,6 +17,9 @@ import mega.privacy.android.app.contacts.requests.ContactRequestsViewModel
 import mega.privacy.android.app.databinding.BottomSheetContactRequestBinding
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 
+/**
+ * Bottom Sheet Dialog that represents the UI for a dialog containing contact request information.
+ */
 @AndroidEntryPoint
 class ContactRequestBottomSheetDialogFragment : BottomSheetDialogFragment() {
 

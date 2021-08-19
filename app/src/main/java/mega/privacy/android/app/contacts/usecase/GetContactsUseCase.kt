@@ -38,6 +38,15 @@ import java.io.File
 import java.util.*
 import javax.inject.Inject
 
+/**
+ * Use case to retrieve contacts for current user.
+ *
+ * @property context                    Application context required to get resources
+ * @property megaApi                    MegaApi required to call the SDK
+ * @property megaChatApi                MegaChatApi required to call the SDK
+ * @property getChatChangesUseCase      Use case required to get contact request updates
+ * @property getGlobalChangesUseCase    Use case required to get contact updates
+ */
 class GetContactsUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
@@ -185,6 +194,12 @@ class GetContactsUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
+    /**
+     * Get MegaUser from email
+     *
+     * @param userEmail     Email to retrieve
+     * @return              Single containing MegaUser
+     */
     fun getMegaUser(userEmail: String): Single<MegaUser> =
         Single.fromCallable { megaApi.getContact(userEmail) }
 
@@ -219,6 +234,11 @@ class GetContactsUseCase @Inject constructor(
         )
     }
 
+    /**
+     * Request missing fields for current `ContactItem.Data`
+     *
+     * @param listener  Callback to retrieve requested fields
+     */
     private fun ContactItem.Data.requestMissingFields(listener: MegaRequestListenerInterface) {
         if (avatarUri == null) {
             val userAvatarFile = AvatarUtil.getUserAvatarFile(context, email)?.absolutePath

@@ -13,6 +13,12 @@ object MegaUserUtils {
 
     private const val RECENTLY_ADDED_MIN_HOURS = 24
 
+    /**
+     * Get user status color based on user status code
+     *
+     * @param userStatus    User status code
+     * @return              User status color
+     */
     @ColorRes
     @JvmStatic
     fun getUserStatusColor(userStatus: Int): Int =
@@ -23,6 +29,11 @@ object MegaUserUtils {
             else -> R.color.grey_700
         }
 
+    /**
+     * Check if the user has been added within the last 24h.
+     *
+     * @return  True if it has been added recently, false otherwise
+     */
     @JvmStatic
     fun MegaUser.wasRecentlyAdded(): Boolean {
         val now = LocalDateTime.now()
