@@ -150,6 +150,9 @@ class GetContactsUseCase @Inject constructor(
                                 emitter.onNext(contacts.sortedAlphabetically())
                             }
                         }
+                        else -> {
+                            // Nothing to do
+                        }
                     }
                 }
             )
