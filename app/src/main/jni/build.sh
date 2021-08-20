@@ -39,6 +39,8 @@ BASE_PATH=`pwd`
 LIBDIR=${BASE_PATH}/../obj/local/armeabi
 JAVA_OUTPUT_PATH=${BASE_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
+API_LEVEL=`echo ${APP_PLATFORM} | cut -d'-' -f2`
+JOBS=8
 LOG_FILE=/dev/null
 
 CRYPTOPP=cryptopp
@@ -87,11 +89,11 @@ SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/${SODIUM_S
 SODIUM_SHA1="795b73e3f92a362fabee238a71735579bf46bb97"
 
 LIBUV=libuv
-LIBUV_VERSION=1.8.0
+LIBUV_VERSION=1.42.0
 LIBUV_SOURCE_FILE=libuv-v${LIBUV_VERSION}.tar.gz
 LIBUV_SOURCE_FOLDER=libuv-v${LIBUV_VERSION}
 LIBUV_DOWNLOAD_URL=http://dist.libuv.org/dist/v${LIBUV_VERSION}/${LIBUV_SOURCE_FILE}
-LIBUV_SHA1="91ea51844ec0fac1c6358a7ad3e8bba128e9d0cc"
+LIBUV_SHA1="c78715261a1371381c8e2423995829e054daf906"
 
 MEDIAINFO=mediainfo
 MEDIAINFO_VERSION=4ee7f77c087b29055f48d539cd679de8de6f9c48
@@ -133,6 +135,47 @@ FLAC_SOURCE_FILE=flac-${FLAC_VERSION}.tar.xz
 FLAC_DOWNLOAD_URL=https://ftp.osuosl.org/pub/xiph/releases/flac/${FLAC_SOURCE_FILE}
 FLAC_SHA1="2bdbb56b128a780a5d998e230f2f4f6eb98f33ee"
 FLAC_EXT_LIBRARY=exoplayer-extension-flac-${EXOPLAYER_VERSION}.aar
+
+function setupEnv()
+{
+    local ABI="${1}"
+
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        local TOOLCHAIN="${NDK_ROOT}/toolchains/llvm/prebuilt/darwin-x86_64"
+    else
+        local TOOLCHAIN="${NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64"
+    fi
+    export AR=$TOOLCHAIN/bin/llvm-ar
+    export LD=$TOOLCHAIN/bin/ld
+    export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+    export STRIP=$TOOLCHAIN/bin/llvm-strip
+
+    if [ "${ABI}" == "armeabi-v7a" ]; then
+        export TARGET_HOST="armv7a-linux-androideabi"
+    elif [ "${ABI}" == "arm64-v8a" ]; then
+        export TARGET_HOST="aarch64-linux-android"
+    elif [ "${ABI}" == "x86" ]; then
+        export TARGET_HOST="i686-linux-android"
+    elif [ "${ABI}" == "x86_64" ]; then
+        export TARGET_HOST="x86_64-linux-android"
+    fi
+
+    export CC=$TOOLCHAIN/bin/${TARGET_HOST}${API_LEVEL}-clang
+    export AS=$CC
+    export CXX=$TOOLCHAIN/bin/${TARGET_HOST}${API_LEVEL}-clang++
+}
+
+function cleanEnv()
+{
+    unset AR
+    unset LD
+    unset RANLIB
+    unset STRIP
+    unset TARGET_HOST
+    unset CC
+    unset AS
+    unset CXX
+}
 
 function downloadCheckAndUnpack()
 {
@@ -393,6 +436,36 @@ echo "* Setting up libuv"
 if [ ! -f ${LIBUV}/${LIBUV_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${LIBUV_DOWNLOAD_URL} ${LIBUV}/${LIBUV_SOURCE_FILE} ${LIBUV_SHA1} ${LIBUV}
     ln -sf ${LIBUV_SOURCE_FOLDER} ${LIBUV}/${LIBUV}
+
+    for ABI in ${BUILD_ARCHS}; do
+        echo "* Prebuilding libuv for ${ABI}"
+
+        #rm -r ${LIBUV}/${LIBUV}/build &>> ${LOG_FILE} ||:
+        #mkdir -p ${LIBUV}/${LIBUV}/build &>> ${LOG_FILE}
+        #pushd ${LIBUV}/${LIBUV}/build &>> ${LOG_FILE}
+        #cmake -DCMAKE_INSTALL_PREFIX="${BASE_PATH}/${LIBUV}/${LIBUV}/libuv-android-${ABI}" -DANDROID_ABI=${ABI} -DANDROID_PLATFORM=${APP_PLATFORM} \
+        #-DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake -DCMAKE_VERBOSE_MAKEFILE=ON -DBUILD_TESTING=OFF \
+        #-DBUILD_SHARED_LIBS=OFF \
+        #../ &>> ${LOG_FILE}
+
+        #cmake --build . &>> ${LOG_FILE}
+        #cmake --build . --target install &>> ${LOG_FILE}
+
+        setupEnv "${ABI}"
+
+        pushd ${LIBUV}/${LIBUV} &>> ${LOG_FILE}
+        ./autogen.sh
+        ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${LIBUV}/${LIBUV}"/libuv-android-${ABI} &>> ${LOG_FILE}
+        make clean &>> ${LOG_FILE}
+        make -j${JOBS} &>> ${LOG_FILE}
+        make install &>> ${LOG_FILE}
+
+        popd &>> ${LOG_FILE}
+
+    done
+
+    cleanEnv
+
     touch ${LIBUV}/${LIBUV_SOURCE_FILE}.ready
 fi
 echo "* libuv is ready"
@@ -453,41 +526,23 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
         patch -p0 ${CURL}/ares/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}
     fi
 
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        TOOLCHAIN="${NDK_ROOT}/toolchains/llvm/prebuilt/darwin-x86_64"
-    else
-        TOOLCHAIN="${NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64"
-    fi
-    export AR=$TOOLCHAIN/bin/llvm-ar
-    export LD=$TOOLCHAIN/bin/ld
-    export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
-    export STRIP=$TOOLCHAIN/bin/llvm-strip
-
-    API_LEVEL=`echo ${APP_PLATFORM} | cut -d'-' -f2`
-
     for ABI in ${BUILD_ARCHS}; do
         echo "* Prebuilding cURL with c-ares for ${ABI}"
+
+        setupEnv "${ABI}"
+
         if [ "${ABI}" == "armeabi-v7a" ]; then
-            TARGET="armv7a-linux-androideabi"
             WEBRTC_SUFFIX="arm"
         elif [ "${ABI}" == "arm64-v8a" ]; then
-            TARGET="aarch64-linux-android"
             WEBRTC_SUFFIX="arm64"
-        elif [ "${ABI}" == "x86" ]; then
-            TARGET="i686-linux-android"
-            WEBRTC_SUFFIX=${ABI}
-        elif [ "${ABI}" == "x86_64" ]; then
-            TARGET="x86_64-linux-android"
+        else
             WEBRTC_SUFFIX=${ABI}
         fi
-        export CC=$TOOLCHAIN/bin/${TARGET}${API_LEVEL}-clang
-        export AS=$CC
-        export CXX=$TOOLCHAIN/bin/${TARGET}${API_LEVEL}-clang++
 
         pushd ${CURL}/ares &>> ${LOG_FILE}
-        ./configure --host "${TARGET}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} &>> ${LOG_FILE}
+        ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
-        make &>> ${LOG_FILE}
+        make -j${JOBS} &>> ${LOG_FILE}
         make install &>> ${LOG_FILE}
         popd &>> ${LOG_FILE}
 
@@ -498,16 +553,15 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
         ln -s ${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a boringssl/lib/libcrypto.a
         ln -s ${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a boringssl/lib/libssl.a
 
-        LIBS=-lc++ ./configure --host "${TARGET}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}/${CURL}"/curl-android-${ABI} --with-ssl="${PWD}"/boringssl/ \
+        LIBS=-lc++ ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}/${CURL}"/curl-android-${ABI} --with-ssl="${PWD}"/boringssl/ \
         --enable-ares="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} ${CURL_EXTRA} &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
-        make &>> ${LOG_FILE}
+        make -j${JOBS} &>> ${LOG_FILE}
         make install &>> ${LOG_FILE}
         popd &>> ${LOG_FILE}
     done
 
-    # clean env
-    unset AR; unset LD; unset RANLIB; unset STRIP; unset CC; unset AS; unset CXX
+    cleanEnv
 
     touch ${CURL}/${CURL_SOURCE_FILE}.ready
 fi
@@ -544,7 +598,7 @@ if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
         -DLWS_WITH_LIBUV=1 -DLWS_LIBUV_INCLUDE_DIRS="${BASE_PATH}/libuv/libuv/include" -DLWS_LIBUV_LIBRARIES="${BASE_PATH}/libuv/libuv/libuv.a" "${EXTRA_FLAGS}" \
         ../ &>> ${LOG_FILE}
 
-        cmake --build . &>> ${LOG_FILE}
+        cmake -j${JOBS} --build . &>> ${LOG_FILE}
         cmake --build . --target install &>> ${LOG_FILE}
         popd &>> ${LOG_FILE}
     done
@@ -623,28 +677,28 @@ rm -rf ../tmpLibs
 mkdir ../tmpLibs
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86`" ]; then
     echo "* Running ndk-build x86"
-    ${NDK_BUILD} -j8 APP_ABI=x86 &>> ${LOG_FILE}
+    ${NDK_BUILD} -j${JOBS} APP_ABI=x86 &>> ${LOG_FILE}
     mv ../libs/x86 ../tmpLibs/
     echo "* ndk-build finished for x86"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w armeabi-v7a`" ]; then
     echo "* Running ndk-build arm 32bits"
-    ${NDK_BUILD} -j8 APP_ABI=armeabi-v7a &>> ${LOG_FILE}
+    ${NDK_BUILD} -j${JOBS} APP_ABI=armeabi-v7a &>> ${LOG_FILE}
     mv ../libs/armeabi-v7a ../tmpLibs/
     echo "* ndk-build finished for arm 32bits"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86_64`" ]; then
     echo "* Running ndk-build x86_64"
-    ${NDK_BUILD} -j8 APP_ABI=x86_64 &>> ${LOG_FILE}
+    ${NDK_BUILD} -j${JOBS} APP_ABI=x86_64 &>> ${LOG_FILE}
     mv ../libs/x86_64 ../tmpLibs/
     echo "* ndk-build finished for x86_64"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
     echo "* Running ndk-build arm 64bits"
-    ${NDK_BUILD} -j8 APP_ABI=arm64-v8a &>> ${LOG_FILE}
+    ${NDK_BUILD} -j${JOBS} APP_ABI=arm64-v8a &>> ${LOG_FILE}
     echo "* ndk-build finished for arm 64bits"
     mv ../libs/arm64-v8a ../tmpLibs/
 fi
