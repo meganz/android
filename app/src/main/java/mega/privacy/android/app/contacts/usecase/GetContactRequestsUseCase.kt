@@ -164,6 +164,11 @@ class GetContactRequestsUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
+    /**
+     * Build ContactRequestItem from MegaContactRequest object
+     *
+     * @return  ContactRequestItem
+     */
     private fun MegaContactRequest.toContactRequestItem(): ContactRequestItem {
         var userImageUri: Uri? = null
 
@@ -187,6 +192,13 @@ class GetContactRequestsUseCase @Inject constructor(
         )
     }
 
+    /**
+     * Build Avatar placeholder Drawable given a Title and a Color
+     *
+     * @param title     Title string
+     * @param color     Background color
+     * @return          Drawable with the placeholder
+     */
     private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
         TextDrawable.builder()
             .beginConfig()

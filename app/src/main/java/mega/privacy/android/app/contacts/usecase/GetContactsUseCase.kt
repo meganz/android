@@ -206,6 +206,11 @@ class GetContactsUseCase @Inject constructor(
     fun getMegaUser(userEmail: String): Single<MegaUser> =
         Single.fromCallable { megaApi.getContact(userEmail) }
 
+    /**
+     * Build ContactItem.Data from MegaUser object
+     *
+     * @return  ContactItem.Data
+     */
     private fun MegaUser.toContactItem(): ContactItem.Data {
         val alias = megaChatApi.getUserAliasFromCache(handle)
         val fullName = megaChatApi.getUserFullnameFromCache(handle)
@@ -259,6 +264,13 @@ class GetContactsUseCase @Inject constructor(
         }
     }
 
+    /**
+     * Build Avatar placeholder Drawable given a Title and a Color
+     *
+     * @param title     Title string
+     * @param color     Background color
+     * @return          Drawable with the placeholder
+     */
     private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
         TextDrawable.builder()
             .beginConfig()

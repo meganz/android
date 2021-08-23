@@ -20,28 +20,35 @@ class ReplyContactRequestUseCase @Inject constructor(
 ) {
 
     fun acceptReceivedRequest(requestHandle: Long): Completable =
-        replyToReceivedRequest(requestHandle, REPLY_ACTION_ACCEPT)
+        handleReceivedRequest(requestHandle, REPLY_ACTION_ACCEPT)
 
     fun ignoreReceivedRequest(requestHandle: Long): Completable =
-        replyToReceivedRequest(requestHandle, REPLY_ACTION_ACCEPT)
+        handleReceivedRequest(requestHandle, REPLY_ACTION_ACCEPT)
 
     fun denyReceivedRequest(requestHandle: Long): Completable =
-        replyToReceivedRequest(requestHandle, REPLY_ACTION_DENY)
+        handleReceivedRequest(requestHandle, REPLY_ACTION_DENY)
 
     fun remindSentRequest(requestHandle: Long): Completable =
-        replyToSentRequest(requestHandle, INVITE_ACTION_REMIND)
+        handleSentRequest(requestHandle, INVITE_ACTION_REMIND)
 
     fun deleteSentRequest(requestHandle: Long): Completable =
-        replyToSentRequest(requestHandle, INVITE_ACTION_DELETE)
+        handleSentRequest(requestHandle, INVITE_ACTION_DELETE)
 
-    private fun replyToReceivedRequest(requestHandle: Long, replyAction: Int): Completable =
+    /**
+     * Reply with an action to a previously previously received Contact Request
+     *
+     * @param requestHandle     Contact request Id
+     * @param action            Action for this contact request
+     * @return                  Completable
+     */
+    private fun handleReceivedRequest(requestHandle: Long, action: Int): Completable =
         Completable.create { emitter ->
             val contactRequest = megaApi.getContactRequestByHandle(requestHandle)
 
             if (!contactRequest.isOutgoing) {
                 megaApi.replyContactRequest(
                     contactRequest,
-                    replyAction,
+                    action,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = { _, error ->
                             if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
@@ -61,7 +68,14 @@ class ReplyContactRequestUseCase @Inject constructor(
             }
         }
 
-    private fun replyToSentRequest(requestHandle: Long, replyAction: Int): Completable =
+    /**
+     * Send an action to a previously sent Contact Request
+     *
+     * @param requestHandle     Contact request Id
+     * @param action            Action for this contact request
+     * @return                  Completable
+     */
+    private fun handleSentRequest(requestHandle: Long, action: Int): Completable =
         Completable.create { emitter ->
             val contactRequest = megaApi.getContactRequestByHandle(requestHandle)
 
@@ -69,7 +83,7 @@ class ReplyContactRequestUseCase @Inject constructor(
                 megaApi.inviteContact(
                     contactRequest.targetEmail,
                     contactRequest.sourceMessage,
-                    replyAction,
+                    action,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = { _, error ->
                             if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface

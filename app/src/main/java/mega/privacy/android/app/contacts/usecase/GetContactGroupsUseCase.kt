@@ -130,6 +130,13 @@ class GetContactGroupsUseCase @Inject constructor(
             emitter.onNext(groups.sortedAlphabetically())
         }, BackpressureStrategy.LATEST)
 
+    /**
+     * Build ContactGroupUser given an User handle
+     *
+     * @param userHandle    User handle to obtain group
+     * @param listener      Listener to deliver user attributes
+     * @return              ContactGroupUser
+     */
     private fun getGroupUserFromHandle(
         userHandle: Long,
         listener: OptionalMegaRequestListenerInterface
@@ -168,6 +175,13 @@ class GetContactGroupsUseCase @Inject constructor(
         )
     }
 
+    /**
+     * Build Avatar placeholder Drawable given a Title and a Color
+     *
+     * @param title     Title string
+     * @param color     Background color
+     * @return          Drawable with the placeholder
+     */
     private fun getImagePlaceholder(title: String, @ColorInt color: Int): Drawable =
         TextDrawable.builder()
             .beginConfig()
