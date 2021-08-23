@@ -440,17 +440,6 @@ if [ ! -f ${LIBUV}/${LIBUV_SOURCE_FILE}.ready ]; then
     for ABI in ${BUILD_ARCHS}; do
         echo "* Prebuilding libuv for ${ABI}"
 
-        #rm -r ${LIBUV}/${LIBUV}/build &>> ${LOG_FILE} ||:
-        #mkdir -p ${LIBUV}/${LIBUV}/build &>> ${LOG_FILE}
-        #pushd ${LIBUV}/${LIBUV}/build &>> ${LOG_FILE}
-        #cmake -DCMAKE_INSTALL_PREFIX="${BASE_PATH}/${LIBUV}/${LIBUV}/libuv-android-${ABI}" -DANDROID_ABI=${ABI} -DANDROID_PLATFORM=${APP_PLATFORM} \
-        #-DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake -DCMAKE_VERBOSE_MAKEFILE=ON -DBUILD_TESTING=OFF \
-        #-DBUILD_SHARED_LIBS=OFF \
-        #../ &>> ${LOG_FILE}
-
-        #cmake --build . &>> ${LOG_FILE}
-        #cmake --build . --target install &>> ${LOG_FILE}
-
         setupEnv "${ABI}"
 
         pushd ${LIBUV}/${LIBUV} &>> ${LOG_FILE}
@@ -595,7 +584,8 @@ if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
         -DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake -DLWS_WITH_SHARED=OFF -DLWS_WITH_STATIC=ON -DLWS_WITHOUT_TESTAPPS=ON \
         -DLWS_WITHOUT_SERVER=ON -DLWS_IPV6=ON -DLWS_STATIC_PIC=ON -DLWS_WITH_HTTP2=0 -DLWS_WITH_BORINGSSL=ON -DLWS_SSL_CLIENT_USE_OS_CA_CERTS=0 \
         -DLWS_OPENSSL_INCLUDE_DIRS="${BASE_PATH}/megachat/webrtc/include/third_party/boringssl/src/include" -DLWS_OPENSSL_LIBRARIES="${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a" \
-        -DLWS_WITH_LIBUV=1 -DLWS_LIBUV_INCLUDE_DIRS="${BASE_PATH}/libuv/libuv/include" -DLWS_LIBUV_LIBRARIES="${BASE_PATH}/libuv/libuv/libuv.a" "${EXTRA_FLAGS}" \
+        -DLWS_WITH_LIBUV=1 -DLWS_LIBUV_INCLUDE_DIRS="${BASE_PATH}/${LIBUV}/${LIBUV}/libuv-android-${ABI}/include" \
+        -DLWS_LIBUV_LIBRARIES="${BASE_PATH}/${LIBUV}/${LIBUV}/libuv-android-${ABI}/lib/libuv.a" "${EXTRA_FLAGS}" \
         ../ &>> ${LOG_FILE}
 
         cmake -j${JOBS} --build . &>> ${LOG_FILE}
