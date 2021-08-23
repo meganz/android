@@ -363,11 +363,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             return;
         }
 
-        if (!isOnline(context)) {
-            ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
-            return;
-        }
-
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         messagesSelected.add(message);
         Intent i;
