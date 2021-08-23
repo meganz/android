@@ -607,7 +607,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					mediaIntent.putExtra("HANDLE", file.getHandle());
 					mediaIntent.putExtra("FILENAME", file.getName());
 
-					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					String localPath = getLocalFile(file);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						//mediaIntent.setDataAndType(Uri.parse(localPath), mimeType);
@@ -669,7 +669,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					pdfIntent.putExtra("inside", true);
 					pdfIntent.putExtra("adapterType", CONTACT_FILE_ADAPTER);
 
-					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					String localPath = getLocalFile(file);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N	&& localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
@@ -719,7 +719,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					logDebug("Is URL file");
 					MegaNode file = contactNodes.get(position);
 
-					String localPath = getLocalFile(context, file.getName(), file.getSize());
+					String localPath = getLocalFile(file);
 					if (localPath != null){
 						File mediaFile = new File(localPath);
 						InputStream instream = null;

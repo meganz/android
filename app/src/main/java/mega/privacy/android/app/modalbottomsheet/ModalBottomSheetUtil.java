@@ -45,7 +45,7 @@ public class ModalBottomSheetUtil {
         String mimeType = MimeTypeList.typeForName(node.getName()).getType();
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 
-        String localPath = getLocalFile(app, node.getName(), node.getSize());
+        String localPath = getLocalFile(node);
         if (localPath != null) {
             File mediaFile = new File(localPath);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

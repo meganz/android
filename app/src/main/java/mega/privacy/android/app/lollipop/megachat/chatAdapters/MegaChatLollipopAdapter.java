@@ -93,6 +93,7 @@ import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.megachat.RemovedMessage;
 import mega.privacy.android.app.objects.GifData;
 
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
@@ -1898,15 +1899,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             String textToShow = "";
 
             if(message.getType()==MegaChatMessage.TYPE_CALL_STARTED){
-                ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_calling));
+                holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
                 textToShow = context.getResources().getString(R.string.call_started_messages);
             }
             else{
                 switch(message.getTermCode()){
                     case MegaChatMessage.END_CALL_REASON_ENDED:{
-
-                        ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_calling));
-
+                        holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_ended));
 
                         int hours = message.getDuration() / 3600;
                         int minutes = (message.getDuration() % 3600) / 60;
@@ -1949,8 +1948,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         break;
                     }
                     case MegaChatMessage.END_CALL_REASON_REJECTED:{
-
-                        ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
+                        holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
 
                         textToShow = context.getString(R.string.call_rejected_messages);
                         try {
@@ -1963,8 +1961,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         break;
                     }
                     case END_CALL_REASON_NO_ANSWER:{
-
-                        ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
+                        holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
 
                         textToShow = context.getString(R.string.call_not_answered_messages);
                         try {
@@ -1976,8 +1973,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         break;
                     }
                     case MegaChatMessage.END_CALL_REASON_FAILED:{
-
-                        ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
+                        holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
 
                         textToShow = context.getString(R.string.call_failed_messages);
                         try {
@@ -1989,8 +1985,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         break;
                     }
                     case END_CALL_REASON_CANCELLED:{
-
-                        ((ViewHolderMessageChat) holder).ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_cancelled));
+                        holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_cancelled));
 
                         textToShow = context.getString(R.string.call_cancelled_messages);
                         try {
@@ -2066,8 +2061,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 switch(message.getTermCode()){
                     case MegaChatMessage.END_CALL_REASON_ENDED:{
-
-                        ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
+                        holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_ended));
 
                         int hours = message.getDuration() / 3600;
                         int minutes = (message.getDuration() % 3600) / 60;
@@ -2110,7 +2104,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         break;
                     }
                     case MegaChatMessage.END_CALL_REASON_REJECTED:{
-                        ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
+                        holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
                         textToShow = context.getString(R.string.call_rejected_messages);
                         try {
                             textToShow = textToShow.replace("[A]", "");
@@ -2121,7 +2115,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         break;
                     }
                     case END_CALL_REASON_NO_ANSWER:{
-                        ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
+                        holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
 
                         textToShow = context.getString(R.string.call_missed_messages);
                         try {
@@ -2133,8 +2127,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         break;
                     }
                     case MegaChatMessage.END_CALL_REASON_FAILED:{
-
-                        ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
+                        holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
 
                         textToShow = context.getString(R.string.call_failed_messages);
                         try {
@@ -2146,8 +2139,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         break;
                     }
                     case END_CALL_REASON_CANCELLED:{
-
-                        ((ViewHolderMessageChat) holder).contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
+                        holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_cancelled));
 
                         textToShow = context.getString(R.string.call_cancelled_messages);
                         try {
@@ -5151,7 +5143,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @return  The Uri if success, null otherwise.
      */
     private Uri getUri(MegaNode node) {
-        String localPath = getLocalFile(context, node.getName(), node.getSize());
+        String localPath = getLocalFile(node);
         if (localPath != null) {
             return UriUtil.getUriForFile(new File(localPath));
         } else {
@@ -8181,14 +8173,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public boolean onLongClick(View view) {
-
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
         ViewHolderMessageChat holder = (ViewHolderMessageChat) view.getTag();
         int currentPosition = holder.getAdapterPosition();
 
-        if (isMultipleSelect() || currentPosition < 1 || messages.get(currentPosition-1).isUploading())
+        if (isMultipleSelect() || currentPosition < 1 || messages.get(currentPosition - 1).isUploading() || !ChatUtil.shouldBottomDialogBeDisplayed(messages.get(currentPosition - 1).getMessage()))
             return true;
 
         if(MegaApplication.isShowInfoChatMessages()){

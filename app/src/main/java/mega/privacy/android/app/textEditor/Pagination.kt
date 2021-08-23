@@ -3,7 +3,9 @@ package mega.privacy.android.app.textEditor
 import java.util.regex.Pattern
 import kotlin.collections.ArrayList
 
-class Pagination(private var text: String, initialPage: Int) {
+class Pagination(private var text: String) {
+
+    constructor() : this("")
 
     companion object {
         private const val CHARS_FOR_PAGE = 30000
@@ -11,7 +13,7 @@ class Pagination(private var text: String, initialPage: Int) {
     }
 
     private var pages: MutableList<String?> = ArrayList()
-    private var currentPage = initialPage
+    private var currentPage = 0
     private var firstLineNumber = 1
 
     init {

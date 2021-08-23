@@ -222,7 +222,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
             intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, AUDIO_BROWSE_ADAPTER)
         }
 
-        val localPath = getLocalFile(context, file.name, file.size)
+        val localPath = getLocalFile(file)
         var paramsSetSuccessfully = if (isLocalFile(node, megaApi, localPath)) {
             setLocalIntentParams(activity, node, intent, localPath, false,
                 requireActivity() as ManagerActivityLollipop)

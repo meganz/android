@@ -187,7 +187,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	private FloatingActionButton fabButton;
 
 	private MegaNode parentMoveCopy;
-	private ArrayList<Long> nodeHandleMoveCopy;
 
 	private MenuItem createFolderMenuItem;
 	private MenuItem newChatMenuItem;
@@ -629,43 +628,26 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				mode = MOVE;
 				moveFromHandles = intent.getLongArrayExtra("MOVE_FROM");
 
+				if (moveFromHandles != null) {
+					MegaNode moveNode = megaApi.getNodeByHandle(moveFromHandles[0]);
+					parentMoveCopy = megaApi.getParentNode(moveNode);
+				}
+
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(SHOW_TABS, false, CHAT_TAB);
-
-				ArrayList<Long> list = new ArrayList<Long>(moveFromHandles.length);
-				nodeHandleMoveCopy = new ArrayList<Long>(moveFromHandles.length);
-				MegaNode p;
-				for (long n : moveFromHandles) {
-					list.add(n);
-					nodeHandleMoveCopy.add(n);
-					p = megaApi.getNodeByHandle(n);
-					p = megaApi.getParentNode(p);
-					parentMoveCopy = p;
-				}
-
-				cDriveExplorer = getCloudExplorerFragment();
-				if(cDriveExplorer!=null){
-					cDriveExplorer.setDisableNodes(list);
-				}
 			}
 			else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)){
 				logDebug("ACTION_PICK_COPY_FOLDER");
 				mode = COPY;
 				copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
 
+				if (copyFromHandles != null) {
+					MegaNode copyNode = megaApi.getNodeByHandle(copyFromHandles[0]);
+					parentMoveCopy = megaApi.getParentNode(copyNode);
+				}
+
 				aB.setTitle(getString(R.string.title_share_folder_explorer).toUpperCase());
 				setView(SHOW_TABS, false, CHAT_TAB);
-
-				MegaNode p;
-				nodeHandleMoveCopy = new ArrayList<Long>(copyFromHandles.length);
-				ArrayList<Long> list = new ArrayList<Long>(copyFromHandles.length);
-				for (long n : copyFromHandles){
-					list.add(n);
-					nodeHandleMoveCopy.add(n);
-					p = megaApi.getNodeByHandle(n);
-					p = megaApi.getParentNode(p);
-					parentMoveCopy = p;
-				}
 			}
 			else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)){
 				logDebug("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
@@ -1693,6 +1675,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 
 		if (infos == null) {
+			statusDialog.dismiss();
 			showSnackbar(getString(R.string.upload_can_not_open));
 		} else if (existsMyChatFilesFolder()) {
 			setMyChatFilesFolder(getMyChatFilesFolder());
@@ -2146,6 +2129,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
                 credentials = new UserCredentials(lastEmail, gSession, "", "", "");
                 dbH.saveCredentials(credentials);
 				logDebug("Logged in with session");
+				logDebug("Setting account auth token for folder links.");
+				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
 				megaApi.fetchNodes(this);
 			}
 		}
@@ -2741,7 +2726,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		if (cDriveExplorer != null) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.detach(cDriveExplorer);
-			cDriveExplorer.setHeaderItemDecoration(null);
 			ft.attach(cDriveExplorer);
 			ft.commitAllowingStateLoss();
 		}
@@ -2749,7 +2733,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		if (iSharesExplorer != null) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.detach(iSharesExplorer);
-			iSharesExplorer.setHeaderItemDecoration(null);
 			ft.attach(iSharesExplorer);
 			ft.commitAllowingStateLoss();
 		}
@@ -2816,14 +2799,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		this.selectFile = selectFile;
 	}
 
-	public MegaNode parentMoveCopy(){
-			return parentMoveCopy;
-
+	public MegaNode parentMoveCopy() {
+		return parentMoveCopy;
 	}
-
-    public ArrayList<Long> getNodeHandleMoveCopy() {
-        return nodeHandleMoveCopy;
-    }
 
 	public int getDeepBrowserTree() {
 		return deepBrowserTree;

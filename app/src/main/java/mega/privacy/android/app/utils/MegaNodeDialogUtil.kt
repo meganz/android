@@ -406,7 +406,6 @@ object MegaNodeDialogUtil {
                                         node,
                                         typedString,
                                         oldMimeType.extension,
-                                        newExtension,
                                         snackbarShower,
                                         actionNodeCallback
                                     )
@@ -511,7 +510,6 @@ object MegaNodeDialogUtil {
      * @param node               A valid node if needed to confirm the action, null otherwise.
      * @param typedString        Typed name.
      * @param oldExtension       Current file extension.
-     * @param newExtension       New file extension.
      * @param snackbarShower     Interface to show snackbar.
      * @param actionNodeCallback Callback to finish the node action if needed, null otherwise.
      */
@@ -520,7 +518,6 @@ object MegaNodeDialogUtil {
         node: MegaNode,
         typedString: String,
         oldExtension: String,
-        newExtension: String,
         snackbarShower: SnackbarShower?,
         actionNodeCallback: ActionNodeCallback?
     ) {
@@ -528,37 +525,17 @@ object MegaNodeDialogUtil {
             if (oldExtension.isEmpty()) typedString.substring(0, typedString.lastIndexOf("."))
             else typedString.substring(0, typedString.lastIndexOf(".") + 1) + oldExtension
 
-        val message = if (oldExtension.isEmpty() && newExtension.isNotEmpty()) {
-            getString(R.string.file_extension_change_warning_old_empty, newExtension)
-        } else if (oldExtension.isNotEmpty() && newExtension.isEmpty()) {
-            getString(R.string.file_extension_change_warning_new_empty, oldExtension)
-        } else {
-            getString(R.string.file_extension_change_warning, oldExtension, newExtension)
-        }
-
-        val useButton = if (newExtension.isEmpty()) {
-            getString(R.string.action_use_empty_new_extension)
-        } else {
-            getString(R.string.action_use_new_extension, newExtension)
-        }
-
-        val keepButton = if (oldExtension.isEmpty()) {
-            getString(R.string.action_keep_empty_old_extension)
-        } else {
-            getString(R.string.action_keep_old_extension, oldExtension)
-        }
-
         MaterialAlertDialogBuilder(context)
             .setTitle(getString(R.string.file_extension_change_title))
-            .setMessage(message)
-            .setPositiveButton(keepButton) { _, _ ->
+            .setMessage(getString(R.string.file_extension_change_warning))
+            .setPositiveButton(getString(R.string.general_cancel)) { _, _ ->
                 if (typedOldExt == node.name) {
                     return@setPositiveButton
                 }
 
                 confirmRenameAction(context, node, typedOldExt, snackbarShower, actionNodeCallback)
             }
-            .setNegativeButton(useButton) { _, _ ->
+            .setNegativeButton(getString(R.string.action_change_anyway)) { _, _ ->
                 confirmRenameAction(context, node, typedString, snackbarShower, actionNodeCallback)
             }
             .show()

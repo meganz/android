@@ -135,11 +135,9 @@
                 android:layout_centerInParent="true"
                 android:background="@drawable/rounded_background" />
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:layout_centerInParent="true"
-                android:adjustViewBounds="true"
-                android:padding="3dp"
                 android:background="@null"
                 android:src="@drawable/ic_emoji_add"
                 app:tint="?attr/textColorHint" />

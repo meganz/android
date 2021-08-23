@@ -80,9 +80,7 @@ public class MimeTypeList {
 		resources.put(R.drawable.ic_numbers_list, new String[] {"numbers", });
 		resources.put(R.drawable.ic_openoffice_list, new String[] {"odp", "odt", "ods"});
 		resources.put(R.drawable.ic_sketch_list, new String[] {"sketch", });
-
-
-
+		resources.put(R.drawable.ic_url_list, new String[]{"url"});
 	}
 
 	private String type;

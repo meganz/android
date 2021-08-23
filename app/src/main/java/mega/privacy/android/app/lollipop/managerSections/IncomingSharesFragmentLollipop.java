@@ -142,8 +142,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		} else {
 			v = getGridView(inflater, container);
 
-			addSectionTitle(nodes, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
-
 			if (adapter == null) {
 				adapter = new MegaNodeAdapter(context, this, nodes, managerActivity.getParentHandleIncoming(), recyclerView, null, INCOMING_SHARES_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -161,7 +159,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			logDebug("ParentHandle to find children: " + managerActivity.getParentHandleIncoming());
 
 			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
-			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 		}
 
@@ -187,7 +184,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 		} else {
 			parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleIncoming());
 			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
-			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 		}
 
@@ -231,7 +227,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			managerActivity.setToolbarTitle();
 
 			nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
-			addSectionTitle(nodes, adapter.getAdapterType());
 
 			adapter.setNodes(nodes);
 			recyclerView.scrollToPosition(0);
@@ -246,7 +241,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 	public void findNodes() {
 		nodes = megaApi.getInShares(sortOrderManagement.getOrderOthers());
-		addSectionTitle(nodes, adapter.getAdapterType());
 		adapter.setNodes(nodes);
 
 		setEmptyView();
@@ -321,7 +315,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 					managerActivity.setToolbarTitle();
 
 					nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
-					addSectionTitle(nodes, adapter.getAdapterType());
 
 					adapter.setNodes(nodes);
 					visibilityFastScroller();
@@ -353,11 +346,6 @@ public class IncomingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	@Override
 	public void setNodes(ArrayList<MegaNode> nodes) {
 		this.nodes = nodes;
-		if (managerActivity.isList) {
-			addSectionTitle(nodes, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
-		} else {
-			addSectionTitle(nodes, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
-		}
 		adapter.setNodes(nodes);
 	}
 

@@ -319,14 +319,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public static final String TRANSFERS_TAB = "TRANSFERS_TAB";
 	private static final String SEARCH_SHARED_TAB = "SEARCH_SHARED_TAB";
 	private static final String SEARCH_DRAWER_ITEM = "SEARCH_DRAWER_ITEM";
-	private static final String DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE = "DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE";
-	public static final String OFFLINE_SEARCH_QUERY = "OFFLINE_SEARCH_QUERY:";
+	private static final String BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE = "BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE";
 	private static final String MK_LAYOUT_VISIBLE = "MK_LAYOUT_VISIBLE";
 
     private static final String BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN";
 	private static final String BUSINESS_CU_ALERT_SHOWN = "BUSINESS_CU_ALERT_SHOWN";
-	public static final String BUSINESS_CU_FRAGMENT_SETTINGS = "BUSINESS_CU_FRAGMENT_SETTINGS";
-	public static final String BUSINESS_CU_FRAGMENT_CU = "BUSINESS_CU_FRAGMENT_CU";
 
 	private static final String DEEP_BROWSER_TREE_LINKS = "DEEP_BROWSER_TREE_LINKS";
     private static final String PARENT_HANDLE_LINKS = "PARENT_HANDLE_LINKS";
@@ -355,7 +352,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private static final int CHAT_BNV = 3;
 	private static final int SHARED_BNV = 4;
 	private static final int HIDDEN_BNV = 5;
-	private static final int MEDIA_UPLOADS_BNV = 6;
 	// 8dp + 56dp(Fab's size) + 8dp
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
 
@@ -477,6 +473,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 	private BillingManager mBillingManager;
 	private List<MegaSku> mSkuDetailsList;
+
+	private Boolean initFabButtonShow = false;
+	private Observer<Boolean> fabChangeObserver  = isShow -> {
+		if(initFabButtonShow) {
+			if (isShow) {
+				showFabButtonAfterScrolling();
+			} else {
+				hideFabButtonWhenScrolling();
+			}
+		}
+	};
 
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, CONTACTS, RECEIVED_REQUESTS, SENT_REQUESTS, SETTINGS, MY_ACCOUNT, MY_STORAGE, SEARCH, TRANSFERS, COMPLETED_TRANSFERS, RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, UPGRADE_ACCOUNT, TURN_ON_NOTIFICATIONS, EXPORT_RECOVERY_KEY, PERMISSIONS, SMS_VERIFICATION, LINKS;
@@ -673,7 +680,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private SMSVerificationFragment svF;
 
 	private boolean mStopped = true;
-	private DrawerItem drawerItemBeforeOpenFullscreenOffline = null;
+	private int bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
 	private OfflineFragment fullscreenOfflineFragment;
 	private OfflineFragment pagerOfflineFragment;
 	private RecentsFragment pagerRecentsFragment;
@@ -777,6 +784,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     drawerLayout.closeDrawer(Gravity.LEFT);
                 }
                 refreshAddPhoneNumberButton();
+				app.askForAccountDetails();
             }
         }
     };
@@ -1508,8 +1516,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putLong("parentHandleSearch", parentHandleSearch);
 		outState.putLong("parentHandleInbox", parentHandleInbox);
 		outState.putSerializable("drawerItem", drawerItem);
-		outState.putSerializable(DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
-				drawerItemBeforeOpenFullscreenOffline);
+		outState.putInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
+				bottomItemBeforeOpenFullscreenOffline);
 		outState.putSerializable(SEARCH_DRAWER_ITEM, searchDrawerItem);
 		outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
 		outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
@@ -1675,8 +1683,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
 			askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
-			drawerItemBeforeOpenFullscreenOffline
-					= (DrawerItem) savedInstanceState.getSerializable(DRAWER_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE);
+			bottomItemBeforeOpenFullscreenOffline = savedInstanceState.getInt(BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE);
 			searchDrawerItem = (DrawerItem) savedInstanceState.getSerializable(SEARCH_DRAWER_ITEM);
 			searchSharedTab = savedInstanceState.getInt(SEARCH_SHARED_TAB);
 			indexShares = savedInstanceState.getInt("indexShares", indexShares);
@@ -1957,6 +1964,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			@Override
 			public void onDrawerOpened(@NonNull View drawerView) {
 				refreshDrawerInfo(storageState == MegaApiAndroid.STORAGE_STATE_UNKNOWN);
+
+				// Sync the account info after changing account information settings to keep the data the same
+				updateAccountDetailsVisibleInfo();
 			}
 
 			@Override
@@ -3302,6 +3312,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		checkTransferOverQuotaOnResume();
+
+		LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
 	}
 
 	void queryIfNotificationsAreOn(){
@@ -4180,6 +4192,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		logDebug("onPause");
     	managerActivity = null;
     	MegaApplication.getTransfersManagement().setIsOnTransfersSection(false);
+		LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
     	super.onPause();
     }
 
@@ -4263,38 +4276,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	private void refreshFragment (String fTag) {
+	private void refreshFragment(String fTag) {
 		Fragment f = getSupportFragmentManager().findFragmentByTag(fTag);
 		if (f != null) {
 			logDebug("Fragment " + fTag + " refreshing");
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 			ft.detach(f);
-			if (fTag.equals(FragmentTag.CLOUD_DRIVE.getTag())) {
-				((FileBrowserFragmentLollipop) f).headerItemDecoration = null;
-			}
-			else if (fTag.equals(FragmentTag.RUBBISH_BIN.getTag())) {
-				((RubbishBinFragmentLollipop) f).headerItemDecoration = null;
-			}
-			else if (fTag.equals(FragmentTag.INCOMING_SHARES.getTag())) {
-				((IncomingSharesFragmentLollipop) f).headerItemDecoration = null;
-			}
-			else if (fTag.equals(FragmentTag.OUTGOING_SHARES.getTag())) {
-				((OutgoingSharesFragmentLollipop) f).headerItemDecoration = null;
-			}
-            else if (fTag.equals(FragmentTag.LINKS.getTag())) {
-                ((LinksFragment) f).headerItemDecoration = null;
-            }
-			else if (fTag.equals(FragmentTag.INBOX.getTag())) {
-				((InboxFragmentLollipop) f).headerItemDecoration = null;
-			}
-			else if (fTag.equals(FragmentTag.SEARCH.getTag())) {
-				((SearchFragmentLollipop) f).setHeaderItemDecoration(null);
-			}
-
 			ft.attach(f);
 			ft.commitNowAllowingStateLoss();
-		}
-		else {
+		} else {
 			logWarning("Fragment == NULL. Not refresh");
 		}
 	}
@@ -4739,16 +4729,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 
 					supportInvalidateOptionsMenu();
-
-//					if (rChatFL != null) {
-//						if (rChatFL.isAdded()) {
-//							logDebug("ONLINE: Update screen RecentChats");
-//							if (!isChatEnabled()) {
-//								rChatFL.showDisableChatScreen();
-//							}
-//						}
-//					}		updateAccountDetailsVisibleInfo();
-
 					updateAccountDetailsVisibleInfo();
 					checkCurrentStorageStatus(false);
 				} else {
@@ -5782,11 +5762,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void fullscreenOfflineFragmentClosed(OfflineFragment fragment) {
 		if (fragment == fullscreenOfflineFragment) {
-			if (drawerItemBeforeOpenFullscreenOffline != null && !mStopped) {
-				if (drawerItem != drawerItemBeforeOpenFullscreenOffline) {
-					selectDrawerItemLollipop(drawerItemBeforeOpenFullscreenOffline);
-				}
-				drawerItemBeforeOpenFullscreenOffline = null;
+			if (bottomItemBeforeOpenFullscreenOffline != INVALID_VALUE && !mStopped) {
+				backToDrawerItem(bottomItemBeforeOpenFullscreenOffline);
+				bottomItemBeforeOpenFullscreenOffline = INVALID_VALUE;
 			}
 
 			setPathNavigationOffline("/");
@@ -7836,8 +7814,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		this.isClearRubbishBin = value;
 	}
 
-	public void setMoveToRubbish(boolean value){
+	public void setMoveToRubbish(boolean value) {
 		this.moveToRubbish = value;
+	}
+
+	public void setRestoreFromRubbish(boolean value) {
+		this.restoreFromRubbish = value;
 	}
 
 	public void askConfirmationMoveToRubbish(final ArrayList<Long> handleList){
@@ -9653,7 +9635,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			case R.id.offline_section: {
 				sectionClicked = true;
-				drawerItemBeforeOpenFullscreenOffline = drawerItem;
+				bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem;
 				openFullscreenOfflineFragment(getPathNavigationOffline());
 				break;
 			}
@@ -13086,7 +13068,22 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void hideFabButton(){
+		initFabButtonShow = false;
 		fabButton.hide();
+	}
+
+	/**
+	 * Hides the fabButton icon when scrolling.
+	 */
+	public void hideFabButtonWhenScrolling() {
+		fabButton.hide();
+	}
+
+	/**
+	 * Shows the fabButton icon.
+	 */
+	public void showFabButtonAfterScrolling() {
+		fabButton.show();
 	}
 
 	/**
@@ -13101,6 +13098,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Shows or hides the fabButton depending on the current section.
 	 */
 	public void showFabButton() {
+		initFabButtonShow = true;
+
 		if (drawerItem == null) {
 			return;
 		}

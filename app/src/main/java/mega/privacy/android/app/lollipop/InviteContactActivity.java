@@ -15,9 +15,12 @@ import android.os.Handler;
 import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,6 +49,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -97,7 +102,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private static final String UNSELECTED = "UNSELECTED";
     private static final int ID_MEGA_CONTACTS_HEADER = -2;
     private static final int ID_PHONE_CONTACTS_HEADER = -1;
-    private static final int PHONE_NUMBER_MIN_LENGTH = 5;
     private static final int USER_INDEX_NONE_EXIST = -1;
     private static final int MIN_LIST_SIZE_FOR_FAST_SCROLLER = 20;
     private static final int ADDED_CONTACT_VIEW_MARGIN_LEFT = 10;
@@ -128,7 +132,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private LayoutInflater inflater;
     private boolean isGettingLocalContact, isGettingMegaContact, isPermissionGranted, isGetContactCompleted;
     private MegaContactGetter megaContactGetter;
-    private List<ContactsUtil.LocalContact> rawLocalContacts;
     private String contactLink;
     private DatabaseHandler dbH;
     private ArrayList<String> contactsEmailsSelected, contactsPhoneSelected;
@@ -137,8 +140,16 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private InvitationContactInfo currentSelected;
 
+    private final Observer<Boolean> fabChangeObserver  = isShow -> {
+        if(isShow){
+            showFabButton();
+        } else {
+            hideFabButton();
+        }
+    };
+
     //work around for android bug - https://issuetracker.google.com/issues/37007605#c10
-    class LinearLayoutManagerWrapper extends LinearLayoutManager {
+    static class LinearLayoutManagerWrapper extends LinearLayoutManager {
 
         LinearLayoutManagerWrapper(Context context) {
             super(context);
@@ -198,15 +209,12 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         typeContactEditText.addTextChangedListener(this);
         typeContactEditText.setOnEditorActionListener(this);
         typeContactEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        typeContactEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
-                        filterContactsTask.cancel(true);
-                    }
-                    startFilterTask();
+        typeContactEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
+                    filterContactsTask.cancel(true);
                 }
+                startFilterTask();
             }
         });
 
@@ -215,12 +223,9 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManagerWrapper(this);
         recyclerViewList = findViewById(R.id.invite_contact_list);
-        recyclerViewList.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                hideKeyboard(InviteContactActivity.this, 0);
-                return false;
-            }
+        recyclerViewList.setOnTouchListener((v, event) -> {
+            hideKeyboard(InviteContactActivity.this, 0);
+            return false;
         });
         recyclerViewList.setClipToPadding(false);
         recyclerViewList.setHasFixedSize(true);
@@ -252,12 +257,15 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         }
         logDebug("Request by Achievement: " + fromAchievement);
         if (isGetContactCompleted) {
-            phoneContacts = savedInstanceState.getParcelableArrayList(KEY_PHONE_CONTACTS);
-            megaContacts = savedInstanceState.getParcelableArrayList(KEY_MEGA_CONTACTS);
-            addedContacts = savedInstanceState.getParcelableArrayList(KEY_ADDED_CONTACTS);
-            filteredContacts = savedInstanceState.getParcelableArrayList(KEY_FILTERED_CONTACTS);
-            totalContacts = savedInstanceState.getParcelableArrayList(KEY_TOTAL_CONTACTS);
-            isPermissionGranted = savedInstanceState.getBoolean(KEY_IS_PERMISSION_GRANTED, false);
+            if (savedInstanceState != null) {
+                phoneContacts = savedInstanceState.getParcelableArrayList(KEY_PHONE_CONTACTS);
+                megaContacts = savedInstanceState.getParcelableArrayList(KEY_MEGA_CONTACTS);
+                addedContacts = savedInstanceState.getParcelableArrayList(KEY_ADDED_CONTACTS);
+                filteredContacts = savedInstanceState.getParcelableArrayList(KEY_FILTERED_CONTACTS);
+                totalContacts = savedInstanceState.getParcelableArrayList(KEY_TOTAL_CONTACTS);
+                isPermissionGranted = savedInstanceState.getBoolean(KEY_IS_PERMISSION_GRANTED, false);
+                currentSelected = savedInstanceState.getParcelable(CURRENT_SELECTED_CONTACT);
+            }
             refreshAddedContactsView(true);
             setRecyclersVisibility();
             setTitleAB();
@@ -272,17 +280,19 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                 emptyImageView.setVisibility(View.VISIBLE);
                 noPermissionHeader.setVisibility(View.VISIBLE);
             }
-            currentSelected = savedInstanceState.getParcelable(CURRENT_SELECTED_CONTACT);
+
             if(currentSelected != null) {
                 listDialog = new ContactInfoListDialog(this, currentSelected, this);
-                listDialog.setCheckedIndex(savedInstanceState.getIntegerArrayList(CHECKED_INDEX));
-                ArrayList<InvitationContactInfo> selectedList = savedInstanceState.getParcelableArrayList(SELECTED_CONTACT_INFO);
-                if(selectedList != null) {
-                    listDialog.setSelected(new HashSet<>(selectedList));
-                }
-                ArrayList<InvitationContactInfo> unSelectedList = savedInstanceState.getParcelableArrayList(UNSELECTED);
-                if(unSelectedList != null) {
-                    listDialog.setUnSelected(new HashSet<>(unSelectedList));
+                if (savedInstanceState != null) {
+                    listDialog.setCheckedIndex(savedInstanceState.getIntegerArrayList(CHECKED_INDEX));
+                    ArrayList<InvitationContactInfo> selectedList = savedInstanceState.getParcelableArrayList(SELECTED_CONTACT_INFO);
+                    if(selectedList != null) {
+                        listDialog.setSelected(new HashSet<>(selectedList));
+                    }
+                    ArrayList<InvitationContactInfo> unSelectedList = savedInstanceState.getParcelableArrayList(UNSELECTED);
+                    if(unSelectedList != null) {
+                        listDialog.setUnSelected(new HashSet<>(unSelectedList));
+                    }
                 }
                 listDialog.showInfo(addedContacts, true);
             }
@@ -318,6 +328,18 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             }
         };
         megaApi.contactLinkCreate(false, getContactLinkCallback);
+    }
+
+    @Override
+    protected void onPause() {
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
     }
 
     @Override
@@ -608,9 +630,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             String s = v.getText().toString();
             String processedStrong = s.trim();
-            if (TextUtils.isEmpty(processedStrong)) {
-                hideKeyboard(this, 0);
-            } else {
+            if (!TextUtils.isEmpty(processedStrong)) {
                 typeContactEditText.getText().clear();
                 boolean isEmailValid = isValidEmail(processedStrong);
                 boolean isPhoneValid = isValidPhone(processedStrong);
@@ -631,15 +651,15 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                     Toast.makeText(this, R.string.invalid_input, Toast.LENGTH_SHORT).show();
                     return true;
                 }
-                if(!isScreenInPortrait(this)) {
+                if (!isScreenInPortrait(this)) {
                     hideKeyboard(this, 0);
                 }
                 if (filterContactsTask != null && filterContactsTask.getStatus() == AsyncTask.Status.RUNNING) {
                     filterContactsTask.cancel(true);
                 }
                 startFilterTask();
-                hideKeyboard(this, 0);
             }
+            hideKeyboard(this, 0);
             refreshInviteContactButton();
             return true;
         }
@@ -691,24 +711,22 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions, @NotNull int[] grantResults) {
         logDebug("onRequestPermissionsResult");
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case Constants.REQUEST_READ_CONTACTS: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    logDebug("Permission granted");
-                    isPermissionGranted = true;
-                    prepareToGetContacts();
-                    noPermissionHeader.setVisibility(View.GONE);
-                } else {
-                    logDebug("Permission denied");
-                    setEmptyStateVisibility(true);
-                    emptyTextView.setText(R.string.no_contacts_permissions);
-                    emptyImageView.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
-                    noPermissionHeader.setVisibility(View.VISIBLE);
-                }
+        if (requestCode == REQUEST_READ_CONTACTS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                logDebug("Permission granted");
+                isPermissionGranted = true;
+                prepareToGetContacts();
+                noPermissionHeader.setVisibility(View.GONE);
+            } else {
+                logDebug("Permission denied");
+                setEmptyStateVisibility(true);
+                emptyTextView.setText(R.string.no_contacts_permissions);
+                emptyImageView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+                noPermissionHeader.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -851,6 +869,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class GetPhoneContactsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -860,7 +879,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             isGettingLocalContact = true;
 
             //add new value
-            rawLocalContacts = megaContactGetter.getLocalContacts();
+            List<ContactsUtil.LocalContact> rawLocalContacts = megaContactGetter.getLocalContacts();
             filteredContacts.addAll(megaContacts);
             phoneContacts.addAll(localContactToContactInfo(rawLocalContacts));
             filteredContacts.addAll(phoneContacts);
@@ -884,6 +903,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class FilterContactsTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -1131,19 +1151,15 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                 }
 
                 hideKeyboard(InviteContactActivity.this, 0);
-                new Handler().postDelayed(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        if (contactsPhoneSelected.size() > 0) {
-                            invitePhoneContacts(contactsPhoneSelected);
-                        }
-                        numberSent = 0;
-                        numberToSend = 0;
-                        numberNotSent = 0;
-                        setResult(Activity.RESULT_OK, result);
-                        finish();
+                new Handler().postDelayed(() -> {
+                    if (contactsPhoneSelected.size() > 0) {
+                        invitePhoneContacts(contactsPhoneSelected);
                     }
+                    numberSent = 0;
+                    numberToSend = 0;
+                    numberNotSent = 0;
+                    setResult(Activity.RESULT_OK, result);
+                    finish();
                 }, 2000);
             }
         }
@@ -1213,5 +1229,23 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         filteredContacts.addAll(megaContacts);
         filteredContacts.addAll(phoneContacts);
         totalContacts.addAll(filteredContacts);
+    }
+
+    /**
+     * Shows the fabButton
+     */
+    private void showFabButton() {
+        if (fabButton != null){
+            fabButton.show();
+        }
+    }
+
+    /**
+     * Hides the fabButton
+     */
+    private void hideFabButton() {
+        if (fabButton != null){
+            fabButton.hide();
+        }
     }
 }

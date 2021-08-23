@@ -392,7 +392,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
             putThumbnailLocation(intent, listView, index, VIEWER_FROM_VIDEOS, it)
         }
 
-        val localPath = FileUtil.getLocalFile(context, file.name, file.size)
+        val localPath = FileUtil.getLocalFile(file)
         var paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
             FileUtil.setLocalIntentParams(context, node, intent, localPath, false,
                 requireActivity() as ManagerActivityLollipop)
