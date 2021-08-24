@@ -207,6 +207,11 @@ class VideoGridViewAdapter(
             holder.removeResolutionAndListener(participant)
             return
         }
+
+        participant.videoListener?.let {
+            inMeetingViewModel.removeResolutionAndListener(participant, it)
+        }
+        participant.videoListener = null
     }
 }
 

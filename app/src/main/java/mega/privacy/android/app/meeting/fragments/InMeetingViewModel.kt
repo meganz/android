@@ -1559,9 +1559,21 @@ class InMeetingViewModel @ViewModelInject constructor(
         val checkParticipant = visibleParticipants.filter {
             it.peerId == participant.peerId && it.clientId == participant.clientId
         }
+
         if (checkParticipant.isEmpty()) {
             visibleParticipants.add(participant)
         }
+    }
+
+    /**
+     * Removing all visible participants
+     */
+    fun removeAllParticipantVisible() {
+        if (visibleParticipants.isNullOrEmpty()) {
+            return
+        }
+
+        visibleParticipants.clear()
     }
 
     /**
@@ -1597,14 +1609,8 @@ class InMeetingViewModel @ViewModelInject constructor(
                 return true
             }
         }
-        return false
-    }
 
-    /**
-     * Removing all visible participants
-     */
-    fun removeVisibleParticipants() {
-        visibleParticipants.clear()
+        return false
     }
 
     /**

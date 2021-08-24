@@ -307,7 +307,11 @@ class InMeetingRepository @Inject constructor(
         hiRes: Boolean,
         listener: MegaChatVideoListenerInterface
     ) {
-        logDebug("Add Chat remote video listener of client $clientId , with HiRes $hiRes")
+        if (hiRes) {
+            logDebug("Add Chat remote video listener of client $clientId , with HiRes")
+        } else {
+            logDebug("Add Chat remote video listener of client $clientId , with LowRes")
+        }
         megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
     }
 
@@ -325,7 +329,11 @@ class InMeetingRepository @Inject constructor(
         hiRes: Boolean,
         listener: MegaChatVideoListenerInterface
     ) {
-        logDebug("Remove Chat remote video listener of client $clientId, with isHiRes $hiRes")
+        if (hiRes) {
+            logDebug("Remove Chat remote video listener of client $clientId, with HiRes")
+        } else {
+            logDebug("Remove Chat remote video listener of client $clientId, with LowRes")
+        }
         megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
     }
 
@@ -559,7 +567,7 @@ class InMeetingRepository @Inject constructor(
     fun getRemoteAvatar(peerId: Long) {
         var email = ChatController(context).getParticipantEmail(peerId)
 
-        if(email == null) {
+        if (email == null) {
             email = MegaApiJava.handleToBase64(peerId)
         }
 

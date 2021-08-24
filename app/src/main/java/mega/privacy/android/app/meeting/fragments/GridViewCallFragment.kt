@@ -77,7 +77,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
                     currentPage = position
 
                     logDebug("New page selected $position")
-                    (parentFragment as InMeetingFragment).inMeetingViewModel.removeVisibleParticipants()
+                    (parentFragment as InMeetingFragment).inMeetingViewModel.removeAllParticipantVisible()
 
                     val data = sliceBy6(participants)
                     updateVisibleParticipantsGrid(data)
@@ -120,7 +120,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
                 dataInPage
             )
         } else {
-            (parentFragment as InMeetingFragment).inMeetingViewModel.removeVisibleParticipants()
+            (parentFragment as InMeetingFragment).inMeetingViewModel.removeAllParticipantVisible()
         }
 
         activateVideoWhenScroll()
