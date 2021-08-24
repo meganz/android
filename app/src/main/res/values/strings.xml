@@ -999,14 +999,6 @@
     <string name="sortby_type_photo_first">Photos</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Videos</string>
-    <!-- sort files by date newest first -->
-    <string name="sort_by_newest_date">Newest date</string>
-    <!-- sort files by date oldest first -->
-    <string name="sort_by_oldest_date">Oldest date</string>
-    <!-- sort files by largest size -->
-    <string name="sort_by_largest_size">Largest size</string>
-    <!-- sort files by smallest size -->
-    <string name="sort_by_smallest_size">Smallest size</string>
     <!-- Title to choose the type of Passcode -->
     <string name="pin_lock_type">Passcode Type</string>
     <!-- Passcode with 4 digits -->
@@ -3834,8 +3826,6 @@
     <string name="dialog_cookie_alert_unsaved">Cookie Settings unsaved.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Cookie Settings changes have been saved</string>
-    <!-- Cookie dialog third party title -->
-    <string name="dialog_cookie_thirdparty_title">Third Party Cookies</string>
     <!-- Cookie dialog third party first subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle1">Google Advertising Cookies</string>
     <!-- Cookie dialog third party second subtitle -->
@@ -3864,10 +3854,6 @@
     <string name="preference_cookies_thirdparty_title">Third Party Cookies</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
     <string name="preference_cookies_thirdparty_summary">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Tap on “More Information” below for details on all the third party Cookies we use.</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_privacy">Privacy Policy</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_cookie">Cookie Policy</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Always On</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
