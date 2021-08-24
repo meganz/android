@@ -576,6 +576,22 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                             node, highPriority = true, fromMediaViewer = true, needSerialize = true
                         )
                     }
+                    FILE_LINK_ADAPTER -> {
+                        launchIntent.getStringExtra(EXTRA_SERIALIZE_STRING)?.let { serialize ->
+                            val currentDocument = MegaNode.unserialize(serialize)
+                            if (currentDocument != null) {
+                                logDebug("currentDocument NOT NULL")
+                                nodeSaver.saveNode(
+                                    currentDocument,
+                                    isFolderLink = isFolderLink,
+                                    fromMediaViewer = true,
+                                    needSerialize = true
+                                )
+                            } else {
+                                LogUtil.logWarning("currentDocument is NULL")
+                            }
+                        }
+                    }
                     else -> {
                         nodeSaver.saveHandle(
                             playingHandle,
@@ -831,7 +847,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
             handleSelectFolderToImportResult(resultCode, toHandle, node, this, this)
         } else {
-            viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
+            viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
         }
     }
 

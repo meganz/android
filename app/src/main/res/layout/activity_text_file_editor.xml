@@ -4,87 +4,151 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/text_file_editor_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    app:layout_behavior="com.google.android.material.behaviour.HideBottomViewOnScrollBehavior">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/file_editor_toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium" />
+        android:layout_gravity="top"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ScrollView
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/file_editor_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:minHeight="?attr/actionBarSize"
+            app:titleTextAppearance="@style/TextAppearance.Mega.Subtitle1.Medium" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/file_editor_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipToPadding="false"
-        app:layout_constraintTop_toBottomOf="@+id/file_editor_toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/app_bar">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/content_text_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <TextView
+            <mega.privacy.android.app.textEditor.views.LineNumberTextView
                 android:id="@+id/content_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="100dp"
+                android:paddingStart="@dimen/text_editor_padding_without_nLines"
+                android:paddingTop="@dimen/text_editor_padding_top"
+                android:paddingEnd="@dimen/text_editor_padding_without_nLines"
+                android:paddingBottom="@dimen/text_editor_padding_bottom"
                 android:textAppearance="@style/TextAppearance.Mega.Body2"
                 android:textIsSelectable="true" />
 
-            <EditText
+            <mega.privacy.android.app.textEditor.views.LineNumberEditText
                 android:id="@+id/content_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
+                android:imeOptions="flagNoExtractUi"
                 android:inputType="textMultiLine"
-                android:paddingBottom="100dp"
+                android:paddingStart="@dimen/text_editor_padding_without_nLines"
+                android:paddingTop="@dimen/text_editor_padding_top"
+                android:paddingEnd="@dimen/text_editor_padding_without_nLines"
+                android:paddingBottom="@dimen/text_editor_padding_bottom"
                 android:textAppearance="@style/TextAppearance.Mega.Body2"
                 android:theme="@style/TransparentEditText.Transparent"
                 tools:ignore="Autofill,LabelFor" />
 
-        </LinearLayout>
+        </RelativeLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <ImageView
-        android:id="@+id/loading_image"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:layout_marginTop="97dp"
-        android:src="@drawable/ic_text_thumbnail"
+    <TextView
+        android:id="@+id/pagination_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/pagination_indicator"
+        android:elevation="6dp"
+        android:paddingStart="10dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="4dp"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Black13sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/file_editor_toolbar"
+        app:layout_constraintTop_toTopOf="@+id/file_editor_scroll_view"
+        tools:text="1/52" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/previous"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="136dp"
+        app:backgroundTint="@color/white_teal_100"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_arrow_previous"
+        app:tint="@color/black"
         tools:ignore="ContentDescription" />
 
-    <ProgressBar
-        android:id="@+id/loading_progress_bar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/next"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="44dp"
-        android:indeterminate="true"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="64dp"
+        app:backgroundTint="@color/white_teal_100"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_arrow_next"
+        app:tint="@color/black"
+        tools:ignore="ContentDescription" />
+
+    <RelativeLayout
+        android:id="@+id/loading_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="153dp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/loading_image" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/loading_image"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_text_thumbnail"
+            tools:ignore="ContentDescription" />
+
+        <ProgressBar
+            android:id="@+id/loading_progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/loading_image"
+            android:layout_marginStart="44dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="44dp"
+            android:indeterminate="true" />
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/name_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:background="@color/white_090_grey_080"
         android:gravity="center_horizontal"
         android:padding="14dp"
@@ -96,6 +160,7 @@
         android:id="@+id/edit_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin_span"
         android:src="@drawable/ic_file_edit"
         app:borderWidth="0dp"

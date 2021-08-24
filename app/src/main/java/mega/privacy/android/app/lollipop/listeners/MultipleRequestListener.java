@@ -13,10 +13,11 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.StringResourcesUtils.*;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 
 //Listener for  multiselect
@@ -87,39 +88,63 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
         if(counter==0){
             switch (requestType) {
                 case  MegaRequest.TYPE_MOVE:{
-                    if (actionListener== MULTIPLE_SEND_RUBBISH){
+                    if (actionListener == MULTIPLE_SEND_RUBBISH) {
                         logDebug("Move to rubbish request finished");
-                        if(error>0){
-                            message = context.getString(R.string.number_correctly_moved_to_rubbish, max_items-error) + context.getString(R.string.number_incorrectly_moved_to_rubbish, error);
+                        int success_items = max_items - error;
+                        if (error > 0 && (success_items > 0)) {
+                            if (error == 1 && (success_items == 1)) {
+                                message = getString(R.string.node_correctly_and_node_incorrectly_moved_to_rubbish);
+                            } else if (error == 1) {
+                                message = getString(R.string.nodes_correctly_and_node_incorrectly_moved_to_rubbish, success_items);
+                            } else if (success_items == 1) {
+                                message = getString(R.string.node_correctly_and_nodes_incorrectly_moved_to_rubbish, error);
+                            } else {
+                                message = getString(R.string.nodes_correctly_and_nodes_incorrectly_moved_to_rubbish, success_items, error);
+                            }
+                        } else if (error > 0) {
+                            message = getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error, error);
+                        } else {
+                            message = getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items);
                         }
-                        else{
-                            message = context.getString(R.string.number_correctly_moved_to_rubbish, max_items);
-                        }
-                        if(context instanceof ManagerActivityLollipop) {
+
+                        if (context instanceof ManagerActivityLollipop) {
                             ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
+                            managerActivity.setMoveToRubbish(false);
                             managerActivity.refreshAfterMovingToRubbish();
                             resetAccountDetailsTimeStamp();
-                        }
-                        else {
+                        } else {
                             ((ContactFileListActivityLollipop) context).actionConfirmed();
                         }
-                    }
-                    else if (actionListener== MULTIPLE_RESTORED_FROM_RUBBISH){
+                    } else if (actionListener == MULTIPLE_RESTORED_FROM_RUBBISH) {
                         logDebug("Restore nodes from rubbish request finished");
-                        if(error>0){
-                            message = context.getString(R.string.number_correctly_restored_from_rubbish, max_items-error) + context.getString(R.string.number_incorrectly_restored_from_rubbish, error);
-                        }
-                        else{
-                            message = context.getString(R.string.number_correctly_restored_from_rubbish, max_items);
+                        int success_items = max_items - error;
+                        if (error > 0 && (success_items > 0)) {
+                            if (error == 1 && (success_items == 1)) {
+                                message = getString(R.string.node_correctly_and_node_incorrectly_restored_from_rubbish);
+                            } else if (error == 1) {
+                                message = getString(R.string.nodes_correctly_and_node_incorrectly_restored_from_rubbish, success_items);
+                            } else if (success_items == 1) {
+                                message = getString(R.string.node_correctly_and_nodes_incorrectly_restored_from_rubbish, error);
+                            } else {
+                                message = getString(R.string.nodes_correctly_and_nodes_incorrectly_restored_from_rubbish, success_items, error);
+                            }
+                        } else if (error > 0) {
+                            message = getQuantityString(R.plurals.number_incorrectly_restored_from_rubbish, error, error);
+                        } else {
+                            message = getQuantityString(R.plurals.number_correctly_restored_from_rubbish, success_items, success_items);
                         }
 
                         ManagerActivityLollipop managerActivity = (ManagerActivityLollipop) context;
+                        managerActivity.setRestoreFromRubbish(false);
                         managerActivity.refreshAfterMovingToRubbish();
                         resetAccountDetailsTimeStamp();
-                    }
-                    else{
+                    } else {
                         logDebug("Move nodes request finished");
                         if(error>0){
+                            if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+                                showForeignStorageOverQuotaWarningDialog(context);
+                            }
+
                             message = context.getString(R.string.number_correctly_moved, max_items-error) + context.getString(R.string.number_incorrectly_moved, error);
                         }
                         else{
@@ -205,6 +230,10 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     else{
                         logDebug("Copy request finished");
                         if(error>0){
+                            if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+                                showForeignStorageOverQuotaWarningDialog(context);
+                            }
+
                             message = context.getString(R.string.number_correctly_copied, max_items-error) + context.getString(R.string.number_no_copied, error);
                         }
                         else{

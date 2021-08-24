@@ -15,14 +15,14 @@ public class DefaultScrollerViewProvider extends ScrollerViewProvider {
 
     @Override
     public View provideHandleView(ViewGroup container) {
-        handle = LayoutInflater.from(getContext()).inflate(R.layout.fastscroll__default_handle, container, false);
+        handle = LayoutInflater.from(getContext()).inflate(R.layout.fastscroll_default_handle, container, false);
         handle.setVisibility(View.INVISIBLE);
         return handle;
     }
 
     @Override
     public View provideBubbleView(ViewGroup container) {
-        bubble = LayoutInflater.from(getContext()).inflate(R.layout.fastscroll__default_bubble, container, false);
+        bubble = LayoutInflater.from(getContext()).inflate(R.layout.fastscroll_default_bubble, container, false);
         bubble.setVisibility(View.INVISIBLE);
         return bubble;
     }

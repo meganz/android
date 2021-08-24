@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -47,6 +48,8 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -97,6 +100,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
@@ -157,6 +161,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean resumeSesion = false;
 
     private MegaApiAndroid megaApi;
+    private MegaApiAndroid megaApiFolder;
     private MegaChatApiAndroid megaChatApi;
     private String confirmLink;
 
@@ -1428,7 +1433,16 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 try {
                     Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(RECOVERY_URL));
+
+                    if (et_user != null && et_user.getText() != null && !isTextEmpty(et_user.getText().toString())) {
+                        String typedEmail = et_user.getText().toString();
+                        String encodedEmail = Base64.encodeToString(typedEmail.getBytes(), Base64.DEFAULT);
+                        encodedEmail = encodedEmail.replace("\n", "");
+                        openTermsIntent.setData(Uri.parse(RECOVERY_URL_EMAIL + encodedEmail));
+                    } else {
+                        openTermsIntent.setData(Uri.parse(RECOVERY_URL));
+                    }
+
                     startActivity(openTermsIntent);
                 }
                 catch (Exception e){
@@ -1523,7 +1537,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
@@ -1534,25 +1548,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
+        if (megaApiFolder == null){
+            megaApiFolder = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
+        }
+
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
-        }
-    }
-
-    @Override
-    public void onAttach(Activity context) {
-        logDebug("onAttach Activity");
-        super.onAttach(context);
-        this.context = context;
-
-        dbH = DatabaseHandler.getDbHandler(context);
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) context.getApplication()).getMegaApi();
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) context.getApplication()).getMegaChatApi();
         }
     }
 
@@ -1902,6 +1903,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 returnToLogin();
             } else {
+                logDebug("Logged in. Setting account auth token for folder links.");
+                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
+
                 if (is2FAEnabled){
                     loginVerificationLayout.setVisibility(View.GONE);
                     ((LoginActivityLollipop) context).hideAB();

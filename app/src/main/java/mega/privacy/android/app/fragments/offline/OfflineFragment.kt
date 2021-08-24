@@ -34,13 +34,13 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.*
-import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
@@ -641,7 +641,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             }
             mime.isOpenableTextFile(file.length()) -> {
                 startActivity(
-                    Intent(requireContext(), TextFileEditorActivity::class.java)
+                    Intent(requireContext(), TextEditorActivity::class.java)
                         .putExtra(INTENT_EXTRA_KEY_FILE_NAME, file.name)
                         .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
                         .putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)

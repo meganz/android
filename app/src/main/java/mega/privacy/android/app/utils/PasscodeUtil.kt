@@ -252,7 +252,7 @@ class PasscodeUtil @Inject constructor(
 
     fun enablePasscode(passcodeType: String, passcode: String) {
         updatePasscode(true, passcodeType, passcode, REQUIRE_PASSCODE_AFTER_30S)
-        update()
+        pauseUpdate()
     }
 
     fun disablePasscode() {
@@ -297,26 +297,14 @@ class PasscodeUtil @Inject constructor(
      */
     fun resume() {
         if (shouldLock()) {
-            MegaApplication.getPasscodeManagement().lastLocked = context
             showLockScreen()
-        } else {
-            MegaApplication.getPasscodeManagement().lastLocked = null
         }
     }
 
     /**
      * Called when some activity is paused to update the lastPause value.
      */
-    fun pause() {
-        if (MegaApplication.getPasscodeManagement().lastLocked != context) {
-            update()
-        }
-    }
-
-    /**
-     * Updates the lastPause value.
-     */
-    fun update() {
+    fun pauseUpdate() {
         MegaApplication.getPasscodeManagement().lastPause = System.currentTimeMillis()
     }
 

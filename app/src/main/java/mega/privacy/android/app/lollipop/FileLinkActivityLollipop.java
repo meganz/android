@@ -65,6 +65,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
@@ -677,6 +678,11 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				logDebug("e.getErrorCode() != MegaError.API_OK");
 				
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					if (api.isForeignNode(request.getParentHandle())) {
+						showForeignStorageOverQuotaWarningDialog(this);
+						return;
+					}
+
 					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(ACTION_OVERQUOTA_STORAGE);

@@ -630,7 +630,7 @@ class MediaPlayerServiceViewModel(
                 it.isFile && filterByNodeName(it.name)
             },
             {
-                val localPath = getLocalFile(context, it.name, it.size)
+                val localPath = getLocalFile(it)
                 if (isLocalFile(it, api, localPath)) {
                     mediaItemFromFile(File(localPath), it.handle.toString())
                 } else {
@@ -982,7 +982,9 @@ class MediaPlayerServiceViewModel(
             return
         }
 
-        if ((e.errorCode == MegaError.API_EOVERQUOTA && e.value != 0L) || e.errorCode == MegaError.API_EBLOCKED) {
+        if ((e.errorCode == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota && e.value != 0L)
+            || e.errorCode == MegaError.API_EBLOCKED
+        ) {
             _error.value = e.errorCode
         }
     }

@@ -24,7 +24,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.textFileEditor.TextFileEditorActivity
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -40,9 +40,10 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.EDIT_MODE
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.MODE
-import mega.privacy.android.app.textFileEditor.TextFileEditorViewModel.Companion.VIEW_MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
+import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -187,7 +188,7 @@ object MegaNodeUtil {
         onExportFinishedListener: ExportListener.OnExportFinishedListener?
     ) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
-            val path = getLocalFile(context, node.name, node.size)
+            val path = getLocalFile(node)
 
             if (!isTextEmpty(path) && !node.isFolder) {
                 shareFile(context, File(path))
@@ -214,7 +215,7 @@ object MegaNodeUtil {
         val downloadedFiles = ArrayList<File>()
 
         for (node in listNodes) {
-            val path = if (node.isFolder) null else getLocalFile(context, node.name, node.size)
+            val path = if (node.isFolder) null else getLocalFile(node)
 
             if (isTextEmpty(path)) {
                 return false
@@ -923,6 +924,7 @@ object MegaNodeUtil {
      * @param context Android context
      * @return whether this function call really starts SDK HTTP streaming server
      */
+    @JvmStatic
     fun setupStreamingServer(api: MegaApiAndroid, context: Context): Boolean {
         if (api.httpServerIsRunning() == 0) {
             api.httpServerStart()
@@ -1053,14 +1055,19 @@ object MegaNodeUtil {
     /**
      * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_MOVE.
      *
-     * @param requestCode requestCode parameter of onActivityResult
-     * @param resultCode resultCode parameter of onActivityResult
-     * @param data data parameter of onActivityResult
-     * @param snackbarShower interface to show snackbar
+     * @param context        Current Context.
+     * @param requestCode    RequestCode parameter of onActivityResult
+     * @param resultCode     ResultCode parameter of onActivityResult
+     * @param data           Data parameter of onActivityResult
+     * @param snackbarShower Interface to show snackbar
      */
     @JvmStatic
     fun handleSelectFolderToMoveResult(
-        requestCode: Int, resultCode: Int, data: Intent?, snackbarShower: SnackbarShower
+        context: Context,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower
     ): List<Long> {
         if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_MOVE
             || resultCode != RESULT_OK || data == null
@@ -1080,7 +1087,12 @@ object MegaNodeUtil {
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return emptyList()
 
-        val listener = MoveListener(snackbarShower)
+        val listener = MoveListener(snackbarShower) { _, isForeignOverQuota ->
+            if (isForeignOverQuota) {
+                showForeignStorageOverQuotaWarningDialog(context)
+            }
+        }
+
         val result = ArrayList<Long>()
 
         for (handle in moveHandles) {
@@ -1117,15 +1129,20 @@ object MegaNodeUtil {
     /**
      * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_COPY.
      *
-     * @param requestCode requestCode parameter of onActivityResult
-     * @param resultCode resultCode parameter of onActivityResult
-     * @param data data parameter of onActivityResult
-     * @param snackbarShower interface to show snackbar
-     * @param activityLauncher interface to start activity
+     * @param context          Current Context.
+     * @param requestCode      RequestCode parameter of onActivityResult
+     * @param resultCode       ResultCode parameter of onActivityResult
+     * @param data             Data parameter of onActivityResult
+     * @param snackbarShower   Interface to show snackbar
+     * @param activityLauncher Interface to start activity
      */
     @JvmStatic
     fun handleSelectFolderToCopyResult(
-        requestCode: Int, resultCode: Int, data: Intent?, snackbarShower: SnackbarShower,
+        context: Context,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower,
         activityLauncher: ActivityLauncher
     ): Boolean {
         if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_COPY
@@ -1146,7 +1163,7 @@ object MegaNodeUtil {
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return false
 
-        val listener = CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, megaApp)
+        val listener = CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, context)
 
         for (handle in copyHandles) {
             val node = megaApi.getNodeByHandle(handle)
@@ -1558,7 +1575,7 @@ object MegaNodeUtil {
         urlFileLink: String?,
         mode: String
     ) {
-        val textFileIntent = Intent(context, TextFileEditorActivity::class.java)
+        val textFileIntent = Intent(context, TextEditorActivity::class.java)
 
         if (adapterType == FILE_LINK_ADAPTER) {
             textFileIntent.putExtra(EXTRA_SERIALIZE_STRING, node.serialize())
