@@ -2664,7 +2664,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void bindContainsMetaMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         logDebug("bindContainsMetaMessage()");
-
         MegaChatMessage message = androidMessage.getMessage();
         MegaChatContainsMeta meta = message.getContainsMeta();
         if (meta == null) {
@@ -2756,7 +2755,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.urlOwnMessageDisableButtonsLayout.setVisibility(View.GONE);
 
                 checkEmojiSize(text, holder.urlOwnMessageText);
-                holder.urlOwnMessageText.setText(getFormattedText(text));
+                holder.urlOwnMessageText.setText(text);
 
                 holder.urlOwnMessageTitle.setVisibility(View.VISIBLE);
                 holder.urlOwnMessageTitle.setText(title);
@@ -2864,7 +2863,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 checkEmojiSize(text, holder.urlContactMessageText);
 
                 //Color always status SENT
-                holder.urlContactMessageText.setText(getFormattedText(text));
+                holder.urlContactMessageText.setText(text);
 
                     if (bitmapImage != null) {
                         holder.urlContactMessageImage.setImageBitmap(bitmapImage);
@@ -3245,7 +3244,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     public void bindMegaLinkMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         logDebug("bindMegaLinkMessage()");
-
         MegaChatMessage message = androidMessage.getMessage();
         MegaNode node = androidMessage.getRichLinkMessage().getNode();
 
@@ -3372,7 +3370,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
 
                 checkEmojiSize(messageContent, holder.urlOwnMessageText);
-                holder.urlOwnMessageText.setText(getFormattedText(messageContent));
+                holder.urlOwnMessageText.setText(messageContent);
             }
 
             holder.urlOwnMessageIconAndLinkLayout.setVisibility(View.VISIBLE);
@@ -3513,11 +3511,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 checkEmojiSize(messageContent, holder.urlContactMessageText);
 
             } else {
-                holder.urlContactMessageText.setText(getFormattedText(messageContent));
+                holder.urlContactMessageText.setText(messageContent);
             }
 
             checkEmojiSize(messageContent, holder.urlContactMessageText);
-            holder.urlContactMessageText.setText(getFormattedText(holder.urlContactMessageText.getText().toString()));
+            holder.urlContactMessageText.setText(holder.urlContactMessageText.getText().toString());
 
             holder.ownMessageLayout.setVisibility(View.GONE);
             holder.contactMessageLayout.setVisibility(View.VISIBLE);
@@ -3683,17 +3681,15 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             if (lastPosition == position) {
 
                 if (MegaChatApi.hasUrl(messageContent)) {
-
                     if(((ChatActivityLollipop)context).checkMegaLink(message)==-1) {
                         logDebug("Is a link - not from MEGA");
-
                         if (MegaApplication.isShowRichLinkWarning()) {
                             logWarning("SDK - show link rich warning");
                             if (((ChatActivityLollipop) context).showRichLinkWarning == RICH_WARNING_TRUE) {
                                 logWarning("ANDROID - show link rich warning");
 
                                 holder.urlOwnMessageLayout.setVisibility(View.VISIBLE);
-                                holder.urlOwnMessageText.setText(getFormattedText(messageContent));
+                                holder.urlOwnMessageText.setText(messageContent);
                                 holder.urlOwnMessageTitle.setVisibility(View.VISIBLE);
                                 holder.urlOwnMessageTitle.setText(context.getString(R.string.title_enable_rich_links));
                                 holder.urlOwnMessageTitle.setMaxLines(10);
@@ -3741,7 +3737,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 logWarning("ANDROID - show link disable rich link confirmation");
 
                                 holder.urlOwnMessageLayout.setVisibility(View.VISIBLE);
-                                holder.urlOwnMessageText.setText(getFormattedText(messageContent));
+                                holder.urlOwnMessageText.setText(messageContent);
                                 holder.urlOwnMessageTitle.setVisibility(View.VISIBLE);
                                 holder.urlOwnMessageTitle.setText(context.getString(R.string.title_confirmation_disable_rich_links));
                                 holder.urlOwnMessageTitle.setMaxLines(10);
@@ -3894,7 +3890,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 checkEmojiSize(messageContent, holder.contentOwnMessageText);
                 ((ViewHolderMessageChat) holder).contentOwnMessageText.setTextColor(Color.WHITE);
                 ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinkTextColor(Color.WHITE);
-                holder.contentOwnMessageText.setText(getFormattedText(messageContent));
+
+                if (!MegaChatApi.hasUrl(messageContent)) {
+                    holder.contentOwnMessageText.setText(getFormattedText(messageContent));
+                } else {
+                    holder.contentOwnMessageText.setText(messageContent);
+                }
+
                 if (isOnline(context)) {
                     if(isMultipleSelect()){
                         holder.contentOwnMessageText.setLinksClickable(false);
@@ -3943,13 +3945,13 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.layoutAvatarMessages.setVisibility(View.GONE);
             }
 
+            String messageContent = "";
+            if (message.getContent() != null) {
+                messageContent = converterShortCodes(message.getContent());
+            }
+
             if (message.isEdited()) {
                 logDebug("Message is edited");
-
-                String messageContent = "";
-                if (message.getContent() != null) {
-                    messageContent = converterShortCodes(message.getContent());
-                }
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setVisibility(View.VISIBLE);
                 ((ViewHolderMessageChat) holder).urlContactMessageLayout.setVisibility(View.GONE);
 
@@ -4035,8 +4037,6 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.GONE);
                 ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.VISIBLE);
 
-                String messageContent = "";
-
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setVisibility(View.VISIBLE);
 
                 ((ViewHolderMessageChat) holder).contentContactMessageAttachLayout.setVisibility(View.GONE);
@@ -4044,17 +4044,17 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                 ((ViewHolderMessageChat) holder).contentContactMessageContactLayout.setVisibility(View.GONE);
 
-
-                if (message.getContent() != null) {
-                    messageContent = message.getContent();
-                }
-
                 checkEmojiSize(messageContent, holder.contentContactMessageText);
 
                 //Color always status SENT
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ContextCompat.getColor(context, R.color.grey_087_white));
                 ((ViewHolderMessageChat) holder).contentContactMessageText.setLinkTextColor(ContextCompat.getColor(context, R.color.grey_087_white));
-                holder.contentContactMessageText.setText(getFormattedText(messageContent));
+
+                if (!MegaChatApi.hasUrl(messageContent)) {
+                    holder.contentContactMessageText.setText(getFormattedText(messageContent));
+                } else {
+                    holder.contentContactMessageText.setText(messageContent);
+                }
 
                 if (isOnline(context)) {
                     if(isMultipleSelect()){
