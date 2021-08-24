@@ -16,6 +16,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.middlelayer.BuildFlavorHelper;
+import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -298,6 +299,8 @@ public class PushMessageHanlder implements MegaRequestListenerInterface, MegaCha
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             if (e.getErrorCode() == MegaError.API_OK) {
+                SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
+
                 logDebug("OK fetch nodes");
                 logDebug("Chat --> connectInBackground");
                 megaChatApi.connectInBackground(this);

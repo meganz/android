@@ -19,6 +19,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -235,6 +236,7 @@ public class IncomingCallService extends Service implements MegaRequestListenerI
             }
         } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
             if (e.getErrorCode() == MegaError.API_OK) {
+                SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
                 logDebug("OK fetch nodes");
                 logDebug("Chat --> connectInBackground");
                 megaChatApi.connectInBackground(this);

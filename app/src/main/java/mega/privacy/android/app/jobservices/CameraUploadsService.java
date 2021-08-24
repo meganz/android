@@ -53,6 +53,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.JobUtil;
+import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1393,6 +1394,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (e.getErrorCode() == MegaError.API_OK) {
                 logDebug("fetch nodes ok");
                 megaChatApi.connectInBackground(this);
+                SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
                 setLoginState(false);
                 logDebug("Start service here MegaRequest.TYPE_FETCH_NODES");
                 startWorkerThread();

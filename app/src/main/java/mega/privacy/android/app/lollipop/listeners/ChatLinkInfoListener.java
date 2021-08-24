@@ -8,6 +8,7 @@ import java.io.File;
 
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
+import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
@@ -102,6 +103,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
             else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
                 MegaNode rootNode = megaApiFolder.getRootNode();
                 if (rootNode != null) {
+                    SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
 
                     if (!request.getFlag()) {
 
