@@ -34,7 +34,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections

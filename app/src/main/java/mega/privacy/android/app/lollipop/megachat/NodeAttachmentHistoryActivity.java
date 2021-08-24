@@ -536,7 +536,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
                             mediaIntent.putExtra("FILENAME", node.getName());
 
-                            String localPath = getLocalFile(this, node.getName(), node.getSize());
+                            String localPath = getLocalFile(node);
 
                             if (localPath != null) {
                                 File mediaFile = new File(localPath);
@@ -626,7 +626,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
                             pdfIntent.putExtra("FILENAME", node.getName());
 
-                            String localPath = getLocalFile(this, node.getName(), node.getSize());
+                            String localPath = getLocalFile(node);
                             if (localPath != null) {
                                 File mediaFile = new File(localPath);
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && localPath.contains(Environment.getExternalStorageDirectory().getPath())) {

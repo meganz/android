@@ -12,7 +12,7 @@ open class PasscodeFileProviderActivity: AppCompatActivity() {
     lateinit var passcodeUtil: PasscodeUtil
 
     override fun onPause() {
-        passcodeUtil.pause()
+        passcodeUtil.pauseUpdate()
         super.onPause()
     }
 

@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.view.ViewPropertyAnimator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Observer
@@ -27,6 +28,7 @@ import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.EventConstants.EVENT_PERFORM_SCROLL
 import mega.privacy.android.app.databinding.ActivityTextFileEditorBinding
+import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
@@ -35,6 +37,7 @@ import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MO
 import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
+import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
@@ -49,7 +52,7 @@ import nz.mega.sdk.MegaShare
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
-class TextEditorActivity : PasscodeActivity(), SnackbarShower {
+class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
     companion object {
         private const val SCROLL_TEXT = "SCROLL_TEXT"
@@ -75,6 +78,15 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
     private var currentUIState = STATE_SHOWN
     private var animator: ViewPropertyAnimator? = null
     private var countDownTimer: CountDownTimer? = null
+
+    private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
+    private val toolbarElevationColor by lazy { getColorForElevation(this, elevation) }
+    private val transparentColor by lazy {
+        ContextCompat.getColor(
+            this,
+            android.R.color.transparent
+        )
+    }
 
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
@@ -146,7 +158,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onDestroy() {
-        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java).removeObserver(performScrollObserver)
+        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java)
+            .removeObserver(performScrollObserver)
 
         if (isDiscardChangesConfirmationDialogShown()) {
             discardChangesDialog?.dismiss()
@@ -277,7 +290,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
                     menu.findItem(R.id.action_share).isVisible = true
                     updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
-                FOLDER_LINK_ADAPTER -> {
+                FOLDER_LINK_ADAPTER, VERSIONS_ADAPTER -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
                     updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
@@ -422,15 +435,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
         ListenScrollChangesHelper().addViewToListen(
             binding.fileEditorScrollView
         ) { _, _, _, _, _ ->
-            val scrolling = binding.fileEditorScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
-
-            binding.fileEditorToolbar.elevation = if (scrolling) {
-                dp2px(4F, resources.displayMetrics).toFloat()
-            } else 0F
-
+            checkScroll()
             hideUI()
             animatePaginationUI()
-            changeStatusBarColorForElevation(this, scrolling)
         }
     }
 
@@ -439,7 +446,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
         viewModel.getFileName().observe(this, ::showFileName)
         viewModel.getMode().observe(this, ::showMode)
         viewModel.onContentTextRead().observe(this, ::showContentRead)
-        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java).observeForever(performScrollObserver)
+
+        LiveEventBus.get(EVENT_PERFORM_SCROLL, Int::class.java)
+            .observeForever(performScrollObserver)
     }
 
     /**
@@ -539,6 +548,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
         if (viewModel.canShowEditFab() && currentUIState == STATE_SHOWN) {
             binding.editFab.show()
         }
+
+        checkScroll()
     }
 
     /**
@@ -796,5 +807,29 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower {
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.textFileEditorContainer, content, chatId)
+    }
+
+    override fun checkScroll() {
+        if (!this::binding.isInitialized) {
+            return
+        }
+
+        val scrolling = binding.fileEditorScrollView.canScrollVertically(SCROLLING_UP_DIRECTION)
+
+        when {
+            !scrolling -> {
+                binding.fileEditorToolbar.setBackgroundColor(transparentColor)
+                binding.appBar.elevation = 0f
+            }
+            isDarkMode(this) -> {
+                binding.fileEditorToolbar.setBackgroundColor(toolbarElevationColor)
+            }
+            else -> {
+                binding.fileEditorToolbar.setBackgroundColor(transparentColor)
+                binding.appBar.elevation = elevation
+            }
+        }
+
+        changeStatusBarColorForElevation(this, scrolling)
     }
 }

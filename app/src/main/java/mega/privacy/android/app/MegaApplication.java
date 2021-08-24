@@ -767,7 +767,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
-        passcodeManagement = new PasscodeManagement(null, 0, true);
+        passcodeManagement = new PasscodeManagement(0, true);
         chatManagement = new ChatManagement();
 
 		//Logout check resumed pending transfers

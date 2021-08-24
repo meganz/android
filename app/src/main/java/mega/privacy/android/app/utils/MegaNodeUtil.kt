@@ -188,7 +188,7 @@ object MegaNodeUtil {
         onExportFinishedListener: ExportListener.OnExportFinishedListener?
     ) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
-            val path = getLocalFile(context, node.name, node.size)
+            val path = getLocalFile(node)
 
             if (!isTextEmpty(path) && !node.isFolder) {
                 shareFile(context, File(path))
@@ -215,7 +215,7 @@ object MegaNodeUtil {
         val downloadedFiles = ArrayList<File>()
 
         for (node in listNodes) {
-            val path = if (node.isFolder) null else getLocalFile(context, node.name, node.size)
+            val path = if (node.isFolder) null else getLocalFile(node)
 
             if (isTextEmpty(path)) {
                 return false
@@ -924,6 +924,7 @@ object MegaNodeUtil {
      * @param context Android context
      * @return whether this function call really starts SDK HTTP streaming server
      */
+    @JvmStatic
     fun setupStreamingServer(api: MegaApiAndroid, context: Context): Boolean {
         if (api.httpServerIsRunning() == 0) {
             api.httpServerStart()
