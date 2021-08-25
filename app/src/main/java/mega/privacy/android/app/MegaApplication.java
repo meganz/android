@@ -1613,7 +1613,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		//Show missed call if time out ringing (for incoming calls)
 		try {
 			if(termCode == MegaChatCall.TERM_CODE_ERROR && !isIgnored){
-				if (megaApi.isChatNotifiable(chatId)) {
+				MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+				if (chatRoom != null && !chatRoom.isGroup() && !chatRoom.isMeeting() && megaApi.isChatNotifiable(chatId)) {
 					logDebug("localTermCodeNotLocal");
 					try {
 						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
