@@ -182,9 +182,20 @@ public class ChatManagement {
         notificationShown.add(chatId);
     }
 
+    public void removeNotificationShown(long chatId) {
+        notificationShown.remove(chatId);
+    }
+
+    public boolean isNotificationShown(long chatId) {
+        if (notificationShown.isEmpty())
+            return false;
+
+        return notificationShown.contains(chatId);
+    }
+
     public void removeActiveChatAndNotificationShown(long chatId) {
         currentActiveGroupChat.remove(chatId);
-        notificationShown.remove(chatId);
+        removeNotificationShown(chatId);
     }
 
     public void removeStatusVideoAndSpeaker(long chatId) {
@@ -220,21 +231,22 @@ public class ChatManagement {
      * @param chatId The chat ID
      */
     public void checkToShowIncomingGroupCallNotification(MegaChatCall call, long chatId) {
-        if (!call.isRinging() && (notificationShown.isEmpty() || !notificationShown.contains(chatId))) {
-            MegaChatRoom chatRoom = app.getMegaChatApi().getChatRoom(chatId);
-            if (chatRoom == null) {
-                logError("Chat is null");
-                return;
-            }
+        if(call.isRinging() || isNotificationShown(chatId))
+            return;
 
-            if (isOpeningMeetingLink(chatId)) {
-                logDebug("Opening meeting link, don't show notification");
-                return;
-            }
-
-            logDebug("Show incoming call notification");
-            app.createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-            app.showGroupCallNotification(chatId);
+        MegaChatRoom chatRoom = app.getMegaChatApi().getChatRoom(chatId);
+        if (chatRoom == null) {
+            logError("Chat is null");
+            return;
         }
+
+        if (isOpeningMeetingLink(chatId)) {
+            logDebug("Opening meeting link, don't show notification");
+            return;
+        }
+
+        logDebug("Show incoming call notification");
+        app.createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
+        app.showGroupCallNotification(chatId);
     }
 }

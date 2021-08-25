@@ -615,6 +615,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 				logDebug("Call has ended");
 				getChatManagement().setOpeningMeetingLink(chatId, false);
+				getChatManagement().removeNotificationShown(chatId);
 				int termCode = call.getTermCode();
 				boolean isIgnored = call.isIgnored();
 				checkCallDestroyed(chatId, callId, termCode, isIgnored);

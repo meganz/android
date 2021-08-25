@@ -1255,7 +1255,7 @@ public class CallUtil {
      * @param callStatus   Call Status
      */
     public static void incomingCall(MegaHandleList listAllCalls, long chatId, int callStatus) {
-        if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(chatId))
+        if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(chatId) || MegaApplication.getChatManagement().isNotificationShown(chatId))
             return;
 
         MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
