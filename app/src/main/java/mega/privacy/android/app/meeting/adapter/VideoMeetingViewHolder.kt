@@ -96,11 +96,11 @@ class VideoMeetingViewHolder(
             binding.name.isVisible = false
         }
 
-        initAvatar(participant)
-
         if (!isGrid) {
             inMeetingViewModel.addParticipantVisible(participant)
         }
+
+        initAvatar(participant)
 
         if (isGrid || isDrawing) {
             inMeetingViewModel.getSession(participant.clientId)?.let {
@@ -774,10 +774,10 @@ class VideoMeetingViewHolder(
 
         isDrawing = false
         inMeetingViewModel.getParticipant(peerId, clientId)?.let { participant ->
+            inMeetingViewModel.removeParticipantVisible(participant)
+
             if (participant.isVideoOn) {
                 logDebug("Recycle participant in the list, participant clientId is ${participant.clientId}")
-
-                inMeetingViewModel.removeParticipantVisible(participant)
                 participant.videoListener?.let {
                     removeResolutionAndListener(participant)
                 }

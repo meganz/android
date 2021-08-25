@@ -1384,6 +1384,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to remove all child fragments
      */
     private fun removeAllFragments() {
+        inMeetingViewModel.removeAllParticipantVisible()
         logDebug("Remove all fragments")
         floatingWindowFragment?.let {
             if (it.isAdded) {
@@ -1586,6 +1587,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         status = TYPE_IN_SPEAKER_VIEW
         checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
+        inMeetingViewModel.removeAllParticipantVisible()
+
         gridViewCallFragment?.let {
             if (it.isAdded) {
                 it.removeTextureView()
@@ -1624,6 +1627,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Show group call - Grid View UI")
         status = TYPE_IN_GRID_VIEW
         checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
+
+        inMeetingViewModel.removeAllParticipantVisible()
 
         speakerViewCallFragment?.let {
             if (it.isAdded) {
@@ -2463,11 +2468,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     override fun onEndMeeting() {
         if (inMeetingViewModel.isOneToOneCall() || inMeetingViewModel.isGroupCall()) {
             logDebug("End the one to one or group call")
-            disableCamera()
-            inMeetingViewModel.leaveMeeting()
+            leaveMeeting()
             checkIfAnotherCallShouldBeShown()
         } else if (inMeetingViewModel.shouldAssignModerator()) {
-            disableCamera()
             EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId())
                 .run {
                     setAssignCallBack(showAssignModeratorFragment)
@@ -2508,6 +2511,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun leaveMeeting() {
         logDebug("Leaving meeting")
+        disableCamera()
         removeUI()
 
         inMeetingViewModel.leaveMeeting()

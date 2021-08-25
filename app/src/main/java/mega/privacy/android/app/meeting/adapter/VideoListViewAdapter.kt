@@ -2,6 +2,7 @@ package mega.privacy.android.app.meeting.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
@@ -23,7 +24,23 @@ class VideoListViewAdapter(
         if (holder.adapterPosition == INVALID_POSITION)
             return
 
-        holder.onRecycle()
+        val manager: RecyclerView.LayoutManager? = listView.layoutManager
+        if (manager is LinearLayoutManager) {
+            val firstPositionVisible = manager.findFirstVisibleItemPosition()
+            val lastPositionVisible = manager.findLastVisibleItemPosition() + 1
+            if (!currentList.isNullOrEmpty()) {
+                val iterator = currentList.iterator()
+                iterator.forEach { participant ->
+                    val position = getParticipantPosition(participant.peerId, participant.clientId)
+                    if (position == holder.adapterPosition) {
+                        if (position < firstPositionVisible || position > lastPositionVisible) {
+                            holder.onRecycle()
+                            return@forEach
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun getParticipantPosition(peerId: Long, clientId: Long) =
@@ -215,5 +232,10 @@ class VideoListViewAdapter(
             holder.removeResolutionAndListener(participant)
             return
         }
+
+        participant.videoListener?.let {
+            inMeetingViewModel.removeResolutionAndListener(participant, it)
+        }
+        participant.videoListener = null
     }
 }

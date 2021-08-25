@@ -69,7 +69,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             isFirsTime = false
             adapter.submitList(null)
             adapter.submitList(participants)
-            updateVisibleParticipantsSpeakerView(participants)
         }
     }
 
@@ -136,7 +135,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         logDebug("View created and participants added")
         adapter.submitList(null)
         adapter.submitList(participants)
-        updateVisibleParticipantsSpeakerView(participants)
         listView.adapter = adapter
 
         observeViewModel()
@@ -188,14 +186,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 }
             })
     }
-
-    /**
-     * Method that updates the number of participants visible on the recyclerview
-     *
-     * @param list list of participants
-     */
-    private fun updateVisibleParticipantsSpeakerView(list: List<Participant>) =
-        inMeetingViewModel.updateVisibleParticipants(list)
 
     /**
      * Method for selecting a new speaker
