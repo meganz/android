@@ -182,8 +182,6 @@ class InMeetingRepository @Inject constructor(
             return
 
         megaChatApi.setIgnoredCall(chatId)
-        MegaApplication.getInstance().stopSounds()
-        CallUtil.clearIncomingCallNotification(chatId)
     }
 
     /**
@@ -308,9 +306,9 @@ class InMeetingRepository @Inject constructor(
         listener: MegaChatVideoListenerInterface
     ) {
         if (hiRes) {
-            logDebug("Add Chat remote video listener of client $clientId , with HiRes")
+            logDebug("***************+ Add Chat remote video listener of client $clientId , with HiRes")
         } else {
-            logDebug("Add Chat remote video listener of client $clientId , with LowRes")
+            logDebug("***************+ Add Chat remote video listener of client $clientId , with LowRes")
         }
         megaChatApi.addChatRemoteVideoListener(chatId, clientId, hiRes, listener)
     }
@@ -330,9 +328,9 @@ class InMeetingRepository @Inject constructor(
         listener: MegaChatVideoListenerInterface
     ) {
         if (hiRes) {
-            logDebug("Remove Chat remote video listener of client $clientId, with HiRes")
+            logDebug("***************+ Remove Chat remote video listener of client $clientId, with HiRes")
         } else {
-            logDebug("Remove Chat remote video listener of client $clientId, with LowRes")
+            logDebug("***************+ Remove Chat remote video listener of client $clientId, with LowRes")
         }
         megaChatApi.removeChatVideoListener(chatId, clientId, hiRes, listener)
     }
@@ -349,7 +347,7 @@ class InMeetingRepository @Inject constructor(
         clientId: Long,
         listener: MegaChatRequestListenerInterface
     ) {
-        logDebug("Request HiRes video of client $clientId")
+        logDebug("***************+ Request HiRes video of client $clientId")
         megaChatApi.requestHiResVideo(chatId, clientId, listener)
     }
 
@@ -365,7 +363,7 @@ class InMeetingRepository @Inject constructor(
         clientId: MegaHandleList,
         listener: MegaChatRequestListenerInterface
     ) {
-        logDebug("Stop HiRes video of client  ${clientId[0]}")
+        logDebug("***************+ Stop HiRes video of client  ${clientId[0]}")
         megaChatApi.stopHiResVideo(chatId, clientId, listener)
     }
 
@@ -381,7 +379,7 @@ class InMeetingRepository @Inject constructor(
         clientId: MegaHandleList,
         listener: MegaChatRequestListenerInterface
     ) {
-        logDebug("Request LowRes video of client ${clientId[0]}")
+        logDebug("***************+ Request LowRes video of client ${clientId[0]}")
         megaChatApi.requestLowResVideo(chatId, clientId, listener)
     }
 
@@ -397,7 +395,7 @@ class InMeetingRepository @Inject constructor(
         clientId: MegaHandleList,
         listener: MegaChatRequestListenerInterface
     ) {
-        logDebug("Stop LowRes video of client  ${clientId[0]}")
+        logDebug("***************+ Stop LowRes video of client  ${clientId[0]}")
         megaChatApi.stopLowResVideo(chatId, clientId, listener)
     }
 

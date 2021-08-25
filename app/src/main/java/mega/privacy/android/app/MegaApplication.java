@@ -579,7 +579,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		stopService(new Intent(getInstance(), IncomingCallService.class));
 
-		logDebug("Call status is " + callStatusToString(callStatus)+", chat id is "+chatId);
+		logDebug("Call status is " + callStatusToString(callStatus)+", chat id is "+chatId+", call id is "+callId);
 		switch (callStatus) {
 			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
 			case MegaChatCall.CALL_STATUS_JOINING:
@@ -600,9 +600,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				}
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
-					getChatManagement().setNotificationShown(chatId);
+					getChatManagement().addNotificationShown(chatId);
 					logDebug("Is ongoing call");
-					ongoingCall(chatId, (isOutgoing && getChatManagement().isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
+					ongoingCall(chatId, callId, (isOutgoing && getChatManagement().isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
 				}
 				break;
 
@@ -1377,7 +1377,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	 */
 	public void showGroupCallNotification(long chatId) {
 		logDebug("Show group call notification: chatId = "+chatId);
-		getChatManagement().setNotificationShown(chatId);
+		getChatManagement().addNotificationShown(chatId);
 		stopService(new Intent(this, IncomingCallService.class));
 		ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 		notificationBuilder.checkOneGroupCall(chatId);
@@ -1605,11 +1605,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (shouldNotify(this)) {
 			toSystemSettingNotification(this);
 		}
+
 		cancelIncomingCallNotification(this);
 		if (wakeLock != null && wakeLock.isHeld()) {
 			wakeLock.release();
 		}
-
 		clearIncomingCallNotification(callId);
 		//Show missed call if time out ringing (for incoming calls)
 		try {

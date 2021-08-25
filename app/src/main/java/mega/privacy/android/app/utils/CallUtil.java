@@ -1102,7 +1102,7 @@ public class CallUtil {
      * @param callIdIncomingCall The call ID
      */
     public static void clearIncomingCallNotification(long callIdIncomingCall) {
-        logDebug("Clear the notification in chat: " + callIdIncomingCall);
+        logDebug("Clear the notification in call: " + callIdIncomingCall);
         if (callIdIncomingCall == MEGACHAT_INVALID_HANDLE)
             return;
 
@@ -1255,7 +1255,8 @@ public class CallUtil {
      * @param callStatus   Call Status
      */
     public static void incomingCall(MegaHandleList listAllCalls, long chatId, int callStatus) {
-        if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(chatId) || MegaApplication.getChatManagement().isNotificationShown(chatId))
+        if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(chatId) ||
+                MegaApplication.getChatManagement().isNotificationShown(chatId))
             return;
 
         MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
@@ -1274,9 +1275,10 @@ public class CallUtil {
      * Method that performs the necessary actions when there is an outgoing call or incoming call.
      *
      * @param chatId           Chat ID
+     * @param callId           Call ID
      * @param typeAudioManager audio Manager type
      */
-    public static void ongoingCall(long chatId, int typeAudioManager) {
+    public static void ongoingCall(long chatId, long callId, int typeAudioManager) {
         AppRTCAudioManager rtcAudioManager = MegaApplication.getInstance().getAudioManager();
         if (rtcAudioManager != null && rtcAudioManager.getTypeAudioManager() == typeAudioManager)
             return;
@@ -1289,7 +1291,7 @@ public class CallUtil {
 
         logDebug("Controlling outgoing/in progress call");
         if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING && chatRoom.isMeeting()) {
-            clearIncomingCallNotification(chatId);
+            clearIncomingCallNotification(callId);
             typeAudioManager = AUDIO_MANAGER_CALL_IN_PROGRESS;
         }
 

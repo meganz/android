@@ -1315,6 +1315,16 @@ class InMeetingViewModel @ViewModelInject constructor(
     }
 
     /**
+     * Method for remove incoming call notification
+     */
+    fun removeIncomingCallNotification(chatId: Long) {
+        inMeetingRepository.getMeeting(chatId)?.let { call ->
+            MegaApplication.getInstance().stopSounds()
+            CallUtil.clearIncomingCallNotification(call.callId)
+        }
+    }
+
+    /**
      * Method to hang up a specific call
      *
      * @param callId Call ID

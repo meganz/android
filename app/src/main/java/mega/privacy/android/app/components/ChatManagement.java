@@ -178,12 +178,17 @@ public class ChatManagement {
         }
     }
 
-    public void setNotificationShown(long chatId) {
+    public void addNotificationShown(long chatId) {
+        if (isNotificationShown(chatId))
+            return;
+
         notificationShown.add(chatId);
     }
 
     public void removeNotificationShown(long chatId) {
-        notificationShown.remove(chatId);
+        if (isNotificationShown(chatId)) {
+            notificationShown.remove(chatId);
+        }
     }
 
     public boolean isNotificationShown(long chatId) {
