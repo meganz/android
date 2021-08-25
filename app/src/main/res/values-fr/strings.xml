@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l’utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n’importe quand, de n’importe quel appareil, n’importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre clé de récupération) ou vous perdrez l’accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l’utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur disque nuagique MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 50&#160;Go à tous les utilisateurs inscrits, avec des primes d’objectif, et propose des abonnements payants avec des limites beaucoup plus élevées&#160;: \n\n\nAbonnement Pro Léger&#160;: 4,99&#160;€ (4,99&#160;USD) par mois ou 49,99&#160;€ (49,99&#160;USD) par an vous donne 400&#160;Go d’espace de stockage et 1&#160;To de quota de transfert par mois.\nAbonnement Pro I&#160;: 9,99&#160;€ (9,99&#160;USD) par mois ou 99,99&#160;€ (99,99&#160;USD) par an vous donne 2&#160;To d’espace de stockage et 2&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;II&#160;: 19,99&#160;€ (19,99&#160;USD) par mois ou 199,99&#160;€ (199,99&#160;USD) par an vous donne 8&#160;To d’espace de stockage et 8&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;III&#160;: 29,99&#160;€ (29,99&#160;USD) par mois ou 299,99&#160;€ (299,99&#160;USD) par an vous donne 16&#160;To d’espace de stockage et 16&#160;To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes d’abonnement successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, cliquez simplement sur l’icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n’est pas déjà fait) et cliquez sur l’appli MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l’appli&#160;: \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -&gt; Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -&gt; Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -&gt; Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -&gt; MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur&#160;: https://github.com/meganz/android \n\nPour de plus amples renseignements, veuillez visiter notre site Web&#160;: \nhttps://mega.nz/terms \n\n\nOrdinateur – https://mega.nz/</string>
+    <string name="full_description_text">MEGA offre un service de stockage nuagique et un système de dialogue en ligne chiffrés, contrôlés par l’utilisateur, en utilisant des navigateurs Web normaux, mais aussi des applis dédiées pour les appareils mobiles. Contrairement aux autres fournisseurs de service de stockage nuagique, vos données sont seulement chiffrées et déchiffrées par vos appareils client et jamais par nous.\n\nTéléversez vos fichiers de votre téléphone intelligent ou tablette, puis recherchez, stockez, téléchargez, lisez en continu, visualisez, partagez, renommez ou supprimez vos fichiers n’importe quand, de n’importe quel appareil, n’importe où. Partagez des dossiers avec vos contacts et suivez leurs modifications en temps réel. Le processus de chiffrement implique que nous ne pouvons ni accéder à votre mot de passe ni le réinitialiser. Vous DEVEZ donc le mémoriser (à moins que vous ayez sauvegardé votre Clé de récupération) ou vous perdrez l’accès à vos fichiers stockés.\n\nLe système de dialogue vidéo de MEGA, chiffré de bout en bout par l’utilisateur, permet une confidentialité totale et est proposé pour les navigateurs depuis 2016. Le service a été étendu à notre appli&#160;MEGA mobile, avec un historique des conversations accessible à partir de plusieurs appareils. Les utilisateurs peuvent aussi facilement ajouter des fichiers à une conversation à partir de leur Disque nuagique&#160;MEGA.\n\nMEGA offre un généreux espace de stockage gratuit de 20&#160;Go à tous les utilisateurs inscrits, avec des primes d’objectif, et propose des abonnements payants avec des limites beaucoup plus élevées&#160;: \n\n\nAbonnement Pro Léger&#160;: 4,99&#160;€ (4,99&#160;USD) par mois ou 49,99&#160;€ (49,99&#160;USD) par an vous donne 400&#160;Go d’espace de stockage et 1&#160;To de quota de transfert par mois.\nAbonnement Pro I&#160;: 9,99&#160;€ (9,99&#160;USD) par mois ou 99,99&#160;€ (99,99&#160;USD) par an vous donne 2&#160;To d’espace de stockage et 2&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;II&#160;: 19,99&#160;€ (19,99&#160;USD) par mois ou 199,99&#160;€ (199,99&#160;USD) par an vous donne 8&#160;To d’espace de stockage et 8&#160;To de quota de transfert par mois.\nAbonnement Pro&#160;III&#160;: 29,99&#160;€ (29,99&#160;USD) par mois ou 299,99&#160;€ (299,99&#160;USD) par an vous donne 16&#160;To d’espace de stockage et 16&#160;To de quota de transfert par mois.\n\nLes abonnements sont renouvelés automatiquement pour les périodes successives de même durée et au même tarif que la période initiale choisie. Pour gérer vos abonnements, touchez simplement l’icône du magasin Play Store de Google sur votre appareil, connectez-vous avec votre identifiant Google (si ce n’est pas déjà fait). Puis touchez l’appli&#160;MEGA. Vous pourrez y gérer votre abonnement.\n\nPermissions de l’appli&#160;: \nWRITE_EXTERNAL_STORAGE (écriture sur la mémoire externe) -&gt; Télécharger vos fichiers de MEGA vers votre appareil et téléverser des fichiers de votre appareil vers MEGA\nCAMERA (appareil photo) -&gt; Prendre des photos et en téléverser vers MEGA\nREAD_CONTACTS (lire les contacts) -&gt; Ajouter facilement des contacts de votre appareil comme contacts MEGA\nRECORD_AUDIO et CAPTURE_VIDEO_OUTPUT (enregistrer du son et capturer la sortie vidéo, micro et appareil photo) -&gt; MEGA offre des appels audio et vidéo chiffrés de bout en bout\n\n\nPour augmenter la confiance des utilisateurs dans le système MEGA, tout le code côté client est publié afin que les chercheurs en matière de sécurité intéressés puissent évaluer le processus de chiffrement. Le code de notre appli mobile se trouve sur&#160;: https://github.com/meganz/android \n\nPour de plus amples renseignements, veuillez visiter notre site Web&#160;: \nhttps://mega.nz/terms \n\n\nOrdinateur – https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA, le service de stockage nuagique qui protège vos données personnelles en tout temps.</string>
+    <string name="short_description_text">Confidentialité et sécurité en tout temps avec le stockage nuagique MEGA.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro léger</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -95,7 +95,7 @@
     <!-- On clicking menu item upload in a incoming shared folder read only -->
     <string name="no_permissions_upload">Ce dossier est en lecture seulement. Vous n’avez pas le droit de téléverser</string>
     <!-- confirmation message before removing the previously downloaded MasterKey file -->
-    <string name="remove_key_confirmation">Vous êtes en train de supprimer le fichier de clé de récupération exporté précédemment</string>
+    <string name="remove_key_confirmation">Vous êtes en train de supprimer le fichier de Clé de récupération exporté précédemment</string>
     <!-- confirmation message before sending an invitation to a contact -->
     <string name="confirmation_add_contact">Voulez-vous envoyer une invitation à %s ?</string>
     <!-- Button where the user can sign off or logout -->
@@ -137,7 +137,7 @@
     <!-- Menu item to change from grid view to list view -->
     <string name="action_list">Vue en liste</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="action_export_master_key">Sauvegarder la clé de récupération</string>
+    <string name="action_export_master_key">Sauvegarder la Clé de récupération</string>
     <!-- Menu item to let the user cancel subscriptions -->
     <string name="action_cancel_subscriptions">Annuler l’abonnement</string>
     <!-- success message when the subscription has been canceled correctly -->
@@ -193,7 +193,7 @@
     <!-- when the user tries to log in to MEGA without a valid session -->
     <string name="error_server_expired_session">Vous avez été déconnecté de cet appareil d’un autre endroit</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">Calcul des clés de chiffrement</string>
+    <string name="login_generating_key">Génération des clés de chiffrement</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">Connexion au serveur</string>
     <!-- Status text when updating the file manager -->
@@ -219,7 +219,7 @@
     <!--  -->
     <string name="tour_access_title">L’accès MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 20&#160;Go+ d’espace de stockage gratuit</string>
+    <string name="tour_space_text">Inscrivez-vous maintenant et obtenez 20&#160;Go d’espace de stockage gratuit</string>
     <!--  -->
     <string name="tour_speed_text">Les téléversements sont rapides. Partagez rapidement des fichiers avec tout le monde</string>
     <!--  -->
@@ -292,9 +292,9 @@
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">Contacts [A](%1$d)[/A]</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
-    <string name="sent_requests_empty">[B]Il n’y a aucune [/B][A]demande envoyée[/A]</string>
+    <string name="sent_requests_empty">[B]Aucune [/B][A]demande envoyée[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
-    <string name="received_requests_empty">[B]Il n’y a aucune [/B][A]demande reçue[/A]</string>
+    <string name="received_requests_empty">[B]Aucune [/B][A]demande reçue[/A]</string>
     <!-- Title for the file transfer screen (with the up & download) -->
     <string name="section_transfers">Transferts</string>
     <!-- Section name for the “My Account” section.Preferably one or two words. There is little space for this. -->
@@ -312,7 +312,7 @@
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Partages entrants avec</string>
     <!-- message when there are no files in the Cloud drive -->
-    <string name="file_browser_empty_cloud_drive">Aucun fichier dans votre disque nuagique</string>
+    <string name="file_browser_empty_cloud_drive">Aucun fichier dans votre Disque nuagique</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Le dossier est vide</string>
     <!-- Title of the fragment Choose Account -->
@@ -398,7 +398,7 @@
     <string name="intent_not_available">Aucune appli installée sur votre appareil ne peut exécuter ce fichier</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">Aucune appli n’est proposée sur votre appareil pour ouvrir cette position</string>
-    <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Il semble qu’aucune appli n’est installée qui prenne ce type de fichier en charge</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
     <string name="context_share_image">Partager l’image avec</string>
@@ -531,10 +531,6 @@
     <string name="number_incorrectly_moved">%d éléments ont été déplacés avec succès</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">A été déplacé vers la corbeille avec succès</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved_to_rubbish">%d éléments ont été déplacés avec succès vers la corbeille.</string>
-    <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved_to_rubbish">&#160;et %d éléments n’ont pas été envoyé avec succès</string>
     <!-- error message -->
     <string name="context_no_moved">Erreur. N’a pas été déplacé</string>
     <!-- success message when sharing a folder -->
@@ -606,7 +602,7 @@
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Vous êtes sur le point d’annuler votre abonnement MEGA. Si nous pouvons faire quoi que ce soit pour vous faire changer d’idée, n’hésitez pas à nous le communiquer.</string>
     <!-- hint cancel subscriptions dialog -->
-    <string name="hint_cancel_subscriptions">Rédigez votre commentaire ici</string>
+    <string name="hint_cancel_subscriptions">Rédigez votre rétroaction ici</string>
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Envoyer</string>
     <!-- confirmation cancel subscriptions dialog -->
@@ -687,7 +683,7 @@
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Confirmer le nouveau mot de passe</string>
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
-    <string name="my_account_change_password_dont_match">Le mot de passe ne correspond pas</string>
+    <string name="my_account_change_password_dont_match">Les mots de passe ne correspondent pas</string>
     <!-- title of the selection of the pro account wanted -->
     <string name="upgrade_select_pricing">Sélectionner un abonnement</string>
     <!-- the user has to decide the way of payment -->
@@ -707,7 +703,7 @@
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Veuillez vous déconnecter avant de créer le compte</string>
     <!-- message shown in the screen when there are not any active transfer -->
-    <string name="transfers_empty">Il n’y a aucun transfert actif</string>
+    <string name="transfers_empty">Aucun transfert actif</string>
     <!-- menu item -->
     <string name="menu_pause_transfers">Mettre les transferts en pause</string>
     <!-- menu item -->
@@ -805,7 +801,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_incorrect_code">Le code est erroné. Veuillez essayer et envoyer de nouveau.</string>
     <!-- text message to remind user to resend verification code -->
-    <string name="verify_account_resend_label">N’avez-vous pas reçu un code ?</string>
+    <string name="verify_account_resend_label">N’avez-vous pas reçu le code ?</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Renvoyer</string>
     <!-- error message that will show to user when host detected that the mobile number has been registered already -->
@@ -965,10 +961,10 @@
     <string name="zip_browser_activity">Navigateur de fichiers ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Type de compte</string>
-    <!-- title of the Expiration Date -->
+    <!-- Label to indicate the date when the current subscription renews -->
     <string name="renews_on">Se renouvelle le&#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="expires_on">Expire le &#160;</string>
+    <string name="expires_on">Expire le&#160;</string>
     <!--  -->
     <string name="free_account">Gratuit</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -1003,14 +999,6 @@
     <string name="sortby_type_photo_first">Photos</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Vidéos</string>
-    <!-- sort files by date newest first -->
-    <string name="sort_by_newest_date">Du plus récent</string>
-    <!-- sort files by date oldest first -->
-    <string name="sort_by_oldest_date">Du plus ancien</string>
-    <!-- sort files by largest size -->
-    <string name="sort_by_largest_size">Du plus grand</string>
-    <!-- sort files by smallest size -->
-    <string name="sort_by_smallest_size">Du plus petit</string>
     <!-- Title to choose the type of Passcode -->
     <string name="pin_lock_type">Type de code d’accès</string>
     <!-- Passcode with 4 digits -->
@@ -1044,21 +1032,21 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Compte&#160;Pro léger</string>
     <!--  -->
-    <string name="backup_title">Sauvegarder votre clé de récupération</string>
+    <string name="backup_title">Sauvegarder votre Clé de récupération</string>
     <!-- Subtitle of the screen to backup the master key -->
-    <string name="backup_subtitle">Votre mot de passe déverrouille votre clé de récupération</string>
+    <string name="backup_subtitle">Votre mot de passe déverrouille votre Clé de récupération</string>
     <!-- First paragraph of the screen to backup the master key -->
-    <string name="backup_first_paragraph">Vos données ne sont lisibles qu’à la suite d’une chaîne d’opérations de déchiffrement qui commence par votre clé maîtresse de chiffrement (clé de récupération), que nous stockons chiffrée avec votre mot de passe. Cela signifie que si vous perdez votre mot de passe, votre clé de récupération ne pourra plus être déchiffrée et que vous ne pourrez plus déchiffrer vos données.</string>
+    <string name="backup_first_paragraph">Vos données ne sont lisibles qu’à la suite d’une chaîne d’opérations de déchiffrement qui commence par votre clé maîtresse de chiffrement (Clé de récupération), que nous stockons chiffrée avec votre mot de passe. Cela signifie que si vous perdez votre mot de passe, votre Clé de récupération ne pourra plus être déchiffrée et que vous ne pourrez plus déchiffrer vos données.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="backup_second_paragraph">En exportant et en conservant la clé de récupération en lieu sûr, vous pourrez définir un nouveau mot de passe sans risquer de perdre des données.</string>
+    <string name="backup_second_paragraph">En exportant et en conservant la Clé de récupération en lieu sûr, vous pourrez définir un nouveau mot de passe sans risquer de perdre des données.</string>
     <!-- Third paragraph of the screen to backup the master key -->
     <string name="backup_third_paragraph">Un assaillant externe ne peut pas accéder à votre compte avec seulement votre clé. Une réinitialisation du mot de passe exige à la fois la clé et l’accès à votre compte de courriel.</string>
     <!-- Sentence to inform the user the available actions in the screen to backup the master key -->
-    <string name="backup_action">Copiez la clé de récupération dans le presse-papiers ou enregistrez-la comme fichier texte.</string>
+    <string name="backup_action">Copiez la Clé de récupération dans le presse-papiers ou enregistrez-la comme fichier texte.</string>
     <!-- Action of a button to save something -->
     <string name="save_action">Enregistrer</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">La clé de récupération a été copiée avec succès</string>
+    <string name="copy_MK_confirmation">La Clé de récupération a été copiée avec succès</string>
     <!-- Button to change the password -->
     <string name="change_pass">Changer</string>
     <!-- Positive button to perform a general action -->
@@ -1070,19 +1058,19 @@
     <!-- Button in the Login screen to reset the password -->
     <string name="forgot_pass">Mot de passe oublié ?</string>
     <!-- First paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_first_paragraph">Si vous avez une sauvegarde de votre clé de récupération, vous pouvez réinitialiser votre mot de passe en sélectionnant OUI. Aucunes données ne seront perdues.</string>
+    <string name="forgot_pass_first_paragraph">Si vous avez une sauvegarde de votre Clé de récupération, vous pouvez réinitialiser votre mot de passe en sélectionnant OUI. Aucunes données ne seront perdues.</string>
     <!-- Second paragraph of the screen when the password has been forgotten -->
-    <string name="forgot_pass_second_paragraph">Vous pouvez encore exporter votre clé de récupération maintenant si vous avez une session MEGA active dans n’importe quel autre navigateur sur cet ordinateur ou sur un autre. Si ce n’est pas le cas, vous ne pourrez plus déchiffrer votre compte actuel, mais vous pourrez en créer un nouveau avec la même adresse courriel en choisissant NON.</string>
+    <string name="forgot_pass_second_paragraph">Vous pouvez encore exporter votre Clé de récupération maintenant si vous avez une session MEGA active dans n’importe quel autre navigateur sur cet ordinateur ou sur un autre. Si ce n’est pas le cas, vous ne pourrez plus déchiffrer votre compte actuel, mais vous pourrez en créer un nouveau avec la même adresse courriel en choisissant NON.</string>
     <!-- Sentence to ask to the user if he has the master key in the screen when the password has been forgotten -->
-    <string name="forgot_pass_action">Avez-vous une sauvegarde de votre clé de récupération ?</string>
+    <string name="forgot_pass_action">Avez-vous une sauvegarde de votre Clé de récupération ?</string>
     <!-- Title of the alert message to ask for the link to reset the pass with the MK -->
     <string name="title_alert_reset_with_MK">Parfait !</string>
     <!-- Hint of the text where the user can write his e-mail -->
     <string name="edit_text_insert_mail">Saisissez votre adresse courriel ici</string>
     <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="text_alert_reset_with_MK">Veuillez saisir votre adresse courriel ci-dessous. Vous recevrez un lien de récupération qui vous permettra de fournir votre clé de récupération et de réinitialiser votre mot de passe.</string>
+    <string name="text_alert_reset_with_MK">Veuillez saisir votre adresse courriel ci-dessous. Vous recevrez un lien de récupération qui vous permettra de fournir votre Clé de récupération et de réinitialiser votre mot de passe.</string>
     <!-- Hint of the text when the user can write his master key -->
-    <string name="edit_text_insert_mk">Saisissez votre clé de récupération ici</string>
+    <string name="edit_text_insert_mk">Saisissez votre Clé de récupération ici</string>
     <!-- Hint of the text where the user can write his password -->
     <string name="edit_text_insert_pass">Saisissez votre mot de passe ici</string>
     <!-- Text shown in the last alert dialog to confirm delete user account -->
@@ -1096,7 +1084,7 @@
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Vous devez être connecté pour effectuer cette action.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">Vous devez être connecté pour effectuer votre changement d’adresse courriel. Veuillez vous connecter de nouveau avec votre adresse courriel actuelle et recliquer ensuite sur le lien de confirmation.</string>
+    <string name="change_email_not_logged_in">Vous devez être connecté pour effectuer votre changement d’adresse courriel. Veuillez vous connecter de nouveau avec votre adresse courriel actuelle et retoucher ensuite le lien de confirmation.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Félicitations, votre nouvelle adresse courriel pour ce compte&#160;MEGA est&#160;: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
@@ -1110,7 +1098,7 @@
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Réinitialisation du mot de passe</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
-    <string name="text_dialog_insert_MK">Veuillez saisir votre clé de récupération ci-dessous</string>
+    <string name="text_dialog_insert_MK">Veuillez saisir votre Clé de récupération ci-dessous</string>
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Votre mot de passe a été changé.</string>
     <!-- Title of the dialog to park an account -->
@@ -1120,7 +1108,7 @@
     <!-- Title of the screen to park an account -->
     <string name="park_account_title">Oups !</string>
     <!-- First paragraph of the screen to park an account -->
-    <string name="park_account_first_paragraph">En raison de notre modèle de chiffrement de bout en bout, vous ne pourrez pas accéder à vos données sans votre mot de passe ou une sauvegarde de votre clé de récupération.</string>
+    <string name="park_account_first_paragraph">En raison de notre modèle de chiffrement de bout en bout, vous ne pourrez pas accéder à vos données sans votre mot de passe ou une sauvegarde de votre Clé de récupération.</string>
     <!-- Second paragraph of the screen to park an account -->
     <string name="park_account_second_paragraph">Vous pouvez remiser votre compte existant et en commencer un nouveau avec la même adresse courriel. Vos données seront conservées pendant au moins 60&#160;jours. Au cas où vous vous souviendriez du mot de passe de votre compte remisé, veuillez contacter support&#64;mega.nz</string>
     <!-- Text of the dialog message to ask for the link to park the account -->
@@ -1132,7 +1120,7 @@
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">Le lien de récupération est expiré. Veuillez réessayer.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
-    <string name="text_reset_pass_logged_in">Votre clé de récupération sera utilisée pour réinitialiser votre mot de passe. Veuillez saisir votre nouveau mot de passe.</string>
+    <string name="text_reset_pass_logged_in">Votre Clé de récupération sera utilisée pour réinitialiser votre mot de passe. Veuillez saisir votre nouveau mot de passe.</string>
     <!-- Text of the alert dialog to inform the user that have to check the email after clicking the option forgot pass -->
     <string name="email_verification_text_change_pass">Vous recevrez un lien de récupération qui vous permettra de réinitialiser votre mot de passe.</string>
     <!-- Button to upgrade the account to PRO account in My Account Section -->
@@ -1140,21 +1128,21 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Surclasser le compte maintenant</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Améliorez la capacité de votre nuage.[A]Obtenez plus d’espace et un quota de transfert supérieur avec un compte&#160;Pro.</string>
+    <string name="get_pro_account">Faites grandir votre nuage.[A]Obtenez de quotas augmentés d’espace de stockage et de transfert avec un compte&#160;Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">La clé de récupération a été sauvegardée dans&#160;: %1s. [A]Tant que le fichier restera dans ce chemin, vous la trouverez dans la section Enregistré Hors ligne.[A]Note&#160;: Elle sera supprimée si vous vous déconnectez, veuillez la conserver en lieu sûr.</string>
+    <string name="toast_master_key">La Clé de récupération du compte&#160;MEGA a été enregistrée dans&#160;: %1s. [A]Vous trouverez le fichier de votre Clé de récupération dans la section Enregistré Hors ligne.[A]Note&#160;: dans la mesure où le fichier de votre Clé de récupération sera supprimé si vous vous déconnectez, veuillez le conserver en lieu sûr en dehors de votre compte&#160;MEGA..</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Erreur. Cette adresse courriel est déjà utilisée.</string>
+    <string name="mail_already_used">L’adresse courriel est déjà utilisée. Veuillez saisir une adresse courriel différente.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Vous avez déjà demandé un lien de confirmation pour cette adresse courriel.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">La nouvelle adresse courriel et l’ancienne ne doivent pas correspondre</string>
+    <string name="mail_same_as_old">Ceci est votre adresse courriel existante.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
     <string name="change_mail_text_last_step">Ceci est la dernière étape pour changer votre adresse courriel. Veuillez saisir votre mot de passe ci-dessous.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Changer l’adresse courriel</string>
     <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">Vous êtes presque à court d’espace.</string>
+    <string name="title_new_warning_out_space">Vous êtes presque à court d’espace de stockage.</string>
     <!-- Text of the warning when the user is running out of space -->
     <string name="new_warning_out_space">Profitez pleinement de votre compte&#160;MEGA en passant à un compte&#160;Pro.</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
@@ -1168,7 +1156,7 @@
     <!-- Alert when the user introduces his MK to reset pass incorrectly -->
     <string name="incorrect_MK">La clé que vous avez fournie ne correspond pas à ce compte. Veuillez vous assurez d’utiliser la bonne clé et réessayer.</string>
     <!-- Title of the alert when the user introduces his MK to reset pass incorrectly -->
-    <string name="incorrect_MK_title">La clé de récupération est invalide</string>
+    <string name="incorrect_MK_title">La Clé de récupération est invalide</string>
     <!-- Alert Dialog to get link -->
     <string name="option_full_link">Lien avec clé</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
@@ -1230,7 +1218,7 @@
     <!-- Error message when trying to login to an account not validated. -->
     <string name="account_not_validated_login">Ce compte n’a pas encore été validé. Veuillez vérifier vos courriels.</string>
     <!-- Error message shown when opening a folder link which doesn’t exist -->
-    <string name="general_error_folder_not_found">Le lien de dossier n’est pas disponible</string>
+    <string name="general_error_folder_not_found">Le lien de dossier est inaccessible</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
     <string name="folder_link_unavaible_ToS_violation">Le lien de dossier a été supprimé en raison du non-respect des CGU/PUA.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
@@ -1242,7 +1230,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">En attente de la confirmation par courriel</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Veuillez vérifier vos courriels et cliquer sur le lien pour confirmer votre compte.</string>
+    <string name="confirm_email_explanation">Veuillez vérifier vos courriels et toucher sur le lien pour confirmer votre compte.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 élément</item>
@@ -1503,7 +1491,7 @@
     <!-- title of the menu for an uploading message with attachment -->
     <string name="title_message_uploading_options">Téléverser un fichier joint</string>
     <!-- message shown when a chat has no messages -->
-    <string name="no_conversation_history">Il n’y a aucun historique de conversation</string>
+    <string name="no_conversation_history">Aucun historique de conversation</string>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]écrit&#8230;[/A]</item>
@@ -1638,7 +1626,7 @@
     <!-- Title of the panel where the progress of the transfers is shown -->
     <string name="paused_transfers_title">Transferts en pause</string>
     <!-- message shown in the screen when there are not any active transfer -->
-    <string name="completed_transfers_empty">Il n’y a aucun transfert terminé</string>
+    <string name="completed_transfers_empty">Aucun transfert terminé</string>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_notification">
         <item quantity="one">Téléversement d’un %1$d de %2$d fichier</item>
@@ -1738,19 +1726,19 @@
     <!-- Menu option to choose save to Offline section -->
     <string name="save_for_offline">Enregistrer Hors ligne</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
-    <string name="add_to_cloud_node_chat">Ajouter au disque nuagique</string>
+    <string name="add_to_cloud_node_chat">Ajouter au Disque nuagique</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Visualiser les contacts</string>
     <!-- Message displayed when a file has been successfully imported to Cloud Drive -->
-    <string name="import_success_message">A été ajouté avec succès au disque nuagique</string>
+    <string name="import_success_message">A été ajouté avec succès au Disque nuagique</string>
     <!-- Menu option -->
-    <string name="import_success_error">Erreur. N’a pas été ajouté au disque nuagique</string>
+    <string name="import_success_error">Erreur. N’a pas été ajouté au Disque nuagique</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Connexion&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s a déjà été invité. Consultez les demandes en attente.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Si une erreur s’est glissée dans votre adresse courriel, corrigez-la et cliquez sur [A] Renvoyer[A].</string>
+    <string name="confirm_email_misspelled">Si une erreur s’est glissée dans votre adresse courriel, corrigez-la et touchez [A] Renvoyer[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Renvoyer</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1821,7 +1809,7 @@
     <!--  -->
     <string name="no_files_selected_warning">Aucun fichier n’a été sélectionné</string>
     <!--  -->
-    <string name="attachment_upload_panel_from_cloud">Du disque nuagique</string>
+    <string name="attachment_upload_panel_from_cloud">Du Disque nuagique</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
     <!--  -->
@@ -1919,23 +1907,23 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invitez des amis et obtenez des récompenses</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s d’espace de stockage pour chaque parrainage. Valide pendant 365&#160;jours.</string>
+    <string name="figures_achievements_text_referrals">%1$s d’espace de stockage pour chaque invitation. Valide pendant 365&#160;jours.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s d’espace de stockage. Valide pendant 365&#160;jours.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Récompenses déverrouillées</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">Quota de stockage</string>
+    <string name="unlocked_storage_title">Quota d’espace de stockage</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Primes de parrainage</string>
-    <!-- title of the section for install a mobile app in achivements section (maximum 24 chars) -->
-    <string name="title_install_app">Installer une appli mobile</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 24 chars) -->
-    <string name="title_add_phone">Ajouter un téléphone mobile</string>
+    <string name="title_referral_bonuses">Primes d’invitation</string>
+    <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
+    <string name="title_install_app">Installer une appli&#160;MEGA mobile</string>
+    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
+    <string name="title_add_phone">Ajouter un numéro de téléphone</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Prime d’inscription</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Installer l’appli MEGA pour ordinateur</string>
+    <string name="title_install_desktop">Obtenir une appli&#160;MEGA pour ordinateur</string>
     <!-- title of the section for base quota in achivements section -->
     <string name="title_base_quota">Quota de base du compte</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
@@ -1951,9 +1939,9 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Fonctionnement</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invitez vos amis à créer un compte&#160;MEGA gratuit et à installer l’appli MEGA mobile. Pour chaque inscription et installation d’appli réussie, vous recevez de l’espace de stockage en prime.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invitez vos amis à créer un compte&#160;MEGA Gratuit et à installer une appli&#160;MEGA mobile. Vous recevrez de l’espace de stockage gratuit en prime pour chaque inscription et installation d’appli réussie.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">Vous ne recevrez pas de crédit si vous invitez quelqu’un qui a utilisé MEGA par le passé et un tel refus ne vous sera pas signalé. Les contacts invités doivent installer l’appli MEGA mobile ou l’appli MEGA pour ordinateur sur leurs appareils.</string>
+    <string name="second_paragraph_achievement_invite_friends">La prime d’espace de stockage gratuit n’est applicable que pour les nouvelles invitations et si l’appli&#160;MEGA mobile ou l’appli&#160;MEGA pour ordinateur est installée.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">Choisissez des contacts de la liste de contacts de votre téléphone ou saisissez plusieurs adresses courriel.</string>
     <!-- title of the dialog to confirm the contact request -->
@@ -1961,19 +1949,19 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">L’invitation a été envoyée</string>
     <!-- paragraph of the dialog to confirm the contact request -->
-    <string name="paragraph_confirmation_invite_friends">Encouragez vos amis à s’inscrire et à installer une appli MEGA. Tant que votre ami utilisera la même adresse courriel que celle que vous avez saisie, vous recevrez votre récompense en quota de transfert.</string>
+    <string name="paragraph_confirmation_invite_friends">Encouragez vos amis à s’inscrire et à installer une appli&#160;MEGA. Tant que votre ami utilisera la même adresse courriel que celle que vous avez saisie, vous recevrez votre récompense en quota de transfert.</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">L’adresse courriel est mal formée</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">En installant l’appli MEGA pour ordinateur, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. L’appli MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">En installant l’appli&#160;MEGA pour ordinateur, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. L’appli&#160;MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">En installant l’appli MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. Nos applis mobiles sont proposées pour iOS, Android et Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">En installant l’appli&#160;MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours. Nos applis mobiles sont proposées pour iOS et Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Quand vous confirmez votre numéro de téléphone, vous obtenez %1$s d’espace de stockage gratuit valide pendant 365&#160;jours.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre appli MEGA pour ordinateur.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre appli&#160;MEGA pour ordinateur.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre appli mobile.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">Vous avez reçu %1$s d’espace de stockage pour avoir installé l’appli&#160;MEGA mobile.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="result_paragraph_info_achievement_add_phone">Vous avez reçu %1$s d’espace de stockage pour avoir confirmé votre numéro de téléphone.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -1997,11 +1985,11 @@
     <!-- Settings preference title for help centre -->
     <string name="settings_help_centre">Centre d’assistance</string>
     <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Envoyer un commentaire</string>
+    <string name="settings_help_preference">Envoyer une rétroaction</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Rétroaction Android</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">Veuillez rédiger votre commentaire ici&#160;:</string>
+    <string name="setting_feedback_body">Veuillez rédiger votre rétroaction ici&#160;:</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">Modèle de l’appareil</string>
     <!-- mail body -->
@@ -2054,8 +2042,8 @@
     <string name="invalid_characters_defined">Les caractères suivants ne sont pas autorisés&#160;: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">Veuillez nommer votre fichier avant de poursuivre</item>
-        <item quantity="other">Veuillez nommer vos fichiers avant de poursuivre</item>
+        <item quantity="one">Le nom de fichier ne peut pas être vide.</item>
+        <item quantity="other">Les noms de fichier ne peuvent pas être vides.</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
     <string name="audio_play">Fichier son</string>
@@ -2064,7 +2052,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Compte utilisateur</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">Enregistrer sur mon \ndisque nuagique</string>
+    <string name="save_to_mega">Enregistrer sur mon \nDisque nuagique</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">La conversation existe déjà</string>
     <!-- before sharing a file, has to be downloaded -->
@@ -2074,13 +2062,13 @@
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">Reconnexion au dialogue en ligne</string>
     <!-- Message show when a call cannot be established -->
-    <string name="call_error">Erreur. L’appel ne peut pas être établi</string>
+    <string name="call_error">Une erreur est survenue et l’appel ne peut pas être connecté.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Cette appli vous satisfait-elle ?</string>
+    <string name="title_evaluate_the_app_panel">Aimez-vous l’appli&#160;MEGA mobile ?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Oui, évaluer l’appli</string>
     <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Non, envoyer un commentaire</string>
+    <string name="send_feedback_panel">Non, envoyer une rétroaction</string>
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Options avancées</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
@@ -2094,13 +2082,13 @@
     <!-- Option of the sliding panel to go to QR code section -->
     <string name="choose_qr_option_panel">Mon code QR</string>
     <!-- Title of the screen that shows the options to the QR code -->
-    <string name="section_qr_code">Code QR</string>
+    <string name="section_qr_code">Code&#160;QR</string>
     <!-- Option in menu of section  My QR code to reset the QR code -->
     <string name="action_reset_qr">Réinitialiser le code QR</string>
     <!-- Option in menu of section  My QR code to delete the QR code -->
     <string name="action_delete_qr">Supprimer le code QR</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
-    <string name="save_cloud_drive">Sur le disque nuagique</string>
+    <string name="save_cloud_drive">Sur le Disque nuagique</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Sur le système de fichiers</string>
     <!-- Title of QR code section -->
@@ -2174,27 +2162,27 @@
     <!-- Text of the empty screen when there are not elements in  Inbox -->
     <string name="context_empty_inbox">[B]Aucun fichier dans votre [/B][A]boîte de réception[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]Aucun fichier [/B][A]dans votre disque nuagique[/A]</string>
+    <string name="context_empty_cloud_drive">[B]Aucun fichier [/B][A]dans votre Disque nuagique[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[B]Il n’y a aucun fichier enregistré [/B][A]Hors ligne[/A]</string>
+    <string name="context_empty_offline">[B]Aucun fichier enregistré [/B][A]Hors ligne[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_contacts">[B]Il n’y a aucun [/B][A]contact[/A]</string>
+    <string name="context_empty_contacts">[B]Aucun [/B][A]contact[/A]</string>
     <!-- Message shown when the user has no chats -->
-    <string name="recent_chat_empty">[A]Il n’y a aucune[/A] [B]conversation[/B]</string>
+    <string name="recent_chat_empty">[A]Aucune[/A] [B]conversation[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
     <string name="recent_chat_loading_conversations">[A]Chargement des[/A] [B]conversations&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]Il n’y a aucun [/B][A]dossier partagé entrant[/A]</string>
+    <string name="context_empty_incoming">[B]Aucun [/B][A]dossier partagé entrant[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]Il n’y a aucun [/B][A]dossier partagé sortant[/A]</string>
+    <string name="context_empty_outgoing">[B]Aucun [/B][A]dossier partagé sortant[/A]</string>
     <!-- Text of the empty screen when there are not elements in Links. Please, keep the place holders to format the string -->
-    <string name="context_empty_links">[B]Il n’y a aucun [/B][A]lien public[/A][B][/B]</string>
+    <string name="context_empty_links">[B]Aucun [/B][A]lien public[/A][B][/B]</string>
     <!-- Title of the sent requests tab. Capital letters -->
     <string name="tab_sent_requests">Demandes envoyées</string>
     <!-- Title of the received requests tab. Capital letters -->
     <string name="tab_received_requests">Demandes reçues</string>
     <!-- Title dialog overquota error -->
-    <string name="overquota_alert_title">Le quota de stockage a été dépassé</string>
+    <string name="overquota_alert_title">Le quota d’espace de stockage a été dépassé</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
     <string name="invalid_link">Le lien est invalide, veuillez demander un nouveau lien valide</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
@@ -2224,7 +2212,7 @@
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Appel en cours</string>
     <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Cliquer pour retourner vers l’appel</string>
+    <string name="action_notification_call_in_progress">Toucher pour retourner vers l’appel</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Retourner vers l’appel</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2366,13 +2354,13 @@
     <!-- Message shown to the user when is testing her password and it is correct -->
     <string name="test_pwd_accepted">Le mot de passe a été accepté</string>
     <!-- Message shown to the user when is testing her password and it is wrong -->
-    <string name="test_pwd_wrong">Le mot de passe est erroné.\nSauvegardez votre clé de récupération dès que possible.</string>
+    <string name="test_pwd_wrong">Le mot de passe est erroné.\nSauvegardez votre Clé de récupération dès que possible.</string>
     <!-- Text of the dialog ‘Recovery Key exported’ when the user wants logout -->
     <string name="recovery_key_exported_dialog_text_logout">Vous êtes sur le point de vous déconnecter. Veuillez essayer votre mot de passe pour vous assurer que vous en souvenez.\nSi vous perdez votre mot de passe, vous perdrez l’accès à vos données MEGA.</string>
     <!-- Option that permits user copy to clipboard -->
     <string name="option_copy_to_clipboard">Copier vers le presse-papiers</string>
     <!-- Option that permits user export his recovery key -->
-    <string name="option_export_recovery_key">Exporter la clé de récupération</string>
+    <string name="option_export_recovery_key">Exporter la Clé de récupération</string>
     <!-- Option that permits user logout -->
     <string name="proceed_to_logout">Poursuivre la déconnexion</string>
     <!-- Title of the preference Recovery key on Settings section -->
@@ -2410,9 +2398,9 @@
     <!-- Title of the category Security options on Settings section -->
     <string name="settings_security_options_title">Sécurité</string>
     <!-- Title of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_title">Sauvegarder la clé de récupération</string>
+    <string name="settings_recovery_key_title">Sauvegarder la Clé de récupération</string>
     <!-- Summary of the preference Recovery key on Settings section -->
-    <string name="settings_recovery_key_summary">En exportant et en conservant la clé de récupération en lieu sûr, vous pourrez définir un nouveau mot de passe sans risquer de perdre des données.</string>
+    <string name="settings_recovery_key_summary">En exportant et en conservant la Clé de récupération en lieu sûr, vous pourrez définir un nouveau mot de passe sans risquer de perdre des données.</string>
     <!-- message when a temporary error on logging in is due to connectivity issues -->
     <string name="login_connectivity_issues">Impossible d’atteindre MEGA. Veuillez vérifier votre connectivité ou réessayer ultérieurement.</string>
     <!-- message when a temporary error on logging in is due to servers busy -->
@@ -2436,7 +2424,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Imprimer</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">La clé de récupération a été enregistrée avec succès</string>
+    <string name="save_MK_confirmation">La Clé de récupération a été enregistrée avec succès</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(En attente)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -2505,7 +2493,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La prochaine fois que vous vous connecterez à votre compte, un code à 6 chiffres fourni par votre appli d’authentification vous sera demandé.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Envisagez d’exporter votre <b>clé de récupération</b> au cas où vous perdriez accès à votre appli ou si vous voulez désactiver l’authentification à deux facteurs dans le futur.</string>
+    <string name="recommendation_2fa_enabled">Veuillez enregistrer votre <b>Clé de récupération</b> en lieu sûr pour éviter les problèmes au cas où vous perdriez l’accès à votre appli ou si vous voulez désactiver l’authentification à deux facteurs.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Le code est invalide</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2537,7 +2525,7 @@
     <!-- Text button -->
     <string name="general_close">Fermer</string>
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
-    <string name="backup_rk_2fa_end">Exportez votre clé de récupération pour terminer</string>
+    <string name="backup_rk_2fa_end">Exportez votre Clé de récupération pour terminer</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
     <string name="no_authentication_apps_title">Appli d’authentification à deux facteurs</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
@@ -2557,7 +2545,7 @@
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">L’ouverture du fichier est impossible.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">Il n’y a pas de connexion réseau. Le fichier ne peut pas être ouvert.</string>
+    <string name="error_fail_to_open_file_no_network">Il n’y a pas de connexion réseau. Veuillez vous reconnecter pour ouvrir le fichier.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Le fichier existe déjà dans Enregistré Hors ligne</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2632,10 +2620,6 @@
     <string name="inactive_chat">La conversation est inactive</string>
     <!-- Subtitle of chat screen when the chat is archived -->
     <string name="archived_chat">La conversation est archivée</string>
-    <!-- error message when restoring several nodes from rubbish -->
-    <string name="number_incorrectly_restored_from_rubbish">%d éléments n’ont pas été restaurés avec succès</string>
-    <!-- success message when restoring several nodes from rubbish -->
-    <string name="number_correctly_restored_from_rubbish">%d éléments ont été restaurés avec succès</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Touchez pour vous joindre à l’appel</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2699,17 +2683,17 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Le code est invalide</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Votre disque nuagique est presque plein. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_almost_full_warning">Votre Disque nuagique est presque plein. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">Votre disque nuagique est presque plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_almost_full_warning_pro_account">Votre Disque nuagique est presque plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Votre disque nuagique est presque plein. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
+    <string name="text_almost_full_warning_pro3_account">Votre Disque nuagique est presque plein. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Votre disque nuagique est plein. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_storage_full_warning">Votre Disque nuagique est plein. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Votre disque nuagique est plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_storage_full_warning_pro_account">Votre Disque nuagique est plein. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Votre disque nuagique est plein. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
+    <string name="text_storage_full_warning_pro3_account">Votre Disque nuagique est plein. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">Voir les abonnements</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
@@ -2786,7 +2770,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Si les vidéos à compresser dépassent</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Pour désactiver le programmateur de vidage de la corbeille ou pour définir une période de conservation plus longue, vous devez détenir un abonnement PRO.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Pour désactiver le programmateur de vidage de la corbeille ou pour définir une période de conservation plus longue, vous devez détenir un abonnement&#160;Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">jours</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2846,7 +2830,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">L’invitation pour le contact %s a été envoyée auparavant et peut être consultée dans l’onglet Demandes envoyées.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">Enregistrement du %s dans le disque nuagique&#8230;</string>
+    <string name="save_qr_cloud_drive">Enregistrement du %s dans le Disque nuagique&#8230;</string>
     <!-- General label for folders -->
     <string name="general_folders">Dossiers</string>
     <!-- General label for files -->
@@ -3036,9 +3020,9 @@
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">Erreur de clé SSL</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGA n’arrive pas à se connecter de façon sécurisée par SSL. Vous vous trouvez peut-être sur un réseau Wi-Fi public avec des exigences supplémentaires.</string>
+    <string name="ssl_error_dialog_text">MEGA n’arrive pas à établir une connexion sécurisée par SSL. Vous vous trouvez peut-être sur un réseau Wi-Fi public avec des exigences supplémentaires.</string>
     <!-- Text of the empty screen for the notifications section -->
-    <string name="context_empty_notifications">[B]Il n’y a aucune [/B][A]notification[/A]</string>
+    <string name="context_empty_notifications">[B]Aucune [/B][A]notification[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurer MEGA</string>
     <!-- Permissions screen explanation -->
@@ -3054,7 +3038,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Autoriser les appels</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Accorder à MEGA l’autorisation d’accéder à vos contacts</string>
+    <string name="allow_acces_contact_title">Accorder l’accès à votre carnet d’adresses</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Trouvez facilement les contacts de votre carnet d’adresses sur MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3103,7 +3087,7 @@
     <!-- label tomorrow -->
     <string name="label_tomorrow">demain</string>
     <!-- Text of the empty screen for the chat shared files -->
-    <string name="context_empty_shared_files">[B]Il n’y a aucun [/B][A]fichier partagé[/A]</string>
+    <string name="context_empty_shared_files">[B]Aucun [/B][A]fichier partagé[/A]</string>
     <!-- Text to indicate that a contact has joined a group call -->
     <string name="contact_joined_the_call">%1$s s’est joint à l’appel</string>
     <!-- Text to indicate that a contact has left a group call -->
@@ -3113,7 +3097,7 @@
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">Vous ne pouvez pas vous joindre à l’appel, car la limite de participants a été dépassée.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Vous ne pouvez pas vous joindre à l’appel de groupe, car la limite de participants a été dépassée.</string>
+    <string name="call_error_too_many_participants_join">Vous ne pouvez pas vous joindre à l’appel de groupe, car la limite de participants est atteinte.</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
     <string name="call_error_too_many_video">Vous ne pouvez pas vous joindre à l’appel vidéo, car la limite de participants a été dépassée.</string>
     <!-- Message show when a user cannot put the call on hold -->
@@ -3228,7 +3212,7 @@
     <!-- Title of second tour screen -->
     <string name="title_tour_two">Dialogue en ligne chiffré</string>
     <!-- Content of second tour screen -->
-    <string name="content_tour_two">Le dialogue en ligne est entièrement chiffré et offre des appels vocaux et vidéo, une messagerie de groupe et le partage de fichiers, tous intégrés à votre disque nuagique.</string>
+    <string name="content_tour_two">Le dialogue en ligne est entièrement chiffré et offre des appels vocaux et vidéo, une messagerie de groupe et le partage de fichiers, tous intégrés à votre Disque nuagique.</string>
     <!-- Title of third tour screen -->
     <string name="title_tour_three">Créez votre réseau</string>
     <!-- Content of third tour screen -->
@@ -3330,7 +3314,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Commencez à discuter en toute sécurité avec vos contacts grâce au chiffrement de bout en bout</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Bonjour. Conversez avec moi en toute sécurité sur MEGA et obtenez 20&#160;Go+ d’espace de stockage gratuit. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Bonjour. Conversez avec moi en toute sécurité sur MEGA et obtenez 20&#160;Go d’espace de stockage nuagique gratuit. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Aucun lien de conversation n’est disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3359,15 +3343,15 @@
     <string name="invite_contact_chooser_title">Inviter un ou une ami par</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">Inviter un ami par&#8230;</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files -->
+    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">%d fichier a déjà été téléchargé.&#160;</item>
-        <item quantity="other">%d fichiers ont déjà été téléchargés.&#160;</item>
+        <item quantity="one">1  fichier a déjà été téléchargé.</item>
+        <item quantity="other">%d fichiers ont déjà été téléchargés.</item>
     </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
+    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">%d fichier en attente.</item>
-        <item quantity="other">%d fichiers en attente.</item>
+        <item quantity="one">1 fichier est en attente.</item>
+        <item quantity="other">%d fichiers est en attente.</item>
     </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Connectez-vous à MEGA</string>
@@ -3378,7 +3362,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Conversations</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Il n’y a aucun fichier dans [/B][A]Récents[/A]</string>
+    <string name="context_empty_recents">[B]Aucun fichier dans [/B][A]Récents[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s et %2$d de plus</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3524,7 +3508,7 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">Erreur de droits</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">Vous n’avez pas les droits exigés pour rétablir ce fichier. Afin de poursuivre, nous pouvons créer un nouveau fichier avec les données rétablies. Voulez-vous poursuivre ?</string>
+    <string name="alert_not_enough_permissions_revert">Vous n’avez pas les droits nécessaires pour modifier ce fichier. Voulez-vous créer un nouveau fichier ?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">La version a été créée avec succès en tant que nouveau fichier.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
@@ -3562,7 +3546,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">Le dossier n’existe pas.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Le fichier n’existe pas dans le disque nuagique.</string>
+    <string name="warning_node_not_exists_in_cloud">Le fichier est introuvable pas dans votre Disque nuagique.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">L’espace de stockage est plein</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3674,9 +3658,9 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%1$d%% sur %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_enabled">Les renseignements spéciaux sont activés pour les messages du dialogue en ligne</string>
+    <string name="show_info_chat_msg_enabled">Les renseignements de débogage des conversations sont activés</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Les renseignements spéciaux sont désactivés pour les messages du dialogue en ligne</string>
+    <string name="show_info_chat_msg_disabled">Les renseignements de débogage des conversations sont désactivés</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Vous avez atteint la limite maximale de %d réactions.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
@@ -3708,7 +3692,7 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Supprimer automatiquement les messages de plus de&#160;:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Effacer tout l’historique de cette conversation ?</string>
+    <string name="confirmation_clear_chat_history">Voulez-vous vraiment effacer l’historique entier de cette conversation ?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 an</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
@@ -3842,14 +3826,12 @@
     <string name="dialog_cookie_alert_unsaved">Des paramètres de témoins ne sont pas enregistrés.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Les modifications des paramètres des témoins ont été enregistrées.</string>
-    <!-- Cookie dialog third party title -->
-    <string name="dialog_cookie_thirdparty_title">Témoins tiers</string>
     <!-- Cookie dialog third party first subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle1">Témoins publicitaires de Google</string>
     <!-- Cookie dialog third party second subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle2">Catégorie&#160;: Témoins publicitaires</string>
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Utilisés par Google pour&#160;: \n• Personnaliser les publicités que Google affiche sur nos services et notre site Web, et sur d’autres services et sites Web, d’après des éléments tels que votre position géographique et les autres sites Web que vous avez visités précédemment ; \n• Surveiller la fréquence d’affichage de certaines publicités ; \n• Fournir une prévention contre les fraudes ; et\n• Déterminer quand vous cliquez sur une publicité particulière, pour ensuite suivre les différentes actions que vous effectuez en réponse à cette publicité.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="dialog_cookie_thirdparty_message">Utilisés par Google pour&#160;: \n• Personnaliser les publicités que Google affiche sur nos services et sites Web, et sur d’autres services et sites Web, d’après des éléments tels que votre position géographique et les autres sites Web que vous avez visités précédemment ; \n• Surveiller la fréquence d’affichage de certaines publicités ; \n• Fournir une prévention contre les fraudes ; et\n• Déterminer si vous touchez une publicité particulière, pour ensuite suivre les différentes actions que vous effectuez en réponse à cette publicité.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Accepter les Témoins de connexion</string>
     <!-- Preference screen item title -->
@@ -3871,11 +3853,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_thirdparty_title">Témoins tiers</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Ces Témoins ne sont pas contrôlés par nous, mais par des tiers ; nous utilisons ces Témoins pour fournir les types de fonctions que nous décrivons ci-dessous. Le refus de ces Témoins aurait différentes implications suivant la nature de chaque Témoin tiers. Vous obtiendrez des détails sur les Témoins que nous utilisons en cliquant sur «&#160;Plus de précision&#160;» ci-dessous.</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_privacy">Politique de confidentialité</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_cookie">Politique sur les Témoins de connexion</string>
+    <string name="preference_cookies_thirdparty_summary">Ces Témoins ne sont pas contrôlés par nous, mais par des tiers ; nous utilisons ces Témoins pour fournir les types de fonctions que nous décrivons ci-dessous. Le refus de ces Témoins aurait différentes implications suivant la nature de chaque Témoin tiers. Vous obtiendrez des détails sur les Témoins que nous utilisons en touchant «&#160;Plus de précision&#160;» ci-dessous.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Toujours activés</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3903,7 +3881,7 @@
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">Le fichier a été créé</string>
     <!-- Warning indicating a file was not created successfully -->
-    <string name="file_creation_failed">Échec de création du fichier. Veuillez réessayer.</string>
+    <string name="file_creation_failed">Erreur de création du fichier. Veuillez réessayer.</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">Le fichier a été enregistré dans le %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
@@ -3920,20 +3898,8 @@
     <string name="file_without_extension_warning">Afin de poursuivre, vous devez saisir une extension de fichier</string>
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">Changement de l’extension du fichier</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
-    <string name="file_extension_change_warning">Vous ne pourrez peut-être pas accéder à ce fichier si vous changez l’extension de «&#160;.%1$s&#160;» à «&#160;%2$s&#160;»</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
-    <string name="file_extension_change_warning_old_empty">Vous ne pourrez peut-être pas accéder à ce fichier si vous ajoutez l’extension «&#160;.%1$s&#160;»</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
-    <string name="file_extension_change_warning_new_empty">Vous ne pourrez peut-être pas accéder à ce fichier si vous supprimer l’extension «&#160;.%1$s&#160;»</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
-    <string name="action_use_empty_new_extension">Supprimer l’extension</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
-    <string name="action_use_new_extension">Utiliser .%1$s</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
-    <string name="action_keep_empty_old_extension">Pas d’extension</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
-    <string name="action_keep_old_extension">Conserver .%1$s</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
+    <string name="file_extension_change_warning">Vous ne pourrez peut-être pas ouvrir ce fichier si vous changez l’extension.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">Un fichier porte déjà ce nom</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
@@ -3949,9 +3915,9 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Lecture en arrière-plan</string>
     <!-- Text of the empty screen when there are no elements in Photos -->
-    <string name="photos_empty">[B]Il n’y a aucune[/B] [A]photo[/A]</string>
+    <string name="photos_empty">[B]Aucune[/B] [A]photo[/A]</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Sauvegardez automatiquement vos photos et vos vidéos dans votre disque nuagique.</string>
+    <string name="enable_cu_subtitle">Sauvegardez automatiquement vos photos et vos vidéos dans votre Disque nuagique.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Tout</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -3980,9 +3946,55 @@
     <!-- Indicates pagination progress. E.g.: 3/49 -->
     <string name="pagination_progress">%1$s/%2$s</string>
     <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
-    <string name="error_share_owner_storage_quota">Le propriétaire du partage a dépassé son quota de stockage.</string>
+    <string name="error_share_owner_storage_quota">Le propriétaire du partage a dépassé son quota d’espace de stockage.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
-    <string name="warning_share_owner_storage_quota">Le fichier ne peut pas être envoyé, car l’utilisateur cible a dépassé son quota de stockage.</string>
+    <string name="warning_share_owner_storage_quota">Le fichier ne peut pas être envoyé, car l’utilisateur cible a dépassé son quota d’espace de stockage.</string>
     <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">Nous mettons MEGAchat à niveau. Votre appel pourrait ne pas être connecté en raison de problèmes d’incompatibilité des versions.</string>
+    <string name="version_incompatibility">Nous mettons MEGAchat à niveau. Vos appels pourraient ne pas être connectés en raison d’incompatibilité des versions, à moins qu’appelant et appelés aient aussi mis à niveau leurs applis&#160;MEGA vers la version la plus récente.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
+    <string name="file_already_downloaded_and_file_pending_download">1 fichier est déjà téléchargé, 1 fichier est en attente.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
+    <string name="file_already_downloaded_and_files_pending_download">1 fichier est déjà téléchargé, %d fichiers sont en attente.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <string name="files_already_downloaded_and_file_pending_download">%d fichiers sont déjà téléchargés, 1 fichier est en attente.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
+    <string name="files_already_downloaded_and_files_pending_download">%1$d fichiers sont déjà téléchargés, %2$d fichiers sont en attente.</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 élément a été déplacé vers la corbeille avec succès et 1 ne l’a pas été</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 élément a été déplacé vers la corbeille avec succès et %d ne l’ont pas été</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d éléments ont été déplacé vers la corbeille avec succès et 1 ne l’a pas été</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d éléments ont été déplacé vers la corbeille avec succès et %2$d ne l’ont pas été</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
+    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 élément a été restauré de la corbeille avec succès et 1 ne l’a pas été</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 élément a été restauré de la corbeille avec succès et %d ne l’ont pas été</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d éléments ont été restaurés de la corbeille avec succès et 1 ne l’a pas été</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d éléments ont été restaurés de la corbeille avec succès et %2$d ne l’ont pas été</string>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_correctly_moved_to_rubbish">
+        <item quantity="one">1 élément a été déplacé vers la corbeille avec succès.</item>
+        <item quantity="other">%d éléments ont été déplacés vers la corbeille avec succès.</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 élément n’a pas été déplacé vers la corbeille avec succès.</item>
+        <item quantity="other">%d éléments n’ont pas été déplacés vers la corbeille avec succès.</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="one">1 éléments a été restauré avec succès</item>
+        <item quantity="other">%d éléments ont été restaurés avec succès</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 élément n’a pas été restaurés avec succès</item>
+        <item quantity="other">%d éléments n’ont pas été restaurés avec succès</item>
+    </plurals>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
+    <string name="action_change_anyway">La changer quand même</string>
 </resources>

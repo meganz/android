@@ -1,51 +1,51 @@
 <?xml version="1.0"?>
 <resources>
-  <!-- Screen title for cropping current scan (Document scanner) -->
-  <string name="scan_title_crop">クロップ</string>
-  <!-- Screen title for saving current scan (Document scanner) -->
-  <string name="scan_title_save_scan">スキャンを保存</string>
-  <!-- Label of the button to add a new page to the current document scan -->
-  <string name="scan_action_add">追加</string>
-  <!-- Action of a button to save something -->
-  <string name="scan_action_save">保存</string>
-  <!-- Action text to retake current scan picture (Document scanner) -->
-  <string name="scan_action_retake">撮り直す</string>
-  <!-- Document scanner file name -->
-  <string name="scan_file_name">ファイル名</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_file_type">ファイルの種類</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_quality">品質</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_destination">保存先</string>
-  <!-- Document scanner high quality option -->
-  <string name="scan_quality_high">高</string>
-  <!-- Document scanner medium quality option -->
-  <string name="scan_quality_medium">中</string>
-  <!-- Document scanner low quality option -->
-  <string name="scan_quality_low">低</string>
-  <!-- Title text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_title">スキャンを破棄しますか？</string>
-  <!-- Body text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_body">現在のスキャンは失われます</string>
-  <!-- Title text shown on document scanner dialog to discard scan all scans -->
-  <string name="scan_dialog_discard_all_title">すべてのスキャンを破棄しますか？　</string>
-  <!-- Body text shown on document scanner dialog to discard all scans -->
-  <string name="scan_dialog_discard_all_body">現在のドキュメントは失われます</string>
-  <!-- Action text shown on document scanner dialog to discard scans -->
-  <string name="scan_dialog_discard_action">破棄する</string>
-  <!-- Body text shown on document scanner dialog to delete current scan -->
-  <string name="scan_dialog_delete_body">現在のスキャンを削除しますか？　</string>
-  <!-- Message shown when users deny camera permissions to scan documents -->
-  <string name="scan_requires_permission">ドキュメントをスキャンするにはカメラの権限が必要です</string>
-  <!-- Error text for incorrect name -->
-  <string name="scan_incorrect_name">名前が間違っています</string>
-  <!-- Error text for invalid characters -->
-  <string name="scan_invalid_characters">無効な文字です</string>
-  <!-- Snackbar text for incorrect name -->
-  <string name="scan_snackbar_incorrect_name">先に進む前にファイル名を修正してください</string>
-  <!-- Dialog message showing file progress -->
-  <string name="scan_dialog_progress">%1$sを準備しています。お待ちください&#8230;</string>
-  <!-- Error shown when the user writes a character not allowed -->
-  <string name="scan_snackbar_invalid_characters">次の文字は許可されていません： ” * / : &lt; &gt; ? \ |</string>
+    <!-- Screen title for cropping current scan (Document scanner) -->
+    <string name="scan_title_crop">クロップ</string>
+    <!-- Screen title for saving current scan (Document scanner) -->
+    <string name="scan_title_save_scan">スキャンを保存</string>
+    <!-- Label of the button to add a new page to the current document scan -->
+    <string name="scan_action_add">追加</string>
+    <!-- Action of a button to save something -->
+    <string name="scan_action_save">保存</string>
+    <!-- Action text to retake current scan picture (Document scanner) -->
+    <string name="scan_action_retake">撮り直す</string>
+    <!-- Document scanner file name -->
+    <string name="scan_file_name">ファイル名</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_file_type">ファイルの種類</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_quality">品質</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_destination">保存先</string>
+    <!-- Document scanner high quality option -->
+    <string name="scan_quality_high">高</string>
+    <!-- Document scanner medium quality option -->
+    <string name="scan_quality_medium">中</string>
+    <!-- Document scanner low quality option -->
+    <string name="scan_quality_low">低</string>
+    <!-- Title text shown on document scanner dialog to discard scan -->
+    <string name="scan_dialog_discard_title">スキャンを破棄しますか？</string>
+    <!-- Body text shown on document scanner dialog to discard scan -->
+    <string name="scan_dialog_discard_body">現在のスキャンは失われます</string>
+    <!-- Title text shown on document scanner dialog to discard scan all scans -->
+    <string name="scan_dialog_discard_all_title">すべてのスキャンを破棄しますか？　</string>
+    <!-- Body text shown on document scanner dialog to discard all scans -->
+    <string name="scan_dialog_discard_all_body">現在のドキュメントは失われます</string>
+    <!-- Action text shown on document scanner dialog to discard scans -->
+    <string name="scan_dialog_discard_action">破棄する</string>
+    <!-- Body text shown on document scanner dialog to delete current scan -->
+    <string name="scan_dialog_delete_body">現在のスキャンを削除しますか？　</string>
+    <!-- Message shown when users deny camera permissions to scan documents -->
+    <string name="scan_requires_permission">ドキュメントをスキャンするにはカメラの権限が必要です</string>
+    <!-- Error text for incorrect name -->
+    <string name="scan_incorrect_name">名前が間違っています</string>
+    <!-- Error text for invalid characters -->
+    <string name="scan_invalid_characters">無効な文字です</string>
+    <!-- Snackbar text for incorrect name -->
+    <string name="scan_snackbar_incorrect_name">先に進む前にファイル名を修正してください</string>
+    <!-- Dialog message showing file progress -->
+    <string name="scan_dialog_progress">%1$sを準備しています。お待ちください&#8230;</string>
+    <!-- Error shown when the user writes a character not allowed -->
+    <string name="scan_snackbar_invalid_characters">次の文字は許可されていません： ” * / : &lt; &gt; ? \ |</string>
 </resources>

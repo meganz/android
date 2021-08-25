@@ -1,51 +1,51 @@
 <?xml version="1.0"?>
 <resources>
-  <!-- Screen title for cropping current scan (Document scanner) -->
-  <string name="scan_title_crop">Rogner</string>
-  <!-- Screen title for saving current scan (Document scanner) -->
-  <string name="scan_title_save_scan">Enregistrer la numérisation</string>
-  <!-- Label of the button to add a new page to the current document scan -->
-  <string name="scan_action_add">Ajouter</string>
-  <!-- Action of a button to save something -->
-  <string name="scan_action_save">Enregistrer</string>
-  <!-- Action text to retake current scan picture (Document scanner) -->
-  <string name="scan_action_retake">Renumériser</string>
-  <!-- Document scanner file name -->
-  <string name="scan_file_name">Nom du fichier</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_file_type">Type de fichier</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_quality">Qualité</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_destination">Destination</string>
-  <!-- Document scanner high quality option -->
-  <string name="scan_quality_high">Haute</string>
-  <!-- Document scanner medium quality option -->
-  <string name="scan_quality_medium">Moyenne</string>
-  <!-- Document scanner low quality option -->
-  <string name="scan_quality_low">Basse</string>
-  <!-- Title text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_title">Abandonner la numérisation ?</string>
-  <!-- Body text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_body">La présente numérisation sera perdue</string>
-  <!-- Title text shown on document scanner dialog to discard scan all scans -->
-  <string name="scan_dialog_discard_all_title">Abandonner toutes les numérisations ?</string>
-  <!-- Body text shown on document scanner dialog to discard all scans -->
-  <string name="scan_dialog_discard_all_body">Le présent document sera perdue</string>
-  <!-- Action text shown on document scanner dialog to discard scans -->
-  <string name="scan_dialog_discard_action">Abandonner</string>
-  <!-- Body text shown on document scanner dialog to delete current scan -->
-  <string name="scan_dialog_delete_body">Supprimer la présente numérisation ?</string>
-  <!-- Message shown when users deny camera permissions to scan documents -->
-  <string name="scan_requires_permission">L’autorisation Appareil photo est nécessaire pour numériser des documents</string>
-  <!-- Error text for incorrect name -->
-  <string name="scan_incorrect_name">Le nom est incorrect</string>
-  <!-- Error text for invalid characters -->
-  <string name="scan_invalid_characters">Certains caractères sont invalides</string>
-  <!-- Snackbar text for incorrect name -->
-  <string name="scan_snackbar_incorrect_name">Veuillez corriger le nom de votre fichier avant de poursuivre</string>
-  <!-- Dialog message showing file progress -->
-  <string name="scan_dialog_progress">Préparation de %1$s. Veuillez patienter&#8230;</string>
-  <!-- Error shown when the user writes a character not allowed -->
-  <string name="scan_snackbar_invalid_characters">Les caractères suivants ne sont pas autorisés&#160;: ” * / : &lt; &gt; ? \ |</string>
+    <!-- Screen title for cropping current scan (Document scanner) -->
+    <string name="scan_title_crop">Rogner</string>
+    <!-- Screen title for saving current scan (Document scanner) -->
+    <string name="scan_title_save_scan">Enregistrer la numérisation</string>
+    <!-- Label of the button to add a new page to the current document scan -->
+    <string name="scan_action_add">Ajouter</string>
+    <!-- Action of a button to save something -->
+    <string name="scan_action_save">Enregistrer</string>
+    <!-- Action text to retake current scan picture (Document scanner) -->
+    <string name="scan_action_retake">Renumériser</string>
+    <!-- Document scanner file name -->
+    <string name="scan_file_name">Nom du fichier</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_file_type">Type de fichier</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_quality">Qualité</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_destination">Destination</string>
+    <!-- Document scanner high quality option -->
+    <string name="scan_quality_high">Haute</string>
+    <!-- Document scanner medium quality option -->
+    <string name="scan_quality_medium">Moyenne</string>
+    <!-- Document scanner low quality option -->
+    <string name="scan_quality_low">Basse</string>
+    <!-- Title text shown on document scanner dialog to discard scan -->
+    <string name="scan_dialog_discard_title">Abandonner la numérisation ?</string>
+    <!-- Body text shown on document scanner dialog to discard scan -->
+    <string name="scan_dialog_discard_body">La présente numérisation sera perdue</string>
+    <!-- Title text shown on document scanner dialog to discard scan all scans -->
+    <string name="scan_dialog_discard_all_title">Abandonner toutes les numérisations ?</string>
+    <!-- Body text shown on document scanner dialog to discard all scans -->
+    <string name="scan_dialog_discard_all_body">Le présent document sera perdue</string>
+    <!-- Action text shown on document scanner dialog to discard scans -->
+    <string name="scan_dialog_discard_action">Abandonner</string>
+    <!-- Body text shown on document scanner dialog to delete current scan -->
+    <string name="scan_dialog_delete_body">Supprimer la présente numérisation ?</string>
+    <!-- Message shown when users deny camera permissions to scan documents -->
+    <string name="scan_requires_permission">L’autorisation Appareil photo est nécessaire pour numériser des documents</string>
+    <!-- Error text for incorrect name -->
+    <string name="scan_incorrect_name">Le nom est incorrect</string>
+    <!-- Error text for invalid characters -->
+    <string name="scan_invalid_characters">Certains caractères sont invalides</string>
+    <!-- Snackbar text for incorrect name -->
+    <string name="scan_snackbar_incorrect_name">Veuillez corriger le nom de votre fichier avant de poursuivre</string>
+    <!-- Dialog message showing file progress -->
+    <string name="scan_dialog_progress">Préparation de %1$s. Veuillez patienter&#8230;</string>
+    <!-- Error shown when the user writes a character not allowed -->
+    <string name="scan_snackbar_invalid_characters">Les caractères suivants ne sont pas autorisés&#160;: ” * / : &lt; &gt; ? \ |</string>
 </resources>
