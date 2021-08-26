@@ -1456,6 +1456,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		} else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
 
 			if (e.getErrorCode() != MegaError.API_OK) {
+
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.INVISIBLE);

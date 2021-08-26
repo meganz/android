@@ -6,23 +6,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.content.Intent;
 import android.view.View;
 
-import ash.TL;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.WeakAccountProtectionAlertActivity;
-import mega.privacy.android.app.listeners.BaseListener;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaRequest;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
-import androidx.annotation.NonNull;
 
 public class FabButtonListener implements FloatingActionButton.OnClickListener{
 

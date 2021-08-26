@@ -60,6 +60,7 @@ fun removeBackupsBeforeLogout() {
  * If the client has enabled CU, but hasn't set backup, here create the backup for current account.
  */
 fun initCuSync() {
+    // Check device name.
     SetDeviceNameHelper.setDefaultDeviceName(MegaApplication.getInstance().megaApi)
 
     val dbH = MegaApplication.getInstance().dbH

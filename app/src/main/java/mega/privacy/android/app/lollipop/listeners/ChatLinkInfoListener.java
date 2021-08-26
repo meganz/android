@@ -102,6 +102,7 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
             else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
                 MegaNode rootNode = megaApiFolder.getRootNode();
                 if (rootNode != null) {
+
                     if (!request.getFlag()) {
 
                         String folderSubHandle = null;
