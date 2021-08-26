@@ -123,8 +123,8 @@ class GridViewCallFragment : MeetingBaseFragment() {
             (parentFragment as InMeetingFragment).inMeetingViewModel.removeAllParticipantVisible()
         }
 
-        activateVideoWhenScroll()
         closeVideoWhenScroll()
+        activateVideoWhenScroll()
     }
 
     /**

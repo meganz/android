@@ -579,7 +579,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		stopService(new Intent(getInstance(), IncomingCallService.class));
 
-		logDebug("Call status is " + callStatusToString(callStatus)+", chat id is "+chatId);
+		logDebug("Call status is " + callStatusToString(callStatus)+", chat id is "+chatId+", call id is "+callId);
 		switch (callStatus) {
 			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
 			case MegaChatCall.CALL_STATUS_JOINING:
@@ -600,9 +600,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				}
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
-					getChatManagement().setNotificationShown(chatId);
+					getChatManagement().addNotificationShown(chatId);
 					logDebug("Is ongoing call");
-					ongoingCall(chatId, (isOutgoing && getChatManagement().isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
+					ongoingCall(chatId, callId, (isOutgoing && getChatManagement().isRequestSent(callId)) ? AUDIO_MANAGER_CALL_OUTGOING : AUDIO_MANAGER_CALL_IN_PROGRESS);
 				}
 				break;
 
@@ -615,6 +615,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 				logDebug("Call has ended");
 				getChatManagement().setOpeningMeetingLink(chatId, false);
+				getChatManagement().removeNotificationShown(chatId);
 				int termCode = call.getTermCode();
 				boolean isIgnored = call.isIgnored();
 				checkCallDestroyed(chatId, callId, termCode, isIgnored);
@@ -1376,7 +1377,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	 */
 	public void showGroupCallNotification(long chatId) {
 		logDebug("Show group call notification: chatId = "+chatId);
-		getChatManagement().setNotificationShown(chatId);
+		getChatManagement().addNotificationShown(chatId);
 		stopService(new Intent(this, IncomingCallService.class));
 		ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 		notificationBuilder.checkOneGroupCall(chatId);
@@ -1604,16 +1605,17 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (shouldNotify(this)) {
 			toSystemSettingNotification(this);
 		}
+
 		cancelIncomingCallNotification(this);
 		if (wakeLock != null && wakeLock.isHeld()) {
 			wakeLock.release();
 		}
-
 		clearIncomingCallNotification(callId);
 		//Show missed call if time out ringing (for incoming calls)
 		try {
 			if(termCode == MegaChatCall.TERM_CODE_ERROR && !isIgnored){
-				if (megaApi.isChatNotifiable(chatId)) {
+				MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+				if (chatRoom != null && !chatRoom.isGroup() && !chatRoom.isMeeting() && megaApi.isChatNotifiable(chatId)) {
 					logDebug("localTermCodeNotLocal");
 					try {
 						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);

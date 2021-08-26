@@ -201,20 +201,15 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun amIAloneOnTheCall(chatId: Long): Boolean {
         if (isSameChatRoom(chatId)) {
-            //Update call
             inMeetingRepository.getMeeting(currentChatId)?.let { call ->
-                logDebug("Num participants in the meeting is ${call.numParticipants}")
-                if (call.numParticipants == 0) {
-                    logDebug("No participants in the call yet")
-                    return true
-                } else if (call.numParticipants == 1) {
-                    val peerIds = call.peeridParticipants
-                    peerIds?.let {
-                        val isMe = isMe(it.get(0))
-                        logDebug("I am the only participant in the call $isMe")
-                        return isMe
-                    }
+                val sessionsInTheCall: MegaHandleList? = call.sessionsClientid
+                if (sessionsInTheCall != null && sessionsInTheCall.size() > 0) {
+                    logDebug("I am not the only participant in the call, num of session in the call is ${sessionsInTheCall.size()}")
+                    return false
                 }
+
+                logDebug("I am the only participant in the call")
+                return true
             }
         }
 
@@ -1311,6 +1306,16 @@ class InMeetingViewModel @ViewModelInject constructor(
     fun ignoreCall() {
         _callLiveData.value?.let {
             inMeetingRepository.ignoreCall(it.chatid)
+        }
+    }
+
+    /**
+     * Method for remove incoming call notification
+     */
+    fun removeIncomingCallNotification(chatId: Long) {
+        inMeetingRepository.getMeeting(chatId)?.let { call ->
+            MegaApplication.getInstance().stopSounds()
+            CallUtil.clearIncomingCallNotification(call.callId)
         }
     }
 

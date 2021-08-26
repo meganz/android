@@ -125,12 +125,13 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         })
 
         binding.rejectFab.setOnClickListener {
+            inMeetingViewModel.removeIncomingCallNotification(chatId)
+
             if (inMeetingViewModel.isOneToOneCall()) {
                 inMeetingViewModel.leaveMeeting()
             } else {
                 inMeetingViewModel.ignoreCall()
             }
-
             requireActivity().finish()
         }
 

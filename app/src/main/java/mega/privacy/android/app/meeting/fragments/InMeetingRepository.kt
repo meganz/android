@@ -182,8 +182,6 @@ class InMeetingRepository @Inject constructor(
             return
 
         megaChatApi.setIgnoredCall(chatId)
-        MegaApplication.getInstance().stopSounds()
-        CallUtil.clearIncomingCallNotification(chatId)
     }
 
     /**
