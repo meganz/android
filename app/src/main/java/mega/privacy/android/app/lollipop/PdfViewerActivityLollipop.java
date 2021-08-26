@@ -77,7 +77,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
-import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1896,8 +1895,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
             if (e.getErrorCode() == MegaError.API_OK){
-                SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
-
                 gSession = megaApi.dumpSession();
                 MegaUser myUser = megaApi.getMyUser();
                 String myUserHandle = "";

@@ -73,7 +73,6 @@ import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -2138,7 +2137,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
 			if (error.getErrorCode() == MegaError.API_OK){
-                SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
 			    DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
 				gSession = megaApi.dumpSession();

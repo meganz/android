@@ -71,7 +71,6 @@ import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLol
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -1457,8 +1456,6 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		} else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
 
 			if (e.getErrorCode() != MegaError.API_OK) {
-                SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
-
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.INVISIBLE);

@@ -70,7 +70,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1961,8 +1960,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             MegaApplication.setLoggingIn(false);
 
             if (error.getErrorCode() == MegaError.API_OK){
-                SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
-
                 receivedIntent = ((LoginActivityLollipop) context).getIntentReceived();
                 if (receivedIntent != null) {
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivityLollipop.EXTRA_SHARE_INFOS);

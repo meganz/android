@@ -76,7 +76,6 @@ import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
-import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
 
@@ -350,7 +349,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			else if(request.getType() == MegaRequest.TYPE_FETCH_NODES){
 				logDebug("TYPE_FETCH_NODES");
 				if (e.getErrorCode() == MegaError.API_OK){
-                    SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
 					askForFullAccountInfo();
 
 					GetAttrUserListener listener = new GetAttrUserListener(getApplicationContext());

@@ -53,7 +53,6 @@ import mega.privacy.android.app.notifications.TransferOverQuotaNotification;
 import mega.privacy.android.app.objects.SDTransfer;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.SDCardOperator;
-import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1829,7 +1828,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				megaChatApi.connectInBackground(this);
 				isLoggingIn = false;
 				MegaApplication.setLoggingIn(isLoggingIn);
-                SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
 
 				for (int i=0;i<pendingIntents.size();i++){
 					onHandleIntent(pendingIntents.get(i));

@@ -73,7 +73,6 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.SetDeviceNameHelper;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -886,8 +885,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 
 			if (e.getErrorCode() == MegaError.API_OK) {
-                SetDeviceNameHelper.INSTANCE.setDefaultDeviceName(megaApi);
-
 				logDebug("DOCUMENTNODEHANDLEPUBLIC: " + request.getNodeHandle());
 				if (dbH == null){
 					dbH = DatabaseHandler.getDbHandler(getApplicationContext());

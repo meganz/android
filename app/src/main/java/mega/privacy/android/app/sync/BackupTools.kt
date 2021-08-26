@@ -8,6 +8,7 @@ import mega.privacy.android.app.sync.cusync.CuSyncManager.setSecondaryBackup
 import mega.privacy.android.app.sync.cusync.CuSyncManager.updatePrimaryBackupName
 import mega.privacy.android.app.sync.cusync.CuSyncManager.updateSecondaryBackupName
 import mega.privacy.android.app.utils.CameraUploadUtil
+import mega.privacy.android.app.utils.SetDeviceNameHelper
 
 /**
  * @return Name of the node with the handle. null if the node doesn't exist.
@@ -47,11 +48,11 @@ fun deleteSQL(id: Long) =
  */
 fun removeBackupsBeforeLogout() {
     if (CameraUploadUtil.isPrimaryEnabled()) {
-        CuSyncManager.removePrimaryBackup();
+        CuSyncManager.removePrimaryBackup()
     }
 
     if (CameraUploadUtil.isSecondaryEnabled()) {
-        CuSyncManager.removeSecondaryBackup();
+        CuSyncManager.removeSecondaryBackup()
     }
 }
 
@@ -59,6 +60,8 @@ fun removeBackupsBeforeLogout() {
  * If the client has enabled CU, but hasn't set backup, here create the backup for current account.
  */
 fun initCuSync() {
+    SetDeviceNameHelper.setDefaultDeviceName(MegaApplication.getInstance().megaApi)
+
     val dbH = MegaApplication.getInstance().dbH
 
     if (CameraUploadUtil.isPrimaryEnabled() && dbH.cuBackup == null) {
