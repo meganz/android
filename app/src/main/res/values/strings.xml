@@ -1723,8 +1723,6 @@
     <string name="general_view">View files</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Import</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Save for offline</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Add to Cloud Drive</string>
     <!-- Menu option -->
