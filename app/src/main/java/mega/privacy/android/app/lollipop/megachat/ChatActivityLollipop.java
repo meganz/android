@@ -4452,7 +4452,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                 menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
                 menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                 importIcon.setVisible(false);
-
             }else {
                 if((chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RM||chatRoom.getOwnPrivilege()==MegaChatRoom.PRIV_RO) && !chatRoom.isPreview()){
                     logDebug("Chat without permissions || without preview");
@@ -4482,13 +4481,15 @@ public class ChatActivityLollipop extends PasscodeActivity
                 }
                 else{
                     logDebug("Chat with permissions or preview");
-                    menu.findItem(R.id.chat_cab_menu_forward).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode());
                     if (selected.size() == 1) {
-                        if(hasMessagesRemoved(selected.get(0).getMessage()) || selected.get(0).isUploading()) {
+                        boolean isRemovedMsg = hasMessagesRemoved(selected.get(0).getMessage());
+                        boolean shouldForwardOptionVisible = !selected.get(0).isUploading() && !isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode();
+                        menu.findItem(R.id.chat_cab_menu_forward).setVisible(shouldForwardOptionVisible);
+
+                        if(selected.get(0).isUploading()) {
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
@@ -4498,21 +4499,20 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                         }else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_NODE_ATTACHMENT) {
                             menu.findItem(R.id.chat_cab_menu_share).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-                            menu.findItem(R.id.chat_cab_menu_share).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode());
+                            menu.findItem(R.id.chat_cab_menu_share).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && !isRemovedMsg);
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(selected.get(0).getMessage().getUserHandle() == myUserHandle &&
-                                    selected.get(0).getMessage().isDeletable());
-                            menu.findItem(R.id.chat_cab_menu_download).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode());
+                                    selected.get(0).getMessage().isDeletable() && !isRemovedMsg);
+                            menu.findItem(R.id.chat_cab_menu_download).setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode()&& !isRemovedMsg);
                             menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(isOnline(chatActivity) &&
-                                    !chatC.isInAnonymousMode() && isMsgImage(selected.get(0)));
-                            importIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && selected.get(0).getMessage().getUserHandle() != myUserHandle);
+                                    !chatC.isInAnonymousMode() && isMsgImage(selected.get(0)) && !isRemovedMsg);
+                            importIcon.setVisible(isOnline(chatActivity) && !chatC.isInAnonymousMode() && selected.get(0).getMessage().getUserHandle() != myUserHandle && !isRemovedMsg);
                         }
                         else if(selected.get(0).getMessage().getType()==MegaChatMessage.TYPE_CONTACT_ATTACHMENT){
                             logDebug("TYPE_CONTACT_ATTACHMENT selected");
-
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
@@ -4525,16 +4525,16 @@ public class ChatActivityLollipop extends PasscodeActivity
                                 MegaUser contact = megaApi.getContact(userEmail);
                                 if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                                     menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
-                                    menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0));
+                                    menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(!isRemovedMsg && (chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0)));
                                 } else {
-                                    menu.findItem(R.id.chat_cab_menu_invite).setVisible(userHandle != myUserHandle);
+                                    menu.findItem(R.id.chat_cab_menu_invite).setVisible(!isRemovedMsg && userHandle != myUserHandle);
                                     menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                                 }
                             } else {
                                 menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
                                 menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                             }
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(selected.get(0).getMessage().getUserHandle() == myUserHandle &&
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(!isRemovedMsg && selected.get(0).getMessage().getUserHandle() == myUserHandle &&
                                     selected.get(0).getMessage().isDeletable());
                             importIcon.setVisible(false);
                         }
@@ -4545,7 +4545,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                             menu.findItem(R.id.chat_cab_menu_invite).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_share).setVisible(false);
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(selected.get(0).getMessage().getUserHandle() == myUserHandle &&
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(!isRemovedMsg && selected.get(0).getMessage().getUserHandle() == myUserHandle &&
                                     selected.get(0).getMessage().isDeletable());
                             menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(false);
@@ -4553,7 +4553,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                         }
                         else{
                             logDebug("Other type: " + selected.get(0).getMessage().getType());
-
                             MegaChatMessage messageSelected= megaChatApi.getMessage(idChat, selected.get(0).getMessage().getMsgId());
                             if(messageSelected == null){
                                 messageSelected = megaChatApi.getMessage(idChat, selected.get(0).getMessage().getTempId());
@@ -4583,10 +4582,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                             int type = selected.get(0).getMessage().getType();
 
                             if(messageSelected.getUserHandle()==myUserHandle){
-                                menu.findItem(R.id.chat_cab_menu_edit).setVisible(messageSelected.isEditable());
-                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(messageSelected.isDeletable());
+                                menu.findItem(R.id.chat_cab_menu_edit).setVisible(!isRemovedMsg && messageSelected.isEditable());
+                                menu.findItem(R.id.chat_cab_menu_delete).setVisible(!isRemovedMsg && messageSelected.isDeletable());
 
-                                if (!isOnline(chatActivity) || type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED||type == MegaChatMessage.TYPE_CALL_STARTED) {
+                                if (isRemovedMsg || !isOnline(chatActivity) || chatC.isInAnonymousMode() || type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED||type == MegaChatMessage.TYPE_CALL_STARTED) {
                                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                                 }
                                 else{
@@ -4598,7 +4597,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                 menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                                 importIcon.setVisible(false);
 
-                                if (chatC.isInAnonymousMode() || !isOnline(chatActivity) || type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED||type == MegaChatMessage.TYPE_CALL_STARTED) {
+                                if (isRemovedMsg || !isOnline(chatActivity) || chatC.isInAnonymousMode() || type == MegaChatMessage.TYPE_TRUNCATE||type == MegaChatMessage.TYPE_ALTER_PARTICIPANTS||type == MegaChatMessage.TYPE_CHAT_TITLE||type == MegaChatMessage.TYPE_PRIV_CHANGE||type == MegaChatMessage.TYPE_CALL_ENDED||type == MegaChatMessage.TYPE_CALL_STARTED) {
                                     menu.findItem(R.id.chat_cab_menu_forward).setVisible(false);
                                 }
                                 else{
@@ -4628,10 +4627,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                         for(int i=0; i<selected.size();i++) {
 
-                            if(hasMessagesRemoved(selected.get(i).getMessage())){
-                                isRemoved = true;
-                                break;
-                            }
+                            isRemoved = hasMessagesRemoved(selected.get(i).getMessage());
 
                             if (!isUploading) {
                                 if (selected.get(i).isUploading()) {
@@ -4650,7 +4646,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                 showCopy = false;
                             }
 
-                            if((showDelete) && ((msg.getUserHandle() != myUserHandle) || ((msg.getType() == MegaChatMessage.TYPE_NORMAL || msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_CONTAINS_META || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP) && (!(msg.isDeletable()))))){
+                            if(isRemoved || (showDelete && ((msg.getUserHandle() != myUserHandle) || ((msg.getType() == MegaChatMessage.TYPE_NORMAL || msg.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT || msg.getType() == MegaChatMessage.TYPE_CONTAINS_META || msg.getType() == MegaChatMessage.TYPE_VOICE_CLIP) && (!(msg.isDeletable())))))){
                                 showDelete = false;
                             }
 
@@ -4680,7 +4676,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                             }
                     }
 
-                        if (isUploading || isRemoved) {
+                        if (isUploading) {
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_delete).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
@@ -4691,7 +4687,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                             importIcon.setVisible(false);
                         }
                         else {
-                            if (allNodeAttachments && isOnline(chatActivity)) {
+                            if (allNodeAttachments && isOnline(chatActivity) && !isRemoved) {
                                 if (chatC.isInAnonymousMode()) {
                                     menu.findItem(R.id.chat_cab_menu_download).setVisible(false);
                                     menu.findItem(R.id.chat_cab_menu_download_gallery).setVisible(false);
@@ -4712,10 +4708,9 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                             menu.findItem(R.id.chat_cab_menu_edit).setVisible(false);
                             menu.findItem(R.id.chat_cab_menu_copy).setVisible(!chatC.isInAnonymousMode() && showCopy);
-                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(!chatC.isInAnonymousMode() && showDelete);
-                            menu.findItem(R.id.chat_cab_menu_forward).setVisible((isOnline(chatActivity) &&
-                                    !chatC.isInAnonymousMode()) && showForward);
-                            menu.findItem(R.id.chat_cab_menu_invite).setVisible(allNodeNonContacts &&
+                            menu.findItem(R.id.chat_cab_menu_delete).setVisible(!isRemoved && !chatC.isInAnonymousMode() && showDelete);
+                            menu.findItem(R.id.chat_cab_menu_forward).setVisible(!isRemoved && isOnline(chatActivity) && !chatC.isInAnonymousMode() && showForward);
+                            menu.findItem(R.id.chat_cab_menu_invite).setVisible(!isRemoved && allNodeNonContacts &&
                                     isOnline(chatActivity) && !chatC.isInAnonymousMode());
                         }
                     }
@@ -4895,6 +4890,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             return;
 
         AndroidMegaChatMessage m = messages.get(positionInMessages);
+
         if (adapter.isMultipleSelect() || m == null || m.isUploading() || m.getMessage().getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED || m.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL)
             return;
 
@@ -4972,9 +4968,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                     if(m.isUploading()){
                         showUploadingAttachmentBottomSheet(m, positionInMessages);
                     }else{
-                        if (!ChatUtil.shouldBottomDialogBeDisplayed(m.getMessage())) {
+                        if (!ChatUtil.shouldBottomDialogBeDisplayed(m.getMessage()))
                             return;
-                        }
 
                         if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
                             if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
@@ -7465,10 +7460,24 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void updatingRemovedMessage(MegaChatMessage message) {
         for (int i = 0; i < messages.size(); i++) {
             MegaChatMessage messageToCompare = messages.get(i).getMessage();
-            if (messageToCompare != null && messageToCompare.getTempId() == message.getTempId() && messageToCompare.getMsgId() == message.getMsgId()) {
-                RemovedMessage msg = new RemovedMessage(messageToCompare.getTempId(), messageToCompare.getMsgId());
-                removedMessages.add(msg);
-                adapter.notifyItemChanged(i + 1);
+            if (messageToCompare != null) {
+                if (message.getMsgId() != MEGACHAT_INVALID_HANDLE && messageToCompare.getMsgId() != MEGACHAT_INVALID_HANDLE) {
+                    if (message.getMsgId() == messageToCompare.getMsgId()) {
+                        RemovedMessage msg = new RemovedMessage(messageToCompare.getTempId(), messageToCompare.getMsgId());
+                        removedMessages.add(msg);
+                        adapter.notifyItemChanged(i + 1);
+                        break;
+                    }
+                }
+
+                if (message.getTempId() != MEGACHAT_INVALID_HANDLE && messageToCompare.getTempId() != MEGACHAT_INVALID_HANDLE) {
+                    if (message.getTempId() == messageToCompare.getTempId()) {
+                        RemovedMessage msg = new RemovedMessage(messageToCompare.getTempId(), messageToCompare.getMsgId());
+                        removedMessages.add(msg);
+                        adapter.notifyItemChanged(i + 1);
+                        break;
+                    }
+                }
             }
         }
     }
