@@ -19,7 +19,7 @@ class OfflineGridFileViewHolder(
 
     init {
         binding.filenameContainer.setOnClickListener {
-            val position = adapterPosition
+            val position = bindingAdapterPosition
             listener.onOptionsClicked(position, itemGetter(position))
         }
     }
