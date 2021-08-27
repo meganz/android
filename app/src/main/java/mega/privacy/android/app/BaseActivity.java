@@ -1099,6 +1099,16 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     }
 
     @Override
+    public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
+        try {
+            return super.registerReceiver(receiver, filter);
+        } catch (IllegalStateException e) {
+            logError("IllegalStateException registering receiver", e);
+            return null;
+        }
+    }
+
+    @Override
     public void unregisterReceiver(BroadcastReceiver receiver) {
         try {
             //If the receiver is not registered, it throws an IllegalArgumentException
