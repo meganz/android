@@ -707,23 +707,26 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     SimpleChatRequestListener(
                         MegaChatRequest.TYPE_LOGOUT,
                         onSuccess = { _, _, _ ->
+                            logDebug("Action guest. Log out, done")
                             inMeetingViewModel.createEphemeralAccountAndJoinChat(
                                 args.firstName,
                                 args.lastName,
                                 SimpleMegaRequestListener(
                                     MegaRequest.TYPE_CREATE_ACCOUNT,
                                     onSuccess = { _, _, _ ->
+                                        logDebug("Action guest. Create ephemeral Account, done")
                                         inMeetingViewModel.chatConnect(
                                             SimpleChatRequestListener(
                                                 MegaChatRequest.TYPE_CONNECT,
                                                 onSuccess = { _, _, _ ->
+                                                    logDebug("Action guest. Connect to chat, done")
                                                     inMeetingViewModel.openChatPreview(
                                                         meetingLink,
                                                         SimpleChatRequestListener(
                                                             MegaChatRequest.TYPE_LOAD_PREVIEW,
                                                             onSuccess = { _, request, _ ->
                                                                 logDebug(
-                                                                    "Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
+                                                                    "Action guest. Open chat preview, done. Param type: ${request.paramType}, Chat id: ${request.chatHandle}, Flag: ${request.flag}, Call id: ${
                                                                         request.megaHandleList?.get(
                                                                             0
                                                                         )
@@ -734,6 +737,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                                                                         request.chatHandle,
                                                                         true
                                                                     )
+
                                                                 camIsEnable =
                                                                     sharedModel.cameraLiveData.value!!
                                                                 inMeetingViewModel.joinPublicChat(
@@ -1349,6 +1353,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
+     * Method to remove all video listeners and all child fragments
+     */
+    private fun removeListenersAndFragments() {
+        removeAllListeners()
+        removeAllFragments()
+    }
+
+    /**
      * Method to remove all video listeners
      */
     private fun removeAllListeners() {
@@ -1425,8 +1437,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         status = NOT_TYPE
 
-        removeAllListeners()
-        removeAllFragments()
+        removeListenersAndFragments()
         binding.reconnecting.isVisible = true
         checkInfoBanner(TYPE_RECONNECTING)
     }
@@ -1440,9 +1451,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         status = NOT_TYPE
 
-        removeAllListeners()
         MegaApplication.getInstance().unregisterProximitySensor()
-        removeAllFragments()
+        removeListenersAndFragments()
     }
 
     private fun checkMenuItemsVisibility() {
@@ -1479,6 +1489,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun initOneToOneCall() {
         if (status == TYPE_IN_ONE_TO_ONE) return
 
+        removeListenersAndFragments()
+
         val call: MegaChatCall? = inMeetingViewModel.getCall()
         call?.let { currentCall ->
             val session = inMeetingViewModel.getSessionOneToOneCall(currentCall)
@@ -1486,14 +1498,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 logDebug("Show one to one call UI")
                 status = TYPE_IN_ONE_TO_ONE
                 checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
-
-                individualCallFragment?.let {
-                    if (it.isAdded) {
-                        it.removeChatVideoListener()
-                        removeChildFragment(it)
-                        individualCallFragment = null
-                    }
-                }
 
                 logDebug("Create fragment")
                 individualCallFragment = IndividualCallFragment.newInstance(
@@ -1527,8 +1531,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         status = TYPE_WAITING_CONNECTION
         checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
 
-        removeAllListeners()
-        removeAllFragments()
+        removeListenersAndFragments()
 
         individualCallFragment = IndividualCallFragment.newInstance(
             chatId,
@@ -1666,6 +1669,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun initGroupCall(chatId: Long) {
         if (status != TYPE_IN_GRID_VIEW && status != TYPE_IN_SPEAKER_VIEW) {
+            individualCallFragment?.let {
+                if (it.isAdded) {
+                    it.removeChatVideoListener()
+                    removeChildFragment(it)
+                    individualCallFragment = null
+                }
+            }
             initLocal(chatId)
         }
 
@@ -2526,6 +2536,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Method to control when call ended
      */
     private fun finishActivity() {
+        disableCamera()
+        removeUI()
         logDebug("Finishing the activity")
         meetingActivity.snackbar?.dismiss()
         meetingActivity.finish()
