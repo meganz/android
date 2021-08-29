@@ -28,7 +28,6 @@ import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
-import androidx.preference.PreferenceManager;
 
 import android.text.Html;
 import android.text.Spanned;
@@ -77,7 +76,6 @@ import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.ThemeHelper;
-import mega.privacy.android.app.service.ads.AdsLibInitializer;
 
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
@@ -853,8 +851,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
-
-		AdsLibInitializer.INSTANCE.init(this);
 	}
 
 	public void askForFullAccountInfo(){
