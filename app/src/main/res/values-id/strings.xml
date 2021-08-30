@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available in web browsers since 2016. It has been extended to the Mega Mobile App, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 20 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive periods of the same duration, at the same price as the initial period chosen. To manage your subscriptions, simply tap the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so). Then tap on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA menyediakan penyimpanan cloud dan obrolan terenkripsi yang dikendalikan pengguna melalui browser web standar, bersama dengan aplikasi khusus untuk perangkat seluler. Tidak seperti penyedia penyimpanan cloud lainnya, data anda dienkripsi dan didekripsi hanya oleh perangkat klien anda dan tidak pernah oleh kami.\n\nUnggah file anda dari ponsel cerdas atau tablet anda lalu cari, simpan, unduh, streaming, lihat, bagikan, ganti nama, atau hapus file anda kapan saja, dari perangkat apa pun, di mana pun. Bagikan folder dengan kontak anda dan lihat pembaruannya secara real time. Proses enkripsi berarti kami tidak dapat mengakses atau mereset kata sandi anda sehingga anda HARUS mengingatnya (kecuali anda memiliki Kunci Pemulihan yang dicadangkan) atau anda akan kehilangan akses ke file yang anda simpan.\n\nObrolan video MEGA terenkripsi pengguna menyeluruh memungkinkan privasi total, dan telah tersedia di browser web sejak 2016. Ini telah diperluas ke Aplikasi Seluler Mega, dengan riwayat obrolan yang dapat diakses di beberapa perangkat. Pengguna juga dapat dengan mudah menambahkan file ke obrolan dari MEGA Cloud Drive mereka.\n\nMEGA menawarkan penyimpanan gratis sebesar 20 GB untuk semua pengguna terdaftar dengan prestasi bonus, dan menawarkan paket berbayar dengan batas yang jauh lebih tinggi:\n\n\nLangganan Pro Lite: € 4,99 per bulan atau € 49,99 per tahun memberi anda ruang penyimpanan 400 GB dan kuota transfer 1 TB per bulan.\nLangganan Pro I: € 9,99 per bulan atau € 99,99 per tahun memberi anda ruang penyimpanan 2 TB dan kuota transfer 2 TB per bulan.\nLangganan Pro II: € 19,99  per bulan atau € 199,99 per tahun memberi anda ruang penyimpanan 8 TB dan kuota transfer 8 TB per bulan.\nLangganan Pro III: € 29,99 per bulan atau € 299,99 per tahun memberi Anda ruang penyimpanan 16 TB dan kuota transfer 16 TB per bulan.\n\nLangganan diperbarui secara otomatis untuk periode berturut-turut dengan durasi yang sama, dengan harga yang sama dengan periode awal yang dipilih. Untuk mengelola langganan anda, cukup ketuk ikon Play Store di perangkat seluler anda, masuk dengan ID Google anda (jika anda belum melakukannya). Kemudian ketuk aplikasi MEGA. Anda akan dapat mengelola langganan anda di sana.\n\nIzin aplikasi:\nWRITE_EXTERNAL_STORAGE -&gt; Unduh file anda dari MEGA ke perangkat anda dan unggah file dari perangkat anda ke MEGA\nCAMERA -&gt; Ambil gambar dan unggah foto anda ke MEGA\nREAD_CONTACTS -&gt; Tambahkan kontak dengan mudah dari perangkat anda sebagai kontak MEGA\nRECORD_AUDIO dan CAPTURE_VIDEO_OUTPUT (mikrofon dan kamera)-&gt; MEGA menyediakan panggilan audio/video terenkripsi menyeluruh\n\n\nUntuk meningkatkan kepercayaan pengguna dalam sistem MEGA, semua kode sisi klien diterbitkan, sehingga peneliti keamanan yang tertarik dapat mengevaluasi proses enkripsi. Kode aplikasi seluler kami terletak di: https://github.com/meganz/android \n\nUntuk info lebih lanjut, silakan periksa situs web kami:\nLihat https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA is Cloud Storage with secure always-on privacy.</string>
     <!-- PRO Lite account -->
@@ -1684,8 +1684,6 @@
     <string name="general_view">Lihat file</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Import</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Simpan untuk offline</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Tambah ke Cloud Drive</string>
     <!-- Menu option -->
@@ -2713,7 +2711,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Jika video yang dikompres lebih besar dari</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a Pro plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin clearing scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">hari</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2973,7 +2971,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Aktifkan panggilan</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Enable access to your address book</string>
+    <string name="allow_acces_contact_title">Grant access to your address book</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Temukan kontak dari buku alamat Anda dengan mudah di MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3270,13 +3268,11 @@
     <string name="invite_contact_action_button">Undang teman melalui &#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">1 file already downloaded.</item>
-        <item quantity="other">%d files already downloaded.</item>
+        <item quantity="other">%d file sudah diunduh.</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">1 file pending.</item>
-        <item quantity="other">%d files pending.</item>
+        <item quantity="other">%d file tertunda.</item>
     </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Masuk ke MEGA</string>
@@ -3463,9 +3459,9 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Transfer Anda telah terputus. Tingkatkan akun Anda atau tunggu %s untuk  melanjutkan.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Transfer melebihi kuota</string>
+    <string name="label_transfer_over_quota">Kuota transfer telah terlewati</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Penyimpanan melebihi kuota</string>
+    <string name="label_storage_over_quota">Kuota penyimpanan terlewati</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Dapatkan kuota transfer lebih</string>
     <!-- Warning show to the user when a folder does not exist -->
@@ -3815,7 +3811,7 @@
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">Ekstensi file berubah</string>
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
-    <string name="file_extension_change_warning">You might not be able to open this file if you change its extension.</string>
+    <string name="file_extension_change_warning">Anda mungkin tidak dapat membuka file ini jika anda mengubah ekstensinya.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">Sudah ada file dengan nama yang sama</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
@@ -3867,49 +3863,45 @@
     <!-- Content to show in a Snackbar to tip the incompatibility-->
     <string name="version_incompatibility">We are upgrading MEGAchat. Your calls might not be connected due to version incompatibility unless all parties update their MEGA apps to the latest version.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 file already downloaded. 1 file pending.</string>
+    <string name="file_already_downloaded_and_file_pending_download">1 file sudah diunduh. 1 file tertunda.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 file already downloaded. %d files pending.</string>
+    <string name="file_already_downloaded_and_files_pending_download">1 file sudah diunduh. %d file tertunda.</string>
     <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d files already downloaded. 1 file pending.</string>
+    <string name="files_already_downloaded_and_file_pending_download">%d file sudah diunduh. 1 file tertunda.</string>
     <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d files already downloaded. %2$d files pending.</string>
+    <string name="files_already_downloaded_and_files_pending_download">%1$d file sudah diunduh. %2$d file tertunda.</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 item moved to the Rubbish Bin successfully and 1 item was not sent successfully</string>
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 barang berhasil dipindahkan ke Tempat Sampah dan 1 barang tidak berhasil dikirim</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 item moved to the Rubbish Bin successfully and %d items were not sent successfully</string>
+    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 barang berhasil dipindahkan ke Tempat Sampah dan %d barang tidak berhasil dikirim</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d items moved to the Rubbish Bin successfully and 1 item was not sent successfully</string>
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d barang berhasil dipindahkan ke Tempat Sampah dan 1 barang tidak berhasil dikirim</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d items moved to the Rubbish Bin successfully and %2$d items were not sent successfully</string>
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d barang berhasil dipindahkan ke Tempat Sampah dan %2$d barang tidak berhasil dikirim</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 item restored successfully and 1 item was not restored successfully</string>
+    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 barang berhasil dipulihkan dan 1 barang tidak berhasil dipulihkan</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 item restored successfully and %d items were not restored successfully</string>
+    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 barang berhasil dipulihkan dan %d barang tidak berhasil dipulihkan</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d items restored successfully and 1 item was not restored successfully</string>
+    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d barang berhasil dipulihkan dan 1 barang tidak berhasil dipulihkan</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d items restored successfully and %2$d items were not restored successfully</string>
+    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d barang berhasil dipulihkan dan %2$d barang tidak berhasil dipulihkan</string>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to the Rubbish Bin successfully</item>
-        <item quantity="other">%d items moved to the Rubbish Bin successfully</item>
+        <item quantity="other">%d barang berhasil dipindahkan ke Tempat Sampah</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item was not moved to the Rubbish Bin successfully</item>
-        <item quantity="other">%d items were not moved to the Rubbish Bin successfully</item>
+        <item quantity="other">%d barang tidak berhasil dipindahkan ke Tempat Sampah</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item restored successfully</item>
-        <item quantity="other">%d items restored successfully</item>
+        <item quantity="other">%d barang berhasil dipulihkan</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item was not restored successfully</item>
-        <item quantity="other">%d items were not restored successfully</item>
+        <item quantity="other">%d barang tidak berhasil dipulihkan</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
-    <string name="action_change_anyway">Change anyway</string>
+    <string name="action_change_anyway">Tetap ganti</string>
 </resources>

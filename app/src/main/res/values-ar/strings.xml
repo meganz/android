@@ -1879,8 +1879,6 @@
     <string name="general_view">عرض الملفات</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">استيراد</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">احفظ دون اتصال</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">أضف إلى السواقة السحابية</string>
     <!-- Menu option -->
@@ -3850,9 +3848,9 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">تمت قطع عمليات التراسل الخاصة بك. قم بترقية حسابك أو انتظر%s للمتابعة.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">تجاوز حد التراسل المتاح</string>
+    <string name="label_transfer_over_quota">تم تجاوز حجم التراسل المتاح</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">التخزين فوق الحصة</string>
+    <string name="label_storage_over_quota">تم تجاوز مساحة التخزين المتاحة</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">الحصول على المزيد من حجم التراسل المتاح</string>
     <!-- Warning show to the user when a folder does not exist -->

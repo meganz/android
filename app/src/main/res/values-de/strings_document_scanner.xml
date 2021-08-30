@@ -39,11 +39,11 @@
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">The Camera permission is needed to scan documents</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">Incorrect name</string>
+    <string name="scan_incorrect_name">Invalid name</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">Ungültige Zeichen</string>
     <!-- Snackbar text for incorrect name -->
-    <string name="scan_snackbar_incorrect_name">Correct your filename before proceeding</string>
+    <string name="scan_snackbar_incorrect_name">Please correct your filename before proceeding</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">Preparing %1$s. Please wait&#8230;</string>
     <!-- Error shown when the user writes a character not allowed -->

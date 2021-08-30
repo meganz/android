@@ -1801,8 +1801,6 @@
     <string name="general_view">Просмотр файлов</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Импортировать</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Сохранить локально</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Добавить на облачный диск</string>
     <!-- Menu option -->
@@ -2886,7 +2884,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Если видео для сжатия больше</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Чтобы отключить очистку корзины по расписанию или выбрать более длительный период хранения, нужно подписаться на план Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Чтобы отключить очистку корзины по расписанию или выбрать более длительный период хранения, пожалуйста, подпишитесь на план Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">д.</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3694,9 +3692,9 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Ваши передачи были прерваны. Улучшите аккаунт или подождите %s, чтобы продолжить.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Превышена квота передач</string>
+    <string name="label_transfer_over_quota">Квота на передачу превышена</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Превышен лимит хранения</string>
+    <string name="label_storage_over_quota">Недостаточно места</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Увеличить квоту на передачу</string>
     <!-- Warning show to the user when a folder does not exist -->
@@ -4063,7 +4061,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Файл обновлён</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">Не удалось обновить файл. Попробуйте ещё раз.</string>
+    <string name="file_update_failed">Не удалось обновить файл. Пожалуйста, попробуйте ещё раз.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Файл слишком большой, его нельзя открыть или просмотреть.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->

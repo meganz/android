@@ -39,7 +39,7 @@
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">Izin Kamera diperlukan untuk memindai dokumen</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">Nama salah</string>
+    <string name="scan_incorrect_name">Salah nama</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">Karakter salah</string>
     <!-- Snackbar text for incorrect name -->

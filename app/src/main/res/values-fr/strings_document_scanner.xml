@@ -39,7 +39,7 @@
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">L’autorisation Appareil photo est nécessaire pour numériser des documents</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">Le nom est incorrect</string>
+    <string name="scan_incorrect_name">Le nom est invalide</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">Certains caractères sont invalides</string>
     <!-- Snackbar text for incorrect name -->

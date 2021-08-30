@@ -1723,8 +1723,6 @@
     <string name="general_view">Dateien anzeigen</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Import</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Für Offline-Nutzung speichern</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">In Cloud Drive kopieren</string>
     <!-- Menu option -->
@@ -2770,7 +2768,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Falls die zu komprimiertenden Videos größer sind als</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a Pro plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin clearing scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">Tagen</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3038,7 +3036,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Anrufe aktivieren</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Enable access to your address book</string>
+    <string name="allow_acces_contact_title">Grant access to your address book</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Sehen Sie, welcher Ihrer Kontakte MEGA bereits nutzt</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3278,7 +3276,7 @@
     <!-- The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other. -->
     <string name="end_and_join_call_incoming">Beenden und teilnehmen</string>
     <!-- when trying to download a file that is already downloaded in the device and has to copy in another path -->
-    <string name="copy_already_downloaded">File already downloaded. Copied to the selected path.</string>
+    <string name="copy_already_downloaded">Die Datei war bereits heruntergeladen und wurde an den gewählten Ort kopiert.</string>
     <!-- Title of the dialog shown when you want to join a group call -->
     <string name="title_join_call">An Konferenz teilnehmen</string>
     <!-- Text of the dialog shown when you want to join a group call -->
@@ -3345,8 +3343,8 @@
     <string name="invite_contact_action_button">Einen Freund einladen via&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">1 file already downloaded.</item>
-        <item quantity="other">%d files already downloaded.</item>
+        <item quantity="one">Eine Datei bereits heruntergeladen.</item>
+        <item quantity="other">%d Dateien bereits heruntergeladen.</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
@@ -3538,7 +3536,7 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Ihre Transfers wurden angehalten. Erweitern Sie Ihren Account oder warten Sie %s.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Transferquota überschritten</string>
+    <string name="label_transfer_over_quota">Transfervolumen erschöpft</string>
     <!-- Label indicating storage over quota -->
     <string name="label_storage_over_quota">Speicherlimit überschritten</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
@@ -3899,7 +3897,7 @@
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">Änderung des Dateisuffix</string>
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
-    <string name="file_extension_change_warning">You might not be able to open this file if you change its extension.</string>
+    <string name="file_extension_change_warning">Wenn Sie die Dateierweiterung ändern, können Sie diese Datei möglicherweise nicht mehr öffnen.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">Eine Datei dieses Namens existiert bereits</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
@@ -3952,49 +3950,49 @@
     <!-- Content to show in a Snackbar to tip the incompatibility-->
     <string name="version_incompatibility">We are upgrading MEGAchat. Your calls might not be connected due to version incompatibility unless all parties update their MEGA apps to the latest version.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 file already downloaded. 1 file pending.</string>
+    <string name="file_already_downloaded_and_file_pending_download">Eine Datei wurde bereits heruntergeladen. Eine Datei steht noch aus.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 file already downloaded. %d files pending.</string>
+    <string name="file_already_downloaded_and_files_pending_download">Eine Datei wurde bereits heruntergeladen. %d Dateien stehen noch aus.</string>
     <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d files already downloaded. 1 file pending.</string>
+    <string name="files_already_downloaded_and_file_pending_download">%d Dateien wurden bereits heruntergeladen. Eine Datei steht noch aus.</string>
     <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d files already downloaded. %2$d files pending.</string>
+    <string name="files_already_downloaded_and_files_pending_download">%1$d Dateien wurden bereits heruntergeladen. %2$d Dateien stehen noch aus.</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 item moved to the Rubbish Bin successfully and 1 item was not sent successfully</string>
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">Ein Element wurde erfolgreich in den Papierkorb verschoben und ein Element konnte nicht verschoben werden</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 item moved to the Rubbish Bin successfully and %d items were not sent successfully</string>
+    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">Ein Element wurde erfolgreich in den Papierkorb verschoben und %d Elemente konnten nicht verschoben werden</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d items moved to the Rubbish Bin successfully and 1 item was not sent successfully</string>
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d Elemente wurden erfolgreich in den Papierkorb verschoben und ein Element konnte nicht verschoben werden</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d items moved to the Rubbish Bin successfully and %2$d items were not sent successfully</string>
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d Elemente wurden erfolgreich in den Papierkorb verschoben und %2$d Elemente konnten nicht verschoben werden</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 item restored successfully and 1 item was not restored successfully</string>
+    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">Ein Element wurde erfolgreich wiederhergestellt und ein Element konnte nicht wiederhergestellt werden</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 item restored successfully and %d items were not restored successfully</string>
+    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">Ein Element wurde erfolgreich wiederhergestellt und %d Elemente konnten nicht wiederhergestellt werden</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d items restored successfully and 1 item was not restored successfully</string>
+    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d Elemente wurden erfolgreich wiederhergestellt und ein Element konnte nicht wiederhergestellt werden</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d items restored successfully and %2$d items were not restored successfully</string>
+    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d Elemente wurden erfolgreich wiederhergestellt und %2$d Elemente konnten nicht wiederhergestellt werden</string>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to the Rubbish Bin successfully</item>
-        <item quantity="other">%d items moved to the Rubbish Bin successfully</item>
+        <item quantity="one">Ein Element wurde in den Papierkorb verschoben</item>
+        <item quantity="other">%d Elemente wurden in den Papierkorb verschoben</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item was not moved to the Rubbish Bin successfully</item>
-        <item quantity="other">%d items were not moved to the Rubbish Bin successfully</item>
+        <item quantity="one">Ein Elemente konnte nicht in den Papierkorb verschoben werden</item>
+        <item quantity="other">%d Elemente konnten nicht in den Papierkorb verschoben werden</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item restored successfully</item>
-        <item quantity="other">%d items restored successfully</item>
+        <item quantity="one">Ein Element wiederhergestellt</item>
+        <item quantity="other">%d Elemente wiederhergestellt</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item was not restored successfully</item>
-        <item quantity="other">%d items were not restored successfully</item>
+        <item quantity="one">Ein Element konnte nicht wiederhergestellt werden</item>
+        <item quantity="other">%d Elemente konnten nicht wiederhergestellt werden</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
-    <string name="action_change_anyway">Change anyway</string>
+    <string name="action_change_anyway">Trotzdem ändern</string>
 </resources>

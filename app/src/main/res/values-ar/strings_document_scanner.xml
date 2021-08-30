@@ -39,7 +39,7 @@
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">تحتاج إلى إعطاء إذن الوصول للكاميرا لمسح المستندات ضوئيًا</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">اسم غير صحيح</string>
+    <string name="scan_incorrect_name">اسم غير صالح</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">عناصر غير صالحة</string>
     <!-- Snackbar text for incorrect name -->

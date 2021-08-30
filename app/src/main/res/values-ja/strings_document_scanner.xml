@@ -39,7 +39,7 @@
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">ドキュメントをスキャンするにはカメラの権限が必要です</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">名前が間違っています</string>
+    <string name="scan_incorrect_name">名前が無効です</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">無効な文字です</string>
     <!-- Snackbar text for incorrect name -->

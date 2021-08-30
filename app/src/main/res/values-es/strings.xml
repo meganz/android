@@ -1128,7 +1128,7 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Ampliar cuenta</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Aumenta la capacidad de tu nube [A]¡Obtén más espacio y más cuota de transferencia con una cuenta PRO!</string>
+    <string name="get_pro_account">Aumenta la capacidad de tu nube. [A]Obtén más espacio y más cuota de transferencia con una cuenta Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
     <string name="toast_master_key">Se ha realizado una copia de seguridad de la Clave de recuperación en: %1s.[A] Encontrarás el archivo con la Clave de recuperación en la sección Sin conexión.[A]Aviso: Si cierras la sesión, la Clave se eliminará, por lo tanto tienes que guardarla en un lugar seguro fuera de tu cuenta MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
@@ -1723,8 +1723,6 @@
     <string name="general_view">Ver archivos</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Importar</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Guardar en Sin conexión</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Añadir a Mi nube</string>
     <!-- Menu option -->
@@ -2545,7 +2543,7 @@
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">No se ha podido abrir el archivo.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">No se ha podido abrir el archivo debido a la falta de conexión de red.</string>
+    <string name="error_fail_to_open_file_no_network">Sin conexión. Conéctate para abrir el archivo.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">El archivo ya está en la sección Sin conexión</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -3097,7 +3095,7 @@
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
     <string name="call_error_too_many_participants">No puedes unirte a esta llamada ya que se ha alcanzado el número máximo de participantes.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">No puedes unirte a esta llamada porque el chat de grupo ha superado el límite de participantes.</string>
+    <string name="call_error_too_many_participants_join">No puedes unirte a esta llamada grupal ya que se ha alcanzado el número máximo de participantes</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
     <string name="call_error_too_many_video">No puedes unirte a esta videollamada ya que se ha alcanzado el número máximo de participantes.</string>
     <!-- Message show when a user cannot put the call on hold -->
@@ -3508,7 +3506,7 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">Error de permisos</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">No tienes los permisos necesarios para revertir este archivo. Para continuar, podemos crear un nuevo archivo con los datos anteriores. ¿Te gustaría continuar?</string>
+    <string name="alert_not_enough_permissions_revert">No tienes los permisos necesarios para modificar este archivo. ¿Te gustaría crear un nuevo archivo?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">La versión se ha creado como un nuevo archivo.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
@@ -3546,7 +3544,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">La carpeta no existe.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">El archivo no existe</string>
+    <string name="warning_node_not_exists_in_cloud">No se ha podido encontrar el archivo en tu Nube.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">Almacenamiento lleno</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3658,9 +3656,9 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%1$d%% de %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_enabled">La información especial para mensajes de chat está activada</string>
+    <string name="show_info_chat_msg_enabled">Información de depuración del chat activada</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">La información especial para mensajes de chat está desactivada</string>
+    <string name="show_info_chat_msg_disabled">Información de depuración del chat desactivada</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Ha alcanzado el límite máximo de %d reacciones.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
@@ -3899,7 +3897,7 @@
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">Cambio de extensión del archivo</string>
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
-    <string name="file_extension_change_warning">You might not be able to open this file if you change its extension.</string>
+    <string name="file_extension_change_warning">Es posible que no puedas abrir este archivo si cambias su extensión.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">Ya existe un archivo con el mismo nombre</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
@@ -3964,9 +3962,9 @@
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 elemento se ha movido a la Papelera y otros %d no se han podido mover</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d elementos sen ha movido a la Papelera y uno no se ha podido mover</string>
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d elementos se han movido a la Papelera y uno no se ha podido mover</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d elementos sen ha movido a la Papelera y otros %2$d no se han podido mover</string>
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d elementos se han movido a la Papelera y %2$d no se han podido mover</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
     <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">Se ha restaurado 1 elemento y otro no se ha podido restaurar</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
@@ -3983,7 +3981,7 @@
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
         <item quantity="one">No se ha podido enviar 1 elemento a la papelera</item>
-        <item quantity="other">No se han podido enviar %d elementos a la papelera</item>
+        <item quantity="other">No se han podido enviar %d elementos a la Papelera</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -3996,5 +3994,5 @@
         <item quantity="other">No se han podido restaurar %d elementos</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
-    <string name="action_change_anyway">Change anyway</string>
+    <string name="action_change_anyway">Cambiar de todos modos</string>
 </resources>

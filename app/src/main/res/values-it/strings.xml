@@ -1723,8 +1723,6 @@
     <string name="general_view">Vedi file</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Importa</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Salva per l’Offline</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Aggiungi al Cloud Drive</string>
     <!-- Menu option -->
@@ -1913,7 +1911,7 @@
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Ricompense sbloccate</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">Storage quota</string>
+    <string name="unlocked_storage_title">Spazio di archiviazione utilizzato</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Invitation bonuses</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
@@ -2770,7 +2768,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Se i video da comprimere sono più grandi di</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a Pro plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin clearing scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">giorni</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3038,7 +3036,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Attiva chiamate</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Enable access to your address book</string>
+    <string name="allow_acces_contact_title">Grant access to your address book</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Trova facilmente i tuoi contatti che hai in rubrica su MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3538,9 +3536,9 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">I tuoi trasferimenti sono stati interrotti. Fai l’upgrade del tuo account o attendi %s per continuare.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">I trasferimenti hanno superato la banda</string>
+    <string name="label_transfer_over_quota">Quota di trasferimento superata</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Spazio utilizzato oltre il limite</string>
+    <string name="label_storage_over_quota">Quota superata</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Ottieni più quota di trasferimento</string>
     <!-- Warning show to the user when a folder does not exist -->

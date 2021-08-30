@@ -39,11 +39,11 @@
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">需要相機存取權限才能掃描文件</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">不正確的名稱</string>
+    <string name="scan_incorrect_name">無效的名稱</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">無效字元</string>
     <!-- Snackbar text for incorrect name -->
-    <string name="scan_snackbar_incorrect_name">在繼續操作之前，請更正您的檔案名稱</string>
+    <string name="scan_snackbar_incorrect_name">在繼續操作前請更正您的檔案名稱</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">正在準備%1$s。請稍等&#8230;</string>
     <!-- Error shown when the user writes a character not allowed -->

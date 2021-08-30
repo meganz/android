@@ -1684,8 +1684,6 @@
     <string name="general_view">檢視檔案</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">匯入</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">儲存為可離線存取</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">新增至雲端硬碟</string>
     <!-- Menu option -->
@@ -2712,7 +2710,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">如果要壓縮的影片大於</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">欲停用垃圾筒定時清理排程或設定更長的保留期限，您需要訂閱Pro方案。</string>
+    <string name="settings_rb_scheduler_alert_disabling">欲停用垃圾筒定時清理排程或設定更長的保留期限，請訂閱Pro方案。</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">日</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2972,7 +2970,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">啟用通話</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">開啟對您通訊錄的存取權</string>
+    <string name="allow_acces_contact_title">開啟對您通訊錄的存取權限</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">輕易的在您通訊錄中找到有在使用MEGA的聯絡人。</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3284,7 +3282,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">對話</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]沒有檔案在您的[/B][A]近期存取[/A]</string>
+    <string name="context_empty_recents">[A]近期存取[/A]裡[B]沒有檔案[/B]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">還有%1$s和%2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3460,9 +3458,9 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">您的傳輸已中斷。請升級您的帳戶或等待%s再繼續。</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">超出傳輸配額</string>
+    <string name="label_transfer_over_quota">已超出傳輸配額</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">儲存空間超出配額</string>
+    <string name="label_storage_over_quota">已超出空間配額</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">獲取更多傳輸配額</string>
     <!-- Warning show to the user when a folder does not exist -->
@@ -3802,7 +3800,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">檔案已更新</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">檔案更新失敗。再試一次。</string>
+    <string name="file_update_failed">檔案更新失敗。請再試一次。</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">檔案太大而無法開啟或預覽。</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->

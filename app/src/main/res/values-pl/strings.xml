@@ -1801,8 +1801,6 @@
     <string name="general_view">Zobacz pliki</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Importuj</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Zapisz lokalnie</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Dodaj do Cloud Drive</string>
     <!-- Menu option -->
@@ -2886,7 +2884,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Jeśli filmy do skompresowania są większe niż</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Aby wyłączyć harmonogram czyszczenia kosza lub ustawić dłuższy okres retencji, musisz wykupić plan Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Aby wyłączyć harmonogram czyszczenia Kosza na śmieci lub ustawić dłuższy okres retencji, należy wykupić plan Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">dni</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3170,7 +3168,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Włącz połączenia</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Enable access to your address book</string>
+    <string name="allow_acces_contact_title">Udzielanie dostępu do książki adresowej</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Łatwo odkrywaj kontakty z książki adresowej na MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3518,7 +3516,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Czaty</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Brak plików w folderze [/B][A]Ostatnie[/A]</string>
+    <string name="context_empty_recents">[B]Brak plików w [/B][A]Recents[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s i %2$d więcej</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3694,9 +3692,9 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Twoje transfery zostały przerwane. Uaktualnij swoje konto lub poczekaj %s, aby kontynuować.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Przenieś ponad limit</string>
+    <string name="label_transfer_over_quota">Transfer przekroczony</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Przestrzeń dyskowa przekracza limit</string>
+    <string name="label_storage_over_quota">Dostępny limit został przekroczony</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Zwiększ swój transfer</string>
     <!-- Warning show to the user when a folder does not exist -->
@@ -4063,7 +4061,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Plik został zaktualizowany</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">Aktualizacja pliku nie powiodła się. Spróbuj ponownie.</string>
+    <string name="file_update_failed">Aktualizacja pliku nie powiodła się. Proszę spróbować ponownie.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Plik jest zbyt duży i nie można go otworzyć ani wyświetlić jego podglądu.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
