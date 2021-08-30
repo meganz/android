@@ -170,15 +170,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val error =
-            viewModel.manageActivityResult(this, requestCode, resultCode, data) { result ->
-                profileAvatarChange(result)
-            }
-
-        if (!error.isNullOrEmpty()) {
-            if (error == PROCESSING_FILE) binding.progressBar.isVisible = true
-            else showSnackbar(error)
-        }
+        viewModel.manageActivityResult(this, requestCode, resultCode, data, this)
     }
 
     private fun setupView() {
@@ -239,28 +231,10 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java).observe(this) {
             binding.headerLayout.secondLineToolbar.text = viewModel.getEmail()
         }
-    }
 
-    /**
-     * Shows the result of an avatar change or deletion.
-     *
-     * @param result Pair<Boolean, Boolean> containing the result of the request.
-     *      If first value is true, indicates is an avatar change, otherwise is a deletion.
-     *      If second value is true, means the action finished with success, otherwise not.
-     */
-    private fun profileAvatarChange(result: Pair<Boolean, Boolean>) {
-        binding.progressBar.isVisible = false
-
-        val avatarChange = result.first
-        val success = result.second
-
-        val stringId = if (success) {
-            if (avatarChange) R.string.success_changing_user_avatar
-            else R.string.success_deleting_user_avatar
-        } else if (avatarChange) R.string.error_changing_user_avatar
-        else R.string.error_deleting_user_avatar
-
-        showSnackbar(StringResourcesUtils.getString(stringId))
+        viewModel.isProcessingFile().observe(this) { isProcessing ->
+            binding.progressBar.isVisible = isProcessing
+        }
     }
 
     /**
@@ -670,9 +644,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         deletePhotoDialog = MaterialAlertDialogBuilder(this)
             .setMessage(R.string.confirmation_delete_avatar)
             .setPositiveButton(R.string.context_delete) { _, _ ->
-                viewModel.deleteProfileAvatar(this) { result ->
-                    profileAvatarChange(result)
-                }
+                viewModel.deleteProfileAvatar(this, this)
             }
             .setNegativeButton(R.string.general_cancel, null)
             .show()

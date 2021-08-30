@@ -81,10 +81,12 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
     private val versionsInfo: MutableLiveData<String> = MutableLiveData()
     private val updateAccountDetails: MutableLiveData<Boolean> = MutableLiveData()
+    private val processingFile: MutableLiveData<Boolean> = MutableLiveData()
 
     fun checkElevation(): LiveData<Boolean> = withElevation
     fun getVersionsInfo(): LiveData<String> = versionsInfo
     fun onUpdateAccountDetails(): LiveData<Boolean> = updateAccountDetails
+    fun isProcessingFile(): LiveData<Boolean> = processingFile
 
     fun setElevation(withElevation: Boolean) {
         this.withElevation.value = withElevation
@@ -102,7 +104,7 @@ class MyAccountViewModel @ViewModelInject constructor(
 
     private var numOfClicksLastSession = 0
 
-    private var setAvatarAction: ((Pair<Boolean, Boolean>) -> Unit)? = null
+    private lateinit var snackbarShower: SnackbarShower
 
     private var confirmationLink: String? = null
 
@@ -250,28 +252,29 @@ class MyAccountViewModel @ViewModelInject constructor(
     /**
      * Manages onActivityResult.
      *
-     * @param activity    Current activity.
-     * @param requestCode The integer request code originally supplied to
-     *                    startActivityForResult(), allowing you to identify who this
-     *                    result came from.
-     * @param resultCode  The integer result code returned by the child activity
-     *                    through its setResult().
-     * @param data        An Intent, which can return result data to the caller
-     *                    (various data can be attached to Intent "extras").
+     * @param activity       Current activity.
+     * @param requestCode    The integer request code originally supplied to
+     *                       startActivityForResult(), allowing you to identify who this
+     *                       result came from.
+     * @param resultCode     The integer result code returned by the child activity
+     *                       through its setResult().
+     * @param data           An Intent, which can return result data to the caller
+     *                       (various data can be attached to Intent "extras").
+     * @param snackbarShower Callback to show the action result if needed.
      */
     fun manageActivityResult(
         activity: Activity,
         requestCode: Int,
         resultCode: Int,
         data: Intent?,
-        setAvatarAction: ((Pair<Boolean, Boolean>) -> Unit)? = null
-    ): String? {
+        snackbarShower: SnackbarShower
+    ) {
         if (resultCode != RESULT_OK) {
             logWarning("Result code not OK. Request code $requestCode")
-            return null
+            return
         }
 
-        this.setAvatarAction = setAvatarAction
+        this.snackbarShower = snackbarShower
 
         when (requestCode) {
             REQUEST_CODE_REFRESH -> {
@@ -281,12 +284,11 @@ class MyAccountViewModel @ViewModelInject constructor(
                 app.askForExtendedAccountDetails()
                 LiveEventBus.get(EVENT_REFRESH).post(true)
             }
-            TAKE_PICTURE_PROFILE_CODE -> {
-                return addProfileAvatar(null)
-            }
+            TAKE_PICTURE_PROFILE_CODE -> addProfileAvatar(null)
             CHOOSE_PICTURE_PROFILE_CODE -> {
                 if (data == null) {
-                    return getString(R.string.error_changing_user_avatar_image_not_available)
+                    showResult(getString(R.string.error_changing_user_avatar_image_not_available))
+                    return
                 }
 
                 /* Need to check image existence before use due to android content provider issue.
@@ -309,16 +311,15 @@ class MyAccountViewModel @ViewModelInject constructor(
                 }
 
                 if (!fileExists) {
-                    return getString(R.string.error_changing_user_avatar_image_not_available)
+                    showResult(getString(R.string.error_changing_user_avatar_image_not_available))
+                    return
                 }
 
                 data.action = Intent.ACTION_GET_CONTENT
+                processingFile.value = true
                 FilePrepareTask(this).execute(data)
-                return PROCESSING_FILE
             }
         }
-
-        return null
     }
 
     /**
@@ -499,10 +500,10 @@ class MyAccountViewModel @ViewModelInject constructor(
     /**
      * Adds a photo as avatar.
      *
-     * @param path Path of the chosen photo or null if is a new taken photo.
-     * @return An error message if something was wrong, null otherwise.
+     * @param path           Path of the chosen photo or null if is a new taken photo.
+     * @param snackbarShower Callback to show the request result.
      */
-    private fun addProfileAvatar(path: String?): String? {
+    private fun addProfileAvatar(path: String?) {
         val app = MegaApplication.getInstance()
         val myEmail = megaApi.myUser.email
         val imgFile = if (!path.isNullOrEmpty()) File(path)
@@ -513,7 +514,8 @@ class MyAccountViewModel @ViewModelInject constructor(
         )
 
         if (!FileUtil.isFileAvailable(imgFile)) {
-            return getString(R.string.general_error)
+            showResult(getString(R.string.general_error))
+            return
         }
 
         val newFile = buildAvatarFile(app, myEmail + "Temp.jpg")
@@ -523,22 +525,26 @@ class MyAccountViewModel @ViewModelInject constructor(
             setAvatarUseCase.set(newFile.absolutePath)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy { result -> setAvatarAction?.invoke(result) }
+                .subscribeBy(
+                    onComplete = {
+                        processingFile.value = false
+                        showResult(getString(R.string.success_changing_user_avatar))
+                    },
+                    onError = { showResult(getString(R.string.error_changing_user_avatar)) }
+                )
                 .addTo(composite)
         } else {
             logError("ERROR! Destination PATH is NULL")
         }
-
-        return null
     }
 
     /**
      * Deletes the current avatar.
      *
-     * @param context Current context.
-     * @param action  Action to perform after delete the avatar.
+     * @param context        Current context.
+     * @param snackbarShower Callback to show the request result.
      */
-    fun deleteProfileAvatar(context: Context, action: (Pair<Boolean, Boolean>) -> Unit) {
+    fun deleteProfileAvatar(context: Context, snackbarShower: SnackbarShower) {
         val avatar = buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)
 
         if (FileUtil.isFileAvailable(avatar)) {
@@ -549,7 +555,10 @@ class MyAccountViewModel @ViewModelInject constructor(
         setAvatarUseCase.remove()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy { result -> action.invoke(result) }
+            .subscribeBy(
+                onComplete = { snackbarShower.showSnackbar(getString(R.string.success_deleting_user_avatar)) },
+                onError = { snackbarShower.showSnackbar(getString(R.string.error_deleting_user_avatar)) }
+            )
             .addTo(composite)
     }
 
@@ -647,7 +656,7 @@ class MyAccountViewModel @ViewModelInject constructor(
      * Resets the verified phone number of the current account.
      *
      * @param isModify       True if the action is modify, false if is remove.
-     * @param snackbarShower Callback to inform about the request result if needed.
+     * @param snackbarShower Callback to show the request result if needed.
      * @param action         Action to perform after reset the phone number if modifying.
      */
     fun resetPhoneNumber(isModify: Boolean, snackbarShower: SnackbarShower, action: () -> Unit) {
@@ -667,7 +676,7 @@ class MyAccountViewModel @ViewModelInject constructor(
      * Gets the current account user data.
      *
      * @param isModify       True if the action is modify phone number, false if is remove.
-     * @param snackbarShower Callback to inform about the request result if needed.
+     * @param snackbarShower Callback to show the request result if needed.
      * @param action         Action to perform after reset the phone number if modifying.
      */
     private fun getUserData(isModify: Boolean, snackbarShower: SnackbarShower, action: () -> Unit) {
@@ -795,6 +804,17 @@ class MyAccountViewModel @ViewModelInject constructor(
             API_OK -> actionSuccess.invoke(getString(R.string.pass_changed_alert))
             API_EARGS -> actionError.invoke(getString(R.string.old_password_provided_incorrect))
             else -> actionError.invoke(getString(R.string.general_text_error))
+        }
+    }
+
+    /**
+     * Uses the SnackbarShower object if is initialized to show an action result.
+     *
+     * @param result String to show as result.
+     */
+    private fun showResult(result: String) {
+        if (this::snackbarShower.isInitialized) {
+            snackbarShower.showSnackbar(result)
         }
     }
 }

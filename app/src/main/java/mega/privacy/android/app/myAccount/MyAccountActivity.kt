@@ -27,6 +27,7 @@ import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_MASTER
 import mega.privacy.android.app.databinding.ActivityMyAccountBinding
 import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
@@ -43,7 +44,8 @@ import nz.mega.documentscanner.utils.ViewUtils.hideKeyboard
 import nz.mega.sdk.MegaError.API_OK
 import java.util.*
 
-class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback {
+class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback,
+    SnackbarShower {
 
     companion object {
         private const val KILL_SESSIONS_SHOWN = "KILL_SESSIONS_SHOWN"
@@ -203,8 +205,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val error = viewModel.manageActivityResult(this, requestCode, resultCode, data)
-        if (!error.isNullOrEmpty()) showSnackbar(error)
+        viewModel.manageActivityResult(this, requestCode, resultCode, data, this)
     }
 
     override fun onBackPressed() {
@@ -652,5 +653,9 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     override fun show(message: String) {
         showSnackbar(message)
+    }
+
+    override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+        content?.let { showSnackbar(it) }
     }
 }
