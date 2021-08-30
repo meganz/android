@@ -2709,15 +2709,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun onErrorAnsweredCall(errorCode: Int) {
         logDebug("Error answering the meeting so close it: $errorCode")
-        showSnackbar(
-            SNACKBAR_TYPE,
-            StringResourcesUtils.getString(
-                if (errorCode == MegaChatError.ERROR_TOOMANY) R.string.call_error_too_many_participants
-                else R.string.call_error
-            ),
-            MEGACHAT_INVALID_HANDLE
-        )
-
         finishActivity()
     }
 

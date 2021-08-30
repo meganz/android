@@ -23,6 +23,7 @@ class AnswerChatCallListener(context: Context?) : ChatBaseListener(context) {
 
         if (e.errorCode == MegaError.API_OK) {
             LogUtil.logDebug("Call answered")
+
             val call: MegaChatCall = api.getChatCall(request.chatHandle)
             MegaApplication.getChatManagement().setRequestSentCall(call.callId, false)
             callback?.onCallAnswered(request.chatHandle, request.flag)

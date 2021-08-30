@@ -109,15 +109,11 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_PROXIMITY_SENSOR_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER_PREFERENCES;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.PRODUCTION_SERVER_VALUE;
@@ -125,11 +121,6 @@ import static mega.privacy.android.app.utils.ChangeApiServerUtil.SANDBOX3_SERVER
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue;
 import static mega.privacy.android.app.utils.CacheFolderManager.clearPublicCache;
 import static mega.privacy.android.app.utils.CallUtil.*;
-import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER;
-import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER_PREFERENCES;
-import static mega.privacy.android.app.utils.ChangeApiServerUtil.PRODUCTION_SERVER_VALUE;
-import static mega.privacy.android.app.utils.ChangeApiServerUtil.SANDBOX3_SERVER_VALUE;
-import static mega.privacy.android.app.utils.ChangeApiServerUtil.getApiServerFromValue;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -607,19 +598,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				break;
 
 			case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-				clearIncomingCallNotification(callId);
-				removeValues(chatId);
-				getChatManagement().setRequestSentCall(callId, false);
+				logDebug("The user participation in the call has ended");
+				getChatManagement().controlCallFinished(callId, chatId, call.getTermCode());
 				break;
 
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 				logDebug("Call has ended");
-				getChatManagement().setOpeningMeetingLink(chatId, false);
-				getChatManagement().removeNotificationShown(chatId);
 				int termCode = call.getTermCode();
+				getChatManagement().controlCallFinished(callId, chatId, termCode);
 				boolean isIgnored = call.isIgnored();
 				checkCallDestroyed(chatId, callId, termCode, isIgnored);
-				getChatManagement().setRequestSentCall(callId, false);
 				break;
 		}
 	};
@@ -1588,20 +1576,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
-	private void removeValues(long chatId) {
-		PreferenceManager.getDefaultSharedPreferences(this).edit().remove(KEY_IS_SHOWED_WARNING_MESSAGE + chatId).apply();
-		getChatManagement().removeStatusVideoAndSpeaker(chatId);
-
-        if (!existsAnOngoingOrIncomingCall()) {
-            removeRTCAudioManager();
-            removeRTCAudioManagerRingIn();
-        } else if (participatingInACall()) {
-            removeRTCAudioManagerRingIn();
-        }
-	}
-
 	private void checkCallDestroyed(long chatId, long callId, int termCode, boolean isIgnored) {
-		removeValues(chatId);
+		getChatManagement().setOpeningMeetingLink(chatId, false);
+
 		if (shouldNotify(this)) {
 			toSystemSettingNotification(this);
 		}
@@ -1610,7 +1587,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		if (wakeLock != null && wakeLock.isHeld()) {
 			wakeLock.release();
 		}
-		clearIncomingCallNotification(callId);
+		getChatManagement().removeNotificationShown(chatId);
+
 		//Show missed call if time out ringing (for incoming calls)
 		try {
 			if(termCode == MegaChatCall.TERM_CODE_ERROR && !isIgnored){

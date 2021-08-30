@@ -1081,9 +1081,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		switch (callStatus) {
 			case MegaChatCall.CALL_STATUS_CONNECTING:
 			case MegaChatCall.CALL_STATUS_IN_PROGRESS:
+			case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
 				updateVisibleCallElements(call.getChatid());
+				if ((call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION ||
+						call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) &&
+						call.getTermCode() == MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS) {
+					showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
+				}
 				break;
 		}
 	};

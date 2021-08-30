@@ -63,8 +63,6 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class CallUtil {
 
-    public static final int MAX_PARTICIPANTS_IN_CALL = 20;
-
     /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
      *
@@ -1037,59 +1035,6 @@ public class CallUtil {
         }
 
         return true;
-    }
-
-    /**
-     * Checks if it cannot join to call because has reached the maximum number of participants.
-     * If so, shows a snackbar with a warning.
-     *
-     * @param context current Context
-     * @param call    MegaChatCall to check
-     * @param chat    MegaChatRoom to check
-     * @return True if cannot joint to call, false otherwise
-     */
-    public static boolean canNotJoinCall(Context context, MegaChatCall call, MegaChatRoom chat) {
-        if (call == null || call.getNumParticipants() >= MAX_PARTICIPANTS_IN_CALL) {
-            showSnackbar(context, context.getString(R.string.call_error_too_many_participants));
-            return true;
-        } else if (canNotStartCall(context, chat, true)) {
-            showSnackbar(context, context.getString(R.string.call_error_too_many_participants_join));
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if it cannot start a call because has reached the maximum number of participants.
-     * If so, shows a snackbar with a warning.
-     *
-     * @param context current Context
-     * @param chat    MegaChatRoom to check
-     * @return True if cannot start a call, false otherwise
-     */
-    public static boolean canNotStartCall(Context context, MegaChatRoom chat) {
-        return canNotStartCall(context, chat, false);
-    }
-
-    /**
-     * Checks if it cannot start a call because has reached the maximum number of participants.
-     * If so, shows a snackbar with a warning.
-     *
-     * @param context current Context
-     * @param chat    MegaChatRoom to check
-     * @param joining true if it is related to a join request, false otherwise
-     * @return True if cannot start a call, false otherwise
-     */
-    public static boolean canNotStartCall(Context context, MegaChatRoom chat, boolean joining) {
-        if (chat == null || (chat.isPublic() && chat.getPeerCount() + 1 > MAX_PARTICIPANTS_IN_CALL)) {
-            if (!joining) {
-                showSnackbar(context, context.getString(R.string.call_error_too_many_participants_start));
-            }
-            return true;
-        }
-
-        return false;
     }
 
     public static void addChecksForACall(long chatId, boolean speakerStatus) {
