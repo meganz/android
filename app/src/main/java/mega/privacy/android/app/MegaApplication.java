@@ -28,7 +28,6 @@ import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
-import androidx.preference.PreferenceManager;
 
 import android.text.Html;
 import android.text.Spanned;
@@ -76,6 +75,7 @@ import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.ThemeHelper;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
 
@@ -107,7 +107,6 @@ import nz.mega.sdk.MegaUser;
 
 import static android.media.AudioManager.STREAM_RING;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
-import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -365,7 +364,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
 
 					// Init CU sync data after login successfully
-					initCuSync();
+					new CUBackupInitializeChecker(megaApi).initCuSync();
 
 					//Login check resumed pending transfers
 					TransfersManagement.checkResumedPendingTransfers();
