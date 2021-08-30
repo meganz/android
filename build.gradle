@@ -69,7 +69,7 @@ ext {
     ktxVersion = '1.3.2'
     lifecycleVersion = '2.3.0'
     materialVersion = '1.3.0'
-    recyclerViewVersion = '1.1.0'
+    recyclerViewVersion = '1.2.1'
     roomVersion = '2.2.5'
     viewPagerVersion = '1.0.0'
     cardViewVersion = '1.0.0'
