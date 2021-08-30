@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.Observer
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -87,20 +86,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private var changeEmailDialog: AlertDialog? = null
     private var deletePhotoDialog: AlertDialog? = null
 
-    private val profileAvatarUpdatedObserver = Observer<Boolean> { setUpAvatar() }
-
-    private val phoneNumberObserver = Observer<Boolean> { setupPhoneNumber() }
-
-    private val nameUpdatedObserver =
-        Observer<Boolean> {
-            binding.headerLayout.firstLineToolbar.text =
-                viewModel.getName().toUpperCase(Locale.getDefault())
-        }
-
-    private val emailUpdatedObserver =
-        Observer<Boolean> { binding.headerLayout.secondLineToolbar.text = viewModel.getEmail() }
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -168,18 +153,6 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     override fun onDestroy() {
         super.onDestroy()
 
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .removeObserver(profileAvatarUpdatedObserver)
-
-        LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
-            .removeObserver(phoneNumberObserver)
-
-        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
-            .removeObserver(nameUpdatedObserver)
-
-        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
-            .removeObserver(emailUpdatedObserver)
-
         changeNameDialog?.dismiss()
         changeEmailDialog?.dismiss()
         deletePhotoDialog?.dismiss()
@@ -227,7 +200,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             showChangeEmailDialog(null)
         }
 
-        permitEditNameAndEmail()
+        allowNameAndEmailEdition()
 
         binding.changePassword.setOnClickListener {
             startActivity(Intent(this, ChangePasswordActivityLollipop::class.java))
@@ -242,7 +215,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         setupLogoutWarnings()
     }
 
-    private fun permitEditNameAndEmail() {
+    private fun allowNameAndEmailEdition() {
         val permitEditNameAndEmail = !megaApi.isBusinessAccount || megaApi.isMasterBusinessAccount
         binding.changeName.isVisible = permitEditNameAndEmail
         binding.changeNameSeparator.separator.isVisible = permitEditNameAndEmail
@@ -252,16 +225,19 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
     private fun setupObservers() {
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .observeForever(profileAvatarUpdatedObserver)
+            .observe(this) { setUpAvatar() }
 
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
-            .observeForever(phoneNumberObserver)
+            .observe(this) { setupPhoneNumber() }
 
-        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
-            .removeObserver(nameUpdatedObserver)
+        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java).observe(this) {
+            binding.headerLayout.firstLineToolbar.text =
+                viewModel.getName().toUpperCase(Locale.getDefault())
+        }
 
-        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
-            .removeObserver(emailUpdatedObserver)
+        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java).observe(this) {
+            binding.headerLayout.secondLineToolbar.text = viewModel.getEmail()
+        }
     }
 
     /**

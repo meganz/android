@@ -62,7 +62,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridRecyclerView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -105,8 +104,6 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
-	@Inject
-	MyAccountInfo myAccountInfo;
 
 	String myEmail;
 	private RoundedImageView avatarImage;

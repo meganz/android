@@ -596,32 +596,29 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             .append(getString(R.string.settings_feedback_body_android_version)).append("  ").append(Build.VERSION.RELEASE).append(" ").append(Build.DISPLAY).append("\n")
             .append(getString(R.string.user_account_feedback)).append("  ").append(megaApi.getMyEmail());
 
-            MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
-            if (myAccountInfo != null) {
-                body.append(" (");
-                switch (myAccountInfo.getAccountType()) {
-                    case FREE:
-                    default:
-                        body.append(getString(R.string.my_account_free));
-                        break;
-                    case PRO_I:
-                        body.append(getString(R.string.my_account_pro1));
-                        break;
-                    case PRO_II:
-                        body.append(getString(R.string.my_account_pro2));
-                        break;
-                    case PRO_III:
-                        body.append(getString(R.string.my_account_pro3));
-                        break;
-                    case PRO_LITE:
-                        body.append(getString(R.string.my_account_prolite_feedback_email));
-                        break;
-                    case BUSINESS:
-                        body.append(getString(R.string.business_label));
-                        break;
-                }
-                body.append(")");
+            body.append(" (");
+            switch (myAccountInfo.getAccountType()) {
+                case FREE:
+                default:
+                    body.append(getString(R.string.my_account_free));
+                    break;
+                case PRO_I:
+                    body.append(getString(R.string.my_account_pro1));
+                    break;
+                case PRO_II:
+                    body.append(getString(R.string.my_account_pro2));
+                    break;
+                case PRO_III:
+                    body.append(getString(R.string.my_account_pro3));
+                    break;
+                case PRO_LITE:
+                    body.append(getString(R.string.my_account_prolite_feedback_email));
+                    break;
+                case BUSINESS:
+                    body.append(getString(R.string.business_label));
+                    break;
             }
+            body.append(")");
 
             String versionApp = (getString(R.string.app_version));
             String subject = getString(R.string.setting_feedback_subject) + " v" + versionApp;

@@ -73,16 +73,6 @@ class MyAccountFragment : Fragment(), Scrollable {
 
     private val gettingInfo by lazy { StringResourcesUtils.getString(R.string.recovering_info) }
 
-    private val profileAvatarUpdatedObserver = Observer<Boolean> { setupAvatar(false) }
-
-    private val nameUpdatedObserver =
-        Observer<Boolean> { binding.nameText.text = viewModel.getName() }
-
-    private val emailUpdatedObserver =
-        Observer<Boolean> { binding.emailText.text = viewModel.getEmail() }
-
-    private val phoneNumberObserver = Observer<Boolean> { setupPhoneNumber() }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         messageResultCallback = activity as? MessageResultCallback
@@ -150,16 +140,16 @@ class MyAccountFragment : Fragment(), Scrollable {
 
     private fun setupObservers() {
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .observeForever(profileAvatarUpdatedObserver)
+            .observe(viewLifecycleOwner) { setupAvatar(true) }
 
         LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
-            .observeForever(nameUpdatedObserver)
+            .observe(viewLifecycleOwner) { binding.nameText.text = viewModel.getName() }
 
         LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
-            .observeForever(emailUpdatedObserver)
+            .observe(viewLifecycleOwner) { binding.emailText.text = viewModel.getEmail() }
 
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
-            .observeForever(phoneNumberObserver)
+            .observe(viewLifecycleOwner) { setupPhoneNumber() }
 
         viewModel.onUpdateAccountDetails().observe(viewLifecycleOwner) { setupAccountDetails() }
     }
@@ -171,18 +161,6 @@ class MyAccountFragment : Fragment(), Scrollable {
 
     override fun onDestroy() {
         super.onDestroy()
-
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .removeObserver(profileAvatarUpdatedObserver)
-
-        LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java)
-            .removeObserver(nameUpdatedObserver)
-
-        LiveEventBus.get(EVENT_USER_EMAIL_UPDATED, Boolean::class.java)
-            .removeObserver(emailUpdatedObserver)
-
-        LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
-            .removeObserver(profileAvatarUpdatedObserver)
 
         changeApiServerDialog?.dismiss()
     }

@@ -31,7 +31,10 @@ class UpdateMyUserAttributesUseCase @Inject constructor(
                 firstName,
                 OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
                     updateFirstName(request.text, error)
-                    finishAction(error.errorCode == API_OK, emitter)
+
+                    val success = error.errorCode == API_OK
+                    finishAction(success)
+                    emitter.onSuccess(success)
                 })
             )
         }
@@ -60,7 +63,10 @@ class UpdateMyUserAttributesUseCase @Inject constructor(
                 firstName,
                 OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
                     updateLastName(request.text, error)
-                    finishAction(error.errorCode == API_OK, emitter)
+
+                    val success = error.errorCode == API_OK
+                    finishAction(success)
+                    emitter.onSuccess(success)
                 })
             )
         }
@@ -78,15 +84,14 @@ class UpdateMyUserAttributesUseCase @Inject constructor(
     }
 
     /**
-     * Finishes the request action (change first or last name) by sending the emitter result
-     * and launching an update event if success.
+     * Finishes the request action (change first or last name) by launching an update event if success.
+     *
+     * @param success True if the action finished successfully, false otherwise.
      */
-    private fun finishAction(success: Boolean, emitter: SingleEmitter<Boolean>) {
+    private fun finishAction(success: Boolean) {
         if (success) {
             LiveEventBus.get(EVENT_USER_NAME_UPDATED, Boolean::class.java).post(true)
         }
-
-        emitter.onSuccess(success)
     }
 
     /**
