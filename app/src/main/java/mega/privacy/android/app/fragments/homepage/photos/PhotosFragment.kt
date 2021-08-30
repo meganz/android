@@ -35,6 +35,9 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
+import mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X
+import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_3X
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -59,6 +62,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private lateinit var itemDecoration: SimpleDividerItemDecoration
 
+    private var currentZoom = ZOOM_DEFAULT
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -78,6 +83,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         setupEmptyHint()
         setupListView()
         setupListAdapter()
+        setupViewTypes()
         setupFastScroller()
         setupActionMode()
         setupNavigation()
@@ -98,6 +104,22 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
             getString(R.string.homepage_empty_hint_photos).toUpperCase(Locale.ROOT)
+    }
+
+    private fun setupViewTypes() {
+        binding.btnZoomIn.setOnClickListener {
+            if(currentZoom < ZOOM_IN_1X) {
+                currentZoom++
+                viewModel.setZoom(currentZoom)
+            }
+        }
+
+        binding.btnZoomOut.setOnClickListener {
+            if(currentZoom > ZOOM_OUT_3X) {
+                currentZoom--
+                viewModel.setZoom(currentZoom)
+            }
+        }
     }
 
     private fun doIfOnline(operation: () -> Unit) {
@@ -337,6 +359,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         if (listView.layoutManager !is CustomizedGridLayoutManager) return
 
         (listView.layoutManager as CustomizedGridLayoutManager).apply {
+
             spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
             val itemDimen =
                 outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.photo_grid_margin)

@@ -5,10 +5,10 @@ import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.fragments.homepage.TypedFilesRepository
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
 import nz.mega.sdk.MegaApiJava.*
 
 class PhotosViewModel @ViewModelInject constructor(
@@ -16,6 +16,9 @@ class PhotosViewModel @ViewModelInject constructor(
 ) : ViewModel() {
 
     private var _query = MutableLiveData<String>()
+
+    private var _zoom = MutableLiveData(ZOOM_DEFAULT)
+    val zoom : LiveData<Int> = _zoom
 
     var searchMode = false
     var searchQuery = ""
@@ -85,6 +88,10 @@ class PhotosViewModel @ViewModelInject constructor(
         }
     }
 
+    private val changeZoomObserver = Observer<Int> {
+
+    }
+
     init {
         items.observeForever(loadFinishedObserver)
         // Calling ObserveForever() here instead of calling observe()
@@ -92,7 +99,12 @@ class PhotosViewModel @ViewModelInject constructor(
         // emitted accidentally between the Fragment's onDestroy and onCreate when rotating screen.
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean::class.java)
             .observeForever(nodesChangeObserver)
+        zoom.observeForever(changeZoomObserver)
         loadPhotos(true)
+    }
+
+    fun setZoom(zoom: Int) {
+        _zoom.value = zoom
     }
 
     /**

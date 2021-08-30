@@ -2,6 +2,7 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,7 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.app.ActivityCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -42,6 +44,7 @@ import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.app.utils.ZoomUtil;
 import nz.mega.sdk.MegaNode;
 
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
@@ -67,6 +70,7 @@ import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
+import static mega.privacy.android.app.utils.ZoomUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
@@ -111,6 +115,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     private int selectedView = ALL_VIEW;
 
     private static final String AD_SLOT = "and3";
+
+    private int currentZoom = ZOOM_DEFAULT;
 
     public int getItemCount() {
         return gridAdapter == null ? 0 : gridAdapter.getItemCount();
@@ -338,14 +344,60 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         setGridView();
     }
 
-    private void setGridView() {
+    private void zoom() {
         boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
         boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
-        int spanCount = getSpanCount(isPortrait, smallGrid);
+        int spanCount = getSpanCount(isPortrait);
         layoutManager = new GridLayoutManager(context, spanCount);
         binding.cuList.setLayoutManager(layoutManager);
         binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.cuList.getLayoutParams();
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.cuList.getLayoutParams();
+
+        if (selectedView == ALL_VIEW) {
+            int imageMargin = ZoomUtil.INSTANCE.getMargin(context,currentZoom);
+
+            int gridWidth = ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount;
+            int icSelectedWidth = getResources().getDimensionPixelSize(smallGrid
+                    ? R.dimen.cu_fragment_ic_selected_size_small
+                    : R.dimen.cu_fragment_ic_selected_size_large);
+
+            int icSelectedMargin = getResources().getDimensionPixelSize(smallGrid
+                    ? R.dimen.cu_fragment_ic_selected_margin_small
+                    : R.dimen.cu_fragment_ic_selected_margin_large);
+
+            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, gridWidth,
+                    icSelectedWidth, imageMargin,
+                    getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
+                    icSelectedMargin,
+                    getResources().getDimensionPixelSize(
+                            R.dimen.cu_fragment_selected_round_corner_radius));
+
+            gridAdapter = new CUGridViewAdapter(this, spanCount, itemSizeConfig);
+            gridAdapter.setHasStableIds(true);
+            layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override public int getSpanSize(int position) {
+                    return gridAdapter.getSpanSize(position);
+                }
+            });
+            binding.cuList.setAdapter(gridAdapter);
+            params.leftMargin = params.rightMargin = imageMargin;
+        }
+
+        binding.cuList.setLayoutParams(params);
+        binding.scroller.setRecyclerView(binding.cuList);
+
+        viewModel.getCards();
+        observeLiveData();
+    }
+
+    private void setGridView() {
+        boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
+        boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
+        int spanCount = getSpanCount(isPortrait);
+        layoutManager = new GridLayoutManager(context, spanCount);
+        binding.cuList.setLayoutManager(layoutManager);
+        binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.cuList.getLayoutParams();
 
         if (selectedView == ALL_VIEW) {
             int imageMargin = getResources().getDimensionPixelSize(smallGrid
@@ -394,13 +446,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.scroller.setRecyclerView(binding.cuList);
     }
 
-    private int getSpanCount(boolean isPortrait, boolean smallGRid) {
+    private int getSpanCount(boolean isPortrait) {
         if (selectedView != ALL_VIEW) {
             return isPortrait ? SPAN_CARD_PORTRAIT : SPAN_CARD_LANDSCAPE;
-        } else if (smallGRid) {
-            return isPortrait ? SPAN_SMALL_GRID_PORTRAIT : SPAN_SMALL_GRID_LANDSCAPE;
         } else {
-            return SPAN_LARGE_GRID;
+            return ZoomUtil.INSTANCE.getSpanCount(isPortrait, currentZoom);
         }
     }
 
@@ -410,6 +460,30 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.emptyHintText.setText(HtmlCompat.fromHtml(
                 formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.photos_empty)),
                 HtmlCompat.FROM_HTML_MODE_LEGACY));
+
+        binding.btnZoomIn.setOnClickListener(v -> {
+            if (currentZoom < ZOOM_IN_1X) {
+                currentZoom++;
+                zoom();
+                binding.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white)));
+            }
+
+            if (currentZoom == ZOOM_IN_1X) {
+                binding.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.grey_600)));
+            }
+        });
+
+        binding.btnZoomOut.setOnClickListener(v -> {
+            if (currentZoom > ZOOM_OUT_3X) {
+                currentZoom--;
+                zoom();
+                binding.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white)));
+            }
+
+            if (currentZoom == ZOOM_OUT_3X) {
+                binding.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.grey_600)));
+            }
+        });
     }
 
     private void newViewClicked(int selectedView) {

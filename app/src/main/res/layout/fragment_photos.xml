@@ -15,12 +15,37 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#abcdef">
 
         <include
             android:id="@+id/empty_hint"
             layout="@layout/empty_result_files"
             app:showHint="@{viewModel.items.empty}" />
+
+        <ImageView
+            android:id="@+id/btn_zoom_out"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintEnd_toStartOf="@id/btn_zoom_in"
+            app:layout_constraintTop_toTopOf="@id/photo_list"
+            android:layout_marginTop="52dp"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/ic_zoom_out"
+            android:elevation="1dp"
+            app:tint="@color/white"/>
+
+        <ImageView
+            android:id="@+id/btn_zoom_in"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/photo_list"
+            android:layout_marginTop="52dp"
+            android:layout_marginEnd="18dp"
+            android:elevation="1dp"
+            android:src="@drawable/ic_zoom_in"
+            app:tint="@color/white"/>
 
         <mega.privacy.android.app.components.NewGridRecyclerView
             android:id="@+id/photo_list"
@@ -44,6 +69,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:visibleGone="@{viewModel.items.size() > (viewModel.searchMode ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}" />
+
+        <include
+            android:id="@+id/photos_view_type"
+            layout="@layout/cu_view_type_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="@dimen/cu_view_type_button_vertical_margin"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
