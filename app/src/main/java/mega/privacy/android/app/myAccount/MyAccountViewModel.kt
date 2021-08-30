@@ -134,6 +134,8 @@ class MyAccountViewModel @ViewModelInject constructor(
 
     fun getRenewTime(): Long = myAccountInfo.subscriptionRenewTime
 
+    fun getBonusStorageSMS(): String = myAccountInfo.bonusStorageSMS
+
     fun hasRenewableSubscription(): Boolean {
         return myAccountInfo.subscriptionStatus == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
                 && myAccountInfo.subscriptionRenewTime > 0

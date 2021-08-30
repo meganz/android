@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -464,8 +463,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             binding.addPhoneSubtitle.text =
                 if (megaApi.isAchievementsEnabled) StringResourcesUtils.getString(
                     R.string.sms_add_phone_number_dialog_msg_achievement_user,
-//                    (mActivity as ManagerActivityLollipop).bonusStorageSMS
-                    ""
+                    viewModel.getBonusStorageSMS()
                 ) else StringResourcesUtils.getString(
                     R.string.sms_add_phone_number_dialog_msg_non_achievement_user
                 )

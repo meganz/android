@@ -88,6 +88,8 @@ class MyAccountInfo @Inject constructor(
     var numVersions = INVALID_VALUE
     var previousVersionsSize = INVALID_VALUE.toLong()
 
+    var bonusStorageSMS = "GB"
+
     /**
      * Resets all values by default.
      * It's mandatory to add here any new attribute included
@@ -139,6 +141,8 @@ class MyAccountInfo @Inject constructor(
 
         numVersions = INVALID_VALUE
         previousVersionsSize = INVALID_VALUE.toLong()
+
+        bonusStorageSMS = "GB"
     }
 
     fun setAccountDetails(numDetails: Int) {

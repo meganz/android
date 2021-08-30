@@ -451,9 +451,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     int orientationSaved;
 
     private boolean isSMSDialogShowing;
-    private String bonusStorageSMS = "GB";
     private final static String STATE_KEY_SMS_DIALOG =  "isSMSDialogShowing";
-    private final static String STATE_KEY_SMS_BONUS =  "bonusStorageSMS";
 
 	private Boolean initFabButtonShow = false;
 	private Observer<Boolean> fabChangeObserver  = isShow -> {
@@ -1307,7 +1305,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putSerializable(SEARCH_SHARED_TAB, searchSharedTab);
 		outState.putBoolean(EXTRA_FIRST_LOGIN, firstLogin);
 		outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing);
-		outState.putString(STATE_KEY_SMS_BONUS, bonusStorageSMS);
 
 		if (parentHandleIncoming != INVALID_HANDLE) {
 			outState.putInt("deepBrowserTreeIncoming", deepBrowserTreeIncoming);
@@ -1456,7 +1453,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			deepBrowserTreeOutgoing = savedInstanceState.getInt("deepBrowserTreeOutgoing", 0);
 			deepBrowserTreeLinks = savedInstanceState.getInt(DEEP_BROWSER_TREE_LINKS, 0);
 			isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false);
-			bonusStorageSMS = savedInstanceState.getString(STATE_KEY_SMS_BONUS);
 			firstLogin = savedInstanceState.getBoolean(EXTRA_FIRST_LOGIN);
 			askPermissions = savedInstanceState.getBoolean(EXTRA_ASK_PERMISSIONS);
 			drawerItem = (DrawerItem) savedInstanceState.getSerializable("drawerItem");
@@ -9281,7 +9277,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         boolean isAchievementUser = megaApi.isAchievementsEnabled();
         logDebug("is achievement user: " + isAchievementUser);
         if (isAchievementUser) {
-            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), myAccountInfo.getBonusStorageSMS());
             msg.setText(message);
         } else {
             msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
@@ -9870,7 +9866,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		} else if(request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
             if (e.getErrorCode() == MegaError.API_OK) {
-                bonusStorageSMS = getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE));
+				myAccountInfo.setBonusStorageSMS(getSizeString(request.getMegaAchievementsDetails()
+						.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE)));
             }
             showAddPhoneNumberInMenu();
             checkBeforeShowSMSVerificationDialog();
@@ -11835,7 +11832,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         }
         if(canVoluntaryVerifyPhoneNumber()) {
             if(megaApi.isAchievementsEnabled()) {
-                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), myAccountInfo.getBonusStorageSMS());
                 addPhoneNumberLabel.setText(message);
             } else {
                 addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
@@ -12195,9 +12192,5 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void actionConfirmed() {
 		//No update needed
-	}
-
-	public String getBonusStorageSMS() {
-		return bonusStorageSMS;
 	}
 }
