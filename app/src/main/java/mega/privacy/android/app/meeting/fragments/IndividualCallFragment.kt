@@ -142,10 +142,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
     }
 
-    private val floatingWindowObserver = Observer<Boolean> {
-        videoSurfaceView.visibility = if (it) View.GONE else View.VISIBLE
-    }
-
     @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -195,9 +191,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
             .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EventConstants.EVENT_MEETING_INCOMPATIBILITY_SHOW)
-            .observeSticky(this, floatingWindowObserver as Observer<Any>)
     }
 
     override fun onCreateView(
