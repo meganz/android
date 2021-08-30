@@ -1,7 +1,7 @@
 package mega.privacy.android.app.smsVerification.usecase
 
 import com.jeremyliao.liveeventbus.LiveEventBus
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Completable
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -18,10 +18,10 @@ class ResetPhoneNumberUseCase @Inject constructor(
     /**
      * Launches a request to remove current verified phone number.
      *
-     * @return Single<Boolean> True if the request finished with success, error if not.
+     * @return Completable onComplete() if the request finished with success, error if not.
      */
-    fun reset(): Single<Boolean> =
-        Single.create { emitter ->
+    fun reset(): Completable =
+        Completable.create { emitter ->
             megaApi.resetSmsVerifiedPhoneNumber(
                 OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
                     when (error.errorCode) {
@@ -29,7 +29,7 @@ class ResetPhoneNumberUseCase @Inject constructor(
                             LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
                                 .post(true)
 
-                            emitter.onSuccess(true)
+                            emitter.onComplete()
                         }
                         else -> emitter.onError(error.toThrowable())
                     }

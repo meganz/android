@@ -24,6 +24,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
+import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
@@ -49,7 +50,7 @@ import nz.mega.sdk.MegaError.*
 import java.util.*
 
 class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback,
-    PhoneNumberBottomSheetDialogFragment.PhoneNumberCallback {
+    PhoneNumberBottomSheetDialogFragment.PhoneNumberCallback, SnackbarShower {
 
     companion object {
         private const val PADDING_BOTTOM_APP_BAR = 19F
@@ -694,29 +695,20 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setTitle(title)
                 .setMessage(message)
-                .setPositiveButton(R.string.general_ok) { _, _ -> resetPhoneNumber() }
+                .setPositiveButton(R.string.general_ok) { _, _ ->
+                    viewModel.resetPhoneNumber(isModify, this) {
+                        startActivity(Intent(this, SMSVerificationActivity::class.java))
+                    }
+                }
                 .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
                 .show()
     }
 
-    /**
-     * Removes the current phone number.
-     */
-    private fun resetPhoneNumber() {
-        viewModel.resetPhoneNumber { success ->
-            if (success) {
-                if (isModify) {
-                    startActivity(Intent(this, SMSVerificationActivity::class.java))
-                } else {
-                    showSnackbar(StringResourcesUtils.getString(R.string.remove_phone_number_success))
-                }
-            } else {
-                showSnackbar(StringResourcesUtils.getString(R.string.remove_phone_number_fail))
-            }
-        }
-    }
-
     private fun showSnackbar(message: String) {
         showSnackbar(binding.root, message)
+    }
+
+    override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+        content?.let { showSnackbar(it) }
     }
 }

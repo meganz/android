@@ -26,6 +26,8 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.TestPasswordActivity
@@ -644,17 +646,19 @@ class MyAccountViewModel @ViewModelInject constructor(
     /**
      * Resets the verified phone number of the current account.
      *
-     * @param action Action to perform after reset the phone number.
+     * @param isModify       True if the action is modify, false if is remove.
+     * @param snackbarShower Callback to inform about the request result if needed.
+     * @param action         Action to perform after reset the phone number if modifying.
      */
-    fun resetPhoneNumber(action: (Boolean) -> Unit) {
+    fun resetPhoneNumber(isModify: Boolean, snackbarShower: SnackbarShower, action: () -> Unit) {
         resetPhoneNumberUseCase.reset()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { getUserData(action) },
+                onComplete = { getUserData(isModify, snackbarShower, action) },
                 onError = { error ->
                     logWarning("Reset phone number failed: ${error.message}")
-                    action.invoke(false)
+                    snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
                 })
             .addTo(composite)
     }
@@ -662,13 +666,23 @@ class MyAccountViewModel @ViewModelInject constructor(
     /**
      * Gets the current account user data.
      *
-     * @param action Action to perform after reset the phone number.
+     * @param isModify       True if the action is modify phone number, false if is remove.
+     * @param snackbarShower Callback to inform about the request result if needed.
+     * @param action         Action to perform after reset the phone number if modifying.
      */
-    private fun getUserData(action: (Boolean) -> Unit) {
+    private fun getUserData(isModify: Boolean, snackbarShower: SnackbarShower, action: () -> Unit) {
         getUserDataUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy { success -> action.invoke(success) }
+            .subscribeBy(
+                onComplete = {
+                    if (isModify) action.invoke()
+                    else snackbarShower.showSnackbar(getString(R.string.remove_phone_number_success))
+                },
+                onError = { error ->
+                    logWarning("Reset phone number failed: ${error.message}")
+                    snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
+                })
             .addTo(composite)
     }
 
@@ -777,7 +791,7 @@ class MyAccountViewModel @ViewModelInject constructor(
         actionSuccess: (String) -> Unit,
         actionError: (String) -> Unit
     ) {
-        when(result) {
+        when (result) {
             API_OK -> actionSuccess.invoke(getString(R.string.pass_changed_alert))
             API_EARGS -> actionError.invoke(getString(R.string.old_password_provided_incorrect))
             else -> actionError.invoke(getString(R.string.general_text_error))
