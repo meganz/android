@@ -5,8 +5,12 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.view.View
 import android.view.Window
+import android.view.WindowInsetsController
+import android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.annotation.AttrRes
@@ -21,6 +25,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import mega.privacy.android.app.R
 import kotlin.math.roundToInt
+
 
 object ColorUtils {
     /** The alpha applied to the image in dark mode */
@@ -157,11 +162,37 @@ object ColorUtils {
     @JvmStatic
     fun setStatusBarTextColor(context: Context, window: Window?) {
         val decor: View = window?.decorView ?: return
-        if (Util.isDarkMode(context)) {
-            decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(true)
+            if (!Util.isDarkMode(context)) {
+                val wic: WindowInsetsController? = decor.windowInsetsController
+                wic?.setSystemBarsAppearance(
+                    APPEARANCE_LIGHT_STATUS_BARS,
+                    APPEARANCE_LIGHT_STATUS_BARS
+                )
+                wic?.setSystemBarsAppearance(
+                    APPEARANCE_LIGHT_NAVIGATION_BARS,
+                    APPEARANCE_LIGHT_NAVIGATION_BARS
+                )
+            }
         } else {
-            // decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            decor.systemUiVisibility = 0x00002000 or 0x00000010
+            @Suppress("DEPRECATION")
+            if (Util.isDarkMode(context)) {
+                decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            } else {
+                when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
+                        decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                    }
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                        decor.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or 0x00000010
+                    }
+                    else -> {
+                        decor.systemUiVisibility = 0x00002000 or 0x00000010
+                    }
+                }
+            }
         }
     }
 

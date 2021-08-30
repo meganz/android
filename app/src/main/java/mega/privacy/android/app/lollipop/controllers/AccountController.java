@@ -60,6 +60,7 @@ import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class AccountController {
@@ -147,16 +148,13 @@ public class AccountController {
             megaApi.masterKeyExported((TestPasswordActivity) context);
         }
 
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                if (context instanceof ManagerActivityLollipop) {
-                    ActivityCompat.requestPermissions((ManagerActivityLollipop) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-                } else if (context instanceof TestPasswordActivity) {
-                    ActivityCompat.requestPermissions((TestPasswordActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-                }
-                return;
+        if (!hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            if (context instanceof ManagerActivityLollipop) {
+                requestPermission((ManagerActivityLollipop) context, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            } else if (context instanceof TestPasswordActivity) {
+                requestPermission((TestPasswordActivity) context, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
+            return;
         }
 
         if (thereIsNotEnoughFreeSpace(path)) {

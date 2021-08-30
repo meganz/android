@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -70,6 +71,7 @@ import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -101,7 +103,9 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
@@ -1432,7 +1436,16 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 try {
                     Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(RECOVERY_URL));
+
+                    if (et_user != null && et_user.getText() != null && !isTextEmpty(et_user.getText().toString())) {
+                        String typedEmail = et_user.getText().toString();
+                        String encodedEmail = Base64.encodeToString(typedEmail.getBytes(), Base64.DEFAULT);
+                        encodedEmail = encodedEmail.replace("\n", "");
+                        openTermsIntent.setData(Uri.parse(RECOVERY_URL_EMAIL + encodedEmail));
+                    } else {
+                        openTermsIntent.setData(Uri.parse(RECOVERY_URL));
+                    }
+
                     startActivity(openTermsIntent);
                 }
                 catch (Exception e){
@@ -1956,11 +1969,16 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivityLollipop.EXTRA_SHARE_INFOS);
 
                     if (shareInfos != null && shareInfos.size() > 0) {
-                        boolean canRead = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                        boolean canRead = hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
                         if (canRead) {
                             toSharePage();
                         } else {
-                            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_MEDIA_PERMISSION);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                PermissionUtils.requestPermission((LoginActivityLollipop) context,
+                                        READ_MEDIA_PERMISSION, Manifest.permission.READ_EXTERNAL_STORAGE);
+                            } else {
+                                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_MEDIA_PERMISSION);
+                            }
                         }
                         return;
                     } else if (ACTION_REFRESH.equals(action) && getActivity() != null) {

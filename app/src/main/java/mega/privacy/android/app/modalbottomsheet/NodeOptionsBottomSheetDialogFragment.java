@@ -188,6 +188,9 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         if (mMode == MODE6) {
             viewInFolder.setVisibility(View.VISIBLE);
             viewInFolder.setOnClickListener(this);
+        } else {
+            viewInFolder.setVisibility(View.GONE);
+            viewInFolder.setOnClickListener(null);
         }
 
         int counterOpen = 2;

@@ -32,6 +32,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
@@ -658,8 +659,7 @@ class NodeSaver(
     }
 
     private fun hasWriteExternalStoragePermission(): Boolean =
-        ContextCompat.checkSelfPermission(app, permission.WRITE_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED
+        hasPermissions(app, permission.WRITE_EXTERNAL_STORAGE)
 
     private fun lackPermission(): Boolean {
         if (!hasWriteExternalStoragePermission()) {

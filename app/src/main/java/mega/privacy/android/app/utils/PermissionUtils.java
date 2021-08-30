@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -7,14 +8,22 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.Settings;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.view.View;
 
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
+import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.providers.FileProviderActivity;
 
+import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
+import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE_FOR_LOGS;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 
 @TargetApi(Build.VERSION_CODES.M)
@@ -35,7 +44,7 @@ public class PermissionUtils {
     /**
      * Provide an OnClickListener for snackbar's action.
      *
-     * @param context Contex.
+     * @param context Context.
      * @return an OnClickListener, which leads to the APP info page, in where, users can grant MEGA permissions.
      */
     public static View.OnClickListener toAppInfo(Context context) {
@@ -54,7 +63,7 @@ public class PermissionUtils {
                 context.startActivity(intent);
             } catch (Exception e) {
                 if (context instanceof ManagerActivityLollipop) {
-                    // in case few devices cannot hanle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
+                    // in case few devices cannot handle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
                     Util.showSnackbar(context, context.getString(R.string.on_permanently_denied));
                 } else {
                     logError("Exception opening device settings", e);
@@ -76,7 +85,13 @@ public class PermissionUtils {
 
         if (context != null && permissions != null) {
             for (String permission : permissions) {
-                if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                        (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                                permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE))) {
+                    if (!Environment.isExternalStorageManager()) {
+                        return false;
+                    }
+                } else if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                     return false;
                 }
             }
@@ -89,11 +104,61 @@ public class PermissionUtils {
      * Ask permissions
      * @param activity The activity
      * @param requestCode request code of permission asking
-     * @param permission requested permissions
+     * @param permissions requested permissions
      */
-    public static void requestPermission(Activity activity, int requestCode, String... permission) {
-        ActivityCompat.requestPermissions(activity,
-                permission,
-                requestCode);
+    public static void requestPermission(Activity activity, int requestCode, String... permissions) {
+        if (permissions != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                for (String permission : permissions) {
+                    if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                            permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        if (!Environment.isExternalStorageManager()) {
+                            requestManageExternalStoragePermission(activity, requestCode);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            ActivityCompat.requestPermissions(activity,
+                    permissions,
+                    requestCode);
+        }
+    }
+
+    /**
+     * Ask for the MANAGE_EXTERNAL_STORAGE special permission required by the app since Android 11
+     *
+     * @param context Context
+     * @param requestCode request code of permission asking
+     */
+    @TargetApi(Build.VERSION_CODES.R)
+    public static void requestManageExternalStoragePermission(Context context, int requestCode) {
+        Intent intent = null;
+        try {
+            intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            intent.addCategory("android.intent.category.DEFAULT");
+            intent.setData(Uri.parse(String.format("package:%s", context.getPackageName())));
+        } catch (Exception e) {
+            intent = new Intent();
+            intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+        } finally {
+            Activity activity = null;
+            if (context instanceof ManagerActivityLollipop) {
+                activity = ((ManagerActivityLollipop) context);
+            } else if (context instanceof LoginActivityLollipop) {
+                activity = ((LoginActivityLollipop) context);
+            } else if (context instanceof FileProviderActivity) {
+                activity = ((FileProviderActivity) context);
+            } else if (context instanceof CameraUploadsPreferencesActivity) {
+                activity = ((CameraUploadsPreferencesActivity) context);
+            } else if (context instanceof BaseActivity) {
+                activity = ((BaseActivity) context);
+            }
+
+            if (activity != null) {
+                activity.startActivityForResult(intent, requestCode);
+            }
+        }
     }
  }
