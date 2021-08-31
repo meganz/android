@@ -73,8 +73,6 @@ object MegaNodeUtil {
      */
     private var alertTakenDown: AlertDialog? = null
 
-    private const val URL_INDICATOR = "URL="
-
     /**
      * The method to calculate how many nodes are folders in array list
      *

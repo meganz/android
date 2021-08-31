@@ -857,4 +857,6 @@ public class Constants {
     public static final int ORDER_CAMERA = 3;
 
     public static final long ANIMATION_DURATION = 400;
+
+    public static final String URL_INDICATOR = "URL=";
 }

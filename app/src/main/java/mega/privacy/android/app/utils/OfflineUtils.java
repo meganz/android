@@ -6,8 +6,12 @@ import android.content.Intent;
 import android.os.StatFs;
 
 import android.util.Base64;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -760,5 +764,36 @@ public class OfflineUtils {
             }
             shareNodes(context, nodes);
         }
+    }
+
+    /**
+     * Reads an URL file content.
+     *
+     * @param file File to read its content.
+     * @return The content of the file.
+     */
+    public static String getURLOfflineFileContent(File file) {
+        BufferedReader reader = null;
+
+        try {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+
+            if (reader.readLine() != null) {
+                String line = reader.readLine();
+                return line.replace(URL_INDICATOR, "");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return "";
     }
 }
