@@ -450,7 +450,7 @@ if [ ! -f ${LIBUV}/${LIBUV_SOURCE_FILE}.ready ]; then
         setupEnv "${ABI}"
 
         pushd ${LIBUV}/${LIBUV} &>> ${LOG_FILE}
-        ./autogen.sh
+        ./autogen.sh &>> ${LOG_FILE}
         ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${LIBUV}/${LIBUV}"/libuv-android-${ABI} &>> ${LOG_FILE}
         make clean &>> ${LOG_FILE}
         make -j${JOBS} &>> ${LOG_FILE}
