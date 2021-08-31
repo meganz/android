@@ -167,9 +167,7 @@ public class CallNotificationIntentService extends IntentService implements Hang
 
     @Override
     public void onErrorAnsweredCall(int errorCode) {
-        Util.showSnackbar(this, (errorCode == MegaChatError.ERROR_TOOMANY) ?
-                StringResourcesUtils.getString(R.string.call_error_too_many_participants) :
-                StringResourcesUtils.getString(R.string.call_error));
+        Util.showSnackbar(this, StringResourcesUtils.getString(R.string.call_error));
     }
 
     @Override

@@ -2,6 +2,8 @@ package mega.privacy.android.app.components;
 
 import android.content.Intent;
 
+import androidx.preference.PreferenceManager;
+
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
@@ -16,7 +18,11 @@ import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_JOINED_SUCCESSFULLY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL;
+import static mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification;
+import static mega.privacy.android.app.utils.CallUtil.existsAnOngoingOrIncomingCall;
+import static mega.privacy.android.app.utils.CallUtil.participatingInACall;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_RINGING;
+import static mega.privacy.android.app.utils.Constants.KEY_IS_SHOWED_WARNING_MESSAGE;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
@@ -206,6 +212,36 @@ public class ChatManagement {
     public void removeStatusVideoAndSpeaker(long chatId) {
         hashMapSpeaker.remove(chatId);
         hashMapVideo.remove(chatId);
+    }
+
+    /**
+     * Method to control when a call has ended
+     *
+     * @param callId   Call ID
+     * @param chatId   Chat ID
+     * @param termCode Termination code of the call
+     */
+    public void controlCallFinished(long callId, long chatId, int termCode) {
+        clearIncomingCallNotification(callId);
+        removeValues(chatId);
+        setRequestSentCall(callId, false);
+    }
+
+    /**
+     * Method to remove the audio manager and reset video and speaker settings
+     *
+     * @param chatId Chat ID
+     */
+    private void removeValues(long chatId) {
+        PreferenceManager.getDefaultSharedPreferences(MegaApplication.getInstance().getApplicationContext()).edit().remove(KEY_IS_SHOWED_WARNING_MESSAGE + chatId).apply();
+        removeStatusVideoAndSpeaker(chatId);
+
+        if (!existsAnOngoingOrIncomingCall()) {
+            MegaApplication.getInstance().removeRTCAudioManager();
+            MegaApplication.getInstance().removeRTCAudioManagerRingIn();
+        } else if (participatingInACall()) {
+            MegaApplication.getInstance().removeRTCAudioManagerRingIn();
+        }
     }
 
     /**

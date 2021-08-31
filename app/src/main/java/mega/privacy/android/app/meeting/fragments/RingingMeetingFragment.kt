@@ -368,11 +368,13 @@ class RingingMeetingFragment : MeetingBaseFragment(),
     }
 
     override fun onErrorAnsweredCall(errorCode: Int) {
-        showSnackBar(
-            StringResourcesUtils.getString(
-                if (errorCode == MegaChatError.ERROR_TOOMANY) R.string.call_error_too_many_participants
-                else R.string.call_error
-            )
-        )
+        logDebug("Error answering the call")
+        inMeetingViewModel.removeIncomingCallNotification(chatId)
+        binding.answerVideoFab.clearAnimation()
+        binding.firstArrowCall.clearAnimationAndGone()
+        binding.secondArrowCall.clearAnimationAndGone()
+        binding.thirdArrowCall.clearAnimationAndGone()
+        binding.fourthArrowCall.clearAnimationAndGone()
+        requireActivity().finish()
     }
 }

@@ -593,6 +593,12 @@ public class ChatActivityLollipop extends PasscodeActivity
                 } else if (call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED && dialogCall != null) {
                     dialogCall.dismiss();
                 }
+
+                if((call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION ||
+                        call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) &&
+                        call.getTermCode() == MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS){
+                    showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
+                }
                 break;
         }
     };
@@ -669,10 +675,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onErrorAnsweredCall(int errorCode) {
         callInProgressLayout.setEnabled(true);
 
-        showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(errorCode == MegaChatError.ERROR_TOOMANY
-                ? R.string.call_error_too_many_participants
-                : R.string.call_error
-        ), MEGACHAT_INVALID_HANDLE);
+        showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
     }
 
     @Override
@@ -2717,7 +2720,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 break;
             }
             case R.id.cab_menu_call_chat:{
-                if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
+                if(recordView.isRecordingNow()) break;
 
                 if(participatingInACall()){
                     showConfirmationInACall(this);
@@ -2732,7 +2735,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
             case R.id.cab_menu_video_chat:{
                 logDebug("cab_menu_video_chat");
-                if(recordView.isRecordingNow() || canNotStartCall(this, chatRoom)) break;
+                if(recordView.isRecordingNow()) break;
 
                 if(CallUtil.participatingInACall()){
                     showConfirmationInACall(this);
@@ -3212,7 +3215,6 @@ public class ChatActivityLollipop extends PasscodeActivity
 
                 return;
             }
-            if (canNotJoinCall(this, callInThisChat, chatRoom)) return;
 
             if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                 logDebug("The call in this chat is In progress, but I do not participate");
