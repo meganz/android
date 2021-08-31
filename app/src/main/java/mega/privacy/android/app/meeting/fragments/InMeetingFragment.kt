@@ -80,6 +80,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_CANCEL
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_FINISH
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_INVITE
+import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_NEW
 import mega.privacy.android.app.meeting.fragments.InMeetingViewModel.Companion.STATE_RESUME
 import mega.privacy.android.app.meeting.listeners.AnswerChatCallListener
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
@@ -1797,10 +1798,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 return
             }
             // Message has been shown, no duplicate count down
-            val state = inMeetingViewModel.shouldShowWarningMessage()
-            if (STATE_FINISH == state || STATE_CANCEL == state) {
-                logDebug("launchTimer - Message has been shown or canceled, state = $state")
-                return
+            when (val state = inMeetingViewModel.shouldShowWarningMessage()) {
+                STATE_NEW -> {
+                    inMeetingViewModel.updateShowWarningMessage(STATE_NEW)
+                }
+                STATE_FINISH, STATE_CANCEL -> {
+                    logDebug("launchTimer - Message has been shown or canceled, state = $state")
+                    return
+                }
             }
             val timer = inMeetingViewModel.restoreCurrentTimer()
             logDebug("launchTimer - restoreCurrentTimer to $timer")
@@ -1959,9 +1964,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     meetingActivity.snackbar?.dismiss()
                 }
                 if (participantsCount > 0 && count < participantsCount.toInt()) {
-                    if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()
-                        && STATE_CANCEL != inMeetingViewModel.shouldShowWarningMessage()
-                    ) {
+                    val currentStep = inMeetingViewModel.shouldShowWarningMessage()
+                    if (STATE_FINISH != currentStep && STATE_CANCEL != currentStep) {
                         logDebug("launchTimer - when not all participants in")
                         launchTimer()
                     }
