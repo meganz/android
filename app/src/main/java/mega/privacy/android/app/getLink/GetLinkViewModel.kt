@@ -79,16 +79,6 @@ class GetLinkViewModel @ViewModelInject constructor(
     fun getLinkWithPassword(): String? = linkWithPassword
 
     /**
-     * Initializes the node and all the available info.
-     *
-     * @param handle MegaNode identifier.
-     */
-    fun initNode(handle: Long) {
-        updateLink(handle)
-        resetLinkWithPassword()
-    }
-
-    /**
      * Gets the title to show as [GetLinkFragment] title.
      *
      * @return The title to show.
@@ -121,7 +111,10 @@ class GetLinkViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { updateLink(node.handle) },
+                onSuccess = {
+                    updateLink(node.handle)
+                    resetLinkWithPassword()
+                },
                 onError = { error ->
                     logWarning(error.message)
                 }
@@ -243,7 +236,7 @@ class GetLinkViewModel @ViewModelInject constructor(
      *
      * @param handle The identifier of the MegaNode from which the link has to be managed.
      */
-    private fun updateLink(handle: Long) {
+    fun updateLink(handle: Long) {
         node = megaApi.getNodeByHandle(handle)
 
         if (node.isExported) {
