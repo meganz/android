@@ -595,7 +595,7 @@ if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
         -DLWS_LIBUV_LIBRARIES="${BASE_PATH}/${LIBUV}/${LIBUV}/libuv-android-${ABI}/lib/libuv.a" "${EXTRA_FLAGS}" \
         ../ &>> ${LOG_FILE}
 
-        cmake -j${JOBS} --build . &>> ${LOG_FILE}
+        cmake --build . -- -j${JOBS} &>> ${LOG_FILE}
         cmake --build . --target install &>> ${LOG_FILE}
         popd &>> ${LOG_FILE}
     done
