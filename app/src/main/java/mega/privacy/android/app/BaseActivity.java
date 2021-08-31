@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,11 +18,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Observer;
 
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -36,17 +37,20 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
 import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PermissionsFragment;
+import mega.privacy.android.app.lollipop.managerSections.ExportRecoveryKeyFragment;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.psa.Psa;
-import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
@@ -94,9 +98,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private boolean delaySignalPresence = false;
 
     //Indicates if app is requesting the required permissions to enable the SDK logger
-    private boolean permissionLoggerSDK = false;
+    protected boolean permissionLoggerSDK = false;
     //Indicates if app is requesting the required permissions to enable the Karere logger
-    private boolean permissionLoggerKarere = false;
+    protected boolean permissionLoggerKarere = false;
 
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
@@ -1082,20 +1086,30 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         logDebug("Request Code: " + requestCode);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_WRITE_STORAGE_FOR_LOGS) {
-            if (permissionLoggerKarere) {
-                permissionLoggerKarere = false;
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setStatusLoggerKarere(baseActivity, true);
-                } else {
-                    Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
-                }
-            } else if (permissionLoggerSDK) {
-                permissionLoggerSDK = false;
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setStatusLoggerSDK(baseActivity, true);
-                } else {
-                    Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
-                }
+            onRequestWriteStorageForLogs(grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED);
+        }
+    }
+
+    /**
+     * Method to enable logs if the required permission has been granted after request it
+     *
+     * @param permissionGranted Flag to indicate if the permission has been granted or not
+     */
+    protected void onRequestWriteStorageForLogs(boolean permissionGranted) {
+        if (permissionLoggerKarere) {
+            permissionLoggerKarere = false;
+            if (permissionGranted) {
+                setStatusLoggerKarere(baseActivity, true);
+            } else {
+                Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
+            }
+        } else if (permissionLoggerSDK) {
+            permissionLoggerSDK = false;
+            if (permissionGranted) {
+                setStatusLoggerSDK(baseActivity, true);
+            } else {
+                Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
             }
         }
     }
@@ -1186,6 +1200,35 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     public void askPermissions(@NotNull String[] permissions, int requestCode) {
-        ActivityCompat.requestPermissions(this, permissions, requestCode);
+        requestPermission(this, requestCode, permissions);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
+
+        switch (requestCode) {
+            case REQUEST_WRITE_STORAGE_FOR_LOGS:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    onRequestWriteStorageForLogs(Environment.isExternalStorageManager());
+                }
+                break;
+
+            case REQUEST_WRITE_STORAGE:
+            case REQUEST_READ_WRITE_STORAGE:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    if (!Environment.isExternalStorageManager()) {
+                        Toast.makeText(this,
+                                StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+
+            default:
+                logWarning("No request code processed");
+                super.onActivityResult(requestCode, resultCode, intent);
+                break;
+        }
     }
 }

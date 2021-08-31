@@ -52,7 +52,7 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardDirName;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
@@ -437,7 +437,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             };
 
             if (!hasPermissions(context, PERMISSIONS)) {
-                ActivityCompat.requestPermissions((CameraUploadsPreferencesActivity) context, PERMISSIONS, REQUEST_CAMERA_UPLOAD);
+                requestPermission((CameraUploadsPreferencesActivity) context, REQUEST_CAMERA_UPLOAD, PERMISSIONS);
             } else {
                 ((CameraUploadsPreferencesActivity) context).checkIfShouldShowBusinessCUAlert();
             }

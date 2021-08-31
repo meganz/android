@@ -63,7 +63,7 @@ import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CUMU;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
@@ -171,8 +171,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void requestCameraUploadPermission(String[] permissions, int requestCode) {
-        ActivityCompat.requestPermissions(mManagerActivity, permissions,
-                requestCode);
+        requestPermission(mManagerActivity, requestCode, permissions);
     }
 
     public void enableCu() {
@@ -641,7 +640,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW);
         mManagerActivity.updateCuFragmentOptionsMenu();
         mManagerActivity.updateEnableCUButton(selectedView == ALL_VIEW
-                && gridAdapter.getItemCount() > 0 && !viewModel.isCUEnabled()
+                && (gridAdapter != null && gridAdapter.getItemCount() > 0)
+                && (viewModel != null && !viewModel.isCUEnabled())
                 ? View.VISIBLE
                 : View.GONE);
 

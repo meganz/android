@@ -169,7 +169,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Are you sure that you want to cancel the current login process?</string>
     <!-- Login button -->
-    <string name="login_text">Login</string>
+    <string name="login_text">Log in</string>
     <!-- email label -->
     <string name="email_text">Email</string>
     <!-- password label -->
@@ -318,7 +318,7 @@
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">CHOOSE ACCOUNT</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">Available offline</string>
+    <string name="file_properties_available_offline">Available Offline</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">Size</string>
     <!-- When the file/folder was last modified -->
@@ -398,7 +398,7 @@
     <string name="intent_not_available">There isn’t any available app to execute this file on your device</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">There are no apps available on your device to open this location</string>
-    <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">You may not have any apps installed which support this file type</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
     <string name="context_share_image">Share image using</string>
@@ -799,7 +799,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_incorrect_code">Wrong code. Please try again or resend.</string>
     <!-- text message to remind user to resend verification code -->
-    <string name="verify_account_resend_label">You didn’t receive a code?</string>
+    <string name="verify_account_resend_label">Didn’t receive the code?</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Resend</string>
     <!-- error message that will show to user when host detected that the mobile number has been registered already -->
@@ -997,14 +997,6 @@
     <string name="sortby_type_photo_first">Photos</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Videos</string>
-    <!-- sort files by date newest first -->
-    <string name="sort_by_newest_date">Newest date</string>
-    <!-- sort files by date oldest first -->
-    <string name="sort_by_oldest_date">Oldest date</string>
-    <!-- sort files by largest size -->
-    <string name="sort_by_largest_size">Largest size</string>
-    <!-- sort files by smallest size -->
-    <string name="sort_by_smallest_size">Smallest size</string>
     <!-- Title to choose the type of Passcode -->
     <string name="pin_lock_type">Passcode Type</string>
     <!-- Passcode with 4 digits -->
@@ -1729,8 +1721,6 @@
     <string name="general_view">View files</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Import</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Save for offline</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Add to Cloud Drive</string>
     <!-- Menu option -->
@@ -2497,7 +2487,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Two-Factor Authentication Enabled</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Next time you login to your account you will be asked to enter a 6-digit code provided by your Authenticator App.</string>
+    <string name="description_2fa_enabled">Next time you log in to your account you will be asked to enter a 6-digit code provided by your Authenticator App.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Please save your <b>Recovery Key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable Two-Factor Authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2655,7 +2645,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">You are about to delete the version histories of all files. Any file version shared to you from a contact will need to be deleted by them.\n\nPlease note that the current files will not be deleted.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">File versions deleted successfully</string>
+    <string name="success_delete_versions">File versions successfully deleted</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">An error occurred while trying to delete all previous versions of your files, please try again later.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2776,7 +2766,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">If videos to compress are larger than</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin Clearing Scheduler or set a longer retention period, you need to subscribe to a Pro plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin clearing scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">days</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2826,7 +2816,7 @@
     <!-- error message shown when a chat link is not well formed -->
     <string name="invalid_chat_link_args">Invalid chat link</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
-    <string name="ekr_label">Encryption Key Rotation</string>
+    <string name="ekr_label">Encryption key rotation</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -3044,7 +3034,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Enable calls</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Grant MEGA permission to access to your contacts</string>
+    <string name="allow_acces_contact_title">Grant access to your address book</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Easily discover contacts from your address book on MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3368,7 +3358,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Chats</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]No files in your [/B][A]Recents[/A]</string>
+    <string name="context_empty_recents">[B]No files in [/B][A]Recents[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s and %2$d more</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3514,7 +3504,7 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">Permission error</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">You do not have the permissions required to revert this file. In order to continue, we can create a new file with the reverted data. Would you like to proceed?</string>
+    <string name="alert_not_enough_permissions_revert">You do not have the correct permissions to amend this file. Would you like to create a new file?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Version was created as a new file successfully.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
@@ -3544,9 +3534,9 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Your transfers have been interrupted. Upgrade your account or wait %s to continue.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Transfer over quota</string>
+    <string name="label_transfer_over_quota">Transfer quota exceeded</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Storage over quota</string>
+    <string name="label_storage_over_quota">Storage quota exceeded</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Get more transfer quota</string>
     <!-- Warning show to the user when a folder does not exist -->
@@ -3664,9 +3654,9 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%1$d%% of %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_enabled">Enabled special info for chat messages</string>
+    <string name="show_info_chat_msg_enabled">Debugging info for chat messages enabled</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Disabled special info for chat messages</string>
+    <string name="show_info_chat_msg_disabled">Debugging info for chat messages is disabled</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">You have reached the maximum limit of %d reactions.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
@@ -3698,7 +3688,7 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Automatically delete messages older than:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Clear the full message history for this conversation?</string>
+    <string name="confirmation_clear_chat_history">Are you sure you want to clear the full message history of this conversation?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 year</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
@@ -3828,8 +3818,6 @@
     <string name="dialog_cookie_alert_unsaved">Cookie Settings unsaved.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Cookie Settings changes have been saved</string>
-    <!-- Cookie dialog third party title -->
-    <string name="dialog_cookie_thirdparty_title">Third Party Cookies</string>
     <!-- Cookie dialog third party first subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle1">Google Advertising Cookies</string>
     <!-- Cookie dialog third party second subtitle -->
@@ -3858,10 +3846,6 @@
     <string name="preference_cookies_thirdparty_title">Third Party Cookies</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
     <string name="preference_cookies_thirdparty_summary">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Tap on “More Information” below for details on all the third party Cookies we use.</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_privacy">Privacy Policy</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_cookie">Cookie Policy</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Always On</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3889,7 +3873,7 @@
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">File created</string>
     <!-- Warning indicating a file was not created successfully -->
-    <string name="file_creation_failed">File creation failed. Try again.</string>
+    <string name="file_creation_failed">File creation failed. Please try again.</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">File saved to %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
@@ -3897,7 +3881,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">File updated</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">File update failed. Try again.</string>
+    <string name="file_update_failed">File update failed. Please try again.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -4005,6 +3989,8 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Change anyway</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Permission needed to access storage.</string>
     <!-- Text informing links management is only available for single items. -->
     <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
     <!-- Action which allows to copy all the links showed in the list. -->

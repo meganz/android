@@ -50,13 +50,13 @@ task clean(type: Delete) {
 ext {
     // App
     appVersion = "4.2.1"
-    versionCode = 397
+    versionCode = 399
 
     // Sdk and tools
-    compileSdkVersion = 29
+    compileSdkVersion = 30
     minSdkVersion = 21
-    targetSdkVersion = 29
-    buildToolsVerion = '29.0.3'
+    targetSdkVersion = 30
+    buildToolsVerion = '30.0.2'
 
     // App dependencies
     appCompatVersion = '1.2.0'
@@ -69,7 +69,7 @@ ext {
     ktxVersion = '1.3.2'
     lifecycleVersion = '2.3.0'
     materialVersion = '1.3.0'
-    recyclerViewVersion = '1.1.0'
+    recyclerViewVersion = '1.2.1'
     roomVersion = '2.2.5'
     viewPagerVersion = '1.0.0'
     cardViewVersion = '1.0.0'
