@@ -79,29 +79,10 @@
         android:layout_below="@+id/upload_progress"
         android:clipToPadding="false" />
 
-    <ImageView
-        android:id="@+id/btn_zoom_out"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        app:layout_constraintEnd_toStartOf="@id/btn_zoom_in"
-        app:layout_constraintTop_toTopOf="@id/cu_list"
-        android:layout_marginTop="52dp"
-        android:layout_marginEnd="20dp"
-        android:src="@drawable/ic_zoom_out"
-        android:elevation="1dp"
-        app:tint="@color/amber_700"/>
-
-    <ImageView
-        android:id="@+id/btn_zoom_in"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/cu_list"
-        android:layout_marginTop="52dp"
-        android:layout_marginEnd="18dp"
-        android:elevation="1dp"
-        android:src="@drawable/ic_zoom_in"
-        app:tint="@color/amber_700"/>
+    <include
+        android:id="@+id/zoom_panel"
+        layout="@layout/zoom_panel"
+        app:layout_constraintTop_toTopOf="@id/cu_list"/>
 
     <mega.privacy.android.app.components.scrollBar.FastScroller
         android:id="@+id/scroller"

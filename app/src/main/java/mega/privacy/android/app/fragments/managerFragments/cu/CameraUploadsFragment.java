@@ -345,6 +345,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     private void zoom() {
+        viewModel.clearSelection();
+
         boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
         boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
         int spanCount = getSpanCount(isPortrait);
@@ -461,27 +463,27 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.photos_empty)),
                 HtmlCompat.FROM_HTML_MODE_LEGACY));
 
-        binding.btnZoomIn.setOnClickListener(v -> {
+        binding.zoomPanel.btnZoomIn.setOnClickListener(v -> {
             if (currentZoom < ZOOM_IN_1X) {
                 currentZoom++;
                 zoom();
-                binding.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white)));
+                binding.zoomPanel.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white)));
             }
 
             if (currentZoom == ZOOM_IN_1X) {
-                binding.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.grey_600)));
+                binding.zoomPanel.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054)));
             }
         });
 
-        binding.btnZoomOut.setOnClickListener(v -> {
+        binding.zoomPanel.btnZoomOut.setOnClickListener(v -> {
             if (currentZoom > ZOOM_OUT_3X) {
                 currentZoom--;
                 zoom();
-                binding.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white)));
+                binding.zoomPanel.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white)));
             }
 
             if (currentZoom == ZOOM_OUT_3X) {
-                binding.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.grey_600)));
+                binding.zoomPanel.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054)));
             }
         });
     }
@@ -494,21 +496,25 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         this.selectedView = selectedView;
         setGridView();
 
-        switch (selectedView) {
-            case DAYS_VIEW:
-                showDayCards(viewModel.getDayCards());
-                break;
+        if(selectedView == ALL_VIEW) {
+            binding.zoomPanel.zoomPanel.setVisibility(View.VISIBLE);
+            gridAdapter.setNodes(viewModel.getCUNodes());
+        } else {
+            binding.zoomPanel.zoomPanel.setVisibility(View.GONE);
 
-            case MONTHS_VIEW:
-                showMonthCards(viewModel.getMonthCards());
-                break;
+            switch (selectedView) {
+                case DAYS_VIEW:
+                    showDayCards(viewModel.getDayCards());
+                    break;
 
-            case YEARS_VIEW:
-                showYearCards(viewModel.getYearCards());
-                break;
+                case MONTHS_VIEW:
+                    showMonthCards(viewModel.getMonthCards());
+                    break;
 
-            default:
-                gridAdapter.setNodes(viewModel.getCUNodes());
+                case YEARS_VIEW:
+                    showYearCards(viewModel.getYearCards());
+                    break;
+            }
         }
 
         updateViewSelected();
@@ -676,7 +682,10 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     @Override public void onNodeLongClicked(int position, CuNode node) {
-        viewModel.onNodeLongClicked(position, node);
+        // Multiple selection only avaiable for zoom default(3 items per row) or zoom out 1x(5 items per row).
+        if(currentZoom == ZOOM_DEFAULT || currentZoom == ZOOM_OUT_1X) {
+            viewModel.onNodeLongClicked(position, node);
+        }
     }
 
     public boolean isEnableCUFragmentShown() {

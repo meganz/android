@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/zoom_panel"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:elevation="1dp"
+    android:background="@drawable/zoom_panel_gradient_bg">
+
+    <ImageView
+        android:id="@+id/btn_zoom_out"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintEnd_toStartOf="@id/btn_zoom_in"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="20dp"
+        android:src="@drawable/ic_zoom_out"
+        android:layout_marginTop="18dp"
+        app:tint="@color/white"/>
+
+    <ImageView
+        android:id="@+id/btn_zoom_in"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="18dp"
+        android:layout_marginTop="18dp"
+        android:src="@drawable/ic_zoom_in"
+        app:tint="@color/white"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
