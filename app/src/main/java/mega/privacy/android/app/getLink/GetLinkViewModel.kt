@@ -21,6 +21,7 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.notifyObserver
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -79,6 +80,16 @@ class GetLinkViewModel @ViewModelInject constructor(
     fun getLinkWithPassword(): String? = linkWithPassword
 
     /**
+     * Initializes the node and all the available info.
+     *
+     * @param handle MegaNode identifier.
+     */
+    fun initNode(handle: Long) {
+        updateLink(handle)
+        resetLinkWithPassword()
+    }
+
+    /**
      * Gets the title to show as [GetLinkFragment] title.
      *
      * @return The title to show.
@@ -113,7 +124,7 @@ class GetLinkViewModel @ViewModelInject constructor(
             .subscribeBy(
                 onSuccess = {
                     updateLink(node.handle)
-                    resetLinkWithPassword()
+                    password.notifyObserver()
                 },
                 onError = { error ->
                     logWarning(error.message)
@@ -236,7 +247,7 @@ class GetLinkViewModel @ViewModelInject constructor(
      *
      * @param handle The identifier of the MegaNode from which the link has to be managed.
      */
-    fun updateLink(handle: Long) {
+    private fun updateLink(handle: Long) {
         node = megaApi.getNodeByHandle(handle)
 
         if (node.isExported) {
