@@ -13,6 +13,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -136,6 +137,9 @@ class CuActionModeCallback implements ActionMode.Callback {
         if (selected.isEmpty()) {
             return false;
         }
+
+        menu.findItem(R.id.cab_menu_share_link)
+                .setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
 
         CloudStorageOptionControlUtil.Control control =
                 new CloudStorageOptionControlUtil.Control();

@@ -268,7 +268,6 @@
             <TextView
                 android:id="@+id/link_option"
                 style="@style/BottomSheetOption"
-                android:text="@{@plurals/get_links(one)}"
                 app:drawableStartCompat="@drawable/link_ic"/>
 
             <TextView

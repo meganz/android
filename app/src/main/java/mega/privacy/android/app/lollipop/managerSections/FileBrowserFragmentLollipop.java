@@ -73,6 +73,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -315,6 +316,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			if (selected.isEmpty()) {
 				return false;
 			}
+
+			menu.findItem(R.id.cab_menu_share_link)
+					.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
 
 			CloudStorageOptionControlUtil.Control control =
 					new CloudStorageOptionControlUtil.Control();

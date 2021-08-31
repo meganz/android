@@ -71,6 +71,7 @@ import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.search.SearchNodesTask;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -294,6 +295,10 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchN
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = adapter.getSelectedNodes();
+
+			menu.findItem(R.id.cab_menu_share_link)
+					.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
+
 			MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
 
 			boolean showDownload = false;

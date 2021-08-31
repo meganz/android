@@ -286,8 +286,7 @@
 
         <activity
             android:name="mega.privacy.android.app.getLink.GetLinkActivity"
-            android:configChanges="screenSize|orientation"
-            android:label="@{@plurals/get_links(one)}">
+            android:configChanges="screenSize|orientation">
         </activity>
 
         <activity
