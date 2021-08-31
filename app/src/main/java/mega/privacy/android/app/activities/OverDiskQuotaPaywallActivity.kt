@@ -12,6 +12,8 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
@@ -65,6 +67,9 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener{
         }
 
         getUserDataUseCase.get()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe()
 
         setContentView(R.layout.activity_over_disk_quota_paywall)
 
