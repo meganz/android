@@ -287,7 +287,6 @@ public class ChatManagement {
         }
 
         logDebug("Show incoming call notification");
-        app.createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
         app.showGroupCallNotification(chatId);
     }
 }
