@@ -33,6 +33,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerActivity
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
@@ -401,25 +402,22 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
      * Shows a warning for free users to upgrade to Pro.
      */
     private fun showUpgradeToProWarning() {
-        val upgradeToProDialogBuilder = MaterialAlertDialogBuilder(
-            requireContext(),
-            R.style.ThemeOverlay_Mega_MaterialAlertDialog
-        )
-
-        upgradeToProDialogBuilder.setTitle(R.string.upgrade_pro)
-            .setMessage(getString(R.string.link_upgrade_pro_explanation) + "\n")
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(StringResourcesUtils.getString(R.string.upgrade_pro))
+            .setMessage(StringResourcesUtils.getString(R.string.link_upgrade_pro_explanation) + "\n")
             .setCancelable(false)
-            .setPositiveButton(R.string.button_plans_almost_full_warning) { _, _ ->
+            .setPositiveButton(StringResourcesUtils.getString(R.string.button_plans_almost_full_warning)) { _, _ ->
                 (requireActivity() as BaseActivity).apply {
                     navigateToUpgradeAccount()
                     finish()
                 }
             }
-            .setNegativeButton(R.string.verify_account_not_now_button) { dialog, _ ->
-                dialog.dismiss()
-            }
-
-        upgradeToProDialogBuilder.create().show()
+            .setNegativeButton(
+                StringResourcesUtils.getString(R.string.verify_account_not_now_button),
+                null
+            )
+            .create()
+            .show()
     }
 
     /**
@@ -503,22 +501,19 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
      * @param data Intent containing the info to share to chat or null if is sharing outside the app.
      */
     private fun showShareKeyOrPasswordDialog(type: Int, data: Intent? = null) {
-        val shareKeyDialogBuilder =
-            MaterialAlertDialogBuilder(
-                requireContext(),
-                R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        MaterialAlertDialogBuilder(requireContext())
+            .setMessage(
+                StringResourcesUtils.getString(
+                    if (viewModel.isPasswordSet()) R.string.share_password_warning
+                    else R.string.share_key_warning
+                ) + "\n"
             )
-
-        shareKeyDialogBuilder.setMessage(
-            getString(
-                if (viewModel.isPasswordSet()) R.string.share_password_warning
-                else R.string.share_key_warning
-            ) + "\n"
-        )
             .setCancelable(false)
             .setPositiveButton(
-                if (viewModel.isPasswordSet()) R.string.button_share_password
-                else R.string.button_share_key
+                StringResourcesUtils.getString(
+                    if (viewModel.isPasswordSet()) R.string.button_share_password
+                    else R.string.button_share_key
+                )
             ) { _, _ ->
                 if (type == SHARE) {
                     viewModel.shareLinkAndKeyOrPassword { intent -> startActivity(intent) }
@@ -528,7 +523,7 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
                     }
                 }
             }
-            .setNegativeButton(R.string.general_dismiss) { _, _ ->
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
                 if (type == SHARE) {
                     viewModel.shareCompleteLink { intent -> startActivity(intent) }
                 } else if (type == SEND_TO_CHAT) {
@@ -537,8 +532,8 @@ class GetLinkFragment : BaseFragment(), DatePickerDialog.OnDateSetListener, Scro
                     }
                 }
             }
-
-        shareKeyDialogBuilder.create().show()
+            .create()
+            .show()
     }
 
     /**
