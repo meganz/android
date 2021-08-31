@@ -2,7 +2,8 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:id="@+id/export_MK_fragment_container"
@@ -73,15 +74,15 @@
 
             <LinearLayout
                 android:id="@+id/MK_buttons_layout"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/action_export_MK_layout"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
-                android:gravity="start"
+                android:gravity="start|center_vertical"
                 android:orientation="horizontal">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/print_MK_button"
                     style="@style/Widget.Mega.Button.OutlinedButton"
                     android:layout_width="wrap_content"
@@ -89,7 +90,7 @@
                     android:text="@string/context_option_print"
                     android:textSize="14sp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/copy_MK_button"
                     style="@style/Widget.Mega.Button.OutlinedButton"
                     android:layout_width="wrap_content"
@@ -98,14 +99,14 @@
                     android:text="@string/context_copy"
                     android:textSize="14sp" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/save_MK_button"
                     style="@style/Widget.Mega.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="@string/save_action"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:text="@string/save_action"/>
             </LinearLayout>
 
         </RelativeLayout>
