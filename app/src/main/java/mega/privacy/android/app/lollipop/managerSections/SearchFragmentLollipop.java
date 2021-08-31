@@ -58,10 +58,9 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SearchNodesTask;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.NewHeaderItemDecoration;
+import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -70,15 +69,20 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.search.SearchNodesTask;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
-import static mega.privacy.android.app.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.LINKS_TAB;
+import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OUTGOING_TAB;
+import static mega.privacy.android.app.search.SearchNodesTask.TYPE_GENERAL;
+import static mega.privacy.android.app.search.SearchNodesTask.setSearchProgressView;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -87,7 +91,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
-public class SearchFragmentLollipop extends RotatableFragment{
+public class SearchFragmentLollipop extends RotatableFragment implements SearchNodesTask.Callback {
 
 	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
@@ -123,10 +127,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	private boolean allFiles = true;
 	private String downloadLocationDefaultPath;
 
-    private int placeholderCount;
-
-	private NewHeaderItemDecoration headerItemDecoration;
-
 	private SearchNodesTask searchNodesTask;
 	private RelativeLayout contentLayout;
 	private ProgressBar searchProgressBar;
@@ -161,6 +161,12 @@ public class SearchFragmentLollipop extends RotatableFragment{
 		clearSelections();
 		hideMultipleSelect();
 		resetSelectedItems();
+	}
+
+	@Override
+	public void finishSearchNodes(@NonNull ArrayList<MegaNode> nodes) {
+		setProgressView(false);
+		setNodes(nodes);
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -474,62 +480,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			}
 		}
 	}
-
-    public void addSectionTitle(List<MegaNode> nodes,int type) {
-        Map<Integer, String> sections = new HashMap<>();
-        int folderCount = 0;
-        int fileCount = 0;
-        for (MegaNode node : nodes) {
-            if(node == null) {
-                continue;
-            }
-            if (node.isFolder()) {
-                folderCount++;
-            }
-            if (node.isFile()) {
-                fileCount++;
-            }
-        }
-
-        if (type == MegaNodeAdapter.ITEM_VIEW_TYPE_GRID) {
-            int spanCount = 2;
-            if (recyclerView instanceof NewGridRecyclerView) {
-                spanCount = ((NewGridRecyclerView)recyclerView).getSpanCount();
-            }
-            if(folderCount > 0) {
-                for (int i = 0;i < spanCount;i++) {
-                    sections.put(i, getString(R.string.general_folders));
-                }
-            }
-
-            if(fileCount > 0 ) {
-                placeholderCount =  (folderCount % spanCount) == 0 ? 0 : spanCount - (folderCount % spanCount);
-                if (placeholderCount == 0) {
-                    for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + i, getString(R.string.general_files));
-                    }
-                } else {
-                    for (int i = 0;i < spanCount;i++) {
-                        sections.put(folderCount + placeholderCount + i, getString(R.string.general_files));
-                    }
-                }
-            }
-        } else {
-            placeholderCount = 0;
-            sections.put(0, context.getString(R.string.general_folders));
-            sections.put(folderCount, context.getString(R.string.general_files));
-        }
-		if (headerItemDecoration == null) {
-			logDebug("Create new decoration");
-			headerItemDecoration = new NewHeaderItemDecoration(context);
-		} else {
-			logDebug("Remove old decoration");
-			recyclerView.removeItemDecoration(headerItemDecoration);
-		}
-		headerItemDecoration.setType(type);
-		headerItemDecoration.setKeys(sections);
-		recyclerView.addItemDecoration(headerItemDecoration);
-    }
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -564,6 +514,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setHasFixedSize(true);
 			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -645,9 +596,44 @@ public class SearchFragmentLollipop extends RotatableFragment{
 	public void newSearchNodesTask() {
 		setProgressView(true);
 		cancelPreviousAsyncTask();
-		searchNodesTask = new SearchNodesTask(context, this, ((ManagerActivityLollipop) context).getSearchQuery(),
-				((ManagerActivityLollipop) context).getParentHandleSearch(), nodes, sortOrderManagement);
+		String query = ((ManagerActivityLollipop) context).getSearchQuery();
+		long parentHandleSearch = ((ManagerActivityLollipop) context).getParentHandleSearch();
+		ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getSearchDrawerItem();
+		int sharesTab = ((ManagerActivityLollipop) context).getSearchSharedTab();
+		boolean isFirstNavigationLevel = ((ManagerActivityLollipop) context).isFirstNavigationLevel();
+
+		searchNodesTask = new SearchNodesTask(megaApi, sortOrderManagement, query,
+				parentHandleSearch, getParentHandleForSearch(drawerItem), nodes, this,
+				TYPE_GENERAL, drawerItem, sharesTab, isFirstNavigationLevel);
+
 		searchNodesTask.execute();
+	}
+
+	private long getParentHandleForSearch(ManagerActivityLollipop.DrawerItem drawerItem) {
+		switch (drawerItem) {
+			case CLOUD_DRIVE:
+				return ((ManagerActivityLollipop) context).getParentHandleBrowser();
+
+			case SHARED_ITEMS:
+				switch (((ManagerActivityLollipop) context).getSearchSharedTab()) {
+					case OUTGOING_TAB:
+						return ((ManagerActivityLollipop) context).getParentHandleOutgoing();
+					case LINKS_TAB:
+						return ((ManagerActivityLollipop) context).getParentHandleLinks();
+					case INCOMING_TAB:
+					default:
+						return ((ManagerActivityLollipop) context).getParentHandleIncoming();
+				}
+
+			case RUBBISH_BIN:
+				return ((ManagerActivityLollipop) context).getParentHandleRubbish();
+
+			case INBOX:
+				return ((ManagerActivityLollipop) context).getParentHandleInbox();
+
+			default:
+				return megaApi.getRootNode().getHandle();
+		}
 	}
 
 	public void cancelPreviousAsyncTask() {
@@ -726,7 +712,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
                     //Put flag to notify FullScreenImageViewerLollipop.
-                    intent.putExtra("placeholder", placeholderCount);
+                    intent.putExtra("placeholder", adapter.getPlaceholderCount());
 					intent.putExtra("position", position);
 					intent.putExtra("searchQuery", ((ManagerActivityLollipop)context).getSearchQuery());
 					intent.putExtra("adapterType", SEARCH_ADAPTER);
@@ -768,7 +754,7 @@ public class SearchFragmentLollipop extends RotatableFragment{
 						mediaIntent = getMediaIntent(context, nodes.get(position).getName());
 						mediaIntent.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
 					}
-                    mediaIntent.putExtra("placeholder", placeholderCount);
+                    mediaIntent.putExtra("placeholder", adapter.getPlaceholderCount());
 					mediaIntent.putExtra("position", position);
 					mediaIntent.putExtra("searchQuery", ((ManagerActivityLollipop)context).getSearchQuery());
 					mediaIntent.putExtra("adapterType", SEARCH_ADAPTER);
@@ -1178,7 +1164,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 			return;
 		}
 
-		addSectionTitle(nodes, adapter.getAdapterType());
 		adapter.setNodes(nodes);
 		visibilityFastScroller();
 
@@ -1281,10 +1266,6 @@ public class SearchFragmentLollipop extends RotatableFragment{
 				fastScroller.setVisibility(View.VISIBLE);
 			}
 		}
-	}
-
-	public void setHeaderItemDecoration(NewHeaderItemDecoration headerItemDecoration) {
-		this.headerItemDecoration = headerItemDecoration;
 	}
 
 	/**

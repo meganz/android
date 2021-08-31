@@ -39,7 +39,7 @@ import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
-import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop

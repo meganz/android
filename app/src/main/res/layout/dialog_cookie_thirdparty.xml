@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/dialog_cookie_thirdparty_title"
+        android:text="@string/preference_cookies_thirdparty_title"
         android:textAppearance="?textAppearanceHeadline6"
         android:textColor="?android:attr/textColorPrimary" />
 

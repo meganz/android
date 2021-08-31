@@ -10,26 +10,27 @@
         android:id="@+id/bottom_sheet_options_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="3dp"
         android:orientation="vertical"
         android:visibility="visible">
 
         <LinearLayout
             android:id="@+id/reactions_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="54dp"
             android:orientation="vertical">
 
             <mega.privacy.android.app.lollipop.megachat.ChatReactionsView
                 android:id="@+id/fragment_container_reactions"
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"/>
-
-            <include
-                android:id="@+id/separator"
-                layout="@layout/view_relative_layout_separator" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"/>
         </LinearLayout>
+
+        <include
+            android:id="@+id/separator"
+            layout="@layout/view_relative_layout_separator" />
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"

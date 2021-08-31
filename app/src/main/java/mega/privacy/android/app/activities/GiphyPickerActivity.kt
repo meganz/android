@@ -439,7 +439,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_PICK_GIF) {
-            val gifData = data?.getParcelableExtra(GIF_DATA) as GifData
+            val gifData = data?.getParcelableExtra(GIF_DATA) as GifData?
             setResult(RESULT_OK, Intent().putExtra(GIF_DATA, gifData))
             finish()
         }

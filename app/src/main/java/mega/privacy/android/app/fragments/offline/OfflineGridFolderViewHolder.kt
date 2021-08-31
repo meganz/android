@@ -13,7 +13,7 @@ class OfflineGridFolderViewHolder(
 
     init {
         binding.threeDots.setOnClickListener {
-            val position = adapterPosition
+            val position = bindingAdapterPosition
             listener.onOptionsClicked(position, itemGetter(position))
         }
     }

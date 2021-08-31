@@ -1,6 +1,8 @@
 package mega.privacy.android.app.fragments.homepage.banner
 
 import android.content.Intent
+import android.net.Uri
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
@@ -21,7 +23,7 @@ class BannerClickHandler(private val fragment: HomepageFragment) : BannerAdapter
                 context.startActivity(intent)
             }
             REFERRAL -> {
-                LinksUtil.requiresTransferSession(context, REFERRAL)
+                LinksUtil.requiresTransferSession(context, link)
             }
             SETTINGS -> {
                 (fragment.activity as ManagerActivityLollipop).selectDrawerItemLollipop(
@@ -29,6 +31,12 @@ class BannerClickHandler(private val fragment: HomepageFragment) : BannerAdapter
             }
             TEXT_EDITOR -> {
                 (fragment.activity as ManagerActivityLollipop).showNewTextFileDialog(null)
+            }
+            else -> {
+                with(Intent(context, WebViewActivity::class.java)) {
+                    data = Uri.parse(link)
+                    context.startActivity(this)
+                }
             }
         }
     }

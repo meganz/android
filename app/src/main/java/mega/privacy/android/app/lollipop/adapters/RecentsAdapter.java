@@ -380,7 +380,7 @@ public class RecentsAdapter extends RecyclerView.Adapter<RecentsAdapter.ViewHold
     }
 
     private RecentsItem getItemtAtPosition(int pos) {
-        if (recentsItems == null || recentsItems.isEmpty() || pos >= recentsItems.size())
+        if (recentsItems == null || recentsItems.isEmpty() || pos < 0 || pos >= recentsItems.size())
             return null;
 
         return recentsItems.get(pos);

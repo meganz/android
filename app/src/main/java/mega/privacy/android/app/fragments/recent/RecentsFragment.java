@@ -43,7 +43,7 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.fragments.homepage.Scrollable;
+import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;

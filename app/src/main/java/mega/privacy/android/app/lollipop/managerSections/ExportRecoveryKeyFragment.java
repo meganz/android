@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -22,12 +21,14 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
+import mega.privacy.android.app.utils.PermissionUtils;
 import nz.mega.sdk.MegaApiAndroid;
 
 import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 import com.google.android.material.button.MaterialButton;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 
 public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickListener{
 
@@ -116,19 +117,22 @@ public class ExportRecoveryKeyFragment extends Fragment implements View.OnClickL
         }
     }
 
-    private void toFileSystem() {
+    public void toFileSystem() {
         hideMKLayout();
         AccountController aC = new AccountController(context);
         aC.saveRkToFileSystem();
     }
 
     private boolean checkStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-            if (!hasStoragePermission) {
+        boolean hasStoragePermission = hasPermissions(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (!hasStoragePermission) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                PermissionUtils.requestPermission((Activity) context,
+                        REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            } else {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-                return false;
             }
+            return false;
         }
         return true;
     }
