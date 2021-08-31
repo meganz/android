@@ -1,6 +1,13 @@
 #!/bin/bash -i
 set -e
 
+if [ ${BASH_VERSINFO:-0} -lt 4 ] ; then
+    echo
+    echo "Bash 4.0 or higher is required to run this script."
+    echo
+    exit 1
+fi
+
 ##############################################################
 # SET THE PATH TO YOUR ANDROID NDK, SDK and JAVA DIRECTORIES #
 ##############################################################
@@ -41,7 +48,7 @@ JAVA_OUTPUT_PATH=${BASE_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
 API_LEVEL=`echo ${APP_PLATFORM} | cut -d'-' -f2`
 JOBS=8
-LOG_FILE=/dev/null
+LOG_FILE=/dev/null # Ensure you use a full path
 
 CRYPTOPP=cryptopp
 CRYPTOPP_VERSION=820
