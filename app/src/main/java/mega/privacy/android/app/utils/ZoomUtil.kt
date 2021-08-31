@@ -1,7 +1,6 @@
 package mega.privacy.android.app.utils
 
 import android.content.Context
-import android.widget.Switch
 import mega.privacy.android.app.R
 
 object ZoomUtil {
@@ -25,9 +24,9 @@ object ZoomUtil {
     fun getLandscapeSpanCount(zoom: Int) = when (zoom) {
         ZOOM_IN_1X -> 1
         ZOOM_DEFAULT -> 3
-        ZOOM_OUT_1X -> 5
-        ZOOM_OUT_2X -> 12
-        ZOOM_OUT_3X -> 24
+        ZOOM_OUT_1X -> 7
+        ZOOM_OUT_2X -> 24
+        ZOOM_OUT_3X -> 45
         else -> 3
     }
 
@@ -36,11 +35,9 @@ object ZoomUtil {
     else
         getLandscapeSpanCount(zoom)
 
-    fun getMargin(context: Context, zoom: Int) =
-        when (zoom) {
+    fun getMargin(context: Context, zoom: Int) =when (zoom) {
             ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_image_margin_large)
             ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_image_margin_small)
             else -> 0
-        }
-
+    }
 }

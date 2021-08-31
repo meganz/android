@@ -344,7 +344,16 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         setGridView();
     }
 
-    private void zoom() {
+    private void zoom(Integer zoom) {
+        currentZoom = zoom;
+
+        if (currentZoom == ZOOM_OUT_3X) {
+            binding.zoomPanel.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054)));
+        }
+        if (currentZoom == ZOOM_IN_1X) {
+            binding.zoomPanel.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054)));
+        }
+
         viewModel.clearSelection();
 
         boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
@@ -356,7 +365,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.cuList.getLayoutParams();
 
         if (selectedView == ALL_VIEW) {
-            int imageMargin = ZoomUtil.INSTANCE.getMargin(context,currentZoom);
+            int imageMargin = ZoomUtil.INSTANCE.getMargin(context, zoom);
 
             int gridWidth = ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount;
             int icSelectedWidth = getResources().getDimensionPixelSize(smallGrid
@@ -377,25 +386,25 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             gridAdapter = new CUGridViewAdapter(this, spanCount, itemSizeConfig);
             gridAdapter.setHasStableIds(true);
             layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override public int getSpanSize(int position) {
+                @Override
+                public int getSpanSize(int position) {
                     return gridAdapter.getSpanSize(position);
                 }
             });
             binding.cuList.setAdapter(gridAdapter);
             params.leftMargin = params.rightMargin = imageMargin;
+
+            gridAdapter.setNodes(viewModel.getCUNodes());
         }
 
         binding.cuList.setLayoutParams(params);
         binding.scroller.setRecyclerView(binding.cuList);
-
-        viewModel.getCards();
-        observeLiveData();
     }
 
     private void setGridView() {
         boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
         boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
-        int spanCount = getSpanCount(isPortrait);
+        int spanCount = getSpanCount(isPortrait, smallGrid);
         layoutManager = new GridLayoutManager(context, spanCount);
         binding.cuList.setLayoutManager(layoutManager);
         binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
@@ -448,6 +457,16 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.scroller.setRecyclerView(binding.cuList);
     }
 
+    private int getSpanCount(boolean isPortrait, boolean smallGRid) {
+        if (selectedView != ALL_VIEW) {
+            return isPortrait ? SPAN_CARD_PORTRAIT : SPAN_CARD_LANDSCAPE;
+        } else if (smallGRid) {
+            return isPortrait ? SPAN_SMALL_GRID_PORTRAIT : SPAN_SMALL_GRID_LANDSCAPE;
+        } else {
+            return SPAN_LARGE_GRID;
+        }
+    }
+
     private int getSpanCount(boolean isPortrait) {
         if (selectedView != ALL_VIEW) {
             return isPortrait ? SPAN_CARD_PORTRAIT : SPAN_CARD_LANDSCAPE;
@@ -466,7 +485,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.zoomPanel.btnZoomIn.setOnClickListener(v -> {
             if (currentZoom < ZOOM_IN_1X) {
                 currentZoom++;
-                zoom();
+                viewModel.setZoom(currentZoom);
                 binding.zoomPanel.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white)));
             }
 
@@ -478,7 +497,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.zoomPanel.btnZoomOut.setOnClickListener(v -> {
             if (currentZoom > ZOOM_OUT_3X) {
                 currentZoom--;
-                zoom();
+                viewModel.setZoom(currentZoom);
                 binding.zoomPanel.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white)));
             }
 
@@ -593,6 +612,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         viewModel.getDayCardsData().observe(getViewLifecycleOwner(), this::showDayCards);
         viewModel.getMonthCardsData().observe(getViewLifecycleOwner(), this::showMonthCards);
         viewModel.getYearCardsData().observe(getViewLifecycleOwner(), this::showYearCards);
+
+        viewModel.getZoomLiveData().observe(getViewLifecycleOwner(), this::zoom);
     }
 
     /**

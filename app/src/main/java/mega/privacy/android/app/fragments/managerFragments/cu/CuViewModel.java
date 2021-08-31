@@ -74,6 +74,7 @@ class CuViewModel extends BaseRxViewModel {
     private final MutableLiveData<Pair<Integer, CuNode>> mNodeToAnimate = new MutableLiveData<>();
     private final MutableLiveData<String> mActionBarTitle = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mActionMode = new MutableLiveData<>();
+    private final MutableLiveData<Integer> zoom = new MutableLiveData<>();
 
     private final Subject<Pair<Integer, CuNode>> mOpenNodeAction = PublishSubject.create();
     private final Subject<Object> mCreatingThumbnailFinished = PublishSubject.create();
@@ -635,5 +636,13 @@ class CuViewModel extends BaseRxViewModel {
 
         //No month equal or behind the current found, then return the latest month.
         return monthCards.size() - 1;
+    }
+
+    public void setZoom(Integer zoomLevel) {
+        zoom.setValue(zoomLevel);
+    }
+
+    public LiveData<Integer> getZoomLiveData() {
+        return zoom;
     }
 }
