@@ -45,7 +45,8 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     /**
-     * initialize Item Decoration when it is not initialized.
+     * Initializes Item Decoration when it is not initialized.
+     *
      * @param c         Canvas in which the dividers will be drawn.
      * @param parent    RecyclerView in which the item decorations will be set.
      */
