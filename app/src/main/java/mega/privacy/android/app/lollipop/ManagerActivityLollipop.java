@@ -210,6 +210,7 @@ import mega.privacy.android.app.modalbottomsheet.SentRequestBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -1208,8 +1209,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     logDebug("Purchase " + sku + " successfully, subscription type is: " + subscriptionType + ", subscription renewal type is: " + subscriptionRenewalType);
                     message = getString(R.string.message_user_purchased_subscription, subscriptionType, subscriptionRenewalType);
                     updateSubscriptionLevel(app.getMyAccountInfo());
-                } else {
-                    //payment is being processed or in unknown state
+					new RatingHandlerImpl(this).updateTransactionFlag(true);
+				} else {
+					//payment is being processed or in unknown state
                     logDebug("Purchase " + sku + " is being processed or in unknown state.");
                     message = getString(R.string.message_user_payment_pending);
                 }
@@ -2990,6 +2992,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		logDebug("END onCreate");
+		new RatingHandlerImpl(this).showRatingBaseOnTransaction();
 	}
 
 	/**
@@ -11941,6 +11944,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					else{
 						logError("ContactRequest is NULL");
 					}
+
+					new RatingHandlerImpl(this).showRatingBaseOnContacts();
 				}
 				else if(request.getNumber()==MegaContactRequest.REPLY_ACTION_DENY){
 					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_invitacion_reply_declined), -1);

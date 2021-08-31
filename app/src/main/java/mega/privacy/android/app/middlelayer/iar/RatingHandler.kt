@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.preference.PreferenceManager
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.components.transferWidget.TransfersManagement
+import nz.mega.sdk.MegaApiJava
 
 /**
  * Abstract In-App review handler for determine the base conditions and some special moment
@@ -50,6 +52,39 @@ abstract class RatingHandler(val context: Context) {
         }
     }
 
+    /**
+     * Determine if match the moment 1 of phase 2 that when a user accepts the incoming request or others accept
+     * the outgoing request, then the total contacts number is greater than 5
+     */
+    fun showRatingBaseOnContacts() {
+        if (!meetBaseCondition()) return
+
+        val app = MegaApplication.getInstance()
+        val condition = if (app != null && app.megaApi != null) {
+            val contact = app.megaApi.contacts
+            if (contact.isNullOrEmpty()) {
+                false
+            } else {
+                contact.size > CONTACTS_NUMBER_LIMIT
+            }
+        } else {
+            false
+        }
+
+        if (condition) {
+            showReviewDialog(context, completeListener)
+        }
+    }
+
+    fun showRatingBaseOnTransaction() {
+        if (!meetBaseCondition()) return
+
+        if (isPurchasedTransaction()) {
+            showReviewDialog(context, completeListener)
+            updateTransactionFlag(false)
+        }
+    }
+
 
     /**
      * Determine if match the moment 2 that when a user that activates a share and this user already has >=4 file/folder shares
@@ -82,6 +117,12 @@ abstract class RatingHandler(val context: Context) {
             return false
         }
 
+        // Exclude ODQ & OBQ accounts
+        if (TransfersManagement.isOnTransferOverQuota()
+            && MegaApplication.getInstance().storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+            return false
+        }
+
         val app = MegaApplication.getInstance()
         if (app != null && app.megaApi != null) {
             val totalNum = app.megaApi.numNodes
@@ -100,8 +141,7 @@ abstract class RatingHandler(val context: Context) {
         val key = getPreferenceKeyForRating()
         if (key.isNullOrEmpty()) return false
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        return sharedPreferences.getBoolean(key, false)
+        return getSpValueByKey(key)
     }
 
     /**
@@ -112,8 +152,7 @@ abstract class RatingHandler(val context: Context) {
         val key = getPreferenceKeyForRating()
         if (key.isNullOrEmpty()) return
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        sharedPreferences.edit().putBoolean(key, true).apply()
+        updateSpValueByKey(key, true)
     }
 
     /**
@@ -121,7 +160,7 @@ abstract class RatingHandler(val context: Context) {
      *
      * @return the key of the flag for showing rating
      */
-    fun getPreferenceKeyForRating(): String? {
+    private fun getPreferenceKeyForRating(): String? {
         val pm = context.packageManager
         try {
             val packageInfo = pm.getPackageInfo(context.packageName, 0)
@@ -132,6 +171,27 @@ abstract class RatingHandler(val context: Context) {
         return null
     }
 
+    fun updateTransactionFlag(flag: Boolean) {
+        val app = MegaApplication.getInstance()
+        if (app != null && app.megaApi != null) {
+            app.megaApi.myEmail
+        }
+        updateSpValueByKey(PREFERENCE_PURCHASE_TRANSACTION, flag)
+    }
+
+    private fun isPurchasedTransaction(): Boolean = getSpValueByKey(PREFERENCE_PURCHASE_TRANSACTION)
+
+    private fun getSpValueByKey(key: String): Boolean {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        return sharedPreferences.getBoolean(key, false)
+    }
+
+    private fun updateSpValueByKey(key: String, value: Boolean) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        sharedPreferences.edit().putBoolean(key, value).apply()
+    }
+
+
     companion object {
         // The size limitation, 10 Mb
         const val SIZE_LIMIT = 10
@@ -141,7 +201,11 @@ abstract class RatingHandler(val context: Context) {
         const val FILES_NUM_LIMIT = 20
         const val SHARED_NUM_LIMIT = 4
 
+        const val CONTACTS_NUMBER_LIMIT = 5
+        const val REFERRAL_BONUS_NUM_LIMIT = 3
+
         const val PREFERENCE_SHOW_RATING = "show_rating_"
+        const val PREFERENCE_PURCHASE_TRANSACTION = "purchase_transaction_"
     }
 
     /**
