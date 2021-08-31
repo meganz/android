@@ -221,24 +221,6 @@ class MyAccountViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Launches the ChangePasswordActivityLollipop activity.
-     *
-     * @param context Current context.
-     */
-    fun changePassword(context: Context) {
-        context.startActivity(Intent(context, ChangePasswordActivityLollipop::class.java))
-    }
-
-    /**
-     * Launches the ExportRecoveryKeyActivity activity.
-     *
-     * @param context Current context.
-     */
-    fun exportMK(context: Context) {
-        context.startActivity(Intent(context, ExportRecoveryKeyActivity::class.java))
-    }
-
-    /**
      * Launches the LoginActivityLollipop activity to perform an account refresh.
      *
      * @param activity Current activity.
@@ -386,15 +368,6 @@ class MyAccountViewModel @ViewModelInject constructor(
                 }
             )
             .addTo(composite)
-    }
-
-    /**
-     * Launches the UpgradeAccountActivity activity.
-     *
-     * @param context Current context.
-     */
-    fun upgradeAccount(context: Context) {
-        context.startActivity(Intent(context, UpgradeAccountActivity::class.java))
     }
 
     /**

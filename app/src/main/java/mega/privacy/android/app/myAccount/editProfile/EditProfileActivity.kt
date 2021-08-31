@@ -24,6 +24,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
+import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
@@ -201,7 +202,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         setupPhoneNumber()
 
-        binding.recoveryKeyButton.setOnClickListener { viewModel.exportMK(this) }
+        binding.recoveryKeyButton.setOnClickListener {
+            startActivity(Intent(this, ExportRecoveryKeyActivity::class.java))
+        }
 
         binding.logoutButton.setOnClickListener { viewModel.logout(this@EditProfileActivity) }
 

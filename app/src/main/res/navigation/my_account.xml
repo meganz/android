@@ -8,19 +8,71 @@
     <fragment
         android:id="@+id/my_account"
         android:name="mega.privacy.android.app.myAccount.MyAccountFragment"
-        android:label=""
         tools:layout="@layout/fragment_my_account">
 
         <action
             android:id="@+id/action_my_account_to_my_account_usage"
             app:destination="@id/my_account_usage" />
 
+        <action
+            android:id="@+id/action_my_account_to_edit_profile"
+            app:destination="@+id/edit_profile"/>
+
+        <action
+            android:id="@+id/action_my_account_to_export_recovery_key"
+            app:destination="@+id/export_recovery_key"/>
+
+        <action
+            android:id="@+id/action_my_account_to_add_phone_number"
+            app:destination="@+id/add_phone_number"/>
+
+        <action
+            android:id="@+id/action_my_account_to_change_password"
+            app:destination="@+id/change_password"/>
+
+        <action
+            android:id="@+id/action_my_account_to_upgrade"
+            app:destination="@+id/upgrade"/>
+
+        <action
+            android:id="@+id/action_my_account_to_achievements"
+            app:destination="@+id/achievements"/>
+
     </fragment>
 
     <fragment
         android:id="@+id/my_account_usage"
         android:name="mega.privacy.android.app.myAccount.MyAccountUsageFragment"
-        android:label=""
         tools:layout="@layout/fragment_my_account_usage" />
+
+    <activity
+        android:id="@+id/edit_profile"
+        android:name="mega.privacy.android.app.myAccount.editProfile.EditProfileActivity"
+        tools:layout="@layout/activity_edit_profile"/>
+
+    <activity
+        android:id="@+id/export_recovery_key"
+        android:name="mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity"
+        tools:layout="@layout/activity_export_recovery_key"/>
+
+    <activity
+        android:id="@+id/add_phone_number"
+        android:name="mega.privacy.android.app.smsVerification.SMSVerificationActivity"
+        tools:layout="@layout/activity_sms_verification"/>
+
+    <activity
+        android:id="@+id/change_password"
+        android:name="mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop"
+        tools:layout="@layout/activity_change_password"/>
+
+    <activity
+        android:id="@+id/upgrade"
+        android:name="mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity"
+        tools:layout="@layout/activity_choose_upgrade_account"/>
+
+    <activity
+        android:id="@+id/achievements"
+        android:name="mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity"
+        tools:layout="@layout/activity_achievements"/>
 
 </navigation>

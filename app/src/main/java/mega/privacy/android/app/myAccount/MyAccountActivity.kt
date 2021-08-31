@@ -135,7 +135,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
         when (intent.action) {
             ACTION_OPEN_ACHIEVEMENTS -> {
-                startActivity(Intent(this, AchievementsActivity::class.java))
+                navController.navigate(R.id.action_my_account_to_achievements)
                 intent.action = null
             }
             ACTION_CANCEL_ACCOUNT -> {
@@ -246,10 +246,10 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         when (item.itemId) {
             android.R.id.home -> onBackPressed()
             R.id.action_kill_all_sessions -> showConfirmationKillSessions()
-            R.id.action_change_pass -> viewModel.changePassword(this)
-            R.id.action_export_MK -> viewModel.exportMK(this)
+            R.id.action_change_pass -> navController.navigate(R.id.action_my_account_to_change_password)
+            R.id.action_export_MK -> navController.navigate(R.id.action_my_account_to_export_recovery_key)
             R.id.action_refresh -> viewModel.refresh(this)
-            R.id.action_upgrade_account -> viewModel.upgradeAccount(this)
+            R.id.action_upgrade_account -> navController.navigate(R.id.action_my_account_to_upgrade)
             R.id.action_cancel_subscriptions -> showCancelSubscriptions()
             R.id.action_logout -> viewModel.logout(this)
         }

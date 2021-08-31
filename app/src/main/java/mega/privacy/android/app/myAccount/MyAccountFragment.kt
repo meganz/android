@@ -1,6 +1,5 @@
 package mega.privacy.android.app.myAccount
 
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -113,7 +112,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         binding.myAccountThumbnail.setOnClickListener { viewModel.openQR(requireActivity()) }
 
         binding.myAccountTextInfoLayout.setOnClickListener {
-            startActivity(Intent(requireContext(), EditProfileActivity::class.java))
+            findNavController().navigate(R.id.action_my_account_to_edit_profile)
         }
 
         binding.nameText.text = viewModel.getName()
@@ -122,7 +121,9 @@ class MyAccountFragment : Fragment(), Scrollable {
         setupPhoneNumber()
         setupAccountDetails()
 
-        binding.backupRecoveryKeyLayout.setOnClickListener { viewModel.exportMK(requireContext()) }
+        binding.backupRecoveryKeyLayout.setOnClickListener {
+            findNavController().navigate(R.id.action_my_account_to_export_recovery_key)
+        }
 
         setupAchievements()
         setupLastSession()
@@ -241,7 +242,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
             setOnClickListener {
                 if (Util.isOnline(requireContext())) {
-                    startActivity(Intent(requireContext(), AchievementsActivity::class.java))
+                    findNavController().navigate(R.id.action_my_account_to_achievements)
                 } else {
                     messageResultCallback?.show(
                         StringResourcesUtils.getString(R.string.error_server_connection_problem)
@@ -306,7 +307,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             isEnabled = true
             text = StringResourcesUtils.getString(R.string.my_account_upgrade_pro)
 
-            setOnClickListener { viewModel.upgradeAccount(requireContext()) }
+            setOnClickListener { findNavController().navigate(R.id.action_my_account_to_upgrade) }
         }
 
         binding.accountTypeText.isVisible = true
@@ -446,7 +447,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
             setOnClickListener {
                 if (Util.canVoluntaryVerifyPhoneNumber()) {
-                    startActivity(Intent(requireContext(), SMSVerificationActivity::class.java))
+                    findNavController().navigate(R.id.action_my_account_to_add_phone_number)
                 } else if (!ModalBottomSheetUtil.isBottomSheetDialogShown(phoneNumberBottomSheet)) {
                     phoneNumberBottomSheet = PhoneNumberBottomSheetDialogFragment()
                     activity?.supportFragmentManager?.let { fragmentManager ->
