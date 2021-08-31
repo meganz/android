@@ -15,6 +15,11 @@ import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.showAlert
+import android.view.Gravity
+
+import android.widget.LinearLayout
+
+import com.google.android.material.button.MaterialButton
 
 class ExportRecoveryKeyActivity : PasscodeActivity() {
 
@@ -58,6 +63,12 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
     }
 
     private fun setUpView() {
+        binding.MKButtonsLayout.post {
+            if (isOverOneLine()) {
+                setVerticalLayout()
+            }
+        }
+
         binding.printMKButton.setOnClickListener { AccountController(this).printRK() }
 
         binding.copyMKButton.setOnClickListener {
@@ -72,6 +83,45 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
             viewModel.checkPermissionsBeforeSaveRK(this) { exportedRK ->
                 recoveryKeyExported(exportedRK)
             }
+        }
+    }
+
+
+    /**
+     * Determines if one of those buttons show the content in more than one line.
+     *
+     * @return True if one of those buttons show the content in more than one line, false otherwise.
+     */
+    private fun isOverOneLine(): Boolean {
+        return  binding.printMKButton.lineCount > 1
+                || binding.copyMKButton.lineCount > 1
+                || binding.saveMKButton.lineCount > 1
+    }
+
+    /**
+     * Changes the buttons layout to vertical.
+     */
+    private fun setVerticalLayout() {
+        binding.MKButtonsLayout.orientation = LinearLayout.VERTICAL
+        updateViewParam(binding.copyMKButton)
+        updateViewParam(binding.saveMKButton)
+        updateViewParam(binding.printMKButton)
+    }
+
+    /**
+     * Updates the button params.
+     *
+     * @param view The target view which needs the update.
+     */
+    private fun updateViewParam(view: MaterialButton) {
+        val params = view.layoutParams as LinearLayout.LayoutParams
+        params.marginStart = 0
+
+        view.apply {
+            layoutParams = params
+            strokeWidth = 0
+            setPadding(0, 0, 0, 0)
+            gravity = Gravity.START
         }
     }
 

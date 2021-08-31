@@ -46,6 +46,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
+
+import android.provider.Settings;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
@@ -738,20 +740,32 @@ public class Util {
 		}
 
 	}
-	
-	/** Returns the consumer friendly device name */
-	public static String getDeviceName() {
-	    final String manufacturer = Build.MANUFACTURER;
-	    final String model = Build.MODEL;
-	    if (model.startsWith(manufacturer)) {
-	        return model;
-	    }
-	    if (manufacturer.equalsIgnoreCase("HTC")) {
-	        // make sure "HTC" is fully capitalized.
-	        return "HTC " + model;
-	    }
-	    return manufacturer + " " + model;
-	}
+
+    /**
+     * Returns the consumer friendly device name.
+     * If Android version is above 7, the name is manufacturer + custom name set by user, otherwise, will be manufacturer + model.
+     *
+     * @return Device name, always starts with manufacturer, prefer user set name.
+     */
+    public static String getDeviceName() {
+        final String manufacturer = Build.MANUFACTURER;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            return manufacturer + " " + Settings.Global.getString(MegaApplication.getInstance().getContentResolver(), Settings.Global.DEVICE_NAME);
+        } else {
+            final String model = Build.MODEL;
+
+            if (model.startsWith(manufacturer)) {
+                return model;
+            }
+
+            if (manufacturer.equalsIgnoreCase("HTC")) {
+                // make sure "HTC" is fully capitalized.
+                return "HTC " + model;
+            }
+            return manufacturer + " " + model;
+        }
+    }
 
 	public static BitSet convertToBitSet(long value) {
 	    BitSet bits = new BitSet();
