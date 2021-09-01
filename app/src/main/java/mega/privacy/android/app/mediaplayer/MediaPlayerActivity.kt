@@ -46,7 +46,7 @@ import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri

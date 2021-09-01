@@ -118,15 +118,11 @@ public class Constants {
     public static final int DISABLE_2FA = 4002;
     public static final int CHANGE_PASSWORD_2FA = 4003;
 
-    public static final int MY_ACCOUNT_FRAGMENT = 5000;
-    public static final int UPGRADE_ACCOUNT_FRAGMENT = 5001;
     public static final int OVERQUOTA_ALERT = 5003;
-    public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5004;
 
     public static final int TOUR_FRAGMENT = 6000;
     public static final int LOGIN_FRAGMENT = 6001;
     public static final int CONFIRM_EMAIL_FRAGMENT = 6002;
-    public static final int CHOOSE_ACCOUNT_FRAGMENT = 6003;
     public static final int CREATE_ACCOUNT_FRAGMENT = 604;
 
     public static final int ACHIEVEMENTS_FRAGMENT = 8000;
@@ -284,7 +280,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED = "INTENT_BUSINESS_EXPIRED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED = "INTENT_CHAT_ARCHIVED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
-    public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
 
@@ -860,6 +855,9 @@ public class Constants {
     public static final int ORDER_CONTACTS = 1;
     public static final int ORDER_OTHERS = 2;
     public static final int ORDER_CAMERA = 3;
+
+    public final static float MAX_WIDTH_APPBAR_LAND = 400;
+    public final static float MAX_WIDTH_APPBAR_PORT = 200;
 
     public static final long ANIMATION_DURATION = 400;
 }

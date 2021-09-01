@@ -268,7 +268,9 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 
 					} else {
 						logDebug("Logged IN");
-						megaApi.queryCancelLink(url, new QueryRecoveryLinkListener(this));
+						startActivity(new Intent(this, ManagerActivityLollipop.class)
+								.setAction(ACTION_CANCEL_ACCOUNT)
+								.setData(Uri.parse(url)));
 					}
 				} else {
 					logDebug("Not logged");
@@ -294,7 +296,9 @@ public class OpenLinkActivity extends PasscodeActivity implements MegaRequestLis
 						finish();
 
 					} else {
-						megaApi.queryChangeEmailLink(url, new QueryRecoveryLinkListener(this));
+						startActivity(new Intent(this, ManagerActivityLollipop.class)
+								.setAction(ACTION_CHANGE_MAIL)
+								.setData(Uri.parse(url)));
 					}
 				} else {
 					setError(getString(R.string.change_email_not_logged_in));

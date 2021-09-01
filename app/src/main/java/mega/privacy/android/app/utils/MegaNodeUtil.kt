@@ -43,7 +43,7 @@ import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showForeignStorageOverQuotaWarningDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug

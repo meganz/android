@@ -19,6 +19,8 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
 public class TextUtil {
 
+    private static final String COPIED = "Copied Text";
+
     public static boolean isTextEmpty(String string) {
         return string == null || string.isEmpty() || string.trim().isEmpty();
     }
