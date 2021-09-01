@@ -97,6 +97,7 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrR
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -1282,7 +1283,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 
 		adapterType = savedInstanceState.getInt("adapterType");
 
-		if ((adapterType != OFFLINE_ADAPTER) && (adapterType != ZIP_ADAPTER)){
+		if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER){
 			boolean aBshown = savedInstanceState.getBoolean("aBshown");
 			adapterMega.setaBshown(aBshown);
 		}
@@ -1451,18 +1452,17 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			return;
 		}
 
-		if (intent == null) {
-			return;
-		}
-
 		if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (!hasStoragePermission) {
-					ActivityCompat.requestPermissions(this,
-							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-							REQUEST_WRITE_STORAGE);
-				}
+			if (intent == null) {
+				logWarning("Intent is null");
+				return;
+			}
+
+			boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+			if (!hasStoragePermission) {
+				requestPermission(this,
+						REQUEST_WRITE_STORAGE,
+						Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			}
 
 			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
@@ -1489,6 +1489,10 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+			if (intent == null) {
+				logWarning("Intent is null");
+				return;
+			}
 
 			if(!isOnline(this)){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
@@ -1517,6 +1521,11 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+			if (intent == null) {
+				logWarning("Intent is null");
+				return;
+			}
+
 			if(!isOnline(this)){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return;
@@ -1554,6 +1563,16 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 						logError(ex.getMessage());
 					}
 				}
+			}
+		} else if (requestCode == REQUEST_WRITE_STORAGE) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (Environment.isExternalStorageManager()) {
+					nodeSaver.handleRequestPermissionsResult(requestCode);
+				} else {
+					super.onActivityResult(requestCode, resultCode, intent);
+				}
+			} else {
+				super.onActivityResult(requestCode, resultCode, intent);
 			}
 		}
 	}

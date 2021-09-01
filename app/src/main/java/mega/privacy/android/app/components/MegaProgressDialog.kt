@@ -15,31 +15,29 @@ open class MegaProgressDialog(context: Context?) : AlertDialog(context), View.On
     var yesButton: View? = null
     var noButton: View? = null
 
-    constructor(context: Context?, title: String, content: String, yesCallBack: ClickCallBack)
-            : this(context, title, content, yesCallBack, true) {
+    constructor(context: Context?, title: String, yesCallBack: ClickCallBack)
+            : this(context, title, yesCallBack, true) {
     }
 
-    constructor(context: Context?, title: String, content: String, yesCallBack: ClickCallBack, isCircularProgress: Boolean) : this(context) {
+    constructor(context: Context?, title: String, yesCallBack: ClickCallBack, isCircularProgress: Boolean) : this(context) {
         call = yesCallBack
         txtMessage?.text = title
         isCircular = isCircularProgress
     }
 
     override fun setMessage(message: CharSequence?) {
-        txtMessage?.text = message;
+        txtMessage?.text = message
     }
 
     init {
-        val inflate = LayoutInflater.from(context).inflate(R.layout.progress_bar, null);
-        setView(inflate)
-        // Sets whether this dialog is cancelable with the BACK key.
-        setCancelable(false)
-        txtMessage = inflate.findViewById(R.id.progress_msg)
+        val inflater = LayoutInflater.from(context).inflate(R.layout.progress_bar, null);
+        setView(inflater)
+        txtMessage = inflater.findViewById(R.id.progress_msg)
     }
 
 
     override fun onClick(p0: View?) {
-        call?.yesClick(this);
+        call?.yesClick(this)
     }
 
     interface ClickCallBack {

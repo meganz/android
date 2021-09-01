@@ -1,30 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-import static android.graphics.Color.BLACK;
-import static android.graphics.Color.TRANSPARENT;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
-import static mega.privacy.android.app.utils.Constants.ANIMATION_DURATION;
-import static mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT;
-import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
-import static mega.privacy.android.app.utils.FileUtil.copyFile;
-import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.LogUtil.logError;
-import static mega.privacy.android.app.utils.LogUtil.logWarning;
-import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.Util.getScaleH;
-import static mega.privacy.android.app.utils.Util.getScaleW;
-import static mega.privacy.android.app.utils.Util.isOnline;
-import static mega.privacy.android.app.utils.Util.scaleWidthPx;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -37,6 +12,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
@@ -47,17 +32,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.viewpager.widget.ViewPager;
-import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
-
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -72,7 +46,6 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ExtendedViewPager;
 import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.components.TouchImageView;
@@ -82,6 +55,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -101,12 +75,27 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static android.graphics.Color.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+
 public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPageChangeListener,
 		MegaRequestListenerInterface, MegaGlobalListenerInterface,SnackbarShower {
 
 	boolean fromChatSavedInstance = false;
 	RelativeLayout relativeImageViewerLayout;
 	private Handler handler;
+
+	private DisplayMetrics outMetrics;
+
+	private boolean aBshown = true;
 
 	MegaProgressDialog statusDialog;
 
@@ -122,6 +111,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 	private MegaChatFullScreenImageAdapter adapterMega;
 	private int positionG;
+	private ArrayList<Long> imageHandles;
 	private RelativeLayout fragmentContainer;
 	private TextView fileNameTextView;
 	private RelativeLayout bottomLayout;
@@ -298,7 +288,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		chatC = new ChatController(this);
 
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics();
+		outMetrics = new DisplayMetrics ();
 		display.getMetrics(outMetrics);
 		float density  = getResources().getDisplayMetrics().density;
 
@@ -403,29 +393,31 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 		messages = new ArrayList<>();
 
-		ArrayList<Long> imageHandles = new ArrayList<Long>();
+		imageHandles = new ArrayList<Long>();
 
 		if(messageIds==null){
 			return;
 		}
 
-		for (long messageId : messageIds) {
-			MegaChatMessage message = megaChatApi.getMessage(chatId, messageId);
-			if (message == null) {
-				message = megaChatApi.getMessageFromNodeHistory(chatId, messageId);
+		for(int j=0; j<messageIds.length; j++){
+			MegaChatMessage message = megaChatApi.getMessage(chatId, messageIds[j]);
+			if(message==null){
+				message = megaChatApi.getMessageFromNodeHistory(chatId, messageIds[j]);
 			}
 
-			if (message != null) {
+			if(message!=null){
 				MegaNodeList list = message.getMegaNodeList();
-				if (list.size() == 1) {
+				if(list.size()==1){
 					MegaNode node = list.get(0);
-					if (MimeTypeList.typeForName(node.getName()).isImage()) {
+					if(MimeTypeList.typeForName(node.getName()).isImage()){
 						messages.add(message);
 					}
-				} else {
+				}
+				else{
 					logWarning("Messages with more than one attachment - do not supported");
 				}
-			} else {
+			}
+			else{
 				logError("ERROR - the message is NULL");
 			}
 		}
@@ -550,7 +542,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 	public void onRestoreInstanceState (Bundle savedInstanceState){
 		super.onRestoreInstanceState(savedInstanceState);
 
-		boolean aBshown = savedInstanceState.getBoolean("aBshown");
+		aBshown = savedInstanceState.getBoolean("aBshown");
 		adapterMega.setaBshown(aBshown);
 	}
 
@@ -731,13 +723,11 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 			return;
 		}
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
+		boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		if (!hasStoragePermission) {
+			requestPermission(this,
+					REQUEST_WRITE_STORAGE,
+					Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		}
 		
 		double availableFreeSpace = Double.MAX_VALUE;

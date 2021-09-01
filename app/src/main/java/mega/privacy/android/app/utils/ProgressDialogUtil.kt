@@ -6,13 +6,18 @@ import android.content.Intent
 import android.net.Uri
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.MegaProgressDialog
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 
 object ProgressDialogUtil {
+
     @SuppressLint("StaticFieldLeak")
     private var dialog: MegaProgressDialog? = null
+
     @JvmField
     var shouldShowDialog = false
+
     private var isPl = false
+
     @JvmStatic
     fun showProcessFileDialog(context: Context, intent: Intent?) {
         dialog = object : MegaProgressDialog(context) {
@@ -20,10 +25,12 @@ object ProgressDialogUtil {
                 dismiss()
             }
         }
+
         dialog?.let{
             it.setCancelable(false)
             it.setCanceledOnTouchOutside(false)
         }
+
         if (intent != null) {
             val imageUris = intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
             isPl = imageUris != null && imageUris.size > 1
@@ -32,18 +39,16 @@ object ProgressDialogUtil {
                 isPl = clipData != null && clipData.itemCount > 1
             }
         }
-        val i = if (isPl) 2 else 1
-        val message = context.resources.getQuantityString(R.plurals.upload_prepare, i)
 
         dialog?.let{
-            it.setMessage(message)
+            it.setMessage(getQuantityString(R.plurals.upload_prepare, if (isPl) 2 else 1))
             shouldShowDialog = true
             it.show()
         }
     }
 
     @JvmStatic
-    fun dissmisDialog() {
+    fun dismissDialog() {
         shouldShowDialog = false
         if (dialog != null && dialog!!.isShowing) {
             dialog!!.dismiss()
@@ -53,6 +58,7 @@ object ProgressDialogUtil {
     @JvmStatic
     fun getMegaProgressDialog(context: Context?, message: String): MegaProgressDialog? {
         var temp: MegaProgressDialog? = null
+
         try {
             temp = MegaProgressDialog(context)
             temp.setMessage(message)
@@ -60,6 +66,7 @@ object ProgressDialogUtil {
         } catch (e: Exception) {
             LogUtil.logWarning("Exception creating progress dialog: $message", e)
         }
+
         return temp
     }
 }

@@ -11,11 +11,11 @@ abstract class OfflineViewHolder(
 
     init {
         itemView.setOnClickListener {
-            handleNodeClicked(adapterPosition)
+            handleNodeClicked(bindingAdapterPosition)
         }
 
         itemView.setOnLongClickListener {
-            handleNodeLongClicked(adapterPosition)
+            handleNodeLongClicked(bindingAdapterPosition)
             true
         }
     }
