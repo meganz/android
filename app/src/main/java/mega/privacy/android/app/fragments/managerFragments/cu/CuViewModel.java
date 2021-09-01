@@ -34,6 +34,7 @@ import mega.privacy.android.app.di.MegaApi;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.BaseListener;
 import mega.privacy.android.app.repo.MegaNodeRepo;
+import mega.privacy.android.app.utils.ZoomUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -407,11 +408,18 @@ class CuViewModel extends BaseRxViewModel {
                     dateString,
                     mSelectedNodes.containsKey(node.getHandle()));
 
-            if (lastMonthDate == null
-                    || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
-                lastMonthDate = modifyDate;
-                nodes.add(new CuNode(dateString, new Pair<>(ofPattern("MMMM").format(modifyDate),
-                        sameYear ? "" : ofPattern("yyyy").format(modifyDate))));
+            if(zoom.getValue() != null && zoom.getValue() == ZoomUtil.ZOOM_OUT_3X) {
+                if (lastMonthDate == null || !Year.from(lastMonthDate).equals(Year.from(modifyDate))) {
+                    lastMonthDate = modifyDate;
+                    nodes.add(new CuNode(ofPattern("yyyy").format(modifyDate), new Pair<>(ofPattern("yyyy").format(modifyDate), "")));
+                }
+            } else {
+                if (lastMonthDate == null
+                        || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
+                    lastMonthDate = modifyDate;
+                    nodes.add(new CuNode(dateString, new Pair<>(ofPattern("MMMM").format(modifyDate),
+                            sameYear ? "" : ofPattern("yyyy").format(modifyDate))));
+                }
             }
 
             nodes.add(cuNode);

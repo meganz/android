@@ -348,6 +348,9 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
         if (currentZoom == ZOOM_OUT_3X) {
             binding.zoomPanel.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054)));
+
+            // For zoom out 3X mode, nodes need to be re-group by years.
+            viewModel.loadNodes();
         }
         if (currentZoom == ZOOM_IN_1X) {
             binding.zoomPanel.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054)));
