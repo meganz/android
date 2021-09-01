@@ -46,6 +46,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
+
+import android.provider.Settings;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
@@ -540,24 +542,29 @@ public class Util {
 	 * @return The speed or size string.
 	 */
 	private static String getUnitString(long unit, boolean isSpeed) {
-		Context context = MegaApplication.getInstance().getApplicationContext();
 		DecimalFormat df = new DecimalFormat("#.##");
 
 		float KB = 1024;
 		float MB = KB * 1024;
 		float GB = MB * 1024;
 		float TB = GB * 1024;
+		float PB = TB * 1024;
+		float EB = PB * 1024;
 
 		if (unit < KB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
 		} else if (unit < MB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
 		} else if (unit < GB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
 		} else if (unit < TB) {
-			return context.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
+		} else if (unit < PB) {
+			return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
+		} else if (unit < EB) {
+			return StringResourcesUtils.getString(R.string.label_file_size_peta_byte, df.format(unit / PB));
 		} else {
-			return context.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
+			return StringResourcesUtils.getString(R.string.label_file_size_exa_byte, df.format(unit / EB));
 		}
 	}
 
@@ -733,20 +740,32 @@ public class Util {
 		}
 
 	}
-	
-	/** Returns the consumer friendly device name */
-	public static String getDeviceName() {
-	    final String manufacturer = Build.MANUFACTURER;
-	    final String model = Build.MODEL;
-	    if (model.startsWith(manufacturer)) {
-	        return model;
-	    }
-	    if (manufacturer.equalsIgnoreCase("HTC")) {
-	        // make sure "HTC" is fully capitalized.
-	        return "HTC " + model;
-	    }
-	    return manufacturer + " " + model;
-	}
+
+    /**
+     * Returns the consumer friendly device name.
+     * If Android version is above 7, the name is manufacturer + custom name set by user, otherwise, will be manufacturer + model.
+     *
+     * @return Device name, always starts with manufacturer, prefer user set name.
+     */
+    public static String getDeviceName() {
+        final String manufacturer = Build.MANUFACTURER;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            return manufacturer + " " + Settings.Global.getString(MegaApplication.getInstance().getContentResolver(), Settings.Global.DEVICE_NAME);
+        } else {
+            final String model = Build.MODEL;
+
+            if (model.startsWith(manufacturer)) {
+                return model;
+            }
+
+            if (manufacturer.equalsIgnoreCase("HTC")) {
+                // make sure "HTC" is fully capitalized.
+                return "HTC " + model;
+            }
+            return manufacturer + " " + model;
+        }
+    }
 
 	public static BitSet convertToBitSet(long value) {
 	    BitSet bits = new BitSet();

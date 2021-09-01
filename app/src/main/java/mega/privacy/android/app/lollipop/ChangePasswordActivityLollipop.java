@@ -26,7 +26,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
@@ -41,6 +40,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -70,7 +70,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 	private AppCompatEditText newPassword2;
 	private ImageView newPassword2Error;
 	private Button changePasswordButton;
-    private RelativeLayout fragmentContainer;
+    private LinearLayout generalContainer;
 	private TextView title;
 	private String linkToReset;
 	private String mk;
@@ -99,7 +99,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_change_password);
 		
-        fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_change_pass);
+        generalContainer = findViewById(R.id.change_password_container);
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 
 		display = getWindowManager().getDefaultDisplay();
@@ -189,8 +189,10 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 			}
 		});
 
-		changePasswordButton = (Button) findViewById(R.id.action_change_password);
+		changePasswordButton = findViewById(R.id.action_change_password);
 		changePasswordButton.setOnClickListener(this);
+
+		findViewById(R.id.action_cancel).setOnClickListener(v -> finish());
 
         TextView top = findViewById(R.id.top);
 
@@ -242,7 +244,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 						logWarning("link is NULL - close activity");
 						finish();
 					}
-					mk = getIntent().getStringExtra("MK");
+					mk = getIntent().getStringExtra(EXTRA_MASTER_KEY);
 					if(mk==null){
 						logWarning("MK is NULL - close activity");
 						showAlert(this, getString(R.string.general_text_error), getString(R.string.general_error_word));
@@ -728,7 +730,7 @@ public class ChangePasswordActivityLollipop extends PasscodeActivity implements 
 	}
 
 	public void showSnackbar(String s){
-		showSnackbar(fragmentContainer, s);
+		showSnackbar(generalContainer, s);
 	}
 
 	void hideAB(){

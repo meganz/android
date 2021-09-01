@@ -28,7 +28,7 @@ import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.CREATE_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showForeignStorageOverQuotaWarningDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION

@@ -422,9 +422,9 @@
             android:label="@string/app_name">
         </activity>
 
-        <activity android:name="mega.privacy.android.app.SMSVerificationActivity" />
+        <activity android:name="mega.privacy.android.app.smsVerification.SMSVerificationActivity" />
 
-        <activity android:name="mega.privacy.android.app.SMSVerificationReceiveTxtActivity"/>
+        <activity android:name="mega.privacy.android.app.smsVerification.SMSVerificationReceiveTxtActivity"/>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity"
@@ -637,6 +637,28 @@
             android:screenOrientation="sensorPortrait"
             android:theme="@style/DocumentScannerTheme"
             android:windowSoftInputMode="stateHidden|adjustNothing"/>
+
+        <activity
+            android:name="mega.privacy.android.app.myAccount.editProfile.EditProfileActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.myAccount.MyAccountActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity"
+            android:label="@string/action_upgrade_account"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.upgradeAccount.ChooseAccountActivity"
+            android:label="@string/choose_account_fragment"
+            android:launchMode="singleTop" />
 
         <receiver android:name=".psa.AlarmReceiver">
             <intent-filter>
