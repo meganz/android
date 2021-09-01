@@ -10,4 +10,6 @@ object StringUtils {
         HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
     fun String.isTextEmpty() = TextUtil.isTextEmpty(this)
+
+    fun String.toThrowable(): Throwable = Throwable(this)
 }

@@ -11,7 +11,10 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 
-import mega.privacy.android.app.lollipop.MyAccountInfo;
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -19,10 +22,14 @@ import nz.mega.sdk.MegaApiAndroid;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
+@AndroidEntryPoint
 public class BusinessExpiredAlertActivity extends PasscodeActivity implements View.OnClickListener {
 
     private static final int IMAGE_HEIGHT_PORTRAIT = 284;
     private static final int IMAGE_HEIGHT_LANDSCAPE = 136;
+
+    @Inject
+    MyAccountInfo myAccountInfo;
 
     private MegaApiAndroid megaApi;
 
@@ -105,11 +112,7 @@ public class BusinessExpiredAlertActivity extends PasscodeActivity implements Vi
 
     @Override
     public void finish() {
-        MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
-        if (myAccountInfo != null) {
-            myAccountInfo.setBusinessAlertShown(false);
-        }
-
+        myAccountInfo.setBusinessAlertShown(false);
         super.finish();
     }
 }

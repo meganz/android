@@ -1,0 +1,20 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="isVisible"
+            type="boolean" />
+
+    </data>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="72dp"
+        android:background="@color/grey_012_white_012"
+        android:visibility="@{isVisible ? View.VISIBLE : View.GONE}" />
+
+</layout>

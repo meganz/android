@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.settingsFragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,21 +8,29 @@ import android.view.ViewGroup;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.settingsActivities.FileManagementPreferencesActivity;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.tasks.ManageCacheTask;
 import mega.privacy.android.app.lollipop.tasks.ManageOfflineTask;
 import nz.mega.sdk.MegaAccountDetails;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.utils.Constants.INVALID_VALUE;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
+@AndroidEntryPoint
 public class SettingsFileManagementFragment extends SettingsBaseFragment {
+
+    @Inject
+    MyAccountInfo myAccountInfo;
 
     private final static String INITIAL_VALUE = "0";
     private Preference offlineFileManagement;
@@ -77,19 +84,13 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         cacheAdvancedOptions.setSummary(getString(R.string.settings_advanced_features_calculating));
         offlineFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
 
-        if (((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo() == null) {
-            rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
+        rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, myAccountInfo.getFormattedUsedRubbish()));
+
+        if (myAccountInfo.getNumVersions() == INVALID_VALUE) {
             fileVersionsFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
             getPreferenceScreen().removePreference(clearVersionsFileManagement);
         } else {
-            rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo().getFormattedUsedRubbish()));
-
-            if (((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo().getNumVersions() == -1) {
-                fileVersionsFileManagement.setSummary(getString(R.string.settings_advanced_features_calculating));
-                getPreferenceScreen().removePreference(clearVersionsFileManagement);
-            } else {
-                setVersionsInfo();
-            }
+            setVersionsInfo();
         }
 
         taskGetSizeCache();
@@ -122,19 +123,13 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
 
                 if (enableRbSchedulerSwitch.isChecked()) {
                     ((FileManagementPreferencesActivity) context).showRbSchedulerValueDialog(true);
+                } else if (myAccountInfo.getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+                    ((FileManagementPreferencesActivity) context).showRBNotDisabledDialog();
+                    enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
+                    enableRbSchedulerSwitch.setChecked(true);
+                    enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
                 } else {
-                    MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo();
-
-                    if (myAccountInfo != null) {
-                        if (myAccountInfo.getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-                            ((FileManagementPreferencesActivity) context).showRBNotDisabledDialog();
-                            enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
-                            enableRbSchedulerSwitch.setChecked(true);
-                            enableRbSchedulerSwitch.setOnPreferenceClickListener(this);
-                        } else {
-                            ((FileManagementPreferencesActivity) context).setRBSchedulerValue(INITIAL_VALUE);
-                        }
-                    }
+                    ((FileManagementPreferencesActivity) context).setRBSchedulerValue(INITIAL_VALUE);
                 }
                 break;
 
@@ -174,11 +169,6 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
      * Method for updating version information.
      */
     private void setVersionsInfo() {
-        MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo();
-
-        if (myAccountInfo == null)
-            return;
-
         int numVersions = myAccountInfo.getNumVersions();
         logDebug("Num versions: " + numVersions);
         String previousVersions = myAccountInfo.getFormattedPreviousVersionsSize();
@@ -228,7 +218,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
      * Method for updating rubbish information.
      */
     public void setRubbishInfo() {
-        rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo().getFormattedUsedRubbish()));
+        rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, myAccountInfo.getFormattedUsedRubbish()));
     }
 
     public void taskGetSizeCache() {
@@ -256,7 +246,6 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
             getPreferenceScreen().removePreference(daysRbSchedulerPreference);
             daysRbSchedulerPreference.setOnPreferenceClickListener(null);
         } else {
-            MyAccountInfo myAccountInfo = ((MegaApplication) ((Activity) context).getApplication()).getMyAccountInfo();
             enableRbSchedulerSwitch.setOnPreferenceClickListener(null);
             enableRbSchedulerSwitch.setChecked(true);
 
@@ -283,7 +272,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
         logInfo("Updating size after clean the Rubbish Bin");
         String emptyString = getString(R.string.label_file_size_byte, INITIAL_VALUE);
         rubbishFileManagement.setSummary(getString(R.string.settings_advanced_features_size, emptyString));
-        MegaApplication.getInstance().getMyAccountInfo().setFormattedUsedRubbish(emptyString);
+        myAccountInfo.setFormattedUsedRubbish(emptyString);
     }
 
     public void setCacheSize(String size) {

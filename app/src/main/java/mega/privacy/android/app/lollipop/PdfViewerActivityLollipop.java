@@ -76,6 +76,7 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -160,7 +161,8 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 public class PdfViewerActivityLollipop extends PasscodeActivity
         implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener,
         OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface,
-        MegaTransferListenerInterface, ActionNodeCallback, SnackbarShower {
+        MegaTransferListenerInterface, ActionNodeCallback, SnackbarShower,
+        FilePrepareTask.ProcessedFilesCallback {
 
     MegaApplication app = null;
     MegaApiAndroid megaApi;
@@ -913,6 +915,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         nodeSaver.handleRequestPermissionsResult(requestCode);
     }
 
+    @Override
     public void onIntentProcessed(List<ShareInfo> infos) {
 
         if (statusDialog != null) {

@@ -24,7 +24,7 @@ public class RecoveryKeyBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 break;
 
             case R.id.recovery_key_saveTo_fileSystem_layout:
-                aC.saveRkToFileSystem();
+                AccountController.saveRkToFileSystem(getActivity());
                 break;
 
             case R.id.recovery_key_print_layout:

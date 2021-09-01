@@ -43,6 +43,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
@@ -68,7 +69,6 @@ import mega.privacy.android.app.fcm.KeepAliveService;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
@@ -152,13 +152,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	GetCookieSettingsUseCase getCookieSettingsUseCase;
 	@Inject
 	SortOrderManagement sortOrderManagement;
+	@Inject
+	MyAccountInfo myAccountInfo;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
 	final static public String APP_KEY = "6tioyn8ka5l6hty";
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
 
-	MyAccountInfo myAccountInfo;
 	boolean esid = false;
 
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
@@ -335,7 +336,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 				} else if (e.getErrorCode() == MegaError.API_ESID) {
 					logWarning("TYPE_LOGOUT:API_ESID");
-					myAccountInfo = new MyAccountInfo();
+					myAccountInfo.resetDefaults();
 
 					esid = true;
 
@@ -460,7 +461,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				logDebug ("Account details request");
 				if (e.getErrorCode() == MegaError.API_OK){
 
-					boolean storage = (request.getNumDetails() & myAccountInfo.hasStorageDetails) != 0;
+					boolean storage = (request.getNumDetails() & MyAccountInfo.HAS_STORAGE_DETAILS) != 0;
 					if (storage) {
 						dbH.setAccountDetailsTimeStamp();
 					}
@@ -469,7 +470,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
 						myAccountInfo.setAccountDetails(request.getNumDetails());
 
-						boolean sessions = (request.getNumDetails() & myAccountInfo.hasSessionsDetails) != 0;
+						boolean sessions = (request.getNumDetails() & MyAccountInfo.HAS_SESSIONS_DETAILS) != 0;
 						if (sessions) {
 							MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
 
@@ -485,7 +486,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 							}
 						}
 
-						logDebug("onRequest TYPE_ACCOUNT_DETAILS: " + myAccountInfo.getUsedPerc());
+						logDebug("onRequest TYPE_ACCOUNT_DETAILS: " + myAccountInfo.getUsedPercentage());
 					}
 
 					sendBroadcastUpdateAccountDetails();
@@ -792,7 +793,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			megaApi.useHttpsOnly(useHttpsOnly);
 		}
 
-		myAccountInfo = new MyAccountInfo();
+		myAccountInfo.resetDefaults();
 
 		if (dbH != null) {
 			dbH.resetExtendedAccountDetailsTimestamp();
@@ -1896,7 +1897,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public void resetMyAccountInfo() {
-    	myAccountInfo = new MyAccountInfo();
+    	myAccountInfo.resetDefaults();
 	}
 
 	public static boolean getSpeakerStatus(long chatId) {

@@ -24,7 +24,7 @@ import mega.privacy.android.app.interfaces.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*

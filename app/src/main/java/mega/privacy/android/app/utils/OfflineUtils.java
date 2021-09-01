@@ -436,7 +436,7 @@ public class OfflineUtils {
                     mOffParent = dbH.findByHandle(parentNode.getHandle());
                     //If the parent is not in the DB
                     //Insert the parent in the DB
-                    if (mOffParent == null && parentNode != null) {
+                    if (mOffParent == null) {
                         insertParentDB(context, megaApi, dbH, parentNode, fromInbox);
                     }
 
@@ -662,14 +662,10 @@ public class OfflineUtils {
 
     public static boolean existsOffline(Context context) {
         File offlineFolder = OfflineUtils.getOfflineFolder(context, OFFLINE_DIR);
-        if (isFileAvailable(offlineFolder)
+        return isFileAvailable(offlineFolder)
                 && offlineFolder.length() > 0
                 && offlineFolder.listFiles() != null
-                && offlineFolder.listFiles().length > 0) {
-            return true;
-        }
-
-        return false;
+                && offlineFolder.listFiles().length > 0;
     }
 
     /**
@@ -684,13 +680,15 @@ public class OfflineUtils {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiAndroid megaApi = app.getMegaApi();
 
-        File inboxOfflineFolder = getOfflineFolder(app, OFFLINE_INBOX_DIR);
+        File filesDir = app.getFilesDir();
+        File inboxOfflineFolder = new File(filesDir + SEPARATOR + OFFLINE_INBOX_DIR);
         MegaNode transferNode = megaApi.getNodeByHandle(handle);
-        File incomingFolder = getOfflineFolder(app, OFFLINE_DIR + SEPARATOR + findIncomingParentHandle(transferNode, megaApi));
+        File incomingFolder = new File(filesDir + SEPARATOR + OFFLINE_DIR + SEPARATOR
+                + findIncomingParentHandle(transferNode, megaApi));
 
-        if (inboxOfflineFolder != null && path.startsWith(inboxOfflineFolder.getAbsolutePath())) {
+        if (inboxOfflineFolder.exists() && path.startsWith(inboxOfflineFolder.getAbsolutePath())) {
             path = path.replace(inboxOfflineFolder.getPath(), "");
-        } else if (incomingFolder != null && path.startsWith(incomingFolder.getAbsolutePath())) {
+        } else if (incomingFolder.exists() && path.startsWith(incomingFolder.getAbsolutePath())) {
             path = path.replace(incomingFolder.getPath(), "");
         } else {
             path = path.replace(getOfflineFolder(app, OFFLINE_DIR).getPath(), "");

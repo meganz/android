@@ -21,9 +21,12 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import mega.privacy.android.app.MegaApplication;
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
@@ -35,10 +38,15 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.Util.*;
 
+@AndroidEntryPoint
 public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
     private static final int RB_SCHEDULER_MINIMUM_PERIOD = 6;
     private static final int RB_SCHEDULER_MAXIMUM_PERIOD = 31;
+
+    @Inject
+    MyAccountInfo myAccountInfo;
+
     private SettingsFileManagementFragment sttFileManagment;
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog newFolderDialog;
@@ -298,7 +306,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         try {
             int daysCount = Integer.parseInt(value);
-            boolean isNotFree = MegaApplication.getInstance().getMyAccountInfo().getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE;
+            boolean isNotFree = myAccountInfo.getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE;
 
             if ((isNotFree && daysCount > RB_SCHEDULER_MINIMUM_PERIOD)
                     || (daysCount > RB_SCHEDULER_MINIMUM_PERIOD && daysCount < RB_SCHEDULER_MAXIMUM_PERIOD)) {
@@ -360,7 +368,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         input.requestFocus();
 
         final TextView text = new TextView(FileManagementPreferencesActivity.this);
-        if (((MegaApplication) getApplication()).getMyAccountInfo().getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
+        if (myAccountInfo.getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
             text.setText(getString(R.string.settings_rb_scheduler_enable_period_PRO));
         } else {
             text.setText(getString(R.string.settings_rb_scheduler_enable_period_FREE));
