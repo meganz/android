@@ -36,7 +36,7 @@ object ZoomUtil {
         getLandscapeSpanCount(zoom)
 
     fun getMargin(context: Context, zoom: Int) =when (zoom) {
-            ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_image_margin_large)
+            ZOOM_DEFAULT, ZOOM_IN_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_image_margin_large)
             ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_image_margin_small)
             else -> 0
     }

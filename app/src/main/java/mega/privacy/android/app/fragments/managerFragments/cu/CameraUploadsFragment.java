@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -367,7 +366,14 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         if (selectedView == ALL_VIEW) {
             int imageMargin = ZoomUtil.INSTANCE.getMargin(context, zoom);
 
-            int gridWidth = ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount;
+            int gridWidth;
+
+            if (currentZoom == ZOOM_IN_1X) {
+                gridWidth = outMetrics.widthPixels;
+            } else {
+                gridWidth = ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount;
+            }
+
             int icSelectedWidth = getResources().getDimensionPixelSize(smallGrid
                     ? R.dimen.cu_fragment_ic_selected_size_small
                     : R.dimen.cu_fragment_ic_selected_size_large);
@@ -376,7 +382,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                     ? R.dimen.cu_fragment_ic_selected_margin_small
                     : R.dimen.cu_fragment_ic_selected_margin_large);
 
-            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, gridWidth,
+            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, currentZoom, gridWidth,
                     icSelectedWidth, imageMargin,
                     getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
                     icSelectedMargin,
@@ -392,7 +398,12 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 }
             });
             binding.cuList.setAdapter(gridAdapter);
-            params.leftMargin = params.rightMargin = imageMargin;
+
+            if(currentZoom == ZOOM_IN_1X) {
+                params.leftMargin = params.rightMargin = 0;
+            } else {
+                params.leftMargin = params.rightMargin = imageMargin;
+            }
 
             gridAdapter.setNodes(viewModel.getCUNodes());
         }
@@ -424,7 +435,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                     ? R.dimen.cu_fragment_ic_selected_margin_small
                     : R.dimen.cu_fragment_ic_selected_margin_large);
 
-            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, gridWidth,
+            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, ZOOM_DEFAULT, gridWidth,
                     icSelectedWidth, imageMargin,
                     getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
                     icSelectedMargin,
