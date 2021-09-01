@@ -647,6 +647,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private RecentsFragment pagerRecentsFragment;
 
 	MegaProgressDialog statusDialog;
+	private  MegaProgressDialog processFileDialog;
 
 	private AlertDialog permissionsDialog;
 	private AlertDialog presenceStatusDialog;
@@ -1433,7 +1434,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		boolean selectDrawerItemPending = true;
 		//upload from device, progress dialog should show when screen orientation changes.
         if (shouldShowDialog) {
-            showProcessFileDialog(this,null);
+			processFileDialog = showProcessFileDialog(this,null);
         }
 
 		getLifecycle().addObserver(cookieDialogHandler);
@@ -8104,7 +8105,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void showStatusDialog(String text){
-		MegaProgressDialog temp = null;
+		MegaProgressDialog temp;
 		try{
 			temp = new MegaProgressDialog(managerActivity);
 			temp.setMessage(text);
@@ -8457,7 +8458,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);
-			showProcessFileDialog(this,intent);
+			processFileDialog = showProcessFileDialog(this,intent);
 		}
 		else if (requestCode == CHOOSE_PICTURE_PROFILE_CODE && resultCode == RESULT_OK) {
 
@@ -9539,7 +9540,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			catch(Exception ex){}
 		}
-		ProgressDialogUtil.dismissDialog();
+		ProgressDialogUtil.dismissDialog(processFileDialog);
 
 		MegaNode parentNode = getCurrentParentNode(getCurrentParentHandle(), -1);
 		if(parentNode == null){

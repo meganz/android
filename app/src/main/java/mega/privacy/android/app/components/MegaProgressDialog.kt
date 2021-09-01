@@ -7,6 +7,10 @@ import android.view.View
 import android.widget.TextView
 import mega.privacy.android.app.R
 
+/**
+ * A subclass of AlertDialog that can display the circle progress and message.
+ * @Params: context – the parent context
+ */
 open class MegaProgressDialog(context: Context?) : AlertDialog(context), View.OnClickListener {
 
     var call: ClickCallBack? = null
