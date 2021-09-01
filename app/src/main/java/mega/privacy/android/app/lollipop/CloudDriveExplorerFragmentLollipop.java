@@ -41,6 +41,8 @@ import java.util.Stack;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -48,20 +50,22 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.search.callback.SearchActionsCallback;
+import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.adapters.MegaExplorerLollipopAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
-import mega.privacy.android.app.search.SearchNodesTask;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.CLOUD_FRAGMENT;
-import static mega.privacy.android.app.search.SearchNodesTask.TYPE_CLOUD_EXPLORER;
-import static mega.privacy.android.app.search.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_CLOUD_EXPLORER;
+import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.setProgressView;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.*;
@@ -69,10 +73,12 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implements
-		OnClickListener, CheckScrollInterface, SearchNodesTask.Callback {
+		OnClickListener, CheckScrollInterface, SearchActionsCallback {
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
+	@Inject
+	SearchNodesUseCase searchNodesUseCase;
 
 	private Context context;
 	private MegaApiAndroid megaApi;
@@ -113,7 +119,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 	private int order;
 
-	private SearchNodesTask searchNodesTask;
+	private MegaCancelToken searchCancelToken;
 	private ProgressBar searchProgressBar;
 	private boolean shouldResetNodes = true;
 
@@ -145,12 +151,6 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 	@Override
 	public void reselectUnHandledSingleItem(int position) {
-	}
-
-	@Override
-	public void finishSearchNodes(@NonNull ArrayList<MegaNode> nodes) {
-		setProgressView(false);
-		setSearchNodes(nodes);
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -855,24 +855,42 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			return;
 		}
 
-		setProgressView(true);
-		cancelPreviousAsyncTask();
-		searchNodesTask = new SearchNodesTask(megaApi, sortOrderManagement, s, INVALID_HANDLE,
-				getParentHandle(), nodes, this, TYPE_CLOUD_EXPLORER);
-
-		searchNodesTask.execute();
+		searchCancelToken = initNewSearch();
+		searchNodesUseCase.get(s, INVALID_HANDLE, getParentHandle(), TYPE_CLOUD_EXPLORER, searchCancelToken)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((searchedNodes, throwable) -> {
+					if (throwable == null) {
+						finishSearch(searchedNodes);
+					}
+				});
 	}
 
-	private void cancelPreviousAsyncTask() {
-		if (searchNodesTask != null) {
-			searchNodesTask.cancel(true);
-			searchNodesTask.cancelSearch();
+	@Override
+	public MegaCancelToken initNewSearch() {
+		updateSearchProgressView(true);
+		cancelPreviousSearch();
+		return MegaCancelToken.createInstance();
+	}
+
+	@Override
+	public void updateSearchProgressView(boolean inProgress) {
+		setProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
+	}
+
+	@Override
+	public void cancelPreviousSearch() {
+		if (searchCancelToken != null) {
+			searchCancelToken.cancel();
 		}
 	}
 
-	public void setProgressView(boolean inProgress) {
-		setSearchProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
+	@Override
+	public void finishSearch(@NonNull ArrayList<MegaNode> searchedNodes) {
+		updateSearchProgressView(false);
+		setSearchNodes(searchedNodes);
 	}
+
 	public void setSearchNodes(ArrayList<MegaNode> nodes) {
 		if (adapter == null) return;
 		searchNodes = nodes;
@@ -886,8 +904,8 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 	}
 
 	public void closeSearch(boolean collapsedByClick) {
-		setProgressView(false);
-		cancelPreviousAsyncTask();
+		updateSearchProgressView(false);
+		cancelPreviousSearch();
 		if (!collapsedByClick) {
             searchNodes = null;
         }

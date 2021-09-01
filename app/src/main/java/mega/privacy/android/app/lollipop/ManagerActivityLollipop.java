@@ -3556,7 +3556,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private void cancelSearch() {
 		if (getSearchFragment() != null) {
-			sFLol.cancelPreviousAsyncTask();
+			sFLol.cancelPreviousSearch();
 		}
 	}
 

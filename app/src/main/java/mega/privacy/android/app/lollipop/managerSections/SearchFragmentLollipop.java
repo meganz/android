@@ -46,15 +46,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -62,6 +62,8 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.search.callback.SearchActionsCallback;
+import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -69,9 +71,9 @@ import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.lollipop.adapters.RotatableAdapter;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.search.SearchNodesTask;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaCancelToken;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -81,8 +83,8 @@ import static mega.privacy.android.app.components.dragger.DragToExitSupport.putT
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING_TAB;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.LINKS_TAB;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OUTGOING_TAB;
-import static mega.privacy.android.app.search.SearchNodesTask.TYPE_GENERAL;
-import static mega.privacy.android.app.search.SearchNodesTask.setSearchProgressView;
+import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_GENERAL;
+import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.setProgressView;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -91,7 +93,7 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
-public class SearchFragmentLollipop extends RotatableFragment implements SearchNodesTask.Callback {
+public class SearchFragmentLollipop extends RotatableFragment implements SearchActionsCallback {
 
 	public static final String ARRAY_SEARCH = "ARRAY_SEARCH";
 
@@ -99,6 +101,8 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchN
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
+	@Inject
+	SearchNodesUseCase searchNodesUseCase;
 
 	private Context context;
 	private RecyclerView recyclerView;
@@ -127,7 +131,7 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchN
 	private boolean allFiles = true;
 	private String downloadLocationDefaultPath;
 
-	private SearchNodesTask searchNodesTask;
+	private MegaCancelToken searchCancelToken;
 	private RelativeLayout contentLayout;
 	private ProgressBar searchProgressBar;
 
@@ -161,12 +165,6 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchN
 		clearSelections();
 		hideMultipleSelect();
 		resetSelectedItems();
-	}
-
-	@Override
-	public void finishSearchNodes(@NonNull ArrayList<MegaNode> nodes) {
-		setProgressView(false);
-		setNodes(nodes);
 	}
 
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -594,19 +592,22 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchN
 	}
 
 	public void newSearchNodesTask() {
-		setProgressView(true);
-		cancelPreviousAsyncTask();
 		String query = ((ManagerActivityLollipop) context).getSearchQuery();
 		long parentHandleSearch = ((ManagerActivityLollipop) context).getParentHandleSearch();
 		ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getSearchDrawerItem();
 		int sharesTab = ((ManagerActivityLollipop) context).getSearchSharedTab();
 		boolean isFirstNavigationLevel = ((ManagerActivityLollipop) context).isFirstNavigationLevel();
 
-		searchNodesTask = new SearchNodesTask(megaApi, sortOrderManagement, query,
-				parentHandleSearch, getParentHandleForSearch(drawerItem), nodes, this,
-				TYPE_GENERAL, drawerItem, sharesTab, isFirstNavigationLevel);
-
-		searchNodesTask.execute();
+		searchCancelToken = initNewSearch();
+		searchNodesUseCase.get(query, parentHandleSearch, getParentHandleForSearch(drawerItem),
+				TYPE_GENERAL, searchCancelToken, drawerItem, sharesTab, isFirstNavigationLevel)
+				.subscribeOn(Schedulers.io())
+				.observeOn(AndroidSchedulers.mainThread())
+				.subscribe((searchedNodes, throwable) -> {
+					if (throwable == null) {
+						finishSearch(searchedNodes);
+					}
+				});
 	}
 
 	private long getParentHandleForSearch(ManagerActivityLollipop.DrawerItem drawerItem) {
@@ -636,15 +637,29 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchN
 		}
 	}
 
-	public void cancelPreviousAsyncTask() {
-		if (searchNodesTask != null) {
-			searchNodesTask.cancelSearch();
-			searchNodesTask.cancel(true);
+	@Override
+	public MegaCancelToken initNewSearch() {
+		updateSearchProgressView(true);
+		cancelPreviousSearch();
+		return MegaCancelToken.createInstance();
+	}
+
+	@Override
+	public void updateSearchProgressView(boolean inProgress) {
+		setProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
+	}
+
+	@Override
+	public void cancelPreviousSearch() {
+		if (searchCancelToken != null) {
+			searchCancelToken.cancel();
 		}
 	}
 
-	public void setProgressView(boolean inProgress) {
-		setSearchProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
+	@Override
+	public void finishSearch(@NonNull ArrayList<MegaNode> searchedNodes) {
+		updateSearchProgressView(false);
+		setNodes(searchedNodes);
 	}
 
 	@Override
@@ -1065,7 +1080,7 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchN
 	
 	public int onBackPressed(){
 		logDebug("onBackPressed");
-		cancelPreviousAsyncTask();
+		cancelPreviousSearch();
 		int levelSearch = ((ManagerActivityLollipop)context).levelsSearch;
 
 		if (levelSearch >= 0) {
