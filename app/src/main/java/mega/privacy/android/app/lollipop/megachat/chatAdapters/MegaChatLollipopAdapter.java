@@ -179,8 +179,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     Context context;
     private int positionClicked;
-    private ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-    private ArrayList<RemovedMessage> removedMessages = new ArrayList<>();
+    private ArrayList<AndroidMegaChatMessage> messages;
+    private ArrayList<RemovedMessage> removedMessages;
 
     private RecyclerView listFragment;
     MegaApiAndroid megaApi;
@@ -8176,10 +8176,11 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         if(megaChatApi.isSignalActivityRequired()){
             megaChatApi.signalPresenceActivity();
         }
+
         ViewHolderMessageChat holder = (ViewHolderMessageChat) view.getTag();
         int currentPosition = holder.getAdapterPosition();
 
-        if (isMultipleSelect() || currentPosition < 1 || messages.get(currentPosition - 1).isUploading() || !ChatUtil.shouldBottomDialogBeDisplayed(messages.get(currentPosition - 1).getMessage()))
+        if (isMultipleSelect() || currentPosition < 1 || messages.get(currentPosition - 1).isUploading())
             return true;
 
         if(MegaApplication.isShowInfoChatMessages()){

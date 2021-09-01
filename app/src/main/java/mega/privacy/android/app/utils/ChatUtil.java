@@ -1731,24 +1731,4 @@ public class ChatUtil {
             preferences.edit().clear().apply();
         }
     }
-
-    /**
-     * Method to know if the bottom dialog with message options should be displayed
-     *
-     * @param currentMsg The message to be checked
-     * @return True, if it is to be displayed. False, if not
-     */
-    public static boolean shouldBottomDialogBeDisplayed(MegaChatMessage currentMsg) {
-        if (currentMsg.getStatus() == MegaChatMessage.STATUS_SENDING ||
-                currentMsg.getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL ||
-                currentMsg.getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED) {
-
-            if (!Util.isOnline(MegaApplication.getInstance().getApplicationContext())) {
-                logDebug("No network connection");
-                return false;
-            }
-        }
-
-        return true;
-    }
 }

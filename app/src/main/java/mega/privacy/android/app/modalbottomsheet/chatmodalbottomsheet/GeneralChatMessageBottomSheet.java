@@ -134,7 +134,11 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         optionSaveOffline.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
-        boolean isRemovedMsg = ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage());
+        boolean isRemovedMsg = ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) ||
+                message.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING ||
+                message.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL ||
+                message.getMessage().getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED;
+
         boolean shouldReactionOptionBeVisible = chatRoom != null && message != null &&
                 context instanceof ChatActivityLollipop && shouldReactionBeClicked(chatRoom) &&
                 !isRemovedMsg &&

@@ -4939,7 +4939,6 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     public void itemClick(int positionInAdapter, int [] screenPosition) {
         int positionInMessages = positionInAdapter-1;
-
         if(positionInMessages < messages.size()){
             AndroidMegaChatMessage m = messages.get(positionInMessages);
 
@@ -4968,9 +4967,6 @@ public class ChatActivityLollipop extends PasscodeActivity
                     if(m.isUploading()){
                         showUploadingAttachmentBottomSheet(m, positionInMessages);
                     }else{
-                        if (!ChatUtil.shouldBottomDialogBeDisplayed(m.getMessage()))
-                            return;
-
                         if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
                             if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
                                 if (!(m.getMessage().isManagementMessage())) {
@@ -7461,22 +7457,14 @@ public class ChatActivityLollipop extends PasscodeActivity
         for (int i = 0; i < messages.size(); i++) {
             MegaChatMessage messageToCompare = messages.get(i).getMessage();
             if (messageToCompare != null) {
-                if (message.getMsgId() != MEGACHAT_INVALID_HANDLE && messageToCompare.getMsgId() != MEGACHAT_INVALID_HANDLE) {
-                    if (message.getMsgId() == messageToCompare.getMsgId()) {
-                        RemovedMessage msg = new RemovedMessage(messageToCompare.getTempId(), messageToCompare.getMsgId());
-                        removedMessages.add(msg);
-                        adapter.notifyItemChanged(i + 1);
-                        break;
-                    }
-                }
-
-                if (message.getTempId() != MEGACHAT_INVALID_HANDLE && messageToCompare.getTempId() != MEGACHAT_INVALID_HANDLE) {
-                    if (message.getTempId() == messageToCompare.getTempId()) {
-                        RemovedMessage msg = new RemovedMessage(messageToCompare.getTempId(), messageToCompare.getMsgId());
-                        removedMessages.add(msg);
-                        adapter.notifyItemChanged(i + 1);
-                        break;
-                    }
+                if ((message.getMsgId() != MEGACHAT_INVALID_HANDLE && messageToCompare.getMsgId() != MEGACHAT_INVALID_HANDLE &&
+                        message.getMsgId() == messageToCompare.getMsgId()) ||
+                        (message.getTempId() != MEGACHAT_INVALID_HANDLE && messageToCompare.getTempId() != MEGACHAT_INVALID_HANDLE &&
+                                message.getTempId() == messageToCompare.getTempId())) {
+                    RemovedMessage msg = new RemovedMessage(messageToCompare.getTempId(), messageToCompare.getMsgId());
+                    removedMessages.add(msg);
+                    adapter.notifyItemChanged(i + 1);
+                    break;
                 }
             }
         }
