@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_kill_all_sessions"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="90"
+        android:title="@string/action_kill_all_sessions"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_change_pass"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="90"
+        android:title="@string/my_account_change_password"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_export_MK"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="95"
+        android:title="@string/action_export_master_key"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="130"
+        android:title="@string/action_refresh"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_upgrade_account"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="145"
+        android:title="@string/action_upgrade_account"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_cancel_subscriptions"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="155"
+        android:title="@string/action_cancel_subscriptions"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_logout"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="175"
+        android:title="@string/action_logout"
+        android:visible="false"
+        app:showAsAction="never" />
+
+</menu>

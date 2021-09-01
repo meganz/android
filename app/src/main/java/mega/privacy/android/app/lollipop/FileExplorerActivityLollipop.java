@@ -44,7 +44,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
@@ -123,7 +122,7 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		implements MegaRequestListenerInterface, MegaGlobalListenerInterface,
 		MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface,
-		ActionNodeCallback, SnackbarShower {
+		ActionNodeCallback, SnackbarShower, FilePrepareTask.ProcessedFilesCallback {
 
 	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
 	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
@@ -1660,10 +1659,11 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	/*
+	/**
 	 * Handle processed upload intent
 	 */
-	public void onIntentChatProcessed(List<ShareInfo> infos) {
+	@Override
+	public void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentChatProcessed");
 
 		if (getIntent() != null && !getIntent().getAction().equals(ACTION_PROCESSED)) {
@@ -2568,7 +2568,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 				}
 				else{
-                    onIntentChatProcessed(filePreparedInfos);
+                    onIntentProcessed(filePreparedInfos);
 				}
 			}
 		}
@@ -2579,7 +2579,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 			}
 			else{
-				onIntentChatProcessed(filePreparedInfos);
+				onIntentProcessed(filePreparedInfos);
 			}
 		}
 

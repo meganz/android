@@ -124,7 +124,8 @@ import nz.mega.sdk.MegaUserAlert;
 
 public class ContactFileListActivityLollipop extends PasscodeActivity
 		implements MegaGlobalListenerInterface, MegaRequestListenerInterface,
-		UploadBottomSheetDialogActionListener, ActionNodeCallback, SnackbarShower {
+		UploadBottomSheetDialogActionListener, ActionNodeCallback, SnackbarShower,
+		FilePrepareTask.ProcessedFilesCallback {
 
 	FrameLayout fragmentContainer;
 
@@ -838,6 +839,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
         }
 	}
 
+	@Override
 	public void onIntentProcessed(List<ShareInfo> infos) {
 		if (statusDialog != null) {
 			try {

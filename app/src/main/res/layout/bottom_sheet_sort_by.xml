@@ -48,12 +48,9 @@
             app:drawableTint="?android:attr/textColorSecondary"
             tools:text="Name (descending)" />
 
-        <View
+        <include
             android:id="@+id/sort_by_name_separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="@dimen/divider_width"
-            android:background="@color/grey_012_white_012" />
+            layout="@layout/view_linear_layout_separator_72" />
 
         <TextView
             android:id="@+id/sort_by_largest_size"
@@ -81,12 +78,9 @@
             app:drawableStartCompat="@drawable/ic_sort_smallest"
             app:drawableTint="?android:attr/textColorSecondary" />
 
-        <View
+        <include
             android:id="@+id/sort_by_size_separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="@dimen/divider_width"
-            android:background="@color/grey_012_white_012" />
+            layout="@layout/view_linear_layout_separator_72" />
 
         <TextView
             android:id="@+id/sort_by_newest_date"
@@ -114,13 +108,9 @@
             app:drawableStartCompat="@drawable/ic_sort_oldest"
             app:drawableTint="?android:attr/textColorSecondary" />
 
-        <View
+        <include
             android:id="@+id/sort_by_date_separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="@dimen/divider_width"
-            android:background="@color/grey_012_white_012"
-            android:visibility="gone" />
+            layout="@layout/view_linear_layout_separator_72" />
 
         <TextView
             android:id="@+id/sort_by_photos_media_type"
