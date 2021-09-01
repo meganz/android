@@ -143,6 +143,11 @@
         </activity>
 
         <activity
+            android:name="mega.privacy.android.app.image.ImageViewerActivity"
+            android:label="@string/full_screen_image_viewer_label"
+            android:launchMode="singleTop"/>
+
+        <activity
             android:name="mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"

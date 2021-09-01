@@ -28,6 +28,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.image.ImageViewerActivity
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
@@ -356,7 +357,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
             R.id.thumbnail
         )?.also {
-            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
+//            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
+            val intent = Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_HANDLE, nodeItem.node?.handle ?: INVALID_HANDLE)
+//                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, megaApi.getParentNode(nodeItem.node).handle)
+            }
 
             intent.putExtra(INTENT_EXTRA_KEY_POSITION, nodeItem.photoIndex)
             intent.putExtra(
@@ -366,13 +371,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
             if (viewModel.searchMode) {
                 intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_SEARCH_ADAPTER);
-                intent.putExtra(
-                    INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
-                    viewModel.getHandlesOfPhotos()
-                )
             } else {
                 intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_BROWSE_ADAPTER)
             }
+            intent.putExtra(
+                INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
+                viewModel.getHandlesOfPhotos()
+            )
 
             intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodeItem.node?.handle ?: INVALID_HANDLE)
             (listView.adapter as? DragThumbnailGetter)?.let {
