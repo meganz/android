@@ -3,10 +3,10 @@ package mega.privacy.android.app.image.data
 import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 
-data class ImageItem(
+data class ImageItem constructor(
     val handle: Long,
     val name: String,
-    val uri: Uri
+    val uri: Uri? = null
 ) {
 
     class DiffCallback : DiffUtil.ItemCallback<ImageItem>() {

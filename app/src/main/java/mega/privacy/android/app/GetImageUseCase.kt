@@ -16,6 +16,7 @@ import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
 import javax.inject.Inject
@@ -227,28 +228,6 @@ class GetImageUseCase @Inject constructor(
         this.isFile
 //        isFile && MimeTypeList.typeForName(name).isImage
 
-//    fun getImages(parentNodeHandle: Long): Flowable<List<ImageItem>> =
-//        Flowable.create({ emitter ->
-//            val node = megaApi.getNodeByHandle(parentNodeHandle)
-//
-//            if (megaApi.hasChildren(node)) {
-//                val items = sortedMapOf<Long, ImageItem>()
-//
-//                megaApi.getChildren(node).forEach { childNode ->
-//                    getProgressiveImage(childNode.handle).blockingSubscribeBy(
-//                        onNext = { imageUri ->
-//                            items[childNode.handle] = ImageItem(childNode.handle, childNode.name, imageUri)
-//                            emitter.onNext(items.values.toList())
-//                        }, onError = { error ->
-//                            Log.e("TAG", error.stackTraceToString())
-//                        }
-//                    )
-//                }
-//            } else {
-//                emitter.onError(IllegalArgumentException("Node has no children"))
-//            }
-//        }, BackpressureStrategy.LATEST)
-
     fun getImages(parentNodeHandle: Long): Flowable<List<ImageItem>> =
         getImages(megaApi.getChildren(megaApi.getNodeByHandle(parentNodeHandle)).map { it.handle })
 
@@ -257,15 +236,15 @@ class GetImageUseCase @Inject constructor(
             val items = sortedMapOf<Long, ImageItem>()
             nodeHandles.forEach { node ->
                 val childNode = megaApi.getNodeByHandle(node)
-                Log.wtf("CACATAG", "ChildNode: ${childNode.name}")
+                Log.wtf("TEST", "ChildNode: ${childNode.name}")
 
                 getProgressiveImage(childNode.handle).subscribeBy(
                     onNext = { imageUri ->
-                        Log.wtf("CACATAG", "ImageUri: $imageUri")
+                        Log.wtf("TEST", "ImageUri: $imageUri")
                         items[childNode.handle] = ImageItem(childNode.handle, childNode.name, imageUri)
                         emitter.onNext(items.values.toList())
                     }, onError = { error ->
-                        Log.e("TAG", error.stackTraceToString())
+                        logError(error.stackTraceToString())
                     }
                 )
             }

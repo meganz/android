@@ -14,8 +14,7 @@ class ImageViewHolder(
     private val binding: PageImageViewerBinding
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    private val retainingSupplier =
-        RetainingDataSourceSupplier<CloseableReference<CloseableImage>>()
+    private val retainingSupplier = RetainingDataSourceSupplier<CloseableReference<CloseableImage>>()
 
     init {
         binding.image.apply {

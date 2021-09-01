@@ -17,15 +17,11 @@ class ImageViewerAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = PageImageViewerBinding.inflate(layoutInflater, parent, false)
-        return ImageViewHolder(binding)
-//            .apply {
-//            binding.root.setOnClickListener {
-//                itemCallback.invoke(getItem(adapterPosition).handle)
-//            }
-//        }
-//        return ImageViewHolder(
-//            PageImageViewerBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-//        )
+        return ImageViewHolder(binding).apply {
+            binding.root.setOnClickListener {
+                itemCallback.invoke(getItem(adapterPosition).handle)
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
