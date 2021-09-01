@@ -1,7 +1,12 @@
 package mega.privacy.android.app.utils
 
+import android.content.Context
 import android.text.Spanned
+import android.util.Base64
+import androidx.annotation.ColorRes
 import androidx.core.text.HtmlCompat
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaStringMap
 
 object StringUtils {
 
