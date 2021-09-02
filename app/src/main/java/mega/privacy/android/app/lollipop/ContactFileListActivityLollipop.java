@@ -1,5 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
+import static mega.privacy.android.app.components.MegaProgressDialog.getMegaProgressDialog;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
@@ -34,15 +35,12 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.PermissionUtils.requestPermission;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.getMegaProgressDialog;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.UploadUtil.chooseFromDevice;
 import static mega.privacy.android.app.utils.UploadUtil.pickFileFromFileSystem;
 import static mega.privacy.android.app.utils.UploadUtil.uploadTakePicture;
 import static mega.privacy.android.app.utils.Util.checkTakePicture;
 import static mega.privacy.android.app.utils.Util.getExternalCardPath;
-import static mega.privacy.android.app.utils.Util.getScaleH;
-import static mega.privacy.android.app.utils.Util.getScaleW;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
