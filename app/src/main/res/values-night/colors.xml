@@ -156,6 +156,8 @@
 
     <color name="grey_200_grey_600">@color/grey_600</color>
 
+    <color name="grey_700_grey_600">@color/grey_600</color>
+
     <!-- homepage upload FAB tint -->
     <color name="grey_900_grey_050">@color/grey_050</color>
 
@@ -227,6 +229,9 @@
     <!-- Date picker background color -->
     <color name="white_grey_800">@color/grey_800</color>
 
+    <!-- Meeting bottom floating panel background -->
+    <color name="white_grey_900">@color/grey_900</color>
+
     <!--    For disabled alert dialog borderless button-->
     <color name="teal_300_038_teal_200_038">@color/teal_200_alpha_038</color>
 
@@ -256,6 +261,17 @@
 
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/grey_alpha_080</color>
+
+    <!--  Background of panel when expand-->
+    <color name="grey_070_dark_grey_066">@color/dark_grey_alpha_066</color>
+    <!--  Background of share link and invite button-->
+    <color name="grey_020_grey_040">@color/grey_alpha_040</color>
+    <!--  title color of share link and invite button-->
+    <color name="grey_600_white">@color/white</color>
+    <!--  background of bottom menu button when expand-->
+    <color name="grey_060_white_054">@color/white_alpha_054</color>
+    <!--  background of bottom menu button when collapse-->
+    <color name="grey_032_white_054">@color/white_alpha_054</color>
 
     <!--  SnackBar background  -->
     <color name="grey_alpha_087_white">@color/white</color>

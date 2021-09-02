@@ -1183,16 +1183,20 @@ public class ContactsFragmentLollipop extends Fragment implements MegaRequestLis
 	public void updateContact(long contactHandle) {
 		int positionVisibleContacts = -1;
 		int positionContacts = -1;
-		for (int i = 0; i < visibleContacts.size(); i++) {
-			if (visibleContacts.get(i).getMegaUser().getHandle() == contactHandle) {
-				positionVisibleContacts = i;
-				break;
+		if(visibleContacts != null && !visibleContacts.isEmpty()) {
+			for (int i = 0; i < visibleContacts.size(); i++) {
+				if (visibleContacts.get(i).getMegaUser().getHandle() == contactHandle) {
+					positionVisibleContacts = i;
+					break;
+				}
 			}
 		}
-		for (int i = 0; i < contacts.size(); i++) {
-			if (contacts.get(i).getHandle() == contactHandle) {
-				positionContacts = i;
-				break;
+		if(contacts != null && !contacts.isEmpty()) {
+			for (int i = 0; i < contacts.size(); i++) {
+				if (contacts.get(i).getHandle() == contactHandle) {
+					positionContacts = i;
+					break;
+				}
 			}
 		}
 		if (positionVisibleContacts != -1 && positionContacts != -1) {

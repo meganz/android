@@ -26,6 +26,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Vibrator;
 import android.util.Log;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import org.webrtc.ThreadUtils;
 
 import java.io.IOException;
@@ -35,12 +38,11 @@ import java.util.Set;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnProximitySensorListener;
-import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaHandleList;
 
 import static android.media.AudioManager.RINGER_MODE_NORMAL;
 import static android.media.AudioManager.RINGER_MODE_SILENT;
 import static android.media.AudioManager.RINGER_MODE_VIBRATE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHANGE;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -57,7 +59,6 @@ public class AppRTCAudioManager {
     // Handles all tasks related to Bluetooth headset devices.
     private AppRTCBluetoothManager bluetoothManager;
     private AudioManager audioManager;
-    private AudioManagerEvents audioManagerEvents;
     private AudioManagerState amState;
     private MediaPlayer mediaPlayer;
     private Vibrator vibrator;
@@ -65,7 +66,7 @@ public class AppRTCAudioManager {
     private boolean savedIsMicrophoneMute = false;
     private boolean hasWiredHeadset = false;
     private OnProximitySensorListener proximitySensorListener;
-    private int typeStatus;
+    private int typeAudioManager;
     private boolean isTemporary;
     private boolean isIncomingSound = false;
     private int previousVolume;
@@ -97,7 +98,7 @@ public class AppRTCAudioManager {
     // Callback method for changes in audio focus.
     private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener;
 
-    private AppRTCAudioManager(Context context, boolean statusSpeaker, int callStatus) {
+    private AppRTCAudioManager(Context context, boolean statusSpeaker, int type) {
         Log.d(TAG, "ctor");
         ThreadUtils.checkIsOnMainThread();
         apprtcContext = context;
@@ -105,9 +106,9 @@ public class AppRTCAudioManager {
         audioManager = ((AudioManager) context.getSystemService(Context.AUDIO_SERVICE));
         wiredHeadsetReceiver = new WiredHeadsetReceiver();
         amState = AudioManagerState.UNINITIALIZED;
-        typeStatus = callStatus;
+        this.typeAudioManager = type;
         isTemporary = false;
-        start(null, statusSpeaker);
+        start(statusSpeaker);
         if (apprtcContext instanceof ChatActivityLollipop) {
             registerProximitySensor();
         }
@@ -132,21 +133,25 @@ public class AppRTCAudioManager {
         this.proximitySensorListener = proximitySensorListener;
     }
 
-    public void registerProximitySensor() {
+    public boolean registerProximitySensor() {
         // Create and initialize the proximity sensor.
         // Note that, the sensor will not be active until start() has been called.
         //This method will be called each time a state change is detected.
-        if (proximitySensor != null) return;
+        if (proximitySensor != null) return false;
+
         proximitySensor = AppRTCProximitySensor.create(apprtcContext, new Runnable() {
             public void run() {
                 onProximitySensorChangedState();
             }
         });
+
+        return true;
     }
 
     public void startProximitySensor() {
-        registerProximitySensor();
-        proximitySensor.start();
+        if (registerProximitySensor()) {
+            proximitySensor.start();
+        }
     }
 
     /**
@@ -183,46 +188,39 @@ public class AppRTCAudioManager {
         }
     }
 
-    public void setTypeStatus(int typeStatus) {
-        this.typeStatus = typeStatus;
+    public void setTypeAudioManager(int type) {
+        this.typeAudioManager = type;
+
+        if (typeAudioManager == AUDIO_MANAGER_CALL_IN_PROGRESS) {
+            stopAudioSignals();
+        }
+
+        setValues();
+    }
+
+    public int getTypeAudioManager() {
+        return typeAudioManager;
     }
 
     private void setValues() {
-        if ((typeStatus != MegaChatCall.CALL_STATUS_RING_IN && typeStatus != MegaChatCall.CALL_STATUS_REQUEST_SENT) ||
+        if ((typeAudioManager != AUDIO_MANAGER_CALL_RINGING && typeAudioManager != AUDIO_MANAGER_CALL_OUTGOING) ||
                 bluetoothManager.getState() == AppRTCBluetoothManager.State.HEADSET_AVAILABLE ||
                 bluetoothManager.getState() == AppRTCBluetoothManager.State.SCO_CONNECTING) {
             return;
         }
-
-        setAudioManagerValues(typeStatus);
+        setAudioManagerValues();
     }
 
-    private void setAudioManagerValues(int callStatus) {
-        logDebug("Call status: " + callStatusToString(callStatus));
-
+    private void setAudioManagerValues() {
         logDebug("Updating values of Chat Audio Manager...");
-        MegaHandleList listCallsRing = MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_RING_IN);
-
-        if (callStatus == MegaChatCall.CALL_STATUS_REQUEST_SENT) {
-            if (listCallsRing != null && listCallsRing.size() > 0) {
-                logDebug("There was also an incoming call (stop incoming call sound)");
-                stopAudioSignals();
-            }
-
+        if (typeAudioManager == AUDIO_MANAGER_CALL_OUTGOING) {
+            logDebug("If there was also an incoming call (stop incoming call sound)");
+            stopAudioSignals();
             outgoingCallSound();
-        } else if (callStatus == MegaChatCall.CALL_STATUS_RING_IN) {
-            MegaHandleList listCallsRequest = MegaApplication.getInstance().getMegaChatApi().getChatCalls(MegaChatCall.CALL_STATUS_REQUEST_SENT);
-
-            if (listCallsRequest == null || listCallsRequest.size() < 1) {
-                logDebug("I'm not calling");
-                if (listCallsRing != null && listCallsRing.size() > 1) {
-                    logDebug("There is another incoming call (stop the sound of the previous incoming call)");
-                    stopAudioSignals();
-                }
-
-                incomingCallSound();
-            }
-
+        } else if (typeAudioManager == AUDIO_MANAGER_CALL_RINGING) {
+            logDebug("If there is another incoming call (stop the sound of the previous incoming call)");
+            stopAudioSignals();
+            incomingCallSound();
             checkVibration();
         }
     }
@@ -465,18 +463,19 @@ public class AppRTCAudioManager {
     /**
      * Construction.
      */
-   public static AppRTCAudioManager create(Context context, boolean isSpeakerOn, int callStatus) {
-        return new AppRTCAudioManager(context, isSpeakerOn, callStatus);
+   public static AppRTCAudioManager create(Context context, boolean isSpeakerOn, int type) {
+       return new AppRTCAudioManager(context, isSpeakerOn, type);
     }
 
-    public void updateSpeakerStatus(boolean speakerStatus, int callStatus) {
-        typeStatus = callStatus;
+    public void updateSpeakerStatus(boolean speakerStatus, int type) {
+        typeAudioManager = type;
+
         if (audioDevices.size() >= 2 && audioDevices.contains(AudioDevice.EARPIECE) && audioDevices.contains(AudioDevice.SPEAKER_PHONE)) {
             selectAudioDevice(speakerStatus ? AudioDevice.SPEAKER_PHONE : AudioDevice.EARPIECE, false);
         }
     }
 
-    private void start(AudioManagerEvents audioManagerEvents, boolean statusSpeaker) {
+    private void start(boolean statusSpeaker) {
         ThreadUtils.checkIsOnMainThread();
         if (amState == AudioManagerState.RUNNING) {
             Log.e(TAG, "AudioManager is already active");
@@ -485,7 +484,6 @@ public class AppRTCAudioManager {
 
         // TODO(henrika): perhaps call new method called preInitAudio() here if UNINITIALIZED.
         Log.d(TAG, "AudioManager starts...");
-        this.audioManagerEvents = audioManagerEvents;
         amState = AudioManagerState.RUNNING;
 
         // Store current audio state so we can restore it when stop() is called.
@@ -532,45 +530,53 @@ public class AppRTCAudioManager {
             }
         };
 
-        int typeStream = INVALID_TYPE_FOCUS;
-        int typeFocus = INVALID_TYPE_FOCUS;
-        if (apprtcContext instanceof MegaApplication) {
-            if (typeStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+        int typeStream;
+        int typeFocus;
+        switch (typeAudioManager) {
+            case AUDIO_MANAGER_PLAY_VOICE_CLIP:
+                typeStream = STREAM_MUSIC_DEFAULT;
+                typeFocus = AUDIOFOCUS_DEFAULT;
+                break;
+
+            case AUDIO_MANAGER_CALL_RINGING:
                 typeStream = AudioManager.STREAM_RING;
                 typeFocus = AUDIOFOCUS_DEFAULT;
-            } else {
+                break;
+
+            default:
                 typeStream = AudioManager.STREAM_VOICE_CALL;
                 typeFocus = AudioManager.AUDIOFOCUS_GAIN;
-            }
-        } else if (apprtcContext instanceof ChatActivityLollipop) {
-            typeStream = STREAM_MUSIC_DEFAULT;
-            typeFocus = AUDIOFOCUS_DEFAULT;
+                break;
         }
 
-        if (apprtcContext instanceof MegaApplication || apprtcContext instanceof ChatActivityLollipop) {
-            int result = audioManager.requestAudioFocus(audioFocusChangeListener, typeStream, typeFocus);
-            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                logDebug("Audio focus request granted for VOICE_CALL streams");
-            } else {
-                logError("Audio focus request failed");
-            }
+        int result = audioManager.requestAudioFocus(audioFocusChangeListener, typeStream, typeFocus);
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            logDebug("Audio focus request granted for VOICE_CALL streams");
+        } else {
+            logError("Audio focus request failed");
+        }
 
-            if (apprtcContext instanceof MegaApplication &&
-                    (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) &&
-                    typeStatus != MegaChatCall.CALL_STATUS_RING_IN) {
-                logDebug("Mode communication");
-                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            } else {
-                logDebug("Mode normal");
-                audioManager.setMode(AudioManager.MODE_NORMAL);
-            }
+        if (typeAudioManager != AUDIO_MANAGER_PLAY_VOICE_CLIP &&
+                typeAudioManager != AUDIO_MANAGER_CALL_RINGING &&
+                (Build.VERSION.SDK_INT < Build.VERSION_CODES.N ||
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
+            logDebug("Mode communication");
+            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        } else {
+            logDebug("Mode normal");
+            audioManager.setMode(AudioManager.MODE_NORMAL);
         }
 
         // Always disable microphone mute during a WebRTC call.
         setMicrophoneMute(false);
 
         // Set initial device states.
-        userSelectedAudioDevice = AudioDevice.NONE;
+        if (typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP || typeAudioManager == AUDIO_MANAGER_CREATING_JOINING_MEETING) {
+            userSelectedAudioDevice = AudioDevice.SPEAKER_PHONE;
+        } else {
+            userSelectedAudioDevice = AudioDevice.NONE;
+        }
+
         selectedAudioDevice = AudioDevice.NONE;
         audioDevices.clear();
 
@@ -595,9 +601,8 @@ public class AppRTCAudioManager {
             return;
         }
 
-        typeStatus = INVALID_CALL_STATUS;
+        typeAudioManager = INVALID_CALL_STATUS;
         amState = AudioManagerState.UNINITIALIZED;
-
         unregisterReceiver(wiredHeadsetReceiver);
 
         stopAudioSignals();
@@ -614,7 +619,6 @@ public class AppRTCAudioManager {
         Log.d(TAG, "Abandoned audio focus for VOICE_CALL streams");
         unregisterProximitySensor();
 
-        audioManagerEvents = null;
         Log.d(TAG, "AudioManager stopped");
     }
 
@@ -631,7 +635,7 @@ public class AppRTCAudioManager {
         AppRTCUtils.assertIsTrue(audioDevices.contains(device));
         switch (device) {
             case SPEAKER_PHONE:
-                if(apprtcContext instanceof ChatActivityLollipop){
+                if(typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP){
                     audioManager.setMode(AudioManager.MODE_NORMAL);
                 }
 
@@ -644,7 +648,7 @@ public class AppRTCAudioManager {
                     MegaApplication.isSpeakerOn = false;
                 }
 
-                if(apprtcContext instanceof ChatActivityLollipop){
+                if(typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP){
                     audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
                 }
 
@@ -662,8 +666,11 @@ public class AppRTCAudioManager {
                 break;
         }
 
-        selectedAudioDevice = device;
-        setValues();
+        if (selectedAudioDevice != device) {
+            selectedAudioDevice = device;
+            LiveEventBus.get(EVENT_AUDIO_OUTPUT_CHANGE, AudioDevice.class).post(selectedAudioDevice);
+            setValues();
+        }
     }
 
     /**
@@ -672,7 +679,6 @@ public class AppRTCAudioManager {
      */
     private void setDefaultAudioDevice(AudioDevice defaultDevice) {
         ThreadUtils.checkIsOnMainThread();
-
         switch (defaultDevice) {
             case SPEAKER_PHONE:
                 defaultAudioDevice = AudioDevice.SPEAKER_PHONE;
@@ -798,6 +804,10 @@ public class AppRTCAudioManager {
             }
             return false;
         }
+    }
+
+    public void changeUserSelectedAudioDeviceForHeadphone(AudioDevice device){
+        userSelectedAudioDevice = device;
     }
 
     /**
@@ -945,7 +955,7 @@ public class AppRTCAudioManager {
                 newAudioDevice = AudioDevice.WIRED_HEADSET;
             }
         } else if (userSelectedAudioDevice == AudioDevice.NONE) {
-            if (typeStatus == MegaChatCall.CALL_STATUS_RING_IN) {
+            if (typeAudioManager == AUDIO_MANAGER_CALL_RINGING) {
                 newAudioDevice = AudioDevice.SPEAKER_PHONE;
             } else {
                 newAudioDevice = defaultAudioDevice;
@@ -962,10 +972,6 @@ public class AppRTCAudioManager {
             Log.d(TAG, "New device status: "
                     + "available=" + audioDevices + ", "
                     + "selected=" + newAudioDevice);
-            if (audioManagerEvents != null) {
-                // Notify a listening client that audio device has been changed.
-                audioManagerEvents.onAudioDeviceChanged(selectedAudioDevice, audioDevices);
-            }
         }
         Log.d(TAG, "updateAudioDeviceState done");
     }
@@ -987,15 +993,6 @@ public class AppRTCAudioManager {
         RUNNING,
     }
 
-    /**
-     * Selected audio device change event.
-     */
-    public static interface AudioManagerEvents {
-        // Callback fired once audio device is changed or list of available audio devices changed.
-        void onAudioDeviceChanged(
-                AudioDevice selectedAudioDevice, Set<AudioDevice> availableAudioDevices);
-    }
-
     /* Receiver which handles changes in wired headset availability. */
     private class WiredHeadsetReceiver extends BroadcastReceiver {
         private static final int STATE_UNPLUGGED = 0;
@@ -1014,6 +1011,10 @@ public class AppRTCAudioManager {
                     + (microphone == HAS_MIC ? "mic" : "no mic") + ", n=" + name + ", sb="
                     + isInitialStickyBroadcast());
             hasWiredHeadset = (state == STATE_PLUGGED);
+            if (state == STATE_PLUGGED) {
+                changeUserSelectedAudioDeviceForHeadphone(AudioDevice.WIRED_HEADSET);
+            }
+
             updateAudioDeviceState();
         }
     }

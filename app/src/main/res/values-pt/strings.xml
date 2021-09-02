@@ -3995,4 +3995,138 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Alterar mesmo assim</string>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">Não tem mais ninguém aqui</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">Meeting</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">Fazer uma reunião ou entrar</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">Nova reunião</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">Entrar em uma reunião</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">Fazer uma reunião</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">Entrar como convidado</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">Reunião de %s</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">Desligar</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">Microfone</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">O seu microfone está silenciado</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">O seu microfone já não está silenciado</string>
+    <!-- General label for camera -->
+    <string name="general_camera">Câmera</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">A sua câmera está ativada.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">A sua câmera está desativada.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">Em espera</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">Viva-voz</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">Fones de ouvido</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">Os fones de ouvido estão ativados.</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">O viva-voz está ativado</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">O viva-voz está desativado</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">Finalizar</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">Convidar participantes</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">Participantes (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">Mostrar na vista principal</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">Converter em moderador</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">Você quer sair da reunião?</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">Sem moderador</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">Antes de sair, selecione um ou mais novos moderadores para manter a estrutura da reunião.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">Converter em moderador</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">Sair de qualquer forma</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">Selecione um ou mais novos moderadores.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">Alterar o nome da reunião</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">Participantes: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">Moderador: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">Link da reunião</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">Duração</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">Entrar em uma reunião como convidado</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">Você foi convidado para uma reunião.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">Acesse o link que você recebeu ou digite o link aqui</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">A qualidade da sua conexão não é boa.</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">A reunião terminou</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">O link da reunião é inválido</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">Permissões de acesso necessárias para o MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">O MEGA precisa ter acesso ao seu microfone e à sua câmera nas reuniões.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Entendi</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">Acesse as Configurações para permitir o acesso do MEGA à sua câmera e ao seu microfone.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">Ver o chat da reunião</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">Convide mais participantes para a reunião. Deslize para cima para convidar.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">Toque para criar uma nova reunião</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">Configure rapidamente uma reunião criptografada com o nosso novo recurso MEGA Meeting</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">Você é o novo moderador.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">O link da reunião foi copiado</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%scomeçou uma reunião. Toque aqui para entrar.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA Meeting</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">Videoconferência criptografada de ponta a ponta</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">Digite um link de reunião válido</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">Mais do que reuniões</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">A sua privacidade é importante</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">Faça parte da maior plataforma de colaboração e armazenamento em nuvem segura do mundo.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">Obtenha 20 GB de forma gratuita</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">Cadastre-se agora e aproveite de forma gratuita os recursos de colaboração avançados.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">Há outra chamada em andamento. Finalize a sua chamada atual antes de fazer outra.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">Novo nome da reunião</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">Não foi possível criar a reunião.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](eu)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">Vista principal</string>
 </resources>

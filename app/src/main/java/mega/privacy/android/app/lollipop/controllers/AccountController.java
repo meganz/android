@@ -524,6 +524,8 @@ public class AccountController {
     static public void logout(Context context, MegaApiAndroid megaApi) {
         logDebug("logout");
 
+        MegaApplication.setLoggingOut(true);
+
         BackupToolsKt.removeBackupsBeforeLogout();
 
         if (megaApi == null){

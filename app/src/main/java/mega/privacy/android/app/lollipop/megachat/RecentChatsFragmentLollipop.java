@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
@@ -23,6 +24,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableString;
@@ -67,6 +69,7 @@ import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLollipopAdapter;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.HighLightHintHelper;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -166,6 +169,12 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     private AskForDisplayOverDialog askForDisplayOverDialog;
 
+    private static final String SP_KEY_IS_HINT_SHOWN_RECENT_CHATS = "is_hint_shown_recent_chats";
+    private boolean isHintShowing;
+
+    private HighLightHintHelper highLightHintHelper;
+
+
     public static RecentChatsFragmentLollipop newInstance() {
         logDebug("newInstance");
         RecentChatsFragmentLollipop fragment = new RecentChatsFragmentLollipop();
@@ -215,6 +224,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         contactGetter.setMegaContactUpdater(this);
 
         askForDisplayOverDialog = new AskForDisplayOverDialog(context);
+
+        highLightHintHelper = new HighLightHintHelper(requireActivity());
     }
 
     @Override
@@ -422,10 +433,31 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         } else {
             bannerContainer.setVisibility(View.GONE);
         }
-        if(askForDisplayOverDialog != null) {
+
+        // Workaround: wait for R.id.action_menu_open_meeting initialized.
+        new Handler().postDelayed(() -> {
+            if (shouldShowMeetingHint(context, SP_KEY_IS_HINT_SHOWN_RECENT_CHATS) || isHintShowing) {
+                highLightHintHelper.showHintForMeetingIcon(R.id.action_menu_open_meeting, () -> {
+                    hintShown(context, SP_KEY_IS_HINT_SHOWN_RECENT_CHATS);
+                    highLightHintHelper.dismissPopupWindow();
+                    isHintShowing = false;
+                    askForDisplayOver();
+                    return null;
+                });
+
+                isHintShowing = true;
+            } else {
+                askForDisplayOver();
+            }
+        }, 300);
+
+        return v;
+    }
+
+    private void askForDisplayOver() {
+        if (askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
-        return v;
     }
 
     private boolean showInviteBanner() {
@@ -1418,6 +1450,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
         outState.putBoolean(KEY_DIALOG_IS_SHOWING, isExplanationDialogShowing);
+        outState.putBoolean(KEY_HINT_IS_SHOWING, isHintShowing);
     }
 
     @Override
@@ -1443,6 +1476,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (context instanceof ManagerActivityLollipop) {
             ((ManagerActivityLollipop) context).setSearchQuery("");
         }
+
+        // Avoid window leak.
+        highLightHintHelper.dismissPopupWindow();
     }
 
     @Override
@@ -1504,6 +1540,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if(isExplanationDialogShowing) {
                 showExplanationDialog();
             }
+
+            isHintShowing = savedInstanceState.getBoolean(KEY_HINT_IS_SHOWING);
         }
     }
 

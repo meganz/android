@@ -3903,4 +3903,138 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">仍要更改</string>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">只有您一人</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">会议</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">开始/加入会议</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">新建会议</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">加入会议</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">开始会议</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">以游客身份加入</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">%s的会议</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">通话结束</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">麦克风</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">您的麦克风已静音</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">您的麦克风已取消静音</string>
+    <!-- General label for camera -->
+    <string name="general_camera">相机</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">您的摄像头已开启。</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">您的摄像头已关闭。</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">通话保持</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">扬声器</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">听筒</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">听筒已开启</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">扬声器已开启</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">扬声器已关闭</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">结束</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">邀请参会者</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">参会者（%d）</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">在主视图中显示</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">成为发起人</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">现在离开会议吗？</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">无主持人</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">请在离开前为会议指定一位或多位新主持人。</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">成为发起人</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">离开</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">请指定一位或多位新主持人。</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">更改会议名称</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">参会者：%d人</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">主持人：%s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">会议链接</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">时长</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">以游客身份加入会议</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">您被邀请加入一场会议。</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">点击发送给您的会议链接或将其粘贴到此处</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">连接质量不佳</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">会议已结束</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">会议链接无效</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">MEGA请求访问权限</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">MEGA需要访问您的麦克风和摄像头以进行会议。</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">知道了</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">转到“设置”并允许MEGA访问您的相机和麦克风。</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">查看会议聊天</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">邀请更多参会者加入会议。向上滑动邀请。</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">点击创建一场新会议</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">通过全新的加密会议功能快速设置MEGA会议</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">您是新的主持人。</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">会议链接已复制。</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%s已开始一场会议。点击加入。</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA会议</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">端到端加密视频会议</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">请输入一个有效的会议链接</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">不仅仅是会议</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">您的隐私非常重要</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">加入全球最大的安全云存储和协作平台。</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">获得20GB免费存储空间</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">立即注册并免费享受全球领先的协作平台。</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">正在进行另一个通话。请先结束您的当前通话。</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">新会议</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">创建会议失败。</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s[A](我)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">主视图</string>
 </resources>

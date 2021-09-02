@@ -51,6 +51,7 @@ import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -1647,4 +1648,13 @@ public class Util {
     public static boolean isSimplifiedChinese() {
         return Locale.getDefault().toLanguageTag().contains(HANS);
     }
+
+	/**
+	 * Method to know the current orientation of the device
+	 *
+	 * @return current orientation of the device
+	 */
+	public static int getCurrentOrientation() {
+		return MegaApplication.getInstance().getApplicationContext().getResources().getConfiguration().orientation;
+	}
 }

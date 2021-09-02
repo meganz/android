@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="participant"
+            type="mega.privacy.android.app.meeting.adapter.Participant" />
+
+        <variable
+            name="viewModel"
+            type="mega.privacy.android.app.meeting.fragments.MeetingParticipantBottomSheetDialogViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <mega.privacy.android.app.components.RoundedImageView
+            android:id="@+id/avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:scaleType="fitCenter"
+            app:corner_radius="60dp"
+            app:layout_constraintBottom_toTopOf="@id/divider_info"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@id/divider_info"
+            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:gravity="center_vertical"
+                android:showModeratorIcon="@{participant.moderator}"
+                android:singleLine="true"
+                android:textAppearance="?attr/textAppearanceSubtitle1" />
+
+            <TextView
+                android:id="@+id/email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:show="@{!viewModel.participantGuest}"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary"
+                tools:text="@{viewModel.getEmail(context)}" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider_info"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="77dp"
+            android:background="@color/grey_012_white_012"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider_info">
+
+            <TextView
+                android:id="@+id/add_contact"
+                style="@style/BottomSheetItem"
+                android:show="@{viewModel.showAddContact()}"
+                android:text="@string/menu_add_contact"
+                app:drawableStartCompat="@drawable/ic_g_add_contact" />
+
+            <TextView
+                android:id="@+id/contact_info"
+                style="@style/BottomSheetItem"
+                android:show="@{viewModel.showContactInfoOrEditProfile()}"
+                android:text="@{viewModel.getContactItemText()}"
+                app:drawableStartCompat="@drawable/info_ic" />
+
+            <View
+                android:id="@+id/divider_contact_info"
+                style="@style/BottomSheetItemDivider"
+                android:show="@{viewModel.showDividerContactInfo()}" />
+
+            <TextView
+                android:id="@+id/send_message"
+                style="@style/BottomSheetItem"
+                android:show="@{viewModel.showSendMessage()}"
+                android:text="@string/context_send_message"
+                app:drawableStartCompat="@drawable/ic_chat" />
+
+            <View
+                android:id="@+id/divider_send_message"
+                style="@style/BottomSheetItemDivider"
+                android:show="@{viewModel.showSendMessage()}" />
+
+            <TextView
+                android:id="@+id/ping_to_speaker"
+                style="@style/BottomSheetItem"
+                android:show="@{viewModel.showPinItem()}"
+                android:text="@string/pin_to_speaker"
+                app:drawableStartCompat="@drawable/ic_speaker_view" />
+
+            <View
+                android:id="@+id/divider_ping_to_speaker"
+                style="@style/BottomSheetItemDivider"
+                android:show="@{viewModel.showPinItem()}" />
+
+            <TextView
+                android:id="@+id/make_moderator"
+                style="@style/BottomSheetItem"
+                android:show="@{viewModel.showMakeModeratorItem()}"
+                android:text="@string/make_moderator"
+                app:drawableStartCompat="@drawable/ic_moderator" />
+
+            <View
+                android:id="@+id/divider_make_moderator"
+                style="@style/BottomSheetItemDivider"
+                android:show="@{viewModel.showMakeModeratorItem()}" />
+
+            <TextView
+                android:id="@+id/remove_participant"
+                style="@style/BottomSheetItem"
+                android:show="@{viewModel.showRemoveItem()}"
+                android:text="@string/remove_participant_menu_item"
+                android:textColor="@color/red_600_red_300"
+                app:drawableStartCompat="@drawable/ic_remove"
+                app:drawableTint="@color/red_600_red_300" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

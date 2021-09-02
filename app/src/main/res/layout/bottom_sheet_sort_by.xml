@@ -22,13 +22,7 @@
 
         <TextView
             android:id="@+id/sort_by_name_asc"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
+            style="@style/BottomSheetItem"
             app:drawableStartCompat="@drawable/ic_sort_name_ascending"
             app:drawableTint="?android:attr/textColorSecondary"
             tools:drawableTint="?attr/colorSecondary"
@@ -37,118 +31,59 @@
 
         <TextView
             android:id="@+id/sort_by_name_desc"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
+            style="@style/BottomSheetItem"
             app:drawableStartCompat="@drawable/ic_sort_name_descending"
-            app:drawableTint="?android:attr/textColorSecondary"
             tools:text="Name (descending)" />
 
         <View
             android:id="@+id/sort_by_name_separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="@dimen/divider_width"
-            android:background="@color/grey_012_white_012" />
+            style="@style/BottomSheetItemDivider" />
 
         <TextView
             android:id="@+id/sort_by_largest_size"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            style="@style/BottomSheetItem"
             android:text="@string/sortby_size_largest_first"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:drawableStartCompat="@drawable/ic_sort_largest"
-            app:drawableTint="?android:attr/textColorSecondary" />
+            app:drawableStartCompat="@drawable/ic_sort_largest" />
 
         <TextView
             android:id="@+id/sort_by_smallest_size"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            style="@style/BottomSheetItem"
             android:text="@string/sortby_size_smallest_first"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:drawableStartCompat="@drawable/ic_sort_smallest"
-            app:drawableTint="?android:attr/textColorSecondary" />
+            app:drawableStartCompat="@drawable/ic_sort_smallest" />
 
         <View
             android:id="@+id/sort_by_size_separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="@dimen/divider_width"
-            android:background="@color/grey_012_white_012" />
+            style="@style/BottomSheetItemDivider" />
 
         <TextView
             android:id="@+id/sort_by_newest_date"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            style="@style/BottomSheetItem"
             android:text="@string/sortby_date_newest"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:drawableStartCompat="@drawable/ic_sort_newest"
-            app:drawableTint="?android:attr/textColorSecondary" />
+            app:drawableStartCompat="@drawable/ic_sort_newest" />
 
         <TextView
             android:id="@+id/sort_by_oldest_date"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            style="@style/BottomSheetItem"
             android:text="@string/sortby_date_oldest"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:drawableStartCompat="@drawable/ic_sort_oldest"
-            app:drawableTint="?android:attr/textColorSecondary" />
+            app:drawableStartCompat="@drawable/ic_sort_oldest" />
 
         <View
             android:id="@+id/sort_by_date_separator"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginStart="@dimen/divider_width"
-            android:background="@color/grey_012_white_012"
-            android:visibility="gone" />
+            style="@style/BottomSheetItemDivider" />
 
         <TextView
             android:id="@+id/sort_by_photos_media_type"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            style="@style/BottomSheetItem"
             android:text="@string/sortby_type_photo_first"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
             android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_cu_photos"
-            app:drawableTint="?android:attr/textColorSecondary" />
+            app:drawableStartCompat="@drawable/ic_cu_photos"/>
 
         <TextView
             android:id="@+id/sort_by_videos_media_type"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            style="@style/BottomSheetItem"
             android:text="@string/sortby_type_video_first"
-            android:textAppearance="?attr/textAppearanceSubtitle1"
             android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_cu_videos"
-            app:drawableTint="?android:attr/textColorSecondary" />
+            app:drawableStartCompat="@drawable/ic_cu_videos" />
 
     </LinearLayout>
 

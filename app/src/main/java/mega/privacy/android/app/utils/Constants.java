@@ -326,6 +326,10 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
     public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
     public static final String INTENT_EXTRA_KEY_ENABLED = "enabled";
+    public static final String INTENT_EXTRA_KEY_CONTACT_TYPE = "contactType";
+    public static final String INTENT_EXTRA_KEY_CHAT = "chat";
+    public static final String INTENT_EXTRA_KEY_TOOL_BAR_TITLE = "aBtitle";
+    public static final String INTENT_EXTRA_IS_FROM_MEETING = "extra_is_from_meeting";
 
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
@@ -480,6 +484,15 @@ public class Constants {
     public static final int START_CALL_PERMISSIONS = 2;
     public static final int RETURN_CALL_PERMISSIONS = 3;
 
+    public static int TYPE_LEFT = -1;
+    public static int TYPE_JOIN = 1;
+    public static int TYPE_NETWORK_QUALITY = 2;
+    public static int TYPE_AUDIO = 3;
+    public static int TYPE_VIDEO = 4;
+    public static int TYPE_RECONNECTING = 5;
+    public static int TYPE_SINGLE_PARTICIPANT = 6;
+    public static int TYPE_NO_CONNECTION = 7;
+
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
 
@@ -554,7 +567,6 @@ public class Constants {
     public static final int PERMISSIONS_TYPE = 4;
     public static final int INVITE_CONTACT_TYPE = 5;
     public static final int SNACKBAR_IMCOMPATIBILITY_TYPE = 6;
-    public static final int SNACKBAR_IMCOMPATIBILITY_BUTTON_TYPE = 7;
 
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
@@ -568,9 +580,6 @@ public class Constants {
     public static final int CHAT_LINK = 202;
     public static final int CONTACT_LINK = 203;
     public static final int ERROR_LINK = -1;
-    public static final int INVALID_CALL_STATUS = -1;
-    public static final int MAX_PARTICIPANTS_GRID = 6;
-    public static final int INVALID_CALL = -1;
 
     public static final int BACK_PRESS_NOT_HANDLED = 0;
     public static final int BACK_PRESS_HANDLED = 1;
@@ -606,13 +615,13 @@ public class Constants {
     public static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
     public static final String USER_WAITING_FOR_CALL = "USER_WAITING_FOR_CALL";
     public static final String TYPE_CALL_PERMISSION = "TYPE_CALL_PERMISSION";
-    public static final String INCOMING_VIDEO_CALL = "INCOMING_VIDEO_CALL";
     public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
     public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
     public static final String EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE";
     public static final String COPIED_TEXT_LABEL = "Copied Text";
     public static final String PLAIN_TEXT_SHARE_TYPE = "text/plain";
     public static final String IS_FROM_CONTACTS = "IS_FROM_CONTACTS";
+    public static final String IS_FLOATING_WINDOW = "IS_FLOATING_WINDOW";
 
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
@@ -621,6 +630,8 @@ public class Constants {
     public static final int INVALID_VOLUME = -1;
     public static final int INVALID_DIMENSION = -1;
     public static final int INVALID_VIEW_TYPE = -1;
+    public static final int INVALID_CALL_STATUS = -1;
+    public static final int INVALID_CALL = -1;
 
     public static final String POSITION_SELECTED_MESSAGE = "POSITION_SELECTED_MESSAGE";
 
@@ -645,6 +656,9 @@ public class Constants {
     public static final int AVATAR_SIZE_CALLS = 50;
     public static final int AVATAR_SIZE_GRID = 75;
     public static final int AVATAR_SIZE = 150;
+    public static final float MEETING_BOTTOM_MARGIN = 40f;
+    public static final float MEETING_BOTTOM_MARGIN_WITH_KEYBOARD = 10f;
+    public static final float MIN_MEETING_HEIGHT_CHANGE = 200;
 
     //Thumbnail dimens
     public static final float THUMB_CORNER_RADIUS_DP = 4;
@@ -656,6 +670,16 @@ public class Constants {
     // Thumbnail dimens for Browse file page
     public static final int THUMBNAIL_SIZE_DP = 36;
     public static final int THUMBNAIL_MARGIN_DP = 18;
+
+    public static final int AUDIO_MANAGER_PLAY_VOICE_CLIP = 0;
+    public static final int AUDIO_MANAGER_CALL_RINGING = 1;
+    public static final int AUDIO_MANAGER_CALL_IN_PROGRESS = 2;
+    public static final int AUDIO_MANAGER_CALL_OUTGOING = 3;
+    public static final int AUDIO_MANAGER_CREATING_JOINING_MEETING = 4;
+
+    public static final int CHECK_LINK_TYPE_UNKNOWN_LINK = 0;
+    public static final int CHECK_LINK_TYPE_CHAT_LINK = 1;
+    public static final int CHECK_LINK_TYPE_MEETING_LINK = 2;
 
     public static final String SEPARATOR = File.separator;
 
@@ -820,6 +844,8 @@ public class Constants {
 
     public static final int MAX_BADGE_NUM = 9;
 
+    public static final int START_CALL_AUDIO_ENABLE = 1;
+
     /** Event Keys */
     public static final String EVENT_NODES_CHANGE = "nodes_change";
     public static final String EVENT_ORDER_CHANGE = "order_change";
@@ -839,6 +865,9 @@ public class Constants {
 
     public static final String EVENT_FAB_CHANGE = "fab_change";
 
+    public static final String KEY_HINT_IS_SHOWING = "hint_is_showing";
+    public static final String KEY_IS_SHOWED_WARNING_MESSAGE = "is_showed_meeting_warning_message_";
+
     /** In database, invalid value is defined as '-1' */
     public static final String INVALID_NON_NULL_VALUE = "-1";
 
@@ -856,5 +885,14 @@ public class Constants {
     public static final int ORDER_OTHERS = 2;
     public static final int ORDER_CAMERA = 3;
 
+    /** The param type returned by checkChatLink denoting the link is for a meeting room */
+    public final static int LINK_IS_FOR_MEETING = 1;
+
     public static final long ANIMATION_DURATION = 400;
+
+    public static final float MEETING_NAME_MARGIN_TOP = 16f;
+
+    public static final int NAME_CHANGE = 0;
+    public static final int AVATAR_CHANGE = 1;
+
 }

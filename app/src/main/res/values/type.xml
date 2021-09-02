@@ -37,6 +37,10 @@
         <item name="android:letterSpacing">0</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Variant.18">
+        <item name="android:textSize">18sp</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Variant2">
         <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
@@ -272,6 +276,10 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.Variant.AccentColor">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle2.Variant2">
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">@color/grey_087_white</item>
@@ -471,6 +479,12 @@
     <!-- Regular, 12sp, 0px, AudioPlayer playlist position and duration -->
     <style name="TextAppearance.Mega.Caption.Variant4">
         <item name="android:textColor">@color/grey_038_white_alpha_038</item>
+    </style>
+
+    <!-- Regular, 10sp, 0px, white -->
+    <style name="TextAppearance.Mega.Caption.Variant5">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">10sp</item>
     </style>
 
     <!-- Regular, 12sp, 0.25px -->
