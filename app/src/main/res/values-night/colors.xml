@@ -274,4 +274,10 @@
     <color name="black_grey_alpha_012">@color/grey_alpha_012</color>
     <color name="grey_alpha_012_black">@color/black</color>
 
+    <color name="white_teal_100">@color/teal_100</color>
+
+    <!-- For fast scroller -->
+    <color name="scroll_handle">@color/teal_100</color>
+    <color name="scroll_bubble_text_color">@color/dark_grey</color>
+
 </resources>

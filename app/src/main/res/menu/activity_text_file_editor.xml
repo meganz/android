@@ -77,6 +77,13 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_line_numbers"
+        android:orderInCategory="110"
+        android:title="@string/action_show_line_numbers"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_move_to_trash"
         android:orderInCategory="120"
         android:title="@string/context_move_to_trash"
@@ -103,7 +110,7 @@
         android:id="@+id/chat_action_save_for_offline"
         android:icon="@drawable/ic_save_offline"
         android:orderInCategory="100"
-        android:title="@string/save_for_offline"
+        android:title="@string/file_properties_available_offline"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />

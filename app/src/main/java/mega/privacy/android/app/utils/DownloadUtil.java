@@ -65,31 +65,4 @@ public class DownloadUtil {
             }
         }
     }
-
-    /**
-     * Shows an snackbar to alert if:
-     *      only one file has to be downloaded and is not downloaded yet
-     *      several files have to be downloaded and some of them are already downloaded
-     *
-     * @param context activity where the snackbar has to be shown
-     * @param numberOfNodesPending pending downloads
-     * @param numberOfNodesAlreadyDownloaded files already downloaded
-     * @param emptyFolders number of empty folders
-     */
-    public static void showSnackBarWhenDownloading(Context context, int numberOfNodesPending, int numberOfNodesAlreadyDownloaded, int emptyFolders) {
-        logDebug(" Already downloaded: " + numberOfNodesAlreadyDownloaded + " Pending: " + numberOfNodesPending);
-
-        if (numberOfNodesPending == 0 && numberOfNodesAlreadyDownloaded == 0) {
-            showSnackbar(context, context.getResources().getQuantityString(R.plurals.empty_folders, emptyFolders));
-        } else if (numberOfNodesAlreadyDownloaded == 0) {
-            showSnackbar(context, context.getResources().getQuantityString(R.plurals.download_began, numberOfNodesPending, numberOfNodesPending));
-        } else {
-            String msg;
-            msg = context.getResources().getQuantityString(R.plurals.file_already_downloaded, numberOfNodesAlreadyDownloaded, numberOfNodesAlreadyDownloaded);
-            if (numberOfNodesPending > 0) {
-                msg = msg + context.getResources().getQuantityString(R.plurals.file_pending_download, numberOfNodesPending, numberOfNodesPending);
-            }
-            showSnackbar(context, msg);
-        }
-    }
 }

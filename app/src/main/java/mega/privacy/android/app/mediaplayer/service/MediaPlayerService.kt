@@ -161,6 +161,14 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                     playerNotificationManager?.setPlayer(exoPlayer)
                     notificationDismissed = false
                 }
+
+                if (playWhenReady) {
+                    if (viewModel.audioPlayer) {
+                        pauseVideoPlayer(this@MediaPlayerService)
+                    } else {
+                        pauseAudioPlayer(this@MediaPlayerService)
+                    }
+                }
             }
 
             override fun onPlaybackStateChanged(state: Int) {
@@ -480,6 +488,18 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         private const val RESUME_DELAY_MS = 500L
 
         const val SINGLE_PLAYLIST_SIZE = 2
+
+        /**
+         * Pause the video player when play audio.
+         *
+         * @param context Android context
+         */
+        @JvmStatic
+        fun pauseVideoPlayer(context: Context) {
+            val videoPlayerIntent = Intent(context, VideoPlayerService::class.java)
+            videoPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_PAUSE)
+            context.startService(videoPlayerIntent)
+        }
 
         /**
          * Pause the audio player when play video, play/record audio clip, start/receive call.

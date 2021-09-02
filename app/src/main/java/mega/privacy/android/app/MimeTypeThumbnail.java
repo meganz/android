@@ -65,7 +65,7 @@ public class MimeTypeThumbnail {
 		resources.put(R.drawable.ic_numbers_thumbnail, new String[] {"numbers", });
 		resources.put(R.drawable.ic_openoffice_thumbnail, new String[] {"odp", "odt", "ods"});
 		resources.put(R.drawable.ic_sketch_thumbnail, new String[] {"sketch", });
-
+		resources.put(R.drawable.ic_url_thumbnail, new String[]{"url"});
 	}
 
 	private String type;

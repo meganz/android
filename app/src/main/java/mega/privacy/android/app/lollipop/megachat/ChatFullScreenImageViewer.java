@@ -76,6 +76,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
@@ -573,6 +574,11 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 				logWarning("e.getErrorCode() != MegaError.API_OK");
 
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					if (api.isForeignNode(request.getParentHandle())) {
+						showForeignStorageOverQuotaWarningDialog(this);
+						return;
+					}
+
 					logWarning("OVERQUOTA ERROR: "+e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -762,7 +768,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
 				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					logDebug("ISFILE");
-					String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
+					String localPath = getLocalFile(tempNode);
 					if(localPath != null){	
 						try { 
 							copyFile(new File(localPath), new File(parentPath, tempNode.getName()));

@@ -641,7 +641,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         mManagerActivity.enableHideBottomViewOnScroll(selectedView != ALL_VIEW);
         mManagerActivity.updateCuFragmentOptionsMenu();
         mManagerActivity.updateEnableCUButton(selectedView == ALL_VIEW
-                && gridAdapter.getItemCount() > 0 && !viewModel.isCUEnabled()
+                && (gridAdapter != null && gridAdapter.getItemCount() > 0)
+                && (viewModel != null && !viewModel.isCUEnabled())
                 ? View.VISIBLE
                 : View.GONE);
 

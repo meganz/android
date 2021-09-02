@@ -90,6 +90,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
         items_layout = contentView.findViewById(R.id.items_layout);
 
+        View reactionSeparator = contentView.findViewById(R.id.separator);
         RelativeLayout optionOpenWith = contentView.findViewById(R.id.open_with_layout);
         LinearLayout forwardSeparator = contentView.findViewById(R.id.forward_separator);
         RelativeLayout optionForward = contentView.findViewById(R.id.forward_layout);
@@ -144,6 +145,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         } else {
             reactionsLayout.setVisibility(View.GONE);
         }
+        reactionSeparator.setVisibility(shouldReactionOptionBeVisible ? View.VISIBLE : View.GONE);
 
         if (message == null || message.getMessage() == null || chatRoom == null || ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) || message.isUploading()) {
             optionOpenWith.setVisibility(View.GONE);
@@ -358,11 +360,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     public void onClick(View view) {
         if (message == null) {
             logWarning("The message is NULL");
-            return;
-        }
-
-        if (!isOnline(context)) {
-            ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
             return;
         }
 

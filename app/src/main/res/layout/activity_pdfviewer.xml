@@ -29,10 +29,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_marginLeft="24dp"
+                android:layout_marginStart="24dp"
                 android:layout_marginBottom="24dp"
                 android:padding="8dp"
-                android:background="@drawable/shape_page_number">
+                android:background="@drawable/shape_page_number"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/pdf_viewer_actual_page_number"
@@ -49,7 +50,7 @@
                     android:textColor="@color/white"
                     android:textSize="12sp"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@id/pdf_viewer_actual_page_number"
+                    android:layout_toEndOf="@id/pdf_viewer_actual_page_number"
                     android:text=" of "/>
 
                 <TextView
@@ -59,7 +60,7 @@
                     android:textColor="@color/white"
                     android:textSize="12sp"
                     android:layout_centerVertical="true"
-                    android:layout_toRightOf="@id/pdf_viewer_of_page_number"/>
+                    android:layout_toEndOf="@id/pdf_viewer_of_page_number"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -79,7 +80,7 @@
                         android:id="@+id/mega_imageview"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_marginRight="10dp"
+                        android:layout_marginEnd="10dp"
                         android:src="@drawable/mega_ic"
                         android:layout_centerVertical="true"/>
 
@@ -93,7 +94,7 @@
                         android:text="@string/save_to_mega"
                         android:textAlignment="center"
                         android:textSize="16sp"
-                        android:layout_toRightOf="@id/mega_imageview"
+                        android:layout_toEndOf="@id/mega_imageview"
                         android:gravity="center"/>
 
                 </RelativeLayout>

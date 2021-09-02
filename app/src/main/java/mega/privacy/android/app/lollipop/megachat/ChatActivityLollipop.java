@@ -145,6 +145,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.PendingMes
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.SendAttachmentChatBottomSheetDialogFragment;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -187,6 +188,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.*;
@@ -4970,6 +4972,10 @@ public class ChatActivityLollipop extends PasscodeActivity
                     if(m.isUploading()){
                         showUploadingAttachmentBottomSheet(m, positionInMessages);
                     }else{
+                        if (!ChatUtil.shouldBottomDialogBeDisplayed(m.getMessage())) {
+                            return;
+                        }
+
                         if((m.getMessage().getStatus()==MegaChatMessage.STATUS_SERVER_REJECTED)||(m.getMessage().getStatus()==MegaChatMessage.STATUS_SENDING_MANUAL)){
                             if(m.getMessage().getUserHandle()==megaChatApi.getMyUserHandle()) {
                                 if (!(m.getMessage().isManagementMessage())) {
@@ -5027,7 +5033,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                         mediaIntent.putExtra("chatId", idChat);
                                         mediaIntent.putExtra("FILENAME", node.getName());
 
-                                        String localPath = getLocalFile(this, node.getName(), node.getSize());
+                                        String localPath = getLocalFile(node);
 
                                         if (localPath != null){
                                             logDebug("localPath != null");
@@ -5126,7 +5132,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                                         pdfIntent.putExtra("msgId", m.getMessage().getMsgId());
                                         pdfIntent.putExtra("chatId", idChat);
 
-                                        String localPath = getLocalFile(this, node.getName(), node.getSize());
+                                        String localPath = getLocalFile(node);
 
                                         if (localPath != null){
                                             File mediaFile = new File(localPath);
@@ -8200,6 +8206,11 @@ public class ChatActivityLollipop extends PasscodeActivity
                 logDebug("e.getErrorCode() != MegaError.API_OK");
 
                 if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+                    if (api.isForeignNode(request.getParentHandle())) {
+                        showForeignStorageOverQuotaWarningDialog(this);
+                        return;
+                    }
+
                     logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
                     Intent intent = new Intent(this, ManagerActivityLollipop.class);
                     intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -9102,7 +9113,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
         showCallInProgressLayout(text, true, call);
         callInProgressLayout.setOnClickListener(this);
-        if (chatRoom != null && chatRoom.isGroup()) {
+        if (chatRoom != null && chatRoom.isGroup() && megaChatApi.getChatCall(chatRoom.getChatId()) != null) {
             subtitleCall.setVisibility(View.VISIBLE);
             individualSubtitleToobar.setVisibility(View.GONE);
             setGroupalSubtitleToolbarVisibility(false);
