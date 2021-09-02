@@ -21,9 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
@@ -89,7 +87,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -218,7 +215,6 @@ import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.LinksUtil;
-import mega.privacy.android.app.utils.ProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
@@ -256,6 +252,10 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.components.MegaProgressDialog.dismissMegaProgressDialogIfExists;
+import static mega.privacy.android.app.components.MegaProgressDialog.getMegaProgressDialog;
+import static mega.privacy.android.app.components.MegaProgressDialog.isMegaProgressDialogShown;
+import static mega.privacy.android.app.components.MegaProgressDialog.showProcessFileDialog;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
@@ -295,7 +295,6 @@ import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -327,6 +326,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public static final String JOINING_CHAT_LINK = "JOINING_CHAT_LINK";
     public static final String LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK";
     public static final String CONNECTED = "CONNECTED";
+    private static final String PROCESS_FILE_DIALOG_SHOWN = "PROGRESS_DIALOG_SHOWN";
 
     private static final String SMALL_GRID = "SMALL_GRID";
 
@@ -1397,6 +1397,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		nodeAttacher.saveState(outState);
 		nodeSaver.saveState(outState);
+
+		outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isMegaProgressDialogShown(processFileDialog));
 	}
 
 	@Override
@@ -1432,10 +1434,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		boolean selectDrawerItemPending = true;
-		//upload from device, progress dialog should show when screen orientation changes.
-        if (shouldShowDialog) {
-			processFileDialog = showProcessFileDialog(this,null);
-        }
 
 		getLifecycle().addObserver(cookieDialogHandler);
 
@@ -1503,6 +1501,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			nodeAttacher.restoreState(savedInstanceState);
 			nodeSaver.restoreState(savedInstanceState);
+
+			//upload from device, progress dialog should show when screen orientation changes.
+			if (savedInstanceState.getBoolean(PROCESS_FILE_DIALOG_SHOWN, false)) {
+				processFileDialog = showProcessFileDialog(this,null);
+			}
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -3552,6 +3555,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			miniAudioPlayerController.onDestroy();
 			miniAudioPlayerController = null;
 		}
+
+        dismissMegaProgressDialogIfExists(processFileDialog);
 
 		nodeSaver.destroy();
 
@@ -6487,9 +6492,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     		return;
     	}
 
-		try {
-			statusDialog.dismiss();
-		} catch (Exception ignored) {}
+		dismissMegaProgressDialogIfExists(statusDialog);
 
 		logDebug("DRAWERITEM: " + drawerItem);
 
@@ -7347,18 +7350,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 
-		statusDialog = null;
-		try {
-			statusDialog = new MegaProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.context_creating_folder));
-			statusDialog.show();
-		}
-		catch(Exception e){
-			logDebug("Exception showing 'Creating folder' dialog");
-			e.printStackTrace();
-			return;
-		}
-
+		statusDialog = getMegaProgressDialog(this, StringResourcesUtils.getString(R.string.context_creating_folder));
 		megaApi.createFolder(title, parentNode, this);
 	}
 
@@ -8104,28 +8096,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	public void showStatusDialog(String text){
-		MegaProgressDialog temp;
-		try{
-			temp = new MegaProgressDialog(managerActivity);
-			temp.setMessage(text);
-			temp.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		statusDialog = temp;
-	}
-
-	public void dismissStatusDialog(){
-		if (statusDialog != null){
-			try{
-				statusDialog.dismiss();
-			}
-			catch(Exception ex){}
-		}
-	}
-
 	public void setFirstNavigationLevel(boolean firstNavigationLevel){
 		logDebug("Set value to: " + firstNavigationLevel);
 		this.firstNavigationLevel = firstNavigationLevel;
@@ -8478,17 +8448,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 				filePrepareTask.execute(intent);
-				MegaProgressDialog temp = null;
-				try{
-					temp = new MegaProgressDialog(this);
-					temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
-
+				statusDialog = getMegaProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
 			}
 			else {
 				logWarning("resultCode for CHOOSE_PICTURE_PROFILE_CODE: " + resultCode);
@@ -9534,13 +9494,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentProcessedLollipop");
-		if (statusDialog != null) {
-			try {
-				statusDialog.dismiss();
-			}
-			catch(Exception ex){}
-		}
-		ProgressDialogUtil.dismissDialog(processFileDialog);
+
+		dismissMegaProgressDialogIfExists(statusDialog);
+		dismissMegaProgressDialogIfExists(processFileDialog);
 
 		MegaNode parentNode = getCurrentParentNode(getCurrentParentHandle(), -1);
 		if(parentNode == null){
@@ -9988,11 +9944,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
 			logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
 
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
-
+			dismissMegaProgressDialogIfExists(statusDialog);
 
 			if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_contact_invitation_resent), -1);
@@ -10079,10 +10031,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
+			dismissMegaProgressDialogIfExists(statusDialog);
 
 			if (e.getErrorCode() == MegaError.API_OK){
 //				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_LONG).show();
@@ -10211,14 +10160,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			logDebug("requestFinish " + MegaRequest.TYPE_REMOVE);
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (statusDialog != null){
-					if (statusDialog.isShowing()){
-						try {
-							statusDialog.dismiss();
-						}
-						catch (Exception ex) {}
-					}
-				}
+				dismissMegaProgressDialogIfExists(statusDialog);
 				refreshAfterRemoving();
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
 				resetAccountDetailsTimeStamp();
@@ -10231,10 +10173,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else if (request.getType() == MegaRequest.TYPE_COPY){
 			logDebug("TYPE_COPY");
 
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
+			dismissMegaProgressDialogIfExists(statusDialog);
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Show snackbar!!!!!!!!!!!!!!!!!!!");
@@ -10277,10 +10216,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
+			dismissMegaProgressDialogIfExists(statusDialog);
             if (e.getErrorCode() == MegaError.API_OK){
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -10678,10 +10614,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		logDebug("onNodesUpdateLollipop");
-		try {
-			statusDialog.dismiss();
-		}
-		catch (Exception ex) {}
+		dismissMegaProgressDialogIfExists(statusDialog);
 
 		boolean updateContacts = false;
 
@@ -11397,7 +11330,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void copyError(){
 		try {
-			statusDialog.dismiss();
+			dismissMegaProgressDialogIfExists(statusDialog);
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 		}
 		catch (Exception ex) {}
