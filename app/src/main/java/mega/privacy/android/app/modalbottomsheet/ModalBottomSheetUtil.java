@@ -25,6 +25,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
@@ -43,6 +44,12 @@ public class ModalBottomSheetUtil {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiAndroid megaApi = app.getMegaApi();
         String mimeType = MimeTypeList.typeForName(node.getName()).getType();
+
+        if (MimeTypeList.typeForName(node.getName()).isURL()) {
+            manageURLNode(context, MegaApplication.getInstance().getMegaApi(), node);
+            return;
+        }
+
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 
         String localPath = getLocalFile(node);

@@ -499,4 +499,9 @@ public class AvatarUtil {
 
         return Color.rgb(rgb[0], rgb[1], rgb[2]);
     }
+
+    @Nullable
+    public static File getUserAvatarFile(Context context, String userEmail) {
+        return CacheFolderManager.buildAvatarFile(context, userEmail + ".jpg");
+    }
 }
