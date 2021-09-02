@@ -62,7 +62,6 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class CallUtil {
-
     /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
      *
@@ -1212,7 +1211,7 @@ public class CallUtil {
 
         if (!chatRoom.isMeeting() || !MegaApplication.getChatManagement().isOpeningMeetingLink(chatId)) {
             MegaApplication.getInstance().createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-            controlNumberOfCalls(listAllCalls, callStatus);
+            controlNumberOfCalls(listAllCalls, callStatus, chatId);
         }
     }
 
@@ -1249,11 +1248,12 @@ public class CallUtil {
      * @param listAllCalls List of all current calls
      * @param callStatus   Call Status
      */
-    private static void controlNumberOfCalls(MegaHandleList listAllCalls, int callStatus) {
+    private static void controlNumberOfCalls(MegaHandleList listAllCalls, int callStatus, long currentChatId) {
+        logDebug("****************+ controlNumberOfCalls:: currentChatId = "+currentChatId+", listAllCalls.first "+listAllCalls.get(0));
         if (listAllCalls.size() == 1) {
-            MegaApplication.getInstance().checkOneCall(listAllCalls.get(0));
+            MegaApplication.getInstance().checkOneCall(currentChatId);
         } else {
-            MegaApplication.getInstance().checkSeveralCall(listAllCalls, callStatus, true);
+            MegaApplication.getInstance().checkSeveralCall(listAllCalls, callStatus, true, currentChatId);
         }
     }
 }

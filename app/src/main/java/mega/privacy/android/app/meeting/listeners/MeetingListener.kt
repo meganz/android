@@ -45,7 +45,7 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Call status has changed
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
-            logDebug("""Call status changed, current status is ${callStatusToString(call.status)}, call id is ${call.callId}""")
+            logDebug("Call status changed, current status is ${callStatusToString(call.status)}, call id is ${call.callId}")
             sendCallEvent(EVENT_CALL_STATUS_CHANGE, call)
         }
 
@@ -63,7 +63,7 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Call composition has changed (User added or removed from call)
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_CALL_COMPOSITION) && call.callCompositionChange != 0) {
-            logDebug("""Call composition changed. Call status is ${callStatusToString(call.status)}. Num of participants is ${call.numParticipants}""")
+            logDebug("Call composition changed. Call status is ${callStatusToString(call.status)}. Num of participants is ${call.numParticipants}")
             sendCallEvent(EVENT_CALL_COMPOSITION_CHANGE, call)
         }
 

@@ -273,7 +273,19 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         inMeetingViewModel.isCallOnHold()
                     )
                 }
-                MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> finishActivity()
+                MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> {
+                    if (inMeetingViewModel.amIAGuest()) {
+                        logDebug("Finishing the activity as guest")
+                        disableCamera()
+                        removeUI()
+                        AccountController.logout(
+                            meetingActivity,
+                            MegaApplication.getInstance().megaApi
+                        )
+                    } else {
+                        finishActivity()
+                    }
+                }
                 MegaChatCall.CALL_STATUS_CONNECTING -> {
                     bottomFloatingPanelViewHolder.disableEnableButtons(
                         false,
@@ -1056,7 +1068,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 bInviteSent = false
                 val count = inMeetingViewModel.participants.value
                 if (count != null) {
-                    val participantsCount = getparticipantsCount()
+                    val participantsCount = getParticipantsCount()
                     if (participantsCount == 0L && count.size == 0) {
                         if (STATE_FINISH != inMeetingViewModel.shouldShowWarningMessage()) {
                             logDebug("launchTimer() for no participant join in after Invite")
@@ -1105,7 +1117,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
-    private fun getparticipantsCount(): Long {
+    private fun getParticipantsCount(): Long {
         val chat = megaChatApi.getChatRoom(inMeetingViewModel.currentChatId)
         return if (chat == null) {
             -1L
@@ -1795,7 +1807,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
-     * Start Timer for 26s and show snackbar for version incompatibility
+     * Start Timer for 26s and show layout for version incompatibility
      */
     private fun launchTimer() {
         if (!bCountDownTimerStart) {
@@ -1955,7 +1967,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 updatePanelParticipantList(it.toMutableList())
 
                 // Check current the count of participants
-                val participantsCount = getparticipantsCount()
+                val participantsCount = getParticipantsCount()
                 val count = it.size
                 if (participantsCount > 0 && count == participantsCount.toInt()) {
                     // If all participants in, stop timer and save config to prevent new warning msg for this chatID
@@ -1967,7 +1979,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         inMeetingViewModel.updateShowWarningMessage(STATE_CANCEL)
                     }
 
-                    // Remove snackbar
                     meetingActivity.snackbar?.dismiss()
                 }
                 if (participantsCount > 0 && count < participantsCount.toInt()) {
@@ -2537,6 +2548,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         inMeetingViewModel.leaveMeeting()
         if (inMeetingViewModel.amIAGuest()) {
+            logDebug("Finishing the activity as guest")
             AccountController.logout(meetingActivity, MegaApplication.getInstance().megaApi)
         } else {
             checkIfAnotherCallShouldBeShown()
@@ -2801,14 +2813,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun checkIfAnotherCallShouldBeShown() {
         val anotherCall = inMeetingViewModel.getAnotherCall()
-        if (anotherCall == null) {
-            logDebug("Finish current call")
-            finishActivity()
-        } else {
+        if (anotherCall != null) {
             logDebug("Show another call")
             CallUtil.openMeetingInProgress(requireContext(), anotherCall.chatid, false)
-            finishActivity()
         }
+
+        logDebug("Finish current call")
+        finishActivity()
     }
 
     /**

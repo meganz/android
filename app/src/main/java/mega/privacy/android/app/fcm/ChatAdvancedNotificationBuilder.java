@@ -1130,11 +1130,6 @@ public final class ChatAdvancedNotificationBuilder {
         }
     }
 
-    public void checkOneGroupCall(long chatId){
-        MegaChatCall groupCallIncoming = megaChatApi.getChatCall(chatId);
-        showIncomingGroupCallNotification(groupCallIncoming);
-    }
-
     public void checkQueuedCalls(){
         logDebug("checkQueuedCalls");
 
@@ -1216,6 +1211,7 @@ public final class ChatAdvancedNotificationBuilder {
 
                 if(callInProgress!=null){
                     if(callIncoming!=null){
+                        MegaApplication.getChatManagement().addNotificationShown(callIncoming.getChatid());
                         showIncomingCallNotification(callIncoming, callInProgress);
                     } else {
                         logError("ERROR:callIncoming is NULL");

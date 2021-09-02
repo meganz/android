@@ -569,7 +569,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 
 		stopService(new Intent(getInstance(), IncomingCallService.class));
-
 		logDebug("Call status is " + callStatusToString(callStatus)+", chat id is "+chatId+", call id is "+callId);
 		switch (callStatus) {
 			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
@@ -581,13 +580,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					return;
 				}
 
-				if (callStatus == CALL_STATUS_USER_NO_PRESENT) {
-					if (isRinging) {
-						logDebug("Is incoming call");
-						incomingCall(listAllCalls, chatId, callStatus);
-					} else {
-						getChatManagement().checkToShowIncomingGroupCallNotification(call, chatId);
-					}
+				if (callStatus == CALL_STATUS_USER_NO_PRESENT && isRinging) {
+					logDebug("Is incoming call");
+					incomingCall(listAllCalls, chatId, callStatus);
 				}
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
@@ -1365,10 +1360,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	 */
 	public void showGroupCallNotification(long chatId) {
 		logDebug("Show group call notification: chatId = "+chatId);
+		createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
 		getChatManagement().addNotificationShown(chatId);
 		stopService(new Intent(this, IncomingCallService.class));
 		ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-		notificationBuilder.checkOneGroupCall(chatId);
+		notificationBuilder.showIncomingGroupCallNotification(megaChatApi.getChatCall(chatId));
 	}
 
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
@@ -1539,6 +1535,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			if (!wakeLock.isHeld()) {
 				wakeLock.acquire(10 * 1000);
 			}
+
 			toIncomingCall(this, callToLaunch, megaChatApi);
 		} else {
 			logDebug("The call screen should be displayed");
@@ -1546,12 +1543,21 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
-	public void checkSeveralCall(MegaHandleList listAllCalls, int callStatus, boolean isRinging) {
+	public void checkSeveralCall(MegaHandleList listAllCalls, int callStatus, boolean isRinging, long currentChatId) {
 		logDebug("Several calls = " + listAllCalls.size() + "- Current call Status: " + callStatusToString(callStatus));
-		if (isRinging && participatingInACall()) {
-			logDebug("Several calls: show notification");
-			checkQueuedCalls();
-			return;
+		if (isRinging) {
+			if (participatingInACall()) {
+				logDebug("Several calls: show notification");
+				checkQueuedCalls();
+				return;
+			}
+
+			MegaChatRoom chatRoom = megaChatApi.getChatRoom(currentChatId);
+			if (callStatus == CALL_STATUS_USER_NO_PRESENT && chatRoom != null &&
+					(chatRoom.isGroup() || chatRoom.isMeeting()) && !getChatManagement().isOpeningMeetingLink(currentChatId)) {
+				showGroupCallNotification(currentChatId);
+				return;
+			}
 		}
 
 		MegaHandleList handleList = megaChatApi.getChatCalls(callStatus);
