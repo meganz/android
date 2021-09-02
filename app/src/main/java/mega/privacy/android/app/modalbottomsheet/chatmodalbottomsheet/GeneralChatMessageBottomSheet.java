@@ -24,6 +24,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatReactionsView;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaChatContainsMeta;
 import nz.mega.sdk.MegaChatMessage;
@@ -134,11 +135,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         optionSaveOffline.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
-        boolean isRemovedMsg = ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage()) ||
-                message.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING ||
-                message.getMessage().getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL ||
-                message.getMessage().getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED;
-
+        boolean isRemovedMsg = ((ChatActivityLollipop) context).hasMessagesRemoved(message.getMessage());
         boolean shouldReactionOptionBeVisible = chatRoom != null && message != null &&
                 context instanceof ChatActivityLollipop && shouldReactionBeClicked(chatRoom) &&
                 !isRemovedMsg &&

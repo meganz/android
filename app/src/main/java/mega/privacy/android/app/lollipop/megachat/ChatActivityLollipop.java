@@ -567,15 +567,7 @@ public class ChatActivityLollipop extends PasscodeActivity
      * @return True if it's removed. False, otherwise.
      */
     public boolean hasMessagesRemoved(MegaChatMessage messageSelected) {
-        if (removedMessages != null && !removedMessages.isEmpty()) {
-            for (int i = 0; i < removedMessages.size(); i++) {
-                if (messageSelected.getMsgId() == removedMessages.get(i).msgId) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return  ChatUtil.isRemovingMessage(removedMessages, messageSelected);
     }
 
     @Override
@@ -4482,7 +4474,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 else{
                     logDebug("Chat with permissions or preview");
                     if (selected.size() == 1) {
-                        boolean isRemovedMsg = hasMessagesRemoved(selected.get(0).getMessage());
+                        boolean isRemovedMsg = ChatUtil.isRemovingMessage(removedMessages, selected.get(0).getMessage());
                         boolean shouldForwardOptionVisible = !selected.get(0).isUploading() && !isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode();
                         menu.findItem(R.id.chat_cab_menu_forward).setVisible(shouldForwardOptionVisible);
 
@@ -4626,8 +4618,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
 
                         for(int i=0; i<selected.size();i++) {
-
-                            isRemoved = hasMessagesRemoved(selected.get(i).getMessage());
+                            isRemoved = ChatUtil.isRemovingMessage(removedMessages, selected.get(i).getMessage());
 
                             if (!isUploading) {
                                 if (selected.get(i).isUploading()) {

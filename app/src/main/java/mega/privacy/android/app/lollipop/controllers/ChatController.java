@@ -201,19 +201,19 @@ public class ChatController {
         MegaChatMessage messageToDelete;
         if (message.getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT || message.getType() == MegaChatMessage.TYPE_VOICE_CLIP) {
             logDebug("Delete node attachment message or voice clip message");
-            if (message.getType() == MegaChatMessage.TYPE_VOICE_CLIP && message.getMegaNodeList() != null && message.getMegaNodeList().size() > 0 && message.getMegaNodeList().get(0) != null) {
+            if (message.getType() == MegaChatMessage.TYPE_VOICE_CLIP &&
+                    message.getMegaNodeList() != null && message.getMegaNodeList().size() > 0 &&
+                    message.getMegaNodeList().get(0) != null) {
                 deleteOwnVoiceClip(context, message.getMegaNodeList().get(0).getName());
             }
-            megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
-            return;
-        }
-
-        logDebug("Delete normal message with status = "+message.getStatus());
-        if(message.getStatus() == MegaChatMessage.STATUS_SENDING && message.getMsgId() == INVALID_HANDLE){
-
-            messageToDelete = megaChatApi.deleteMessage(chatId, message.getTempId());
-        }else{
-            messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
+            messageToDelete = megaChatApi.revokeAttachmentMessage(chatId, message.getMsgId());
+        } else {
+            logDebug("Delete normal message with status = " + message.getStatus());
+            if (message.getStatus() == MegaChatMessage.STATUS_SENDING && message.getMsgId() == INVALID_HANDLE) {
+                messageToDelete = megaChatApi.deleteMessage(chatId, message.getTempId());
+            } else {
+                messageToDelete = megaChatApi.deleteMessage(chatId, message.getMsgId());
+            }
         }
 
         if (messageToDelete == null) {
