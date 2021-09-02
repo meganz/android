@@ -487,7 +487,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, CAMERA_UPLOADS, HOMEPAGE, CHAT, SHARED_ITEMS, CONTACTS, NOTIFICATIONS,
+		CLOUD_DRIVE, CAMERA_UPLOADS, HOMEPAGE, CHAT, SHARED_ITEMS, NOTIFICATIONS,
 		SETTINGS, INBOX, SEARCH, TRANSFERS, RUBBISH_BIN, ASK_PERMISSIONS;
 
 		public String getTitle(Context context) {
@@ -497,9 +497,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
 				case INBOX: return context.getString(R.string.section_inbox);
 				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
-				case CONTACTS: {
-					context.getString(R.string.section_contacts);
-				}
 				case SETTINGS: return context.getString(R.string.action_settings);
 				case SEARCH: return context.getString(R.string.action_search);
 				case TRANSFERS: return context.getString(R.string.section_transfers);
@@ -3402,22 +3399,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 					break;
 				}
-				case CONTACTS:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					try {
-						ContactsAdvancedNotificationBuilder notificationBuilder;
-						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
-
-						notificationBuilder.removeAllIncomingContactNotifications();
-						notificationBuilder.removeAllAcceptanceContactNotifications();
-					}
-					catch (Exception e){
-						logError("Exception NotificationManager - remove all CONTACT notifications", e);
-					}
-
-					setToolbarTitle();
-					break;
-				}
 				case SEARCH:{
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 					setToolbarTitle();
@@ -3865,12 +3846,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				break;
 			}
-			case CONTACTS:{
-				aB.setSubtitle(null);
-				aB.setTitle(getString(R.string.section_contacts).toUpperCase());
-				firstNavigationLevel = true;
-				break;
-			}
 			case NOTIFICATIONS:{
 				aB.setSubtitle(null);
 				aB.setTitle(getString(R.string.title_properties_chat_contact_notifications).toUpperCase());
@@ -3988,7 +3963,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if(totalNotifications==0){
 			if(isFirstNavigationLevel()){
-				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
+				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.NOTIFICATIONS
 						|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.TRANSFERS){
 					aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
 				}
@@ -4002,7 +3977,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 		else{
 			if(isFirstNavigationLevel()){
-				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
+				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.NOTIFICATIONS
 						|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.TRANSFERS){
 					badgeDrawable.setProgress(1.0f);
 				}
@@ -4185,7 +4160,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					setBottomNavigationMenuItemChecked(CHAT_BNV);
 					break;
 				}
-				case CONTACTS:
 				case SETTINGS:
 				case SEARCH:
 				case TRANSFERS:
@@ -4708,10 +4682,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					bottomNavigationCurrentItem = SHARED_BNV;
 				}
 				setBottomNavigationMenuItemChecked(SHARED_BNV);
-    			break;
-    		}
-    		case CONTACTS:{
-				showHideBottomNavigationView(true);
     			break;
     		}
 			case NOTIFICATIONS:{
@@ -5633,7 +5603,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		switch(id){
 			case android.R.id.home:{
 				if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH){
-					if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS
+					if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.INBOX
 							|| drawerItem == DrawerItem.NOTIFICATIONS|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.TRANSFERS) {
 						if (drawerItem == DrawerItem.SETTINGS) {
 							resetSettingsScrollIfNecessary();
@@ -5957,10 +5927,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	int orderType;
 
 	        	switch (drawerItem) {
-					case CONTACTS:
-						orderType = ORDER_CONTACTS;
-						break;
-
 					case CAMERA_UPLOADS:
 						orderType = ORDER_CAMERA;
 						break;
