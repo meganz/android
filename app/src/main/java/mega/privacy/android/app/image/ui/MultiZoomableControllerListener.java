@@ -8,6 +8,7 @@
 package mega.privacy.android.app.image.ui;
 
 import android.graphics.Matrix;
+
 import java.util.ArrayList;
 import java.util.List;
 

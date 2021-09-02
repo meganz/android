@@ -9,7 +9,9 @@ package mega.privacy.android.app.image.ui;
 
 import android.graphics.Matrix;
 import android.graphics.PointF;
+
 import com.facebook.common.logging.FLog;
+
 import javax.annotation.Nullable;
 
 /**

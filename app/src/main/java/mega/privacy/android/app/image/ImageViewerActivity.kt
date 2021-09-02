@@ -9,6 +9,7 @@ import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.image.adapter.ImageViewerAdapter
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.documentscanner.utils.IntentUtils.extra
+import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 @AndroidEntryPoint
@@ -22,17 +23,19 @@ class ImageViewerActivity : BaseActivity() {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 val itemCount = binding.viewPager.adapter!!.itemCount
-                if (!positionSet && nodePosition != null && itemCount <= nodePosition!!) {
+                if (!positionSet && itemCount <= nodePosition) {
                     positionSet = true
-                    binding.viewPager.currentItem = nodePosition ?: 0
+                    binding.viewPager.currentItem = nodePosition
                 }
+
+                viewModel.loadNearbyImages(position)
             }
         }
     }
 
+    private val nodePosition: Int by extraNotNull(INTENT_EXTRA_KEY_POSITION, 0)
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
-    private val nodePosition: Int? by extra(INTENT_EXTRA_KEY_POSITION, INVALID_POSITION)
     private val childrenHandles: LongArray? by extra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
 
     private var positionSet = false
@@ -69,6 +72,7 @@ class ImageViewerActivity : BaseActivity() {
     }
 
     private fun setupObservers() {
+        viewModel.defaultPosition = nodePosition
         viewModel.getImages().observe(this) { images ->
             adapter.submitList(images)
         }

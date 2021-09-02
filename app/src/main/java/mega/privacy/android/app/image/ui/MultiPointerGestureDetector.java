@@ -8,6 +8,7 @@
 package mega.privacy.android.app.image.ui;
 
 import android.view.MotionEvent;
+
 import javax.annotation.Nullable;
 
 /**

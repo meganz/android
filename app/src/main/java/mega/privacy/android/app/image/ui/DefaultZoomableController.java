@@ -11,9 +11,12 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.view.MotionEvent;
+
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
+
 import com.facebook.common.logging.FLog;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 

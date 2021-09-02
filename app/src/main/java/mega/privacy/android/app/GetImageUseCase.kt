@@ -2,7 +2,6 @@ package mega.privacy.android.app
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
@@ -16,7 +15,7 @@ import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
 import javax.inject.Inject
@@ -231,22 +230,26 @@ class GetImageUseCase @Inject constructor(
     fun getImages(parentNodeHandle: Long): Flowable<List<ImageItem>> =
         getImages(megaApi.getChildren(megaApi.getNodeByHandle(parentNodeHandle)).map { it.handle })
 
-    fun getImages(nodeHandles: List<Long>): Flowable<List<ImageItem>> =
+    fun getImages(nodeHandles: List<Long>, nodePosition: Int = 0): Flowable<List<ImageItem>> =
         Flowable.create({ emitter ->
             val items = sortedMapOf<Long, ImageItem>()
-            nodeHandles.forEach { node ->
-                val childNode = megaApi.getNodeByHandle(node)
-                Log.wtf("TEST", "ChildNode: ${childNode.name}")
 
-                getProgressiveImage(childNode.handle).subscribeBy(
-                    onNext = { imageUri ->
-                        Log.wtf("TEST", "ImageUri: $imageUri")
-                        items[childNode.handle] = ImageItem(childNode.handle, childNode.name, imageUri)
-                        emitter.onNext(items.values.toList())
-                    }, onError = { error ->
-                        logError(error.stackTraceToString())
-                    }
-                )
+            nodeHandles.forEachIndexed { index, nodeHandle ->
+                val node = megaApi.getNodeByHandle(nodeHandle)
+                items[node.handle] = ImageItem(node.handle, node.name)
+
+                if (index in nodePosition - 1..nodePosition + 1) {
+                    getProgressiveImage(node.handle).subscribeBy(
+                        onNext = { imageUri ->
+                            items[node.handle] = ImageItem(node.handle, node.name, imageUri)
+                            emitter.onNext(items.values.toList())
+                        }, onError = { error ->
+                            LogUtil.logError(error.stackTraceToString())
+                        }
+                    )
+                }
             }
+
+            emitter.onNext(items.values.toList())
         }, BackpressureStrategy.LATEST)
 }

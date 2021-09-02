@@ -9,6 +9,7 @@ package mega.privacy.android.app.image.ui;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+
 import java.util.ArrayList;
 import java.util.List;
 
