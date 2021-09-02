@@ -22,157 +22,6 @@ class GetImageUseCase @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    fun getFullImage(nodeHandle: Long): Single<ImageItem> =
-        Single.create { emitter ->
-            val node = megaApi.getNodeByHandle(nodeHandle)
-
-            when {
-                !node.isFile -> {
-                    emitter.onError(IllegalArgumentException("Node is not a file"))
-                }
-                !node.isImage() -> {
-                    emitter.onError(IllegalArgumentException("Node is not an image"))
-                }
-                else -> {
-                    val file = buildTempFile(context, node.base64Handle + JPG_EXTENSION)
-
-                    if (file.exists()) {
-                        val item = ImageItem(
-                            node.handle,
-                            node.name,
-                            fullSizeUri = file.toUri()
-                        )
-                        emitter.onSuccess(item)
-                    } else {
-                        megaApi.startDownload(
-                            node,
-                            file.absolutePath,
-                            OptionalMegaTransferListenerInterface(
-                                onTransferFinish = { _: MegaTransfer, error: MegaError ->
-                                    when (error.errorCode) {
-                                        API_OK -> {
-                                            val item = ImageItem(
-                                                node.handle,
-                                                node.name,
-                                                fullSizeUri = file.toUri()
-                                            )
-                                            emitter.onSuccess(item)
-                                        }
-                                        API_EBUSINESSPASTDUE ->
-                                            emitter.onError(IllegalStateException("Business account is overdue"))
-                                        else ->
-                                            emitter.onError(error.toThrowable())
-                                    }
-                                }
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
-    fun getPreviewImage(nodeHandle: Long): Single<ImageItem> =
-        Single.create { emitter ->
-            val node = megaApi.getNodeByHandle(nodeHandle)
-
-            when {
-                !node.isFile -> {
-                    emitter.onError(IllegalArgumentException("Node is not a file"))
-                }
-                !node.isImage() -> {
-                    emitter.onError(IllegalArgumentException("Node is not an image"))
-                }
-                !node.hasPreview() -> {
-                    emitter.onError(IllegalStateException("Node doesn't have an associated preview"))
-                }
-                else -> {
-                    val file = buildPreviewFile(context, node.base64Handle + JPG_EXTENSION)
-
-                    if (file.exists()) {
-                        val item = ImageItem(
-                            node.handle,
-                            node.name,
-                            previewUri = file.toUri()
-                        )
-                        emitter.onSuccess(item)
-                    } else {
-                        megaApi.getPreview(
-                            node,
-                            file.absolutePath,
-                            OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _: MegaRequest, error: MegaError ->
-                                    when (error.errorCode) {
-                                        API_OK -> {
-                                            val item = ImageItem(
-                                                node.handle,
-                                                node.name,
-                                                previewUri = file.toUri()
-                                            )
-                                            emitter.onSuccess(item)
-                                        }
-                                        API_ENOENT ->
-                                            emitter.onError(IllegalStateException("Node doesn't have an associated preview"))
-                                        else ->
-                                            emitter.onError(error.toThrowable())
-                                    }
-                                }
-                            ))
-                    }
-                }
-            }
-        }
-
-    fun getThumbnailImage(nodeHandle: Long): Single<ImageItem> =
-        Single.create { emitter ->
-            val node = megaApi.getNodeByHandle(nodeHandle)
-
-            when {
-                !node.isFile -> {
-                    emitter.onError(IllegalArgumentException("Node is not a file"))
-                }
-                !node.isImage() -> {
-                    emitter.onError(IllegalArgumentException("Node is not an image"))
-                }
-                !node.hasThumbnail() -> {
-                    emitter.onError(IllegalStateException("Node doesn't have an associated thumbnail"))
-                }
-                else -> {
-                    val file = buildThumbnailFile(context, node.base64Handle + JPG_EXTENSION)
-
-                    if (file.exists()) {
-                        val item = ImageItem(
-                            node.handle,
-                            node.name,
-                            thumbnailUri = file.toUri()
-                        )
-                        emitter.onSuccess(item)
-                    } else {
-                        megaApi.getThumbnail(
-                            node,
-                            file.absolutePath,
-                            OptionalMegaRequestListenerInterface(
-                                onRequestFinish = { _: MegaRequest, error: MegaError ->
-                                    when (error.errorCode) {
-                                        API_OK -> {
-                                            val item = ImageItem(
-                                                node.handle,
-                                                node.name,
-                                                thumbnailUri = file.toUri()
-                                            )
-                                            emitter.onSuccess(item)
-                                        }
-                                        API_ENOENT ->
-                                            emitter.onError(IllegalStateException("Node doesn't have an associated thumbnail"))
-                                        else ->
-                                            emitter.onError(error.toThrowable())
-                                    }
-                                }
-                            ))
-                    }
-                }
-            }
-        }
-
     fun getProgressiveImage(nodeHandle: Long, fullSize: Boolean = false): Flowable<ImageItem> =
         Flowable.create({ emitter ->
             val node = megaApi.getNodeByHandle(nodeHandle)
@@ -261,33 +110,29 @@ class GetImageUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
-    private fun MegaNode.isImage(): Boolean =
-        this.isFile
-//        isFile && MimeTypeList.typeForName(name).isImage
+    fun getChildImages(parentNodeHandle: Long): Single<List<ImageItem>> =
+        Single.create { emitter ->
+            val parentNode = megaApi.getNodeByHandle(parentNodeHandle)
 
-    fun getImages(parentNodeHandle: Long): Flowable<List<ImageItem>> =
-        getImages(megaApi.getChildren(megaApi.getNodeByHandle(parentNodeHandle)).map { it.handle })
-
-    fun getImages(nodeHandles: List<Long>, nodePosition: Int = 0): Flowable<List<ImageItem>> =
-        Flowable.create({ emitter ->
-            val items = sortedMapOf<Long, ImageItem>()
-
-            nodeHandles.forEachIndexed { index, nodeHandle ->
-                val node = megaApi.getNodeByHandle(nodeHandle)
-                items[node.handle] = ImageItem(node.handle, node.name)
-
-//                if (index in nodePosition - 1..nodePosition + 1) {
-//                    getProgressiveImage(node.handle).subscribeBy(
-//                        onNext = { imageUri ->
-//                            items[node.handle] = ImageItem(node.handle, node.name, imageUri)
-//                            emitter.onNext(items.values.toList())
-//                        }, onError = { error ->
-//                            LogUtil.logError(error.stackTraceToString())
-//                        }
-//                    )
-//                }
+            if (megaApi.hasChildren(parentNode)) {
+                val items = megaApi.getChildren(parentNode).map { node ->
+                    ImageItem(node.handle, node.name)
+                }
+                emitter.onSuccess(items)
+            } else {
+                emitter.onError(IllegalStateException("Node has no children"))
             }
+        }
 
-            emitter.onNext(items.values.toList())
-        }, BackpressureStrategy.LATEST)
+    fun getImages(nodeHandles: List<Long>): Single<List<ImageItem>> =
+        Single.create { emitter ->
+            val items = nodeHandles.map { nodeHandle ->
+                val node = megaApi.getNodeByHandle(nodeHandle)
+                ImageItem(node.handle, node.name)
+            }
+            emitter.onSuccess(items)
+        }
+
+    private fun MegaNode.isImage(): Boolean =
+        this.isFile && MimeTypeList.typeForName(name).isImage
 }

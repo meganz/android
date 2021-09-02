@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.RetainingDataSourceSupplier
 import com.facebook.drawee.backends.pipeline.Fresco
@@ -16,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.image.ui.DoubleTapGestureListener
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
@@ -69,18 +69,24 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        val isResumed = viewLifecycleOwner.lifecycle.currentState == Lifecycle.State.RESUMED
+        viewModel.getImage(nodeHandle).observe(viewLifecycleOwner) { item ->
+            if (item != null) {
+                binding.txtTitle.text = item.name
 
-        viewModel.loadSingleImage(nodeHandle, isResumed).observe(viewLifecycleOwner) { item ->
-            binding.txtTitle.text = item.name
-
-            retainingSupplier.replaceSupplier(
-                Fresco.getImagePipeline().getDataSourceSupplier(
-                    ImageRequest.fromUri(item.getAvailableUri()),
-                    null,
-                    ImageRequest.RequestLevel.FULL_FETCH
+                retainingSupplier.replaceSupplier(
+                    Fresco.getImagePipeline().getDataSourceSupplier(
+                        ImageRequest.fromUri(item.getAvailableUri()),
+                        null,
+                        ImageRequest.RequestLevel.FULL_FETCH
+                    )
                 )
-            )
+
+                binding.progress.hide()
+            } else {
+                logError("Image doesn't exist")
+            }
         }
+
+        viewModel.loadSingleImage(nodeHandle, isResumed)
     }
 }

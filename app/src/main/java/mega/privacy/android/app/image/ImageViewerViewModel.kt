@@ -3,6 +3,7 @@ package mega.privacy.android.app.image
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -22,30 +23,30 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun getImages(): LiveData<List<ImageItem>> = images
 
-    fun retrieveSingleImage(nodeHandle: Long): MutableLiveData<ImageItem> {
-        val result = MutableLiveData<ImageItem>()
-        getImageUseCase.getImages(listOf(nodeHandle), 0)
+    fun getImage(nodeHandle: Long): LiveData<ImageItem?> =
+        images.map { items -> items.firstOrNull { it.handle == nodeHandle } }
+
+    fun retrieveSingleImage(nodeHandle: Long) {
+        getImageUseCase.getImages(listOf(nodeHandle))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { imageItems ->
+                onSuccess = { imageItems ->
                     images.value = imageItems.toList()
-                    result.value = imageItems.first()
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
                 }
             )
             .addTo(composite)
-        return result
     }
 
     fun retrieveImagesFromParent(parentNodeHandle: Long) {
-        getImageUseCase.getImages(parentNodeHandle)
+        getImageUseCase.getChildImages(parentNodeHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { imageItems ->
+                onSuccess = { imageItems ->
                     images.value = imageItems.toList()
                 },
                 onError = { error ->
@@ -60,7 +61,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onNext = { imageItems ->
+                onSuccess = { imageItems ->
                     images.value = imageItems.toList()
                 },
                 onError = { error ->
@@ -70,41 +71,22 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun loadNearbyImages(position: Int) {
-        images.value?.forEachIndexed { index, item ->
-            if (index in position - 1..position + 1) {
-                getImageUseCase.getProgressiveImage(item.handle)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onNext = { imageItem ->
-                            val currentImages = images.value!!.toMutableList()
-                            currentImages[index] = imageItem
-                            images.value = currentImages
-                        },
-                        onError = { error ->
-                            logError(error.stackTraceToString())
-                        }
-                    )
-                    .addTo(composite)
-            }
-        }
-    }
-
-    fun loadSingleImage(nodeHandle: Long, fullSize: Boolean): MutableLiveData<ImageItem> {
-        val result = MutableLiveData<ImageItem>()
+    fun loadSingleImage(nodeHandle: Long, fullSize: Boolean) {
         getImageUseCase.getProgressiveImage(nodeHandle, fullSize)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { imageItem ->
-                    result.value = imageItem
+                    val currentImages = images.value?.toMutableList()!!
+                    val index = currentImages.indexOfFirst { it.handle == nodeHandle }
+                    currentImages[index] = imageItem
+
+                    images.value = currentImages.toList()
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
                 }
             )
             .addTo(composite)
-        return result
     }
 }
