@@ -245,8 +245,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 		setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout));
 
-		registerTransfersReceiver();
-
 		try{
 			statusDialog.dismiss();
 		}

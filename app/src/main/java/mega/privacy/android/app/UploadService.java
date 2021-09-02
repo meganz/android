@@ -25,6 +25,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
 
+import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
@@ -52,6 +53,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_FOLDER_DIALOG;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
@@ -1108,6 +1110,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             }
 
             if(transfer.isFolderTransfer()){
+                if (shouldUpdateScanningFolderDialog(transfer)) {
+                    LiveEventBus.get(EVENT_SHOW_SCANNING_FOLDER_DIALOG, MegaTransfer.class).post(transfer);
+                }
+
                 mapProgressFolderTransfers.put(transfer.getTag(), transfer);
                 updateProgressNotification(true);
             }else{

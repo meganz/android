@@ -672,8 +672,6 @@
     <string name="overquota_alert_text">You have exceeded your storage limit. Would you like to upgrade your account?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Last session</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Connections</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Changing password</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -4026,4 +4024,24 @@
         <item quantity="one">1 connection</item>
         <item quantity="other">%1$d connections</item>
     </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Recently Added</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Requests</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Groups</string>
+    <!-- Title of the scanning folder dialog, which informs a folder is scanning to be uploaded or downloaded. -->
+    <string name="title_scanning_folder">Scanning folder</string>
+    <!-- Warning of the scanning folder dialog. It warns about not closing the app because the transfer will be lost. -->
+    <string name="warning_scanning_folder">Please do not close the application.</string>
+    <!-- Stage of the scanning folder dialog indicating a folder is scanning. -->
+    <string name="scanning_folder_stage">Scanning&#8230;</string>
+    <!-- Stage of the scanning folder dialog indicating the folder structure is creating. -->
+    <string name="creating_tree_folder_stage">Creating folder structure&#8230;</string>
+    <!-- Stage of the scanning folder dialog indicating the folder transfer is starting. -->
+    <string name="starting_transfer_folder_stage">Starting transfer&#8230;</string>
+    <!-- Warning shown after close the scanning folder dialog, informing the folder transfer was cancelled. -->
+    <string name="warning_transfer_cancelled">Transfer was cancelled.</string>
 </resources>

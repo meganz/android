@@ -350,8 +350,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		megaApiFolder = app.getMegaApiFolder();
 		megaApi = app.getMegaApi();
 
-		registerTransfersReceiver();
-
 		dbH = DatabaseHandler.getDbHandler(FolderLinkActivityLollipop.this);
 
 		Intent intentReceived = getIntent();

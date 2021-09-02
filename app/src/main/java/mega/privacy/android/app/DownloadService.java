@@ -72,6 +72,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_FOLDER_DIALOG;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -84,6 +85,8 @@ import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetPath;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 /*
  * Background service to download files
@@ -1597,7 +1600,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			if(isVoiceClipType(transfer.getAppData())) return;
 
-			if(!transfer.isFolderTransfer()){
+			if (transfer.isFolderTransfer()) {
+				if (shouldUpdateScanningFolderDialog(transfer)) {
+					LiveEventBus.get(EVENT_SHOW_SCANNING_FOLDER_DIALOG, MegaTransfer.class).post(transfer);
+				}
+			} else {
 				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 				updateProgressNotification();
 			}

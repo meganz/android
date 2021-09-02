@@ -61,6 +61,10 @@
         <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Grey60White60">
+        <item name="android:textColor">@color/grey_060_white_060</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Red.18">
         <item name="android:textSize">18sp</item>
     </style>
@@ -363,6 +367,10 @@
     <style name="TextAppearance.Mega.Caption.Secondary.Variant3" >
         <item name="android:letterSpacing">0</item>
         <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Secondary.Variant3.Grey38White38" >
+        <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
 
     <!-- Regular, 14sp, 0px, textColorPrimary-->
