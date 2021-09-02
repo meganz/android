@@ -4394,7 +4394,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		logDebug("selectDrawerItemTransfers");
 
 		abL.setVisibility(View.VISIBLE);
-        transfersWidget.hide();
+		getTransfersWidget().hide();
 
 		drawerItem = DrawerItem.TRANSFERS;
 
@@ -4406,7 +4406,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			tabLayoutTransfers.setupWithViewPager(viewPagerTransfers);
 		}
 
-		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && transfersWidget.getPendingTransfers() <= 0;
+		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && getTransfersWidget().getPendingTransfers() <= 0;
 
 		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
 		indexTransfers = transfersManagement.thereAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
@@ -4694,7 +4694,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	drawerItem = item;
 		MegaApplication.setRecentChatVisible(false);
 		resetActionBar(aB);
-		transfersWidget.update();
+		getTransfersWidget().update();
 		setCallWidget();
 
 		if (item != DrawerItem.CHAT) {
@@ -10139,7 +10139,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION));
 
 			if (e.getErrorCode() == MegaError.API_OK) {
-			    transfersWidget.updateState();
+				getTransfersWidget().updateState();
 
 			    if (drawerItem == DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
 					boolean paused = megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
@@ -10182,7 +10182,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER) {
 			if (e.getErrorCode() == MegaError.API_OK){
 				MegaApplication.getTransfersManagement().removePausedTransfers(request.getTransferTag());
-				transfersWidget.update();
+				getTransfersWidget().update();
 				supportInvalidateOptionsMenu();
 			} else {
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), MEGACHAT_INVALID_HANDLE);
@@ -10191,7 +10191,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("MegaRequest.TYPE_CANCEL_TRANSFERS");
 			//After cancelling all the transfers
 			if (e.getErrorCode() == MegaError.API_OK){
-				transfersWidget.hide();
+				getTransfersWidget().hide();
 
 				if (drawerItem == DrawerItem.TRANSFERS && isTransfersInProgressAdded()) {
 					pauseTransfersMenuIcon.setVisible(false);
@@ -10966,7 +10966,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if(e.getErrorCode() == MegaError.API_EOVERQUOTA){
 			if (e.getValue() != 0) {
 				logDebug("TRANSFER OVERQUOTA ERROR: " + e.getErrorCode());
-                transfersWidget.update();
+				getTransfersWidget().update();
 			}
 			else {
 				logWarning("STORAGE OVERQUOTA ERROR: " + e.getErrorCode());
