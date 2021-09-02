@@ -217,9 +217,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         if (node == null) return;
 
-        MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
-        if (nodeMime.isVideoReproducible() || nodeMime.isVideo() || nodeMime.isAudio()
-                || nodeMime.isImage() || nodeMime.isPdf()) {
+        if (node.isFile()) {
             optionOpenWith.setVisibility(View.VISIBLE);
         } else {
             counterOpen--;
@@ -316,7 +314,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionLabel.setVisibility(View.VISIBLE);
                 optionFavourite.setVisibility(View.VISIBLE);
 
-                if (node.isFile() && (nodeMime.isImage() || nodeMime.isVideo())) {
+                MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
+                if (nodeMime.isImage() || nodeMime.isVideo()) {
                     optionGallery.setVisibility(View.VISIBLE);
                 } else {
                     optionGallery.setVisibility(View.GONE);
@@ -1184,16 +1183,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         if (isFileAvailable(offlineParent)) {
             File offlineFile = new File(offlineParent, node.getName());
-            // if the file matches to the latest on the cloud, do nothing
-            if (isFileAvailable(offlineFile)
-                    && isFileDownloadedLatest(offlineFile, node)
-                    && offlineFile.length() == node.getSize()) {
-                return;
-            } else {
-                // if the file does not match the latest on the cloud, delete the old file offline database record
-                String parentName = getOfflineParentFileName(context, node).getAbsolutePath() + File.separator;
-                MegaOffline mOffDelete = dbH.findbyPathAndName(parentName, node.getName());
-                removeFromOffline(mOffDelete);
+
+            if (isFileAvailable(offlineFile)) {
+                if (isFileDownloadedLatest(offlineFile, node)
+                        && offlineFile.length() == node.getSize()) {
+                    // if the file matches to the latest on the cloud, do nothing
+                    return;
+                } else {
+                    // if the file does not match the latest on the cloud, delete the old file offline database record
+                    String parentName = getOfflineParentFileName(context, node).getAbsolutePath() + File.separator;
+                    MegaOffline mOffDelete = dbH.findbyPathAndName(parentName, node.getName());
+                    removeFromOffline(mOffDelete);
+                }
             }
         }
 

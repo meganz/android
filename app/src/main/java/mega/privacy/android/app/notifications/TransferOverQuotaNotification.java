@@ -42,7 +42,7 @@ public class TransferOverQuotaNotification {
         Intent intent = new Intent(app.getApplicationContext(), DownloadNotificationIntentService.class);
 
         if (isLoggedIn) {
-            isFreeAccount = MegaApplication.getInstance().getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE;
+            isFreeAccount = app.getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE;
             intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
         } else {
             dbH.clearEphemeral();

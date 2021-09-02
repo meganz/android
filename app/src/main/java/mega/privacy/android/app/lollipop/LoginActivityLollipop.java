@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.widget.RelativeLayout;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -35,8 +33,6 @@ import mega.privacy.android.app.EphemeralCredentials;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener;
-import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -65,7 +61,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     //Fragments
     TourFragmentLollipop tourFragment;
     LoginFragmentLollipop loginFragment;
-    ChooseAccountFragmentLollipop chooseAccountFragment;
     CreateAccountFragmentLollipop createAccountFragment;
 
     ActionBar aB;
@@ -96,21 +91,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (intent != null) {
+                int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
 
-            int actionType;
-
-            if (intent != null){
-                actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION);
-
-                if(actionType == UPDATE_GET_PRICING){
-                    logDebug("BROADCAST TO UPDATE AFTER GET PRICING");
-                    //UPGRADE_ACCOUNT_FRAGMENT
-
-                    if(chooseAccountFragment!=null && chooseAccountFragment.isAdded()){
-                        chooseAccountFragment.setPricingInfo();
-                    }
-                }
-                else if(actionType == UPDATE_PAYMENT_METHODS){
+                if (actionType == UPDATE_PAYMENT_METHODS) {
                     logDebug("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
                 }
             }
@@ -241,12 +225,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                         }
                         break;
                     }
-                    case CHOOSE_ACCOUNT_FRAGMENT: {
-                        if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                            chooseAccountFragment.onFreeClick();
-                        }
-                        break;
-                    }
                 }
                 break;
             }
@@ -275,20 +253,6 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container_login, loginFragment);
-                ft.commitNowAllowingStateLoss();
-
-                setDrawUnderStatusBar(this, false);
-                break;
-            }
-            case CHOOSE_ACCOUNT_FRAGMENT: {
-                logDebug("Show CHOOSE_ACCOUNT_FRAGMENT");
-
-                if (chooseAccountFragment == null) {
-                    chooseAccountFragment = new ChooseAccountFragmentLollipop();
-                }
-
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container_login, chooseAccountFragment);
                 ft.commitNowAllowingStateLoss();
 
                 setDrawUnderStatusBar(this, false);
@@ -480,18 +444,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                 showFragment(TOUR_FRAGMENT);
                 break;
             }
-            case TOUR_FRAGMENT: {
-                valueReturn = 0;
-                break;
-            }
+            case TOUR_FRAGMENT:
             case CONFIRM_EMAIL_FRAGMENT: {
                 valueReturn = 0;
-                break;
-            }
-            case CHOOSE_ACCOUNT_FRAGMENT: {
-                if (chooseAccountFragment != null && chooseAccountFragment.isAdded()) {
-                    chooseAccountFragment.onFreeClick();
-                }
                 break;
             }
         }

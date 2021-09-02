@@ -9,7 +9,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showForeignStorageOverQuotaWarningDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
