@@ -330,6 +330,12 @@ public class TimeUtils implements Comparator<Calendar> {
         }
     }
 
+    public static String unformattedLastGreenDate(Context context, int minutesAgo) {
+        return lastGreenDate(context, minutesAgo)
+                .replace("[A]", "")
+                .replace("[/A]", "");
+    }
+
     public static String formatDateAndTime(Context context, long ts, int format){
 
         java.text.DateFormat df;

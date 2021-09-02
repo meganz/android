@@ -10,9 +10,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -129,6 +126,8 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
     public static final String EXTRA_GROUP_CHAT = "groupChat";
     public static final String EXTRA_EKR = "EKR";
     public static final String EXTRA_CHAT_LINK = "chatLink";
+    public static final String EXTRA_CONTACT_TYPE = "contactType";
+    public static final String EXTRA_ONLY_CREATE_GROUP = "onlyCreateGroup";
 
     private DisplayMetrics outMetrics;
     private MegaApplication app;
@@ -1119,14 +1118,14 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
     private void setMegaAdapterContacts (ArrayList<MegaContactAdapter> contacts, int adapter) {
         if (onNewGroup){
-            adapterMEGA = new MegaContactsLollipopAdapter(addContactActivityLollipop, null, contacts, newGroupRecyclerView, adapter);
+            adapterMEGA = new MegaContactsLollipopAdapter(addContactActivityLollipop, contacts, newGroupRecyclerView, adapter);
 
             adapterMEGA.setPositionClicked(-1);
             newGroupRecyclerView.setAdapter(adapterMEGA);
         }
         else {
             if (adapterMEGA == null) {
-                adapterMEGA = new MegaContactsLollipopAdapter(addContactActivityLollipop, null, contacts, recyclerViewList, adapter);
+                adapterMEGA = new MegaContactsLollipopAdapter(addContactActivityLollipop, contacts, recyclerViewList, adapter);
             } else {
                 adapterMEGA.setAdapterType(adapter);
                 adapterMEGA.setContacts(contacts);
@@ -1591,7 +1590,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
             if (comesFromChat) {
                 title = getIntent().getStringExtra("aBtitle");
             }
-            onlyCreateGroup = getIntent().getBooleanExtra("onlyCreateGroup", false);
+            onlyCreateGroup = getIntent().getBooleanExtra(EXTRA_ONLY_CREATE_GROUP, false);
             if (contactType == CONTACT_TYPE_MEGA || contactType == CONTACT_TYPE_BOTH){
                 multipleSelectIntent = getIntent().getIntExtra("MULTISELECT", -1);
                 if(multipleSelectIntent==0){

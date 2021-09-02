@@ -90,6 +90,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.Util.*;
 
 @AndroidEntryPoint
@@ -900,85 +901,7 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isURL()) {
-					logDebug("Is URL file");
-					MegaNode file = nodes.get(position);
-
-					String localPath = getLocalFile(file);
-
-					if (localPath != null) {
-						File mediaFile = new File(localPath);
-						InputStream instream = null;
-
-						try {
-							// open the file for reading
-							instream = new FileInputStream(mediaFile.getAbsolutePath());
-
-							// if file the available for reading
-							if (instream != null) {
-								// prepare the file for reading
-								InputStreamReader inputreader = new InputStreamReader(instream);
-								BufferedReader buffreader = new BufferedReader(inputreader);
-
-								String line1 = buffreader.readLine();
-								if (line1 != null) {
-									String line2 = buffreader.readLine();
-
-									String url = line2.replace("URL=", "");
-
-									logDebug("Is URL - launch browser intent");
-									Intent i = new Intent(Intent.ACTION_VIEW);
-									i.setData(Uri.parse(url));
-									startActivity(i);
-								} else {
-									logWarning("Not expected format: Exception on processing url file");
-									Intent intent = new Intent(Intent.ACTION_VIEW);
-									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-										intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), "text/plain");
-									} else {
-										intent.setDataAndType(Uri.fromFile(mediaFile), "text/plain");
-									}
-									intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-									if (isIntentAvailable(context, intent)) {
-										startActivity(intent);
-									} else {
-										((ManagerActivityLollipop) context).saveNodesToDevice(
-												Collections.singletonList(nodes.get(position)),
-												true, false, false, false);
-									}
-								}
-							}
-						} catch (Exception ex) {
-
-							Intent intent = new Intent(Intent.ACTION_VIEW);
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-								intent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), "text/plain");
-							} else {
-								intent.setDataAndType(Uri.fromFile(mediaFile), "text/plain");
-							}
-							intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-							if (isIntentAvailable(context, intent)) {
-								startActivity(intent);
-							} else {
-								((ManagerActivityLollipop) context).saveNodesToDevice(
-										Collections.singletonList(nodes.get(position)),
-										true, false, false, false);
-							}
-
-						} finally {
-							// close the file.
-							try {
-								instream.close();
-							} catch (IOException e) {
-								logError("EXCEPTION closing InputStream", e);
-							}
-						}
-					} else {
-						((ManagerActivityLollipop) context).saveNodesToDevice(
-								Collections.singletonList(nodes.get(position)),
-								true, false, false, false);
-					}
+					manageURLNode(requireContext(), megaApi, nodes.get(position));
 				} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
 					manageTextFileIntent(requireContext(), nodes.get(position), SEARCH_ADAPTER);
 				} else{
