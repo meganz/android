@@ -347,15 +347,14 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         currentZoom = zoom;
 
         if (currentZoom == ZOOM_OUT_3X) {
-            binding.zoomPanel.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054)));
-
-            // For zoom out 3X mode, nodes need to be re-group by years.
-            viewModel.loadNodes();
+            ZoomUtil.INSTANCE.disableButton(binding.zoomPanel.btnZoomOut, context);
         }
+
         if (currentZoom == ZOOM_IN_1X) {
-            binding.zoomPanel.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054)));
+            ZoomUtil.INSTANCE.disableButton(binding.zoomPanel.btnZoomIn, context);
         }
 
+        viewModel.loadNodes();
         viewModel.clearSelection();
 
         boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
@@ -500,11 +499,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             if (currentZoom < ZOOM_IN_1X) {
                 currentZoom++;
                 viewModel.setZoom(currentZoom);
-                binding.zoomPanel.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white)));
+                ZoomUtil.INSTANCE.enableButton(binding.zoomPanel.btnZoomOut, context);
             }
 
             if (currentZoom == ZOOM_IN_1X) {
-                binding.zoomPanel.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054)));
+                ZoomUtil.INSTANCE.disableButton(binding.zoomPanel.btnZoomIn, context);
             }
         });
 
@@ -516,7 +515,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             }
 
             if (currentZoom == ZOOM_OUT_3X) {
-                binding.zoomPanel.btnZoomOut.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054)));
+                ZoomUtil.INSTANCE.disableButton(binding.zoomPanel.btnZoomOut, context);
             }
         });
     }
@@ -531,7 +530,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
         if(selectedView == ALL_VIEW) {
             binding.zoomPanel.zoomPanel.setVisibility(View.VISIBLE);
-            gridAdapter.setNodes(viewModel.getCUNodes());
+            zoom(currentZoom);
         } else {
             binding.zoomPanel.zoomPanel.setVisibility(View.GONE);
 
@@ -549,6 +548,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                     break;
             }
         }
+
+        ZoomUtil.INSTANCE.showHidePanel(selectedView == ALL_VIEW, binding.zoomPanel.zoomPanel);
 
         updateViewSelected();
     }
