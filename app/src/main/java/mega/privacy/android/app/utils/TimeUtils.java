@@ -204,19 +204,23 @@ public class TimeUtils implements Comparator<Calendar> {
         Calendar cal = calculateDateFromTimestamp(timestamp);
 
         if (humanized) {
-            // Check if date is today, yesterday or less of a week
+            // Check if date is today, yesterday, tomorrow or less of a week
             Calendar calToday = Calendar.getInstance();
             Calendar calYesterday = Calendar.getInstance();
             calYesterday.add(Calendar.DATE, -1);
+            Calendar calTomorrow = Calendar.getInstance();
+            calTomorrow.add(Calendar.DATE, 1);
             TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
             if (tc.compare(cal, calToday) == 0) {
                 return getString(R.string.label_today);
             } else if (tc.compare(cal, calYesterday) == 0) {
                 return getString(R.string.label_yesterday);
+            } else if (tc.compare(cal, calTomorrow) == 0) {
+                return getString(R.string.tomorrow_date, new SimpleDateFormat("d MMM yyyy", locale)
+                        .format(cal.getTime()));
             } else if (tc.calculateDifferenceDays(cal, calToday) < 7) {
-                Date date = cal.getTime();
-                return new SimpleDateFormat("EEEE", locale).format(date);
+                return new SimpleDateFormat("EEEE, d MMM yyyy", locale).format(cal.getTime());
             }
         }
 

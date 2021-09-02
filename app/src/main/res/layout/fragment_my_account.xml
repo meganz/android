@@ -1,565 +1,404 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@color/grey_020_grey_087"
+    android:fillViewport="true">
 
-    <ScrollView
-        android:id="@+id/my_account_complete_relative_layout"
+    <LinearLayout
+        android:id="@+id/parent_linear_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/grey_020_black"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/my_account_info_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="32dp">
+
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/my_account_thumbnail"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="17dp"
+                android:layout_marginEnd="18dp"
+                android:scaleType="fitCenter"
+                app:corner_radius="30dp" />
+
+            <RelativeLayout
+                android:id="@+id/qr_code_layout"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_below="@+id/my_account_thumbnail"
+                android:layout_alignEnd="@+id/my_account_thumbnail"
+                android:layout_marginEnd="3dp"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/shape_white_circle">
+
+                <ImageView
+                    android:id="@+id/qr_code_icon"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_qr_code_scan"
+                    tools:ignore="ContentDescription" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/my_account_text_info_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="15dp"
+                android:layout_toEndOf="@+id/my_account_thumbnail">
+
+                <mega.privacy.android.app.components.twemoji.EmojiTextView
+                    android:id="@+id/name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableEnd="@drawable/ic_view_edit_profile"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant6"
+                    app:drawableTint="@color/teal_300_teal_200"
+                    tools:text="Daphne Oram" />
+
+                <TextView
+                    android:id="@+id/email_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/name_text"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+                    tools:text="info@daphne_oram.com" />
+
+                <TextView
+                    android:id="@+id/phone_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/email_text"
+                    android:layout_marginTop="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.Mega.Body2.Accent"
+                    tools:text="+642734738292" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
 
         <LinearLayout
-            android:id="@+id/parent_linear_layout"
+            android:id="@+id/account_type_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="8dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="22dp"
+            android:layout_marginEnd="22dp"
+            android:background="@drawable/background_account_type"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/business_account_management_container"
+            <RelativeLayout
+                android:id="@+id/account_type_principal_info"
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:background="@color/grey_020_white_012"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/account_type_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="9dp"
+                    android:src="@drawable/ic_free_account"
+                    app:tint="@color/white_dark_grey"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/business_management_alert"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Variant" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:id="@+id/my_account_email_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp"
-                    android:gravity="left"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:id="@+id/my_account_email_text_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="left"
-                        android:orientation="vertical">
-
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <mega.privacy.android.app.components.twemoji.EmojiTextView
-                                android:id="@+id/my_account_name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="7dp"
-                                android:ellipsize="end"
-                                android:maxLines="1"
-                                android:singleLine="true"
-                                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant"
-                                rounded:emojiSize="14sp" />
-
-                            <ImageView
-                                android:id="@+id/my_account_edit_icon"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="2dp"
-                                android:layout_toRightOf="@+id/my_account_name"
-                                android:src="@drawable/ic_rename"
-                                rounded:tint="?android:attr/textColorSecondary" />
-
-                        </RelativeLayout>
-
-                        <TextView
-                            android:id="@+id/my_account_email"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
-
-                        <TextView
-                            android:id="@+id/add_phone_number"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="7dp"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Accent" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/my_account_extra_layout"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <RelativeLayout
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent">
-
-                            <RelativeLayout
-                                android:id="@+id/my_account_relative_layout_avatar"
-                                android:layout_width="85dp"
-                                android:layout_height="85dp"
-                                android:layout_alignParentRight="true"
-                                android:layout_gravity="right"
-                                android:layout_marginRight="-14px"
-                                android:orientation="horizontal">
-
-                                <mega.privacy.android.app.components.RoundedImageView
-                                    android:id="@+id/my_account_thumbnail"
-                                    android:layout_width="40dp"
-                                    android:layout_height="40dp"
-                                    android:layout_centerInParent="true"
-                                    android:scaleType="fitCenter"
-                                    rounded:corner_radius="30dp" />
-
-                            </RelativeLayout>
-
-                        </RelativeLayout>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/my_data_account_separator"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/grey_012_white_012"
-                    android:orientation="horizontal" />
-
-                <LinearLayout
-                    android:id="@+id/my_account_achievements_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="72dp"
-                    android:gravity="center_vertical|left"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:id="@+id/my_account_achievements_text_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="left"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/my_account_achievements_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:text="@string/achievements_title"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Medium" />
-
-                        <TextView
-                            android:id="@+id/my_account_achievements_subtitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:text="@string/achievements_subtitle"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Accent" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/my_account_achievements_separator"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/grey_012_white_012"
-                    android:orientation="horizontal" />
-
-                <LinearLayout
-                    android:id="@+id/my_account_account_type_layout_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="72dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:id="@+id/my_account_account_type_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/account_type_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/account_label"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
-
-                        <TextView
-                            android:id="@+id/my_account_account_type_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:layout_weight="1"
-                            android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant" />
-
-                    </LinearLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <RelativeLayout
-                            android:id="@+id/my_account_account_upgrade_layout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true">
-
-                            <Button
-                                android:id="@+id/my_account_account_type_button"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                style="@style/Widget.Mega.Button.Variant1"
-                                android:text="@string/my_account_upgrade_pro" />
-
-                        </RelativeLayout>
-
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/my_account_type_separator"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/grey_012_white_012"
-                    android:orientation="horizontal" />
-
-                <LinearLayout
-                    android:id="@+id/expiry_renew_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/expiry_renew_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="1"
-                        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
-
-                    <TextView
-                        android:id="@+id/expiry_renew_date"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="1"
-                        android:gravity="right"
-                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Secondary.Variant" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/expiry_renew_separator"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/grey_012_white_012"
-                    android:orientation="horizontal" />
-
-                <LinearLayout
-                    android:id="@+id/business_account_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:id="@+id/business_account_type_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="72dp"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/business_account_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="14sp"
-                            android:text="@string/account_label"
-                            android:textColor="?android:attr/textColorSecondary"
-                            android:textSize="14sp" />
-
-                        <LinearLayout
-                            android:id="@+id/business_account_layout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/business_account_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:fontFamily="sans-serif-light"
-                                android:text="@string/business_label"
-                                android:textColor="?android:attr/textColorPrimary"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:id="@+id/business_account_type_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="end"
-                                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor"
-                                android:textAllCaps="true" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/business_account_type_separator"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/grey_012_white_012"
-                        android:orientation="horizontal" />
-
-                    <LinearLayout
-                        android:id="@+id/business_account_status_container"
-                        android:layout_width="match_parent"
-                        android:layout_height="72dp"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:id="@+id/business_account_status_layout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="14dp"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/business_account_status_label"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="@string/status_label"
-                                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
-
-                            <TextView
-                                android:id="@+id/business_account_renews_on_label"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="right"
-                                android:text="@string/renews_on"
-                                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/business_account_renews_layout"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/business_account_status_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium.Variant" />
-
-                            <TextView
-                                android:id="@+id/business_account_renews_date_text"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant"
-                                android:gravity="end" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/business_account_status_separator"
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/grey_012_white_012"
-                        android:orientation="horizontal" />
-
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/MK_button"
-                    style="?attr/materialButtonStyle"
+                    android:id="@+id/account_type_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="2dp"
-                    android:layout_marginTop="16dp"
-                    android:paddingLeft="@dimen/btn_21_padding_horizontal"
-                    android:paddingRight="@dimen/btn_21_padding_horizontal"
-                    android:elevation="@dimen/elevation_upgrade_low"
-                    android:text="@string/action_export_master_key" />
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="10dp"
+                    android:layout_toStartOf="@+id/upgrade_button"
+                    android:layout_toEndOf="@+id/account_type_icon"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1.WhiteBlack"
+                    tools:text="Free" />
 
                 <Button
-                    android:id="@+id/change_pass_button"
+                    android:id="@+id/upgrade_button"
                     style="@style/Widget.Mega.Button.Variant2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="2dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:text="@string/my_account_change_password" />
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/my_account_upgrade_pro" />
 
-                <LinearLayout
-                    android:id="@+id/my_account_type_buttons_separator"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/grey_012_white_012"
-                    android:orientation="horizontal" />
+            </RelativeLayout>
 
-                <RelativeLayout
-                    android:id="@+id/my_account_connections_layout"
-                    android:layout_width="fill_parent"
-                    android:layout_height="72dp"
-                    android:gravity="center_vertical|left">
-
-                    <LinearLayout
-                        android:id="@+id/my_account_connections_text_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:layout_centerVertical="true"
-                        android:gravity="left"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/my_account_connections_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="4dp"
-                            android:text="@string/my_account_connections"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
-
-                        <TextView
-                            android:id="@+id/my_account_connections"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="?android:attr/textColorPrimary"
-                            android:textSize="15sp" />
-
-                    </LinearLayout>
-
-                    <mega.privacy.android.app.components.CustomizedGridRecyclerView
-                        android:id="@+id/last_contacts_gridview"
-                        android:layout_width="70dp"
-                        android:layout_height="52dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:columnWidth="20dp"
-                        android:paddingTop="2dp" />
-
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:id="@+id/my_account_connections_separator"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/grey_012_white_012"
-                    android:orientation="horizontal" />
-
-                <LinearLayout
-                    android:id="@+id/my_account_last_session_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="72dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:id="@+id/my_account_last_session_text_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:gravity="left|center_vertical"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/my_account_last_session_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="4dp"
-                            android:text="@string/my_account_last_session"
-                            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant" />
-
-                        <TextView
-                            android:id="@+id/my_account_last_session"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="?android:attr/textColorPrimary"
-                            android:textSize="15sp" />
-
-                    </LinearLayout>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <RelativeLayout
-                            android:id="@+id/my_account_logout_button_layout"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true">
-
-                            <Button
-                                android:id="@+id/logout_button"
-                                style="@style/Widget.Mega.Button.Variant3"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:text="@string/action_logout" />
-
-                        </RelativeLayout>
-
-                    </RelativeLayout>
-
-                </LinearLayout>
-
-
-                <TextView
-                    android:id="@+id/logout_warning_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/grey_038_white_038"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
+            <include
+                android:id="@+id/payment_alert"
+                layout="@layout/my_account_payment_info_container"
+                android:visibility="gone"/>
 
         </LinearLayout>
 
-    </ScrollView>
+        <LinearLayout
+            android:id="@+id/account_options_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/background_account_options"
+            android:elevation="3dp"
+            android:orientation="vertical">
 
-</LinearLayout>
+            <include
+                android:id="@+id/usage_view"
+                layout="@layout/my_account_usage_container" />
+
+            <TextView
+                android:id="@+id/business_account_management_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/grey_050_grey_900"
+                android:paddingStart="20dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="10dp"
+                android:text="@string/business_management_alert"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White" />
+
+            <RelativeLayout
+                android:id="@+id/add_phone_number_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/add_phone_image"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_verify_phone_circle"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/add_phone_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginEnd="18dp"
+                    android:layout_toEndOf="@+id/add_phone_image"
+                    android:text="@string/add_phone_label"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
+
+                <TextView
+                    android:id="@+id/add_phone_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/add_phone_title"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="18dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_toEndOf="@+id/add_phone_image"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60"
+                    tools:text="@string/sms_add_phone_number_dialog_msg_non_achievement_user" />
+
+                <include
+                    layout="@layout/view_relative_layout_separator_72"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/add_phone_subtitle"
+                    android:layout_marginStart="72dp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/backup_recovery_key_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/backup_recovery_key_image"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_recovery_key_circle"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/backup_recovery_key_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginEnd="18dp"
+                    android:layout_toEndOf="@+id/backup_recovery_key_image"
+                    android:text="@string/action_export_master_key"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
+
+                <TextView
+                    android:id="@+id/backup_recovery_key_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/backup_recovery_key_title"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginEnd="18dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_toEndOf="@+id/backup_recovery_key_image"
+                    android:text="@string/backup_recovery_key_subtitle"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60" />
+
+                <include
+                    layout="@layout/view_relative_layout_separator_72"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/backup_recovery_key_subtitle"
+                    android:layout_marginStart="72dp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/contacts_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/contacts_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/ic_contacts_connections"
+                    app:tint="@color/grey_054_white_054"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/contacts_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="18dp"
+                    android:text="@string/section_contacts"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87.16" />
+
+                <TextView
+                    android:id="@+id/contacts_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/contacts_title"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginEnd="18dp"
+                    android:layout_marginBottom="14dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60.14"
+                    tools:text="132 connections" />
+
+                <include
+                    layout="@layout/view_relative_layout_separator_72"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/contacts_subtitle"
+                    android:layout_marginStart="72dp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/achievements_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/achievements_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="32dp"
+                    android:src="@drawable/ic_achievement"
+                    app:tint="@color/grey_054_white_054"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/achievements_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="18dp"
+                    android:text="@string/achievements_title"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87.16" />
+
+                <TextView
+                    android:id="@+id/achievements_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/achievements_title"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginEnd="18dp"
+                    android:layout_marginBottom="14dp"
+                    android:text="@string/achievements_subtitle"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60.14" />
+
+                <include
+                    layout="@layout/view_relative_layout_separator_72"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_below="@id/achievements_subtitle"
+                    android:layout_marginStart="72dp" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/last_session_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/last_session_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/ic_last_session"
+                    app:tint="@color/grey_054_white_054"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/last_session_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginEnd="18dp"
+                    android:text="@string/my_account_last_session"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87.16" />
+
+                <TextView
+                    android:id="@+id/last_session_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/last_session_title"
+                    android:layout_marginStart="72dp"
+                    android:layout_marginEnd="18dp"
+                    android:layout_marginBottom="14dp"
+                    android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60.14"
+                    tools:text="Today 14:53" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

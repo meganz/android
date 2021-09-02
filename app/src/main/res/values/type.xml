@@ -77,6 +77,10 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.WhiteBlack">
+        <item name="android:textColor">@color/white_black</item>
+    </style>
+
     <!-- Action mode title text -->
     <style name="TextAppearance.Mega.Subtitle1.AccentColor">
         <item name="android:textColor">?attr/colorSecondary</item>
@@ -173,7 +177,7 @@
         <item name="android:textColor">@color/white_black</item>
     </style>
 
-    <!-- Medium, normal, 20sp, 0px, textColorPrimary -->
+    <!-- Medium, normal, 20sp, white - black -->
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6">
         <item name="android:textSize">20sp</item>
     </style>
@@ -266,6 +270,30 @@
         <item name="android:textColor">?attr/colorPrimary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle2.GreyWhite87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.WhiteGrey87">
+        <item name="android:textColor">@color/white_087_grey_087</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.White87White">
+        <item name="android:textColor">@color/white_087_white</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.GreyWhite87.16">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Grey54White54">
+        <item name="android:textColor">@color/grey_054_white_054</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle2.Normal.Grey87White">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
     <!--- 0.5px, Medium, AllCap -->
     <style name="TextAppearance.Mega.Subtitle2.Variant">
         <item name="android:letterSpacing">0.035714286</item>
@@ -353,13 +381,33 @@
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
+    <style name="TextAppearance.Mega.Body2.Medium.Grey87White87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
     <!-- Accent -->
     <style name="TextAppearance.Mega.Body2.Accent">
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Body2.Grey54White">
+        <item name="android:textColor">@color/grey_054_white</item>
+    </style>
+
     <style name="TextAppearance.Mega.Body2.Grey54White54">
         <item name="android:textColor">@color/grey_054_white_054</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.White87Grey87">
+        <item name="android:textColor">@color/white_087_grey_087</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Red400">
+        <item name="android:textColor">@color/red_400</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Teal300Teal200">
+        <item name="android:textColor">@color/teal_300_teal_200</item>
     </style>
 
     <!-- Medium, Accent -->
@@ -471,6 +519,30 @@
     <!-- Regular, 12sp, 0px, AudioPlayer playlist position and duration -->
     <style name="TextAppearance.Mega.Caption.Variant4">
         <item name="android:textColor">@color/grey_038_white_alpha_038</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Grey54White60">
+        <item name="android:textColor">@color/grey_054_white_060</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.GreyWhite87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.WhiteGrey87">
+        <item name="android:textColor">@color/white_087_grey_087</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.White87White">
+        <item name="android:textColor">@color/white_087_white</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Grey38Grey400">
+        <item name="android:textColor">@color/grey_038_grey_400</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Grey54White60.14">
+        <item name="android:textSize">14sp</item>
     </style>
 
     <!-- Regular, 12sp, 0.25px -->

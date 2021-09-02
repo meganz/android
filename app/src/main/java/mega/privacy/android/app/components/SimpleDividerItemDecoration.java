@@ -29,7 +29,7 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     protected int childCount;
 
     private final Rect mBounds = new Rect();
-
+    protected boolean isInitialized = false;
     public SimpleDividerItemDecoration(Context context) {
         mDivider = ContextCompat.getDrawable(context, R.drawable.line_divider);
         this.context = context;
@@ -37,10 +37,23 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        initItemDecoration(c, parent);
+        checkIfIsInitialized(c, parent);
 
         for (int i = 0; i < childCount; i++) {
             drawDivider(c, parent, parent.getChildAt(i));
+        }
+    }
+
+    /**
+     * Initializes Item Decoration when it is not initialized.
+     *
+     * @param c         Canvas in which the dividers will be drawn.
+     * @param parent    RecyclerView in which the item decorations will be set.
+     */
+    protected void checkIfIsInitialized(Canvas c, RecyclerView parent) {
+        if (!isInitialized) {
+            initItemDecoration(c, parent);
+            isInitialized = true;
         }
     }
 
@@ -48,8 +61,10 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
         left = (int) MegaApplication.getInstance().getResources().getDimension(R.dimen.divider_width) + parent.getPaddingLeft();
         right = parent.getWidth() - parent.getPaddingRight();
 
-        c.clipRect(left, parent.getPaddingTop(), right,
-                parent.getHeight() - parent.getPaddingBottom());
+        // Canvas.clipRect(left, top, right, bottom) reduces the region of the screen that future draw operations can write to
+        // It should include all areas of the parent, especially the padding part.
+        c.clipRect(left, parent.getTop(), right,
+                parent.getHeight());
 
         childCount = parent.getChildCount();
     }
@@ -62,11 +77,13 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
      * @param child    View which makes reference to each holder of the RecyclerView.
      */
     protected void drawDivider(Canvas c, RecyclerView parent, View child) {
-        parent.getDecoratedBoundsWithMargins(child, mBounds);
-        final int bottom = mBounds.bottom + Math.round(child.getTranslationY());
-        final int top = bottom - mDivider.getIntrinsicHeight();
+        if(child != null) {
+            parent.getDecoratedBoundsWithMargins(child, mBounds);
+            final int bottom = mBounds.bottom + Math.round(child.getTranslationY());
+            final int top = bottom - mDivider.getIntrinsicHeight();
 
-        mDivider.setBounds(left, top, right, bottom);
-        mDivider.draw(c);
+            mDivider.setBounds(left, top, right, bottom);
+            mDivider.draw(c);
+        }
     }
 }

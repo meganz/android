@@ -47,12 +47,6 @@
                     android:layout_height="wrap_content" />
 
                 <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/sliding_tabs_my_account"
-                    style="@style/Widget.Mega.TabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_transfers"
                     style="@style/Widget.Mega.TabLayout"
                     android:layout_width="match_parent"
@@ -101,12 +95,6 @@
 
             <mega.privacy.android.app.components.CustomViewPager
                 android:id="@+id/shares_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/my_account_tabs_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
