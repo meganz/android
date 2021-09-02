@@ -6,8 +6,13 @@ import androidx.recyclerview.widget.DiffUtil
 data class ImageItem constructor(
     val handle: Long,
     val name: String,
-    val uri: Uri? = null
+    var thumbnailUri: Uri? = null,
+    var previewUri: Uri? = null,
+    var fullSizeUri: Uri? = null
 ) {
+
+    fun getAvailableUri(): Uri? =
+        fullSizeUri ?: previewUri ?: thumbnailUri
 
     class DiffCallback : DiffUtil.ItemCallback<ImageItem>() {
         override fun areItemsTheSame(oldItem: ImageItem, newItem: ImageItem) =

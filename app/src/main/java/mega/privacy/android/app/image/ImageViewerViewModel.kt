@@ -22,19 +22,22 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun getImages(): LiveData<List<ImageItem>> = images
 
-    fun retrieveSingleImage(nodeHandle: Long) {
+    fun retrieveSingleImage(nodeHandle: Long): MutableLiveData<ImageItem> {
+        val result = MutableLiveData<ImageItem>()
         getImageUseCase.getImages(listOf(nodeHandle), 0)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { imageItems ->
                     images.value = imageItems.toList()
+                    result.value = imageItems.first()
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
                 }
             )
             .addTo(composite)
+        return result
     }
 
     fun retrieveImagesFromParent(parentNodeHandle: Long) {
@@ -74,12 +77,9 @@ class ImageViewerViewModel @ViewModelInject constructor(
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
-                        onNext = { imageUri ->
+                        onNext = { imageItem ->
                             val currentImages = images.value!!.toMutableList()
-                            val currentItem = currentImages[index]
-                            currentImages[index] = currentItem.copy(
-                                uri = imageUri
-                            )
+                            currentImages[index] = imageItem
                             images.value = currentImages
                         },
                         onError = { error ->
@@ -89,5 +89,22 @@ class ImageViewerViewModel @ViewModelInject constructor(
                     .addTo(composite)
             }
         }
+    }
+
+    fun loadSingleImage(nodeHandle: Long, fullSize: Boolean): MutableLiveData<ImageItem> {
+        val result = MutableLiveData<ImageItem>()
+        getImageUseCase.getProgressiveImage(nodeHandle, fullSize)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { imageItem ->
+                    result.value = imageItem
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+        return result
     }
 }

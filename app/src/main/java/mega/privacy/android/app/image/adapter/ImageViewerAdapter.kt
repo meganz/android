@@ -1,33 +1,13 @@
 package mega.privacy.android.app.image.adapter
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import androidx.recyclerview.widget.ListAdapter
-import mega.privacy.android.app.databinding.PageImageViewerBinding
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import mega.privacy.android.app.image.ImageViewerPageFragment
 import mega.privacy.android.app.image.data.ImageItem
 
-class ImageViewerAdapter(
-    private val itemCallback: (Long) -> Unit
-) : ListAdapter<ImageItem, ImageViewHolder>(ImageItem.DiffCallback()) {
+class ImageViewerAdapter(activity: FragmentActivity) :
+    DiffFragmentStateAdapter<ImageItem>(activity, ImageItem.DiffCallback()) {
 
-    init {
-        setHasStableIds(true)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = PageImageViewerBinding.inflate(layoutInflater, parent, false)
-        return ImageViewHolder(binding).apply {
-            binding.root.setOnClickListener {
-                itemCallback.invoke(getItem(adapterPosition).handle)
-            }
-        }
-    }
-
-    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        holder.bind(getItem(position))
-    }
-
-    override fun getItemId(position: Int): Long =
-        getItem(position).handle
+    override fun createFragment(position: Int): Fragment =
+        ImageViewerPageFragment.newInstance(getItem(position).handle)
 }

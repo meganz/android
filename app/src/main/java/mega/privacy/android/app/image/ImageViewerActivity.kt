@@ -1,5 +1,6 @@
 package mega.privacy.android.app.image
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.viewpager2.widget.ViewPager2
@@ -15,10 +16,14 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 @AndroidEntryPoint
 class ImageViewerActivity : BaseActivity() {
 
+    companion object {
+        private const val OFFSCREEN_PAGE_LIMIT = 3
+    }
+
     private lateinit var binding: ActivityImageViewerBinding
 
     private val viewModel by viewModels<ImageViewerViewModel>()
-    private val adapter by lazy { ImageViewerAdapter(::onImageClick) }
+    private val pagerAdapter by lazy { ImageViewerAdapter(this) }
     private val pageChangeCallback by lazy{
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -27,8 +32,6 @@ class ImageViewerActivity : BaseActivity() {
                     positionSet = true
                     binding.viewPager.currentItem = nodePosition
                 }
-
-                viewModel.loadNearbyImages(position)
             }
         }
     }
@@ -66,15 +69,19 @@ class ImageViewerActivity : BaseActivity() {
         super.onDestroy()
     }
 
+    @SuppressLint("WrongConstant")
     private fun setupView() {
-        binding.viewPager.adapter = adapter
-        binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
+        binding.viewPager.apply {
+            adapter = pagerAdapter
+            offscreenPageLimit = OFFSCREEN_PAGE_LIMIT
+            registerOnPageChangeCallback(pageChangeCallback)
+        }
     }
 
     private fun setupObservers() {
         viewModel.defaultPosition = nodePosition
         viewModel.getImages().observe(this) { images ->
-            adapter.submitList(images)
+            pagerAdapter.submitList(images)
         }
     }
 
