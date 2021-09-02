@@ -860,4 +860,6 @@ public class Constants {
     public final static float MAX_WIDTH_APPBAR_PORT = 200;
 
     public static final long ANIMATION_DURATION = 400;
+
+    public static final String URL_INDICATOR = "URL=";
 }

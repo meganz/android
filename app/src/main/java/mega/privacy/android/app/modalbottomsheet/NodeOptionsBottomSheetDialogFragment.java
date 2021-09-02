@@ -218,9 +218,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
         if (node == null) return;
 
-        MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
-        if (nodeMime.isVideoReproducible() || nodeMime.isVideo() || nodeMime.isAudio()
-                || nodeMime.isImage() || nodeMime.isPdf()) {
+        if (node.isFile()) {
             optionOpenWith.setVisibility(View.VISIBLE);
         } else {
             counterOpen--;
@@ -317,7 +315,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionLabel.setVisibility(View.VISIBLE);
                 optionFavourite.setVisibility(View.VISIBLE);
 
-                if (node.isFile() && (nodeMime.isImage() || nodeMime.isVideo())) {
+                MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
+                if (nodeMime.isImage() || nodeMime.isVideo()) {
                     optionGallery.setVisibility(View.VISIBLE);
                 } else {
                     optionGallery.setVisibility(View.GONE);
