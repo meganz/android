@@ -89,8 +89,6 @@ import static nz.mega.sdk.MegaApiJava.*;
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private static int MARGIN_BOTTOM_LIST = 85;
 
-    private static final String AD_SLOT = "and4";
-
     @Inject
     protected
     SortOrderManagement sortOrderManagement;
@@ -128,12 +126,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public MegaNodeBaseFragment() {
         prefs = dbH.getPreferences();
         downloadLocationDefaultPath = getDownloadLocation();
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initAdsLoader(AD_SLOT, true);
     }
 
     protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
@@ -738,11 +730,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Set the Ad view container to the Ads Loader,
-        // in order to let it know in where to show the Ads
-        mAdsLoader.setAdViewContainer(view.findViewById(R.id.ad_view_container),
-                managerActivity.getOutMetrics());
-
         observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, viewerFrom());
     }
 }

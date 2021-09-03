@@ -97,14 +97,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 
 	private AchievementsActivity mActivity;
 
-	private static final String AD_SLOT = "and2";
-
-	@Override
-	public void onCreate(@Nullable Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		initAdsLoader(AD_SLOT, true);
-	}
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
@@ -246,9 +238,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		daysLeftAddPhoneText.setVisibility(View.INVISIBLE);
 
 		figureUnlockedRewardStorage.setText("...");
-
-		mAdsLoader.setAdViewContainer(v.findViewById(R.id.ad_view_container),
-				mActivity.getOutMetrics());
 
 		if (Util.isDarkMode(context)) {
 			int backgroundColor = ColorUtils.getColorForElevation(context, 1f);
