@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop.managerSections;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -271,7 +270,7 @@ public class NotificationsFragmentLollipop extends Fragment implements View.OnCl
                             MegaContactRequest c = contacts.get(i);
                             if(c.getSourceEmail().equals(notif.getEmail())){
                                 logDebug("Go to Received requests");
-                                ((ManagerActivityLollipop)context).navigateToContacts(2);
+                                ((ManagerActivityLollipop)context).navigateToContactRequests();
                                 break;
                             }
                         }

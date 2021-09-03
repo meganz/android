@@ -291,6 +291,8 @@
     <string name="section_contacts">Contacts</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">Contacts [A](%1$d)[/A]</string>
+    <!-- Section name for the “Recently Added Contacts” section.Preferably one word. -->
+    <string name="section_recently_added">Recently Added</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
     <string name="sent_requests_empty">[B]No [/B][A]sent requests[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
@@ -2165,6 +2167,8 @@
     <string name="context_empty_offline">[B]No files [/B][A]Saved for Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]No [/B][A]Contacts[/A]</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]No[/A] [B]Conversations[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
@@ -4026,4 +4030,8 @@
         <item quantity="one">1 connection</item>
         <item quantity="other">%1$d connections</item>
     </plurals>
+    <!-- Section name for the “Contact Requests” section.Preferably one word. -->
+    <string name="section_requests">Requests</string>
+    <!-- Section name for the “Groups” section.Preferably one word. -->
+    <string name="section_groups">Groups</string>
 </resources>

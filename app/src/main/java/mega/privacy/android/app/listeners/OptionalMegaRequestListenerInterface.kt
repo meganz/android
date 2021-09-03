@@ -5,6 +5,9 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 
+/**
+ * MegaRequestListenerInterface with optional callbacks.
+ */
 class OptionalMegaRequestListenerInterface(
     private val onRequestStart: ((MegaRequest) -> Unit)? = null,
     private val onRequestUpdate: ((MegaRequest) -> Unit)? = null,
