@@ -230,6 +230,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     private fun AlertDialog.updateScanningFolderDialog(stage: Long) {
         if (stage.toInt() == STAGE_TRANSFERRING_FILES) {
+            transfersManagement.resetCancelTransferToken()
             dismiss()
             return
         }

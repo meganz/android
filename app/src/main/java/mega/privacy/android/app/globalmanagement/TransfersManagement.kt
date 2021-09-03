@@ -406,6 +406,13 @@ class TransfersManagement @Inject constructor(
     }
 
     /**
+     * Resets the cancel token when the folder transfer has been processed.
+     */
+    fun resetCancelTransferToken() {
+        cancelTransferToken = null
+    }
+
+    /**
      * Checks if the transfer over quota has occurred at this moment
      * or it occurred in other past moment.
      *
