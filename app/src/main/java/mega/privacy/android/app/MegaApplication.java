@@ -594,13 +594,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 			case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
 				logDebug("The user participation in the call has ended");
-				getChatManagement().controlCallFinished(callId, chatId, call.getTermCode());
+				getChatManagement().controlCallFinished(callId, chatId);
 				break;
 
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 				logDebug("Call has ended");
 				int termCode = call.getTermCode();
-				getChatManagement().controlCallFinished(callId, chatId, termCode);
+				getChatManagement().controlCallFinished(callId, chatId);
 				boolean isIgnored = call.isIgnored();
 				checkCallDestroyed(chatId, callId, termCode, isIgnored);
 				break;

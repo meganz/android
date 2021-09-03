@@ -223,6 +223,7 @@ public class CallUtil {
     public static boolean existsAnOngoingOrIncomingCall() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
         MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
+        MegaHandleList listCallsUserTerminatingUserParticipation = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION);
         MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
         MegaHandleList listCalls = megaChatApi.getChatCalls();
 
@@ -231,7 +232,7 @@ public class CallUtil {
             return false;
         }
 
-        if ((listCalls.size() - listCallsDestroy.size()) == listCallsUserNoPresent.size()) {
+        if ((listCalls.size() - listCallsDestroy.size()) == (listCallsUserNoPresent.size() + listCallsUserTerminatingUserParticipation.size())) {
             logDebug("I'm not participating in any of the calls there");
             return false;
         }
@@ -1249,7 +1250,6 @@ public class CallUtil {
      * @param callStatus   Call Status
      */
     private static void controlNumberOfCalls(MegaHandleList listAllCalls, int callStatus, long currentChatId) {
-        logDebug("****************+ controlNumberOfCalls:: currentChatId = "+currentChatId+", listAllCalls.first "+listAllCalls.get(0));
         if (listAllCalls.size() == 1) {
             MegaApplication.getInstance().checkOneCall(currentChatId);
         } else {
