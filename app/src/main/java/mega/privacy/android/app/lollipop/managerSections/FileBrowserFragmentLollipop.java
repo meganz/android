@@ -73,6 +73,7 @@ import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -85,6 +86,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -222,20 +224,18 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 					break;
 				}
 				case R.id.cab_menu_share_link:
-				case R.id.cab_menu_edit_link: {
-
+				case R.id.cab_menu_edit_link:
 					logDebug("Public link option");
 					if (documents.get(0) == null) {
 						logWarning("The selected node is NULL");
 						break;
 					}
-					((ManagerActivityLollipop) context).showGetLinkActivity(
-							documents.get(0).getHandle());
+
+					((ManagerActivityLollipop) context).showGetLinkActivity(documents);
 					clearSelections();
 					hideMultipleSelect();
-
 					break;
-				}
+
 				case R.id.cab_menu_remove_link:{
 
 					logDebug("Remove public link option");
@@ -318,6 +318,9 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 				return false;
 			}
 
+			menu.findItem(R.id.cab_menu_share_link)
+					.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
+
 			CloudStorageOptionControlUtil.Control control =
 					new CloudStorageOptionControlUtil.Control();
 
@@ -339,6 +342,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 						== MegaError.API_OK) {
 					control.rename().setVisible(true);
 				}
+			} else if (allHaveOwnerAccess(selected)) {
+				control.getLink().setVisible(true).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 
 			boolean showSendToChat = true;
@@ -392,12 +397,15 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 			control.trash().setVisible(showTrash);
 
-			control.shareOut().setVisible(true)
-					.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			control.shareOut().setVisible(true);
+			if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
+				control.shareOut().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+			}
 
 			control.move().setVisible(true);
 			control.copy().setVisible(true);
-			if (selected.size() > 1) {
+			if (selected.size() > 1
+					&& control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
 				control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 			}
 

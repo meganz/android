@@ -67,6 +67,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
@@ -160,6 +161,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         @Override
         public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
             selected = adapter.getSelectedNodes();
+
+            menu.findItem(R.id.cab_menu_share_link)
+                    .setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
+
             return false;
         }
 

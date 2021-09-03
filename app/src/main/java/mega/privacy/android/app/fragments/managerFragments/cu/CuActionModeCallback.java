@@ -13,6 +13,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -20,6 +21,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccess;
 
 class CuActionModeCallback implements ActionMode.Callback {
 
@@ -69,11 +71,7 @@ class CuActionModeCallback implements ActionMode.Callback {
             case R.id.cab_menu_edit_link:
                 logDebug("Public link option");
                 mViewModel.clearSelection();
-                if (documents.size() == 1
-                        && documents.get(0).getHandle() != MegaApiJava.INVALID_HANDLE) {
-                    ((ManagerActivityLollipop) mContext)
-                            .showGetLinkActivity(documents.get(0).getHandle());
-                }
+                ((ManagerActivityLollipop) mContext).showGetLinkActivity(documents);
                 break;
             case R.id.cab_menu_remove_link:
                 logDebug("Remove public link option");
@@ -140,6 +138,9 @@ class CuActionModeCallback implements ActionMode.Callback {
             return false;
         }
 
+        menu.findItem(R.id.cab_menu_share_link)
+                .setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
+
         CloudStorageOptionControlUtil.Control control =
                 new CloudStorageOptionControlUtil.Control();
 
@@ -155,6 +156,8 @@ class CuActionModeCallback implements ActionMode.Callback {
                 control.getLink().setVisible(true)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
+        } else if (allHaveOwnerAccess(selected)) {
+            control.getLink().setVisible(true).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 
         control.sendToChat().setVisible(true)
@@ -167,7 +170,7 @@ class CuActionModeCallback implements ActionMode.Callback {
 
         control.move().setVisible(true);
         control.copy().setVisible(true);
-        if (selected.size() > 1) {
+        if (selected.size() > 1 && !control.getLink().isVisible()) {
             control.move().setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 
