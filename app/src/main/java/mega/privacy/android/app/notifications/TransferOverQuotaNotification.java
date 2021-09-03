@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 
@@ -26,11 +27,11 @@ public class TransferOverQuotaNotification {
     private MegaApplication app;
     private NotificationManager notificationManager;
 
-    public TransferOverQuotaNotification() {
+    public TransferOverQuotaNotification(TransfersManagement transfersManagement) {
         app = MegaApplication.getInstance();
         this.notificationManager = (NotificationManager) app.getSystemService(NOTIFICATION_SERVICE);
 
-        MegaApplication.getTransfersManagement().setTransferOverQuotaBannerShown(true);
+        transfersManagement.setTransferOverQuotaBannerShown(true);
     }
 
     public void show() {

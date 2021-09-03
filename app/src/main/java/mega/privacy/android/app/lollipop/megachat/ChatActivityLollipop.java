@@ -32,7 +32,6 @@ import android.provider.MediaStore;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
@@ -183,8 +182,8 @@ import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isServiceRunning;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.isServiceRunning;
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;

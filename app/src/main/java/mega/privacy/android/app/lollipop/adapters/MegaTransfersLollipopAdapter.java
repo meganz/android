@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +26,7 @@ import java.util.List;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import nz.mega.sdk.MegaApiAndroid;
@@ -36,7 +36,6 @@ import nz.mega.sdk.MegaTransfer;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -44,7 +43,6 @@ import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getRoundedBitmap;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaTransfer.*;
-
 
 public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTransfersLollipopAdapter.ViewHolderTransfer> implements OnClickListener, RotatableAdapter {
 
@@ -60,11 +58,15 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
     private boolean multipleSelect;
     private SparseBooleanArray selectedItems;
 
-    public MegaTransfersLollipopAdapter(Context _context, ArrayList<MegaTransfer> _transfers, RecyclerView _listView, SelectModeInterface selectModeInterface) {
+    private TransfersManagement transfersManagement;
+
+    public MegaTransfersLollipopAdapter(Context _context, ArrayList<MegaTransfer> _transfers,
+                                        RecyclerView _listView, SelectModeInterface selectModeInterface, TransfersManagement transfersManagement) {
         this.context = _context;
         this.tL = _transfers;
         this.listFragment = _listView;
         this.selectModeInterface = selectModeInterface;
+        this.transfersManagement = transfersManagement;
 
         if (megaApi == null) {
             megaApi = MegaApplication.getInstance().getMegaApi();
@@ -259,7 +261,7 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
                 case STATE_COMPLETING:
                 case STATE_RETRYING:
                 case STATE_QUEUED:
-                    if ((transferType == TYPE_DOWNLOAD && isOnTransferOverQuota())
+                    if ((transferType == TYPE_DOWNLOAD && transfersManagement.isOnTransferOverQuota())
                             || (transferType == TYPE_UPLOAD && MegaApplication.getInstance().getStorageState() == MegaApiJava.STORAGE_STATE_RED)) {
                         holder.progressText.setTextColor(ContextCompat.getColor(context, R.color.orange_400_orange_300));
 

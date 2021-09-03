@@ -45,6 +45,7 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieTy
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 import java.util.ArrayList;
@@ -55,7 +56,6 @@ import dagger.hilt.android.HiltAndroidApp;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
-import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
@@ -133,7 +133,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	final String TAG = "MegaApplication";
 
 	private static PushNotificationSettingManagement pushNotificationSettingManagement;
-	private static TransfersManagement transfersManagement;
 	private static PasscodeManagement passcodeManagement;
 	private static ChatManagement chatManagement;
 
@@ -153,6 +152,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	SortOrderManagement sortOrderManagement;
 	@Inject
 	MyAccountInfo myAccountInfo;
+	@Inject
+	TransfersManagement transfersManagement;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
@@ -367,7 +368,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					new CUBackupInitializeChecker(megaApi).initCuSync();
 
 					//Login check resumed pending transfers
-					TransfersManagement.checkResumedPendingTransfers();
+					transfersManagement.checkResumedPendingTransfers();
 				}
 			}
 			else if(request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -765,12 +766,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
         scheduleCameraUploadJob(getApplicationContext());
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
-        transfersManagement = new TransfersManagement();
         passcodeManagement = new PasscodeManagement(0, true);
         chatManagement = new ChatManagement();
 
 		//Logout check resumed pending transfers
-		TransfersManagement.checkResumedPendingTransfers();
+		transfersManagement.checkResumedPendingTransfers();
 
 		int apiServerValue = getSharedPreferences(API_SERVER_PREFERENCES, MODE_PRIVATE)
 				.getInt(API_SERVER, PRODUCTION_SERVER_VALUE);
@@ -1269,7 +1269,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
 			logDebug("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
 
-			sortOrderManagement.resetDefaults();
+			resetDefaults();
 
 			try{
 				if (megaChatApi != null){
@@ -1828,6 +1828,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
+	private void resetDefaults() {
+    	sortOrderManagement.resetDefaults();
+		transfersManagement.resetDefaults();
+	}
+
 	public static boolean isShowRichLinkWarning() {
 		return showRichLinkWarning;
 	}
@@ -1984,10 +1989,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
     public static PushNotificationSettingManagement getPushNotificationSettingManagement() {
         return pushNotificationSettingManagement;
     }
-
-	public static TransfersManagement getTransfersManagement() {
-		return transfersManagement;
-	}
 
 	public static ChatManagement getChatManagement() {
 		return chatManagement;

@@ -21,9 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
@@ -89,7 +87,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -120,7 +117,6 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
@@ -145,9 +141,7 @@ import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.NodeSaver;
-import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
@@ -768,7 +762,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				showTransfersTransferOverQuotaWarning();
 			}
 
-			if (MegaApplication.getTransfersManagement().thereAreFailedTransfers() && drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == COMPLETED_TAB && !retryTransfers.isVisible()) {
+			if (transfersManagement.thereAreFailedTransfers() && drawerItem == DrawerItem.TRANSFERS && getTabItemTransfers() == COMPLETED_TAB && !retryTransfers.isVisible()) {
 				retryTransfers.setVisible(true);
 			}
 		}
@@ -1934,13 +1928,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			for (int i = 0; i < transferData.getNumDownloads(); i++) {
 				int tag = transferData.getDownloadTag(i);
 				transfersInProgress.add(tag);
-				MegaApplication.getTransfersManagement().checkIfTransferIsPaused(tag);
+				transfersManagement.checkIfTransferIsPaused(tag);
 			}
 
 			for (int i = 0; i < transferData.getNumUploads(); i++) {
 				int tag = transferData.getUploadTag(i);
 				transfersInProgress.add(transferData.getUploadTag(i));
-				MegaApplication.getTransfersManagement().checkIfTransferIsPaused(tag);
+				transfersManagement.checkIfTransferIsPaused(tag);
 			}
 		}
 
@@ -3499,7 +3493,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	protected void onPause() {
 		logDebug("onPause");
     	managerActivity = null;
-    	MegaApplication.getTransfersManagement().setIsOnTransfersSection(false);
+    	transfersManagement.setIsOnTransfersSection(false);
     	super.onPause();
     }
 
@@ -4286,7 +4280,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		boolean showCompleted = !dbH.getCompletedTransfers().isEmpty() && getTransfersWidget().getPendingTransfers() <= 0;
 
-		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
 		indexTransfers = transfersManagement.thereAreFailedTransfers() || showCompleted ? COMPLETED_TAB : PENDING_TAB;
 
 		if (viewPagerTransfers != null) {
@@ -4561,7 +4554,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			tFLol.checkSelectModeAfterChangeTabOrDrawerItem();
 		}
 
-		MegaApplication.getTransfersManagement().setIsOnTransfersSection(item == DrawerItem.TRANSFERS);
+		transfersManagement.setIsOnTransfersSection(item == DrawerItem.TRANSFERS);
 
     	switch (item){
 			case CLOUD_DRIVE:{
@@ -9718,7 +9711,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("One MegaRequest.TYPE_PAUSE_TRANSFER");
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
 				int transferTag = request.getTransferTag();
 
 				if (request.getFlag()) {
@@ -9736,7 +9728,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		} else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER) {
 			if (e.getErrorCode() == MegaError.API_OK){
-				MegaApplication.getTransfersManagement().removePausedTransfers(request.getTransferTag());
+				transfersManagement.removePausedTransfers(request.getTransferTag());
 				getTransfersWidget().update();
 				supportInvalidateOptionsMenu();
 			} else {
@@ -9754,7 +9746,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					cancelAllTransfersMenuItem.setVisible(false);
 				}
 
-				MegaApplication.getTransfersManagement().resetPausedTransfers();
+				transfersManagement.resetPausedTransfers();
 			}
 			else{
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_general_nodes), -1);
@@ -11586,8 +11578,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
      * Updates values of TransfersManagement object after the activity comes from background.
      */
 	private void checkTransferOverQuotaOnResume() {
-		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
 		transfersManagement.setIsOnTransfersSection(drawerItem == DrawerItem.TRANSFERS);
+
 		if (transfersManagement.isTransferOverQuotaNotificationShown()) {
 			transfersManagement.setTransferOverQuotaBannerShown(true);
 			transfersManagement.setTransferOverQuotaNotificationShown(false);

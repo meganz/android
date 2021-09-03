@@ -79,7 +79,7 @@ public class TransfersFragmentLollipop extends TransfersBaseFragment implements 
 
 		setTransfers();
 
-		adapter = new MegaTransfersLollipopAdapter(context, tL, listView, this);
+		adapter = new MegaTransfersLollipopAdapter(context, tL, listView, this, transfersManagement);
 
 		adapter.setMultipleSelect(false);
 		listView.setAdapter(adapter);

@@ -29,6 +29,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -38,6 +39,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -51,9 +53,11 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_FOLDER_DIALOG;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText;
@@ -68,9 +72,12 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtilsLollipop.*;
 
+import javax.inject.Inject;
+
 /*
  * Service to Upload files
  */
+@AndroidEntryPoint
 public class UploadService extends Service implements MegaTransferListenerInterface {
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
@@ -83,6 +90,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 	public static String EXTRA_UPLOAD_COUNT = "EXTRA_UPLOAD_COUNT";
     public static String EXTRA_UPLOAD_TXT = "EXTRA_UPLOAD_TXT";
+
+    @Inject
+    TransfersManagement transfersManagement;
 
 	private int errorCount = 0;
 	private int childUploadSucceeded = 0;
@@ -288,7 +298,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                             continue;
                         }
 
-                        MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
+                        transfersManagement.checkIfTransferIsPaused(transfer);
 
                         if (transfer.isFolderTransfer()) {
                             mapProgressFolderTransfers.put(transfer.getTag(), transfer);
@@ -826,7 +836,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
 		    if (!transfer.isFolderTransfer()) {
 		        AndroidCompletedTransfer completedTransfer = new AndroidCompletedTransfer(transfer, error);
-                addCompletedTransfer(completedTransfer);
+                addCompletedTransfer(completedTransfer, dbH);
 
                 String appData = transfer.getAppData();
 
@@ -836,7 +846,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
                 }
 
                 if (transfer.getState() == MegaTransfer.STATE_FAILED) {
-                    MegaApplication.getTransfersManagement().setFailedTransfers(true);
+                    transfersManagement.setFailedTransfers(true);
                 }
             }
 

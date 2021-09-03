@@ -69,10 +69,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static android.content.ContentResolver.QUERY_ARG_OFFSET;
@@ -1594,7 +1594,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         if (transfer.getState() == MegaTransfer.STATE_COMPLETED) {
-            addCompletedTransfer(new AndroidCompletedTransfer(transfer, e));
+            addCompletedTransfer(new AndroidCompletedTransfer(transfer, e), dbH);
         }
 
         if (e.getErrorCode() == MegaError.API_OK) {

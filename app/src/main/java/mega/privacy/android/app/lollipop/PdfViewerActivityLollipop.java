@@ -101,7 +101,6 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -471,7 +470,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                 }
             }
 
-            if (isOnTransferOverQuota()) {
+            if (transfersManagement.isOnTransferOverQuota()) {
                 showGeneralTransferOverQuotaWarning();
             }
         }
@@ -650,7 +649,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
                 megaApi.addTransferListener(this);
                 megaApi.addGlobalListener(this);
 
-                if (isOnTransferOverQuota()) {
+                if (transfersManagement.isOnTransferOverQuota()) {
                     showGeneralTransferOverQuotaWarning();
                 }
             }

@@ -11,7 +11,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.transferWidget.TransferWidget
-import mega.privacy.android.app.components.transferWidget.TransfersManagement
 import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_FOLDER_DIALOG
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
@@ -60,8 +59,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
             if (intent.action != BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE) {
                 return
             }
-
-            val transfersManagement = MegaApplication.getTransfersManagement()
 
             when (intent.getIntExtra(ACTION_TYPE, INVALID_ACTION)) {
                 GO_ONLINE -> transfersManagement.resetNetworkTimer()
@@ -142,7 +139,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         transfersWidgetLayout: RelativeLayout,
         context: Context?
     ) {
-        transfersWidget = TransferWidget(this, transfersWidgetLayout)
+        transfersWidget = TransferWidget(this, transfersWidgetLayout, transfersManagement)
 
         transfersWidgetLayout.findViewById<View>(R.id.transfers_button)
             .setOnClickListener {
@@ -153,9 +150,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
                     openTransfersSection()
                 }
 
-                if (TransfersManagement.isOnTransferOverQuota()) {
-                    MegaApplication.getTransfersManagement()
-                        .setHasNotToBeShowDueToTransferOverQuota(true)
+                if (transfersManagement.isOnTransferOverQuota()) {
+                    transfersManagement.setHasNotToBeShowDueToTransferOverQuota(true)
                 }
             }
     }

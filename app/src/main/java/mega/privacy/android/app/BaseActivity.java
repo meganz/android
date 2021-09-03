@@ -48,13 +48,12 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Pair;
 import mega.privacy.android.app.globalmanagement.MyAccountInfo;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
-import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PermissionsFragment;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.middlelayer.iab.BillingManager;
 import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
@@ -104,6 +103,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Inject
     MyAccountInfo myAccountInfo;
+    @Inject
+    public TransfersManagement transfersManagement;
 
     private BillingManager billingManager;
     private List<MegaSku> skuDetailsList;
@@ -524,7 +525,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 return;
             }
 
-            MegaApplication.getTransfersManagement().setResumeTransfersWarningHasAlreadyBeenShown(true);
+            transfersManagement.setResumeTransfersWarningHasAlreadyBeenShown(true);
             showResumeTransfersWarning(baseActivity);
         }
     };
@@ -1039,7 +1040,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
      * Shows a warning indicating transfer over quota occurred.
      */
     public void showGeneralTransferOverQuotaWarning() {
-        if (MegaApplication.getTransfersManagement().isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
+        if (transfersManagement.isOnTransfersSection() || transferGeneralOverQuotaWarning != null) return;
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
         View dialogView = this.getLayoutInflater().inflate(R.layout.transfer_overquota_layout, null);
@@ -1047,7 +1048,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 .setOnDismissListener(dialog -> {
                     isGeneralTransferOverQuotaWarningShown = false;
                     transferGeneralOverQuotaWarning = null;
-                    MegaApplication.getTransfersManagement().resetTransferOverQuotaTimestamp();
+                    transfersManagement.resetTransferOverQuotaTimestamp();
                 })
                 .setCancelable(false);
 
@@ -1055,7 +1056,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         transferGeneralOverQuotaWarning.setCanceledOnTouchOutside(false);
 
         TextView text = dialogView.findViewById(R.id.text_transfer_overquota);
-        final int stringResource = MegaApplication.getTransfersManagement().isCurrentTransferOverQuota() ? R.string.current_text_depleted_transfer_overquota : R.string.text_depleted_transfer_overquota;
+        final int stringResource = transfersManagement.isCurrentTransferOverQuota() ? R.string.current_text_depleted_transfer_overquota : R.string.text_depleted_transfer_overquota;
         text.setText(getString(stringResource, getHumanizedTime(megaApi.getBandwidthOverquotaDelay())));
 
         Button dismissButton = dialogView.findViewById(R.id.transfer_overquota_button_dissmiss);

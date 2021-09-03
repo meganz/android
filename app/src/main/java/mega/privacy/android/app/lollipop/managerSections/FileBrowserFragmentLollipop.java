@@ -65,6 +65,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -97,6 +98,8 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 	@Inject
 	SortOrderManagement sortOrderManagement;
+	@Inject
+	TransfersManagement transfersManagement;
 
 	Context context;
 	ActionBar aB;
@@ -450,7 +453,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 		if (recyclerView == null) return;
 
 		boolean visible = (adapter != null && adapter.isMultipleSelect())
-				|| MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()
+				|| transfersManagement.isTransferOverQuotaBannerShown()
 				|| (recyclerView.canScrollVertically(-1) && recyclerView.getVisibility() == View.VISIBLE);
 
 		((ManagerActivityLollipop) context).changeAppBarElevation(visible);
@@ -1260,7 +1263,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 * Sets the "transfer over quota" banner visibility.
 	 */
 	public void setTransferOverQuotaBannerVisibility() {
-    	if (MegaApplication.getTransfersManagement().isTransferOverQuotaBannerShown()) {
+    	if (transfersManagement.isTransferOverQuotaBannerShown()) {
     		transferOverQuotaBanner.setVisibility(View.VISIBLE);
     		transferOverQuotaBannerText.setText(context.getString(R.string.current_text_depleted_transfer_overquota, getHumanizedTime(megaApi.getBandwidthOverquotaDelay())));
 			createAndShowCountDownTimer(R.string.current_text_depleted_transfer_overquota, transferOverQuotaBanner, transferOverQuotaBannerText);
@@ -1273,7 +1276,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 	 * Hides the "transfer over quota" banner.
 	 */
 	private void hideTransferOverQuotaBanner() {
-		MegaApplication.getTransfersManagement().setTransferOverQuotaBannerShown(false);
+		transfersManagement.setTransferOverQuotaBannerShown(false);
 		setTransferOverQuotaBannerVisibility();
 	}
 }

@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
@@ -19,11 +20,15 @@ import nz.mega.sdk.MegaApiAndroid;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static nz.mega.sdk.MegaTransfer.*;
 
+import javax.inject.Inject;
+
 public class TransferWidget {
-    static final int NO_TYPE = -1;
+
+    public static final int NO_TYPE = -1;
+
+    private TransfersManagement transfersManagement;
 
     private Context context;
     private MegaApiAndroid megaApi;
@@ -33,12 +38,14 @@ public class TransferWidget {
     private ProgressBar progressBar;
     private ImageView status;
 
-    public TransferWidget(Context context, RelativeLayout transfersWidget) {
+    @Inject
+    public TransferWidget(Context context, RelativeLayout transfersWidget, TransfersManagement transfersManagement) {
         this.context = context;
         megaApi = MegaApplication.getInstance().getMegaApi();
 
         this.transfersWidget = transfersWidget;
         this.transfersWidget.setVisibility(GONE);
+        this.transfersManagement = transfersManagement;
         button = transfersWidget.findViewById(R.id.transfers_button);
         progressBar = transfersWidget.findViewById(R.id.transfers_progress);
         status = transfersWidget.findViewById(R.id.transfers_status);
@@ -78,7 +85,7 @@ public class TransferWidget {
     public void update(int transferType) {
         if (context instanceof ManagerActivityLollipop) {
             if (((ManagerActivityLollipop) context).getDrawerItem() == ManagerActivityLollipop.DrawerItem.TRANSFERS) {
-                MegaApplication.getTransfersManagement().setFailedTransfers(false);
+                transfersManagement.setFailedTransfers(false);
             }
 
             if (!isOnFileManagementManagerSection()) {
@@ -86,8 +93,6 @@ public class TransferWidget {
                 return;
             }
         }
-
-        TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
 
         if (getPendingTransfers() > 0 && !transfersManagement.shouldShowNetWorkWarning()) {
             setProgress(getProgress(), transferType);
@@ -120,9 +125,9 @@ public class TransferWidget {
      * Updates the state of the widget.
      */
     public void updateState() {
-        if (MegaApplication.getTransfersManagement().areTransfersPaused()) {
+        if (transfersManagement.areTransfersPaused()) {
             setPausedTransfers();
-        } else if (isOnTransferOverQuota() && megaApi.getNumPendingUploads() <= 0){
+        } else if (transfersManagement.isOnTransferOverQuota() && megaApi.getNumPendingUploads() <= 0){
             setOverQuotaTransfers();
         } else {
             setProgressTransfers();
@@ -134,9 +139,9 @@ public class TransferWidget {
      * If some transfer failed, a warning icon indicates it.
      */
     private void setProgressTransfers() {
-        if (MegaApplication.getTransfersManagement().thereAreFailedTransfers()) {
+        if (transfersManagement.thereAreFailedTransfers()) {
             updateStatus(getDrawable(R.drawable.ic_transfers_error));
-        } else if (isOnTransferOverQuota()) {
+        } else if (transfersManagement.isOnTransferOverQuota()) {
             updateStatus(getDrawable(R.drawable.ic_transfers_overquota));
         } else if (status.getVisibility() != GONE){
             status.setVisibility(GONE);
@@ -149,7 +154,7 @@ public class TransferWidget {
      * Sets the state of the widget as paused.
      */
     private void setPausedTransfers() {
-        if (isOnTransferOverQuota()) return;
+        if (transfersManagement.isOnTransferOverQuota()) return;
 
         progressBar.setProgressDrawable(getDrawable(R.drawable.thin_circular_progress_bar));
         updateStatus(getDrawable(R.drawable.ic_transfers_paused));
@@ -167,7 +172,7 @@ public class TransferWidget {
      * Sets the state of the widget as failed.
      */
     private void setFailedTransfers() {
-        if (isOnTransferOverQuota()) return;
+        if (transfersManagement.isOnTransferOverQuota()) return;
 
         if (transfersWidget.getVisibility() != VISIBLE) {
             transfersWidget.setVisibility(VISIBLE);
@@ -184,7 +189,7 @@ public class TransferWidget {
      * @param progress  the progress of the transfers
      */
     private void setProgress(int progress) {
-        if (MegaApplication.getTransfersManagement().hasNotToBeShowDueToTransferOverQuota()) return;
+        if (transfersManagement.hasNotToBeShowDueToTransferOverQuota()) return;
 
         if (transfersWidget.getVisibility() != VISIBLE) {
             transfersWidget.setVisibility(VISIBLE);

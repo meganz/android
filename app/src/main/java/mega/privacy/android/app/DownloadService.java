@@ -10,7 +10,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -28,22 +27,21 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import android.widget.RemoteViews;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -70,9 +68,11 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_FOLDER_DIALOG;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -88,9 +88,12 @@ import static mega.privacy.android.app.utils.Util.*;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+import javax.inject.Inject;
+
 /*
  * Background service to download files
  */
+@AndroidEntryPoint
 public class DownloadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
 
 	// Action to stop download
@@ -108,6 +111,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static final String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static final String EXTRA_OPEN_FILE = "OPEN_FILE";
 	public static final String EXTRA_CONTENT_URI = "CONTENT_URI";
+
+	@Inject
+	TransfersManagement transfersManagement;
 
 	private static int errorEBloqued = 0;
 	private int errorCount = 0;
@@ -318,7 +324,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 
 				if (!isVoiceClipType(transfer.getAppData())) {
-					MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
+					transfersManagement.checkIfTransferIsPaused(transfer);
 					transfersCount++;
 				}
 			}
@@ -501,7 +507,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				currentDocument = megaApiFolder.authorizeNode(currentDocument);
 			}
 
-			if (TransfersManagement.isOnTransferOverQuota()) {
+			if (transfersManagement.isOnTransferOverQuota()) {
 				checkTransferOverQuota(false);
 			}
 
@@ -1391,12 +1397,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						completedTransfer.setPath(targetPath);
 					}
 
-					addCompletedTransfer(completedTransfer);
+					addCompletedTransfer(completedTransfer, dbH);
 				}
 
 				launchTransferUpdateIntent(MegaTransfer.TYPE_DOWNLOAD);
 				if (transfer.getState() == MegaTransfer.STATE_FAILED) {
-					MegaApplication.getTransfersManagement().setFailedTransfers(true);
+					transfersManagement.setFailedTransfers(true);
 				}
 
 				if (!isVoiceClip) {
@@ -1609,8 +1615,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				updateProgressNotification();
 			}
 
-			if (!TransfersManagement.isOnTransferOverQuota() && MegaApplication.getTransfersManagement().hasNotToBeShowDueToTransferOverQuota()) {
-				MegaApplication.getTransfersManagement().setHasNotToBeShowDueToTransferOverQuota(false);
+			if (!transfersManagement.isOnTransferOverQuota() && transfersManagement.hasNotToBeShowDueToTransferOverQuota()) {
+				transfersManagement.setHasNotToBeShowDueToTransferOverQuota(false);
 			}
 		}
 	}
@@ -1647,8 +1653,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	 * @param isCurrentOverQuota	true if the overquota is currently received, false otherwise
 	 */
 	private void checkTransferOverQuota(boolean isCurrentOverQuota) {
-		TransfersManagement transfersManagement = MegaApplication.getTransfersManagement();
-
 		if (app.isActivityVisible()) {
 			if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
 				transfersManagement.setCurrentTransferOverQuota(isCurrentOverQuota);
@@ -1660,7 +1664,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			isForeground = false;
 			stopForeground(true);
 			mNotificationManager.cancel(NOTIFICATION_DOWNLOAD);
-			new TransferOverQuotaNotification().show();
+			new TransferOverQuotaNotification(transfersManagement).show();
 		}
 	}
 

@@ -32,12 +32,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.VideoDownsampling;
+import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -57,15 +59,14 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.addCompletedTransfer;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.createInitialServiceNotification;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_CHAT_TRANSFER_START;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RETRY_PENDING_MESSAGE;
 import static mega.privacy.android.app.constants.BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD;
 import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_MESSAGE_ID;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
+import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -78,8 +79,13 @@ import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.isOnMobileData;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
 
+@AndroidEntryPoint
 public class ChatUploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface, MegaChatRequestListenerInterface {
+
+	@Inject
+	TransfersManagement transfersManagement;
 
 	static final float DOWNSCALE_IMAGES_PX = 2000000f;
 
@@ -288,7 +294,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					if (isVoiceClip(data)) {
 						voiceClipsInProgress++;
 					} else {
-						MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
+						transfersManagement.checkIfTransferIsPaused(transfer);
 					}
 				}
 			}
@@ -301,7 +307,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 				stopForeground();
 			}
 
-			launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+			transfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 			return;
 		} else if (ACTION_CHECK_COMPRESSING_MESSAGE.equals(intent.getAction())) {
 			checkCompressingMessage(intent);
@@ -514,7 +520,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-				&& !MegaApplication.getTransfersManagement().isResumeTransfersWarningHasAlreadyBeenShown()) {
+				&& !transfersManagement.isResumeTransfersWarningHasAlreadyBeenShown()) {
 			sendBroadcast(new Intent(BROADCAST_ACTION_RESUME_TRANSFERS));
 		}
 	}
@@ -605,7 +611,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 		}
 
 		logDebug("Stopping service!!");
-		MegaApplication.getTransfersManagement().setResumeTransfersWarningHasAlreadyBeenShown(false);
+		transfersManagement.setResumeTransfersWarningHasAlreadyBeenShown(false);
 		stopForeground();
 		logDebug("After stopSelf");
 
@@ -862,7 +868,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			if(appData==null) return;
 
 			if(appData.contains(APP_DATA_CHAT)){
-				launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+				transfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 				logDebug("This is a chat upload: " + appData);
 				if(!isVoiceClip(appData)) {
 					transfersCount++;
@@ -891,7 +897,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 
 		if(transfer.getType()==MegaTransfer.TYPE_UPLOAD) {
-			launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+			transfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 			logDebug("onTransferUpdate: " + transfer.getNodeHandle());
 
 			String appData = transfer.getAppData();
@@ -916,7 +922,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						return;
 					}
 
-					launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+					transfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
 					if(isOverquota!=0){
 						logWarning("After overquota error");
@@ -985,9 +991,9 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					totalUploadsCompleted++;
 				}
 
-				addCompletedTransfer(new AndroidCompletedTransfer(transfer, error));
+				addCompletedTransfer(new AndroidCompletedTransfer(transfer, error), dbH);
 				mapProgressTransfers.put(transfer.getTag(), transfer);
-				launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
+				transfersManagement.launchTransferUpdateIntent(MegaTransfer.TYPE_UPLOAD);
 
 				if (canceled) {
 					logWarning("Upload cancelled: " + transfer.getNodeHandle());
