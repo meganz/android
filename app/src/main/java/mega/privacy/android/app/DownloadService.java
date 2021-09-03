@@ -520,6 +520,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     String data = isVoiceClipType(type) ? APP_DATA_VOICE_CLIP : "";
                     megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data);
                 }
+			} else if (currentDocument.isFolder()) {
+				if (!isTextEmpty(appData)) {
+					megaApi.startDownloadWithDataAndCancellation(currentDocument, currentDir.getAbsolutePath() + "/", appData, transfersManagement.createCancelTransferToken());
+				} else {
+					megaApi.startDownloadWithCancellation(currentDocument, currentDir.getAbsolutePath() + "/", transfersManagement.createCancelTransferToken());
+				}
 			} else if (!isTextEmpty(appData)) {
 				megaApi.startDownloadWithData(currentDocument, currentDir.getAbsolutePath() + "/", appData);
 			} else {
@@ -1749,9 +1755,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (currentDir.isDirectory()) {
 				logDebug("To downloadPublic(dir)");
 				if (!isTextEmpty(appData)) {
-					megaApi.startDownloadWithData(node, currentDir.getAbsolutePath() + "/", appData);
+					megaApi.startDownloadWithDataAndCancellation(node, currentDir.getAbsolutePath() + "/", appData, transfersManagement.createCancelTransferToken());
 				} else {
-					megaApi.startDownload(node, currentDir.getAbsolutePath() + "/");
+					megaApi.startDownloadWithCancellation(node, currentDir.getAbsolutePath() + "/", transfersManagement.createCancelTransferToken());
 				}
 			}
 		}

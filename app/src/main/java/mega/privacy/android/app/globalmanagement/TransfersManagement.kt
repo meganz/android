@@ -24,6 +24,7 @@ import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD
 import nz.mega.sdk.MegaTransfer.TYPE_UPLOAD
@@ -85,7 +86,10 @@ class TransfersManagement @Inject constructor(
          * @param dbH               DatabaseHandle to add the transfer.
          */
         @JvmStatic
-        fun addCompletedTransfer(completedTransfer: AndroidCompletedTransfer, dbH: DatabaseHandler) {
+        fun addCompletedTransfer(
+            completedTransfer: AndroidCompletedTransfer,
+            dbH: DatabaseHandler
+        ) {
             val id = dbH.setCompletedTransfer(completedTransfer)
             completedTransfer.id = id
 
@@ -131,7 +135,7 @@ class TransfersManagement @Inject constructor(
                     setAutoCancel(true)
                 }
 
-                mBuilder.build()
+                mBuilderCompat.build()
             } else {
                 mBuilder.apply {
                     setSmallIcon(R.drawable.ic_stat_notify)
@@ -158,6 +162,8 @@ class TransfersManagement @Inject constructor(
 
     private val pausedTransfers = ArrayList<String>()
 
+    private var cancelTransferToken: MegaCancelToken? = null
+
     init {
         resetTransferOverQuotaTimestamp()
     }
@@ -174,6 +180,7 @@ class TransfersManagement @Inject constructor(
         resumeTransfersWarningHasAlreadyBeenShown = false
         shouldShowNetworkWarning = false
         pausedTransfers.clear()
+        cancelTransferToken = null
     }
 
     /**
@@ -381,14 +388,31 @@ class TransfersManagement @Inject constructor(
     }
 
     /**
+     * Creates a cancel token to cancel a folder transfer.
+     *
+     * @return The created cancel token.
+     */
+    fun createCancelTransferToken(): MegaCancelToken {
+        val cancelToken = MegaCancelToken.createInstance()
+        cancelTransferToken = cancelToken
+        return cancelToken
+    }
+
+    /**
+     * Cancels a folder transfer if exists.
+     */
+    fun cancelFolderTransfer() {
+        cancelTransferToken?.cancel()
+    }
+
+    /**
      * Checks if the transfer over quota has occurred at this moment
      * or it occurred in other past moment.
      *
      * @return  True if the transfer over quota has occurred at this moment, false otherwise.
      */
-    fun isCurrentTransferOverQuota(): Boolean {
-        return isCurrentTransferOverQuota
-    }
+    fun isCurrentTransferOverQuota(): Boolean =
+        isCurrentTransferOverQuota
 
     fun setCurrentTransferOverQuota(currentTransferOverQuota: Boolean) {
         isCurrentTransferOverQuota = currentTransferOverQuota
@@ -398,47 +422,37 @@ class TransfersManagement @Inject constructor(
         this.isOnTransfersSection = isOnTransfersSection
     }
 
-    fun isOnTransfersSection(): Boolean {
-        return isOnTransfersSection
-    }
+    fun isOnTransfersSection(): Boolean = isOnTransfersSection
 
     fun setFailedTransfers(failedTransfers: Boolean) {
         this.failedTransfers = failedTransfers
     }
 
-    fun thereAreFailedTransfers(): Boolean {
-        return failedTransfers
-    }
+    fun thereAreFailedTransfers(): Boolean = failedTransfers
 
     fun setTransferOverQuotaNotificationShown(transferOverQuotaNotificationShown: Boolean) {
         this.transferOverQuotaNotificationShown = transferOverQuotaNotificationShown
     }
 
-    fun isTransferOverQuotaNotificationShown(): Boolean {
-        return transferOverQuotaNotificationShown
-    }
+    fun isTransferOverQuotaNotificationShown(): Boolean = transferOverQuotaNotificationShown
 
     fun setTransferOverQuotaBannerShown(transferOverQuotaBannerShown: Boolean) {
         isTransferOverQuotaBannerShown = transferOverQuotaBannerShown
     }
 
-    fun isTransferOverQuotaBannerShown(): Boolean {
-        return isTransferOverQuotaBannerShown
-    }
+    fun isTransferOverQuotaBannerShown(): Boolean =
+        isTransferOverQuotaBannerShown
 
     fun setResumeTransfersWarningHasAlreadyBeenShown(resumeTransfersWarningHasAlreadyBeenShown: Boolean) {
         this.resumeTransfersWarningHasAlreadyBeenShown = resumeTransfersWarningHasAlreadyBeenShown
     }
 
-    fun isResumeTransfersWarningHasAlreadyBeenShown(): Boolean {
-        return resumeTransfersWarningHasAlreadyBeenShown
-    }
+    fun isResumeTransfersWarningHasAlreadyBeenShown(): Boolean =
+        resumeTransfersWarningHasAlreadyBeenShown
 
     fun setShouldShowNetworkWarning(shouldShowNetworkWarning: Boolean) {
         this.shouldShowNetworkWarning = shouldShowNetworkWarning
     }
 
-    fun shouldShowNetWorkWarning(): Boolean {
-        return shouldShowNetworkWarning
-    }
+    fun shouldShowNetWorkWarning(): Boolean = shouldShowNetworkWarning
 }

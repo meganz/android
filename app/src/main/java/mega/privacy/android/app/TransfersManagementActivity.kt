@@ -211,7 +211,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
                 .setPositiveButton(
                     StringResourcesUtils.getString(R.string.option_cancel_transfer)
                 ) { _, _ ->
-                    megaApi.cancelTransfer(transfer)
+                    transfersManagement.cancelFolderTransfer()
                 }
                 .create()
                 .apply {

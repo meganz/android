@@ -376,11 +376,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         } else if (file.isDirectory()) {
             // Folder upload
             totalFolderUploads++;
-            if (nameInMEGA != null) {
-                megaApi.startUpload(file.getAbsolutePath(), parentNode, nameInMEGA);
-            } else {
-                megaApi.startUpload(file.getAbsolutePath(), parentNode);
-            }
+            megaApi.startUploadWithCancellation(file.getAbsolutePath(), parentNode, transfersManagement.createCancelTransferToken());
         } else {
             totalFileUploads++;
 
