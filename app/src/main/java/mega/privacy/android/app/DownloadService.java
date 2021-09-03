@@ -69,7 +69,6 @@ import nz.mega.sdk.MegaTransferData;
 import nz.mega.sdk.MegaTransferListenerInterface;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_FOLDER_DIALOG;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.createInitialServiceNotification;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
@@ -85,8 +84,6 @@ import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetPath;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
-
-import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import javax.inject.Inject;
 
@@ -1613,9 +1610,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if(isVoiceClipType(transfer.getAppData())) return;
 
 			if (transfer.isFolderTransfer()) {
-				if (shouldUpdateScanningFolderDialog(transfer)) {
-					LiveEventBus.get(EVENT_SHOW_SCANNING_FOLDER_DIALOG, MegaTransfer.class).post(transfer);
-				}
+				transfersManagement.checkFolderTransfer(transfer);
 			} else {
 				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
 				updateProgressNotification();

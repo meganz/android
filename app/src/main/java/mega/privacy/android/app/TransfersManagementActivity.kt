@@ -13,6 +13,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.transferWidget.TransferWidget
 import mega.privacy.android.app.constants.BroadcastConstants.*
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_FOLDER_DIALOG
+import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.shouldUpdateScanningFolderDialog
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB
@@ -29,21 +30,6 @@ open class TransfersManagementActivity : PasscodeActivity() {
     companion object {
         private const val IS_SCANNING_FOLDER_SHOWN = "IS_SCANNING_FOLDER_SHOWN"
         private const val SCANNING_FOLDER_TAG = "SCANNING_FOLDER_TAG"
-
-        /**
-         * Checks if should update the scanning folder dialog in case the folder transfer stage
-         * is STAGE_SCAN, STAGE_CREATE_TREE, STAGE_GEN_TRANSFERS, STAGE_PROCESS_TRANSFER_QUEUE or
-         * STAGE_TRANSFERRING_FILES.
-         *
-         * @return True if should update it, false otherwise.
-         */
-        @JvmStatic
-        fun shouldUpdateScanningFolderDialog(transfer: MegaTransfer): Boolean =
-            transfer.stage.toInt() == STAGE_SCAN
-                    || transfer.stage.toInt() == STAGE_CREATE_TREE
-                    || transfer.stage.toInt() == STAGE_GEN_TRANSFERS
-                    || transfer.stage.toInt() == STAGE_PROCESS_TRANSFER_QUEUE
-                    || transfer.stage.toInt() == STAGE_TRANSFERRING_FILES
     }
 
     var transfersWidget: TransferWidget? = null

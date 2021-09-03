@@ -12,9 +12,11 @@ import android.os.Handler
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getColor
+import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.*
 import mega.privacy.android.app.components.transferWidget.TransferWidget.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.*
+import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_FOLDER_DIALOG
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService
 import mega.privacy.android.app.utils.Constants
@@ -146,6 +148,21 @@ class TransfersManagement @Inject constructor(
 
                 mBuilder.build()
             }
+
+        /**
+         * Checks if should update the scanning folder dialog in case the folder transfer stage
+         * is STAGE_SCAN, STAGE_CREATE_TREE, STAGE_GEN_TRANSFERS, STAGE_PROCESS_TRANSFER_QUEUE or
+         * STAGE_TRANSFERRING_FILES.
+         *
+         * @return True if should update it, false otherwise.
+         */
+        @JvmStatic
+        fun shouldUpdateScanningFolderDialog(transfer: MegaTransfer): Boolean =
+            transfer.stage.toInt() == MegaTransfer.STAGE_SCAN
+                    || transfer.stage.toInt() == MegaTransfer.STAGE_CREATE_TREE
+                    || transfer.stage.toInt() == MegaTransfer.STAGE_GEN_TRANSFERS
+                    || transfer.stage.toInt() == MegaTransfer.STAGE_PROCESS_TRANSFER_QUEUE
+                    || transfer.stage.toInt() == MegaTransfer.STAGE_TRANSFERRING_FILES
     }
 
     private var networkTimer: CountDownTimer? = null
@@ -163,6 +180,7 @@ class TransfersManagement @Inject constructor(
     private val pausedTransfers = ArrayList<String>()
 
     private var cancelTransferToken: MegaCancelToken? = null
+    private var scanningFolderTransfer: Pair<Int, Long>? = null
 
     init {
         resetTransferOverQuotaTimestamp()
@@ -181,6 +199,7 @@ class TransfersManagement @Inject constructor(
         shouldShowNetworkWarning = false
         pausedTransfers.clear()
         cancelTransferToken = null
+        scanningFolderTransfer = null
     }
 
     /**
@@ -410,6 +429,20 @@ class TransfersManagement @Inject constructor(
      */
     fun resetCancelTransferToken() {
         cancelTransferToken = null
+    }
+
+    fun checkFolderTransfer(transfer: MegaTransfer) {
+        if (scanningFolderTransfer?.first == transfer.tag
+            && scanningFolderTransfer?.second == transfer.stage) {
+            return
+        }
+
+        scanningFolderTransfer = Pair(transfer.tag, transfer.stage)
+
+        if (shouldUpdateScanningFolderDialog(transfer)) {
+            LiveEventBus.get(EVENT_SHOW_SCANNING_FOLDER_DIALOG, MegaTransfer::class.java)
+                .post(transfer)
+        }
     }
 
     /**
