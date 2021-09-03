@@ -155,8 +155,9 @@
     <!-- For fast scroller -->
     <color name="scroll_bubble">#90727272</color>
 
-    <color name="scroll_handle">#90d90007</color>
+    <color name="scroll_handle">@color/grey_010</color>
 
+    <color name="scroll_bubble_text_color">@color/grey_alpha_050</color>
     <!-- ======================== Color pair: light_dark ================== -->
 
     <color name="black_white">@color/black</color>

@@ -42,13 +42,13 @@
         <TextView
             android:id="@+id/sort_by_largest_size"
             style="@style/BottomSheetItem"
-            android:text="@string/sort_by_largest_size"
+            android:text="@string/sortby_size_largest_first"
             app:drawableStartCompat="@drawable/ic_sort_largest" />
 
         <TextView
             android:id="@+id/sort_by_smallest_size"
             style="@style/BottomSheetItem"
-            android:text="@string/sort_by_smallest_size"
+            android:text="@string/sortby_size_smallest_first"
             app:drawableStartCompat="@drawable/ic_sort_smallest" />
 
         <View
@@ -58,13 +58,13 @@
         <TextView
             android:id="@+id/sort_by_newest_date"
             style="@style/BottomSheetItem"
-            android:text="@string/sort_by_newest_date"
+            android:text="@string/sortby_date_newest"
             app:drawableStartCompat="@drawable/ic_sort_newest" />
 
         <TextView
             android:id="@+id/sort_by_oldest_date"
             style="@style/BottomSheetItem"
-            android:text="@string/sort_by_oldest_date"
+            android:text="@string/sortby_date_oldest"
             app:drawableStartCompat="@drawable/ic_sort_oldest" />
 
         <View

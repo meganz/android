@@ -746,7 +746,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
-        passcodeManagement = new PasscodeManagement(null, 0, true);
+        passcodeManagement = new PasscodeManagement(0, true);
         chatManagement = new ChatManagement();
 
 		//Logout check resumed pending transfers
@@ -977,6 +977,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	 * Setup the MegaApiAndroid instance for folder link.
 	 */
 	private void setupMegaApiFolder() {
+		// If logged in set the account auth token
+		if (megaApi.isLoggedIn() != 0) {
+			logDebug("Logged in. Setting account auth token for folder links.");
+			megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
+		}
+
 		megaApiFolder.retrySSLerrors(true);
 
 		megaApiFolder.setDownloadMethod(MegaApiJava.TRANSFER_METHOD_AUTO_ALTERNATIVE);

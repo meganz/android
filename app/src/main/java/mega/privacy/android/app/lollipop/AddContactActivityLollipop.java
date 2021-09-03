@@ -7,7 +7,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -26,7 +25,7 @@ import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.appcompat.app.ActionBar;
-import androidx.preference.PreferenceManager;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,6 +60,7 @@ import android.widget.TextView;
 
 import com.brandongogetap.stickyheaders.StickyLayoutManager;
 import com.brandongogetap.stickyheaders.exposed.StickyHeaderHandler;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -269,6 +269,42 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
     private boolean isHintShowing;
 
     private HighLightHintHelper highLightHintHelper;
+
+    private final Observer<Boolean> fabChangeObserver  = isShow -> {
+        if(isShow){
+            showFabButton();
+        } else {
+            hideFabButton();
+        }
+    };
+
+    /**
+     * Shows the fabButton
+     */
+    private void showFabButton() {
+        setSendInvitationVisibility();
+    }
+
+    /**
+     * Hides the fabButton
+     */
+    private void hideFabButton() {
+        if (fabButton != null){
+            fabButton.hide();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).removeObserver(fabChangeObserver);
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
+    }
 
     @Override
     public List<ShareContactInfo> getAdapterData() {
@@ -3489,7 +3525,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                 fastScroller.setVisibility(View.GONE);
             }
             else{
-                if(adapterMEGA.getItemCount() < 20){
+                if(adapterMEGA.getItemCount() < MIN_ITEMS_SCROLLBAR_CONTACT){
                     fastScroller.setVisibility(View.GONE);
                 }
                 else{
@@ -3502,7 +3538,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                 fastScroller.setVisibility(View.GONE);
             }
             else{
-                if(adapterPhone.getItemCount() < 20){
+                if(adapterPhone.getItemCount() < MIN_ITEMS_SCROLLBAR_CONTACT){
                     fastScroller.setVisibility(View.GONE);
                 }
                 else{
@@ -3515,7 +3551,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                 fastScroller.setVisibility(View.GONE);
             }
             else{
-                if(adapterShareHeader.getItemCount() < 20){
+                if(adapterShareHeader.getItemCount() < MIN_ITEMS_SCROLLBAR_CONTACT){
                     fastScroller.setVisibility(View.GONE);
                 }
                 else{

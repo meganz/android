@@ -83,7 +83,6 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
-import static mega.privacy.android.app.SearchNodesTask.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
@@ -199,6 +198,8 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 
 	private long parentNodeHandle = INVALID_HANDLE;
 
+	private boolean needStopHttpServer;
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null){
@@ -211,6 +212,11 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		nodeSaver.destroy();
 
 		dragToExit.showPreviousHiddenThumbnail();
+
+		if (needStopHttpServer) {
+			MegaApiAndroid api = isFolderLink() ? megaApiFolder : megaApi;
+			api.httpServerStop();
+		}
 
 		super.onDestroy();
 	}
@@ -229,7 +235,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 	boolean isDownloaded(MegaNode node) {
 		logDebug("Node Handle: " + node.getHandle());
 
-		return getLocalFile(this, node.getName(), node.getSize()) != null;
+		return getLocalFile(node) != null;
 	}
 
 	@Override
@@ -1098,6 +1104,25 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 	}
 
 	/**
+	 * Gets a list of the searched MegaNode from the handles list received as param.
+	 *
+	 * @param handles List of searched node handles.
+	 * @return The list of the searched MegaNodes.
+	 */
+	private ArrayList<MegaNode> getSearchedNodes(ArrayList<String> handles) {
+		ArrayList<MegaNode> nodes = new ArrayList<>();
+
+		for (String handle : handles) {
+			MegaNode node = megaApi.getNodeByHandle(Long.parseLong(handle));
+			if (node != null) {
+				nodes.add(node);
+			}
+		}
+
+		return nodes;
+	}
+
+	/**
 	 * Gets all the image handles to preview.
 	 *
 	 * @param nodes				 List of all nodes where search.
@@ -1603,6 +1628,11 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			startActivity(mediaIntent);
 			overridePendingTransition(0, 0);
 		}
+	}
+
+	@Override
+	public void onStartHttpServer() {
+		needStopHttpServer = true;
 	}
 
 	protected void hideActionBar(){

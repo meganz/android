@@ -1322,7 +1322,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 		input.setImeActionLabel(getString(R.string.add_nickname), EditorInfo.IME_ACTION_DONE);
 		if (alias == null) {
-			input.setHint(getString(R.string.add_nickname));
+			input.setHint(getString(R.string.nickname_title));
 			builder.setTitle(getString(R.string.add_nickname));
 		} else {
 			input.setHint(alias);

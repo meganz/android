@@ -630,7 +630,7 @@ class MediaPlayerServiceViewModel(
                 it.isFile && filterByNodeName(it.name)
             },
             {
-                val localPath = getLocalFile(context, it.name, it.size)
+                val localPath = getLocalFile(it)
                 if (isLocalFile(it, api, localPath)) {
                     mediaItemFromFile(File(localPath), it.handle.toString())
                 } else {

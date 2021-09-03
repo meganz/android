@@ -50,8 +50,7 @@ import java.net.URL
 class TextEditorViewModel @ViewModelInject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid,
-    private val dbH: DatabaseHandler
+    private val megaChatApi: MegaChatApiAndroid
 ) : BaseRxViewModel() {
 
     companion object {
@@ -173,6 +172,7 @@ class TextEditorViewModel @ViewModelInject constructor(
                     && getAdapterType() != FOLDER_LINK_ADAPTER
                     && getAdapterType() != ZIP_ADAPTER
                     && getAdapterType() != FROM_CHAT
+                    && getAdapterType() != VERSIONS_ADAPTER
                     && getAdapterType() != INVALID_VALUE
                     && getNodeAccess() >= MegaShare.ACCESS_READWRITE
     }
@@ -278,7 +278,7 @@ class TextEditorViewModel @ViewModelInject constructor(
     private fun initializeReadParams(mi: ActivityManager.MemoryInfo) {
         localFileUri =
             if (getAdapterType() == OFFLINE_ADAPTER || getAdapterType() == ZIP_ADAPTER) getFileUri().toString()
-            else getLocalFile(null, getNode()?.name, getNode()?.size ?: 0)
+            else getLocalFile(getNode())
 
         if (isTextEmpty(localFileUri)) {
             val api = textEditorData.value?.api ?: return

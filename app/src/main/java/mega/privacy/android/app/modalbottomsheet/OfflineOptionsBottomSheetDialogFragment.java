@@ -27,7 +27,6 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
-import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -131,6 +130,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
     }
 
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -140,7 +140,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                             .showConfirmationRemoveFromOffline(nodeOffline,
                                     this::setStateBottomSheetBehaviorHidden);
                 }
-                return;
+                break;
             case R.id.option_open_with_layout:
                 openWith();
                 break;
