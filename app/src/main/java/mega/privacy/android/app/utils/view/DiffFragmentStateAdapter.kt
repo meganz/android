@@ -1,4 +1,4 @@
-package mega.privacy.android.app.image.adapter
+package mega.privacy.android.app.utils.view
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity

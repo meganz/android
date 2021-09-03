@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <mega.privacy.android.app.image.ui.ZoomableDraweeView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <mega.privacy.android.app.image.ui.ZoomableDraweeView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
         android:layout_margin="16dp"
-        tools:text="Test" />
+        tools:text="Image name" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progress"

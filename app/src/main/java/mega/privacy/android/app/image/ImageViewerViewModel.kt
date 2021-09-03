@@ -21,7 +21,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     private val images: MutableLiveData<List<ImageItem>> = MutableLiveData()
 
-    fun getImages(): LiveData<List<ImageItem>> = images
+    fun getImagesHandle(): LiveData<List<Long>> =
+        images.map { items -> items.map { it.handle } }
 
     fun getImage(nodeHandle: Long): LiveData<ImageItem?> =
         images.map { items -> items.firstOrNull { it.handle == nodeHandle } }

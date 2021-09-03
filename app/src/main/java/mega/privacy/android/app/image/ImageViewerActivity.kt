@@ -80,12 +80,8 @@ class ImageViewerActivity : BaseActivity() {
 
     private fun setupObservers() {
         viewModel.defaultPosition = nodePosition
-        viewModel.getImages().observe(this) { images ->
-            pagerAdapter.submitList(images)
+        viewModel.getImagesHandle().observe(this) { handles ->
+            pagerAdapter.submitList(handles)
         }
-    }
-
-    private fun onImageClick(nodeHandle: Long) {
-        //do something
     }
 }

@@ -57,7 +57,7 @@ class ImageViewerPageFragment : Fragment() {
         binding.image.apply {
             setZoomingEnabled(true)
             setIsLongpressEnabled(true)
-            setAllowTouchInterceptionWhileZoomed(true)
+            setAllowTouchInterceptionWhileZoomed(false)
             setTapListener(DoubleTapGestureListener(this))
 
             controller = Fresco.newDraweeControllerBuilder()
