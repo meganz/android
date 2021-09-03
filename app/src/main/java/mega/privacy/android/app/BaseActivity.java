@@ -1099,7 +1099,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     /**
      * Launches an intent to navigate to Upgrade Account screen.
      */
-    protected void navigateToUpgradeAccount() {
+    public void navigateToUpgradeAccount() {
         Intent intent = new Intent(this, ManagerActivityLollipop.class);
         intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
         android:text="@string/warning_scanning_folder"
-        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant3.Grey38White38"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.13sp.Grey38White38"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/scanning_progress" />
 

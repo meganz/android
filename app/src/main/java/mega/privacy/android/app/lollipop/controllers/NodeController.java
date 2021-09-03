@@ -12,7 +12,7 @@ import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.GetLinkActivity;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveVersionsListener;
@@ -89,7 +89,7 @@ public class NodeController {
         logDebug("copyNodes");
 
         if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -143,7 +143,7 @@ public class NodeController {
         logDebug("moveNodes");
 
         if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -282,8 +282,6 @@ public class NodeController {
         logDebug("exportLink");
         if (!isOnline(context)) {
             showSnackbar(context, getString(R.string.error_server_connection_problem));
-        } else if(context instanceof GetLinkActivity) {
-            megaApi.exportNode(document, new ExportListener(context));
         } else if(context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, ((MegaRequestListenerInterface) context));
         }
@@ -293,8 +291,6 @@ public class NodeController {
         logDebug("exportLinkTimestamp: " + timestamp);
         if (!isOnline(context)) {
             showSnackbar(context, getString(R.string.error_server_connection_problem));
-        } else if (context instanceof GetLinkActivity) {
-            megaApi.exportNode(document, timestamp, new ExportListener(context));
         } else if (context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, timestamp, ((MegaRequestListenerInterface) context));
         }
@@ -306,7 +302,7 @@ public class NodeController {
 
     public void removeLinks(ArrayList<MegaNode> nodes){
         if (!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -323,7 +319,7 @@ public class NodeController {
         //TODO shareMultipleFolders
 
         if (!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -594,7 +590,7 @@ public class NodeController {
 
     public void shareFolder(MegaNode node, ArrayList<String> selectedContacts, int permissions) {
         if (!isOnline(context)) {
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -610,7 +606,7 @@ public class NodeController {
     public void shareFolders(long[] nodeHandles, ArrayList<String> contactsData, int permissions){
 
         if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 

@@ -247,6 +247,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         menuInflater.inflate(R.menu.activity_text_file_editor, menu)
         this.menu = menu
 
+        menu?.findItem(R.id.action_get_link)?.title =
+            StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
+
         refreshMenuOptionsVisibility()
 
         return super.onCreateOptionsMenu(menu)

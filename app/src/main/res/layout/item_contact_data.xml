@@ -1,0 +1,93 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="?selectableItemBackground">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/img_thumbnail"
+        android:layout_width="@dimen/image_contact_size"
+        android:layout_height="@dimen/image_contact_size"
+        android:layout_marginStart="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:roundAsCircle="true"
+        tools:placeholderImage="@android:drawable/ic_menu_camera" />
+
+    <androidx.emoji.widget.EmojiAppCompatTextView
+        android:id="@+id/txt_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="20dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Mega.Body1"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toTopOf="@id/txt_last_seen"
+        app:layout_constraintEnd_toStartOf="@id/chip_new"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/img_thumbnail"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="@tools:sample/full_names" />
+
+    <ImageView
+        android:id="@+id/img_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@null"
+        android:src="@drawable/ic_contact_status"
+        app:layout_constraintBottom_toBottomOf="@id/txt_name"
+        app:layout_constraintStart_toEndOf="@id/txt_name"
+        app:layout_constraintTop_toTopOf="@id/txt_name" />
+
+    <mega.privacy.android.app.components.MarqueeTextView
+        android:id="@+id/txt_last_seen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_more"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/txt_name"
+        app:layout_constraintTop_toBottomOf="@id/txt_name"
+        tools:text="Last seen Yesterday at 11:45" />
+
+    <ImageButton
+        android:id="@+id/btn_more"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="16dp"
+        android:background="?selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_dots_vertical_grey"
+        app:layout_constraintBottom_toBottomOf="@id/txt_last_seen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/txt_name" />
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip_new"
+        style="@style/Widget.Mega.Chip.New"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/new_label_notification_item"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/btn_more"
+        app:layout_constraintTop_toTopOf="@id/btn_more"
+        tools:visibility="visible" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/grey_012_white_012"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/txt_last_seen" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

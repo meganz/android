@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!-- Label to show that an SDK operation has been complete successfully. -->
-  <string name="error_ok">Nessun errore</string>
-  <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
-  <string name="error_args">Argomento non valido</string>
-  <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-  <string name="error_access">Accesso negato</string>
-  <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
-  <string name="error_noent">La risorsa non esiste.</string>
-  <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
-  <string name="error_exist">La risorsa esiste già.</string>
-  <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-  <string name="error_unknown">Errore sconosciuto</string>
-  <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
-  <string name="error_toomany">Troppi utilizzi per questa risorsa.</string>
+    <!-- Label to show that an SDK operation has been complete successfully. -->
+    <string name="error_ok">Nessun errore</string>
+    <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
+    <string name="error_args">Argomento non valido</string>
+    <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
+    <string name="error_access">Accesso negato</string>
+    <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
+    <string name="error_noent">La risorsa non esiste.</string>
+    <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
+    <string name="error_exist">La risorsa esiste già.</string>
+    <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
+    <string name="error_unknown">Errore sconosciuto</string>
+    <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
+    <string name="error_toomany">Troppi utilizzi per questa risorsa.</string>
 </resources>

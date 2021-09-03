@@ -89,17 +89,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom">
 
-        <FrameLayout
-            android:id="@+id/ad_view_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <View
             android:id="@+id/separator_3"
             android:layout_width="match_parent"
             android:layout_height="1dip"
-            android:background="@color/grey_012_white_012"
-            android:layout_below="@id/ad_view_container"/>
+            android:background="@color/grey_012_white_012" />
 
         <LinearLayout
             android:layout_width="match_parent"

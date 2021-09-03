@@ -23,7 +23,7 @@
         android:id="@+id/action_get_link"
         android:icon="@drawable/link_ic_white"
         android:orderInCategory="100"
-        android:title="@string/context_get_link_menu"
+        android:title="@{@plurals/get_links(one)}"
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />

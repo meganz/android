@@ -77,7 +77,6 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.ThemeHelper;
-import mega.privacy.android.app.service.ads.AdsLibInitializer;
 
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
@@ -853,8 +852,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
-
-		AdsLibInitializer.INSTANCE.init(this);
 	}
 
 	public void askForFullAccountInfo(){
