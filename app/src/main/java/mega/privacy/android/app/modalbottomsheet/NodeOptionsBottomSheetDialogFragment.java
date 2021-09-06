@@ -29,6 +29,7 @@ import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
@@ -297,7 +298,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionLink.setText(R.string.edit_link_option);
                     optionRemoveLink.setVisibility(View.VISIBLE);
                 } else {
-                    optionLink.setText(R.string.context_get_link_menu);
+                    optionLink.setText(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
                     counterShares--;
                     optionRemoveLink.setVisibility(View.GONE);
                 }
@@ -397,7 +398,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     optionLink.setText(R.string.edit_link_option);
                     optionRemoveLink.setVisibility(View.VISIBLE);
                 } else {
-                    optionLink.setText(R.string.context_get_link_menu);
+                    optionLink.setText(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
                     counterShares--;
                     optionRemoveLink.setVisibility(View.GONE);
                 }
@@ -563,7 +564,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionLink.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
                     } else {
-                        optionLink.setText(R.string.context_get_link_menu);
+                        optionLink.setText(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
                         counterShares--;
                         optionRemoveLink.setVisibility(View.GONE);
                     }
@@ -623,7 +624,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionLink.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
                     } else {
-                        optionLink.setText(R.string.context_get_link_menu);
+                        optionLink.setText(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
                         counterShares--;
                         optionRemoveLink.setVisibility(View.GONE);
                     }
@@ -834,7 +835,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         optionLink.setText(R.string.edit_link_option);
                         optionRemoveLink.setVisibility(View.VISIBLE);
                     } else {
-                        optionLink.setText(R.string.context_get_link_menu);
+                        optionLink.setText(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
                         counterShares--;
                         optionRemoveLink.setVisibility(View.GONE);
                     }
@@ -908,7 +909,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         counterShares--;
                         optionLink.setVisibility(View.GONE);
                         nodeIconLayout.setVisibility(View.GONE);
-                        optionLink.setText(R.string.context_get_link_menu);
+                        optionLink.setText(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
                         counterShares--;
                         optionRemoveLink.setVisibility(View.GONE);
                         break;
@@ -923,7 +924,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                             optionLink.setText(R.string.edit_link_option);
                             optionRemoveLink.setVisibility(View.VISIBLE);
                         } else {
-                            optionLink.setText(R.string.context_get_link_menu);
+                            optionLink.setText(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
                             counterShares--;
                             optionRemoveLink.setVisibility(View.GONE);
                         }

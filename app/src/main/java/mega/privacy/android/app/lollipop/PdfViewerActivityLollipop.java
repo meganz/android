@@ -1011,6 +1011,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         MenuItem chatMenuItem = menu.findItem(R.id.pdf_viewer_chat);
         MenuItem propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties);
         MenuItem getlinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link);
+        getlinkMenuItem.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
         MenuItem renameMenuItem = menu.findItem(R.id.pdf_viewer_rename);
         MenuItem moveMenuItem = menu.findItem(R.id.pdf_viewer_move);
         MenuItem copyMenuItem = menu.findItem(R.id.pdf_viewer_copy);

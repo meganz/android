@@ -57,7 +57,7 @@
         android:id="@+id/get_link"
         android:icon="@drawable/link_ic_white"
         android:orderInCategory="115"
-        android:title="@string/context_get_link_menu"
+        android:title="@{@plurals/get_links(one)}"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 

@@ -291,6 +291,8 @@
     <string name="section_contacts">Contacts</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">Contacts [A](%1$d)[/A]</string>
+    <!-- Section name for the “Recently Added Contacts” section.Preferably one word. -->
+    <string name="section_recently_added">Recently Added</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
     <string name="sent_requests_empty">[B]No [/B][A]sent requests[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
@@ -406,8 +408,6 @@
     <string name="context_get_link">Share link</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">Delete link</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">Get Link</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Leave</string>
     <!-- Title alert before leaving a share. -->
@@ -2165,6 +2165,8 @@
     <string name="context_empty_offline">[B]No files [/B][A]Saved for Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]No [/B][A]Contacts[/A]</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]No[/A] [B]Conversations[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
@@ -3748,14 +3750,10 @@
     <string name="button_copy_key">Copy key</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Copy password</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">Link copied to the clipboard.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">Key copied to the clipboard.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Password copied to the clipboard.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">Link successfully sent.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">Link and key successfully sent.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -4026,4 +4024,27 @@
         <item quantity="one">1 connection</item>
         <item quantity="other">%1$d connections</item>
     </plurals>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Copy all</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Link successfully sent.</item>
+        <item quantity="other">Links successfully sent.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link copied to the clipboard.</item>
+        <item quantity="other">Links copied to the clipboard.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Get Link</item>
+        <item quantity="other">Get Links</item>
+    </plurals>
+    <!-- Section name for the “Contact Requests” section.Preferably one word. -->
+    <string name="section_requests">Requests</string>
+    <!-- Section name for the “Groups” section.Preferably one word. -->
+    <string name="section_groups">Groups</string>
 </resources>
