@@ -1,51 +1,51 @@
 <?xml version="1.0"?>
 <resources>
-  <!-- Screen title for cropping current scan (Document scanner) -->
-  <string name="scan_title_crop">裁剪</string>
-  <!-- Screen title for saving current scan (Document scanner) -->
-  <string name="scan_title_save_scan">保存扫描</string>
-  <!-- Label of the button to add a new page to the current document scan -->
-  <string name="scan_action_add">新增</string>
-  <!-- Action of a button to save something -->
-  <string name="scan_action_save">保存</string>
-  <!-- Action text to retake current scan picture (Document scanner) -->
-  <string name="scan_action_retake">重新扫描</string>
-  <!-- Document scanner file name -->
-  <string name="scan_file_name">文件名</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_file_type">文件类型</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_quality">画质</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_destination">位置</string>
-  <!-- Document scanner high quality option -->
-  <string name="scan_quality_high">高</string>
-  <!-- Document scanner medium quality option -->
-  <string name="scan_quality_medium">中</string>
-  <!-- Document scanner low quality option -->
-  <string name="scan_quality_low">低</string>
-  <!-- Title text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_title">放弃扫描？</string>
-  <!-- Body text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_body">当前扫描将会丢失</string>
-  <!-- Title text shown on document scanner dialog to discard scan all scans -->
-  <string name="scan_dialog_discard_all_title">放弃所有扫描？</string>
-  <!-- Body text shown on document scanner dialog to discard all scans -->
-  <string name="scan_dialog_discard_all_body">当前文件将会丢失</string>
-  <!-- Action text shown on document scanner dialog to discard scans -->
-  <string name="scan_dialog_discard_action">放弃</string>
-  <!-- Body text shown on document scanner dialog to delete current scan -->
-  <string name="scan_dialog_delete_body">删除当前扫描？</string>
-  <!-- Message shown when users deny camera permissions to scan documents -->
-  <string name="scan_requires_permission">“相机”需获取此权限才能扫描文件</string>
-  <!-- Error text for incorrect name -->
-  <string name="scan_incorrect_name">名称错误</string>
-  <!-- Error text for invalid characters -->
-  <string name="scan_invalid_characters">无效的字符</string>
-  <!-- Snackbar text for incorrect name -->
-  <string name="scan_snackbar_incorrect_name">请先更改您的文件名</string>
-  <!-- Dialog message showing file progress -->
-  <string name="scan_dialog_progress">正在准备%1$s。请稍等&#8230;&#8230;</string>
-  <!-- Error shown when the user writes a character not allowed -->
-  <string name="scan_snackbar_invalid_characters">不允许使用这些字符：” * / : &lt; &gt; ? \ |</string>
+    <!-- Screen title for cropping current scan (Document scanner) -->
+    <string name="scan_title_crop">裁剪</string>
+    <!-- Screen title for saving current scan (Document scanner) -->
+    <string name="scan_title_save_scan">保存扫描</string>
+    <!-- Label of the button to add a new page to the current document scan -->
+    <string name="scan_action_add">新增</string>
+    <!-- Action of a button to save something -->
+    <string name="scan_action_save">保存</string>
+    <!-- Action text to retake current scan picture (Document scanner) -->
+    <string name="scan_action_retake">重新扫描</string>
+    <!-- Document scanner file name -->
+    <string name="scan_file_name">文件名</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_file_type">文件类型</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_quality">画质</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_destination">位置</string>
+    <!-- Document scanner high quality option -->
+    <string name="scan_quality_high">高</string>
+    <!-- Document scanner medium quality option -->
+    <string name="scan_quality_medium">中</string>
+    <!-- Document scanner low quality option -->
+    <string name="scan_quality_low">低</string>
+    <!-- Title text shown on document scanner dialog to discard scan -->
+    <string name="scan_dialog_discard_title">放弃扫描？</string>
+    <!-- Body text shown on document scanner dialog to discard scan -->
+    <string name="scan_dialog_discard_body">当前扫描将会丢失</string>
+    <!-- Title text shown on document scanner dialog to discard scan all scans -->
+    <string name="scan_dialog_discard_all_title">放弃所有扫描？</string>
+    <!-- Body text shown on document scanner dialog to discard all scans -->
+    <string name="scan_dialog_discard_all_body">当前文件将会丢失</string>
+    <!-- Action text shown on document scanner dialog to discard scans -->
+    <string name="scan_dialog_discard_action">放弃</string>
+    <!-- Body text shown on document scanner dialog to delete current scan -->
+    <string name="scan_dialog_delete_body">删除当前扫描？</string>
+    <!-- Message shown when users deny camera permissions to scan documents -->
+    <string name="scan_requires_permission">“相机”需获取此权限才能扫描文件</string>
+    <!-- Error text for incorrect name -->
+    <string name="scan_incorrect_name">文件名无效</string>
+    <!-- Error text for invalid characters -->
+    <string name="scan_invalid_characters">无效的字符</string>
+    <!-- Snackbar text for incorrect name -->
+    <string name="scan_snackbar_incorrect_name">请更改您的文件名后继续</string>
+    <!-- Dialog message showing file progress -->
+    <string name="scan_dialog_progress">正在准备%1$s。请稍等&#8230;&#8230;</string>
+    <!-- Error shown when the user writes a character not allowed -->
+    <string name="scan_snackbar_invalid_characters">不允许使用这些字符：” * / : &lt; &gt; ? \ |</string>
 </resources>

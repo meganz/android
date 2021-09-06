@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/storage_transfer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:layout_marginStart="14dp"
+    android:layout_marginTop="12dp"
+    android:layout_marginEnd="14dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/background_storage_transfer"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    android:transitionName="start_container">
+
+    <RelativeLayout
+        android:id="@+id/storage_layout"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1">
+
+        <RelativeLayout
+            android:id="@+id/storage_progress_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="9dp">
+
+            <ProgressBar
+                android:id="@+id/storage_progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_centerVertical="true"
+                android:progressDrawable="@drawable/storage_transfer_circular_progress_bar" />
+
+            <TextView
+                android:id="@+id/storage_progress_percentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
+                tools:text="30%" />
+
+            <ImageView
+                android:id="@+id/business_storage_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="22dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="22dp"
+                android:src="@drawable/ic_business_storage"
+                tools:ignore="ContentDescription" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/storage_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_toEndOf="@+id/storage_progress_layout"
+            android:textAppearance="@style/TextAppearance.Mega.Caption.GreyWhite87"
+            tools:text="11GG/50GB" />
+
+        <TextView
+            android:id="@+id/storage_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/storage_progress"
+            android:layout_toEndOf="@+id/storage_progress_layout"
+            android:text="@string/label_storage_upgrade_account"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/transfer_layout"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <RelativeLayout
+            android:id="@+id/transfer_progress_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="9dp">
+
+            <ProgressBar
+                android:id="@+id/transfer_progress_bar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_centerVertical="true"
+                android:progressDrawable="@drawable/storage_transfer_circular_progress_bar" />
+
+            <TextView
+                android:id="@+id/transfer_progress_percentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="12.5dp"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Medium.Accent"
+                tools:text="30%" />
+
+            <ImageView
+                android:id="@+id/business_transfer_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="22dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="22dp"
+                android:src="@drawable/ic_business_transfers"
+                tools:ignore="ContentDescription" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/transfer_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_toEndOf="@+id/transfer_progress_layout"
+            android:textAppearance="@style/TextAppearance.Mega.Caption.GreyWhite87"
+            tools:text="11GG/50GB" />
+
+        <TextView
+            android:id="@+id/transfer_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/transfer_progress"
+            android:layout_toEndOf="@+id/transfer_progress_layout"
+            android:text="@string/transfer_label"
+            android:textAppearance="@style/TextAppearance.Mega.Subtitle2.GreyWhite87" />
+
+    </RelativeLayout>
+
+</LinearLayout>

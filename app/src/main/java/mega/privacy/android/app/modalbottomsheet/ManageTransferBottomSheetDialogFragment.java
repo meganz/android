@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.databinding.BottomSheetManageTransferBinding;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
 import nz.mega.sdk.MegaNode;
@@ -56,7 +57,8 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
     @Override
     public void setupDialog(Dialog dialog, int style) {
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_manage_transfer, null);
+        BottomSheetManageTransferBinding binding = BottomSheetManageTransferBinding.inflate(getLayoutInflater());
+        contentView = binding.getRoot();
         mainLinearLayout = contentView.findViewById(R.id.manage_transfer_bottom_sheet);
         items_layout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 

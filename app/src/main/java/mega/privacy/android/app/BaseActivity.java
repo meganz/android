@@ -1,6 +1,7 @@
 package mega.privacy.android.app;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,20 +9,22 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import androidx.core.app.ActivityCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.Observer;
 
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -36,18 +39,32 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+import kotlin.Pair;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.interfaces.PermissionRequester;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
+import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
+import mega.privacy.android.app.lollipop.PermissionsFragment;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.middlelayer.iab.BillingManager;
+import mega.privacy.android.app.middlelayer.iab.BillingUpdatesListener;
+import mega.privacy.android.app.middlelayer.iab.MegaPurchase;
+import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.psa.Psa;
-import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaWebBrowser;
+import mega.privacy.android.app.service.iab.BillingManagerImpl;
+import mega.privacy.android.app.service.iar.RatingHandlerImpl;
+import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -59,8 +76,10 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.NAME_USER_LOCKED;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.middlelayer.iab.BillingManager.RequestCode.REQ_CODE_BUY;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_IMCOMPATIBILITY_TYPE;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -70,14 +89,25 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester {
+import java.util.List;
+
+@AndroidEntryPoint
+public class BaseActivity extends AppCompatActivity implements ActivityLauncher, PermissionRequester,
+        BillingUpdatesListener {
 
     private static final String EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN";
     private static final String TRANSFER_OVER_QUOTA_WARNING_SHOWN = "TRANSFER_OVER_QUOTA_WARNING_SHOWN";
     private static final String RESUME_TRANSFERS_WARNING_SHOWN = "RESUME_TRANSFERS_WARNING_SHOWN";
+
+    @Inject
+    MyAccountInfo myAccountInfo;
+
+    private BillingManager billingManager;
+    private List<MegaSku> skuDetailsList;
 
     private BaseActivity baseActivity;
 
@@ -94,9 +124,9 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     private boolean delaySignalPresence = false;
 
     //Indicates if app is requesting the required permissions to enable the SDK logger
-    private boolean permissionLoggerSDK = false;
+    protected boolean permissionLoggerSDK = false;
     //Indicates if app is requesting the required permissions to enable the Karere logger
-    private boolean permissionLoggerKarere = false;
+    protected boolean permissionLoggerKarere = false;
 
     private boolean isGeneralTransferOverQuotaWarningShown;
     private AlertDialog transferGeneralOverQuotaWarning;
@@ -1036,7 +1066,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
         final boolean isLoggedIn = megaApi.isLoggedIn() != 0 && dbH.getCredentials() != null;
         if (isLoggedIn) {
-            boolean isFreeAccount = MegaApplication.getInstance().getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE;
+            boolean isFreeAccount = myAccountInfo.getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE;
             paymentButton.setText(getString(isFreeAccount ? R.string.my_account_upgrade_pro : R.string.plans_depleted_transfer_overquota));
         } else {
             paymentButton.setText(getString(R.string.login_text));
@@ -1070,7 +1100,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     /**
      * Launches an intent to navigate to Upgrade Account screen.
      */
-    protected void navigateToUpgradeAccount() {
+    public void navigateToUpgradeAccount() {
         Intent intent = new Intent(this, ManagerActivityLollipop.class);
         intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1082,20 +1112,30 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         logDebug("Request Code: " + requestCode);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_WRITE_STORAGE_FOR_LOGS) {
-            if (permissionLoggerKarere) {
-                permissionLoggerKarere = false;
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setStatusLoggerKarere(baseActivity, true);
-                } else {
-                    Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
-                }
-            } else if (permissionLoggerSDK) {
-                permissionLoggerSDK = false;
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setStatusLoggerSDK(baseActivity, true);
-                } else {
-                    Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
-                }
+            onRequestWriteStorageForLogs(grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED);
+        }
+    }
+
+    /**
+     * Method to enable logs if the required permission has been granted after request it
+     *
+     * @param permissionGranted Flag to indicate if the permission has been granted or not
+     */
+    protected void onRequestWriteStorageForLogs(boolean permissionGranted) {
+        if (permissionLoggerKarere) {
+            permissionLoggerKarere = false;
+            if (permissionGranted) {
+                setStatusLoggerKarere(baseActivity, true);
+            } else {
+                Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
+            }
+        } else if (permissionLoggerSDK) {
+            permissionLoggerSDK = false;
+            if (permissionGranted) {
+                setStatusLoggerSDK(baseActivity, true);
+            } else {
+                Util.showSnackbar(baseActivity, getString(R.string.logs_not_enabled_permissions));
             }
         }
     }
@@ -1186,6 +1226,139 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
 
     @Override
     public void askPermissions(@NotNull String[] permissions, int requestCode) {
-        ActivityCompat.requestPermissions(this, permissions, requestCode);
+        requestPermission(this, requestCode, permissions);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
+        logDebug("Request code: " + requestCode + ", Result code:" + resultCode);
+
+        switch (requestCode) {
+            case REQUEST_WRITE_STORAGE_FOR_LOGS:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    onRequestWriteStorageForLogs(Environment.isExternalStorageManager());
+                }
+                break;
+
+            case REQUEST_WRITE_STORAGE:
+            case REQUEST_READ_WRITE_STORAGE:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    if (!Environment.isExternalStorageManager()) {
+                        Toast.makeText(this,
+                                StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+
+            case REQ_CODE_BUY:
+                if (resultCode == Activity.RESULT_OK) {
+                    int purchaseResult = billingManager.getPurchaseResult(intent);
+
+                    if (BillingManager.ORDER_STATE_SUCCESS == purchaseResult) {
+                        billingManager.updatePurchase();
+                    } else {
+                        logWarning("Purchase failed, error code: " + purchaseResult);
+                    }
+                } else {
+                    logWarning("cancel subscribe");
+                }
+
+                break;
+
+            default:
+                logWarning("No request code processed");
+                super.onActivityResult(requestCode, resultCode, intent);
+                break;
+        }
+    }
+
+    protected void initPayments() {
+        billingManager = new BillingManagerImpl(this, this);
+    }
+
+    protected void destroyPayments() {
+        if (billingManager != null) {
+            billingManager.destroy();
+        }
+    }
+
+    protected void launchPayment(String productId) {
+        MegaSku skuDetails = getSkuDetails(skuDetailsList, productId);
+        if (skuDetails == null) {
+            logError("Cannot launch payment, MegaSku is null.");
+            return;
+        }
+
+        MegaPurchase purchase = myAccountInfo.getActiveSubscription();
+        String oldSku = purchase == null ? null : purchase.getSku();
+        String token = purchase == null ? null : purchase.getToken();
+
+        if (billingManager != null) {
+            billingManager.initiatePurchaseFlow(oldSku, token, skuDetails);
+        }
+    }
+
+    @Override
+    public void onBillingClientSetupFinished() {
+        logInfo("Billing client setup finished");
+
+        billingManager.getInventory(skuList -> {
+            skuDetailsList = skuList;
+            myAccountInfo.setAvailableSkus(skuList);
+            updatePricing(this);
+        });
+    }
+
+    @Override
+    public void onPurchasesUpdated(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
+        if (isFailed) {
+            logWarning("Update purchase failed, with result code: " + resultCode);
+            return;
+        }
+
+        String title;
+        String message;
+
+        if (purchases != null && !purchases.isEmpty()) {
+            MegaPurchase purchase = purchases.get(0);
+            //payment may take time to process, we will not give privilege until it has been fully processed
+            String sku = purchase.getSku();
+            title = StringResourcesUtils.getString(R.string.title_user_purchased_subscription);
+
+            if (billingManager.isPurchased(purchase)) {
+                //payment has been processed
+                logDebug("Purchase " + sku + " successfully, subscription type is: "
+                        + getSubscriptionType(sku) + ", subscription renewal type is: "
+                        + getSubscriptionRenewalType(sku));
+
+                updateAccountInfo(this, purchases, myAccountInfo);
+                message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription);
+                updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
+                new RatingHandlerImpl(this).updateTransactionFlag(true);
+            } else {
+                //payment is being processed or in unknown state
+                logDebug("Purchase " + sku + " is being processed or in unknown state.");
+                message = StringResourcesUtils.getString(R.string.message_user_payment_pending);
+            }
+        } else {
+            //down grade case
+            logDebug("Downgrade, the new subscription takes effect when the old one expires.");
+            title = StringResourcesUtils.getString(R.string.my_account_upgrade_pro);
+            message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription_down_grade);
+        }
+
+        LiveEventBus.get(EVENT_PURCHASES_UPDATED, Pair.class).post(new Pair<>(title, message));
+    }
+
+    @Override
+    public void onQueryPurchasesFinished(boolean isFailed, int resultCode, List<MegaPurchase> purchases) {
+        if (isFailed || purchases == null) {
+            logWarning("Query of purchases failed, result code is " + resultCode + ", is purchase null: " + (purchases == null));
+            return;
+        }
+
+        updateAccountInfo(this, purchases, myAccountInfo);
+        updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
     }
 }

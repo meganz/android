@@ -67,6 +67,7 @@ import mega.privacy.android.app.lollipop.managerSections.OutgoingSharesFragmentL
 import mega.privacy.android.app.lollipop.managerSections.RotatableFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
@@ -79,6 +80,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
@@ -86,8 +88,6 @@ import static nz.mega.sdk.MegaApiJava.*;
 @AndroidEntryPoint
 public abstract class MegaNodeBaseFragment extends RotatableFragment {
     private static int MARGIN_BOTTOM_LIST = 85;
-
-    private static final String AD_SLOT = "and4";
 
     @Inject
     protected
@@ -128,12 +128,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         downloadLocationDefaultPath = getDownloadLocation();
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initAdsLoader(AD_SLOT, true);
-    }
-
     protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
 
         protected List<MegaNode> selected;
@@ -159,6 +153,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         @Override
         public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
             selected = adapter.getSelectedNodes();
+
+            menu.findItem(R.id.cab_menu_share_link)
+                    .setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
+
             return false;
         }
 
@@ -519,52 +517,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
         } else if (mimeType.isURL()) {
-            logDebug("Is URL file");
-            String localPath = getLocalFile(node);
-            
-            if (localPath != null) {
-                File f = new File(localPath);
-                InputStream instream = null;
-
-                try {
-                    // open the file for reading
-                    instream = new FileInputStream(f.getAbsolutePath());
-                    // prepare the file for reading
-                    InputStreamReader inputreader = new InputStreamReader(instream);
-                    BufferedReader buffreader = new BufferedReader(inputreader);
-
-                    String line1 = buffreader.readLine();
-                    if (line1 != null) {
-                        String line2 = buffreader.readLine();
-
-                        String url = line2.replace("URL=", "");
-
-                        logDebug("Is URL - launch browser intent");
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(url));
-                        startActivity(i);
-                        return;
-                    }
-                } catch (Exception ex) {
-                    logError("EXCEPTION reading file", ex);
-                } finally {
-                    try {
-                        if (instream != null) {
-                            instream.close();
-                        }
-                    } catch (IOException e) {
-                        logError("EXCEPTION closing InputStream", e);
-                    }
-                }
-
-                intent = new Intent(Intent.ACTION_VIEW);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    intent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, f), TYPE_TEXT_PLAIN);
-                } else {
-                    intent.setDataAndType(Uri.fromFile(f), TYPE_TEXT_PLAIN);
-                }
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
+            manageURLNode(requireContext(), megaApi, node);
+            return;
         } else if (mimeType.isPdf()) {
             logDebug("isFile:isPdf");
             intent = new Intent(context, PdfViewerActivityLollipop.class);
@@ -776,11 +730,6 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Set the Ad view container to the Ads Loader,
-        // in order to let it know in where to show the Ads
-        mAdsLoader.setAdViewContainer(view.findViewById(R.id.ad_view_container),
-                managerActivity.getOutMetrics());
-
         observeDragSupportEvents(getViewLifecycleOwner(), recyclerView, viewerFrom());
     }
 }

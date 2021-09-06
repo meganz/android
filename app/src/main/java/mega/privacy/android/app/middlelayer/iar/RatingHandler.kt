@@ -171,15 +171,9 @@ abstract class RatingHandler(val context: Context) {
         return null
     }
 
-    fun updateTransactionFlag(flag: Boolean) {
-        val app = MegaApplication.getInstance()
-        if (app != null && app.megaApi != null) {
-            app.megaApi.myEmail
-        }
-        updateSpValueByKey(PREFERENCE_PURCHASE_TRANSACTION, flag)
-    }
+    fun updateTransactionFlag(flag: Boolean) = updateSpValueByKey(PREFERENCE_PURCHASE_TRANSACTION, flag)
 
-    private fun isPurchasedTransaction(): Boolean = getSpValueByKey(PREFERENCE_PURCHASE_TRANSACTION)
+    private fun isPurchasedTransaction() = getSpValueByKey(PREFERENCE_PURCHASE_TRANSACTION)
 
     private fun getSpValueByKey(key: String): Boolean {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)

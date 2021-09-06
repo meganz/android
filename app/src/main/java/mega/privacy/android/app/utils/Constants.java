@@ -50,6 +50,7 @@ public class Constants {
     public static final int REQUEST_CODE_PICK_GIF = 1034;
     public static final int REQUEST_CODE_SEND_LINK = 1035;
     public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
+    public static final int REQUEST_CODE_SEND_SEVERAL_LINKS = 1037;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -81,6 +82,7 @@ public class Constants {
 
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
     public static final String EXTRA_LINK = "EXTRA_LINK";
+    public static final String EXTRA_SEVERAL_LINKS = "EXTRA_SEVERAL_LINKS";
     public static final String EXTRA_KEY = "EXTRA_KEY";
     public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
 
@@ -116,15 +118,11 @@ public class Constants {
     public static final int DISABLE_2FA = 4002;
     public static final int CHANGE_PASSWORD_2FA = 4003;
 
-    public static final int MY_ACCOUNT_FRAGMENT = 5000;
-    public static final int UPGRADE_ACCOUNT_FRAGMENT = 5001;
     public static final int OVERQUOTA_ALERT = 5003;
-    public static final int BACKUP_RECOVERY_KEY_FRAGMENT = 5004;
 
     public static final int TOUR_FRAGMENT = 6000;
     public static final int LOGIN_FRAGMENT = 6001;
     public static final int CONFIRM_EMAIL_FRAGMENT = 6002;
-    public static final int CHOOSE_ACCOUNT_FRAGMENT = 6003;
     public static final int CREATE_ACCOUNT_FRAGMENT = 604;
 
     public static final int ACHIEVEMENTS_FRAGMENT = 8000;
@@ -264,7 +262,6 @@ public class Constants {
     public static final String ACTION_SHARE_MSG = "ACTION_SHARE_MSG";
     public static final String ACTION_SHARE_NODE = "ACTION_SHARE_NODE";
     public static final String ACTION_REMOVE_LINK = "ACTION_REMOVE_LINK";
-    public static final String ACTION_GET_LINK = "ACTION_GET_LINK";
 
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
@@ -283,7 +280,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED = "INTENT_BUSINESS_EXPIRED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED = "INTENT_CHAT_ARCHIVED";
     public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
-    public static final String BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER = "BROADCAST_ACTION_INTENT_REFRESH_ADD_PHONE_NUMBER";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
 
@@ -592,6 +588,7 @@ public class Constants {
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String NAME = "name";
     public static final String HANDLE = "handle";
+    public static final String HANDLE_LIST = "HANDLE_LIST";
     public static final String EMAIL = "email";
     public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
     public static final String VISIBLE_FRAGMENT = "VISIBLE_FRAGMENT";
@@ -652,6 +649,9 @@ public class Constants {
     public static final int THUMB_MARGIN_DP = 16;
     public static final int ICON_SIZE_DP = 48;
     public static final int ICON_MARGIN_DP = 12;
+
+    public static final float ALPHA_VIEW_DISABLED = 0.3f;
+    public static final float ALPHA_VIEW_ENABLED = 1.0f;
 
     // Thumbnail dimens for Browse file page
     public static final int THUMBNAIL_SIZE_DP = 36;
@@ -856,5 +856,10 @@ public class Constants {
     public static final int ORDER_OTHERS = 2;
     public static final int ORDER_CAMERA = 3;
 
+    public final static float MAX_WIDTH_APPBAR_LAND = 400;
+    public final static float MAX_WIDTH_APPBAR_PORT = 200;
+
     public static final long ANIMATION_DURATION = 400;
+
+    public static final String URL_INDICATOR = "URL=";
 }
