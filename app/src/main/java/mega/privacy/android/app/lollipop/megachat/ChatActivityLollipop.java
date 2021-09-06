@@ -658,7 +658,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onCallHungUp(long callId) {
         logDebug("The call has been successfully hung up");
         MegaChatCall call = megaChatApi.getChatCall(idChat);
-        if (call == null || call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT)
+        if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
+                call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION))
             return;
 
         addChecksForACall(chatRoom.getChatId(), false);
@@ -683,7 +684,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onCallOnHold(long chatId, boolean isOnHold) {
         if (chatId == idChat && isOnHold) {
             MegaChatCall call = megaChatApi.getChatCall(idChat);
-            if (call == null || call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT)
+            if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
+                    call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION))
                 return;
 
             logDebug("Active call on hold. Joinning in the group chat.");
@@ -3217,7 +3219,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                 return;
             }
 
-            if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+            if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
+                    callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                 logDebug("The call in this chat is In progress, but I do not participate");
                 addChecksForACall(chatRoom.getChatId(), startVideo);
                 callInProgressLayout.setEnabled(false);
@@ -3853,7 +3856,8 @@ public class ChatActivityLollipop extends PasscodeActivity
                 case R.id.hold_join_button:
                     if(anotherCall.isOnHold()){
                         MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
-                        if (callInChat != null && callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+                        if (callInChat != null && (callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
+                                callInChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION )) {
                             addChecksForACall(callInThisChat, false);
                             megaChatApi.answerChatCall(callInThisChat, false, true, new AnswerChatCallListener(this, this));
                         }

@@ -219,9 +219,8 @@ public class ChatManagement {
      *
      * @param callId   Call ID
      * @param chatId   Chat ID
-     * @param termCode Termination code of the call
      */
-    public void controlCallFinished(long callId, long chatId, int termCode) {
+    public void controlCallFinished(long callId, long chatId) {
         clearIncomingCallNotification(callId);
         removeValues(chatId);
         setRequestSentCall(callId, false);
