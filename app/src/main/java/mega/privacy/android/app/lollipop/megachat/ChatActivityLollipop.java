@@ -682,16 +682,17 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     @Override
     public void onCallOnHold(long chatId, boolean isOnHold) {
-        if (chatId == idChat && isOnHold) {
-            MegaChatCall call = megaChatApi.getChatCall(idChat);
-            if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
-                    call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION))
+        if(!isOnHold)
+            return;
+
+        MegaChatCall callInThisChat = megaChatApi.getChatCall(idChat);
+        if (callInThisChat == null || (callInThisChat.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
+                    callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION))
                 return;
 
-            logDebug("Active call on hold. Joinning in the group chat.");
-            addChecksForACall(chatRoom.getChatId(), false);
-            megaChatApi.answerChatCall(idChat, false, true, new AnswerChatCallListener(this, this));
-        }
+        logDebug("Active call on hold. Answer call.");
+        addChecksForACall(chatRoom.getChatId(), false);
+        megaChatApi.answerChatCall(idChat, false, true, new AnswerChatCallListener(this, this));
     }
 
     @Override
@@ -3838,15 +3839,15 @@ public class ChatActivityLollipop extends PasscodeActivity
      */
     public void showJoinCallDialog(long callInThisChat, MegaChatCall anotherCall, boolean existsMoreThanOneCall) {
         LayoutInflater inflater = getLayoutInflater();
-        View dialoglayout = inflater.inflate(R.layout.join_call_dialog, null);
-        final Button holdJoinButton = dialoglayout.findViewById(R.id.hold_join_button);
-        final Button endJoinButton = dialoglayout.findViewById(R.id.end_join_button);
-        final Button cancelButton = dialoglayout.findViewById(R.id.cancel_button);
+        View dialogLayout = inflater.inflate(R.layout.join_call_dialog, null);
+        final Button holdJoinButton = dialogLayout.findViewById(R.id.hold_join_button);
+        final Button endJoinButton = dialogLayout.findViewById(R.id.end_join_button);
+        final Button cancelButton = dialogLayout.findViewById(R.id.cancel_button);
 
         holdJoinButton.setVisibility(existsMoreThanOneCall ? View.GONE : View.VISIBLE);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        builder.setView(dialoglayout);
+        builder.setView(dialogLayout);
         dialogCall = builder.create();
         isJoinCallDialogShown = true;
         dialogCall.show();

@@ -1017,8 +1017,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		if (call == null || !isStatusConnected(context, chat.getChatId()))
 			return false;
 
-		((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
-
 		switch (call.getStatus()) {
 			case CALL_STATUS_TERMINATING_USER_PARTICIPATION:
 			case CALL_STATUS_USER_NO_PRESENT:
@@ -1050,10 +1048,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 		}
 
 		if(holder!=null){
+			((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
+			((ViewHolderNormalChatList) holder).callInProgressIcon.setVisibility(View.GONE);
+
 			MegaChatListItem chat = chats.get(position);
 			if (updateLastCallMessage(holder, chat)) {
 				logDebug("Exist a call in position " + position);
-				((ViewHolderNormalChatList) holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
 				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
 				((ViewHolderNormalChatList) holder).textViewContent.setVisibility(View.VISIBLE);
 				return;
@@ -1063,8 +1063,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 			MegaChatMessage lastMessage = megaChatApi.getMessage(chat.getChatId(), chat.getLastMessageId());
 			logDebug("MessageType: " + messageType);
 			String lastMessageString = converterShortCodes(chat.getLastMessage());
-
-            ((ViewHolderNormalChatList)holder).voiceClipOrLocationLayout.setVisibility(View.GONE);
 
 			if(messageType==MegaChatMessage.TYPE_INVALID){
 				logDebug("Message Type -> INVALID");
