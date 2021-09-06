@@ -185,8 +185,6 @@ class MeetingActivity : PasscodeActivity() {
             else -> R.id.createMeetingFragment
         }
 
-        // Remove app:navGraph="@navigation/meeting" and instead call navController.graph = navGraph
-        // Change start destination dynamically
         navController.setGraph(navGraph, bundle)
     }
 
