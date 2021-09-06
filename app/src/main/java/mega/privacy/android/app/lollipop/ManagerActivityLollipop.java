@@ -250,11 +250,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED;
+import static mega.privacy.android.app.constants.EventConstants.*;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
@@ -716,6 +712,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	};
 
+    private final Observer<Boolean> update2FAObserver = new Observer<Boolean>() {
+        @Override
+        public void onChanged(Boolean aBoolean) {
+            is2FAEnabled = aBoolean;
+            if (getSettingsFragment() != null) {
+                sttFLol.update2FAPreference(aBoolean);
+            }
+        }
+    };
+
 	private EditText openLinkText;
 	private RelativeLayout openLinkError;
 	private TextView openLinkErrorText;
@@ -816,19 +822,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				else if(actionType == UPDATE_PAYMENT_METHODS){
 					logDebug("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
-				}
-			}
-		}
-	};
-
-	private BroadcastReceiver receiverUpdate2FA = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent != null) {
-				boolean enabled = intent.getBooleanExtra(INTENT_EXTRA_KEY_ENABLED, false);
-				is2FAEnabled = enabled;
-				if (getSettingsFragment() != null) {
-					sttFLol.update2FAPreference(enabled);
 				}
 			}
 		}
@@ -1495,9 +1488,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		filter.addAction(ACTION_STORAGE_STATE_CHANGED);
 		registerReceiver(updateMyAccountReceiver, filter);
 
-		registerReceiver(receiverUpdate2FA,
-				new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
-
 		registerReceiver(networkReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 
@@ -1510,6 +1500,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
 				.observeForever(refreshAddPhoneNumberButtonObserver);
+
+        LiveEventBus.get(EVENT_2FA_UPDATED, Boolean.class)
+                .observeForever(update2FAObserver);
 
 		IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
 		filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
@@ -3530,13 +3523,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(contactUpdateReceiver);
 		unregisterReceiver(updateMyAccountReceiver);
-		unregisterReceiver(receiverUpdate2FA);
 		unregisterReceiver(networkReceiver);
 		unregisterReceiver(receiverUpdateOrder);
 		unregisterReceiver(receiverUpdateView);
 		unregisterReceiver(chatArchivedReceiver);
 		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
 				.removeObserver(refreshAddPhoneNumberButtonObserver);
+        LiveEventBus.get(EVENT_2FA_UPDATED, Boolean.class)
+                .removeObserver(update2FAObserver);
 		unregisterReceiver(receiverCUAttrChanged);
 		unregisterReceiver(transferOverQuotaUpdateReceiver);
 		unregisterReceiver(transferFinishReceiver);
