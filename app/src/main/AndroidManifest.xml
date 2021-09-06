@@ -48,6 +48,13 @@
     <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
     <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
 
+    <queries>
+        <!-- Camera -->
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+    </queries>
+
     <application
         android:name="mega.privacy.android.app.MegaApplication"
         android:allowBackup="false"
@@ -285,9 +292,8 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.activities.GetLinkActivity"
-            android:configChanges="screenSize|orientation"
-            android:label="@string/context_get_link_menu">
+            android:name="mega.privacy.android.app.getLink.GetLinkActivity"
+            android:configChanges="screenSize|orientation">
         </activity>
 
         <activity

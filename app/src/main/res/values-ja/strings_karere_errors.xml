@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!-- Label to show that an SDK operation has been complete successfully. -->
-  <string name="error_ok">エラーなし</string>
-  <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
-  <string name="error_args">引数無効</string>
-  <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-  <string name="error_access">アクセスは拒否されました。</string>
-  <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
-  <string name="error_noent">リソースが存在しません。</string>
-  <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
-  <string name="error_exist">リソースはすでに存在しています。</string>
-  <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-  <string name="error_unknown">不明なエラー</string>
-  <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
-  <string name="error_toomany">このリソースの使用が多すぎます。</string>
+    <!-- Label to show that an SDK operation has been complete successfully. -->
+    <string name="error_ok">エラーなし</string>
+    <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
+    <string name="error_args">引数無効</string>
+    <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
+    <string name="error_access">アクセスは拒否されました。</string>
+    <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
+    <string name="error_noent">リソースが存在しません。</string>
+    <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
+    <string name="error_exist">リソースはすでに存在しています。</string>
+    <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
+    <string name="error_unknown">不明なエラー</string>
+    <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
+    <string name="error_toomany">このリソースの使用が多すぎます。</string>
 </resources>

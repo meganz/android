@@ -12,7 +12,6 @@ import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.GetLinkActivity;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
@@ -283,8 +282,6 @@ public class NodeController {
         logDebug("exportLink");
         if (!isOnline(context)) {
             showSnackbar(context, getString(R.string.error_server_connection_problem));
-        } else if(context instanceof GetLinkActivity) {
-            megaApi.exportNode(document, new ExportListener(context));
         } else if(context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, ((MegaRequestListenerInterface) context));
         }
@@ -294,8 +291,6 @@ public class NodeController {
         logDebug("exportLinkTimestamp: " + timestamp);
         if (!isOnline(context)) {
             showSnackbar(context, getString(R.string.error_server_connection_problem));
-        } else if (context instanceof GetLinkActivity) {
-            megaApi.exportNode(document, timestamp, new ExportListener(context));
         } else if (context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, timestamp, ((MegaRequestListenerInterface) context));
         }

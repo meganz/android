@@ -360,9 +360,13 @@
     </style>
 
     <!-- Regular, 13sp, 0px, Authenticity your credentials, 13sp -->
-    <style name="TextAppearance.Mega.Caption.Secondary.Variant3" >
+    <style name="TextAppearance.Mega.Caption.Secondary.13sp" >
         <item name="android:letterSpacing">0</item>
         <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.Secondary.13sp.Grey54White60" >
+        <item name="android:textColor">@color/grey_054_white_060</item>
     </style>
 
     <!-- Regular, 14sp, 0px, textColorPrimary-->
@@ -379,6 +383,14 @@
     <style name="TextAppearance.Mega.Body2.Medium">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Medium.AllCaps">
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Medium.AllCaps.Grey87White87">
+        <item name="android:textColor">@color/grey_087_white_087</item>
     </style>
 
     <style name="TextAppearance.Mega.Body2.Medium.Grey87White87">
@@ -501,6 +513,10 @@
         <item name="android:textColor">?attr/colorOnSecondary</item>
     </style>
 
+    <style name="TextAppearance.Mega.Caption.Grey54White60">
+        <item name="android:textColor">@color/grey_054_white_060</item>
+    </style>
+
     <!-- Regular, 12sp, 0px, chat own file info -->
     <style name="TextAppearance.Mega.Caption.Variant">
         <item name="android:textColor">@color/white</item>
@@ -519,10 +535,6 @@
     <!-- Regular, 12sp, 0px, AudioPlayer playlist position and duration -->
     <style name="TextAppearance.Mega.Caption.Variant4">
         <item name="android:textColor">@color/grey_038_white_alpha_038</item>
-    </style>
-
-    <style name="TextAppearance.Mega.Caption.Grey54White60">
-        <item name="android:textColor">@color/grey_054_white_060</item>
     </style>
 
     <style name="TextAppearance.Mega.Caption.GreyWhite87">

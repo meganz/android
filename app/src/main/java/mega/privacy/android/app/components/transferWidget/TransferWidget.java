@@ -109,7 +109,6 @@ public class TransferWidget {
         ManagerActivityLollipop.DrawerItem drawerItem = ((ManagerActivityLollipop) context).getDrawerItem();
 
         return drawerItem != ManagerActivityLollipop.DrawerItem.TRANSFERS
-                && drawerItem != ManagerActivityLollipop.DrawerItem.CONTACTS
                 && drawerItem != ManagerActivityLollipop.DrawerItem.SETTINGS
                 && drawerItem != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS
                 && drawerItem != ManagerActivityLollipop.DrawerItem.CHAT

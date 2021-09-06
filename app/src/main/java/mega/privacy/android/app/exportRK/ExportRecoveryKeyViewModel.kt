@@ -39,14 +39,14 @@ class ExportRecoveryKeyViewModel @ViewModelInject constructor(
     /**
      * Copies the Recovery Key to the clipboard.
      *
-     * @param context Current context
-     * @param action  Action to perform after copy finishes.
+     * @param activity Current activity.
+     * @param action   Action to perform after copy finishes.
      */
-    fun copyRK(context: Context, action: (String) -> Unit) {
+    fun copyRK(activity: Activity, action: (String) -> Unit) {
         val textRK = exportRK()
 
         if (!isTextEmpty(textRK)) {
-            copyToClipboard(context, textRK)
+            copyToClipboard(activity, textRK)
         }
 
         action.invoke(textRK)
