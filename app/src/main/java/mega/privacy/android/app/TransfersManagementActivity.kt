@@ -189,7 +189,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     private fun showScanningFolderDialog(transfer: MegaTransfer) {
         if (isAlertDialogShown(scanningFolderDialog)) {
-            scanningFolderDialog?.updateScanningFolderDialog(transfer.stage)
+            scanningFolderDialog?.updateScanningFolderDialog(transfer)
         } else {
             scanningFolderDialog = MaterialAlertDialogBuilder(this)
                 .setTitle(StringResourcesUtils.getString(R.string.title_scanning_folder))
@@ -197,13 +197,13 @@ open class TransfersManagementActivity : PasscodeActivity() {
                 .setPositiveButton(
                     StringResourcesUtils.getString(R.string.option_cancel_transfer)
                 ) { _, _ ->
-                    transfersManagement.cancelFolderTransfer()
+                    transfersManagement.cancelFolderTransfer(transfer)
                 }
                 .create()
                 .apply {
                     setCancelable(false)
                     setCanceledOnTouchOutside(false)
-                    setOnShowListener { updateScanningFolderDialog(transfer.stage) }
+                    setOnShowListener { updateScanningFolderDialog(transfer) }
                     show()
                 }
         }
@@ -212,11 +212,13 @@ open class TransfersManagementActivity : PasscodeActivity() {
     /**
      * Updates the scanning folder dialog or dismisses it depending on the transfer stage.
      *
-     * @param stage Folder transfer stage.
+     * @param transfer Folder transfer.
      */
-    private fun AlertDialog.updateScanningFolderDialog(stage: Long) {
+    private fun AlertDialog.updateScanningFolderDialog(transfer: MegaTransfer) {
+        val stage = transfer.stage
+
         if (stage.toInt() == STAGE_TRANSFERRING_FILES) {
-            transfersManagement.resetCancelTransferToken()
+            transfersManagement.scanningFolderFinish(transfer)
             dismiss()
             return
         }
@@ -247,6 +249,10 @@ open class TransfersManagementActivity : PasscodeActivity() {
     /**
      * Gets the progress to show as per the folder transfer stage.
      *
+     * Note that the progress values has been assigned programmatically. This is because currently
+     * the SDK does not provide the progress, but only the stage, so we can to do it only like this
+     * to fill the design requirements.
+     *
      * @param stage The folder transfer stage as numeric value.
      * @return The progress to show.
      */
@@ -254,8 +260,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
         when (stage.toInt()) {
             STAGE_SCAN -> 25
             STAGE_CREATE_TREE -> 50
-            STAGE_GEN_TRANSFERS,
-            STAGE_PROCESS_TRANSFER_QUEUE -> 70
+            STAGE_GEN_TRANSFERS -> 67
+            STAGE_PROCESS_TRANSFER_QUEUE -> 84
             else -> INVALID_VALUE
         }
 

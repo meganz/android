@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import mega.privacy.android.app.fragments.offline.OfflineFragment;
+import mega.privacy.android.app.globalmanagement.ScanningFolderData;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -518,11 +519,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                     megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data);
                 }
 			} else if (currentDocument.isFolder()) {
-				if (!isTextEmpty(appData)) {
-					megaApi.startDownloadWithDataAndCancellation(currentDocument, currentDir.getAbsolutePath() + "/", appData, transfersManagement.createCancelTransferToken());
-				} else {
-					megaApi.startDownloadWithCancellation(currentDocument, currentDir.getAbsolutePath() + "/", transfersManagement.createCancelTransferToken());
-				}
+				startFolderDownload(currentDocument, appData);
 			} else if (!isTextEmpty(appData)) {
 				megaApi.startDownloadWithData(currentDocument, currentDir.getAbsolutePath() + "/", appData);
 			} else {
@@ -1749,12 +1746,28 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (!lock.isHeld()) lock.acquire();
 			if (currentDir.isDirectory()) {
 				logDebug("To downloadPublic(dir)");
-				if (!isTextEmpty(appData)) {
-					megaApi.startDownloadWithDataAndCancellation(node, currentDir.getAbsolutePath() + "/", appData, transfersManagement.createCancelTransferToken());
-				} else {
-					megaApi.startDownloadWithCancellation(node, currentDir.getAbsolutePath() + "/", transfersManagement.createCancelTransferToken());
-				}
+				startFolderDownload(node, appData);
 			}
+		}
+	}
+
+	/**
+	 * Starts a folder download.
+	 *
+	 * @param node    MegaNode to download.
+	 * @param appData Custom app data to save in the MegaTransfer object if applicable,
+	 *                null otherwise.
+	 */
+	private void startFolderDownload(MegaNode node, String appData) {
+		ScanningFolderData folderData = transfersManagement.createScanningFolderData(
+				MegaTransfer.TYPE_DOWNLOAD, currentDir.getAbsolutePath() + "/", node);
+
+		if (!isTextEmpty(appData)) {
+			megaApi.startDownloadWithDataAndCancellation(folderData.getNode(),
+					folderData.getLocalPath(), appData, folderData.getCancelToken());
+		} else {
+			megaApi.startDownloadWithCancellation(folderData.getNode(),
+					folderData.getLocalPath(), folderData.getCancelToken());
 		}
 	}
 

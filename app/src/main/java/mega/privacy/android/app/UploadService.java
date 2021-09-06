@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import mega.privacy.android.app.globalmanagement.ScanningFolderData;
 import mega.privacy.android.app.globalmanagement.TransfersManagement;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
@@ -374,7 +375,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
         } else if (file.isDirectory()) {
             // Folder upload
             totalFolderUploads++;
-            megaApi.startUploadWithCancellation(file.getAbsolutePath(), parentNode, transfersManagement.createCancelTransferToken());
+            ScanningFolderData folderData = transfersManagement.createScanningFolderData(
+                    MegaTransfer.TYPE_UPLOAD, file.getAbsolutePath(), parentNode);
+
+            megaApi.startUploadWithCancellation(folderData.getLocalPath(), folderData.getNode(),
+                    folderData.getCancelToken());
         } else {
             totalFileUploads++;
 

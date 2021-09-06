@@ -12,11 +12,9 @@ import android.os.Handler
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getColor
-import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.*
 import mega.privacy.android.app.components.transferWidget.TransferWidget.NO_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.*
-import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_FOLDER_DIALOG
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService
 import mega.privacy.android.app.utils.Constants
@@ -27,6 +25,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD
 import nz.mega.sdk.MegaTransfer.TYPE_UPLOAD
@@ -179,8 +178,7 @@ class TransfersManagement @Inject constructor(
 
     private val pausedTransfers = ArrayList<String>()
 
-    private var cancelTransferToken: MegaCancelToken? = null
-    private var scanningFolderTransfer: Pair<Int, Long>? = null
+    private val scanningFolders = ArrayList<ScanningFolderData>()
 
     init {
         resetTransferOverQuotaTimestamp()
@@ -198,8 +196,7 @@ class TransfersManagement @Inject constructor(
         resumeTransfersWarningHasAlreadyBeenShown = false
         shouldShowNetworkWarning = false
         pausedTransfers.clear()
-        cancelTransferToken = null
-        scanningFolderTransfer = null
+        scanningFolders.clear()
     }
 
     /**
@@ -407,41 +404,60 @@ class TransfersManagement @Inject constructor(
     }
 
     /**
-     * Creates a cancel token to cancel a folder transfer.
+     * Creates a ScanningFolderData object, containing a token to cancel a folder transfer
+     * and other data to identify the transfer.
      *
-     * @return The created cancel token.
+     * @return The created ScanningFolderData.
      */
-    fun createCancelTransferToken(): MegaCancelToken {
-        val cancelToken = MegaCancelToken.createInstance()
-        cancelTransferToken = cancelToken
-        return cancelToken
+    fun createScanningFolderData(type: Int, localPath: String, node: MegaNode): ScanningFolderData {
+        val scanningFolderData =
+            ScanningFolderData(MegaCancelToken.createInstance(), type, localPath, node)
+
+        scanningFolders.add(scanningFolderData)
+        return scanningFolderData
     }
 
     /**
      * Cancels a folder transfer if exists.
+     *
+     * @param transfer  Folder transfer to cancel.
      */
-    fun cancelFolderTransfer() {
-        cancelTransferToken?.cancel()
+    fun cancelFolderTransfer(transfer: MegaTransfer) {
+        for (data in scanningFolders) {
+            if (data.isTheSameScanningTransfer(transfer)) {
+                data.cancelToken.cancel()
+                scanningFolders.remove(data)
+                break
+            }
+        }
     }
 
     /**
-     * Resets the cancel token when the folder transfer has been processed.
+     * Removes a folder transfer after has been processed.
+     *
+     * @param transfer  Folder transfer to remove.
      */
-    fun resetCancelTransferToken() {
-        cancelTransferToken = null
+    fun scanningFolderFinish(transfer: MegaTransfer) {
+        for (data in scanningFolders) {
+            if (data.isTheSameScanningTransfer(transfer)) {
+                scanningFolders.remove(data)
+                break
+            }
+        }
     }
 
+    /**
+     * Checks if the received transfer is in scanningFolders
+     * and updates the scanning info if applicable.
+     *
+     * @param transfer  Folder transfer to check and update if needed.
+     */
     fun checkFolderTransfer(transfer: MegaTransfer) {
-        if (scanningFolderTransfer?.first == transfer.tag
-            && scanningFolderTransfer?.second == transfer.stage) {
-            return
-        }
-
-        scanningFolderTransfer = Pair(transfer.tag, transfer.stage)
-
-        if (shouldUpdateScanningFolderDialog(transfer)) {
-            LiveEventBus.get(EVENT_SHOW_SCANNING_FOLDER_DIALOG, MegaTransfer::class.java)
-                .post(transfer)
+        for (data in scanningFolders) {
+            if (data.isTheSameScanningFolder(transfer)) {
+                data.performUpdates(transfer)
+                break
+            }
         }
     }
 
