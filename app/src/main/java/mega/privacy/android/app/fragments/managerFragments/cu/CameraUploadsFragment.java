@@ -2,7 +2,6 @@ package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,8 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -86,11 +84,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     private static final int SPAN_CARD_PORTRAIT = 1;
     private static final int SPAN_CARD_LANDSCAPE = 2;
 
-    // Thumbnails per row
-    private static final int SPAN_LARGE_GRID = 3;
-    private static final int SPAN_SMALL_GRID_PORTRAIT = 5;
-    private static final int SPAN_SMALL_GRID_LANDSCAPE = 7;
-
     @Inject
     SortOrderManagement sortOrderManagement;
 
@@ -115,7 +108,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private static final String AD_SLOT = "and3";
 
-    private int currentZoom = ZOOM_DEFAULT;
+    private int currentZoom;
 
     public int getItemCount() {
         return gridAdapter == null ? 0 : gridAdapter.getItemCount();
@@ -210,9 +203,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
         mManagerActivity = (ManagerActivityLollipop) context;
 
+        currentZoom = mManagerActivity.getCurrentZoom();
+
         CuViewModelFactory viewModelFactory =
                 new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
-                        new MegaNodeRepo(megaApi, dbH), context, sortOrderManagement);
+                        new MegaNodeRepo(megaApi, dbH), context, sortOrderManagement, currentZoom);
         viewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
 
         initAdsLoader(AD_SLOT, true);
@@ -228,7 +223,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             return createCameraUploadsViewForFirstLogin(inflater, container);
         } else {
             binding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
-            setupGoogleAds();
             return binding.getRoot();
         }
     }
@@ -343,16 +337,9 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         setGridView();
     }
 
-    private void zoom(Integer zoom) {
+    public void zoom(int zoom) {
         currentZoom = zoom;
-
-        if (currentZoom == ZOOM_OUT_3X) {
-            ZoomUtil.INSTANCE.disableButton(binding.zoomPanel.btnZoomOut, context);
-        }
-
-        if (currentZoom == ZOOM_IN_1X) {
-            ZoomUtil.INSTANCE.disableButton(binding.zoomPanel.btnZoomIn, context);
-        }
+        viewModel.setmZoom(currentZoom);
 
         viewModel.loadNodes();
         viewModel.clearSelection();
@@ -362,10 +349,61 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         layoutManager = new GridLayoutManager(context, spanCount);
         binding.cuList.setLayoutManager(layoutManager);
         binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.cuList.getLayoutParams();
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.cuList.getLayoutParams();
+
+        int imageMargin = ZoomUtil.INSTANCE.getMargin(context, zoom);
+
+        int gridWidth;
+
+        if (currentZoom == ZOOM_IN_1X) {
+            gridWidth = outMetrics.widthPixels;
+        } else {
+            gridWidth = ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount;
+        }
+
+        int icSelectedWidth = ZoomUtil.INSTANCE.getIcSelectedWidth(context, currentZoom);
+
+        int icSelectedMargin = ZoomUtil.INSTANCE.getIcelectedMargin(context, currentZoom);
+
+        CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(currentZoom, gridWidth,
+                icSelectedWidth, imageMargin,
+                getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
+                icSelectedMargin,
+                getResources().getDimensionPixelSize(
+                        R.dimen.cu_fragment_selected_round_corner_radius));
+
+        gridAdapter = new CUGridViewAdapter(this, spanCount, itemSizeConfig);
+        gridAdapter.setHasStableIds(true);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return gridAdapter.getSpanSize(position);
+            }
+        });
+        binding.cuList.setAdapter(gridAdapter);
+
+        if (currentZoom == ZOOM_IN_1X) {
+            params.leftMargin = params.rightMargin = 0;
+        } else {
+            params.leftMargin = params.rightMargin = imageMargin;
+        }
+
+        gridAdapter.setNodes(viewModel.getCUNodes());
+
+        binding.cuList.setLayoutParams(params);
+        binding.scroller.setRecyclerView(binding.cuList);
+    }
+
+    private void setGridView() {
+        boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
+        int spanCount = getSpanCount(isPortrait);
+        layoutManager = new GridLayoutManager(context, spanCount);
+        binding.cuList.setLayoutManager(layoutManager);
+        binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) binding.cuList.getLayoutParams();
 
         if (selectedView == ALL_VIEW) {
-            int imageMargin = ZoomUtil.INSTANCE.getMargin(context, zoom);
+            int imageMargin = ZoomUtil.INSTANCE.getMargin(context, currentZoom);
 
             int gridWidth;
 
@@ -375,68 +413,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 gridWidth = ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount;
             }
 
-            int icSelectedWidth = getResources().getDimensionPixelSize(smallGrid
-                    ? R.dimen.cu_fragment_ic_selected_size_small
-                    : R.dimen.cu_fragment_ic_selected_size_large);
+            int icSelectedWidth = ZoomUtil.INSTANCE.getIcSelectedWidth(context, currentZoom);
 
-            int icSelectedMargin = getResources().getDimensionPixelSize(smallGrid
-                    ? R.dimen.cu_fragment_ic_selected_margin_small
-                    : R.dimen.cu_fragment_ic_selected_margin_large);
+            int icSelectedMargin = ZoomUtil.INSTANCE.getIcelectedMargin(context, currentZoom);
 
-            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, currentZoom, gridWidth,
-                    icSelectedWidth, imageMargin,
-                    getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
-                    icSelectedMargin,
-                    getResources().getDimensionPixelSize(
-                            R.dimen.cu_fragment_selected_round_corner_radius));
-
-            gridAdapter = new CUGridViewAdapter(this, spanCount, itemSizeConfig);
-            gridAdapter.setHasStableIds(true);
-            layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
-                    return gridAdapter.getSpanSize(position);
-                }
-            });
-            binding.cuList.setAdapter(gridAdapter);
-
-            if(currentZoom == ZOOM_IN_1X) {
-                params.leftMargin = params.rightMargin = 0;
-            } else {
-                params.leftMargin = params.rightMargin = imageMargin;
-            }
-
-            gridAdapter.setNodes(viewModel.getCUNodes());
-        }
-
-        binding.cuList.setLayoutParams(params);
-        binding.scroller.setRecyclerView(binding.cuList);
-    }
-
-    private void setGridView() {
-        boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
-        boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
-        int spanCount = getSpanCount(isPortrait, smallGrid);
-        layoutManager = new GridLayoutManager(context, spanCount);
-        binding.cuList.setLayoutManager(layoutManager);
-        binding.cuList.setPadding(0, 0, 0, getResources().getDimensionPixelSize(R.dimen.cu_margin_bottom));
-        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) binding.cuList.getLayoutParams();
-
-        if (selectedView == ALL_VIEW) {
-            int imageMargin = getResources().getDimensionPixelSize(smallGrid
-                    ? R.dimen.cu_fragment_image_margin_small
-                    : R.dimen.cu_fragment_image_margin_large);
-
-            int gridWidth = ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount;
-            int icSelectedWidth = getResources().getDimensionPixelSize(smallGrid
-                    ? R.dimen.cu_fragment_ic_selected_size_small
-                    : R.dimen.cu_fragment_ic_selected_size_large);
-
-            int icSelectedMargin = getResources().getDimensionPixelSize(smallGrid
-                    ? R.dimen.cu_fragment_ic_selected_margin_small
-                    : R.dimen.cu_fragment_ic_selected_margin_large);
-
-            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(smallGrid, ZOOM_DEFAULT, gridWidth,
+            CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(currentZoom, gridWidth,
                     icSelectedWidth, imageMargin,
                     getResources().getDimensionPixelSize(R.dimen.cu_fragment_selected_padding),
                     icSelectedMargin,
@@ -469,16 +450,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.scroller.setRecyclerView(binding.cuList);
     }
 
-    private int getSpanCount(boolean isPortrait, boolean smallGRid) {
-        if (selectedView != ALL_VIEW) {
-            return isPortrait ? SPAN_CARD_PORTRAIT : SPAN_CARD_LANDSCAPE;
-        } else if (smallGRid) {
-            return isPortrait ? SPAN_SMALL_GRID_PORTRAIT : SPAN_SMALL_GRID_LANDSCAPE;
-        } else {
-            return SPAN_LARGE_GRID;
-        }
-    }
-
     private int getSpanCount(boolean isPortrait) {
         if (selectedView != ALL_VIEW) {
             return isPortrait ? SPAN_CARD_PORTRAIT : SPAN_CARD_LANDSCAPE;
@@ -493,30 +464,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.emptyHintText.setText(HtmlCompat.fromHtml(
                 formatEmptyScreenText(context, StringResourcesUtils.getString(R.string.photos_empty)),
                 HtmlCompat.FROM_HTML_MODE_LEGACY));
-
-        binding.zoomPanel.btnZoomIn.setOnClickListener(v -> {
-            if (currentZoom < ZOOM_IN_1X) {
-                currentZoom++;
-                viewModel.setZoom(currentZoom);
-                ZoomUtil.INSTANCE.enableButton(binding.zoomPanel.btnZoomOut, context);
-            }
-
-            if (currentZoom == ZOOM_IN_1X) {
-                ZoomUtil.INSTANCE.disableButton(binding.zoomPanel.btnZoomIn, context);
-            }
-        });
-
-        binding.zoomPanel.btnZoomOut.setOnClickListener(v -> {
-            if (currentZoom > ZOOM_OUT_3X) {
-                currentZoom--;
-                viewModel.setZoom(currentZoom);
-                binding.zoomPanel.btnZoomIn.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white)));
-            }
-
-            if (currentZoom == ZOOM_OUT_3X) {
-                ZoomUtil.INSTANCE.disableButton(binding.zoomPanel.btnZoomOut, context);
-            }
-        });
     }
 
     private void newViewClicked(int selectedView) {
@@ -528,11 +475,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         setGridView();
 
         if(selectedView == ALL_VIEW) {
-            binding.zoomPanel.zoomPanel.setVisibility(View.VISIBLE);
             zoom(currentZoom);
         } else {
-            binding.zoomPanel.zoomPanel.setVisibility(View.GONE);
-
             switch (selectedView) {
                 case DAYS_VIEW:
                     showDayCards(viewModel.getDayCards());
@@ -547,8 +491,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                     break;
             }
         }
-
-        ZoomUtil.INSTANCE.showHidePanel(selectedView == ALL_VIEW, binding.zoomPanel.zoomPanel);
 
         updateViewSelected();
     }
@@ -567,8 +509,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private void observeLiveData() {
         viewModel.cuNodes().observe(getViewLifecycleOwner(), nodes -> {
-            boolean showScroller = nodes.size() >= (mManagerActivity.isSmallGridCameraUploads
-                    ? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
+            boolean showScroller = nodes.size() >= (currentZoom < ZOOM_DEFAULT? MIN_ITEMS_SCROLLBAR_GRID : MIN_ITEMS_SCROLLBAR);
             binding.scroller.setVisibility(showScroller ? View.VISIBLE : View.GONE);
 
             if (gridAdapter != null) {
@@ -626,8 +567,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         viewModel.getDayCardsData().observe(getViewLifecycleOwner(), this::showDayCards);
         viewModel.getMonthCardsData().observe(getViewLifecycleOwner(), this::showMonthCards);
         viewModel.getYearCardsData().observe(getViewLifecycleOwner(), this::showYearCards);
-
-        viewModel.getZoomLiveData().observe(getViewLifecycleOwner(), this::zoom);
     }
 
     /**

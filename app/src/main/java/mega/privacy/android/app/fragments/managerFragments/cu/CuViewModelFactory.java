@@ -15,20 +15,22 @@ class CuViewModelFactory implements ViewModelProvider.Factory {
     private final MegaNodeRepo mRepo;
     private final Context mContext;
     private final SortOrderManagement mSortOrderManagement;
+    private final int mZoom;
 
     CuViewModelFactory(MegaApiAndroid megaApi, DatabaseHandler dbHandler, MegaNodeRepo repo,
-            Context context, SortOrderManagement sortOrderManagement) {
+            Context context, SortOrderManagement sortOrderManagement, int zoom) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;
         mContext = context;
         mSortOrderManagement = sortOrderManagement;
+        mZoom = zoom;
     }
 
     @SuppressWarnings("unchecked")
     @NonNull @Override public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(CuViewModel.class)) {
-            return (T) new CuViewModel(mMegaApi, mDbHandler, mRepo, mContext, mSortOrderManagement);
+            return (T) new CuViewModel(mMegaApi, mDbHandler, mRepo, mContext, mSortOrderManagement, mZoom);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

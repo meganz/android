@@ -75,7 +75,6 @@ class CuViewModel extends BaseRxViewModel {
     private final MutableLiveData<Pair<Integer, CuNode>> mNodeToAnimate = new MutableLiveData<>();
     private final MutableLiveData<String> mActionBarTitle = new MutableLiveData<>();
     private final MutableLiveData<Boolean> mActionMode = new MutableLiveData<>();
-    private final MutableLiveData<Integer> zoom = new MutableLiveData<>();
 
     private final Subject<Pair<Integer, CuNode>> mOpenNodeAction = PublishSubject.create();
     private final Subject<Object> mCreatingThumbnailFinished = PublishSubject.create();
@@ -88,6 +87,8 @@ class CuViewModel extends BaseRxViewModel {
     private int mRealNodeCount;
     private boolean enableCUShown;
 
+    private int mZoom;
+
     public boolean isEnableCUShown() {
         return enableCUShown;
     }
@@ -98,10 +99,11 @@ class CuViewModel extends BaseRxViewModel {
 
     @Inject
     public CuViewModel(@MegaApi MegaApiAndroid megaApi, DatabaseHandler dbHandler,
-                       MegaNodeRepo repo, Context context, SortOrderManagement sortOrderManagement) {
+                       MegaNodeRepo repo, Context context, SortOrderManagement sortOrderManagement, int zoom) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;
+        mZoom = zoom;
         mAppContext = context.getApplicationContext();
         mSortOrderManagement = sortOrderManagement;
         mCreateThumbnailRequest = new BaseListener(mAppContext) {
@@ -408,7 +410,7 @@ class CuViewModel extends BaseRxViewModel {
                     dateString,
                     mSelectedNodes.containsKey(node.getHandle()));
 
-            if(zoom.getValue() != null && zoom.getValue() == ZoomUtil.ZOOM_OUT_3X) {
+            if(mZoom == ZoomUtil.ZOOM_OUT_3X) {
                 if (lastMonthDate == null || !Year.from(lastMonthDate).equals(Year.from(modifyDate))) {
                     lastMonthDate = modifyDate;
                     nodes.add(new CuNode(ofPattern("yyyy").format(modifyDate), new Pair<>(ofPattern("yyyy").format(modifyDate), "")));
@@ -646,11 +648,7 @@ class CuViewModel extends BaseRxViewModel {
         return monthCards.size() - 1;
     }
 
-    public void setZoom(Integer zoomLevel) {
-        zoom.setValue(zoomLevel);
-    }
-
-    public LiveData<Integer> getZoomLiveData() {
-        return zoom;
+    public void setmZoom(int mZoom) {
+        this.mZoom = mZoom;
     }
 }

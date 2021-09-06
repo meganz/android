@@ -2,11 +2,12 @@ package mega.privacy.android.app.utils
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.databinding.ZoomPanelBinding
 
 object ZoomUtil {
 
@@ -60,19 +61,27 @@ object ZoomUtil {
         else -> 0
     }
 
-    fun showHidePanel(shouldShow: Boolean, panel: View) {
-        panel.visibility = if (shouldShow) View.VISIBLE else View.GONE
+    fun disableButton(context: Context, menuItem: MenuItem) {
+        menuItem.icon.let {
+            DrawableCompat.setTint(it, ContextCompat.getColor(context, R.color.grey_038_white_038))
+        }
     }
 
-    fun disableButton(button: ImageView, context: Context) {
-        button.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054))
+    fun enableButton(context: Context, menuItem: MenuItem) {
+        menuItem.icon.let {
+            DrawableCompat.setTint(it, ColorUtils.getThemeColor(context, R.attr.colorControlNormal))
+        }
     }
 
-    fun enableButton(button: ImageView, context: Context) {
-        button.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
+    fun getIcSelectedWidth(context: Context, zoom: Int) = when(zoom) {
+        ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_large)
+        ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_small)
+        else -> 0
     }
 
-    fun getIcSelectedWidth(zoom: Int, context: Context) = when(zoom) {
-
+    fun getIcelectedMargin(context: Context, zoom: Int) = when(zoom) {
+        ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_large)
+        ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_small)
+        else -> 0
     }
 }

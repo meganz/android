@@ -31,6 +31,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;
@@ -232,7 +233,9 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.TimeUtils;
+import mega.privacy.android.app.utils.ZoomUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
+import mega.privacy.android.app.viewmodel.ZoomViewModel;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -285,6 +288,9 @@ import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT;
+import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X;
+import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_3X;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
@@ -772,6 +778,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private boolean onAskingPermissionsFragment = false;
 	public boolean onAskingSMSVerificationFragment = false;
+
+    private ZoomViewModel zoomViewModel;
+    private int currentZoom =ZOOM_DEFAULT;
 
 	private View mNavHostView;
 	private NavController mNavController;
@@ -1807,6 +1816,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		aC = new AccountController(this);
 
         createCacheFolders(this);
+
+        zoomViewModel = new ViewModelProvider(this).get(ZoomViewModel.class);
+        zoomViewModel.getZoom().observe(this, zoom -> {
+            currentZoom = zoom;
+
+            if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+                cuFragment.zoom(currentZoom);
+            }
+        });
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -6335,6 +6353,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 					zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
+                    if (currentZoom == ZOOM_OUT_3X) {
+                        ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
+                    }
+
+                    if (currentZoom == ZOOM_IN_1X) {
+                        ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
+                    }
+
 					updateCuFragmentOptionsMenu();
 					break;
 
@@ -6970,9 +6996,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        }
             case R.id.action_zoom_out: {
                 if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+                    if (currentZoom > ZOOM_OUT_3X) {
+                        currentZoom--;
+                        zoomViewModel.setZoom(currentZoom);
+                        ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
+                    }
 
-
-                    refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+                    if (currentZoom == ZOOM_OUT_3X) {
+                        ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
+                    }
                 }
 
                 if(drawerItem == DrawerItem.HOMEPAGE) {
@@ -6983,10 +7015,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             }
             case R.id.action_zoom_in: {
                 if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+                    if (currentZoom < ZOOM_IN_1X) {
+                        currentZoom++;
+                        zoomViewModel.setZoom(currentZoom);
+                        ZoomUtil.INSTANCE.enableButton(this, zoomOutMenuItem);
+                    }
 
-
-
-                    refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+                    if (currentZoom == ZOOM_IN_1X) {
+                        ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
+                    }
                 }
 
                 if(drawerItem == DrawerItem.HOMEPAGE) {
@@ -6995,26 +7032,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
                 return true;
             }
-	        case R.id.action_grid:{
-				logDebug("action_grid selected");
-	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-					logDebug("action_grid_list in CameraUploads");
-					if(!firstLogin) {
-						zoomOutMenuItem.setVisible(true);
-                        zoomInMenuItem.setVisible(true);
-					}else{
-                        zoomOutMenuItem.setVisible(false);
-                        zoomInMenuItem.setVisible(false);
-					}
-					searchMenuItem.setVisible(false);
-					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
-				} else {
-					updateView(!isList);
-				}
-	        	supportInvalidateOptionsMenu();
+            case R.id.action_grid: {
+                logDebug("action_grid selected");
 
-	        	return true;
-	        }
+                updateView(!isList);
+                supportInvalidateOptionsMenu();
+                return true;
+            }
 	        case R.id.action_menu_clear_rubbish_bin:{
 	        	showClearRubbishBinDialog();
 	        	return true;
@@ -14230,4 +14254,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void actionConfirmed() {
 		//No update needed
 	}
+
+    public int getCurrentZoom() {
+        return currentZoom;
+    }
 }
