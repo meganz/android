@@ -251,8 +251,11 @@ class MeetingActivity : PasscodeActivity() {
                 removeRTCAudioManager()
             }
             is InMeetingFragment -> {
-                currentFragment.removeUI()
-                sendQuitCallEvent()
+                // Prevent guest from quitting the call by pressing back
+                if(!isGuest){
+                    currentFragment.removeUI()
+                    sendQuitCallEvent()
+                }
             }
         }
 
