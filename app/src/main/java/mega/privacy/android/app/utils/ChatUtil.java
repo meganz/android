@@ -1734,13 +1734,14 @@ public class ChatUtil {
     }
 
     /**
-     * Method for finding out if the selected message is deleted.
+     * Method for finding out if the selected message is deleted or
+     * has STATUS_SERVER_REJECTED, STATUS_SENDING_MANUAL or STATUS_SENDING status
      *
      * @param removedMessages List of deleted messages
      * @param message         The message selected.
      * @return True if it's removed. False, otherwise.
      */
-    public static boolean isRemovingMessage(ArrayList<RemovedMessage> removedMessages, MegaChatMessage message) {
+    public static boolean isMsgRemovedOrHasRejectedOrManualSendingStatus(ArrayList<RemovedMessage> removedMessages, MegaChatMessage message) {
         int status = message.getStatus();
         if (status == MegaChatMessage.STATUS_SERVER_REJECTED ||
                 status == MegaChatMessage.STATUS_SENDING_MANUAL ||
@@ -1772,7 +1773,7 @@ public class ChatUtil {
      * @return True, if it must be visible. False, if it must be hidden
      */
     public static boolean checkForwardVisibilityInOwnMsg(ArrayList<RemovedMessage> removedMessages, MegaChatMessage message, boolean isMultipleSelect, ChatController cC) {
-        return !isRemovingMessage(removedMessages, message) && !cC.isInAnonymousMode() && !isMultipleSelect;
+        return !isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) && !cC.isInAnonymousMode() && !isMultipleSelect;
     }
 
     /**

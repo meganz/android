@@ -179,8 +179,8 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     Context context;
     private int positionClicked;
-    private ArrayList<AndroidMegaChatMessage> messages;
-    private ArrayList<RemovedMessage> removedMessages;
+    private ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+    private ArrayList<RemovedMessage> removedMessages = new ArrayList<>();
 
     private RecyclerView listFragment;
     MegaApiAndroid megaApi;
@@ -295,7 +295,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
 
                     if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
                         setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message.getMessage(), isMultipleSelect(), cC));
-                        if (isRemovingMessage(removedMessages, message.getMessage())) {
+                        if (isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message.getMessage())) {
                             setErrorStateOnPreview(holder, preview, message.getMessage().getStatus());
                         }
                     } else {
@@ -386,7 +386,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 if (nodeMessageHandle == node.getHandle()) {
                     if (message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle()) {
                         setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message.getMessage(), isMultipleSelect(), cC));
-                        if (isRemovingMessage(removedMessages, message.getMessage())) {
+                        if (isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message.getMessage())) {
                             setErrorStateOnPreview(holder, preview, message.getMessage().getStatus());
                         }
                     }
@@ -2711,7 +2711,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     holder.forwardOwnRichLinks.setVisibility(View.GONE);
                 }
 
-                holder.urlOwnMessageTextrl.setBackgroundResource(isRemovingMessage(removedMessages, message) ?
+                holder.urlOwnMessageTextrl.setBackgroundResource(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ?
                         R.drawable.light_background_text_rich_link :
                         R.drawable.dark_background_text_rich_link);
 
@@ -2923,7 +2923,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 holder.contentOwnMessageFileLayout.setVisibility(View.GONE);
                 holder.contentOwnMessageContactLayout.setVisibility(View.GONE);
 
-                holder.contentOwnMessageText.setBackgroundResource(isRemovingMessage(removedMessages, message) ?
+                holder.contentOwnMessageText.setBackgroundResource(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ?
                         R.drawable.light_rounded_chat_own_message :
                         R.drawable.dark_rounded_chat_own_message);
 
@@ -3289,7 +3289,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 messageContent = converterShortCodes(message.getContent());
             }
 
-            holder.urlOwnMessageTextrl.setBackgroundResource(isRemovingMessage(removedMessages, message) ?
+            holder.urlOwnMessageTextrl.setBackgroundResource(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ?
                     R.drawable.light_background_text_rich_link :
                     R.drawable.dark_background_text_rich_link);
 
@@ -3729,7 +3729,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 }
             }
 
-            holder.contentOwnMessageText.setBackgroundResource(isRemovingMessage(removedMessages, message) ?
+            holder.contentOwnMessageText.setBackgroundResource(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ?
                     R.drawable.light_rounded_chat_own_message :
                     R.drawable.dark_rounded_chat_own_message);
 
@@ -4112,7 +4112,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             int status = message.getStatus();
             logDebug("Status: " + message.getStatus());
 
-            holder.contentOwnMessageFileLayout.setBackgroundResource(isRemovingMessage(removedMessages, message) ?
+            holder.contentOwnMessageFileLayout.setBackgroundResource(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ?
                     R.drawable.light_rounded_chat_own_message :
                     R.drawable.dark_rounded_chat_own_message);
 
@@ -4151,7 +4151,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                         if (preview != null) {
                             previewCache.put(node.getHandle(), preview);
                             setOwnPreview(holder, preview, node, checkForwardVisibilityInOwnMsg(removedMessages, message, isMultipleSelect(), cC));
-                            if (isRemovingMessage(removedMessages, message)) {
+                            if (isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message)) {
                                 setErrorStateOnPreview(holder, preview, status);
                             }
                         } else {
@@ -4210,7 +4210,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.errorUploadingLandscape.setVisibility(View.GONE);
                                 holder.transparentCoatingLandscape.setVisibility(View.GONE);
 
-                                holder.transparentCoatingPortrait.setVisibility(isRemovingMessage(removedMessages, message) ? View.VISIBLE : View.GONE);
+                                holder.transparentCoatingPortrait.setVisibility(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ? View.VISIBLE : View.GONE);
 
                                 //Forwards element (own messages):
                                 holder.forwardOwnFile.setVisibility(View.GONE);
@@ -4270,7 +4270,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                                 holder.errorUploadingPortrait.setVisibility(View.GONE);
 
                                 holder.transparentCoatingPortrait.setVisibility(View.GONE);
-                                holder.transparentCoatingLandscape.setVisibility(isRemovingMessage(removedMessages, message) ? View.VISIBLE : View.GONE);
+                                holder.transparentCoatingLandscape.setVisibility(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ? View.VISIBLE : View.GONE);
 
                                 //Forwards element (own messages):
                                 holder.forwardOwnFile.setVisibility(View.GONE);
@@ -4772,7 +4772,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                 setGiphyProperties(giphy, holder, orientationPortrait, true);
             } else if (preview == null) {
                 holder.contentOwnMessageFileLayout.setVisibility(View.VISIBLE);
-                holder.contentOwnMessageFileLayout.setBackgroundResource(isRemovingMessage(removedMessages, message) ?
+                holder.contentOwnMessageFileLayout.setBackgroundResource(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ?
                         R.drawable.light_rounded_chat_own_message :
                         R.drawable.dark_rounded_chat_own_message);
 
@@ -4799,7 +4799,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
                     setBitmapAndUpdateDimensions(orientationPortrait ? holder.contentOwnMessageThumbPort : holder.contentOwnMessageThumbLand, preview);
                 }
 
-                if (isRemovingMessage(removedMessages, message)) {
+                if (isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message)) {
                     setErrorStateOnPreview(holder, preview, message.getStatus());
                 }
             }
@@ -5235,7 +5235,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageVoiceClipLayout.setVisibility(View.VISIBLE);
             holder.contentOwnMessageVoiceClipSeekBar.setMax((int) holder.totalDurationOfVoiceClip);
 
-            holder.contentOwnMessageVoiceClipLayout.setBackgroundResource(isRemovingMessage(removedMessages, message) ?
+            holder.contentOwnMessageVoiceClipLayout.setBackgroundResource(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ?
                     R.drawable.light_rounded_chat_own_message :
                     R.drawable.dark_rounded_chat_own_message);
 
@@ -5575,7 +5575,7 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
             holder.contentOwnMessageContactName.setVisibility(View.VISIBLE);
             holder.contentOwnMessageContactEmail.setVisibility(View.VISIBLE);
 
-            holder.contentOwnMessageContactLayout.setBackgroundResource(isRemovingMessage(removedMessages, message) ?
+            holder.contentOwnMessageContactLayout.setBackgroundResource(isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) ?
                     R.drawable.light_rounded_chat_own_message :
                     R.drawable.dark_rounded_chat_own_message);
 

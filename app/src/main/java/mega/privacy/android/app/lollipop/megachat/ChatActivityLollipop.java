@@ -567,7 +567,7 @@ public class ChatActivityLollipop extends PasscodeActivity
      * @return True if it's removed. False, otherwise.
      */
     public boolean hasMessagesRemoved(MegaChatMessage messageSelected) {
-        return  ChatUtil.isRemovingMessage(removedMessages, messageSelected);
+        return  ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, messageSelected);
     }
 
     @Override
@@ -4474,7 +4474,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 else{
                     logDebug("Chat with permissions or preview");
                     if (selected.size() == 1) {
-                        boolean isRemovedMsg = ChatUtil.isRemovingMessage(removedMessages, selected.get(0).getMessage());
+                        boolean isRemovedMsg = ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, selected.get(0).getMessage());
                         boolean shouldForwardOptionVisible = !selected.get(0).isUploading() && !isRemovedMsg && isOnline(chatActivity) && !chatC.isInAnonymousMode();
                         menu.findItem(R.id.chat_cab_menu_forward).setVisible(shouldForwardOptionVisible);
 
@@ -4618,7 +4618,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         menu.findItem(R.id.chat_cab_menu_start_conversation).setVisible(false);
 
                         for(int i=0; i<selected.size();i++) {
-                            isRemoved = ChatUtil.isRemovingMessage(removedMessages, selected.get(i).getMessage());
+                            isRemoved = ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, selected.get(i).getMessage());
 
                             if (!isUploading) {
                                 if (selected.get(i).isUploading()) {
@@ -7448,10 +7448,8 @@ public class ChatActivityLollipop extends PasscodeActivity
         for (int i = 0; i < messages.size(); i++) {
             MegaChatMessage messageToCompare = messages.get(i).getMessage();
             if (messageToCompare != null) {
-                if ((message.getMsgId() != MEGACHAT_INVALID_HANDLE && messageToCompare.getMsgId() != MEGACHAT_INVALID_HANDLE &&
-                        message.getMsgId() == messageToCompare.getMsgId()) ||
-                        (message.getTempId() != MEGACHAT_INVALID_HANDLE && messageToCompare.getTempId() != MEGACHAT_INVALID_HANDLE &&
-                                message.getTempId() == messageToCompare.getTempId())) {
+                if ((message.getMsgId() != MEGACHAT_INVALID_HANDLE && message.getMsgId() == messageToCompare.getMsgId()) ||
+                        (message.getTempId() != MEGACHAT_INVALID_HANDLE && message.getTempId() == messageToCompare.getTempId())) {
                     RemovedMessage msg = new RemovedMessage(messageToCompare.getTempId(), messageToCompare.getMsgId());
                     removedMessages.add(msg);
                     adapter.notifyItemChanged(i + 1);
