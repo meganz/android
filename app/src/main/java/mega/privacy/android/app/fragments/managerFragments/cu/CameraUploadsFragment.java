@@ -357,7 +357,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         viewModel.loadNodes();
         viewModel.clearSelection();
 
-        boolean smallGrid = mManagerActivity.isSmallGridCameraUploads;
         boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
         int spanCount = getSpanCount(isPortrait);
         layoutManager = new GridLayoutManager(context, spanCount);

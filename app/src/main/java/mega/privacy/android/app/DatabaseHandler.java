@@ -2049,45 +2049,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return result;
 	}
 
-	public void setSmallGridCamera (boolean smallGridCamera){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
-        logDebug("setSmallGridCamera");
-
-		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		ContentValues values = new ContentValues();
-		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null && cursor.moveToFirst()) {
-				String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SMALL_GRID_CAMERA + "='" + encrypt(smallGridCamera + "") + "' WHERE " + KEY_ID + " ='1'";
-				db.execSQL(UPDATE_ATTRIBUTES_TABLE);
-			} else {
-				values.put(KEY_SMALL_GRID_CAMERA, encrypt(smallGridCamera + ""));
-				db.insert(TABLE_PREFERENCES, null, values);
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
-	}
-
-
-	public boolean isSmallGridCamera (){
-        logDebug("isSmallGridCamera");
-
-		String selectQuery = "SELECT " + KEY_SMALL_GRID_CAMERA + " FROM " + TABLE_PREFERENCES + " WHERE " + KEY_ID + " = '1'";
-		boolean result = false;
-		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null && cursor.moveToFirst()) {
-				String smallGrid = decrypt(cursor.getString(0));
-				if (smallGrid != null && smallGrid.equals("true")) {
-					result = true;
-				}
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
-		return result;
-	}
-
 	/**
 	 * Saves attributes in DB.
 	 *

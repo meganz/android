@@ -71,4 +71,8 @@ object ZoomUtil {
     fun enableButton(button: ImageView, context: Context) {
         button.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
     }
+
+    fun getIcSelectedWidth(zoom: Int, context: Context) = when(zoom) {
+
+    }
 }

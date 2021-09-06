@@ -336,8 +336,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public static final String LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK";
     public static final String CONNECTED = "CONNECTED";
 
-    private static final String SMALL_GRID = "SMALL_GRID";
-
 	public static final int ERROR_TAB = -1;
 	public static final int INCOMING_TAB = 0;
 	public static final int OUTGOING_TAB = 1;
@@ -635,8 +633,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
        	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO, RECENT_BUCKET
 	}
 
-	public boolean isSmallGridCameraUploads = false;
-
 	public boolean passwordReminderFromMyAccount = false;
 
 	public boolean isList = true;
@@ -705,7 +701,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private AlertDialog newTextFileDialog;
 
 	private MenuItem searchMenuItem;
-	private MenuItem gridSmallLargeMenuItem;
+	private MenuItem zoomOutMenuItem;
+	private MenuItem zoomInMenuItem;
 	private MenuItem addContactMenuItem;
 	private MenuItem addMenuItem;
 	private MenuItem createFolderMenuItem;
@@ -1614,7 +1611,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink);
 		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
 		outState.putBoolean(CONNECTED, connected);
-		outState.putBoolean(SMALL_GRID, isSmallGridCameraUploads);
 
 		if (getCameraUploadFragment() != null) {
 			getSupportFragmentManager().putFragment(outState, FragmentTag.CAMERA_UPLOADS.getTag(), cuFragment);
@@ -1732,7 +1728,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false);
 			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
 			connected = savedInstanceState.getBoolean(CONNECTED, false);
-			isSmallGridCameraUploads = savedInstanceState.getBoolean(SMALL_GRID, false);
 
 			nodeAttacher.restoreState(savedInstanceState);
 			nodeSaver.restoreState(savedInstanceState);
@@ -1890,10 +1885,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (prefs == null){
 			firstTimeAfterInstallation = true;
 			isList=true;
-
-			if (savedInstanceState == null) {
-				isSmallGridCameraUploads = false;
-			}
 		}
 		else{
 			if (prefs.getFirstTime() == null){
@@ -1906,10 +1897,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			else{
 				isList = Boolean.parseBoolean(prefs.getPreferredViewList());
-			}
-
-			if (savedInstanceState == null) {
-				isSmallGridCameraUploads = dbH.isSmallGridCamera();
 			}
 		}
 		logDebug("Preferred View List: " + isList);
@@ -6259,7 +6246,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		});
 
-		gridSmallLargeMenuItem = menu.findItem(R.id.action_grid_view_large_small);
+		zoomOutMenuItem = menu.findItem(R.id.action_zoom_out);
+		zoomInMenuItem = menu.findItem(R.id.action_zoom_in);
 		addContactMenuItem = menu.findItem(R.id.action_add_contact);
 		addMenuItem = menu.findItem(R.id.action_add);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
@@ -6344,7 +6332,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					break;
 				case CAMERA_UPLOADS:
-					gridSmallLargeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+					zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
 					updateCuFragmentOptionsMenu();
 					break;
@@ -6592,28 +6581,31 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         return null;
     }
 
-	public void updateCuFragmentOptionsMenu() {
-		if (selectMenuItem == null || sortByMenuItem == null || gridSmallLargeMenuItem == null) {
-			return;
-		}
+    public void updateCuFragmentOptionsMenu() {
+        if (selectMenuItem == null || sortByMenuItem == null || zoomOutMenuItem == null || zoomInMenuItem == null) {
+            return;
+        }
 
-		if (drawerItem == DrawerItem.CAMERA_UPLOADS
-				&& getCameraUploadFragment() != null
-				&& cuFragment.getItemCount() > 0) {
-			boolean visible = cuFragment.shouldShowFullInfoAndOptions();
-			sortByMenuItem.setVisible(visible);
-			setCuThumbnailTypeIcon();
-			gridSmallLargeMenuItem.setVisible(visible);
-		}
-	}
+        if (drawerItem == DrawerItem.CAMERA_UPLOADS && getCameraUploadFragment() != null && cuFragment.getItemCount() > 0) {
+            boolean visible = cuFragment.shouldShowFullInfoAndOptions();
+            sortByMenuItem.setVisible(visible);
+            zoomOutMenuItem.setVisible(visible);
+            zoomInMenuItem.setVisible(visible);
+        }
+    }
 
-	private void setCuThumbnailTypeIcon() {
-		if (isSmallGridCameraUploads) {
-			gridSmallLargeMenuItem.setIcon(R.drawable.ic_thumbnail_view);
-		} else {
-			gridSmallLargeMenuItem.setIcon(R.drawable.ic_menu_gridview_small);
-		}
-	}
+    public void updatePhotosFragmentOptionsMenu() {
+        if (selectMenuItem == null || sortByMenuItem == null || zoomOutMenuItem == null || zoomInMenuItem == null) {
+            return;
+        }
+
+        if (drawerItem == DrawerItem.HOMEPAGE) {
+            boolean visible = cuFragment.shouldShowFullInfoAndOptions();
+            searchMenuItem.setVisible(visible);
+            zoomOutMenuItem.setVisible(visible);
+            zoomInMenuItem.setVisible(visible);
+        }
+    }
 
 	private void setGridListIcon() {
 		if (isList){
@@ -6976,25 +6968,43 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
-	        case R.id.action_grid_view_large_small:{
-				if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-					isSmallGridCameraUploads = !isSmallGridCameraUploads;
-					dbH.setSmallGridCamera(isSmallGridCameraUploads);
+            case R.id.action_zoom_out: {
+                if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
 
-					setCuThumbnailTypeIcon();
 
-					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
-	        	}
-	        	return true;
-	        }
+                    refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+                }
+
+                if(drawerItem == DrawerItem.HOMEPAGE) {
+
+                }
+
+                return true;
+            }
+            case R.id.action_zoom_in: {
+                if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+
+
+
+                    refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+                }
+
+                if(drawerItem == DrawerItem.HOMEPAGE) {
+
+                }
+
+                return true;
+            }
 	        case R.id.action_grid:{
 				logDebug("action_grid selected");
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 					logDebug("action_grid_list in CameraUploads");
 					if(!firstLogin) {
-						gridSmallLargeMenuItem.setVisible(true);
+						zoomOutMenuItem.setVisible(true);
+                        zoomInMenuItem.setVisible(true);
 					}else{
-						gridSmallLargeMenuItem.setVisible(false);
+                        zoomOutMenuItem.setVisible(false);
+                        zoomInMenuItem.setVisible(false);
 					}
 					searchMenuItem.setVisible(false);
 					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
@@ -7154,7 +7164,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             takePicture.setVisible(false);
             refreshMenuItem.setVisible(false);
             helpMenuItem.setVisible(false);
-            gridSmallLargeMenuItem.setVisible(false);
+            zoomOutMenuItem.setVisible(false);
+            zoomOutMenuItem.setVisible(false);
             logoutMenuItem.setVisible(false);
             forgotPassMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
@@ -12984,13 +12995,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public boolean isListCameraUploads() {
 		return false;
-	}
-
-	public boolean isSmallGridCameraUploads() {
-		return isSmallGridCameraUploads;
-	}
-	public void setSmallGridCameraUploads(boolean isSmallGridCameraUploads) {
-		this.isSmallGridCameraUploads = isSmallGridCameraUploads;
 	}
 
 	public boolean getFirstLogin() {
