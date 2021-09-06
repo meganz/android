@@ -2211,6 +2211,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun disableCamera() {
         if (camIsEnable) {
             sharedModel.clickCamera(false)
+            camIsEnable = false
         }
     }
 
