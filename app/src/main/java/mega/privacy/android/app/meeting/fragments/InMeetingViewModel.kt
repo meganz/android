@@ -846,16 +846,19 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun updatePeerSelected(peerId: Long, clientId: Long): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
+        participants.value?.forEach {
+            if (it.isSpeaker && (it.peerId != peerId || it.clientId != clientId)) {
+                logDebug("The previous speaker ${it.clientId}, now has isSpeaker false")
+                it.isSpeaker = false
+                listWithChanges.add(it)
+            }
+        }
 
         participants.value?.forEach {
-            if (it.peerId == peerId && it.clientId == clientId) {
+            if (it.peerId == peerId && it.clientId == clientId && !it.isSpeaker) {
                 logDebug("New speaker selected found ${it.clientId}")
                 it.isSpeaker = true
                 addSpeaker(it)
-                listWithChanges.add(it)
-            } else if (it.isSpeaker) {
-                logDebug("Remove the last speaker ${it.clientId}")
-                it.isSpeaker = false
                 listWithChanges.add(it)
             }
         }
@@ -2057,7 +2060,9 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @return The speaker
      */
     fun getCurrentSpeakerParticipant(): Participant? {
-        if (speakerParticipants.value.isNullOrEmpty()) return null
+        if (speakerParticipants.value.isNullOrEmpty()) {
+            return null
+        }
 
         speakerParticipants.value?.let { listSpeakerParticipants ->
             val listFound = listSpeakerParticipants.filter { participant ->
@@ -2068,6 +2073,7 @@ class InMeetingViewModel @ViewModelInject constructor(
                 return listFound[0]
             }
         }
+
         return null
     }
 
@@ -2161,8 +2167,31 @@ class InMeetingViewModel @ViewModelInject constructor(
     private fun createSpeaker(participant: Participant) {
         createSpeakerParticipant(participant).let { speakerParticipantCreated ->
             speakerParticipants.value?.add(speakerParticipantCreated)
-            speakerParticipants.value = speakerParticipants.value
             logDebug("Num of speaker participants: " + speakerParticipants.value?.size)
+            speakerParticipants.value = speakerParticipants.value
         }
+    }
+
+    /**
+     * Method to get the list of participants who are no longer speakers
+     *
+     * @param peerId Peer ID of current speaker
+     * @param clientId Client ID of current speaker
+     * @return a list of participants who are no longer speakers
+     */
+    fun getPreviousSpeakers(peerId: Long, clientId: Long): List<Participant>? {
+        if (speakerParticipants.value.isNullOrEmpty()) {
+            return null
+        }
+
+        val checkParticipant = speakerParticipants.value!!.filter {
+            it.peerId != peerId || it.clientId != clientId
+        }
+
+        if (checkParticipant.isNotEmpty()) {
+            return checkParticipant
+        }
+
+        return null
     }
 }
