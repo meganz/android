@@ -48,7 +48,6 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static mega.privacy.android.app.MegaPreferences.MEDIUM;
 import static mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE;
-import static mega.privacy.android.app.utils.Constants.GET_PREVIEW_THROTTLE_MS;
 import static mega.privacy.android.app.utils.Constants.GET_THUMBNAIL_THROTTLE_MS;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
