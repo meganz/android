@@ -51,7 +51,7 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Local audio/video flags has changed
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_LOCAL_AVFLAGS)) {
-            logDebug("Changes in local av flags:: isAudioEnable? ${call.hasLocalAudio()}, isVideoEnable? ${call.hasLocalVideo()}")
+            logDebug("Changes in local av flags. Audio enable ${call.hasLocalAudio()}, Video enable ${call.hasLocalVideo()}")
             sendCallEvent(EVENT_LOCAL_AVFLAGS_CHANGE, call)
         }
 
@@ -115,43 +115,43 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Session status has changed
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_STATUS)) {
-            logDebug("""Session status changed, current status is ${sessionStatusToString(session.status)}""")
+            logDebug("Session status changed, current status is ${sessionStatusToString(session.status)}, of participant with clientID ${session.clientid}")
             sendSessionEvent(EVENT_SESSION_STATUS_CHANGE, session, callid)
         }
 
         // Remote audio/video flags has changed
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_REMOTE_AVFLAGS)) {
-            logDebug("Changes in remote av flags")
+            logDebug("Changes in remote av flags. Client ID  ${session.clientid}")
             sendSessionEvent(EVENT_REMOTE_AVFLAGS_CHANGE, session, callid)
         }
 
         // Session speak requested
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_SPEAK_REQUESTED)) {
-            logDebug("Changes in speak requested")
+            logDebug("Changes in speak requested. Client ID  ${session.clientid}")
             sendSessionEvent(EVENT_SESSION_SPEAK_REQUESTED, session, callid)
         }
 
         // Hi-Res video received
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_HIRES)) {
-            logDebug("Session on high resolution changed")
+            logDebug("Session on high resolution changed. Client ID  ${session.clientid}")
             sendSessionEvent(EVENT_SESSION_ON_HIRES_CHANGE, session, callid)
         }
 
         // Low-Res video received
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_LOWRES)) {
-            logDebug("Session on low resolution changed")
+            logDebug("Session on low resolution changed. Client ID  ${session.clientid}")
             sendSessionEvent(EVENT_SESSION_ON_LOWRES_CHANGE, session, callid)
         }
 
         // Session is on hold
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_SESSION_ON_HOLD)) {
-            logDebug("Session on hold changed: isOnHold? "+session.isOnHold)
+            logDebug("Session on hold changed. Session on hold ${session.isOnHold}. Client ID  ${session.clientid}")
             sendSessionEvent(EVENT_SESSION_ON_HOLD_CHANGE, session, callid)
         }
 
         // Indicates if peer is speaking
         if (session.hasChanged(MegaChatSession.CHANGE_TYPE_AUDIO_LEVEL)) {
-            logDebug("Remote audio level changed")
+            logDebug("Remote audio level changed. Client ID  ${session.clientid}")
             sendSessionEvent(EVENT_REMOTE_AUDIO_LEVEL_CHANGE, session, callid)
         }
     }

@@ -57,6 +57,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                     session.peerid,
                     session.clientid
                 )
+            } else {
+                logDebug("Received remote audio level with clientId ${session.clientid}, same current speaker")
             }
         }
     }
@@ -75,7 +77,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     private val speakerParticipantsObserver = Observer<MutableList<Participant>> {
         val newSpeaker = inMeetingViewModel.getCurrentSpeakerParticipant()
         if (newSpeaker == null) {
-            logDebug("No speaker. The first on the list will be the new speaker")
+
             inMeetingViewModel.getFirstParticipant(
                 MEGACHAT_INVALID_HANDLE,
                 MEGACHAT_INVALID_HANDLE
@@ -83,8 +85,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
                 selectSpeaker(firstParticipant.peerId, firstParticipant.clientId)
             }
         } else {
-            logDebug("Update new speaker selected with clientId ${newSpeaker.clientId}")
             if (!newSpeaker.isVideoOn || inMeetingViewModel.isSessionOnHold(newSpeaker.clientId)) {
+                removeTextureViewOfPreviousSpeaker(newSpeaker.peerId, newSpeaker.clientId)
                 inMeetingViewModel.removePreviousSpeakers()
             }
             updateSpeakerUser()
@@ -392,6 +394,23 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     /**
+     * Method to remove from the textures view of the above speakers
+     *
+     * @param peerId Peer ID of the current speaker
+     * @param clientId Client ID of the current speaker
+     */
+    private fun removeTextureViewOfPreviousSpeaker(peerId: Long, clientId: Long) {
+        inMeetingViewModel.getPreviousSpeakers(peerId, clientId)?.let { list ->
+            val iterator = list.iterator()
+            iterator.forEach { peer ->
+                peer.videoListener?.let { listener ->
+                    surfaceContainer.removeView(listener.textureView)
+                }
+            }
+        }
+    }
+
+    /**
      * Method to add or remove video listener
      *
      * @param peerId Peer ID of the participant whose listener of the video is to be added or removed
@@ -403,8 +422,10 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             if (currentSpeaker.peerId != peerId || currentSpeaker.clientId != clientId) return
 
             if (shouldAddListener) {
-                inMeetingViewModel.removePreviousSpeakers()
                 addSpeakerVideoListener(currentSpeaker)
+                removeTextureViewOfPreviousSpeaker(currentSpeaker.peerId, currentSpeaker.clientId)
+                inMeetingViewModel.removePreviousSpeakers()
+
             } else {
                 currentSpeaker.videoListener?.let { listener ->
                     logDebug("Remove speaker video listener clientID ${currentSpeaker.clientId}")
@@ -428,10 +449,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      */
     private fun activateVideo(speaker: Participant) {
         if (isSpeakerInvalid(speaker)) return
-
         if (speaker.videoListener == null) {
             logDebug("Active video when listener is null, clientId ${speaker.clientId}")
-            surfaceContainer.removeAllViews()
             speaker.videoListener =
                 inMeetingViewModel.createVideoListener(speaker, AVATAR_VIDEO_VISIBLE, ROTATION)
 
@@ -454,10 +473,6 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             }
         } else {
             logDebug("Active video when listener is not null, clientId ${speaker.clientId}")
-            if (surfaceContainer.childCount > 0) {
-                surfaceContainer.removeAllViews()
-            }
-
             speaker.videoListener?.textureView?.let { textureView ->
                 textureView.parent?.let { textureViewParent ->
                     (textureViewParent as ViewGroup).removeView(textureView)
@@ -465,6 +480,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             }
 
             surfaceContainer.addView(speaker.videoListener?.textureView)
+
             speaker.videoListener?.height = 0
             speaker.videoListener?.width = 0
         }
@@ -725,6 +741,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      */
     fun removeTextureView() {
         inMeetingViewModel.getCurrentSpeakerParticipant()?.let { speaker ->
+            removeTextureViewOfPreviousSpeaker(speaker.peerId, speaker.clientId)
             inMeetingViewModel.removeSelected(
                 speaker.peerId,
                 speaker.clientId
