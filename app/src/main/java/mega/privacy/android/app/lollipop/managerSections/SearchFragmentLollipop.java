@@ -86,7 +86,6 @@ import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.INCOMING
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.LINKS_TAB;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.OUTGOING_TAB;
 import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_GENERAL;
-import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.setProgressView;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -666,7 +665,15 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 
 	@Override
 	public void updateSearchProgressView(boolean inProgress) {
-		setProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
+		if (contentLayout == null || searchProgressBar == null || recyclerView == null) {
+			logWarning("Cannot set search progress view, one or more parameters are NULL.");
+			return;
+		}
+
+		contentLayout.setEnabled(!inProgress);
+		contentLayout.setAlpha(inProgress ? 0.4f : 1f);
+		searchProgressBar.setVisibility(inProgress ? View.VISIBLE: View.GONE);
+		recyclerView.setVisibility(inProgress ? View.GONE : View.VISIBLE);
 	}
 
 	@Override

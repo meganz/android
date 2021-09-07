@@ -65,7 +65,6 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.CLOUD_FRAGMENT;
 import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_CLOUD_EXPLORER;
-import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.setProgressView;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.*;
@@ -875,7 +874,15 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 
 	@Override
 	public void updateSearchProgressView(boolean inProgress) {
-		setProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
+		if (contentLayout == null || searchProgressBar == null || recyclerView == null) {
+			logWarning("Cannot set search progress view, one or more parameters are NULL.");
+			return;
+		}
+
+		contentLayout.setEnabled(!inProgress);
+		contentLayout.setAlpha(inProgress ? 0.4f : 1f);
+		searchProgressBar.setVisibility(inProgress ? View.VISIBLE: View.GONE);
+		recyclerView.setVisibility(inProgress ? View.GONE : View.VISIBLE);
 	}
 
 	@Override

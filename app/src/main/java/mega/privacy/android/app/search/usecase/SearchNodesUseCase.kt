@@ -36,40 +36,6 @@ class SearchNodesUseCase @Inject constructor(
         const val TYPE_GENERAL = 1
         const val TYPE_CLOUD_EXPLORER = 2
         const val TYPE_INCOMING_EXPLORER = 3
-
-        /**
-         * Updates the progress search view.
-         *
-         * @param contentLayout     General content view.
-         * @param searchProgressBar ProgressBar to show or hide.
-         * @param recyclerView      Container of the ProgressBar.
-         * @param inProgress        True if the search is in progress, false otherwise.
-         */
-        @JvmStatic
-        fun setProgressView(
-            contentLayout: RelativeLayout?,
-            searchProgressBar: ProgressBar?,
-            recyclerView: RecyclerView?,
-            inProgress: Boolean
-        ) {
-            if (contentLayout == null || searchProgressBar == null || recyclerView == null) {
-                LogUtil.logWarning("Cannot set search progress view, one or more parameters are NULL.")
-                LogUtil.logDebug("contentLayout: $contentLayout, searchProgressBar: $searchProgressBar, recyclerView: $recyclerView")
-                return
-            }
-
-            contentLayout.isEnabled = !inProgress
-
-            if (inProgress) {
-                contentLayout.alpha = 0.4f
-                searchProgressBar.visibility = View.VISIBLE
-                recyclerView.visibility = View.GONE
-            } else {
-                contentLayout.alpha = 1f
-                searchProgressBar.visibility = View.GONE
-                recyclerView.visibility = View.VISIBLE
-            }
-        }
     }
 
     /**

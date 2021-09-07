@@ -69,8 +69,8 @@ import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.COP
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.INCOMING_FRAGMENT;
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.MOVE;
 import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_INCOMING_EXPLORER;
-import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.setProgressView;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.getPreferences;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
@@ -880,7 +880,15 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 
 	@Override
 	public void updateSearchProgressView(boolean inProgress) {
-		setProgressView(contentLayout, searchProgressBar, recyclerView, inProgress);
+		if (contentLayout == null || searchProgressBar == null || recyclerView == null) {
+			logWarning("Cannot set search progress view, one or more parameters are NULL.");
+			return;
+		}
+
+		contentLayout.setEnabled(!inProgress);
+		contentLayout.setAlpha(inProgress ? 0.4f : 1f);
+		searchProgressBar.setVisibility(inProgress ? View.VISIBLE: View.GONE);
+		recyclerView.setVisibility(inProgress ? View.GONE : View.VISIBLE);
 	}
 
 	@Override
