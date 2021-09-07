@@ -94,6 +94,7 @@ class SearchNodesUseCase @Inject constructor(
         Single.create { emitter ->
             if (query == null) {
                 emitter.onSuccess(ArrayList<MegaNode>())
+                return@create
             }
 
             var parent: MegaNode? = null
@@ -109,7 +110,7 @@ class SearchNodesUseCase @Inject constructor(
                                 when (sharesTab) {
                                     INCOMING_TAB -> {
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
-                                            emitter.onSuccess(getInShares(query!!, megaCancelToken))
+                                            emitter.onSuccess(getInShares(query, megaCancelToken))
                                             return@create
                                         }
 
@@ -119,7 +120,7 @@ class SearchNodesUseCase @Inject constructor(
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                                             emitter.onSuccess(
                                                 getOutShares(
-                                                    query!!,
+                                                    query,
                                                     megaCancelToken
                                                 )
                                             )
@@ -132,7 +133,7 @@ class SearchNodesUseCase @Inject constructor(
                                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
                                             emitter.onSuccess(
                                                 getLinks(
-                                                    query!!,
+                                                    query,
                                                     isFirstNavigationLevel,
                                                     megaCancelToken
                                                 )
@@ -166,7 +167,7 @@ class SearchNodesUseCase @Inject constructor(
                     }
                     TYPE_INCOMING_EXPLORER -> {
                         if (parentHandle == MegaApiJava.INVALID_HANDLE) {
-                            emitter.onSuccess(getInShares(query!!, megaCancelToken))
+                            emitter.onSuccess(getInShares(query, megaCancelToken))
                             return@create
                         }
 
@@ -178,7 +179,7 @@ class SearchNodesUseCase @Inject constructor(
             }
 
             if (parent != null) {
-                if (query!!.isEmpty() || parentHandleSearch != MegaApiJava.INVALID_HANDLE) {
+                if (query.isEmpty() || parentHandleSearch != MegaApiJava.INVALID_HANDLE) {
                     emitter.onSuccess(megaApi.getChildren(parent))
                 } else {
                     emitter.onSuccess(
