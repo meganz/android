@@ -21,9 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
@@ -89,7 +87,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -120,7 +117,6 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
@@ -147,7 +143,6 @@ import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
@@ -711,16 +706,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			refreshAddPhoneNumberButton();
 		}
 	};
-
-    private final Observer<Boolean> update2FAObserver = new Observer<Boolean>() {
-        @Override
-        public void onChanged(Boolean aBoolean) {
-            is2FAEnabled = aBoolean;
-            if (getSettingsFragment() != null) {
-                sttFLol.update2FAPreference(aBoolean);
-            }
-        }
-    };
 
 	private EditText openLinkText;
 	private RelativeLayout openLinkError;
@@ -1502,7 +1487,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				.observeForever(refreshAddPhoneNumberButtonObserver);
 
         LiveEventBus.get(EVENT_2FA_UPDATED, Boolean.class)
-                .observeForever(update2FAObserver);
+                .observe(this, this::update2FAEnableState);
 
 		IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
 		filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
@@ -2414,7 +2399,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						openContactLink(getIntent().getLongExtra(CONTACT_HANDLE, -1));
 					}
 					else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
-						update2FASetting();
+						update2FAEnableState();
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
 						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
@@ -3335,7 +3320,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 				}
 				else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
-					update2FASetting();
+					update2FAEnableState();
 				}
 				else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
 					logDebug("Open after LauncherFileExplorerActivityLollipop ");
@@ -3529,8 +3514,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(chatArchivedReceiver);
 		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
 				.removeObserver(refreshAddPhoneNumberButtonObserver);
-        LiveEventBus.get(EVENT_2FA_UPDATED, Boolean.class)
-                .removeObserver(update2FAObserver);
 		unregisterReceiver(receiverCUAttrChanged);
 		unregisterReceiver(transferOverQuotaUpdateReceiver);
 		unregisterReceiver(transferFinishReceiver);
@@ -8045,7 +8028,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		super.showConfirmationEnableLogsKarere();
 	}
 
-	public void update2FASetting(){
+	public void update2FAEnableState(){
 		logDebug("update2FAVisibility");
 		if (getSettingsFragment() != null) {
 			try {
@@ -9873,13 +9856,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				sttFLol.reEnable2faSwitch();
 			}
 
-			if (e.getErrorCode() == MegaError.API_OK) {
-				is2FAEnabled = request.getFlag();
-
-				if (getSettingsFragment() != null) {
-					sttFLol.update2FAPreference(is2FAEnabled);
-				}
-			}
+            if (e.getErrorCode() == MegaError.API_OK) {
+                update2FAEnableState(request.getFlag());
+            }
 		}
 		else if(request.getType() == MegaRequest.TYPE_FOLDER_INFO) {
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -9897,6 +9876,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 	}
+
+    /**
+     * Update 2FA SwitchPreference's enable state.
+     *
+     * @param isEnabled true, turn on SwitchPreference, false, turn off.
+     */
+    private void update2FAEnableState(boolean isEnabled) {
+        is2FAEnabled = isEnabled;
+
+        if (getSettingsFragment() != null) {
+            sttFLol.update2FAPreference(is2FAEnabled);
+        }
+    }
 
 	/**
 	 * Updates own firstName/lastName and fullName data in UI and DB.
