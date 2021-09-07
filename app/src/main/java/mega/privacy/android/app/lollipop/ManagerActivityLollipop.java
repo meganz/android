@@ -198,6 +198,7 @@ import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialog
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -2588,6 +2589,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		logDebug("END onCreate");
+		new RatingHandlerImpl(this).showRatingBaseOnTransaction();
 	}
 
 	/**
@@ -5663,7 +5665,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		    			}
 		    		}
 		    		else if (drawerItem == DrawerItem.TRANSFERS){
-
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
 						selectDrawerItemLollipop(drawerItem);
