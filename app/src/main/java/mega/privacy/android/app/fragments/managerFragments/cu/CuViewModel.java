@@ -394,7 +394,9 @@ class CuViewModel extends BaseRxViewModel {
     private List<CuNode> getCuNodes() {
         List<CuNode> nodes = new ArrayList<>();
         List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
+        LocalDate lastYearDate = null;
         LocalDate lastMonthDate = null;
+        LocalDate lastDayDate = null;
         List<Pair<Integer, MegaNode>> realNodes =
                 mRepo.getFilteredCuChildrenAsPairs(mSortOrderManagement.getOrderCamera());
 
@@ -411,10 +413,19 @@ class CuViewModel extends BaseRxViewModel {
                     mSelectedNodes.containsKey(node.getHandle()));
 
             if(mZoom == ZoomUtil.ZOOM_OUT_3X) {
-                if (lastMonthDate == null || !Year.from(lastMonthDate).equals(Year.from(modifyDate))) {
-                    lastMonthDate = modifyDate;
-                    nodes.add(new CuNode(ofPattern("yyyy").format(modifyDate), new Pair<>(ofPattern("yyyy").format(modifyDate), "")));
+                if (lastYearDate == null || !Year.from(lastYearDate).equals(Year.from(modifyDate))) {
+                    lastYearDate = modifyDate;
+                    String date = ofPattern("yyyy").format(modifyDate);
+                    nodes.add(new CuNode(date, new Pair<>(date, "")));
                 }
+            } else if(mZoom == ZoomUtil.ZOOM_IN_1X) {
+                if (lastDayDate == null || lastDayDate.getDayOfYear() != modifyDate.getDayOfYear()) {
+                    lastDayDate = modifyDate;
+                    String date = ofPattern(sameYear ? "dd MMMM" : "dd MMMM yyyy").format(lastDayDate);
+                    nodes.add(new CuNode(date, new Pair<>(date, "")));
+                }
+                // For zoom in 1X, use preview file as thumbnail to avoid blur.
+                cuNode.setmPreview(new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION));
             } else {
                 if (lastMonthDate == null
                         || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {

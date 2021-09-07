@@ -20,7 +20,7 @@ public class CuNode {
 
     private final MegaNode mNode;
     private final int mIndexForViewer;
-    private final File mThumbnail;
+    private File mThumbnail;
     private final int mType;
     private final String mModifyDate;
     private final Pair<String, String> mHeaderDate;
@@ -72,6 +72,10 @@ public class CuNode {
 
     public int getIndexForViewer() {
         return mIndexForViewer;
+    }
+
+    public void setmPreview(File preview) {
+        mThumbnail = preview;
     }
 
     public File getThumbnail() {

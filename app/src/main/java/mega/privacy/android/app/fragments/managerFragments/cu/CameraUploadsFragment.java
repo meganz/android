@@ -341,7 +341,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         currentZoom = zoom;
         viewModel.setmZoom(currentZoom);
 
-        viewModel.loadNodes();
+//        viewModel.loadNodes();
         viewModel.clearSelection();
 
         boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;
