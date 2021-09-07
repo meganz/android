@@ -22,7 +22,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     private val images: MutableLiveData<List<ImageItem>> = MutableLiveData()
 
     fun getImagesHandle(): LiveData<List<Long>> =
-        images.map { items -> items.map { it.handle } }
+        images.map { items -> items.map(ImageItem::handle) }
 
     fun getImage(nodeHandle: Long): LiveData<ImageItem?> =
         images.map { items -> items.firstOrNull { it.handle == nodeHandle } }
@@ -42,8 +42,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun retrieveImagesFromParent(parentNodeHandle: Long) {
-        getImageUseCase.getChildImages(parentNodeHandle)
+    fun retrieveImagesFromParent(parentNodeHandle: Long, childOrder: Int) {
+        getImageUseCase.getChildImages(parentNodeHandle, childOrder)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

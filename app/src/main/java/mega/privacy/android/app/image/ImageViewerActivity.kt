@@ -12,6 +12,7 @@ import mega.privacy.android.app.utils.Constants.*
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 
 @AndroidEntryPoint
 class ImageViewerActivity : BaseActivity() {
@@ -27,10 +28,10 @@ class ImageViewerActivity : BaseActivity() {
     private val pageChangeCallback by lazy{
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                val itemCount = binding.viewPager.adapter!!.itemCount
-                if (!positionSet && itemCount <= nodePosition) {
+                val itemCount = binding.viewPager.adapter?.itemCount ?: 0
+                if (!positionSet && nodePosition <= itemCount) {
                     positionSet = true
-                    binding.viewPager.currentItem = nodePosition
+                    binding.viewPager.setCurrentItem(nodePosition, false)
                 }
             }
         }
@@ -40,6 +41,7 @@ class ImageViewerActivity : BaseActivity() {
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
     private val childrenHandles: LongArray? by extra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
+    private val childOrder: Int by extraNotNull(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_PHOTO_ASC)
 
     private var positionSet = false
 
@@ -53,14 +55,18 @@ class ImageViewerActivity : BaseActivity() {
         setupObservers()
 
         when {
-            parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
-                viewModel.retrieveImagesFromParent(parentNodeHandle!!)
-            childrenHandles != null && childrenHandles!!.isNotEmpty() ->
+            parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
+                viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder)
+            }
+            childrenHandles != null && childrenHandles!!.isNotEmpty() -> {
                 viewModel.retrieveImages(childrenHandles!!.toList())
-            nodeHandle != null && nodeHandle != INVALID_HANDLE ->
+            }
+            nodeHandle != null && nodeHandle != INVALID_HANDLE -> {
                 viewModel.retrieveSingleImage(nodeHandle!!)
-            else ->
-                error("No params were sent")
+            }
+            else -> {
+                error("Invalid params")
+            }
         }
     }
 

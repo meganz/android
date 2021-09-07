@@ -14,6 +14,7 @@ import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaError.*
 import javax.inject.Inject
 
@@ -110,12 +111,15 @@ class GetImageUseCase @Inject constructor(
             }
         }, BackpressureStrategy.LATEST)
 
-    fun getChildImages(parentNodeHandle: Long): Single<List<ImageItem>> =
+    fun getChildImages(
+        parentNodeHandle: Long,
+        order: Int = ORDER_PHOTO_ASC
+    ): Single<List<ImageItem>> =
         Single.create { emitter ->
             val parentNode = megaApi.getNodeByHandle(parentNodeHandle)
 
             if (megaApi.hasChildren(parentNode)) {
-                val items = megaApi.getChildren(parentNode).map { node ->
+                val items = megaApi.getChildren(parentNode, order).map { node ->
                     ImageItem(node.handle, node.name)
                 }
                 emitter.onSuccess(items)

@@ -47,7 +47,7 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        require(nodeHandle != INVALID_HANDLE) { "Invalid image node handle" }
+        require(nodeHandle != INVALID_HANDLE) { "Invalid node handle" }
 
         setupView()
         setupObservers()

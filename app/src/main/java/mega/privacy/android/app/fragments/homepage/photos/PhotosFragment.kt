@@ -358,10 +358,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             R.id.thumbnail
         )?.also {
 //            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
-            val intent = Intent(context, ImageViewerActivity::class.java).apply {
-                putExtra(INTENT_EXTRA_KEY_HANDLE, nodeItem.node?.handle ?: INVALID_HANDLE)
+            val intent = Intent(context, ImageViewerActivity::class.java)
+//                .apply {
+//                putExtra(INTENT_EXTRA_KEY_HANDLE, nodeItem.node?.handle ?: INVALID_HANDLE)
 //                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, megaApi.getParentNode(nodeItem.node).handle)
-            }
+//                }
 
             intent.putExtra(INTENT_EXTRA_KEY_POSITION, nodeItem.photoIndex)
             intent.putExtra(
