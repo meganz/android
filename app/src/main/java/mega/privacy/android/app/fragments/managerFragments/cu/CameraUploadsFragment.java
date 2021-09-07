@@ -325,11 +325,23 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         setGridView();
     }
 
-    public void zoom(int zoom) {
-        currentZoom = zoom;
-        viewModel.setmZoom(currentZoom);
+    private boolean needReload(int zoom) {
+        if(currentZoom == ZOOM_OUT_3X || currentZoom == ZOOM_IN_1X) return true;
 
-//        viewModel.loadNodes();
+        return zoom == ZOOM_OUT_3X || zoom == ZOOM_IN_1X;
+    }
+
+    public void zoom(int zoom) {
+        boolean needReload = needReload(zoom);
+
+        currentZoom = zoom;
+
+        // Out 3X: organize by year, In 1X: oragnize by day, both need to reload nodes.
+        if(needReload) {
+            viewModel.setmZoom(currentZoom);
+            viewModel.loadNodes();
+        }
+
         viewModel.clearSelection();
 
         boolean isPortrait = getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT;

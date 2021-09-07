@@ -707,7 +707,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public boolean onAskingSMSVerificationFragment = false;
 
     private ZoomViewModel zoomViewModel;
-    private int currentZoom =ZOOM_DEFAULT;
+    private int currentZoom = ZOOM_DEFAULT;
 
 	private View mNavHostView;
 	private NavController mNavController;
