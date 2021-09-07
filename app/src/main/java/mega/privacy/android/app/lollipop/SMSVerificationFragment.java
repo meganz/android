@@ -17,8 +17,7 @@ import android.widget.TextView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.SMSVerificationActivity;
-import mega.privacy.android.app.utils.Constants;
+import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -36,8 +35,6 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
     private ManagerActivityLollipop managerActivity;
 
     private MegaApiJava megaApi;
-
-    private String bonusStorageSMS = "GB";
 
     private TextView msg;
 
@@ -60,7 +57,8 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
         logDebug("is achievement user: " + isAchievementUser);
         if (isAchievementUser) {
             megaApi.getAccountAchievements(this);
-            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+            String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user),
+                    managerActivity.myAccountInfo.getBonusStorageSMS());
             msg.setText(message);
         } else {
             msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user);
@@ -111,10 +109,11 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if(request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
             if (e.getErrorCode() == MegaError.API_OK) {
-                bonusStorageSMS = getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE));
+                managerActivity.myAccountInfo.setBonusStorageSMS(getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE)));
             }
             if(isAdded()) {
-                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), bonusStorageSMS);
+                String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user),
+                        managerActivity.myAccountInfo.getBonusStorageSMS());
                 msg.setText(message);
             }
         }

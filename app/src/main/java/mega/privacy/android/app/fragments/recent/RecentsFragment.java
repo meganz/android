@@ -63,6 +63,7 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
 
 
@@ -381,12 +382,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
-            intent = new Intent(Intent.ACTION_VIEW);
-
-            if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setURLIntentParams(context, node, intent, localPath,
-                        (ManagerActivityLollipop) requireActivity());
-            }
+            manageURLNode(requireContext(), megaApi, node);
+            return;
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
             intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);

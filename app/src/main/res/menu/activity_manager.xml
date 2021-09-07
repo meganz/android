@@ -57,38 +57,6 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_menu_kill_all_sessions"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/action_kill_all_sessions"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_menu_change_pass"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/my_account_change_password"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_menu_forgot_pass"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/forgot_pass_menu"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_menu_export_MK"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="95"
-        android:title="@string/action_export_master_key"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_add"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="100"
@@ -194,14 +162,6 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_menu_refresh"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="130"
-        android:title="@string/action_refresh"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_menu_help"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="135"
@@ -231,13 +191,6 @@
         android:title="@string/context_clear_rubbish"
         android:visible="false"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_menu_cancel_subscriptions"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="155"
-        android:title="@string/action_cancel_subscriptions"
-        android:visible="false"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_menu_retry_transfers"
@@ -263,11 +216,4 @@
         android:visible="false"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/action_menu_logout"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="175"
-        android:title="@string/action_logout"
-        android:visible="false"
-        app:showAsAction="never" />
 </menu>

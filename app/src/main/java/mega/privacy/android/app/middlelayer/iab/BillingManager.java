@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
-import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
+import static mega.privacy.android.app.service.iab.BillingManagerImpl.*;
 
 /**
  * Defines generic methods to handle with in-app purchase.

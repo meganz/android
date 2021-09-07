@@ -175,10 +175,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
             ORDER_CONTACTS -> {
                 sortOrderManagement.setOrderContacts(order)
-
-                if (requireActivity() is ManagerActivityLollipop) {
-                    (requireActivity() as ManagerActivityLollipop).refreshContactsOrder()
-                }
             }
             ORDER_CAMERA -> {
                 sortOrderManagement.setOrderCamera(order)

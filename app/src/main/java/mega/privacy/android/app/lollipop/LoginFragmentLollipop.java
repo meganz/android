@@ -69,6 +69,7 @@ import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
+import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -95,8 +96,9 @@ import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.dismissAlertDialogIfShown;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.isAlertDialogShown;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -737,7 +739,6 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if ((intentReceived != null) && (action != null)){
                 if (action.equals(ACTION_REFRESH)){
                     MegaApplication.setLoggingIn(true);
-                    parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startLoginInProcess();
                     return v;
                 }
@@ -1778,8 +1779,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 MegaApplication.getChatManagement().setPendingJoinLink(null);
                 loginActivityLollipop.finish();
-            } else {
-                loginActivityLollipop.showFragment(CHOOSE_ACCOUNT_FRAGMENT);
+            } else if (dbH.getCredentials() != null) {
+                startActivity(new Intent(loginActivityLollipop, ChooseAccountActivity.class));
+                loginActivityLollipop.finish();
             }
         }
     }
@@ -1965,6 +1967,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 receivedIntent = ((LoginActivityLollipop) context).getIntentReceived();
                 if (receivedIntent != null) {
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivityLollipop.EXTRA_SHARE_INFOS);
+
                     if (shareInfos != null && shareInfos.size() > 0) {
                         boolean canRead = hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
                         if (canRead) {
@@ -1977,6 +1980,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                                 requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_MEDIA_PERMISSION);
                             }
                         }
+                        return;
+                    } else if (ACTION_REFRESH.equals(action) && getActivity() != null) {
+                        getActivity().setResult(RESULT_OK);
+                        getActivity().finish();
                         return;
                     }
                 }
@@ -2275,7 +2282,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
                         intent.setAction(ACTION_RESET_PASS_FROM_LINK);
                         intent.setData(Uri.parse(linkUrl));
-                        intent.putExtra("MK", value);
+                        intent.putExtra(EXTRA_MASTER_KEY, value);
                         startActivity(intent);
                         insertMKDialog.dismiss();
                     }
@@ -2323,7 +2330,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
                     intent.setAction(ACTION_RESET_PASS_FROM_LINK);
                     intent.setData(Uri.parse(linkUrl));
-                    intent.putExtra("MK", value);
+                    intent.putExtra(EXTRA_MASTER_KEY, value);
                     startActivity(intent);
                     insertMKDialog.dismiss();
                 }
@@ -2342,7 +2349,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         closeCancelDialog();
-        dismissAlertDialogIfShown(changeApiServerDialog);
+        dismissAlertDialogIfExists(changeApiServerDialog);
         super.onDestroy();
     }
 

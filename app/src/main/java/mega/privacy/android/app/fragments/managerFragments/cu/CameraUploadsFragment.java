@@ -106,8 +106,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private int selectedView = ALL_VIEW;
 
-    private static final String AD_SLOT = "and3";
-
     private int currentZoom;
 
     public int getItemCount() {
@@ -209,8 +207,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 new CuViewModelFactory(megaApi, DatabaseHandler.getDbHandler(context),
                         new MegaNodeRepo(megaApi, dbH), context, sortOrderManagement, currentZoom);
         viewModel = new ViewModelProvider(this, viewModelFactory).get(CuViewModel.class);
-
-        initAdsLoader(AD_SLOT, true);
     }
 
     @Nullable @Override
@@ -314,14 +310,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         if (getView() != null) {
             updateViewSelected();
         }
-    }
-
-    /**
-     * Set the Ads view container to the Ads Loader
-     */
-    private void setupGoogleAds() {
-        mAdsLoader.setAdViewContainer(binding.adViewContainer,
-                mManagerActivity.getOutMetrics());
     }
 
     private void setupRecyclerView() {

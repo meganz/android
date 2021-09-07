@@ -46,7 +46,7 @@ import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
@@ -349,6 +349,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         optionsMenu = menu
 
         menuInflater.inflate(R.menu.media_player, menu)
+
+        menu.findItem(R.id.get_link).title =
+            StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
 
         searchMenuItem = menu.findItem(R.id.action_search)
 
