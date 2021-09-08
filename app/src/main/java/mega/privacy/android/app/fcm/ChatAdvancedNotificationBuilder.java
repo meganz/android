@@ -194,7 +194,7 @@ public final class ChatAdvancedNotificationBuilder {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(ACTION_CHAT_SUMMARY);
             intent.putExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-            pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT);
+            pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
             //Order by last interaction
             Collections.sort(chats, new Comparator<MegaChatListItem>() {
@@ -212,7 +212,7 @@ public final class ChatAdvancedNotificationBuilder {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
             intent.putExtra(CHAT_ID, chats.get(0).getChatId());
-            pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT);
+            pendingIntent = PendingIntent.getActivity(context, (int) chats.get(0).getChatId(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
         } else {
             logError("ERROR:chatSIZE=0:return");
             return;
@@ -386,7 +386,7 @@ public final class ChatAdvancedNotificationBuilder {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
         intent.putExtra(CHAT_ID, chat.getChatId());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) chat.getChatId(), intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) chat.getChatId(), intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         String title;
         int unreadMessages = chat.getUnreadCount();
@@ -639,7 +639,7 @@ public final class ChatAdvancedNotificationBuilder {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_SUMMARY);
         intent.putExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!beep) {
@@ -795,7 +795,7 @@ public final class ChatAdvancedNotificationBuilder {
         intent.putExtra(INCOMING_VIDEO_CALL, hasVideoInitialCall);
         intent.setAction(type);
         int requestCode = notificationId + getNumberRequestNotifications(type, chatIdCallInProgress);
-        return PendingIntent.getService(context, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        return PendingIntent.getService(context, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     /**
@@ -1037,7 +1037,7 @@ public final class ChatAdvancedNotificationBuilder {
         ignoreIntent.putExtra(INCOMING_VIDEO_CALL, hasVideoInitialCall);
         ignoreIntent.setAction(CallNotificationIntentService.IGNORE);
         int requestCodeIgnore = notificationId + 1;
-        PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore, ignoreIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntentIgnore = PendingIntent.getService(context, requestCodeIgnore, ignoreIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         Intent answerIntent = new Intent(context, CallNotificationIntentService.class);
         answerIntent.putExtra(CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE);
@@ -1045,7 +1045,7 @@ public final class ChatAdvancedNotificationBuilder {
         answerIntent.putExtra(INCOMING_VIDEO_CALL, hasVideoInitialCall);
         answerIntent.setAction(CallNotificationIntentService.ANSWER);
         int requestCodeAnswer = notificationId + 1;
-        PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntentAnswer = PendingIntent.getService(context, requestCodeAnswer, answerIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         PendingIntent callScreen = getPendingIntentCall(context, callToAnswer.getChatid(), notificationId + 1);
 
@@ -1264,7 +1264,7 @@ public final class ChatAdvancedNotificationBuilder {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.setAction(ACTION_CHAT_NOTIFICATION_MESSAGE);
         intent.putExtra(CHAT_ID, chat.getChatId());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)chat.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, (int)chat.getChatId() , intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         long[] pattern = {0, 1000};
 

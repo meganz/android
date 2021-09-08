@@ -1167,7 +1167,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.setAction(ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION);
 			PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-					PendingIntent.FLAG_ONE_SHOT);
+					PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
 			Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             String notificationTitle;

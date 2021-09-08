@@ -940,7 +940,7 @@ public class CallUtil {
         Intent intentCall = new Intent(context, ChatCallActivity.class);
         intentCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intentCall.putExtra(CHAT_ID, chatIdCallToAnswer);
-        return PendingIntent.getActivity(context, requestCode, intentCall, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getActivity(context, requestCode, intentCall, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     /**
