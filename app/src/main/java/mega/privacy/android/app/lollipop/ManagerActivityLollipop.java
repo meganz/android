@@ -21,9 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
@@ -89,7 +87,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -126,6 +123,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -190,7 +188,6 @@ import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -303,8 +300,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-		FilePrepareTask.ProcessedFilesCallback {
+		ChatManagementCallback, ActionNodeCallback, SnackbarShower {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -361,6 +357,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	MyAccountInfo myAccountInfo;
 	@Inject
 	InviteContactUseCase inviteContactUseCase;
+	@Inject
+	FilePrepareUseCase filePrepareUseCase;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -3576,7 +3574,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private void cancelSearch() {
 		if (getSearchFragment() != null) {
-			sFLol.cancelPreviousAsyncTask();
+			sFLol.cancelPreviousSearch();
 		}
 	}
 
@@ -8088,45 +8086,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("Intent type: " + intent.getType());
 
 			intent.setAction(Intent.ACTION_GET_CONTENT);
-			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-			filePrepareTask.execute(intent);
 			showProcessFileDialog(this,intent);
-		}
-		else if (requestCode == CHOOSE_PICTURE_PROFILE_CODE && resultCode == RESULT_OK) {
 
-			if (resultCode == RESULT_OK) {
-				if (intent == null) {
-					logWarning("Intent NULL");
-					return;
-				}
-
-				boolean isImageAvailable = checkProfileImageExistence(intent.getData());
-				if(!isImageAvailable){
-					logError("Error when changing avatar: image not exist");
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_changing_user_avatar_image_not_available), -1);
-					return;
-				}
-
-				intent.setAction(Intent.ACTION_GET_CONTENT);
-				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-				filePrepareTask.execute(intent);
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(this);
-					temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
-
-			}
-			else {
-				logWarning("resultCode for CHOOSE_PICTURE_PROFILE_CODE: " + resultCode);
-			}
-		}
-		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
+			filePrepareUseCase.prepareFiles(intent)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((shareInfo, throwable) -> {
+						if (throwable == null) {
+							onIntentProcessed(shareInfo);
+						}
+					});
+		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				requestPermission(this,
@@ -9124,10 +9094,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	/**
-	 * Handle processed upload intent
+	 * Handle processed upload intent.
+	 *
+	 * @param infos List<ShareInfo> containing all the upload info.
 	 */
-	@Override
-	public void onIntentProcessed(List<ShareInfo> infos) {
+	private void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentProcessedLollipop");
 		if (statusDialog != null) {
 			try {
