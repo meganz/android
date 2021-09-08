@@ -407,8 +407,6 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Link löschen</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">Link exportieren</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Verlassen</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">Freigegebenen Ordner verlassen</string>
@@ -609,8 +607,8 @@
     <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Ihr Abonnement wurde noch nicht storniert. Bitte geben Sie einen Grund an.</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">Vielen Dank für den Abschluss Ihres %1$s %2$sabonnement!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">Thanks. Your payment is processing. Please email us at support&#64;mega.co.nz if you have not received your upgrade within 24 hours.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Ihr Account wird nach Beendigung der laufenden Abonnementperiode auf die neue Stufe wechseln.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -672,8 +670,6 @@
     <string name="overquota_alert_text">Sie haben Ihr kostenloses Speicherplatzlimit überschritten. Möchten Sie auf Pro wechseln?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Letzte Sitzung</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Kontakte</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Ändere Passwort</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -3360,7 +3356,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Chats</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Keine [A]neuen Dateien[/A][/B]</string>
+    <string name="context_empty_recents">[B]No files in [/B][A]Recents[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s und %2$d weitere</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3421,7 +3417,7 @@
     <string name="business_management_alert">Benutzerverwaltung ist nur im Desktop-Webbrowser verfügbar.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Nutzung</string>
-    <!-- Title of usage storage details section in Storage -->
+    <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">Belegter Speicherplatz</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Overall usage</string>
@@ -3748,14 +3744,10 @@
     <string name="button_copy_key">Schlüssel kopieren</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Passwort kopieren</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">Link in die Zwischenablage kopiert</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">Schlüssel in die Zwischenablage kopiert</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Passwort in die Zwischenablage kopiert</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">Link erfolgreich versandt.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">Link und Schlüssel erfolgreich versandt.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -3887,7 +3879,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Datei aktualisiert.</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">Dateiaktualisierung fehlgeschlagen. Bitte versuchen Sie es erneut.</string>
+    <string name="file_update_failed">File update failed. Please try again.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Die Datei ist zu groß, um geöffnet zu werden.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -3995,4 +3987,62 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Trotzdem ändern</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Permission needed to access storage.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">Mobiltelefonnummer hinzufügen</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">Do you remember your password?\nMEGA cannot reset your password if you forget it.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">Change name</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">Add photo</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">Add phone number</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">MEGA needs write permissions to your device storage to continue.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">Tomorrow, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">Warte auf Bestätigung</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="one">1 connection</item>
+        <item quantity="other">%1$d connections</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Recently Added</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Anfragen</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Groups</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Copy all</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Link successfully sent.</item>
+        <item quantity="other">Links successfully sent.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link copied to the clipboard.</item>
+        <item quantity="other">Links copied to the clipboard.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Get Link</item>
+        <item quantity="other">Get Links</item>
+    </plurals>
 </resources>
