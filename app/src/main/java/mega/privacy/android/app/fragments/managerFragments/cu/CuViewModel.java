@@ -106,11 +106,10 @@ class CuViewModel extends BaseRxViewModel {
 
     @Inject
     public CuViewModel(@MegaApi MegaApiAndroid megaApi, DatabaseHandler dbHandler,
-                       MegaNodeRepo repo, Context context, SortOrderManagement sortOrderManagement, int zoom) {
+                       MegaNodeRepo repo, Context context, SortOrderManagement sortOrderManagement) {
         mMegaApi = megaApi;
         mDbHandler = dbHandler;
         mRepo = repo;
-        mZoom = zoom;
         mAppContext = context.getApplicationContext();
         mSortOrderManagement = sortOrderManagement;
         mCreateThumbnailRequest = new BaseListener(mAppContext) {

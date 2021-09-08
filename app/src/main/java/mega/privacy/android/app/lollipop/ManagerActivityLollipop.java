@@ -1553,10 +1553,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         zoomViewModel = new ViewModelProvider(this).get(ZoomViewModel.class);
         zoomViewModel.getZoom().observe(this, zoom -> {
+            // Out 3X: organize by year, In 1X: oragnize by day, both need to reload nodes.
+            boolean needReload = ZoomUtil.INSTANCE.needReload(currentZoom, zoom);
             currentZoom = zoom;
 
             if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
-                cuFragment.zoom(currentZoom);
+                refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+
+                if (needReload) {
+                    refreshCUNodes();
+                }
             }
         });
 
@@ -5340,6 +5346,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
 						updateFullscreenOfflineFragmentOptionMenu(true);
 					}
+
+                    if (mHomepageScreen == HomepageScreen.PHOTOS) {
+                        updatePhotosFragmentOptionsMenu();
+                    }
+
 					break;
 				case RUBBISH_BIN:
 					if (getRubbishBinFragment() != null && rubbishBinFLol.getItemCount() > 0) {
@@ -5579,16 +5590,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     }
 
     public void updatePhotosFragmentOptionsMenu() {
-        if (selectMenuItem == null || sortByMenuItem == null || zoomOutMenuItem == null || zoomInMenuItem == null) {
+        if (zoomOutMenuItem == null || zoomInMenuItem == null) {
             return;
         }
 
-        if (drawerItem == DrawerItem.HOMEPAGE) {
-            boolean visible = cuFragment.shouldShowFullInfoAndOptions();
-            searchMenuItem.setVisible(visible);
-            zoomOutMenuItem.setVisible(visible);
-            zoomInMenuItem.setVisible(visible);
-        }
+        zoomOutMenuItem.setVisible(true);
+        zoomInMenuItem.setVisible(true);
     }
 
 	private void setGridListIcon() {
@@ -5910,10 +5917,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	return true;
 	        }
             case R.id.action_zoom_out: {
-                if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+                if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
                     if (currentZoom > ZOOM_OUT_3X) {
-                        currentZoom--;
-                        zoomViewModel.setZoom(currentZoom);
+                        zoomViewModel.setZoom(currentZoom - 1);
                         ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
                     }
 
@@ -5921,18 +5927,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                         ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
                     }
                 }
-
-                if(drawerItem == DrawerItem.HOMEPAGE) {
-
-                }
-
                 return true;
             }
             case R.id.action_zoom_in: {
-                if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+                if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
                     if (currentZoom < ZOOM_IN_1X) {
-                        currentZoom++;
-                        zoomViewModel.setZoom(currentZoom);
+                        zoomViewModel.setZoom(currentZoom + 1);
                         ZoomUtil.INSTANCE.enableButton(this, zoomOutMenuItem);
                     }
 

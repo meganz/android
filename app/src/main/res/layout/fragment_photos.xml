@@ -15,43 +15,17 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#abcdef">
+        android:layout_height="match_parent">
 
         <include
             android:id="@+id/empty_hint"
             layout="@layout/empty_result_files"
             app:showHint="@{viewModel.items.empty}" />
 
-        <ImageView
-            android:id="@+id/btn_zoom_out"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            app:layout_constraintEnd_toStartOf="@id/btn_zoom_in"
-            app:layout_constraintTop_toTopOf="@id/photo_list"
-            android:layout_marginTop="52dp"
-            android:layout_marginEnd="20dp"
-            android:src="@drawable/ic_zoom_out"
-            android:elevation="1dp"
-            app:tint="@color/white"/>
-
-        <ImageView
-            android:id="@+id/btn_zoom_in"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/photo_list"
-            android:layout_marginTop="52dp"
-            android:layout_marginEnd="18dp"
-            android:elevation="1dp"
-            android:src="@drawable/ic_zoom_in"
-            app:tint="@color/white"/>
-
-        <mega.privacy.android.app.components.NewGridRecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/photo_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:columnWidth="@dimen/photo_item_width"
             android:paddingBottom="@dimen/grid_node_list_padding_bottom"
             app:items="@{viewModel.items}"
             app:layout_constraintBottom_toBottomOf="parent"

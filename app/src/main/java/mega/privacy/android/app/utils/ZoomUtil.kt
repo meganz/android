@@ -84,4 +84,8 @@ object ZoomUtil {
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_small)
         else -> 0
     }
+
+    fun needReload(currentZoom: Int, zoom: Int): Boolean {
+        return if (currentZoom == ZOOM_OUT_3X || currentZoom == ZOOM_IN_1X) true else zoom == ZOOM_OUT_3X || zoom == ZOOM_IN_1X
+    }
 }

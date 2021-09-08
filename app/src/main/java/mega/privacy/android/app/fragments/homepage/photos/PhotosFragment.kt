@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,8 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +31,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
@@ -35,9 +39,11 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_3X
+import mega.privacy.android.app.utils.ZoomUtil.getSpanCount
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -52,17 +58,27 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private lateinit var binding: FragmentPhotosBinding
 
-    private lateinit var listView: NewGridRecyclerView
+    private lateinit var listView: RecyclerView
 
     private lateinit var browseAdapter: PhotosBrowseAdapter
     private lateinit var searchAdapter: PhotosSearchAdapter
+
+    private lateinit var gridLayoutManager: GridLayoutManager
+    private var linearLayoutManager: LinearLayoutManager? = null
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
 
     private lateinit var itemDecoration: SimpleDividerItemDecoration
 
+    private var selectedView = CameraUploadsFragment.ALL_VIEW
+
     private var currentZoom = ZOOM_DEFAULT
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        currentZoom = (activity as ManagerActivityLollipop).currentZoom
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -83,7 +99,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         setupEmptyHint()
         setupListView()
         setupListAdapter()
-        setupViewTypes()
         setupFastScroller()
         setupActionMode()
         setupNavigation()
@@ -104,22 +119,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
             getString(R.string.homepage_empty_hint_photos).toUpperCase(Locale.ROOT)
-    }
-
-    private fun setupViewTypes() {
-        binding.btnZoomIn.setOnClickListener {
-            if(currentZoom < ZOOM_IN_1X) {
-                currentZoom++
-                viewModel.setZoom(currentZoom)
-            }
-        }
-
-        binding.btnZoomOut.setOnClickListener {
-            if(currentZoom > ZOOM_OUT_3X) {
-                currentZoom--
-                viewModel.setZoom(currentZoom)
-            }
-        }
     }
 
     private fun doIfOnline(operation: () -> Unit) {
@@ -356,9 +355,14 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun configureGridLayoutManager() {
-        if (listView.layoutManager !is CustomizedGridLayoutManager) return
+        if (listView.layoutManager !is GridLayoutManager) return
 
-        (listView.layoutManager as CustomizedGridLayoutManager).apply {
+        val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val spanCount = getSpanCount(isPortrait, currentZoom)
+        gridLayoutManager = GridLayoutManager(context, spanCount)
+        listView.switchBackToGrid()
+
+        (listView.layoutManager as GridLayoutManager).apply {
 
             spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
             val itemDimen =
@@ -405,6 +409,24 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             startActivity(intent)
             requireActivity().overridePendingTransition(0, 0)
         }
+    }
+
+    private fun getSpanCount(isPortrait: Boolean): Int {
+        return if (selectedView != CameraUploadsFragment.ALL_VIEW) {
+            if (isPortrait) CameraUploadsFragment.SPAN_CARD_PORTRAIT else CameraUploadsFragment.SPAN_CARD_LANDSCAPE
+        } else {
+            getSpanCount(isPortrait, currentZoom)
+        }
+    }
+
+    private fun RecyclerView.switchToLinear() {
+        linearLayoutManager = LinearLayoutManager(context)
+        listView.layoutManager = linearLayoutManager
+    }
+
+    private fun RecyclerView.switchBackToGrid() {
+        linearLayoutManager = null
+        listView.layoutManager = gridLayoutManager
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
