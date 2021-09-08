@@ -604,6 +604,11 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchN
 	}
 
 	public void newSearchNodesTask() {
+		if (megaApi.getRootNode() == null) {
+			logError("Root node is null.");
+			return;
+		}
+
 		setProgressView(true);
 		cancelPreviousAsyncTask();
 		String query = ((ManagerActivityLollipop) context).getSearchQuery();
@@ -620,6 +625,11 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchN
 	}
 
 	private long getParentHandleForSearch(ManagerActivityLollipop.DrawerItem drawerItem) {
+		if (drawerItem == null) {
+			logWarning("DrawerItem is null.");
+			return megaApi.getRootNode().getHandle();
+		}
+
 		switch (drawerItem) {
 			case CLOUD_DRIVE:
 				return ((ManagerActivityLollipop) context).getParentHandleBrowser();
