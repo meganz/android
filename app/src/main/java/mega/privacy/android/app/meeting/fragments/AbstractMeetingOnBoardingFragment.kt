@@ -24,13 +24,10 @@ import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
-import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
@@ -230,22 +227,33 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                 speakerLiveData.observe(viewLifecycleOwner) {
                     when (it) {
                         AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                            fab_speaker.enable = true
                             fab_speaker.isOn = true
                             fab_speaker.setOnIcon(R.drawable.ic_speaker_on)
                             fab_speaker_label.text =
                                 StringResourcesUtils.getString(R.string.general_speaker)
                         }
                         AppRTCAudioManager.AudioDevice.EARPIECE -> {
+                            fab_speaker.enable = true
                             fab_speaker.isOn = false
                             fab_speaker.setOnIcon(R.drawable.ic_speaker_off)
                             fab_speaker_label.text =
                                 StringResourcesUtils.getString(R.string.general_speaker)
                         }
-                        else -> {
+                        AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
+                        AppRTCAudioManager.AudioDevice.BLUETOOTH -> {
+                            fab_speaker.enable = true
                             fab_speaker.isOn = true
                             fab_speaker.setOnIcon(R.drawable.ic_headphone)
                             fab_speaker_label.text =
                                 StringResourcesUtils.getString(R.string.general_headphone)
+                        }
+                        else -> {
+                            fab_speaker.enable = false
+                            fab_speaker.isOn = true
+                            fab_speaker.setOnIcon(R.drawable.ic_speaker_on)
+                            fab_speaker_label.text =
+                                StringResourcesUtils.getString(R.string.general_speaker)
                         }
                     }
                 }

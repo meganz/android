@@ -24,6 +24,7 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatRoom
@@ -61,7 +62,7 @@ class BottomFloatingPanelViewHolder(
     private var savedMicState: Boolean = false
     private var savedCamState: Boolean = false
     private var savedSpeakerState: AppRTCAudioManager.AudioDevice =
-        AppRTCAudioManager.AudioDevice.EARPIECE
+        AppRTCAudioManager.AudioDevice.NONE
     private val participantsAdapter = ParticipantsAdapter(listener)
 
     private var currentHeight = 0
@@ -135,7 +136,7 @@ class BottomFloatingPanelViewHolder(
      *
      * @param anchor the anchor view, the tips widow should show base on it's location
      */
-    fun initPopWindow(anchor: View) {
+    private fun initPopWindow(anchor: View) {
         if (inMeetingViewModel.isOneToOneCall()) {
             return
         }
@@ -316,6 +317,7 @@ class BottomFloatingPanelViewHolder(
             fabCam.enable = shouldBeEnable
             fabHold.enable = isCallEstablished
             fabHold.isOn = !isHold
+            fabSpeaker.enable = shouldBeEnable
         }
     }
 
@@ -625,21 +627,32 @@ class BottomFloatingPanelViewHolder(
      * @param device Current device selected
      */
     fun updateSpeakerIcon(device: AppRTCAudioManager.AudioDevice) {
+        logDebug("Update speaker icon. Audio device is $device")
         when (device) {
-            AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
-                floatingPanelView.fabSpeaker.isOn = true
+            AppRTCAudioManager.AudioDevice.SPEAKER_PHONE ->{
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                floatingPanelView.fabSpeaker.enable = true
+                floatingPanelView.fabSpeaker.isOn = true
                 floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
             }
             AppRTCAudioManager.AudioDevice.EARPIECE -> {
-                floatingPanelView.fabSpeaker.isOn = false
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_off)
+                floatingPanelView.fabSpeaker.enable = true
+                floatingPanelView.fabSpeaker.isOn = false
                 floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
             }
-            else -> {
-                floatingPanelView.fabSpeaker.isOn = true
+            AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
+            AppRTCAudioManager.AudioDevice.BLUETOOTH -> {
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
+                floatingPanelView.fabSpeaker.enable = true
+                floatingPanelView.fabSpeaker.isOn = true
                 floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_headphone)
+            }
+            else -> {
+                floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                floatingPanelView.fabSpeaker.enable = false
+                floatingPanelView.fabSpeaker.isOn = true
+                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
             }
         }
     }

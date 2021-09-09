@@ -60,7 +60,7 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     private val _speakerLiveData: MutableLiveData<AppRTCAudioManager.AudioDevice> =
         MutableLiveData<AppRTCAudioManager.AudioDevice>().apply {
             value = if (MegaApplication.getInstance().audioManager == null) {
-                AppRTCAudioManager.AudioDevice.SPEAKER_PHONE
+                AppRTCAudioManager.AudioDevice.NONE
             } else {
                 MegaApplication.getInstance().audioManager!!.selectedAudioDevice
             }
@@ -109,7 +109,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
 
     private val audioOutputStateObserver =
         Observer<AppRTCAudioManager.AudioDevice> {
-            if (_speakerLiveData.value != it) {
+            if (_speakerLiveData.value != it && it != AppRTCAudioManager.AudioDevice.NONE) {
+                logDebug("Updating speaker $it")
+
                 _speakerLiveData.value = it
                 tips.value = when (it) {
                     AppRTCAudioManager.AudioDevice.EARPIECE -> getString(R.string.general_speaker_off)
@@ -378,9 +380,11 @@ class MeetingActivityViewModel @ViewModelInject constructor(
     fun clickSpeaker() {
         when (_speakerLiveData.value) {
             AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
+                logDebug("Trying to switch to EARPIECE")
                 meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.EARPIECE)
             }
             else -> {
+                logDebug("Trying to switch to SPEAKER_PHONE")
                 meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)
             }
         }

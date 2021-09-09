@@ -1122,7 +1122,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         return if (chat == null) {
             -1L
         } else {
-            logDebug("all participants: $chat.peerCount")
+            logDebug("All participants: ${chat.peerCount}")
             chat.peerCount
         }
     }
@@ -1609,7 +1609,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Show group call - Speaker View UI")
         status = TYPE_IN_SPEAKER_VIEW
         checkInfoBanner(TYPE_SINGLE_PARTICIPANT)
-
         inMeetingViewModel.removeAllParticipantVisible()
 
         gridViewCallFragment?.let {
@@ -1702,7 +1701,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         when {
             !isManualModeView -> {
                 inMeetingViewModel.getCall()?.let {
-                    if (it.numParticipants <= MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC) {
+                    if (it.sessionsClientid.size() <= MAX_PARTICIPANTS_GRID_VIEW_AUTOMATIC) {
                         logDebug("Automatic mode - Grid view")
                         initGridViewMode()
                     } else {
