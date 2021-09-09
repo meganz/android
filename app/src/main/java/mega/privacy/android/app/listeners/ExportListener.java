@@ -19,7 +19,6 @@ import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-import mega.privacy.android.app.activities.GetLinkActivity;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -46,16 +45,6 @@ public class ExportListener extends BaseListener {
     final private HashMap<Long, Long> msgIdNodeHandle = new HashMap<>();
 
     private OnExportFinishedListener onExportFinishedListener;
-
-    /**
-     * Constructor used for get the link created.
-     *
-     * @param context Current Context
-     */
-    public ExportListener(Context context) {
-        super(context);
-        this.action = ACTION_GET_LINK;
-    }
 
     /**
      * Constructor used for launch a view intent to share content through the link created
@@ -228,20 +217,6 @@ public class ExportListener extends BaseListener {
                     }
                 }
 
-                break;
-
-            case ACTION_GET_LINK:
-                if (context instanceof GetLinkActivity) {
-                    if (e.getErrorCode() == MegaError.API_OK && request.getLink() != null) {
-                        ((GetLinkActivity) context).setLink();
-                    } else {
-                        logError("Error exporting node: " + e.getErrorString());
-                        if (e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE) {
-                            ((GetLinkActivity) context).showSnackbar(SNACKBAR_TYPE,
-                                    context.getString(R.string.context_no_link), MEGACHAT_INVALID_HANDLE);
-                        }
-                    }
-                }
                 break;
 
             case ACTION_SHARE_NODE:

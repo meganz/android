@@ -676,6 +676,25 @@ object MegaNodeUtil {
     }
 
     /**
+     * Check if all nodes have owner access.
+     *
+     * @param nodes List of nodes to check.
+     * @return True if all nodes have owner access, false otherwise.
+     */
+    @JvmStatic
+    fun allHaveOwnerAccess(nodes: List<MegaNode?>): Boolean {
+        val megaApi = MegaApplication.getInstance().megaApi
+
+        for (node in nodes) {
+            if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    /**
      * Shows a confirmation warning before leave an incoming share.
      *
      * @param activity current Activity

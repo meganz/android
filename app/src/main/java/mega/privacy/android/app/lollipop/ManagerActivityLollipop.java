@@ -21,9 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.Looper;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import androidx.annotation.NonNull;
@@ -89,7 +87,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.jeremyliao.liveeventbus.LiveEventBus;
@@ -126,6 +123,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -190,7 +188,6 @@ import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -198,6 +195,7 @@ import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialog
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
+import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -302,8 +300,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-		FilePrepareTask.ProcessedFilesCallback {
+		ChatManagementCallback, ActionNodeCallback, SnackbarShower {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -360,6 +357,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	MyAccountInfo myAccountInfo;
 	@Inject
 	InviteContactUseCase inviteContactUseCase;
+	@Inject
+	FilePrepareUseCase filePrepareUseCase;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -487,7 +486,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public enum DrawerItem {
-		CLOUD_DRIVE, CAMERA_UPLOADS, HOMEPAGE, CHAT, SHARED_ITEMS, CONTACTS, NOTIFICATIONS,
+		CLOUD_DRIVE, CAMERA_UPLOADS, HOMEPAGE, CHAT, SHARED_ITEMS, NOTIFICATIONS,
 		SETTINGS, INBOX, SEARCH, TRANSFERS, RUBBISH_BIN, ASK_PERMISSIONS;
 
 		public String getTitle(Context context) {
@@ -497,9 +496,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
 				case INBOX: return context.getString(R.string.section_inbox);
 				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
-				case CONTACTS: {
-					context.getString(R.string.section_contacts);
-				}
 				case SETTINGS: return context.getString(R.string.action_settings);
 				case SEARCH: return context.getString(R.string.action_search);
 				case TRANSFERS: return context.getString(R.string.section_transfers);
@@ -2591,6 +2587,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		logDebug("END onCreate");
+		new RatingHandlerImpl(this).showRatingBaseOnTransaction();
 	}
 
 	/**
@@ -3402,22 +3399,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 					break;
 				}
-				case CONTACTS:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
-					try {
-						ContactsAdvancedNotificationBuilder notificationBuilder;
-						notificationBuilder =  ContactsAdvancedNotificationBuilder.newInstance(this, megaApi);
-
-						notificationBuilder.removeAllIncomingContactNotifications();
-						notificationBuilder.removeAllAcceptanceContactNotifications();
-					}
-					catch (Exception e){
-						logError("Exception NotificationManager - remove all CONTACT notifications", e);
-					}
-
-					setToolbarTitle();
-					break;
-				}
 				case SEARCH:{
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 					setToolbarTitle();
@@ -3593,7 +3574,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private void cancelSearch() {
 		if (getSearchFragment() != null) {
-			sFLol.cancelPreviousAsyncTask();
+			sFLol.cancelPreviousSearch();
 		}
 	}
 
@@ -3865,12 +3846,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				break;
 			}
-			case CONTACTS:{
-				aB.setSubtitle(null);
-				aB.setTitle(getString(R.string.section_contacts).toUpperCase());
-				firstNavigationLevel = true;
-				break;
-			}
 			case NOTIFICATIONS:{
 				aB.setSubtitle(null);
 				aB.setTitle(getString(R.string.title_properties_chat_contact_notifications).toUpperCase());
@@ -3988,7 +3963,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if(totalNotifications==0){
 			if(isFirstNavigationLevel()){
-				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
+				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.NOTIFICATIONS
 						|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.TRANSFERS){
 					aB.setHomeAsUpIndicator(tintIcon(this, R.drawable.ic_arrow_back_white));
 				}
@@ -4002,7 +3977,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 		else{
 			if(isFirstNavigationLevel()){
-				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS || drawerItem == DrawerItem.NOTIFICATIONS
+				if (drawerItem == DrawerItem.SEARCH || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.NOTIFICATIONS
 						|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.TRANSFERS){
 					badgeDrawable.setProgress(1.0f);
 				}
@@ -4185,7 +4160,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					setBottomNavigationMenuItemChecked(CHAT_BNV);
 					break;
 				}
-				case CONTACTS:
 				case SETTINGS:
 				case SEARCH:
 				case TRANSFERS:
@@ -4708,10 +4682,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					bottomNavigationCurrentItem = SHARED_BNV;
 				}
 				setBottomNavigationMenuItemChecked(SHARED_BNV);
-    			break;
-    		}
-    		case CONTACTS:{
-				showHideBottomNavigationView(true);
     			break;
     		}
 			case NOTIFICATIONS:{
@@ -5633,7 +5603,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		switch(id){
 			case android.R.id.home:{
 				if (firstNavigationLevel && drawerItem != DrawerItem.SEARCH){
-					if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.INBOX || drawerItem == DrawerItem.CONTACTS
+					if (drawerItem == DrawerItem.RUBBISH_BIN || drawerItem == DrawerItem.INBOX
 							|| drawerItem == DrawerItem.NOTIFICATIONS|| drawerItem == DrawerItem.SETTINGS || drawerItem == DrawerItem.TRANSFERS) {
 						if (drawerItem == DrawerItem.SETTINGS) {
 							resetSettingsScrollIfNecessary();
@@ -5693,7 +5663,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		    			}
 		    		}
 		    		else if (drawerItem == DrawerItem.TRANSFERS){
-
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
 						selectDrawerItemLollipop(drawerItem);
@@ -5957,10 +5926,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	int orderType;
 
 	        	switch (drawerItem) {
-					case CONTACTS:
-						orderType = ORDER_CONTACTS;
-						break;
-
 					case CAMERA_UPLOADS:
 						orderType = ORDER_CAMERA;
 						break;
@@ -6556,6 +6521,35 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void showRenameDialog(final MegaNode document){
 		showRenameNodeDialog(this, document, this, this);
+	}
+
+	/**
+	 * Launches an intent to get the links of the nodes received.
+	 *
+	 * @param nodes List of nodes to get their links.
+	 */
+	public void showGetLinkActivity(List<MegaNode> nodes) {
+    	if (nodes == null || nodes.isEmpty()) {
+    		showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error), MEGACHAT_INVALID_HANDLE);
+			return;
+		}
+
+    	if (nodes.size() == 1) {
+    		showGetLinkActivity(nodes.get(0).getHandle());
+    		return;
+		}
+
+    	long[] handles = new long[nodes.size()];
+		for (int i = 0; i < nodes.size(); i++) {
+			MegaNode node = nodes.get(i);
+			if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
+				return;
+			}
+
+			handles[i] = node.getHandle();
+		}
+
+		LinksUtil.showGetLinkActivity(this, handles);
 	}
 
 	public void showGetLinkActivity(long handle){
@@ -8092,45 +8086,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("Intent type: " + intent.getType());
 
 			intent.setAction(Intent.ACTION_GET_CONTENT);
-			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-			filePrepareTask.execute(intent);
 			showProcessFileDialog(this,intent);
-		}
-		else if (requestCode == CHOOSE_PICTURE_PROFILE_CODE && resultCode == RESULT_OK) {
 
-			if (resultCode == RESULT_OK) {
-				if (intent == null) {
-					logWarning("Intent NULL");
-					return;
-				}
-
-				boolean isImageAvailable = checkProfileImageExistence(intent.getData());
-				if(!isImageAvailable){
-					logError("Error when changing avatar: image not exist");
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_changing_user_avatar_image_not_available), -1);
-					return;
-				}
-
-				intent.setAction(Intent.ACTION_GET_CONTENT);
-				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-				filePrepareTask.execute(intent);
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(this);
-					temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
-
-			}
-			else {
-				logWarning("resultCode for CHOOSE_PICTURE_PROFILE_CODE: " + resultCode);
-			}
-		}
-		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
+			filePrepareUseCase.prepareFiles(intent)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((shareInfo, throwable) -> {
+						if (throwable == null) {
+							onIntentProcessed(shareInfo);
+						}
+					});
+		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				requestPermission(this,
@@ -9128,10 +9094,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	/**
-	 * Handle processed upload intent
+	 * Handle processed upload intent.
+	 *
+	 * @param infos List<ShareInfo> containing all the upload info.
 	 */
-	@Override
-	public void onIntentProcessed(List<ShareInfo> infos) {
+	private void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentProcessedLollipop");
 		if (statusDialog != null) {
 			try {

@@ -49,8 +49,8 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "4.2.1"
-    versionCode = 399
+    appVersion = "4.2.2"
+    versionCode = 401
 
     // Sdk and tools
     compileSdkVersion = 30
@@ -79,7 +79,6 @@ ext {
     rxAndroidVersion = '3.0.0'
     ankoVersion = '0.10.8'
     frescoVersion = '2.5.0'
-    playServicesAdsVersion = '19.7.0'
     bannerViewPagerVersion = '3.4.0'
     liveEventBus = '1.7.3'
     firebaseBom = '26.7.0'

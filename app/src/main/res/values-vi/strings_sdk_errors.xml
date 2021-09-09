@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!-- Label to show that an SDK operation has been complete successfully. -->
-  <string name="api_ok">Không có lỗi</string>
-  <!-- Label to show that an Internal error occurs during a SDK operation. -->
-  <string name="api_einternal">Nỗi nội bộ</string>
-  <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
-  <string name="api_eargs">Hàm số không hợp lệ</string>
-  <!-- Label to show that a request error occurs during a SDK operation. -->
-  <string name="api_eagain">Yêu cầu thất bại, đang thử lại</string>
-  <!-- Label to show that the rate limit has been reached during a SDK operation. -->
-  <string name="api_eratelimit">Đã vượt quá giới hạn</string>
-  <!-- Label to show that a SDK operation has failed permanently. -->
-  <string name="api_efailed">Thất bại hoàn toàn</string>
-  <!-- Error shown when terms of service are breached during download. -->
-  <string name="api_etoomany_ec_download">Phát hiện vi phạm Điều Khoản Dịch Vụ</string>
-  <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
-  <string name="api_etoomay">Quá nhiều kết nối/truyền tải cùng lúc</string>
-  <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
-  <string name="api_erange">Nằm ngoài phạm vi</string>
-  <!-- State to indicate something has expired (achivements of business status account for instance) -->
-  <string name="api_eexpired">Hết hạn</string>
-  <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
-  <string name="api_enoent">Không tìm thấy</string>
-  <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
-  <string name="api_ecircular">Phát hiện lỗi liên kết vòng lặp</string>
-  <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-  <string name="api_eaccess">Truy cập bị từ chối</string>
-  <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
-  <string name="api_eexist">Đã tồn tại sẵn</string>
-  <!-- Label to show that an error related with an Incomplete SDK operation. -->
-  <string name="api_eincomplete">Chưa hoàn thoành</string>
-  <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-  <string name="api_ekey">Chìa khóa không hợp lệ / Lỗi giải mã</string>
-  <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
-  <string name="api_esid">Bad session ID</string>
-  <!-- Error shown when download a file that has violated ToS/AUP. -->
-  <string name="api_eblocked_ec_import_ec_download">Không truy cập được do vi phạm ĐKDV/CSSD</string>
-  <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
-  <string name="api_eblocked">Bị chặn</string>
-  <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
-  <string name="api_eoverquota">Quá mức băng thông</string>
-  <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
-  <string name="api_etempunavail">Tạm thời không khả dụng</string>
-  <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
-  <string name="api_etoomanyconnections">Quá tải số lượng kết nối</string>
-  <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
-  <string name="api_ewrite">Lỗi ghi tệp</string>
-  <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
-  <string name="api_eread">Lỗi đọc tệp tin</string>
-  <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
-  <string name="api_eappkey">Application key không hợp lệ</string>
-  <!-- Error shown when SSL check has failed -->
-  <string name="api_essl">Xác thực SSL bị thất bại</string>
-  <!-- Label shown when current account does not have enough quota to complete the operation -->
-  <string name="api_egoingoverquota">Không đủ băng thông</string>
-  <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-  <string name="api_emfarequired">Cần sử dụng Xác Thực 2-Bước.</string>
-  <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
-  <string name="api_emasteronly">Truy cập bị từ chối cho tất cả thành viên dưới hạng admin</string>
-  <!-- A dialog title shown to users when their business account is expired. -->
-  <string name="api_ebusinesspastdue">Tài khoản Doanh Nghiệp đã hết hạn</string>
-  <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
-  <string name="payment_ecard">Thẻ bị từ chối</string>
-  <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
-  <string name="payment_ebilling">Thanh toán thất bại</string>
-  <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
-  <string name="payment_efraud">Bị từ chối bởi phòng chống gian lận</string>
-  <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
-  <string name="payment_etoomay">Quá nhiều yêu cầu</string>
-  <!-- Label to show that an error of Balance occurs during a SDK operation. -->
-  <string name="payment_ebalance">Số dư tài khoản bị lỗi</string>
-  <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-  <string name="payment_egeneric_api_error_unknown">Lỗi không xác định được</string>
-  <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
-  <string name="api_error_http">Lỗi HTTP</string>
-  <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
-  <string name="api_ecircular_ec_upload">Phiên truyền tải bị thất bại do cấu trúc thư mục đệ quy</string>
+    <!-- Label to show that an SDK operation has been complete successfully. -->
+    <string name="api_ok">Không có lỗi</string>
+    <!-- Label to show that an Internal error occurs during a SDK operation. -->
+    <string name="api_einternal">Nỗi nội bộ</string>
+    <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
+    <string name="api_eargs">Hàm số không hợp lệ</string>
+    <!-- Label to show that a request error occurs during a SDK operation. -->
+    <string name="api_eagain">Yêu cầu thất bại, đang thử lại</string>
+    <!-- Label to show that the rate limit has been reached during a SDK operation. -->
+    <string name="api_eratelimit">Đã vượt quá giới hạn</string>
+    <!-- Label to show that a SDK operation has failed permanently. -->
+    <string name="api_efailed">Thất bại hoàn toàn</string>
+    <!-- Error shown when terms of service are breached during download. -->
+    <string name="api_etoomany_ec_download">Phát hiện vi phạm Điều Khoản Dịch Vụ</string>
+    <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
+    <string name="api_etoomay">Quá nhiều kết nối/truyền tải cùng lúc</string>
+    <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
+    <string name="api_erange">Nằm ngoài phạm vi</string>
+    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <string name="api_eexpired">Hết hạn</string>
+    <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
+    <string name="api_enoent">Không tìm thấy</string>
+    <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
+    <string name="api_ecircular">Phát hiện lỗi liên kết vòng lặp</string>
+    <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
+    <string name="api_eaccess">Truy cập bị từ chối</string>
+    <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
+    <string name="api_eexist">Đã tồn tại sẵn</string>
+    <!-- Label to show that an error related with an Incomplete SDK operation. -->
+    <string name="api_eincomplete">Chưa hoàn thoành</string>
+    <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
+    <string name="api_ekey">Chìa khóa không hợp lệ / Lỗi giải mã</string>
+    <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
+    <string name="api_esid">Bad session ID</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="api_eblocked_ec_import_ec_download">Không truy cập được do vi phạm ĐKDV/CSSD</string>
+    <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
+    <string name="api_eblocked">Bị chặn</string>
+    <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
+    <string name="api_eoverquota">Quá mức băng thông</string>
+    <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
+    <string name="api_etempunavail">Tạm thời không khả dụng</string>
+    <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
+    <string name="api_etoomanyconnections">Quá tải số lượng kết nối</string>
+    <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
+    <string name="api_ewrite">Lỗi ghi tệp</string>
+    <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
+    <string name="api_eread">Lỗi đọc tệp tin</string>
+    <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
+    <string name="api_eappkey">Application key không hợp lệ</string>
+    <!-- Error shown when SSL check has failed -->
+    <string name="api_essl">Xác thực SSL bị thất bại</string>
+    <!-- Label shown when current account does not have enough quota to complete the operation -->
+    <string name="api_egoingoverquota">Không đủ băng thông</string>
+    <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
+    <string name="api_emfarequired">Cần sử dụng Xác Thực 2-Bước.</string>
+    <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
+    <string name="api_emasteronly">Truy cập bị từ chối cho tất cả thành viên dưới hạng admin</string>
+    <!-- A dialog title shown to users when their business account is expired. -->
+    <string name="api_ebusinesspastdue">Tài khoản Doanh Nghiệp đã hết hạn</string>
+    <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
+    <string name="payment_ecard">Thẻ bị từ chối</string>
+    <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
+    <string name="payment_ebilling">Thanh toán thất bại</string>
+    <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
+    <string name="payment_efraud">Bị từ chối bởi phòng chống gian lận</string>
+    <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
+    <string name="payment_etoomay">Quá nhiều yêu cầu</string>
+    <!-- Label to show that an error of Balance occurs during a SDK operation. -->
+    <string name="payment_ebalance">Số dư tài khoản bị lỗi</string>
+    <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
+    <string name="payment_egeneric_api_error_unknown">Lỗi không xác định được</string>
+    <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
+    <string name="api_error_http">Lỗi HTTP</string>
+    <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
+    <string name="api_ecircular_ec_upload">Phiên truyền tải bị thất bại do cấu trúc thư mục đệ quy</string>
 </resources>

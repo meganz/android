@@ -350,6 +350,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
         menuInflater.inflate(R.menu.media_player, menu)
 
+        menu.findItem(R.id.get_link).title =
+            StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
+
         searchMenuItem = menu.findItem(R.id.action_search)
 
         val searchView = searchMenuItem?.actionView

@@ -63,6 +63,7 @@ import mega.privacy.android.app.middlelayer.iab.MegaSku;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.service.iab.BillingManagerImpl;
+import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption;
 import mega.privacy.android.app.utils.PermissionUtils;
@@ -1099,7 +1100,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     /**
      * Launches an intent to navigate to Upgrade Account screen.
      */
-    protected void navigateToUpgradeAccount() {
+    public void navigateToUpgradeAccount() {
         Intent intent = new Intent(this, ManagerActivityLollipop.class);
         intent.setAction(ACTION_SHOW_UPGRADE_ACCOUNT);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -1334,6 +1335,7 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
                 updateAccountInfo(this, purchases, myAccountInfo);
                 message = StringResourcesUtils.getString(R.string.message_user_purchased_subscription);
                 updateSubscriptionLevel(myAccountInfo, dbH, megaApi);
+                new RatingHandlerImpl(this).updateTransactionFlag(true);
             } else {
                 //payment is being processed or in unknown state
                 logDebug("Purchase " + sku + " is being processed or in unknown state.");

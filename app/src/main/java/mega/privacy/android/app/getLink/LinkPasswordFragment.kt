@@ -1,9 +1,6 @@
-package mega.privacy.android.app.fragments.getLinkFragments
+package mega.privacy.android.app.getLink
 
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -12,33 +9,53 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
+import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.navArgs
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.FragmentSetLinkPasswordBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.interfaces.GetLinkInterface
-import mega.privacy.android.app.listeners.PasswordLinkListener
+import mega.privacy.android.app.interfaces.Scrollable
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util.setPasswordToggle
 import nz.mega.sdk.MegaApiJava
 
-class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : BaseFragment() {
+/**
+ * Fragment of [GetLinkActivity] to allow encrypt a link of a node with a password.
+ */
+class LinkPasswordFragment : BaseFragment(), Scrollable {
+
+    companion object {
+        private const val ALREADY_RESET = "ALREADY_RESET"
+    }
+
+    private val viewModel: GetLinkViewModel by activityViewModels()
+    private val args: LinkPasswordFragmentArgs by navArgs()
 
     private lateinit var binding: FragmentSetLinkPasswordBinding
 
     private var isPasswordValid = false
+    private var alreadyReset = false
 
-    private lateinit var veryWeakShape: Drawable
-    private lateinit var weakShape: Drawable
-    private lateinit var mediumShape: Drawable
-    private lateinit var goodShape: Drawable
-    private lateinit var strongShape: Drawable
-    private lateinit var emptyShape: Drawable
+    private val veryWeakShape by lazy {
+        ContextCompat.getDrawable(
+            context,
+            R.drawable.passwd_very_weak
+        )
+    }
+    private val weakShape by lazy { ContextCompat.getDrawable(context, R.drawable.passwd_weak) }
+    private val mediumShape by lazy { ContextCompat.getDrawable(context, R.drawable.passwd_medium) }
+    private val goodShape by lazy { ContextCompat.getDrawable(context, R.drawable.passwd_good) }
+    private val strongShape by lazy { ContextCompat.getDrawable(context, R.drawable.passwd_strong) }
+    private val emptyShape by lazy { ContextCompat.getDrawable(context, R.drawable.shape_password) }
 
-    private var veryWeakColor = 0
-    private var weakColor = 0
-    private var mediumColor = 0
-    private var goodColor = 0
-    private var strongColor = 0
+    private val veryWeakColor by lazy { ContextCompat.getColor(context, R.color.red_600_red_300) }
+    private val weakColor by lazy { ContextCompat.getColor(context, R.color.yellow_600_yellow_300) }
+    private val mediumColor by lazy { ContextCompat.getColor(context, R.color.green_500_green_400) }
+    private val goodColor by lazy { ContextCompat.getColor(context, R.color.lime_green_500_200) }
+    private val strongColor by lazy { ContextCompat.getColor(context, R.color.dark_blue_500_200) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,47 +67,42 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        veryWeakShape = ContextCompat.getDrawable(context, R.drawable.passwd_very_weak)!!
-        weakShape = ContextCompat.getDrawable(context, R.drawable.passwd_weak)!!
-        mediumShape = ContextCompat.getDrawable(context, R.drawable.passwd_medium)!!
-        goodShape = ContextCompat.getDrawable(context, R.drawable.passwd_good)!!
-        strongShape = ContextCompat.getDrawable(context, R.drawable.passwd_strong)!!
-        emptyShape = ContextCompat.getDrawable(context, R.drawable.shape_password)!!
+        alreadyReset = savedInstanceState?.getBoolean(ALREADY_RESET, false) ?: false
+        setupView()
+        setupObservers()
+        super.onViewCreated(view, savedInstanceState)
+    }
 
-        veryWeakColor = ContextCompat.getColor(context, R.color.red_600_red_300)
-        weakColor = ContextCompat.getColor(context, R.color.yellow_600_yellow_300)
-        mediumColor = ContextCompat.getColor(context, R.color.green_500_green_400)
-        goodColor = ContextCompat.getColor(context, R.color.lime_green_500_200)
-        strongColor = ContextCompat.getColor(context, R.color.dark_blue_500_200)
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(ALREADY_RESET, alreadyReset)
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun setupView() {
+        ListenScrollChangesHelper().addViewToListen(
+            binding.scrollViewSetLinkPassword
+        ) { _, _, _, _, _ -> checkScroll() }
+
+        checkScroll()
 
         binding.passwordLayout.isEndIconVisible = false
-        with(binding.passwordText) {
-            addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    charSequence: CharSequence,
-                    i: Int,
-                    i1: Int,
-                    i2: Int
-                ) {
+        binding.passwordText.apply {
+            doOnTextChanged { text, _, _, _ ->
+                if (!text.isNullOrEmpty()) {
+                    val temp = text.toString()
+                    binding.containerPasswdElements.visibility = VISIBLE
+                    checkPasswordStrength(temp.trim())
+                } else {
+                    isPasswordValid = false
+                    binding.containerPasswdElements.visibility = GONE
                 }
+            }
 
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    if (s.isNotEmpty()) {
-                        val temp = s.toString()
-                        binding.containerPasswdElements.visibility = VISIBLE
-                        checkPasswordStrength(temp.trim())
-                    } else {
-                        isPasswordValid = false
-                        binding.containerPasswdElements.visibility = GONE
-                    }
+            doAfterTextChanged {
+                if (text.toString().isEmpty()) {
+                    quitError(this)
                 }
-
-                override fun afterTextChanged(editable: Editable) {
-                    if (editable.toString().isEmpty()) {
-                        quitError(this@with)
-                    }
-                }
-            })
+            }
 
             setOnFocusChangeListener { _, hasFocus ->
                 binding.passwordLayout.isEndIconVisible = hasFocus
@@ -98,21 +110,8 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
         }
 
         binding.confirmPasswordLayout.isEndIconVisible = false
-        with(binding.confirmPasswordText) {
-            addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    charSequence: CharSequence,
-                    i: Int,
-                    i1: Int,
-                    i2: Int
-                ) {
-                }
-
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(editable: Editable) {
-                    quitError(this@with)
-                }
-            })
+        binding.confirmPasswordText.apply {
+            doAfterTextChanged { quitError(this) }
 
             setOnFocusChangeListener { _, hasFocus ->
                 binding.confirmPasswordLayout.isEndIconVisible = hasFocus
@@ -130,13 +129,31 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
 
         binding.buttonConfirmPassword.setOnClickListener { confirmClick() }
         binding.buttonConfirmPassword.text = getString(
-            if (isTextEmpty(getLinkInterface.getLinkPassword())) R.string.button_set
+            if (!viewModel.isPasswordSet()) R.string.button_set
             else R.string.action_reset
         )
 
-        binding.buttonCancel.setOnClickListener { cancelClick() }
+        binding.buttonCancel.setOnClickListener {
+            resetView()
+            requireActivity().onBackPressed()
+        }
+    }
 
-        super.onViewCreated(view, savedInstanceState)
+    private fun setupObservers() {
+        viewModel.getPassword().observe(viewLifecycleOwner, ::onPasswordSet)
+    }
+
+    /**
+     * Updates the UI when the password has been set or removed.
+     *
+     * @param password The password if has been set, null if has been removed.
+     */
+    private fun onPasswordSet(password: String?) {
+        resetView()
+        
+        if (!password.isNullOrEmpty() && (!args.isReset || alreadyReset)) {
+            requireActivity().onBackPressed()
+        }
     }
 
     /**
@@ -337,23 +354,9 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
      */
     private fun confirmClick() {
         if (validateForm()) {
-            val password = binding.passwordText.text.toString();
-            getLinkInterface.setLinkPassword(password)
-
-            megaApi.encryptLinkWithPassword(
-                getLinkInterface.getNode().publicLink,
-                password,
-                PasswordLinkListener(context)
-            )
+            alreadyReset = true
+            viewModel.encryptLink(binding.passwordText.text.toString())
         }
-    }
-
-    /**
-     * Manages the click on cancel button by resetting the screen.
-     */
-    private fun cancelClick() {
-        resetView()
-        activity?.onBackPressed()
     }
 
     /**
@@ -362,5 +365,16 @@ class LinkPasswordFragment(private val getLinkInterface: GetLinkInterface) : Bas
     fun resetView() {
         binding.passwordText.text = null
         binding.confirmPasswordText.text = null
+    }
+
+    override fun checkScroll() {
+        if (!this::binding.isInitialized) {
+            return
+        }
+
+        val withElevation = binding.scrollViewSetLinkPassword
+            .canScrollVertically(Constants.SCROLLING_UP_DIRECTION)
+
+        viewModel.setElevation(withElevation)
     }
 }

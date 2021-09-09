@@ -242,6 +242,10 @@ public class InboxFragmentLollipop extends RotatableFragment{
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = adapter.getSelectedNodes();
+
+			menu.findItem(R.id.cab_menu_share_link)
+					.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
+
 			boolean showDownload = false;
 			boolean showSendToChat = false;
 			boolean showRename = false;
