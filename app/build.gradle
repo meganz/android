@@ -217,6 +217,8 @@ dependencies {
 
     implementation "com.jeremyliao:live-event-bus-x:$liveEventBus"
 
+    implementation "androidx.biometric:biometric:$biometricVersion"
+
     //GMS
     gmsImplementation 'com.google.firebase:firebase-core:18.0.0'
     gmsImplementation 'com.google.firebase:firebase-messaging:21.0.1'

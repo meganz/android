@@ -1,9 +1,15 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
-import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings.*
 import androidx.appcompat.app.AlertDialog
+import androidx.biometric.BiometricManager.*
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -12,11 +18,14 @@ import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivi
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_RESET_PASSCODE_LOCK
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity.Companion.ACTION_SET_PASSCODE_LOCK
 import mega.privacy.android.app.constants.SettingsConstants.*
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logWarning
+import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.PasscodeUtil
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import java.util.concurrent.Executor
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -33,9 +42,14 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
     private var passcodeSwitch: SwitchPreferenceCompat? = null
     private var resetPasscode: Preference? = null
+    private var fingerprintSwitch: SwitchPreferenceCompat? = null
     private var requirePasscode: Preference? = null
 
     private var passcodeLock = false
+
+    private lateinit var executor: Executor
+    private lateinit var biometricPrompt: BiometricPrompt
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_passcode)
@@ -56,6 +70,8 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
             intentToPasscodeLock(true)
             true
         }
+
+        fingerprintSwitch = findPreference(KEY_FINGERPRINT_ENABLE)
 
         requirePasscode = findPreference(KEY_REQUIRE_PASSCODE)
         requirePasscode?.setOnPreferenceClickListener {
@@ -92,6 +108,107 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         super.onSaveInstanceState(outState)
     }
 
+    /**
+     * Checks if fingerprint setting should be enabled.
+     */
+    private fun setupFingerprintSetting() {
+        when (val canAuthenticate = from(requireContext()).canAuthenticate(BIOMETRIC_STRONG)) {
+            BIOMETRIC_ERROR_NO_HARDWARE, BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
+                logDebug("Cannot show fingerprint setting, hardware not available.")
+                preferenceScreen.removePreference(fingerprintSwitch)
+            }
+            BIOMETRIC_SUCCESS, BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                logDebug("Show fingerprint setting, hardware available")
+                preferenceScreen.addPreference(fingerprintSwitch)
+                fingerprintSwitch?.setOnPreferenceClickListener {
+                    if (fingerprintSwitch?.isChecked == false) {
+                        return@setOnPreferenceClickListener true
+                    }
+
+                    fingerprintSwitch?.isChecked = false
+
+                    when {
+                        canAuthenticate == BIOMETRIC_SUCCESS -> {
+                            showEnableFingerprint()
+                            return@setOnPreferenceClickListener true
+                        }
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                            val intent = Intent(ACTION_BIOMETRIC_ENROLL)
+                                .putExtra(
+                                    EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
+                                    BIOMETRIC_STRONG
+                                )
+
+                            if (isIntentAvailable(requireContext(), intent)) {
+                                startActivityForResult(intent, REQUEST_CODE_BIOMETRIC_ENROLL)
+                                return@setOnPreferenceClickListener true
+                            }
+                        }
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
+                            val intent = Intent(ACTION_FINGERPRINT_ENROLL)
+                            if (isIntentAvailable(requireContext(), intent)) {
+                                startActivityForResult(intent, REQUEST_CODE_BIOMETRIC_ENROLL)
+                                return@setOnPreferenceClickListener true
+                            }
+                        }
+                    }
+
+                    true
+                }
+            }
+            else -> logDebug("Error. Cannot show fingerprint setting.")
+        }
+    }
+
+    /**
+     * Shows the dialog to enable fingerprint unlock.
+     */
+    private fun showEnableFingerprint() {
+        if (!this::executor.isInitialized) {
+            executor = ContextCompat.getMainExecutor(requireContext())
+        }
+
+        if (!this::biometricPrompt.isInitialized) {
+            biometricPrompt = BiometricPrompt(
+                this,
+                executor,
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationError(
+                        errorCode: Int,
+                        errString: CharSequence
+                    ) {
+                        super.onAuthenticationError(errorCode, errString)
+                        logWarning("Error: $errString")
+                    }
+
+                    override fun onAuthenticationSucceeded(
+                        result: BiometricPrompt.AuthenticationResult
+                    ) {
+                        super.onAuthenticationSucceeded(result)
+                        fingerprintSwitch?.isChecked = true
+                        snackbarCallBack?.showSnackbar(
+                            StringResourcesUtils.getString(R.string.confirmation_fingerprint_enabled)
+                        )
+                    }
+
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                        logWarning("Authentication failed")
+                    }
+                })
+        }
+
+        if (!this::promptInfo.isInitialized) {
+            promptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle(StringResourcesUtils.getString(R.string.title_enable_fingerprint))
+                .setNegativeButtonText(StringResourcesUtils.getString(R.string.general_cancel))
+                .setAllowedAuthenticators(BIOMETRIC_STRONG)
+                .build()
+        }
+
+        biometricPrompt.authenticate(promptInfo)
+    }
+
     private fun showRequirePasscodeDialog(selectedPosition: Int) {
         requirePasscodeDialog = passcodeUtil.showRequirePasscodeDialog(selectedPosition)
         requirePasscodeDialog.setOnDismissListener {
@@ -106,16 +223,24 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     private fun enablePasscode() {
         passcodeLock = true
         passcodeSwitch?.isChecked = true
-        preferenceScreen.addPreference(resetPasscode)
-        preferenceScreen.addPreference(requirePasscode)
+        preferenceScreen.apply {
+            addPreference(resetPasscode)
+            addPreference(requirePasscode)
+        }
+
+        setupFingerprintSetting()
         requirePasscode?.summary = passcodeUtil.getRequiredPasscodeText(dbH.passcodeRequiredTime)
     }
 
     private fun disablePasscode() {
         passcodeLock = false
         passcodeSwitch?.isChecked = false
-        preferenceScreen.removePreference(resetPasscode)
-        preferenceScreen.removePreference(requirePasscode)
+        preferenceScreen.apply {
+            removePreference(resetPasscode)
+            removePreference(fingerprintSwitch)
+            removePreference(requirePasscode)
+        }
+
         passcodeUtil.disablePasscode()
     }
 
@@ -125,16 +250,24 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     private fun intentToPasscodeLock(reset: Boolean) {
         val intent = Intent(context, PasscodeLockActivity::class.java)
         intent.action = if (reset) ACTION_RESET_PASSCODE_LOCK else ACTION_SET_PASSCODE_LOCK
-        startActivityForResult(intent, Constants.SET_PIN)
+        startActivityForResult(intent, SET_PIN)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        if (requestCode != Constants.SET_PIN) return
-
-        if (resultCode == Activity.RESULT_OK) {
-            enablePasscode()
-        } else {
-            LogUtil.logWarning("Set PIN ERROR")
+        when (requestCode) {
+            SET_PIN -> {
+                if (resultCode == RESULT_OK) {
+                    enablePasscode()
+                } else {
+                    logWarning("Set PIN ERROR")
+                }
+            }
+            REQUEST_CODE_BIOMETRIC_ENROLL ->
+                if (requestCode == RESULT_OK) {
+                    logDebug("Fingerprint enabled")
+                } else {
+                    logDebug("Enable fingerprint cancelled")
+                }
         }
     }
 

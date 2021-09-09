@@ -18,6 +18,14 @@
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />
 
+    <androidx.preference.SwitchPreferenceCompat
+        android:defaultValue="false"
+        android:key="settings_fingerprint_enable"
+        android:title="@string/setting_fingerprint"
+        app:allowDividerAbove="true"
+        app:allowDividerBelow="true"
+        app:iconSpaceReserved="false" />
+
     <androidx.preference.Preference
         android:key="settings_require_passcode"
         android:title="@string/settings_require_passcode"

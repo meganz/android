@@ -99,6 +99,7 @@ public class SettingsConstants {
     /* PassCode Lock settings */
     public static final String KEY_PASSCODE_ENABLE = "settings_passcode_enable";
     public static final String KEY_RESET_PASSCODE = "settings_change_passcode";
+    public static final String KEY_FINGERPRINT_ENABLE = "settings_fingerprint_enable";
     public static final String KEY_REQUIRE_PASSCODE = "settings_require_passcode";
 
     /* Advance settings  */

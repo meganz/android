@@ -9,10 +9,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivitySettingsBinding
 import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
+import mega.privacy.android.app.interfaces.SimpleSnackbarCallBack
 import mega.privacy.android.app.utils.StringResourcesUtils
 import java.util.*
 
-open class PreferencesBaseActivity : PasscodeActivity() {
+open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack {
 
     protected lateinit var binding: ActivitySettingsBinding
 
@@ -51,5 +52,9 @@ open class PreferencesBaseActivity : PasscodeActivity() {
     protected fun showSaveButton(callback: () -> Unit) {
         binding.viewSave.isVisible = true
         binding.btnSave.setOnClickListener { callback.invoke() }
+    }
+
+    override fun showSnackbar(message: String?) {
+        super.showSnackbar(binding.root, message)
     }
 }

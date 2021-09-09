@@ -82,4 +82,5 @@ ext {
     bannerViewPagerVersion = '3.4.0'
     liveEventBus = '1.7.3'
     firebaseBom = '26.7.0'
+    biometricVersion = '1.1.0'
 }

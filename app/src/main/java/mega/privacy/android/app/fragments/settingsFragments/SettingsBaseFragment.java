@@ -7,6 +7,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
+import mega.privacy.android.app.interfaces.SimpleSnackbarCallBack;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
@@ -17,6 +18,8 @@ public class SettingsBaseFragment extends PreferenceFragmentCompat implements Pr
     protected MegaChatApiAndroid megaChatApi;
     protected DatabaseHandler dbH;
     protected MegaPreferences prefs;
+
+    protected SimpleSnackbarCallBack snackbarCallBack;
 
     public SettingsBaseFragment () {
         if (megaApi == null) {
@@ -35,6 +38,10 @@ public class SettingsBaseFragment extends PreferenceFragmentCompat implements Pr
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+
+        if (context instanceof SimpleSnackbarCallBack) {
+            snackbarCallBack = (SimpleSnackbarCallBack) context;
+        }
     }
 
     @Override
