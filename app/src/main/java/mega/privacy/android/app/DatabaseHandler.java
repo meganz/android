@@ -42,7 +42,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 62;
+	private static final int DATABASE_VERSION = 63;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -95,6 +95,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PASSCODE_LOCK_TYPE = "pinlocktype";
     private static final String KEY_PASSCODE_LOCK_CODE = "pinlockcode";
 	private static final String KEY_PASSCODE_LOCK_REQUIRE_TIME = "passcodelockrequiretime";
+	private static final String KEY_FINGERPRINT_LOCK= "fingerprintlock";
     private static final String KEY_STORAGE_ASK_ALWAYS = "storageaskalways";
     private static final String KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation";
     private static final String KEY_LAST_UPLOAD_FOLDER = "lastuploadfolder";
@@ -381,7 +382,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ KEY_ASK_SET_DOWNLOAD_LOCATION + " BOOLEAN,"																	//43
 				+ KEY_URI_MEDIA_EXTERNAL_SD_CARD + " TEXT,"																		//44
 				+ KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD + " BOOLEAN," 																//45
-				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT DEFAULT '" + encrypt("" + (REQUIRE_PASSCODE_INVALID)) + "')";	//46
+				+ KEY_PASSCODE_LOCK_REQUIRE_TIME + " TEXT DEFAULT '" + encrypt("" + (REQUIRE_PASSCODE_INVALID)) + "', "	//46
+				+ KEY_FINGERPRINT_LOCK + " BOOLEAN DEFAULT '" + encrypt("false") + "'"									//47
+				+ ")";
 
         db.execSQL(CREATE_PREFERENCES_TABLE);
 
@@ -922,6 +925,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
 			onCreate(db);
 			setAttributes(db, attr);
+		}
+
+		if (oldVersion <= 62) {
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_FINGERPRINT_LOCK + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_FINGERPRINT_LOCK + " = '" + encrypt("false") + "';");
 		}
 	}
 
@@ -1584,6 +1592,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_SMALL_GRID_CAMERA, encrypt(prefs.getSmallGridCamera()));
 		values.put(KEY_REMOVE_GPS, encrypt(prefs.getRemoveGPS()));
 		values.put(KEY_PASSCODE_LOCK_REQUIRE_TIME, encrypt(prefs.getPasscodeLockRequireTime()));
+		values.put(KEY_FINGERPRINT_LOCK, encrypt(prefs.getFingerprintLock()));
 
         db.insert(TABLE_PREFERENCES, null, values);
 	}
@@ -1651,12 +1660,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String preferredSortCameraUpload = decrypt(cursor.getString(40));
 				String sdCardUri = decrypt(cursor.getString(41));
 				String passcodeLockRequireTime = decrypt(cursor.getString(46));
+				String fingerprintLock = decrypt(cursor.getString(47));
 
 				prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
 						pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 						secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
 						pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera, uploadVideoQuality, conversionOnCharging, chargingOnSize, shouldClearCameraSyncRecords, camVideoSyncTimeStamp,
-						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner, preferredSortCameraUpload, sdCardUri, passcodeLockRequireTime);
+						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner, preferredSortCameraUpload, sdCardUri, passcodeLockRequireTime, fingerprintLock);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -3560,6 +3570,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public int getPasscodeRequiredTime() {
 		String string = getStringValue(TABLE_PREFERENCES, KEY_PASSCODE_LOCK_REQUIRE_TIME, REQUIRE_PASSCODE_INVALID + "");
 		return !isTextEmpty(string) ? Integer.parseInt(string) : REQUIRE_PASSCODE_INVALID;
+	}
+
+	public void setFingerprintLockEnabled(boolean enabled) {
+		setStringValue(TABLE_PREFERENCES, KEY_FINGERPRINT_LOCK, "" + enabled);
+	}
+
+	public boolean isFingerprintLockEnabled() {
+		return getBooleanValue(TABLE_PREFERENCES, KEY_FINGERPRINT_LOCK, false);
 	}
 
 	public void setStorageAskAlways(boolean storageAskAlways) {

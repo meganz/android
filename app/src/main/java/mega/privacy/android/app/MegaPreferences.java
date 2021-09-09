@@ -49,6 +49,8 @@ public class MegaPreferences{
 
 	private String passcodeLockRequireTime;
 
+	private String fingerprintLock;
+
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
@@ -60,7 +62,7 @@ public class MegaPreferences{
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
 			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String passcodeLockType, String preferredSortCloud, String preferredSortContacts,
 			String preferredSortOthers, String firstTimeChat, String smallGridCamera, String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String shouldClearCameraSyncRecords,String camVideoSyncTimeStamp,
-            String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,String showInviteBanner, String preferredSortCameraUpload, String sdCardUri, String passcodeLockRequireTime){
+            String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,String showInviteBanner, String preferredSortCameraUpload, String sdCardUri, String passcodeLockRequireTime, String fingerprintLock){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -103,6 +105,7 @@ public class MegaPreferences{
 		this.preferredSortCameraUpload = preferredSortCameraUpload;
 		this.sdCardUri = sdCardUri;
 		this.passcodeLockRequireTime = passcodeLockRequireTime;
+		this.fingerprintLock = fingerprintLock;
 	}
 
 	public String getFirstTime (){
@@ -434,6 +437,10 @@ public class MegaPreferences{
 
 	public void setPasscodeLockRequireTime(String passcodeLockRequireTime) {
 		this.passcodeLockRequireTime = passcodeLockRequireTime;
+	}
+
+	public String getFingerprintLock() {
+		return fingerprintLock;
 	}
 
     @Override

@@ -120,40 +120,45 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
             BIOMETRIC_SUCCESS, BIOMETRIC_ERROR_NONE_ENROLLED -> {
                 logDebug("Show fingerprint setting, hardware available")
                 preferenceScreen.addPreference(fingerprintSwitch)
-                fingerprintSwitch?.setOnPreferenceClickListener {
-                    if (fingerprintSwitch?.isChecked == false) {
-                        return@setOnPreferenceClickListener true
-                    }
+                fingerprintSwitch?.apply {
+                    isChecked = dbH.isFingerprintLockEnabled
 
-                    fingerprintSwitch?.isChecked = false
-
-                    when {
-                        canAuthenticate == BIOMETRIC_SUCCESS -> {
-                            showEnableFingerprint()
+                    setOnPreferenceClickListener {
+                        if (fingerprintSwitch?.isChecked == false) {
+                            dbH.isFingerprintLockEnabled = false
                             return@setOnPreferenceClickListener true
                         }
-                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                            val intent = Intent(ACTION_BIOMETRIC_ENROLL)
-                                .putExtra(
-                                    EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-                                    BIOMETRIC_STRONG
-                                )
 
-                            if (isIntentAvailable(requireContext(), intent)) {
-                                startActivityForResult(intent, REQUEST_CODE_BIOMETRIC_ENROLL)
+                        fingerprintSwitch?.isChecked = false
+
+                        when {
+                            canAuthenticate == BIOMETRIC_SUCCESS -> {
+                                showEnableFingerprint()
                                 return@setOnPreferenceClickListener true
                             }
-                        }
-                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
-                            val intent = Intent(ACTION_FINGERPRINT_ENROLL)
-                            if (isIntentAvailable(requireContext(), intent)) {
-                                startActivityForResult(intent, REQUEST_CODE_BIOMETRIC_ENROLL)
-                                return@setOnPreferenceClickListener true
+                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+                                val intent = Intent(ACTION_BIOMETRIC_ENROLL)
+                                    .putExtra(
+                                        EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
+                                        BIOMETRIC_STRONG
+                                    )
+
+                                if (isIntentAvailable(requireContext(), intent)) {
+                                    startActivityForResult(intent, REQUEST_CODE_BIOMETRIC_ENROLL)
+                                    return@setOnPreferenceClickListener true
+                                }
+                            }
+                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
+                                val intent = Intent(ACTION_FINGERPRINT_ENROLL)
+                                if (isIntentAvailable(requireContext(), intent)) {
+                                    startActivityForResult(intent, REQUEST_CODE_BIOMETRIC_ENROLL)
+                                    return@setOnPreferenceClickListener true
+                                }
                             }
                         }
+
+                        true
                     }
-
-                    true
                 }
             }
             else -> logDebug("Error. Cannot show fingerprint setting.")
@@ -185,6 +190,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
                         result: BiometricPrompt.AuthenticationResult
                     ) {
                         super.onAuthenticationSucceeded(result)
+                        dbH.isFingerprintLockEnabled = true
                         fingerprintSwitch?.isChecked = true
                         snackbarCallBack?.showSnackbar(
                             StringResourcesUtils.getString(R.string.confirmation_fingerprint_enabled)
