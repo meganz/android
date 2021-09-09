@@ -71,8 +71,6 @@ class ImageViewerPageFragment : Fragment() {
     private fun setupObservers() {
         viewModel.getImage(nodeHandle).observe(viewLifecycleOwner) { item ->
             if (item != null) {
-                binding.txtTitle.text = item.name
-
                 retainingSupplier.replaceSupplier(
                     Fresco.getImagePipeline().getDataSourceSupplier(
                         ImageRequest.fromUri(item.getAvailableUri()),

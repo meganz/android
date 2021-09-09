@@ -27,6 +27,9 @@ class ImageViewerViewModel @ViewModelInject constructor(
     fun getImage(nodeHandle: Long): LiveData<ImageItem?> =
         images.map { items -> items.firstOrNull { it.handle == nodeHandle } }
 
+    fun getImage(position: Int): LiveData<ImageItem?> =
+        images.map { items -> items.getOrNull(position) }
+
     fun retrieveSingleImage(nodeHandle: Long) {
         getImageUseCase.getImages(listOf(nodeHandle))
             .subscribeOn(Schedulers.io())
