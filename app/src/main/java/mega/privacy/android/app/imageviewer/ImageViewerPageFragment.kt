@@ -1,4 +1,4 @@
-package mega.privacy.android.app.image
+package mega.privacy.android.app.imageviewer
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +13,7 @@ import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.databinding.PageImageViewerBinding
-import mega.privacy.android.app.image.ui.DoubleTapGestureListener
+import mega.privacy.android.app.utils.view.zoomable.DoubleTapGestureListener
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull

@@ -28,8 +28,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.image.ImageViewerActivity
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants.*

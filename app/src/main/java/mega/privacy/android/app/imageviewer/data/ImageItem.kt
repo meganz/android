@@ -1,4 +1,4 @@
-package mega.privacy.android.app.image.data
+package mega.privacy.android.app.imageviewer.data
 
 import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil

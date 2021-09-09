@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package mega.privacy.android.app.image.ui;
+package mega.privacy.android.app.utils.view.zoomable;
 
 import android.graphics.Matrix;
 import android.graphics.RectF;

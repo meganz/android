@@ -22,18 +22,18 @@ package mega.privacy.android.app.components.flowlayoutmanager;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
-import androidx.recyclerview.widget.LinearSmoothScroller;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
-import mega.privacy.android.app.components.flowlayoutmanager.cache.CacheHelper;
-import mega.privacy.android.app.components.flowlayoutmanager.cache.Line;
-
+import androidx.recyclerview.widget.LinearSmoothScroller;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import mega.privacy.android.app.components.flowlayoutmanager.cache.CacheHelper;
+import mega.privacy.android.app.components.flowlayoutmanager.cache.Line;
+import mega.privacy.android.app.utils.ViewUtils;
 
 public class FlowLayoutManager extends RecyclerView.LayoutManager {
 
@@ -490,15 +490,10 @@ public class FlowLayoutManager extends RecyclerView.LayoutManager {
         layoutHelper = new LayoutHelper(this, recyclerView);
         cacheHelper = new CacheHelper(flowLayoutOptions.itemsPerLine, layoutHelper.visibleAreaWidth());
         if (layoutHelper.visibleAreaWidth() == 0) {
-            view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    cacheHelper.contentAreaWidth(layoutHelper.visibleAreaWidth());
-                }
-            });
+            ViewUtils.waitForLayout(view, () ->
+                    cacheHelper.contentAreaWidth(layoutHelper.visibleAreaWidth())
+            );
         }
-
     }
 
     @Override

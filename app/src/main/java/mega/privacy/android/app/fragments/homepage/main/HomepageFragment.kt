@@ -13,7 +13,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.view.View.OnClickListener
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -39,9 +38,9 @@ import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
-import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
+import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.utils.ColorUtils
@@ -51,6 +50,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -154,17 +154,13 @@ class HomepageFragment : Fragment() {
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
         // Fully expand the BottomSheet if it had been, e.g. rotate screen
-        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
-            OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                if (rootView.height > 0) {
-                    if (savedInstanceState?.getBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED) == true) {
-                        fullyExpandBottomSheet()
-                    }
-                    rootView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+        rootView.waitForLayout {
+            if (rootView.height > 0) {
+                if (savedInstanceState?.getBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED) == true) {
+                    fullyExpandBottomSheet()
                 }
             }
-        })
+        }
 
         (activity as? ManagerActivityLollipop)?.adjustTransferWidgetPositionInHomepage()
 
@@ -480,22 +476,19 @@ class HomepageFragment : Fragment() {
      * Set the initial height of the bottom sheet. The top is just below the banner view.
      */
     private fun setBottomSheetPeekHeight() {
-        rootView.viewTreeObserver.addOnGlobalLayoutListener(object :
-            OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                if (category == null) {
-                    return
-                }
-
-                if (bannerViewPager.data.isNotEmpty()) {
-                    bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
-                } else {
-                    bottomSheetBehavior.peekHeight = rootView.height - category.bottom
-                }
-
-                setBottomSheetMaxHeight()
+        rootView.waitForLayout {
+            if (category == null) {
+                return@waitForLayout
             }
-        })
+
+            if (bannerViewPager.data.isNotEmpty()) {
+                bottomSheetBehavior.peekHeight = rootView.height - bannerViewPager.bottom
+            } else {
+                bottomSheetBehavior.peekHeight = rootView.height - category.bottom
+            }
+
+            setBottomSheetMaxHeight()
+        }
     }
 
     /**

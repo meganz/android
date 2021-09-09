@@ -5,6 +5,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 
 object ViewUtils {
 
+    @JvmStatic
     fun View.waitForLayout(runnable: Runnable) {
         viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
             override fun onGlobalLayout() {

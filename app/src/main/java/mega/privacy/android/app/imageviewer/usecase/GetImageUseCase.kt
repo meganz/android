@@ -1,4 +1,4 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.imageviewer.usecase
 
 import android.content.Context
 import androidx.core.net.toUri
@@ -6,8 +6,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.image.data.ImageItem
+import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager.*

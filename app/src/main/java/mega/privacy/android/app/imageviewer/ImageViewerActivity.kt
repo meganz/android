@@ -1,4 +1,4 @@
-package mega.privacy.android.app.image
+package mega.privacy.android.app.imageviewer
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -9,7 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
-import mega.privacy.android.app.image.adapter.ImageViewerAdapter
+import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra

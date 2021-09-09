@@ -1,4 +1,4 @@
-package mega.privacy.android.app.image
+package mega.privacy.android.app.imageviewer
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
@@ -8,9 +8,9 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.GetImageUseCase
+import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.image.data.ImageItem
+import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.utils.LogUtil.logError
 
 class ImageViewerViewModel @ViewModelInject constructor(
