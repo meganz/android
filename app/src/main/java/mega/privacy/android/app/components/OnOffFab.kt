@@ -105,7 +105,7 @@ class OnOffFab(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     private fun updateAppearance() {
         setImageDrawable(if (!enable) disableIcon else if (isOn) onIcon else offIcon)
         imageTintList = if (!enable){
-            null
+            ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white_alpha_054))
         } else {
             ColorStateList.valueOf(if (isOn) onIconTint else offIconTint)
         }

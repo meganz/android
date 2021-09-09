@@ -545,9 +545,12 @@ class InMeetingViewModel @ViewModelInject constructor(
                 _callLiveData.value?.let {
                     if (it.status >= CALL_STATUS_JOINING && !isRequestSent() && amIAloneOnTheCall(
                             currentChatId
-                        ) && it.numParticipants == 1 && isOnline(MegaApplication.getInstance().applicationContext)
+                        ) && isOnline(MegaApplication.getInstance().applicationContext)
                     ) {
-                        return true
+                        val sessionsInTheCall: MegaHandleList? = it.sessionsClientid
+                        if (sessionsInTheCall == null || sessionsInTheCall.size() < 1) {
+                            return true
+                        }
                     }
                 }
             }

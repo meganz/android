@@ -90,7 +90,7 @@
             app:on_background_tint="@android:color/transparent"
             app:on_icon="@drawable/ic_meeting_video_filled"
             app:on_icon_tint="@color/white"
-            app:disable_icon="@drawable/ic_video_disable"
+            app:disable_icon="@drawable/ic_meeting_video_filled"
             app:pressedTranslationZ="12dp"
             tools:ignore="ContentDescription" />
 
@@ -136,6 +136,7 @@
             app:on_background_tint="@android:color/transparent"
             app:on_icon="@drawable/ic_speaker_on"
             app:on_icon_tint="@color/white"
+            app:disable_icon="@drawable/ic_speaker_on"
             app:pressedTranslationZ="12dp"
             tools:ignore="ContentDescription"
             tools:is_on="true" />
