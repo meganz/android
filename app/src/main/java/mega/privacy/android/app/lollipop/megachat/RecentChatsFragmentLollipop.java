@@ -1803,7 +1803,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         @Override
         protected Void doInBackground(String... strings) {
             ArrayList<MegaChatListItem> chatsToSearch = new ArrayList<>();
-            chatsToSearch.addAll(chats);
+            if (chats != null) {
+                chatsToSearch.addAll(chats);
+            }
 
             if (context instanceof ManagerActivityLollipop) {
                 ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();
