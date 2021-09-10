@@ -73,7 +73,7 @@ open class PasscodeActivity : BaseActivity() {
 
         setAppFontSize(this)
 
-        if (isScreenRotation) {
+        if (isScreenRotation && !passcodeManagement.needsOpenAgain) {
             isScreenRotation = false
         } else if (passcodeManagement.showPasscodeScreen) {
             passcodeUtil.resume()

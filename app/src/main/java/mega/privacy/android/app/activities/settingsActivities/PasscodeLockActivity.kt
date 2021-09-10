@@ -14,11 +14,11 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricPrompt.ERROR_NEGATIVE_BUTTON
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.LifecycleObserver
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -93,6 +93,8 @@ class PasscodeLockActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        passcodeManagement.needsOpenAgain = false
 
         mode = when (intent.action) {
             ACTION_SET_PASSCODE_LOCK -> SET_MODE
@@ -626,7 +628,7 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        passcodeManagement.showPasscodeScreen = isFinishing
+        passcodeManagement.showPasscodeScreen = passcodeManagement.needsOpenAgain || isFinishing
         super.onDestroy()
     }
 
@@ -649,6 +651,8 @@ class PasscodeLockActivity : BaseActivity() {
         outState.putBoolean(FINGERPRINT_ENABLED, fingerprintEnabled)
         outState.putBoolean(FINGERPRINT_SKIPPED, fingerprintSkipped)
 
+        passcodeManagement.needsOpenAgain = true
+
         super.onSaveInstanceState(outState)
     }
 
@@ -668,11 +672,12 @@ class PasscodeLockActivity : BaseActivity() {
                     LogUtil.logWarning("Error: $errString")
 
                     when (errorCode) {
-                        BiometricPrompt.ERROR_NEGATIVE_BUTTON -> {
+                        ERROR_NEGATIVE_BUTTON -> {
                             fingerprintSkipped = true
                             binding.passcodeScrollView.isVisible = true
                         }
                         else -> {
+                            passcodeManagement.needsOpenAgain = true
                             finish()
                         }
                     }
