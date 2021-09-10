@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.DatabaseHandler;
@@ -86,6 +87,7 @@ import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -135,14 +137,19 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
 import mega.privacy.android.app.components.AppBarStateChangeListener.State;
 
 @SuppressLint("NewApi")
-
+@AndroidEntryPoint
 public class ContactInfoActivityLollipop extends PasscodeActivity
 		implements MegaChatRequestListenerInterface, OnClickListener,
 		MegaRequestListenerInterface, MegaChatListenerInterface, OnItemClickListener,
 		MegaGlobalListenerInterface, ActionNodeCallback, SnackbarShower {
+
+	@Inject
+	PasscodeManagement passcodeManagement;
 
 	private ChatController chatC;
 	private ContactController cC;
@@ -967,7 +974,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			}
 			case R.id.action_return_call:
 				if (checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)) {
-					returnActiveCall(this);
+					returnActiveCall(this, passcodeManagement);
 				}
 				return true;
 		}
@@ -1261,7 +1268,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 			case R.id.call_in_progress_layout:
 				if(checkPermissionsCall(this, INVALID_TYPE_PERMISSIONS)){
-					returnActiveCall(this);
+					returnActiveCall(this, passcodeManagement);
 				}
 				break;
 		}

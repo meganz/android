@@ -37,6 +37,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -166,17 +167,18 @@ public class CallUtil {
     }
 
     /**
-     * Open the call that is in progress
+     * Opens the call that is in progress.
      *
-     * @param context from which the action is done
+     * @param context               From which the action is done.
+     * @param passcodeManagement    To disable passcode.
      */
-    public static void returnActiveCall(Context context) {
+    public static void returnActiveCall(Context context, PasscodeManagement passcodeManagement) {
         ArrayList<Long> currentCalls = getCallsParticipating();
 
         for(Long chatIdCall:currentCalls){
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdCall);
             if(call != null){
-                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+                passcodeManagement.setShowPasscodeScreen(false);
                 Intent intent = new Intent(context, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra(CHAT_ID, call.getChatid());
@@ -188,11 +190,13 @@ public class CallUtil {
     }
 
     /**
-     *  Open the call that is in progress
-     * @param context from which the action is done
-     * @param chatId ID chat.
+     * Opens the call that is in progress.
+     *
+     * @param context            From which the action is done.
+     * @param chatId             ID chat.
+     * @param passcodeManagement To disable passcode.
      */
-    public static void returnCall(Context context, long chatId) {
+    public static void returnCall(Context context, long chatId, PasscodeManagement passcodeManagement) {
         ArrayList<Long> currentCalls = getCallsParticipating();
         if(currentCalls == null || currentCalls.isEmpty())
             return;
@@ -200,7 +204,7 @@ public class CallUtil {
         for(Long chatIdCall:currentCalls){
             if(chatIdCall == chatId){
                 MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
-                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+                passcodeManagement.setShowPasscodeScreen(false);
                 Intent intent = new Intent(context, ChatCallActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra(CHAT_ID, call.getChatid());

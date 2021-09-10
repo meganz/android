@@ -134,7 +134,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	private static PushNotificationSettingManagement pushNotificationSettingManagement;
 	private static TransfersManagement transfersManagement;
-	private static PasscodeManagement passcodeManagement;
 	private static ChatManagement chatManagement;
 
 	@MegaApi
@@ -153,6 +152,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	SortOrderManagement sortOrderManagement;
 	@Inject
 	MyAccountInfo myAccountInfo;
+	@Inject
+	PasscodeManagement passcodeManagement;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
@@ -766,7 +767,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
         storageState = dbH.getStorageState();
         pushNotificationSettingManagement = new PushNotificationSettingManagement();
         transfersManagement = new TransfersManagement();
-        passcodeManagement = new PasscodeManagement(0, true);
         chatManagement = new ChatManagement();
 
 		//Logout check resumed pending transfers
@@ -1269,7 +1269,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		else if (request.getType() == MegaChatRequest.TYPE_LOGOUT) {
 			logDebug("CHAT_TYPE_LOGOUT: " + e.getErrorCode() + "__" + e.getErrorString());
 
-			sortOrderManagement.resetDefaults();
+			resetDefaults();
 
 			try{
 				if (megaChatApi != null){
@@ -1828,6 +1828,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
+	private void resetDefaults() {
+		sortOrderManagement.resetDefaults();
+		passcodeManagement.resetDefaults();
+		myAccountInfo.resetDefaults();
+	}
+
 	public static boolean isShowRichLinkWarning() {
 		return showRichLinkWarning;
 	}
@@ -2019,10 +2025,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
-	}
-
-	public static PasscodeManagement getPasscodeManagement() {
-		return passcodeManagement;
 	}
 
 	public static boolean arePreferenceCookiesEnabled() {

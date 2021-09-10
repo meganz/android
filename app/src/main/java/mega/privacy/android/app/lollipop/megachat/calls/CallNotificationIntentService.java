@@ -4,7 +4,9 @@ import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Intent;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -19,6 +21,9 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class CallNotificationIntentService extends IntentService implements MegaChatRequestListenerInterface {
 
     public static final String ANSWER = "ANSWER";
@@ -28,6 +33,9 @@ public class CallNotificationIntentService extends IntentService implements Mega
     public static final String IGNORE = "IGNORE";
     public static final String HOLD_JOIN = "HOLD_JOIN";
     public static final String END_JOIN = "END_JOIN";
+
+    @Inject
+    PasscodeManagement passcodeManagement;
 
     MegaChatApiAndroid megaChatApi;
     MegaApiAndroid megaApi;
@@ -164,7 +172,7 @@ public class CallNotificationIntentService extends IntentService implements Mega
         } else if (request.getType() == MegaChatRequest.TYPE_ANSWER_CHAT_CALL) {
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 logDebug("Incoming call answered.");
-                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+                passcodeManagement.setShowPasscodeScreen(false);
                 Intent i = new Intent(this, ChatCallActivity.class);
                 i.putExtra(CHAT_ID, chatIdIncomingCall);
                 i.setAction(SECOND_CALL);

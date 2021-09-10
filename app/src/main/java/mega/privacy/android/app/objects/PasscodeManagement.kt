@@ -1,8 +1,16 @@
 package mega.privacy.android.app.objects
 
-import android.content.Context
+import javax.inject.Inject
+import javax.inject.Singleton
 
-data class PasscodeManagement(
-    var lastPause: Long,
-    var showPasscodeScreen: Boolean
-)
+@Singleton
+class PasscodeManagement @Inject constructor() {
+
+    var lastPause: Long = 0
+    var showPasscodeScreen: Boolean = true
+
+    fun resetDefaults() {
+        lastPause = 0
+        showPasscodeScreen = true
+    }
+}

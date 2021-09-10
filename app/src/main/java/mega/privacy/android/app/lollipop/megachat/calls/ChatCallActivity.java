@@ -47,6 +47,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import java.util.ArrayList;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
@@ -57,6 +59,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.TextUtil;
 
 import mega.privacy.android.app.lollipop.controllers.ChatController;
@@ -85,6 +88,9 @@ import static mega.privacy.android.app.utils.VideoCaptureUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class ChatCallActivity extends BaseActivity implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, View.OnClickListener, KeyEvent.Callback {
 
     final private static int MIN_PEERS_LIST = 7;
@@ -103,6 +109,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
     private final static String PEERSELECTED_FRAGMENT = "cameraFragmentPeerSelected";
     private static final int TIMEOUT = 5000;
     private static final int WAITING_TIME = 26000; // 26 seconds
+
+    @Inject
+    PasscodeManagement passcodeManagement;
+
     private long chatId;
     private MegaChatRoom chat;
     private MegaChatCall callChat;
@@ -677,7 +687,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         super.onCreate(savedInstanceState);
         cancelIncomingCallNotification(this);
         setContentView(R.layout.activity_calls_chat);
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(true);
+        passcodeManagement.setShowPasscodeScreen(true);
         chatC = new ChatController(this);
         statusBarHeight = getStatusBarHeight();
 
@@ -1769,7 +1779,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         sendSignalPresence();
 
         MegaApplication.setSpeakerStatus(chatCallOnHold.getChatId(), false);
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        passcodeManagement.setShowPasscodeScreen(false);
         Intent intentOpenCall = new Intent(this, ChatCallActivity.class);
         intentOpenCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intentOpenCall.putExtra(CHAT_ID, chatCallOnHold.getChatId());
@@ -1791,7 +1801,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             if (callChat.getChatid() != anotherChatId) {
                 logDebug("Returning to another call");
                 MegaApplication.setSpeakerStatus(anotherChatId, false);
-                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+                passcodeManagement.setShowPasscodeScreen(false);
                 Intent intentOpenCall = new Intent(this, ChatCallActivity.class);
                 intentOpenCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intentOpenCall.putExtra(CHAT_ID, anotherChatId);
@@ -2783,7 +2793,7 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
         }else{
             for(Long chatId:calls) {
                 MegaApplication.setSpeakerStatus(chatId, false);
-                MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+                passcodeManagement.setShowPasscodeScreen(false);
                 Intent intentOpenCall = new Intent(this, ChatCallActivity.class);
                 intentOpenCall.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intentOpenCall.putExtra(CHAT_ID, chatId);

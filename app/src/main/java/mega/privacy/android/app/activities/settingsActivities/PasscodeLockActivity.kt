@@ -19,6 +19,7 @@ import mega.privacy.android.app.databinding.ActivityPasscodeBinding
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.PasscodeUtil
@@ -54,6 +55,8 @@ class PasscodeLockActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
+    @Inject
+    lateinit var passcodeManagement: PasscodeManagement
     private lateinit var binding: ActivityPasscodeBinding
     private var passcodeType = PIN_4
 
@@ -573,7 +576,7 @@ class PasscodeLockActivity : BaseActivity() {
         if (attempts < MAX_ATTEMPTS) {
             when (mode) {
                 UNLOCK_MODE -> return
-                RESET_MODE -> MegaApplication.getPasscodeManagement().showPasscodeScreen = false
+                RESET_MODE -> passcodeManagement.showPasscodeScreen = false
                 else -> finish()
             }
         }
@@ -590,7 +593,7 @@ class PasscodeLockActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        MegaApplication.getPasscodeManagement().showPasscodeScreen = isFinishing
+        passcodeManagement.showPasscodeScreen = isFinishing
         super.onDestroy()
     }
 

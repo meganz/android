@@ -126,6 +126,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -361,6 +362,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	MyAccountInfo myAccountInfo;
 	@Inject
 	InviteContactUseCase inviteContactUseCase;
+	@Inject
+	PasscodeManagement passcodeManagement;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -1235,7 +1238,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (checkPermissionsCall(this, typesCameraPermission)) {
 			switch (typesCameraPermission) {
 				case RETURN_CALL_PERMISSIONS:
-					returnActiveCall(this);
+					returnActiveCall(this, passcodeManagement);
 					break;
 
 				case START_CALL_PERMISSIONS:
@@ -6018,7 +6021,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private void returnCallWithPermissions() {
 		if (checkPermissionsCall(this, RETURN_CALL_PERMISSIONS)) {
-			returnActiveCall(this);
+			returnActiveCall(this, passcodeManagement);
 		}
 	}
 
