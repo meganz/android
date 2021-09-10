@@ -117,7 +117,6 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
@@ -145,7 +144,6 @@ import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
@@ -248,11 +246,7 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED;
+import static mega.privacy.android.app.constants.EventConstants.*;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
@@ -815,19 +809,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				else if(actionType == UPDATE_PAYMENT_METHODS){
 					logDebug("BROADCAST TO UPDATE AFTER UPDATE_PAYMENT_METHODS");
-				}
-			}
-		}
-	};
-
-	private BroadcastReceiver receiverUpdate2FA = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent != null) {
-				boolean enabled = intent.getBooleanExtra(INTENT_EXTRA_KEY_ENABLED, false);
-				is2FAEnabled = enabled;
-				if (getSettingsFragment() != null) {
-					sttFLol.update2FAPreference(enabled);
 				}
 			}
 		}
@@ -1494,9 +1475,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		filter.addAction(ACTION_STORAGE_STATE_CHANGED);
 		registerReceiver(updateMyAccountReceiver, filter);
 
-		registerReceiver(receiverUpdate2FA,
-				new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
-
 		registerReceiver(networkReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 
@@ -1509,6 +1487,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
 				.observeForever(refreshAddPhoneNumberButtonObserver);
+
+        LiveEventBus.get(EVENT_2FA_UPDATED, Boolean.class)
+                .observe(this, this::update2FAEnableState);
 
 		IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
 		filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
@@ -2420,7 +2401,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						openContactLink(getIntent().getLongExtra(CONTACT_HANDLE, -1));
 					}
 					else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
-						update2FASetting();
+						update2FAEnableState();
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
 						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
@@ -3342,7 +3323,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 				}
 				else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
-					update2FASetting();
+					update2FAEnableState();
 				}
 				else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
 					logDebug("Open after LauncherFileExplorerActivityLollipop ");
@@ -3530,7 +3511,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(contactUpdateReceiver);
 		unregisterReceiver(updateMyAccountReceiver);
-		unregisterReceiver(receiverUpdate2FA);
 		unregisterReceiver(networkReceiver);
 		unregisterReceiver(receiverUpdateOrder);
 		unregisterReceiver(receiverUpdateView);
@@ -8050,7 +8030,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		super.showConfirmationEnableLogsKarere();
 	}
 
-	public void update2FASetting(){
+	public void update2FAEnableState(){
 		logDebug("update2FAVisibility");
 		if (getSettingsFragment() != null) {
 			try {
@@ -9851,13 +9831,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				sttFLol.reEnable2faSwitch();
 			}
 
-			if (e.getErrorCode() == MegaError.API_OK) {
-				is2FAEnabled = request.getFlag();
-
-				if (getSettingsFragment() != null) {
-					sttFLol.update2FAPreference(is2FAEnabled);
-				}
-			}
+            if (e.getErrorCode() == MegaError.API_OK) {
+                update2FAEnableState(request.getFlag());
+            }
 		}
 		else if(request.getType() == MegaRequest.TYPE_FOLDER_INFO) {
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -9875,6 +9851,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 	}
+
+    /**
+     * Update 2FA SwitchPreference's enable state.
+     *
+     * @param isEnabled true, turn on SwitchPreference, false, turn off.
+     */
+    private void update2FAEnableState(boolean isEnabled) {
+        is2FAEnabled = isEnabled;
+
+        if (getSettingsFragment() != null) {
+            sttFLol.update2FAPreference(is2FAEnabled);
+        }
+    }
 
 	/**
 	 * Updates own firstName/lastName and fullName data in UI and DB.
