@@ -6,6 +6,12 @@ import android.content.Intent
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.qualifiers.ActivityContext
 import mega.privacy.android.app.DatabaseHandler
@@ -15,10 +21,12 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
+import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
@@ -44,6 +52,10 @@ class PasscodeUtil @Inject constructor(
         const val ONE_MINUTE = 1
         const val TWO_MINUTES = 2
     }
+
+    private lateinit var executor: Executor
+    private lateinit var biometricPrompt: BiometricPrompt
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
     /**
      * Shows a dialog to choose the required time to ask for passcode.
@@ -295,7 +307,15 @@ class PasscodeUtil @Inject constructor(
      * Called after resume some activity to check if should lock or not the app.
      */
     fun resume() {
-        if (shouldLock()) {
+        if (!shouldLock()) {
+            return
+        }
+
+        if (dbH.isFingerprintLockEnabled
+            && BiometricManager.from(context).canAuthenticate(BIOMETRIC_STRONG) == BIOMETRIC_SUCCESS
+        ) {
+            showFingerprintUnlock()
+        } else {
             showLockScreen()
         }
     }
@@ -308,12 +328,61 @@ class PasscodeUtil @Inject constructor(
     }
 
     /**
-     * Launches an intent to show passcode screen when the app is locked.
+     * Launches an intent to show passcode screen when the app is locked
      */
     private fun showLockScreen() {
         context.startActivity(
             Intent(context, PasscodeLockActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         )
+    }
+
+    /**
+     * Shows the fingerprint unlock dialog.
+     */
+    private fun showFingerprintUnlock() {
+        if (!this::executor.isInitialized) {
+            executor = ContextCompat.getMainExecutor(context)
+        }
+
+        if (!this::biometricPrompt.isInitialized) {
+            biometricPrompt = BiometricPrompt(
+                context as FragmentActivity,
+                executor,
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationError(
+                        errorCode: Int,
+                        errString: CharSequence
+                    ) {
+                        super.onAuthenticationError(errorCode, errString)
+                        logWarning("Error: $errString")
+                        if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+                            showLockScreen()
+                        }
+                    }
+
+                    override fun onAuthenticationSucceeded(
+                        result: BiometricPrompt.AuthenticationResult
+                    ) {
+                        super.onAuthenticationSucceeded(result)
+                        logDebug("Fingerprint unlocked")
+                    }
+
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                        logWarning("Authentication failed")
+                    }
+                })
+        }
+
+        if (!this::promptInfo.isInitialized) {
+            promptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle(getString(R.string.title_unlock_fingerprint))
+                .setNegativeButtonText(getString(R.string.action_use_passcode))
+                .setAllowedAuthenticators(BIOMETRIC_STRONG)
+                .build()
+        }
+
+        biometricPrompt.authenticate(promptInfo)
     }
 }
