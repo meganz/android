@@ -133,6 +133,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class Util {
 
@@ -1370,7 +1371,7 @@ public class Util {
     }
 
 	public static void checkTakePicture(Activity activity, int option) {
-		if (isNecessaryDisableLocalCamera() != -1) {
+		if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
 			if(option == TAKE_PHOTO_CODE) {
 				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE, false);
 			}else if(option == TAKE_PICTURE_PROFILE_CODE){

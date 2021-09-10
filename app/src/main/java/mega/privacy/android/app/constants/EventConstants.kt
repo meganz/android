@@ -21,7 +21,6 @@ object EventConstants {
     const val EVENT_LOCAL_AUDIO_LEVEL_CHANGE = "local_audio_level_change"
     const val EVENT_LOCAL_NETWORK_QUALITY_CHANGE = "local_network_quality_change"
     const val EVENT_NOT_OUTGOING_CALL = "not_outgoing_call"
-    const val EVENT_PROXIMITY_SENSOR_CHANGE = "proximity_sensor_change"
     const val EVENT_ENTER_IN_MEETING = "enter_in_meeting"
     const val EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT = "call_answered_in_another_client"
     const val EVENT_AUDIO_OUTPUT_CHANGE = "audio_output_change"
@@ -29,6 +28,7 @@ object EventConstants {
     const val EVENT_LINK_RECOVERED = "meeting_link_recovered"
     const val EVENT_MEETING_INVITE = "meeting_invite"
     const val EVENT_MEETING_INCOMPATIBILITY_SHOW = "meeting_incompatibility"
+    const val EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE = "enable_or_disable_local_video_change"
 
     /** Event Keys related to sessions*/
     const val EVENT_SESSION_STATUS_CHANGE = "session_status_change"

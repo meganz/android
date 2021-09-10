@@ -7192,7 +7192,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void checkBeforeOpeningQR(boolean openScanQR){
-		if (isNecessaryDisableLocalCamera() != -1) {
+		if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
 			showConfirmationOpenCamera(this, ACTION_OPEN_QR, openScanQR);
 			return;
 		}

@@ -33,6 +33,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
+import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener;
 import mega.privacy.android.app.meeting.listeners.StartChatCallListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
@@ -46,6 +47,7 @@ import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatPeerList;
+import nz.mega.sdk.MegaChatRequestListenerInterface;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaChatSession;
 import nz.mega.sdk.MegaHandleList;
@@ -242,32 +244,6 @@ public class CallUtil {
     }
 
     /**
-     * Retrieve the id of a chat that has a call in progress.
-     *
-     * @return A long data type. It's the id of chat.
-     */
-    public static long getChatCallInProgress() {
-        ArrayList<Long> listCalls = new ArrayList<>();
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MegaHandleList listCallsInProgress = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_IN_PROGRESS);
-        if (listCallsInProgress != null && listCallsInProgress.size() > 0) {
-            for (int i = 0; i < listCallsInProgress.size(); i++) {
-                listCalls.add(listCallsInProgress.get(i));
-            }
-        }
-
-        if (!listCalls.isEmpty()) {
-            for (Long idChat : listCalls) {
-                if (!megaChatApi.getChatCall(idChat).isOnHold()) {
-                    return idChat;
-                }
-            }
-        }
-
-        return MEGACHAT_INVALID_HANDLE;
-    }
-
-    /**
      * Retrieve the id of a chat that has a call in progress different that current one
      *
      * @param currentChatId the chat ID of the current call
@@ -447,9 +423,9 @@ public class CallUtil {
             return;
         }
 
-        long chatIdInProgress = getChatCallInProgress();
-        if (chatIdInProgress != MEGACHAT_INVALID_HANDLE) {
-            createCallBanner(context, chatIdInProgress, callInProgressLayout, callInProgressChrono, callInProgressText);
+        MegaChatCall currentCallInProgress = getCallInProgress();
+        if (currentCallInProgress != null) {
+            createCallBanner(context, currentCallInProgress.getChatid(), callInProgressLayout, callInProgressChrono, callInProgressText);
             return;
         }
 
@@ -520,10 +496,9 @@ public class CallUtil {
     public static void setCallMenuItem(final MenuItem returnCallMenuItem, final LinearLayout layoutCallMenuItem, final Chronometer chronometerMenuItem) {
         Context context = MegaApplication.getInstance().getBaseContext();
         if (!isScreenInPortrait(context) && participatingInACall()) {
-            long chatIdInProgress = getChatCallInProgress();
-            if (chatIdInProgress != MEGACHAT_INVALID_HANDLE) {
-                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatIdInProgress);
-                createCallMenuItem(call, returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
+            MegaChatCall currentCall = getCallInProgress();
+            if (currentCall != null) {
+                createCallMenuItem(currentCall, returnCallMenuItem, layoutCallMenuItem, chronometerMenuItem);
                 return;
             }
 
@@ -708,25 +683,54 @@ public class CallUtil {
         return true;
     }
 
-    public static void disableLocalCamera() {
-        long idCall = isNecessaryDisableLocalCamera();
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        if (idCall == MEGACHAT_INVALID_HANDLE) {
-            megaChatApi.releaseVideoDevice(null);
+    /**
+     * Enabling or disabling local video in a call
+     *
+     * @param isEnabled True, if video should be enabled. False, if video should be disabled.
+     * @param chatId    Chat ID of the call
+     * @param listener  MegaChatRequestListenerInterface
+     */
+    public static void enableOrDisableLocalVideo(boolean isEnabled, long chatId, MegaChatRequestListenerInterface listener) {
+        if (isEnabled) {
+            MegaApplication.getInstance().getMegaChatApi().enableVideo(chatId, listener);
         } else {
-            megaChatApi.disableVideo(idCall, null);
+            MegaApplication.getInstance().getMegaChatApi().disableVideo(chatId, listener);
         }
     }
 
+    /**
+     * Method to get the call in progress that is not on hold.
+     *
+     * @return MegaChatCall the call in progress
+     */
+    public static MegaChatCall getCallInProgress() {
+        ArrayList<Long> listCalls = CallUtil.getCallsParticipating();
+        if (listCalls != null && listCalls.size() > 0) {
+            for (Long chatId : listCalls) {
+                MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+                if (call != null && !call.isOnHold()) {
+                    return call;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static void disableLocalCamera() {
+       MegaChatCall call = getCallInProgress();
+       if(call != null){
+           enableOrDisableLocalVideo(false, call.getChatid(), new DisableAudioVideoCallListener(MegaApplication.getInstance()));
+       }
+    }
+
     public static long isNecessaryDisableLocalCamera() {
-        MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        long chatIdCallInProgress = getChatCallInProgress();
-        MegaChatCall callInProgress = megaChatApi.getChatCall(chatIdCallInProgress);
-        if (callInProgress == null || !callInProgress.hasLocalVideo()) {
+        MegaChatCall call = getCallInProgress();
+        if (call == null || !call.hasLocalVideo()) {
             return MEGACHAT_INVALID_HANDLE;
         }
 
-        return chatIdCallInProgress;
+        return call.getChatid();
     }
 
     /**

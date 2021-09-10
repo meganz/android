@@ -1,5 +1,9 @@
 package mega.privacy.android.app;
 
+import static android.content.Intent.ACTION_SCREEN_OFF;
+import static android.content.Intent.ACTION_SCREEN_ON;
+import static android.content.Intent.ACTION_USER_PRESENT;
+
 import android.app.Activity;
 import android.app.Application;
 import android.app.Notification;
@@ -77,6 +81,7 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.service.ads.AdsLibInitializer;
+import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ThemeHelper;
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
@@ -104,12 +109,12 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPOSITION_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_PROXIMITY_SENSOR_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE;
 import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
@@ -642,21 +647,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			long callId = (long) sessionAndCall.first;
 			getChatManagement().setRequestSentCall(callId, false);
 			updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
-		}
-	};
-
-	/**
-	 * Broadcast for controlling changes in screen.
-	 */
-	BroadcastReceiver screenOnOffReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent == null || intent.getAction() == null)
-				return;
-
-			if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-				muteOrUnmute(true);
-			}
 		}
 	};
 
@@ -1626,16 +1616,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public void createOrUpdateAudioManager(boolean isSpeakerOn, int type) {
 		logDebug("Create or update audio manager, type is " + type);
+		chatManagement.registerScreenReceiver();
+
 		if (type == AUDIO_MANAGER_CALL_RINGING) {
 			if (rtcAudioManagerRingInCall != null) {
 				removeRTCAudioManagerRingIn();
 			}
-
-			IntentFilter filterScreen = new IntentFilter();
-			filterScreen.addAction(Intent.ACTION_SCREEN_ON);
-			filterScreen.addAction(Intent.ACTION_SCREEN_OFF);
-			filterScreen.addAction(Intent.ACTION_USER_PRESENT);
-			registerReceiver(screenOnOffReceiver, filterScreen);
 
 			registerReceiver(volumeReceiver, new IntentFilter(VOLUME_CHANGED_ACTION));
 			registerReceiver(becomingNoisyReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
@@ -1668,8 +1654,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
             logDebug("Removing RTC Audio Manager");
             rtcAudioManagerRingInCall.stop();
 			rtcAudioManagerRingInCall = null;
-
-			unregisterReceiver(screenOnOffReceiver);
 			unregisterReceiver(volumeReceiver);
 			unregisterReceiver(becomingNoisyReceiver);
 		} catch (Exception e) {
@@ -1725,7 +1709,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             logDebug("Starting proximity sensor...");
             rtcAudioManager.startProximitySensor();
             rtcAudioManager.setOnProximitySensorListener(isNear -> {
-				LiveEventBus.get(EVENT_PROXIMITY_SENSOR_CHANGE, Boolean.class).post(isNear);
+				chatManagement.controlProximitySensor(isNear);
             });
         }
     }
