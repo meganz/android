@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricManager.*
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricPrompt
+import androidx.biometric.BiometricPrompt.ERROR_NEGATIVE_BUTTON
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
@@ -72,6 +73,15 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         }
 
         fingerprintSwitch = findPreference(KEY_FINGERPRINT_ENABLE)
+        fingerprintSwitch?.setOnPreferenceClickListener {
+            if (fingerprintSwitch?.isChecked == false) {
+                dbH.isFingerprintLockEnabled = false
+            } else {
+                showEnableFingerprint()
+            }
+
+            true
+        }
 
         requirePasscode = findPreference(KEY_REQUIRE_PASSCODE)
         requirePasscode?.setOnPreferenceClickListener {
@@ -108,60 +118,25 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         super.onSaveInstanceState(outState)
     }
 
+    override fun onResume() {
+        super.onResume()
+        setupFingerprintSetting()
+    }
+
     /**
      * Checks if fingerprint setting should be enabled.
      */
     private fun setupFingerprintSetting() {
         when (val canAuthenticate = from(requireContext()).canAuthenticate(BIOMETRIC_STRONG)) {
-            BIOMETRIC_ERROR_NO_HARDWARE, BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
-                logDebug("Cannot show fingerprint setting, hardware not available.")
-                preferenceScreen.removePreference(fingerprintSwitch)
-            }
-            BIOMETRIC_SUCCESS, BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                logDebug("Show fingerprint setting, hardware available")
+            BIOMETRIC_SUCCESS -> {
+                logDebug("Show fingerprint setting, hardware available and fingerprint enabled.")
                 preferenceScreen.addPreference(fingerprintSwitch)
-                fingerprintSwitch?.apply {
-                    isChecked = dbH.isFingerprintLockEnabled
-
-                    setOnPreferenceClickListener {
-                        if (fingerprintSwitch?.isChecked == false) {
-                            dbH.isFingerprintLockEnabled = false
-                            return@setOnPreferenceClickListener true
-                        }
-
-                        fingerprintSwitch?.isChecked = false
-
-                        when {
-                            canAuthenticate == BIOMETRIC_SUCCESS -> {
-                                showEnableFingerprint()
-                                return@setOnPreferenceClickListener true
-                            }
-                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                                val intent = Intent(ACTION_BIOMETRIC_ENROLL)
-                                    .putExtra(
-                                        EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-                                        BIOMETRIC_STRONG
-                                    )
-
-                                if (isIntentAvailable(requireContext(), intent)) {
-                                    startActivityForResult(intent, REQUEST_CODE_BIOMETRIC_ENROLL)
-                                    return@setOnPreferenceClickListener true
-                                }
-                            }
-                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
-                                val intent = Intent(ACTION_FINGERPRINT_ENROLL)
-                                if (isIntentAvailable(requireContext(), intent)) {
-                                    startActivityForResult(intent, REQUEST_CODE_BIOMETRIC_ENROLL)
-                                    return@setOnPreferenceClickListener true
-                                }
-                            }
-                        }
-
-                        true
-                    }
-                }
+                fingerprintSwitch?.isChecked = dbH.isFingerprintLockEnabled
             }
-            else -> logDebug("Error. Cannot show fingerprint setting.")
+            else -> {
+                preferenceScreen.removePreference(fingerprintSwitch)
+                logDebug("Error. Cannot show fingerprint setting: $canAuthenticate")
+            }
         }
     }
 
@@ -184,6 +159,9 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
                     ) {
                         super.onAuthenticationError(errorCode, errString)
                         logWarning("Error: $errString")
+                        if (errorCode == ERROR_NEGATIVE_BUTTON) {
+                            fingerprintSwitch?.isChecked = false
+                        }
                     }
 
                     override fun onAuthenticationSucceeded(
@@ -191,7 +169,6 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
                     ) {
                         super.onAuthenticationSucceeded(result)
                         dbH.isFingerprintLockEnabled = true
-                        fingerprintSwitch?.isChecked = true
                         snackbarCallBack?.showSnackbar(
                             StringResourcesUtils.getString(R.string.confirmation_fingerprint_enabled)
                         )
