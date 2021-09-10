@@ -2,14 +2,11 @@ package mega.privacy.android.app.fragments.settingsFragments
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings.*
 import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricManager.*
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricPrompt
-import androidx.biometric.BiometricPrompt.ERROR_NEGATIVE_BUTTON
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
@@ -22,7 +19,6 @@ import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
-import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
@@ -159,9 +155,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
                     ) {
                         super.onAuthenticationError(errorCode, errString)
                         logWarning("Error: $errString")
-                        if (errorCode == ERROR_NEGATIVE_BUTTON) {
-                            fingerprintSwitch?.isChecked = false
-                        }
+                        fingerprintSwitch?.isChecked = false
                     }
 
                     override fun onAuthenticationSucceeded(

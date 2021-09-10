@@ -1,18 +1,27 @@
 package mega.privacy.android.app.activities.settingsActivities
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo.*
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.RequiresApi
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
+import androidx.biometric.BiometricPrompt
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.LifecycleObserver
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.databinding.ActivityPasscodeBinding
@@ -20,15 +29,16 @@ import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.PasscodeUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboardView
+import java.security.KeyStore
 import java.util.*
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -47,6 +57,10 @@ class PasscodeLockActivity : BaseActivity() {
         private const val ATTEMPTS = "ATTEMPTS"
         private const val PASSCODE_TYPE = "PASSCODE_TYPE"
         private const val IS_CONFIRM_LOGOUT_SHOWN = "IS_CONFIRM_LOGOUT_SHOWN"
+        private const val FINGERPRINT_SKIPPED = "FINGERPRINT_SKIPPED"
+        private const val FINGERPRINT_ENABLED = "FINGERPRINT_ENABLED"
+        private const val KEY_NAME = "MEGA_KEY"
+        private const val ANDROID_KEY_STORE = "AndroidKeyStore"
     }
 
     private var attempts = 0
@@ -69,6 +83,14 @@ class PasscodeLockActivity : BaseActivity() {
 
     private var isConfirmLogoutDialogShown: Boolean = false
 
+    private lateinit var biometricPrompt: BiometricPrompt
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
+    private lateinit var cipher: Cipher
+    private lateinit var keyStore: KeyStore
+    private lateinit var keyGenerator: KeyGenerator
+    private var fingerprintEnabled = false
+    private var fingerprintSkipped = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -89,6 +111,8 @@ class PasscodeLockActivity : BaseActivity() {
 
             attempts = savedInstanceState.getInt(ATTEMPTS, 0)
             passcodeType = savedInstanceState.getString(PASSCODE_TYPE, PIN_4)
+            fingerprintEnabled = savedInstanceState.getBoolean(FINGERPRINT_ENABLED, false)
+            fingerprintSkipped = savedInstanceState.getBoolean(FINGERPRINT_SKIPPED, false)
 
             if (savedInstanceState.getBoolean(IS_CONFIRM_LOGOUT_SHOWN, false)) {
                 askConfirmLogout()
@@ -98,6 +122,10 @@ class PasscodeLockActivity : BaseActivity() {
 
             passcodeType =
                 if (prefs != null && !isTextEmpty(prefs.passcodeLockType)) prefs.passcodeLockType else PIN_4
+
+            if (mode == UNLOCK_MODE) {
+                fingerprintEnabled = dbH.isFingerprintLockEnabled
+            }
         }
 
         binding = ActivityPasscodeBinding.inflate(layoutInflater)
@@ -328,6 +356,11 @@ class PasscodeLockActivity : BaseActivity() {
             binding.passFourthInput.layoutParams = params
 
             binding.passwordInput.isVisible = false
+        }
+
+        if (shouldShowFingerprintLock()) {
+            binding.passcodeScrollView.isVisible = false
+            showFingerprintUnlock()
         }
     }
 
@@ -613,7 +646,122 @@ class PasscodeLockActivity : BaseActivity() {
         outState.putInt(ATTEMPTS, attempts)
         outState.putString(PASSCODE_TYPE, passcodeType)
         outState.putBoolean(IS_CONFIRM_LOGOUT_SHOWN, isConfirmLogoutDialogShown)
+        outState.putBoolean(FINGERPRINT_ENABLED, fingerprintEnabled)
+        outState.putBoolean(FINGERPRINT_SKIPPED, fingerprintSkipped)
 
         super.onSaveInstanceState(outState)
     }
+
+    /**
+     * Shows the fingerprint unlock dialog.
+     */
+    private fun showFingerprintUnlock() {
+        biometricPrompt = BiometricPrompt(
+            this,
+            ContextCompat.getMainExecutor(this),
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationError(
+                    errorCode: Int,
+                    errString: CharSequence
+                ) {
+                    super.onAuthenticationError(errorCode, errString)
+                    LogUtil.logWarning("Error: $errString")
+
+                    when (errorCode) {
+                        BiometricPrompt.ERROR_NEGATIVE_BUTTON -> {
+                            fingerprintSkipped = true
+                            binding.passcodeScrollView.isVisible = true
+                        }
+                        else -> {
+                            finish()
+                        }
+                    }
+                }
+
+                override fun onAuthenticationSucceeded(
+                    result: BiometricPrompt.AuthenticationResult
+                ) {
+                    super.onAuthenticationSucceeded(result)
+                    LogUtil.logDebug("Fingerprint unlocked")
+                    passcodeUtil.pauseUpdate()
+                    finish()
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    LogUtil.logWarning("Authentication failed")
+                }
+            })
+
+        if (!this::promptInfo.isInitialized) {
+            promptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle(StringResourcesUtils.getString(R.string.title_unlock_fingerprint))
+                .setNegativeButtonText(StringResourcesUtils.getString(R.string.action_use_passcode))
+                .setAllowedAuthenticators(BIOMETRIC_STRONG)
+                .build()
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(getCipher()))
+        } else {
+            biometricPrompt.authenticate(promptInfo)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun getSecretKey(): SecretKey {
+        if (!this::keyStore.isInitialized) {
+            keyStore = KeyStore.getInstance(ANDROID_KEY_STORE)
+        }
+
+        if (!this::keyGenerator.isInitialized) {
+            keyGenerator = KeyGenerator.getInstance(
+                KeyProperties.KEY_ALGORITHM_AES,
+                ANDROID_KEY_STORE
+            ).apply {
+                init(
+                    KeyGenParameterSpec.Builder(
+                        KEY_NAME,
+                        KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+                    )
+                        .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                        .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                        .setUserAuthenticationRequired(true)
+                        .build()
+                )
+
+                generateKey()
+            }
+        }
+
+        // Before the keystore can be accessed, it must be loaded.
+        keyStore.load(null)
+
+        return keyStore.getKey(KEY_NAME, null) as SecretKey
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun getCipher(): Cipher {
+        if (!this::cipher.isInitialized) {
+            val secretKey = getSecretKey()
+
+            cipher = Cipher.getInstance(
+                KeyProperties.KEY_ALGORITHM_AES + "/"
+                        + KeyProperties.BLOCK_MODE_CBC + "/"
+                        + KeyProperties.ENCRYPTION_PADDING_PKCS7
+            ).apply { init(Cipher.ENCRYPT_MODE, secretKey) }
+        }
+
+        return cipher
+    }
+
+    /**
+     * Checks if fingerprint lock should be shown.
+     *
+     * @return True if fingerprint lock should be shown, false otherwise.
+     */
+    private fun shouldShowFingerprintLock(): Boolean =
+        !fingerprintSkipped && fingerprintEnabled && BiometricManager.from(this)
+            .canAuthenticate(BIOMETRIC_STRONG) == BIOMETRIC_SUCCESS
+
 }
