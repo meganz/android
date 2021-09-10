@@ -71,6 +71,7 @@ import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -109,6 +110,7 @@ import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
@@ -212,6 +214,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public static final String NAME_USER_LOCKED = "NAME_USER_LOCKED";
     private Intent receivedIntent;
     private ArrayList<ShareInfo> shareInfos;
+
+    private final static int DATA_AGGREGATE = 2;
+    private int mDataCount;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -1931,6 +1936,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 dbH.clearEphemeral();
 
                 megaApi.fetchNodes(this);
+                megaApi.getMyBackupsFolder(this);
             }
         } else if(request.getType() == MegaRequest.TYPE_LOGOUT) {
             logDebug("TYPE_LOGOUT");
@@ -1988,7 +1994,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
                 }
 
-                readyToManager();
+                goToMainActivityIfDataReady();
             } else {
                 if(confirmLogoutDialog != null) {
                     confirmLogoutDialog.dismiss();
@@ -2117,6 +2123,13 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     ((LoginActivityLollipop)context).showSnackbar(error.getErrorString());
                 }
             }
+        } else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER
+                && request.getParamType() == USER_ATTR_MY_BACKUPS_FOLDER) {
+            if (error.getErrorCode() == MegaError.API_OK) {
+                MegaNodeUtil.myBackupHandle = request.getNodeHandle();
+            }
+
+            goToMainActivityIfDataReady();
         }
     }
 
@@ -2573,5 +2586,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
         builder.setCancelable(false);
         builder.show();
+    }
+
+    private void goToMainActivityIfDataReady() {
+        if (++mDataCount == DATA_AGGREGATE) readyToManager();
     }
 }

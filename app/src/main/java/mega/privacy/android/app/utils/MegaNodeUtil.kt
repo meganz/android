@@ -74,6 +74,12 @@ object MegaNodeUtil {
     private var alertTakenDown: AlertDialog? = null
 
     /**
+     * The node handle of the "My Backup" folder if exist
+     */
+    @JvmField
+    var myBackupHandle = INVALID_HANDLE
+
+    /**
      * The method to calculate how many nodes are folders in array list
      *
      * @param nodes the nodes to be calculated
@@ -499,6 +505,8 @@ object MegaNodeUtil {
             }
         } else if (isOutShare(node)) {
             R.drawable.ic_folder_outgoing
+        } else if (node.handle == myBackupHandle) {
+            R.drawable.backup
         } else {
             R.drawable.ic_folder_list
         }
