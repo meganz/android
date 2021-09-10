@@ -1791,7 +1791,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     launchTimer()
                 } else {
                     if (chatRoom != null && !chatRoom.isMeeting) {
-                        logDebug("cancel launchTimer() for chatroom is meeting")
+                        logDebug("cancel launchTimer() for chatroom is not a meeting")
                         cancelCountDownTimer()
                         meetingActivity.snackbar?.dismiss()
                     }
@@ -1979,6 +1979,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
 
                     meetingActivity.snackbar?.dismiss()
+                    LiveEventBus.get(EVENT_MEETING_INCOMPATIBILITY_SHOW, Boolean::class.java)
+                        .post(false)
                 }
                 if (participantsCount > 0 && count < participantsCount.toInt()) {
                     val currentStep = inMeetingViewModel.shouldShowWarningMessage()
