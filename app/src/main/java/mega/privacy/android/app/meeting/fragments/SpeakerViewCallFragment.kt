@@ -586,6 +586,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
             }
         }
 
+        if(participants.isNullOrEmpty())
+            return
+
         //Participant in list
         val iterator = participants.iterator()
         iterator.forEach {
@@ -755,6 +758,9 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
 
         inMeetingViewModel.removePreviousSpeakers()
         inMeetingViewModel.clearSpeakerParticipants()
+
+        if(participants.isNullOrEmpty())
+            return
 
         val iterator = participants.iterator()
         iterator.forEach {
