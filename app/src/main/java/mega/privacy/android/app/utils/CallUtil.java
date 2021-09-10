@@ -60,6 +60,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 public class CallUtil {
     /**
@@ -222,7 +223,7 @@ public class CallUtil {
      */
     public static boolean existsAnOngoingOrIncomingCall() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_USER_NO_PRESENT);
+        MegaHandleList listCallsUserNoPresent = megaChatApi.getChatCalls(CALL_STATUS_USER_NO_PRESENT);
         MegaHandleList listCallsUserTerminatingUserParticipation = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION);
         MegaHandleList listCallsDestroy = megaChatApi.getChatCalls(MegaChatCall.CALL_STATUS_DESTROYED);
         MegaHandleList listCalls = megaChatApi.getChatCalls();
@@ -339,6 +340,36 @@ public class CallUtil {
                 return;
             }
         }
+    }
+
+    /**
+     * Method to know if I can join a one-to-one call
+     *
+     * @param chatId The chat id of the call I want to join
+     * @return True, if I can join. False, if not
+     */
+    public static boolean checkIfCanJoinOneToOneCall(long chatId) {
+        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
+
+        if (chatRoom == null || call == null) {
+            logError("Chat room or call is null");
+            return false;
+        }
+
+        if (!chatRoom.isGroup() && !chatRoom.isMeeting() && call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
+            MegaHandleList listPeers = call.getPeeridParticipants();
+            if (listPeers != null && listPeers.size() > 0) {
+                for (int i = 0; i < listPeers.size(); i++) {
+                    if (listPeers.get(i) == MegaApplication.getInstance().getMegaApi().getMyUserHandleBinary()) {
+                        logDebug("I am already participating in this one-to-one call");
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -632,7 +663,7 @@ public class CallUtil {
         switch (status) {
             case MegaChatCall.CALL_STATUS_INITIAL:
                 return "CALL_STATUS_INITIAL";
-            case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
+            case CALL_STATUS_USER_NO_PRESENT:
                 return "CALL_STATUS_USER_NO_PRESENT";
             case MegaChatCall.CALL_STATUS_CONNECTING:
                 return "CALL_STATUS_CONNECTING";
@@ -1139,7 +1170,7 @@ public class CallUtil {
         MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
         return call != null && call.getStatus() != MegaChatCall.CALL_STATUS_DESTROYED &&
                 call.getStatus() != MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION &&
-                call.getStatus() != MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
+                call.getStatus() != CALL_STATUS_USER_NO_PRESENT;
     }
 
     /**
@@ -1178,7 +1209,7 @@ public class CallUtil {
 
         if (isFromOpenChatPreview) {
             MegaChatCall call = MegaApplication.getInstance().getMegaChatApi().getChatCall(chatId);
-            if (call == null || call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
+            if (call == null || call.getStatus() == CALL_STATUS_USER_NO_PRESENT) {
                 logDebug("Call id: " + list.get(0) + ". It's a meeting, open to join");
                 CallUtil.openMeetingToJoin(context, chatId, titleChat, link, alreadyExist ? publicChatHandle : MEGACHAT_INVALID_HANDLE, alreadyExist);
             } else {

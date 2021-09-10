@@ -3963,6 +3963,11 @@ public class ChatActivityLollipop extends PasscodeActivity
                     break;
 
                 MegaChatCall callBanner = megaChatApi.getChatCall(chatIdBanner);
+                if (!checkIfCanJoinOneToOneCall(chatIdBanner)) {
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
+                    break;
+                }
+
                 if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                         callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                     startVideo = false;
