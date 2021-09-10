@@ -280,7 +280,7 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityStr
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT;
 import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X;
-import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_3X;
+import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
@@ -5365,7 +5365,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 					zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-                    if (currentZoom == ZOOM_OUT_3X) {
+                    if (currentZoom == ZOOM_OUT_2X) {
                         ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
                     }
 
@@ -5918,12 +5918,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        }
             case R.id.action_zoom_out: {
                 if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
-                    if (currentZoom > ZOOM_OUT_3X) {
+                    if (currentZoom > ZOOM_OUT_2X) {
                         zoomViewModel.setZoom(currentZoom - 1);
                         ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
                     }
 
-                    if (currentZoom == ZOOM_OUT_3X) {
+                    if (currentZoom == ZOOM_OUT_2X) {
                         ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
                     }
                 }

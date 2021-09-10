@@ -1,10 +1,7 @@
 package mega.privacy.android.app.utils
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.view.MenuItem
-import android.view.View
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import mega.privacy.android.app.R
@@ -12,24 +9,21 @@ import mega.privacy.android.app.R
 object ZoomUtil {
 
     // Zoom level
-    const val ZOOM_OUT_3X = -3
     const val ZOOM_OUT_2X = -2
     const val ZOOM_OUT_1X = -1
     const val ZOOM_DEFAULT = 0
     const val ZOOM_IN_1X = 1
 
     // Span count portrait
-    private const val SPAN_COUNT_PORTRAIT_OUT_3X = 24
     private const val SPAN_COUNT_PORTRAIT_OUT_2X = 12
     private const val SPAN_COUNT_PORTRAIT_OUT_1X = 5
     private const val SPAN_COUNT_PORTRAIT_DEFAULT = 3
     private const val SPAN_COUNT_PORTRAIT_IN_1X = 1
 
     // Span count landscape
-    private const val SPAN_COUNT_LANDSCAPE_OUT_3X = 45
     private const val SPAN_COUNT_LANDSCAPE_OUT_2X = 24
-    private const val SPAN_COUNT_LANDSCAPE_OUT_1X = SPAN_COUNT_PORTRAIT_DEFAULT
-    private const val SPAN_COUNT_LANDSCAPE_DEFAULT = SPAN_COUNT_PORTRAIT_DEFAULT
+    private const val SPAN_COUNT_LANDSCAPE_OUT_1X = 7
+    private const val SPAN_COUNT_LANDSCAPE_DEFAULT = 5
     private const val SPAN_COUNT_LANDSCAPE_IN_1X = SPAN_COUNT_PORTRAIT_IN_1X
 
     private fun getPortraitSpanCount(zoom: Int) = when (zoom) {
@@ -37,7 +31,6 @@ object ZoomUtil {
         ZOOM_DEFAULT -> SPAN_COUNT_PORTRAIT_DEFAULT
         ZOOM_OUT_1X -> SPAN_COUNT_PORTRAIT_OUT_1X
         ZOOM_OUT_2X -> SPAN_COUNT_PORTRAIT_OUT_2X
-        ZOOM_OUT_3X -> SPAN_COUNT_PORTRAIT_OUT_3X
         else -> SPAN_COUNT_PORTRAIT_DEFAULT
     }
 
@@ -46,7 +39,6 @@ object ZoomUtil {
         ZOOM_DEFAULT -> SPAN_COUNT_LANDSCAPE_DEFAULT
         ZOOM_OUT_1X -> SPAN_COUNT_LANDSCAPE_OUT_1X
         ZOOM_OUT_2X -> SPAN_COUNT_LANDSCAPE_OUT_2X
-        ZOOM_OUT_3X -> SPAN_COUNT_LANDSCAPE_OUT_3X
         else -> SPAN_COUNT_LANDSCAPE_DEFAULT
     }
 
@@ -86,6 +78,6 @@ object ZoomUtil {
     }
 
     fun needReload(currentZoom: Int, zoom: Int): Boolean {
-        return if (currentZoom == ZOOM_OUT_3X || currentZoom == ZOOM_IN_1X) true else zoom == ZOOM_OUT_3X || zoom == ZOOM_IN_1X
+        return if (currentZoom == ZOOM_OUT_2X || currentZoom == ZOOM_IN_1X) true else zoom == ZOOM_OUT_2X || zoom == ZOOM_IN_1X
     }
 }

@@ -42,7 +42,7 @@ import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X
-import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_3X
+import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X
 import mega.privacy.android.app.utils.ZoomUtil.getSpanCount
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE

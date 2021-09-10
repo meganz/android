@@ -430,7 +430,7 @@ class CuViewModel extends BaseRxViewModel {
                     dateString,
                     mSelectedNodes.containsKey(node.getHandle()));
 
-            if(mZoom == ZoomUtil.ZOOM_OUT_3X) {
+            if(mZoom == ZoomUtil.ZOOM_OUT_2X) {
                 if (lastYearDate == null || !Year.from(lastYearDate).equals(Year.from(modifyDate))) {
                     lastYearDate = modifyDate;
                     String date = ofPattern("yyyy").format(modifyDate);
