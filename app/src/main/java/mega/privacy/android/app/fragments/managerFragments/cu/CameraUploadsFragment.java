@@ -269,6 +269,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         setupOtherViews();
         observeLiveData();
         viewModel.getCards();
+        viewModel.getCUNodes();
     }
 
     public void setViewTypes(LinearLayout cuViewTypes, TextView cuYearsButton,

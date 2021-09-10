@@ -1,14 +1,16 @@
 package mega.privacy.android.app.viewmodel
 
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.utils.ZoomUtil
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ZoomViewModel() : ViewModel() {
+@Singleton
+class ZoomViewModel @Inject constructor(): ViewModel() {
 
-    private val _zoom = MutableLiveData<Int>()
+    private val _zoom = MutableLiveData<Int>(ZoomUtil.ZOOM_DEFAULT)
     val zoom : LiveData<Int> = _zoom
 
     fun setZoom(zoom: Int) {

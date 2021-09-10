@@ -7,12 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.*
 import nz.mega.sdk.*
 import java.io.File
 import java.time.LocalDate
+import java.time.Year
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -26,7 +25,8 @@ class TypedNodesFetcher(
     private val megaApi: MegaApiAndroid,
     private val type: Int = MegaApiJava.FILE_TYPE_DEFAULT,
     private val order: Int = MegaApiJava.ORDER_DEFAULT_ASC,
-    private val selectedNodesMap: LinkedHashMap<Any, NodeItem>
+    private val selectedNodesMap: LinkedHashMap<Any, NodeItem>,
+    private val zoom: Int
 ) {
     val result = MutableLiveData<List<NodeItem>>()
 
@@ -62,6 +62,11 @@ class TypedNodesFetcher(
         node.base64Handle.plus(FileUtil.JPG_EXTENSION)
     )
 
+    private fun getPreviewFile(node: MegaNode) = File(
+        PreviewUtils.getPreviewFolder(context),
+        node.base64Handle.plus(FileUtil.JPG_EXTENSION)
+    )
+
     /**
      * Get the thumbnail of the file.
      */
@@ -83,33 +88,66 @@ class TypedNodesFetcher(
     }
 
     /**
+     * Get the preview of the file.
+     */
+    private fun getPreview(node: MegaNode): File? {
+        val previewFile = getPreviewFile(node)
+
+        return if (previewFile.exists()) {
+            previewFile
+        } else {
+            // Note down the nodes and going to get their thumbnails from the server
+            // as soon as the getNodeItems finished. (Don't start the getting operation here
+            // for avoiding potential ConcurrentModification issue)
+            if (node.hasPreview()) {
+                getThumbnailNodes[node] = previewFile.absolutePath
+            }
+
+            null
+        }
+    }
+
+    /**
      * Get all nodes items
      */
     suspend fun getNodeItems() {
-        var lastModifyDate: LocalDate? = null
+        var lastYearDate: LocalDate? = null
+        var lastMonthDate: LocalDate? = null
+        var lastDayDate: LocalDate? = null
 
         for (node in getMegaNodes()) {
-            val thumbnail = getThumbnail(node)
+            val thumbnail = if(zoom == ZoomUtil.ZOOM_IN_1X) {
+                getPreview(node)
+            } else {
+                getThumbnail(node)
+            }
+
             val modifyDate = Util.fromEpoch(node.modificationTime)
             val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
+            val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
 
             // Photo "Month-Year" section headers
-            if (type == MegaApiJava.FILE_TYPE_PHOTO && (lastModifyDate == null
-                        || YearMonth.from(lastModifyDate) != YearMonth.from(
-                    modifyDate
-                ))
-            ) {
-                lastModifyDate = modifyDate
-                // RandomUUID() can ensure non-repetitive values in practical purpose
-                fileNodesMap[UUID.randomUUID()] = PhotoNodeItem(
-                    PhotoNodeItem.TYPE_TITLE,
-                    -1,
-                    null,
-                    -1,
-                    dateString,
-                    null,
-                    false
-                )
+            if (type == MegaApiJava.FILE_TYPE_PHOTO) {
+                when(zoom) {
+                    ZoomUtil.ZOOM_OUT_2X -> {
+                        if (lastYearDate == null || Year.from(lastYearDate) != Year.from(modifyDate)) {
+                            lastYearDate = modifyDate
+                            addPhotoDateTitle(DateTimeFormatter.ofPattern("uuuu").format(modifyDate))
+                        }
+                    }
+                    ZoomUtil.ZOOM_IN_1X -> {
+                        if (lastDayDate == null || lastDayDate.dayOfYear != modifyDate.dayOfYear) {
+                            lastDayDate = modifyDate
+                            addPhotoDateTitle(DateTimeFormatter.ofPattern(if(sameYear) "dd MMMM" else "dd MMMM uuuu").format(modifyDate))
+                        }
+                    }
+                    else -> {
+                        if (lastMonthDate == null || YearMonth.from(lastMonthDate) != YearMonth.from(modifyDate)) {
+                            lastMonthDate = modifyDate
+                            addPhotoDateTitle(DateTimeFormatter.ofPattern(if(sameYear) "MMMM" else "MMMM uuuu").format(modifyDate))
+                        }
+                    }
+                }
             }
 
             val selected = selectedNodesMap[node.handle]?.selected ?: false
@@ -142,6 +180,19 @@ class TypedNodesFetcher(
         result.postValue(ArrayList(fileNodesMap.values))
 
         getThumbnailsFromServer()
+    }
+
+    private fun addPhotoDateTitle(dateString: String) {
+        // RandomUUID() can ensure non-repetitive values in practical purpose
+        fileNodesMap[UUID.randomUUID()] = PhotoNodeItem(
+            PhotoNodeItem.TYPE_TITLE,
+            -1,
+            null,
+            -1,
+            dateString,
+            null,
+            false
+        )
     }
 
     private suspend fun getThumbnailsFromServer() {

@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -42,6 +43,7 @@ import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X
+import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_1X
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X
 import mega.privacy.android.app.utils.ZoomUtil.getSpanCount
 import nz.mega.sdk.MegaApiJava
@@ -98,7 +100,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         setupEmptyHint()
         setupListView()
-        setupListAdapter()
+        setupListAdapter(currentZoom)
         setupFastScroller()
         setupActionMode()
         setupNavigation()
@@ -155,7 +157,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
      * Only refresh the list items of uiDirty = true
      */
     private fun updateUi() = viewModel.items.value?.let { it ->
-        val newList = ArrayList<PhotoNodeItem>(it)
+        val newList = ArrayList(it)
 
         if (viewModel.searchMode) {
             searchAdapter.submitList(newList)
@@ -194,7 +196,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
-            doIfOnline { actionModeViewModel.enterActionMode(it) }
+            if(currentZoom == ZOOM_DEFAULT || currentZoom == ZOOM_OUT_1X) {
+                doIfOnline { actionModeViewModel.enterActionMode(it) }
+            }
         })
 
     private fun observeSelectedItems() =
@@ -300,8 +304,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
-    private fun setupListAdapter() {
-        browseAdapter = PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel)
+    fun setupListAdapter(zoom: Int) {
+        currentZoom = zoom
+        browseAdapter = PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel, currentZoom)
         searchAdapter = PhotosSearchAdapter(actionModeViewModel, itemOperationViewModel)
 
         searchAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -317,7 +322,21 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             listView.switchToLinear()
             listView.adapter = searchAdapter
         } else {
+            val params = listView.layoutParams as ConstraintLayout.LayoutParams
+
+            if (currentZoom == ZOOM_IN_1X) {
+                params.rightMargin = 0
+                params.leftMargin = 0
+            }else{
+                val margin = ZoomUtil.getMargin(context, currentZoom)
+                params.leftMargin = margin
+                params.rightMargin = margin
+            }
+
+            binding.viewModel = viewModel
             configureGridLayoutManager()
+
+            listView.layoutParams = params
             listView.adapter = browseAdapter
         }
     }
@@ -355,19 +374,19 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     }
 
     private fun configureGridLayoutManager() {
-        if (listView.layoutManager !is GridLayoutManager) return
-
         val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        val spanCount = getSpanCount(isPortrait, currentZoom)
+        val spanCount = getSpanCount(isPortrait)
         gridLayoutManager = GridLayoutManager(context, spanCount)
         listView.switchBackToGrid()
 
-        (listView.layoutManager as GridLayoutManager).apply {
-
+        gridLayoutManager.apply {
+            val imageMargin = ZoomUtil.getMargin(context, currentZoom)
             spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
-            val itemDimen =
-                outMetrics.widthPixels / spanCount - resources.getDimension(R.dimen.photo_grid_margin)
-                    .toInt() * 2
+            val itemDimen = if (currentZoom == ZOOM_IN_1X) {
+                outMetrics.widthPixels
+            } else {
+                ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount
+            }
             browseAdapter.setItemDimen(itemDimen)
         }
     }
@@ -378,6 +397,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         viewModel.searchQuery = query
         viewModel.loadPhotos()
     }
+
+    fun loadPhotos() = viewModel.loadPhotos(true)
 
     private fun openPhoto(nodeItem: PhotoNodeItem) {
         listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
