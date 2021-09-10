@@ -615,17 +615,13 @@ public class AppRTCAudioManager {
      * Changes selection of the currently active audio device.
      */
     private void setAudioDeviceInternal(AudioDevice device) {
-        if (isNotDeviceAvailable(device)) {
-            logDebug("Can not select " + device + ", from available " + audioDevices + ". Trying to use SPEAKER_PHONE");
-            device = AudioDevice.SPEAKER_PHONE;
-            if (isNotDeviceAvailable(device)) {
-                logError("Can not select " + device + ", from available " + audioDevices);
-                return;
-            }
-        }
+        logDebug("Selected audio device internal is " + device);
+        device = getDeviceAvailable(device);
+        if (device == null)
+            return;
 
+        logDebug("Audio device internal finally selected is " + device);
         AppRTCUtils.assertIsTrue(audioDevices.contains(device));
-        logDebug("Selected audio device is " + device);
         switch (device) {
             case SPEAKER_PHONE:
                 if(typeAudioManager == AUDIO_MANAGER_PLAY_VOICE_CLIP){
@@ -701,8 +697,28 @@ public class AppRTCAudioManager {
      * @param device AudioDevice
      * @return True, if the array of available audioDevices contains that device. False, otherwise.
      */
-    private boolean isNotDeviceAvailable(AudioDevice device) {
-        return audioDevices == null || !audioDevices.contains(device);
+    private boolean isDeviceAvailable(AudioDevice device) {
+        return audioDevices != null && audioDevices.contains(device);
+    }
+
+    private AudioDevice getDeviceAvailable(AudioDevice device) {
+        if (isDeviceAvailable(device))
+            return device;
+
+        device = AudioDevice.WIRED_HEADSET;
+        if (isDeviceAvailable(device))
+            return device;
+
+        device = AudioDevice.BLUETOOTH;
+        if (isDeviceAvailable(device))
+            return device;
+
+        device = AudioDevice.SPEAKER_PHONE;
+        if (isDeviceAvailable(device))
+            return device;
+
+        logError("Can not select " + device + ", from available " + audioDevices);
+        return null;
     }
 
     /**
@@ -710,14 +726,12 @@ public class AppRTCAudioManager {
      */
     public void selectAudioDevice(AudioDevice device, boolean temporary) {
         ThreadUtils.checkIsOnMainThread();
-        if (isNotDeviceAvailable(device)) {
-            logDebug("Can not select " + device + ", from available " + audioDevices + ". Trying to use SPEAKER_PHONE");
-            device = AudioDevice.SPEAKER_PHONE;
-            if (isNotDeviceAvailable(device)) {
-                logError("Can not select " + device + ", from available " + audioDevices);
-                return;
-            }
-        }
+        logDebug("Selected audio device is " + device);
+        device = getDeviceAvailable(device);
+        if (device == null)
+            return;
+
+        logDebug("Audio device finally selected is " + device);
 
         isTemporary = temporary;
         userSelectedAudioDevice = device;
