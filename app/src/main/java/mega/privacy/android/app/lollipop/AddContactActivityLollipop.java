@@ -116,6 +116,7 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityStr
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class AddContactActivityLollipop extends PasscodeActivity implements View.OnClickListener, RecyclerView.OnItemTouchListener, StickyHeaderHandler, TextWatcher, TextView.OnEditorActionListener, MegaRequestListenerInterface, MegaChatListenerInterface, MegaGlobalListenerInterface {
 
@@ -3058,7 +3059,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         switch (v.getId()) {
             case R.id.layout_scan_qr: {
                 logDebug("Scan QR code pressed");
-                if (isNecessaryDisableLocalCamera() != -1) {
+                if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
                     showConfirmationOpenCamera(this, ACTION_OPEN_QR, true);
                     break;
                 }

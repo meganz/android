@@ -37,6 +37,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_STATUS
 import mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE
+import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.constants.EventConstants.EVENT_ERROR_STARTING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_LOCAL_NETWORK_QUALITY_CHANGE
@@ -46,7 +47,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INCOMPATI
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_INVITE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_PROXIMITY_SENSOR_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HIRES_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
@@ -135,7 +135,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var micIsEnable = false
     private var camIsEnable = false
     private var meetingLink: String = ""
-    private var inTemporaryState = false
     private var isManualModeView = false
     private var isWaitingForAnswerCall = false
 
@@ -163,25 +162,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     val inMeetingViewModel by viewModels<InMeetingViewModel>()
 
-    private val proximitySensorChangeObserver = Observer<Boolean> {
+    private val enableOrDisableLocalVideoObserver = Observer<Boolean> { shouldBeEnabled ->
         val chatId = inMeetingViewModel.getChatId()
-        if (chatId != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null) {
-            val realStatus = MegaApplication.getChatManagement().getVideoStatus(chatId)
-            when {
-                !realStatus -> {
-                    inTemporaryState = false
-                }
-                it -> {
-                    logError("Proximity sensor, video off")
-                    inTemporaryState = true
-                    sharedModel.clickCamera(false)
-                }
-                else -> {
-                    logError("Proximity sensor, video on")
-                    inTemporaryState = false
-                    sharedModel.clickCamera(true)
-                }
-            }
+        if (chatId != MEGACHAT_INVALID_HANDLE && inMeetingViewModel.getCall() != null && shouldBeEnabled != camIsEnable) {
+            MegaApplication.getChatManagement().isDisablingLocalVideo = true
+            sharedModel.clickCamera(shouldBeEnabled)
         }
     }
 
@@ -843,8 +828,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun initLiveEventBus() {
-        LiveEventBus.get(EVENT_PROXIMITY_SENSOR_CHANGE, Boolean::class.java)
-            .observe(this, proximitySensorChangeObserver)
+        LiveEventBus.get(EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE, Boolean::class.java)
+            .observe(this, enableOrDisableLocalVideoObserver)
 
         LiveEventBus.get(EVENT_ERROR_STARTING_CALL, Long::class.java)
             .observe(this, errorStatingCallObserver)
@@ -1471,7 +1456,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         status = NOT_TYPE
 
-        MegaApplication.getInstance().unregisterProximitySensor()
         removeListenersAndFragments()
     }
 
@@ -2256,7 +2240,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         logDebug("Local audio or video changes")
         inMeetingViewModel.getCall()?.let {
             val isVideoOn: Boolean = it.hasLocalVideo()
-            if (!inTemporaryState) {
+            if (!MegaApplication.getChatManagement().isInTemporaryState) {
                 MegaApplication.getChatManagement().setVideoStatus(it.chatid, isVideoOn)
             }
         }
@@ -2689,7 +2673,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         removeUI()
         logDebug("Fragment destroyed")
         CallUtil.activateChrono(false, meetingChrono, null)
-        MegaApplication.getInstance().unregisterProximitySensor()
         resumeAudioPlayerIfNotInCall(meetingActivity)
         RunOnUIThreadUtils.stop()
         bottomFloatingPanelViewHolder.onDestroy()

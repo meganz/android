@@ -3191,8 +3191,9 @@ public class ChatActivityLollipop extends PasscodeActivity
         if(callInThisChat != null){
             logDebug("There is a call in this chat");
             if (participatingInACall()) {
-                long chatIdCallInProgress = getChatCallInProgress();
-                if (callInThisChat.isOnHold() || chatIdCallInProgress == chatRoom.getChatId()) {
+                MegaChatCall currentCallInProgress = getCallInProgress();
+                if (callInThisChat.isOnHold() ||
+                        (currentCallInProgress != null && currentCallInProgress.getChatid() == chatRoom.getChatId())) {
                     logDebug("I'm participating in the call of this chat");
                     returnCall(this, chatRoom.getChatId());
                     return;
@@ -3963,6 +3964,11 @@ public class ChatActivityLollipop extends PasscodeActivity
                     break;
 
                 MegaChatCall callBanner = megaChatApi.getChatCall(chatIdBanner);
+                if (!checkIfCanJoinOneToOneCall(chatIdBanner)) {
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
+                    break;
+                }
+
                 if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
                         callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                     startVideo = false;
@@ -4002,7 +4008,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 logDebug("media_icon_chat");
                 if (recordView.isRecordingNow()) break;
                 hideKeyboard();
-                if(isNecessaryDisableLocalCamera() != -1){
+                if(isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE){
                     showConfirmationOpenCamera(this, ACTION_TAKE_PICTURE, false);
                     break;
                 }
@@ -9412,12 +9418,10 @@ public class ChatActivityLollipop extends PasscodeActivity
         }
 
         if (rtcAudioManager != null) {
-            long chatIdOfCall = getChatCallInProgress();
-            MegaChatCall call = megaChatApi.getChatCall(chatIdOfCall);
-
-            if (call != null && chatIdOfCall != MEGACHAT_INVALID_HANDLE) {
-                if (!MegaApplication.getChatManagement().getSpeakerStatus(chatIdOfCall)) {
-                    MegaApplication.getChatManagement().setSpeakerStatus(chatIdOfCall, true);
+            MegaChatCall call = getCallInProgress();
+            if (call != null) {
+                if (!MegaApplication.getChatManagement().getSpeakerStatus(call.getChatid())) {
+                    MegaApplication.getChatManagement().setSpeakerStatus(call.getChatid(), true);
                     app.updateSpeakerStatus(true, AUDIO_MANAGER_CALL_IN_PROGRESS);
                 }
             } else {

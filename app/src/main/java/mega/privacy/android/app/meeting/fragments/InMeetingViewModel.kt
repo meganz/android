@@ -304,7 +304,9 @@ class InMeetingViewModel @ViewModelInject constructor(
 
             val session = getSessionOneToOneCall(call)
             session?.let { sessionParticipant ->
-                if (sessionParticipant.isOnHold || (!call.hasLocalVideo() && !sessionParticipant.hasVideo())) {
+                if (sessionParticipant.isOnHold || (!call.hasLocalVideo() && !MegaApplication.getChatManagement()
+                        .getVideoStatus(call.chatid) && !sessionParticipant.hasVideo())
+                ) {
                     return true
                 }
             }

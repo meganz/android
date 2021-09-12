@@ -244,7 +244,7 @@ class VideoMeetingViewHolder(
      * @param participant The participant from whom the video is to be closed
      */
     fun removeResolutionAndListener(participant: Participant) {
-        if (participant.videoListener == null) return
+        if (isInvalid(participant) || participant.videoListener == null) return
 
         logDebug("Close video of ${participant.clientId}")
         participant.videoListener?.let {

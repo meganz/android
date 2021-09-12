@@ -228,14 +228,6 @@ class VideoListViewAdapter(
         if (position == INVALID_POSITION)
             return
 
-        getHolder(position)?.let { holder ->
-            holder.removeResolutionAndListener(participant)
-            return
-        }
-
-        participant.videoListener?.let {
-            inMeetingViewModel.removeResolutionAndListener(participant, it)
-        }
-        participant.videoListener = null
+        getHolder(position)?.removeResolutionAndListener(participant)
     }
 }
