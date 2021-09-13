@@ -22,6 +22,8 @@ import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
 
+import androidx.annotation.Nullable;
+
 public class VideoDownsampling {
 
     private static final int TIMEOUT_USEC = 10000;
@@ -171,15 +173,18 @@ public class VideoDownsampling {
 
             audioExtractor = createExtractor(mInputFile);
             int audioInputTrack = getAndSelectAudioTrackIndex(audioExtractor);
-            MediaFormat inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack);
-            MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(MediaFormat.KEY_MIME),
-                    inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
-                    inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
-            outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE);
-            outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE);
 
-            audioEncoder = createAudioEncoder(audioCodecInfo, outputAudioFormat);
-            audioDecoder = createAudioDecoder(inputAudioFormat);
+            if (audioInputTrack >= 0) {
+                MediaFormat inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack);
+                MediaFormat outputAudioFormat = MediaFormat.createAudioFormat(inputAudioFormat.getString(MediaFormat.KEY_MIME),
+                        inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
+                        inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
+                outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE);
+                outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE);
+
+                audioEncoder = createAudioEncoder(audioCodecInfo, outputAudioFormat);
+                audioDecoder = createAudioDecoder(inputAudioFormat);
+            }
 
             muxer = new MediaMuxer(mOutputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 
@@ -348,7 +353,7 @@ public class VideoDownsampling {
 
     private void changeResolution(MediaExtractor videoExtractor, MediaExtractor audioExtractor,
                                   MediaCodec videoDecoder, MediaCodec videoEncoder,
-                                  MediaCodec audioDecoder, MediaCodec audioEncoder,
+                                  @Nullable MediaCodec audioDecoder,  @Nullable MediaCodec audioEncoder,
                                   MediaMuxer muxer,
                                   InputSurface inputSurface, OutputSurface outputSurface, VideoUpload video) {
         logDebug("changeResolution");
@@ -366,6 +371,14 @@ public class VideoDownsampling {
         videoDecoderOutputBufferInfo = new MediaCodec.BufferInfo();
         videoEncoderOutputBufferInfo = new MediaCodec.BufferInfo();
 
+        MediaFormat decoderOutputVideoFormat = null;
+        MediaFormat encoderOutputVideoFormat = null;
+        int outputVideoTrack = -1;
+
+        boolean videoExtractorDone = false;
+        boolean videoDecoderDone = false;
+        boolean videoEncoderDone = false;
+
         ByteBuffer[] audioDecoderInputBuffers = null;
         ByteBuffer[] audioDecoderOutputBuffers = null;
         ByteBuffer[] audioEncoderInputBuffers = null;
@@ -373,30 +386,30 @@ public class VideoDownsampling {
         MediaCodec.BufferInfo audioDecoderOutputBufferInfo = null;
         MediaCodec.BufferInfo audioEncoderOutputBufferInfo = null;
 
-        audioDecoderInputBuffers = audioDecoder.getInputBuffers();
-        audioDecoderOutputBuffers =  audioDecoder.getOutputBuffers();
-        audioEncoderInputBuffers = audioEncoder.getInputBuffers();
-        audioEncoderOutputBuffers = audioEncoder.getOutputBuffers();
-        audioDecoderOutputBufferInfo = new MediaCodec.BufferInfo();
-        audioEncoderOutputBufferInfo = new MediaCodec.BufferInfo();
-
-        MediaFormat decoderOutputVideoFormat = null;
-        MediaFormat decoderOutputAudioFormat = null;
-        MediaFormat encoderOutputVideoFormat = null;
-        MediaFormat encoderOutputAudioFormat = null;
-        int outputVideoTrack = -1;
-        int outputAudioTrack = -1;
-
-        boolean videoExtractorDone = false;
-        boolean videoDecoderDone = false;
-        boolean videoEncoderDone = false;
-
         boolean audioExtractorDone = false;
         boolean audioDecoderDone = false;
         boolean audioEncoderDone = false;
 
+        if (audioDecoder != null && audioEncoder != null) {
+            audioDecoderInputBuffers = audioDecoder.getInputBuffers();
+            audioDecoderOutputBuffers = audioDecoder.getOutputBuffers();
+            audioEncoderInputBuffers = audioEncoder.getInputBuffers();
+            audioEncoderOutputBuffers = audioEncoder.getOutputBuffers();
+            audioDecoderOutputBufferInfo = new MediaCodec.BufferInfo();
+            audioEncoderOutputBufferInfo = new MediaCodec.BufferInfo();
+        } else {
+            audioExtractorDone = true;
+            audioDecoderDone = true;
+            audioEncoderDone = true;
+        }
+
+        MediaFormat decoderOutputAudioFormat = null;
+        MediaFormat encoderOutputAudioFormat = null;
+        int outputAudioTrack = -1;
         int pendingAudioDecoderOutputBufferIndex = -1;
+
         boolean muxing = false;
+
         while ((!videoEncoderDone || !audioEncoderDone) && isRunning) {
             while (!videoExtractorDone && (encoderOutputVideoFormat == null || muxing)) {
                 int decoderInputBufferIndex = videoDecoder.dequeueInputBuffer(TIMEOUT_USEC);
@@ -424,7 +437,8 @@ public class VideoDownsampling {
                 break;
             }
 
-            while (!audioExtractorDone && (encoderOutputAudioFormat == null || muxing)) {
+            while (audioDecoder != null && audioDecoderInputBuffers != null
+                    && !audioExtractorDone && (encoderOutputAudioFormat == null || muxing)) {
                 int decoderInputBufferIndex = audioDecoder.dequeueInputBuffer(TIMEOUT_USEC);
                 if (decoderInputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
                     break;
@@ -486,7 +500,8 @@ public class VideoDownsampling {
                 break;
             }
 
-            while (!audioDecoderDone && pendingAudioDecoderOutputBufferIndex == -1 && (encoderOutputAudioFormat == null || muxing)) {
+            while (audioDecoder != null && audioDecoderOutputBuffers != null
+                    && !audioDecoderDone && (encoderOutputAudioFormat == null || muxing)) {
                 int decoderOutputBufferIndex = audioDecoder.dequeueOutputBuffer(audioDecoderOutputBufferInfo, TIMEOUT_USEC);
                 if (decoderOutputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
                     break;
@@ -508,7 +523,8 @@ public class VideoDownsampling {
                 break;
             }
 
-            while (pendingAudioDecoderOutputBufferIndex != -1) {
+            while (audioEncoder != null && audioEncoderInputBuffers != null
+                    && pendingAudioDecoderOutputBufferIndex != -1) {
                 int encoderInputBufferIndex = audioEncoder.dequeueInputBuffer(TIMEOUT_USEC);
                 ByteBuffer encoderInputBuffer = audioEncoderInputBuffers[encoderInputBufferIndex];
                 int size = audioDecoderOutputBufferInfo.size;
@@ -558,7 +574,8 @@ public class VideoDownsampling {
                 break;
             }
 
-            while (!audioEncoderDone && (encoderOutputAudioFormat == null || muxing)) {
+            while (audioEncoder != null && audioEncoderOutputBuffers != null
+                    && !audioEncoderDone && (encoderOutputAudioFormat == null || muxing)) {
                 int encoderOutputBufferIndex = audioEncoder.dequeueOutputBuffer(audioEncoderOutputBufferInfo, TIMEOUT_USEC);
                 if (encoderOutputBufferIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
                     break;
@@ -585,9 +602,13 @@ public class VideoDownsampling {
                 audioEncoder.releaseOutputBuffer(encoderOutputBufferIndex, false);
                 break;
             }
-            if (!muxing && (encoderOutputAudioFormat != null) && (encoderOutputVideoFormat != null)) {
+            if (!muxing && encoderOutputVideoFormat != null) {
                 outputVideoTrack = muxer.addTrack(encoderOutputVideoFormat);
-                outputAudioTrack = muxer.addTrack(encoderOutputAudioFormat);
+
+                if (encoderOutputAudioFormat != null) {
+                    outputAudioTrack = muxer.addTrack(encoderOutputAudioFormat);
+                }
+
                 muxer.start();
                 muxing = true;
             }
