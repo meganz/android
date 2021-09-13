@@ -1705,13 +1705,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
      * Activate the proximity sensor.
      */
     public void startProximitySensor() {
-        if (rtcAudioManager != null) {
-            logDebug("Starting proximity sensor...");
-            rtcAudioManager.startProximitySensor();
-            rtcAudioManager.setOnProximitySensorListener(isNear -> {
+		if (rtcAudioManager != null && rtcAudioManager.startProximitySensor()) {
+			logDebug("Proximity sensor started");
+			rtcAudioManager.setOnProximitySensorListener(isNear -> {
 				chatManagement.controlProximitySensor(isNear);
-            });
-        }
+			});
+		}
     }
 
     /**
