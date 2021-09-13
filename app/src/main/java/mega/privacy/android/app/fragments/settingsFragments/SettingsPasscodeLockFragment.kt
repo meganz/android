@@ -123,6 +123,10 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
      * Checks if fingerprint setting should be enabled.
      */
     private fun setupFingerprintSetting() {
+        if (passcodeSwitch?.isChecked == false) {
+            return
+        }
+
         when (val canAuthenticate = from(requireContext()).canAuthenticate(BIOMETRIC_STRONG)) {
             BIOMETRIC_SUCCESS -> {
                 logDebug("Show fingerprint setting, hardware available and fingerprint enabled.")
