@@ -93,6 +93,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import java.lang.Integer.min
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
@@ -151,6 +152,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var lastTouch: Long = 0
     private lateinit var dragTouchListener: OnDragTouchListener
     private var bannerShouldBeShown = false
+    private var shiftY = -1f // record the shift of floatingWindowFragment to Snackbar
 
     private lateinit var binding: InMeetingFragmentBinding
 
@@ -577,7 +579,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
     private val floatingWindowObserver = Observer<Boolean> {
-        floatingWindowContainer.visibility = if (it) View.GONE else View.VISIBLE
+        // calculate the position of floating window related to snack bar
+        checkRelativePositionWithSnackbar(it)
     }
 
     override fun onCreateView(
@@ -1240,6 +1243,58 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     /**
+     * Method to control the position of the floating window in relation to the snack bar
+     *
+     * @param showSnackbar true: the snack bar is shown / false: the snack bar is dismiss
+     */
+    private fun checkRelativePositionWithSnackbar(showSnackbar: Boolean) {
+        if(showSnackbar) {
+            val bottom = floatingWindowContainer.y + floatingWindowContainer.height
+            val top = floatingWindowContainer.y
+            var snackbarTop: Int
+            var snackbarBottom: Int
+
+            meetingActivity.snackbar.view.post {
+                snackbarTop = meetingActivity.snackbar.view.top
+                snackbarBottom = meetingActivity.snackbar.view.bottom
+                // When there is an intersection between the floating window and the snack bar, move the floating window.
+                if (meetingActivity.snackbar.isShown && ((top.toInt() until bottom.toInt()) intersect (snackbarTop until snackbarBottom)).isNotEmpty()) {
+                    shiftY = bottom - snackbarTop
+                    floatingWindowContainer.moveY(floatingWindowContainer.y - shiftY)
+                }
+            }
+        } else {
+            if(shiftY > 0) {
+                // When the snack bar dismissed, restore the position of the floating window.
+                floatingWindowContainer.y = floatingWindowContainer.y + shiftY
+                shiftY = -1f
+                checkRelativePositionWithBottomSheet()
+            }
+        }
+    }
+
+    /**
+     * Method to control the position of the floating window in relation to the snack bar and bottom sheet
+     */
+    private fun checkRelativePositionWithSnackbarAndBottomSheet() {
+        meetingActivity.snackbar?.let {
+            if (it.isShown) {
+                val bottom = floatingWindowContainer.y + floatingWindowContainer.height
+                var snackbarTop: Int
+
+                meetingActivity.snackbar.view.post {
+                    snackbarTop = meetingActivity.snackbar.view.top
+
+                    if (meetingActivity.snackbar.isShown && bottom > snackbarTop) {
+                        shiftY = bottom - min(floatingBottomSheet.top, snackbarTop)
+                        floatingWindowContainer.moveY(floatingWindowContainer.y - shiftY)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Show the correct UI in a one-to-one call
      */
     private fun updateOneToOneUI() {
@@ -1581,6 +1636,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 IndividualCallFragment.TAG
             )
         }
+
+        // Calculate the position of floating window if it is shown after the snack bar.
+        meetingActivity.snackbar?.let {
+            floatingWindowContainer.post {
+                checkRelativePositionWithSnackbarAndBottomSheet()
+            }
+        }
     }
 
     /**
@@ -1917,7 +1979,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         val anchor =
-            if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder.getState()) {
+            if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder.getState() && floatingBottomSheet.isVisible) {
                 binding.snackbarPosition
             } else null
 
