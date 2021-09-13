@@ -261,7 +261,7 @@ public class ChatManagement {
      *
      * @param chatId Chat ID
      */
-    private void removeValues(long chatId) {
+    public void removeValues(long chatId) {
         PreferenceManager.getDefaultSharedPreferences(MegaApplication.getInstance().getApplicationContext()).edit().remove(KEY_IS_SHOWED_WARNING_MESSAGE + chatId).apply();
         removeStatusVideoAndSpeaker(chatId);
 

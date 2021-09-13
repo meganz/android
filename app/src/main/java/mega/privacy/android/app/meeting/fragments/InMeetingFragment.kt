@@ -252,13 +252,14 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             updatePanelAndToolbar(it)
 
             when (it.status) {
-                MegaChatCall.CALL_STATUS_INITIAL, MegaChatCall.CALL_STATUS_JOINING -> {
+                MegaChatCall.CALL_STATUS_INITIAL-> {
                     bottomFloatingPanelViewHolder.disableEnableButtons(
                         false,
                         inMeetingViewModel.isCallOnHold()
                     )
                 }
-                MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> {
+                MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
+                MegaChatCall.CALL_STATUS_DESTROYED -> {
                     if (inMeetingViewModel.amIAGuest()) {
                         logDebug("Finishing the activity as guest")
                         disableCamera()
@@ -286,6 +287,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
                     checkMenuItemsVisibility()
                 }
+                MegaChatCall.CALL_STATUS_JOINING,
                 MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
                     bottomFloatingPanelViewHolder.disableEnableButtons(
                         true,
@@ -294,10 +296,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     checkCurrentParticipants()
                     checkMenuItemsVisibility()
                     checkChildFragments()
-
-                    if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                        controlVideoLocalOneToOneCall(it.hasLocalVideo())
-                    }
+                    controlVideoLocalOneToOneCall(it.hasLocalVideo())
                 }
             }
         }
@@ -1764,26 +1763,33 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 }
             }
 
-            MegaChatCall.CALL_STATUS_IN_PROGRESS -> {
+            MegaChatCall.CALL_STATUS_IN_PROGRESS, MegaChatCall.CALL_STATUS_JOINING -> {
                 val chatRoom = inMeetingViewModel.getChat()
-                if (inMeetingViewModel.isRequestSent() && chatRoom != null && !chatRoom.isMeeting) {
-                    CallUtil.activateChrono(false, meetingChrono, null)
-                    toolbarSubtitle?.let {
-                        it.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
-                    }
-                    logDebug("launchTimer() for chatroom that is not a meeting")
-                    launchTimer()
-                } else {
-                    if (chatRoom != null && !chatRoom.isMeeting) {
-                        logDebug("cancel launchTimer() for chatroom is not a meeting")
-                        cancelCountDownTimer()
-                        meetingActivity.snackbar?.dismiss()
-                    }
-                    toolbarSubtitle?.let {
-                        it.text = StringResourcesUtils.getString(R.string.duration_meeting)
+                if (chatRoom != null && !chatRoom.isMeeting) {
+                    if (inMeetingViewModel.isRequestSent() && call.isOutgoing) {
+                        CallUtil.activateChrono(false, meetingChrono, null)
+                        toolbarSubtitle?.let {
+                            it.text =
+                                StringResourcesUtils.getString(R.string.outgoing_call_starting)
+                        }
+                        logDebug("launchTimer() for chatroom that is not a meeting")
+                        launchTimer()
+                        return
                     }
 
-                    CallUtil.activateChrono(true, meetingChrono, call)
+                    logDebug("cancel launchTimer() for chatroom is not a meeting")
+                    cancelCountDownTimer()
+                    meetingActivity.snackbar?.dismiss()
+                }
+
+                toolbarSubtitle?.let {
+                    if (call.status == MegaChatCall.CALL_STATUS_JOINING) {
+                        CallUtil.activateChrono(false, meetingChrono, null)
+                        it.text = StringResourcesUtils.getString(R.string.chat_connecting)
+                    } else {
+                        it.text = StringResourcesUtils.getString(R.string.duration_meeting)
+                        CallUtil.activateChrono(true, meetingChrono, call)
+                    }
                 }
             }
         }
@@ -2207,8 +2213,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun controlVideoLocalOneToOneCall(isCamOn: Boolean) {
         val call = inMeetingViewModel.getCall()
+
         val shouldCheckVideoOn =
-            call != null && call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && isCamOn
+            call != null && (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS ||
+                    call.status == MegaChatCall.CALL_STATUS_JOINING) && isCamOn
 
         individualCallFragment?.let {
             if (it.isAdded) {

@@ -576,6 +576,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		stopService(new Intent(getInstance(), IncomingCallService.class));
 		logDebug("Call status is " + callStatusToString(callStatus)+", chat id is "+chatId+", call id is "+callId);
 		switch (callStatus) {
+			case MegaChatCall.CALL_STATUS_CONNECTING:
+				if ((isOutgoing && getChatManagement().isRequestSent(callId)))
+					removeRTCAudioManager();
+				break;
 			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
 			case MegaChatCall.CALL_STATUS_JOINING:
 			case MegaChatCall.CALL_STATUS_IN_PROGRESS:
@@ -603,8 +607,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				break;
 
 			case MegaChatCall.CALL_STATUS_DESTROYED:
-				logDebug("Call has ended");
 				int termCode = call.getTermCode();
+				logDebug("Call has ended:: termCode = "+termCode);
 				getChatManagement().controlCallFinished(callId, chatId);
 				boolean isIgnored = call.isIgnored();
 				checkCallDestroyed(chatId, callId, termCode, isIgnored);
@@ -639,14 +643,21 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	};
 
-	private final Observer<Pair> sessionStatusObserver = sessionAndCall -> {
-		MegaChatSession session = (MegaChatSession) sessionAndCall.second;
+	private final Observer<Pair> sessionStatusObserver = callIdAndSession -> {
+		MegaChatSession session = (MegaChatSession) callIdAndSession.second;
 		int sessionStatus = session.getStatus();
 		if (sessionStatus == MegaChatSession.SESSION_STATUS_IN_PROGRESS) {
 			logDebug("Session is in progress");
-			long callId = (long) sessionAndCall.first;
-			getChatManagement().setRequestSentCall(callId, false);
-			updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
+			long callId = (long) callIdAndSession.first;
+			MegaChatCall call = megaChatApi.getChatCallByCallId(callId);
+			if (call != null) {
+				MegaChatRoom chatRoom = megaChatApi.getChatRoom(call.getChatid());
+				if (chatRoom != null && (chatRoom.isGroup() || chatRoom.isMeeting() || session.getPeerid() != megaApi.getMyUserHandleBinary()))
+				{
+					getChatManagement().setRequestSentCall(callId, false);
+					updateRTCAudioMangerTypeStatus(AUDIO_MANAGER_CALL_IN_PROGRESS);
+				}
+			}
 		}
 	};
 
