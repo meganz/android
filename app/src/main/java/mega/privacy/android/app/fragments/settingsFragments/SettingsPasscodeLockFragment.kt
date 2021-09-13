@@ -243,12 +243,6 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
                     logWarning("Set PIN ERROR")
                 }
             }
-            REQUEST_CODE_BIOMETRIC_ENROLL ->
-                if (requestCode == RESULT_OK) {
-                    logDebug("Fingerprint enabled")
-                } else {
-                    logDebug("Enable fingerprint cancelled")
-                }
         }
     }
 

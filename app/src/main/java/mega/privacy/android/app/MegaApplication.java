@@ -1828,6 +1828,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
+	/**
+	 * Resets all SingleObjects to their default values.
+	 */
 	private void resetDefaults() {
 		sortOrderManagement.resetDefaults();
 		passcodeManagement.resetDefaults();

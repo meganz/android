@@ -84,7 +84,7 @@ class PasscodeLockActivity : BaseActivity() {
     private var isConfirmLogoutDialogShown: Boolean = false
 
     private lateinit var biometricPrompt: BiometricPrompt
-    private lateinit var promptInfo: BiometricPrompt.PromptInfo
+    private lateinit var promptInfo: PromptInfo
     private lateinit var cipher: Cipher
     private lateinit var keyStore: KeyStore
     private lateinit var keyGenerator: KeyGenerator
@@ -684,7 +684,7 @@ class PasscodeLockActivity : BaseActivity() {
                 }
 
                 override fun onAuthenticationSucceeded(
-                    result: BiometricPrompt.AuthenticationResult
+                    result: AuthenticationResult
                 ) {
                     super.onAuthenticationSucceeded(result)
                     LogUtil.logDebug("Fingerprint unlocked")
@@ -699,7 +699,7 @@ class PasscodeLockActivity : BaseActivity() {
             })
 
         if (!this::promptInfo.isInitialized) {
-            promptInfo = BiometricPrompt.PromptInfo.Builder()
+            promptInfo = PromptInfo.Builder()
                 .setTitle(StringResourcesUtils.getString(R.string.title_unlock_fingerprint))
                 .setNegativeButtonText(StringResourcesUtils.getString(R.string.action_use_passcode))
                 .setAllowedAuthenticators(BIOMETRIC_STRONG)
@@ -707,12 +707,15 @@ class PasscodeLockActivity : BaseActivity() {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            biometricPrompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(getCipher()))
+            biometricPrompt.authenticate(promptInfo, CryptoObject(getCipher()))
         } else {
             biometricPrompt.authenticate(promptInfo)
         }
     }
 
+    /**
+     * Gets the secret key to encrypt the authentication.
+     */
     @RequiresApi(Build.VERSION_CODES.M)
     private fun getSecretKey(): SecretKey {
         if (!this::keyStore.isInitialized) {
@@ -745,6 +748,9 @@ class PasscodeLockActivity : BaseActivity() {
         return keyStore.getKey(KEY_NAME, null) as SecretKey
     }
 
+    /**
+     * Gets the Cipher object to encrypt the authentication.
+     */
     @RequiresApi(Build.VERSION_CODES.M)
     private fun getCipher(): Cipher {
         if (!this::cipher.isInitialized) {

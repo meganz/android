@@ -3572,10 +3572,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return !isTextEmpty(string) ? Integer.parseInt(string) : REQUIRE_PASSCODE_INVALID;
 	}
 
+	/**
+	 * Sets if the fingerprint lock setting is enabled or not.
+	 *
+	 * @param enabled True if the fingerprint is enabled, false otherwise.
+	 */
 	public void setFingerprintLockEnabled(boolean enabled) {
 		setStringValue(TABLE_PREFERENCES, KEY_FINGERPRINT_LOCK, "" + enabled);
 	}
 
+	/**
+	 * Checks if the fingerprint lock setting is enabled.
+	 *
+	 * @return True if the fingerprint is enabled, false otherwise.
+	 */
 	public boolean isFingerprintLockEnabled() {
 		return getBooleanValue(TABLE_PREFERENCES, KEY_FINGERPRINT_LOCK, false);
 	}
