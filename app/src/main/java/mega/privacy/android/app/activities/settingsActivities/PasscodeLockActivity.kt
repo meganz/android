@@ -14,7 +14,7 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricPrompt
-import androidx.biometric.BiometricPrompt.ERROR_NEGATIVE_BUTTON
+import androidx.biometric.BiometricPrompt.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -672,13 +672,13 @@ class PasscodeLockActivity : BaseActivity() {
                     LogUtil.logWarning("Error: $errString")
 
                     when (errorCode) {
-                        ERROR_NEGATIVE_BUTTON -> {
-                            fingerprintSkipped = true
-                            binding.passcodeScrollView.isVisible = true
-                        }
-                        else -> {
+                        ERROR_USER_CANCELED -> {
                             passcodeManagement.needsOpenAgain = true
                             finish()
+                        }
+                        else -> {
+                            fingerprintSkipped = true
+                            binding.passcodeScrollView.isVisible = true
                         }
                     }
                 }
