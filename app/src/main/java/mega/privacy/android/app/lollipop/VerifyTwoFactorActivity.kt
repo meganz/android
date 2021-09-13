@@ -9,11 +9,13 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.EditTextPIN
+import mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.lollipop.controllers.AccountController
@@ -447,12 +449,9 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         when (e.errorCode) {
             API_OK -> {
                 if (!request.flag) {
-                    // Send broadcast to notify.
+                    // Send live event to notify.
                     logDebug("Pin correct: Two-Factor Authentication disabled")
-                    val intent = Intent(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS)
-                    intent.putExtra(INTENT_EXTRA_KEY_ENABLED, false)
-                    sendBroadcast(intent)
-
+                    LiveEventBus.get(EVENT_2FA_UPDATED, Boolean::class.java).post(false)
                     showAlert(R.string.label_2fa_disabled, INVALID_VALUE)
                 } else {
                     logWarning("Disable 2fa failed.")
