@@ -507,8 +507,23 @@ object MegaNodeUtil {
             R.drawable.ic_folder_outgoing
         } else if (node.handle == myBackupHandle) {
             R.drawable.backup
+        } else if (node.parentHandle == myBackupHandle) {
+            getMyBackupSubFolderIcon(node)
         } else {
             R.drawable.ic_folder_list
+        }
+    }
+
+    private fun getMyBackupSubFolderIcon(node: MegaNode): Int {
+        if (isTextEmpty(node.deviceId)) return R.drawable.ic_folder_list
+
+        val folderName = node.name
+        return when {
+            folderName.contains(Regex("win|desktop", RegexOption.IGNORE_CASE)) -> R.drawable.pc_win
+            folderName.contains(Regex("linux|debian|ubuntu|centos", RegexOption.IGNORE_CASE)) -> R.drawable.pc_linux
+            folderName.contains(Regex("mac", RegexOption.IGNORE_CASE)) -> R.drawable.pc_mac
+            folderName.contains(Regex("ext|drive", RegexOption.IGNORE_CASE)) -> R.drawable.ex_drive
+            else -> R.drawable.pc
         }
     }
 
