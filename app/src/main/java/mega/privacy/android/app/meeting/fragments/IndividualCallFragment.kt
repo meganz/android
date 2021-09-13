@@ -420,12 +420,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
      */
     fun checkVideoOn(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
+        val currentCall = inMeetingViewModel.getCall()
 
-        if ((!inMeetingViewModel.isMe(peerId) && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) || (inMeetingViewModel.isMe(
-                peerId
-            ) &&
+        if (currentCall != null && currentCall.status != MegaChatCall.CALL_STATUS_JOINING && currentCall.status != CALL_STATUS_IN_PROGRESS &&
+            ((!inMeetingViewModel.isMe(peerId) && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
+            (inMeetingViewModel.isMe(peerId) &&
                     ((inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
-                            (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold())))
+                            (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold()))))
         ) {
             logDebug("The video should not be turned on")
             videoOffUI(peerId, clientId)

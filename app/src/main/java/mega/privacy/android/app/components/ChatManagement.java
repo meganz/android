@@ -1,7 +1,6 @@
 package mega.privacy.android.app.components;
 
 import static android.content.Intent.ACTION_SCREEN_OFF;
-import static android.content.Intent.ACTION_SCREEN_ON;
 import static android.content.Intent.ACTION_USER_PRESENT;
 
 import android.content.BroadcastReceiver;
@@ -61,6 +60,7 @@ public class ChatManagement {
 
     private boolean inTemporaryState = false;
     private boolean isDisablingLocalVideo = false;
+    private boolean isScreenOn = true;
 
     public ChatManagement() {
         chatRoomListener = new ChatRoomListener();
@@ -261,7 +261,7 @@ public class ChatManagement {
      *
      * @param chatId Chat ID
      */
-    private void removeValues(long chatId) {
+    public void removeValues(long chatId) {
         PreferenceManager.getDefaultSharedPreferences(MegaApplication.getInstance().getApplicationContext()).edit().remove(KEY_IS_SHOWED_WARNING_MESSAGE + chatId).apply();
         removeStatusVideoAndSpeaker(chatId);
 
@@ -343,7 +343,8 @@ public class ChatManagement {
                 case ACTION_SCREEN_OFF:
                     MegaApplication.getInstance().muteOrUnmute(true);
                     MegaChatCall call = CallUtil.getCallInProgress();
-                    if (call.hasLocalVideo()) {
+                    if (call != null && call.hasLocalVideo()) {
+                        isScreenOn = false;
                         logDebug("Screen locked, local video is going to be disabled");
                         CallUtil.enableOrDisableLocalVideo(false, call.getChatid(), new DisableAudioVideoCallListener(MegaApplication.getInstance()));
                     }
@@ -351,7 +352,8 @@ public class ChatManagement {
 
                 case ACTION_USER_PRESENT:
                     MegaChatCall callInProgress = CallUtil.getCallInProgress();
-                    if (!callInProgress.hasLocalVideo()) {
+                    if (callInProgress != null && !callInProgress.hasLocalVideo()) {
+                        isScreenOn = true;
                         logDebug("Screen unlocked, local video is going to be enabled");
                         CallUtil.enableOrDisableLocalVideo(true, callInProgress.getChatid(), new DisableAudioVideoCallListener(MegaApplication.getInstance()));
                     }
@@ -367,11 +369,15 @@ public class ChatManagement {
      */
     public void controlProximitySensor(boolean isNear) {
         MegaChatCall call = CallUtil.getCallInProgress();
+        if (call == null || (call.getStatus() != MegaChatCall.CALL_STATUS_JOINING &&
+                call.getStatus() != MegaChatCall.CALL_STATUS_IN_PROGRESS) || !isScreenOn)
+            return;
+
         if (!getVideoStatus(call.getChatid())) {
             setInTemporaryState(false);
         } else if (isNear) {
             logDebug("Proximity sensor, video off");
-            isDisablingLocalVideo = false;
+            setDisablingLocalVideo(false);
             setInTemporaryState(true);
             LiveEventBus.get(EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE, Boolean.class).post(false);
             if (call.hasLocalVideo() && !isDisablingLocalVideo) {
@@ -379,7 +385,7 @@ public class ChatManagement {
             }
         } else {
             logDebug("Proximity sensor, video on");
-            isDisablingLocalVideo = false;
+            setDisablingLocalVideo(false);
             setInTemporaryState(false);
             LiveEventBus.get(EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE, Boolean.class).post(true);
             if (!call.hasLocalVideo() && !isDisablingLocalVideo) {

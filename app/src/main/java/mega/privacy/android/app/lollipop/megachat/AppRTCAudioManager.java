@@ -144,11 +144,14 @@ public class AppRTCAudioManager {
         return true;
     }
 
-    public void startProximitySensor() {
+    public boolean startProximitySensor() {
         if (registerProximitySensor()) {
             logDebug("Starting proximity sensor");
             proximitySensor.start();
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -160,6 +163,7 @@ public class AppRTCAudioManager {
         if (isNear) {
             // Sensor reports that a "handset is being held up to a person's ear", or "something is covering the light sensor".
             proximitySensor.turnOffScreen();
+            logDebug("Screen off");
 
             if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn &&
                     (bluetoothManager == null || bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED)) ||
@@ -170,6 +174,7 @@ public class AppRTCAudioManager {
         } else {
             // Sensor reports that a "handset is removed from a person's ear", or "the light sensor is no longer covered".
             proximitySensor.turnOnScreen();
+            logDebug("Screen on");
 
             if ((apprtcContext instanceof MegaApplication && MegaApplication.isSpeakerOn &&
                     (bluetoothManager == null || bluetoothManager.getState() != AppRTCBluetoothManager.State.SCO_CONNECTED)) ||
