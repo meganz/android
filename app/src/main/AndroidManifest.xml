@@ -49,6 +49,8 @@
     apps must have the Manifest.permission.SCHEDULE_EXACT_ALARM permission
     in order to use any APIs for setting exact alarms-->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
     <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
 

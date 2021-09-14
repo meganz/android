@@ -149,6 +149,7 @@ import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -3075,8 +3076,14 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     private boolean checkPermissionsCall() {
         logDebug("checkPermissionsCall");
-        return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA)
-                && checkPermissions(Manifest.permission.RECORD_AUDIO, REQUEST_RECORD_AUDIO);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA)
+                    && checkPermissions(Manifest.permission.RECORD_AUDIO, REQUEST_RECORD_AUDIO)
+                    && checkPermissions(Manifest.permission.BLUETOOTH_CONNECT, REQUEST_BT_CONNECT);
+        } else {
+            return checkPermissions(Manifest.permission.CAMERA, REQUEST_CAMERA)
+                    && checkPermissions(Manifest.permission.RECORD_AUDIO, REQUEST_RECORD_AUDIO);
+        }
     }
 
     private boolean checkPermissionsTakePicture() {

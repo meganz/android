@@ -165,6 +165,7 @@ public class Constants {
 
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
     public static final int REQUEST_WRITE_STORAGE_OFFLINE = 16;
+    public static final int REQUEST_BT_CONNECT = 17;
 
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
