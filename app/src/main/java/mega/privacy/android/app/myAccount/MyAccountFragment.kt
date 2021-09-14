@@ -23,18 +23,16 @@ import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED
 import mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED
+import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.Scrollable
-import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
-import mega.privacy.android.app.myAccount.editProfile.EditProfileActivity
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
-import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.*
@@ -266,6 +264,10 @@ class MyAccountFragment : Fragment(), Scrollable {
     }
 
     private fun setupContactConnections() {
+        binding.contactsLayout.setOnClickListener {
+            startActivity(ContactsActivity.getListIntent(requireContext()))
+        }
+
         val contacts = megaApi.contacts
         val visibleContacts = ArrayList<MegaUser>()
 
