@@ -10,7 +10,7 @@ import javax.inject.Singleton
 @Singleton
 class ZoomViewModel @Inject constructor(): ViewModel() {
 
-    private val _zoom = MutableLiveData<Int>(ZoomUtil.ZOOM_DEFAULT)
+    private val _zoom = MutableLiveData(ZoomUtil.ZOOM_DEFAULT)
     val zoom : LiveData<Int> = _zoom
 
     fun setZoom(zoom: Int) {

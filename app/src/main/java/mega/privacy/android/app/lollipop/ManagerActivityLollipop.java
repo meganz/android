@@ -1567,7 +1567,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
             if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS ) {
                 PhotosFragment photosFragment = getFragmentByType(PhotosFragment.class);
-                photosFragment.setupListAdapter(currentZoom);
+                photosFragment.refreshSelf();
 
                 if (needReload) {
                     photosFragment.loadPhotos();
@@ -5940,6 +5940,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             case R.id.action_zoom_out: {
                 if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
                     if (currentZoom > ZOOM_OUT_2X) {
+                        // Don't use currentZoom--, shouldn't change the value of currentZoom here.
                         zoomViewModel.setZoom(currentZoom - 1);
                         ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
                     }
@@ -5953,6 +5954,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             case R.id.action_zoom_in: {
                 if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
                     if (currentZoom < ZOOM_IN_1X) {
+                        // Don't use currentZoom++, shouldn't change the value of currentZoom here.
                         zoomViewModel.setZoom(currentZoom + 1);
                         ZoomUtil.INSTANCE.enableButton(this, zoomOutMenuItem);
                     }

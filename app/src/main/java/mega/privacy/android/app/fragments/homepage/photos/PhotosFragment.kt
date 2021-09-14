@@ -22,9 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
-import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
@@ -44,7 +42,6 @@ import mega.privacy.android.app.utils.ZoomUtil
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_1X
-import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X
 import mega.privacy.android.app.utils.ZoomUtil.getSpanCount
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -77,16 +74,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private var currentZoom = ZOOM_DEFAULT
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        currentZoom = (activity as ManagerActivityLollipop).currentZoom
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        currentZoom = (activity as ManagerActivityLollipop).currentZoom
+
         binding = FragmentPhotosBinding.inflate(inflater, container, false).apply {
             viewModel = this@PhotosFragment.viewModel
         }
@@ -121,6 +115,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         binding.emptyHint.emptyHintText.isVisible = false
         binding.emptyHint.emptyHintText.text =
             getString(R.string.homepage_empty_hint_photos).toUpperCase(Locale.ROOT)
+    }
+
+    fun refreshSelf() {
+        val ft = parentFragmentManager.beginTransaction()
+        ft.detach(this)
+        ft.attach(this)
+        ft.commitNowAllowingStateLoss()
     }
 
     private fun doIfOnline(operation: () -> Unit) {
