@@ -41,6 +41,7 @@ class TypedNodesFetcher(
     private var waitingForRefresh = false
 
     private val getThumbnailNodes = mutableMapOf<MegaNode, String>()
+    private val getPreviewNodes = mutableMapOf<MegaNode, String>()
 
     /**
      * Throttle for updating the LiveData
@@ -96,11 +97,11 @@ class TypedNodesFetcher(
         return if (previewFile.exists()) {
             previewFile
         } else {
-            // Note down the nodes and going to get their thumbnails from the server
+            // Note down the nodes and going to get their previews from the server
             // as soon as the getNodeItems finished. (Don't start the getting operation here
             // for avoiding potential ConcurrentModification issue)
             if (node.hasPreview()) {
-                getThumbnailNodes[node] = previewFile.absolutePath
+                getPreviewNodes[node] = previewFile.absolutePath
             }
 
             null
@@ -180,6 +181,10 @@ class TypedNodesFetcher(
         result.postValue(ArrayList(fileNodesMap.values))
 
         getThumbnailsFromServer()
+
+        if(zoom == ZoomUtil.ZOOM_IN_1X) {
+            getPreviewsFromServer()
+        }
     }
 
     private fun addPhotoDateTitle(dateString: String) {
@@ -211,6 +216,35 @@ class TypedNodesFetcher(
                         request.let {
                             fileNodesMap[it.nodeHandle]?.apply {
                                 thumbnail = getThumbnailFile(item.key).absoluteFile
+                                uiDirty = true
+                            }
+                        }
+
+                        refreshLiveData()
+                    }
+                })
+
+            // Throttle the getThumbnail call, or the UI would be non-responsive
+            delay(GET_THUMBNAIL_THROTTLE)
+        }
+    }
+
+    private suspend fun getPreviewsFromServer() {
+        for (item in getPreviewNodes) {
+            megaApi.getPreview(
+                item.key,
+                item.value,
+                object : BaseListener(context) {
+                    override fun onRequestFinish(
+                        api: MegaApiJava,
+                        request: MegaRequest,
+                        e: MegaError
+                    ) {
+                        if (e.errorCode != MegaError.API_OK) return
+
+                        request.let {
+                            fileNodesMap[it.nodeHandle]?.apply {
+                                thumbnail = getPreviewFile(item.key).absoluteFile
                                 uiDirty = true
                             }
                         }
