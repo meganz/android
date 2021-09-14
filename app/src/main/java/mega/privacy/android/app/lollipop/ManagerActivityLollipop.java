@@ -5939,29 +5939,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        }
             case R.id.action_zoom_out: {
                 if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
-                    if (currentZoom > ZOOM_OUT_2X) {
-                        // Don't use currentZoom--, shouldn't change the value of currentZoom here.
-                        zoomViewModel.setZoom(currentZoom - 1);
-                        ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
-                    }
-
-                    if (currentZoom == ZOOM_OUT_2X) {
-                        ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
-                    }
+                    zoomOut();
                 }
                 return true;
             }
             case R.id.action_zoom_in: {
                 if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
-                    if (currentZoom < ZOOM_IN_1X) {
-                        // Don't use currentZoom++, shouldn't change the value of currentZoom here.
-                        zoomViewModel.setZoom(currentZoom + 1);
-                        ZoomUtil.INSTANCE.enableButton(this, zoomOutMenuItem);
-                    }
-
-                    if (currentZoom == ZOOM_IN_1X) {
-                        ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
-                    }
+                    zoomIn();
                 }
 
                 return true;
@@ -6043,7 +6027,31 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-    private void hideItemsWhenSearchSelected() {
+    public void zoomIn() {
+        if (currentZoom < ZOOM_IN_1X) {
+            // Don't use currentZoom++, shouldn't change the value of currentZoom here.
+            zoomViewModel.setZoom(currentZoom + 1);
+            ZoomUtil.INSTANCE.enableButton(this, zoomOutMenuItem);
+        }
+
+        if (currentZoom == ZOOM_IN_1X) {
+            ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
+        }
+    }
+
+    public void zoomOut() {
+        if (currentZoom > ZOOM_OUT_2X) {
+            // Don't use currentZoom--, shouldn't change the value of currentZoom here.
+            zoomViewModel.setZoom(currentZoom - 1);
+            ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
+        }
+
+        if (currentZoom == ZOOM_OUT_2X) {
+            ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
+        }
+    }
+
+	private void hideItemsWhenSearchSelected() {
         textSubmitted = false;
         if (createFolderMenuItem != null) {
 			doNotDisturbMenuItem.setVisible(false);

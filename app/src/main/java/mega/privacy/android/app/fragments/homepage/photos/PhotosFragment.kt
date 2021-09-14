@@ -3,6 +3,7 @@ package mega.privacy.android.app.fragments.homepage.photos
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -22,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.GridScaleGestureDetector
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
@@ -173,6 +175,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         (activity as ManagerActivityLollipop).changeAppBarElevation(v!!.canScrollVertically(-1))
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupListView() {
         listView = binding.photoList
         listView.itemAnimator = noChangeRecyclerViewItemAnimator()
@@ -183,6 +186,16 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         listView.clipToPadding = false
         listView.setHasFixedSize(true)
+
+
+        val scaleDetector = GridScaleGestureDetector(activity as ManagerActivityLollipop)
+        listView.setOnTouchListener { _, event ->
+
+            when (event.pointerCount) {
+                2 -> scaleDetector.onTouchEvent(event)
+                else -> false
+            }
+        }
     }
 
     private fun setupActionMode() {
@@ -334,7 +347,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 params.rightMargin = margin
             }
 
-            binding.viewModel = viewModel
             configureGridLayoutManager()
 
             listView.layoutParams = params
