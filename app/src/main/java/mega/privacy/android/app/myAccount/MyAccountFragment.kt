@@ -315,6 +315,20 @@ class MyAccountFragment : Fragment(), Scrollable {
         binding.accountTypeText.isVisible = true
         binding.upgradeButton.isVisible = true
 
+        binding.accountTypeIcon.setImageDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                when (viewModel.getAccountType()) {
+                    FREE -> R.drawable.ic_free_account
+                    PRO_I -> R.drawable.ic_pro_i_account
+                    PRO_II -> R.drawable.ic_pro_ii_account
+                    PRO_III -> R.drawable.ic_pro_iii_account
+                    PRO_LITE -> R.drawable.ic_lite_account
+                    else -> R.drawable.ic_free_account
+                }
+            )
+        )
+
         binding.accountTypeText.text = StringResourcesUtils.getString(
             when (viewModel.getAccountType()) {
                 FREE -> R.string.free_account
@@ -346,6 +360,13 @@ class MyAccountFragment : Fragment(), Scrollable {
     }
 
     private fun setupBusinessAccount() {
+        binding.accountTypeIcon.setImageDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_business_account
+            )
+        )
+
         binding.accountTypeText.text = StringResourcesUtils.getString(R.string.business_label)
         binding.upgradeButton.apply {
             isEnabled = false
