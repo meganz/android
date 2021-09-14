@@ -8440,8 +8440,55 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 fileIntent.setType(intent.getType());
                 startActivity(fileIntent);
             }
-        } else{
-			logWarning("No requestcode");
+        } else if (requestCode == PERMISSIONS_FRAGMENT) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (!Environment.isExternalStorageManager()) {
+					Toast.makeText(this,
+							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+							Toast.LENGTH_SHORT).show();
+				}
+
+				if (getPermissionsFragment() != null) {
+					pF.setNextPermission();
+				}
+			}
+		} else if (requestCode == REQUEST_WRITE_STORAGE || requestCode == REQUEST_READ_WRITE_STORAGE) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (!Environment.isExternalStorageManager()) {
+					Toast.makeText(this,
+							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+							Toast.LENGTH_SHORT).show();
+				} else {
+					switch (requestCode) {
+						case REQUEST_WRITE_STORAGE:
+							// Take picture scenarios
+							if (typesCameraPermission == TAKE_PICTURE_OPTION || typesCameraPermission == TAKE_PROFILE_PICTURE) {
+								if (!hasPermissions(this, Manifest.permission.CAMERA)) {
+									requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
+								} else {
+									if (typesCameraPermission == TAKE_PICTURE_OPTION) {
+										checkTakePicture(this, TAKE_PHOTO_CODE);
+									} else if (typesCameraPermission == TAKE_PROFILE_PICTURE) {
+										this.takeProfilePicture();
+									}
+									typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+								}
+								break;
+							}
+
+							// General download scenario
+							nodeSaver.handleRequestPermissionsResult(requestCode);
+							break;
+
+						case REQUEST_READ_WRITE_STORAGE:
+							// Upload scenario
+							new Handler(Looper.getMainLooper()).post(this::showUploadPanel);
+							break;
+					}
+				}
+			}
+		} else {
+			logWarning("No request code processed");
 			super.onActivityResult(requestCode, resultCode, intent);
 		}
 	}
