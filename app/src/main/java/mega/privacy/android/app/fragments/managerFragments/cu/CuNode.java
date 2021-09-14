@@ -32,7 +32,7 @@ public class CuNode {
      *
      * @param node           MegaNode representing the item.
      * @param indexForViewer Index needed on viewers to show the dismiss animation after a drag event.
-     * @param thumbnail      Thumbnail of the node if exists, null otherwise.
+     * @param thumbnail      Thumbnail or preview of the node if exists, null otherwise.
      * @param type           TYPE_IMAGE if photo, TYPE_VIDEO if video.
      * @param modifyDate     String containing the modified date of the node.
      * @param selected       True if the node is selected on list, false otherwise.
@@ -74,8 +74,8 @@ public class CuNode {
         return mIndexForViewer;
     }
 
-    public void setmPreview(File preview) {
-        mThumbnail = preview;
+    public void setThumbnail(File thumbnail) {
+        mThumbnail = thumbnail;
     }
 
     public File getThumbnail() {

@@ -412,6 +412,7 @@ class CuViewModel extends BaseRxViewModel {
     private List<CuNode> getCuNodes() {
         List<CuNode> nodes = new ArrayList<>();
         List<MegaNode> nodesWithoutThumbnail = new ArrayList<>();
+        List<MegaNode> nodesWithoutPreview = new ArrayList<>();
         LocalDate lastYearDate = null;
         LocalDate lastMonthDate = null;
         LocalDate lastDayDate = null;
@@ -421,6 +422,7 @@ class CuViewModel extends BaseRxViewModel {
         for (Pair<Integer, MegaNode> pair : realNodes) {
             MegaNode node = pair.second;
             File thumbnail = new File(getThumbFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
+            File preview = new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
             LocalDate modifyDate = fromEpoch(node.getModificationTime());
             String dateString = ofPattern("MMMM yyyy").format(modifyDate);
             boolean sameYear = Year.from(LocalDate.now()).equals(Year.from(modifyDate));
@@ -443,7 +445,7 @@ class CuViewModel extends BaseRxViewModel {
                     nodes.add(new CuNode(date, new Pair<>(date, "")));
                 }
                 // For zoom in 1X, use preview file as thumbnail to avoid blur.
-                cuNode.setmPreview(new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION));
+                cuNode.setThumbnail(preview );
             } else {
                 if (lastMonthDate == null
                         || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
@@ -457,6 +459,10 @@ class CuViewModel extends BaseRxViewModel {
 
             if (!thumbnail.exists()) {
                 nodesWithoutThumbnail.add(node);
+            }
+
+            if(!preview.exists() && mZoom == ZoomUtil.ZOOM_IN_1X) {
+                nodesWithoutPreview.add(node);
             }
         }
 
@@ -480,7 +486,8 @@ class CuViewModel extends BaseRxViewModel {
 
                 }, logErr("CuViewModel getThumbnail")));
 
-        add(Observable.fromIterable(nodesWithoutThumbnail)
+        // Fetch previews of nodes in computation thread, fetching each in 50ms interval
+        add(Observable.fromIterable(nodesWithoutPreview)
                 .zipWith(Observable.interval(GET_THUMBNAIL_THROTTLE_MS, MILLISECONDS),
                         (node, interval) -> node)
                 .observeOn(Schedulers.computation())
