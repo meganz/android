@@ -5,13 +5,15 @@ import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.os.Environment
 import androidx.hilt.lifecycle.ViewModelInject
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity.Companion.WRITE_STORAGE_TO_SAVE_RK
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.AccountController
-import mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName
 import mega.privacy.android.app.utils.FileUtil.saveTextOnFile
 import mega.privacy.android.app.utils.LogUtil.logWarning
@@ -107,16 +109,17 @@ class ExportRecoveryKeyViewModel @ViewModelInject constructor(
      *                    (various data can be attached to Intent "extras").
      */
     fun manageActivityResult(context: Context, requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode != REQUEST_DOWNLOAD_FOLDER || resultCode != RESULT_OK || data == null) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requestCode == REQUEST_WRITE_STORAGE && Environment.isExternalStorageManager()) {
+            saveRK(context as ExportRecoveryKeyActivity)
+        } else if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK && data != null) {
+            val parentPath: String =
+                data.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH) ?: return
+            val path = parentPath + File.separator + getRecoveryKeyFileName()
+            val sdCardUriString = data.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI)
+            saveRKOnChosenPath(context, path, sdCardUriString)
+        } else {
             logWarning("Wrong activity result.")
-            return
         }
-
-        val parentPath: String =
-            data.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH) ?: return
-        val path = parentPath + File.separator + getRecoveryKeyFileName()
-        val sdCardUriString = data.getStringExtra(FileStorageActivityLollipop.EXTRA_SD_URI)
-        saveRKOnChosenPath(context, path, sdCardUriString)
     }
 
     /**
