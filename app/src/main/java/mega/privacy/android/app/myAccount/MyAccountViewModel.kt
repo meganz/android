@@ -463,8 +463,8 @@ class MyAccountViewModel @ViewModelInject constructor(
         val intent = Intent()
         intent.action = Intent.ACTION_OPEN_DOCUMENT
         intent.action = Intent.ACTION_GET_CONTENT
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        intent.type = "image/*";
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
+        intent.type = "image/*"
         activity.startActivityForResult(
             Intent.createChooser(intent, null),
             CHOOSE_PICTURE_PROFILE_CODE
