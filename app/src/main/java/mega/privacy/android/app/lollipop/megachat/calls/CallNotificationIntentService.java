@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop.megachat.calls;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.Build;
 
 import mega.privacy.android.app.MegaApplication;
 import nz.mega.sdk.MegaApiAndroid;
@@ -172,8 +173,14 @@ public class CallNotificationIntentService extends IntentService implements Mega
                 this.startActivity(i);
                 clearIncomingCallNotification(callIdIncomingCall);
                 stopSelf();
-                Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-                this.sendBroadcast(closeIntent);
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                    try {
+                        Intent closeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+                        this.sendBroadcast(closeIntent);
+                    } catch (SecurityException exception) {
+                        logError("Error action.CLOSE_SYSTEM_DIALOGS： " + exception.getMessage() + "");
+                    }
+                }
             } else {
                 logError("Error answering the call" + e.getErrorCode());
             }
