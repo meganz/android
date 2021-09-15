@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:hint="@string/first_name_text"
+        android:hint="@string/email_text"
         android:theme="@style/Widget.Mega.TextInputLayout"
         app:errorEnabled="true"
         app:layout_constraintTop_toTopOf="parent">
