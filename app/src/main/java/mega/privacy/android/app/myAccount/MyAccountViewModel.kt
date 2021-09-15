@@ -5,11 +5,8 @@ import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Patterns
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,11 +21,9 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.di.MegaApi
-import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.TestPasswordActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
@@ -37,12 +32,13 @@ import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
 import mega.privacy.android.app.lollipop.tasks.FilePrepareTask
 import mega.privacy.android.app.myAccount.usecase.*
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
-import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.LogUtil.*
+import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.API_EARGS
@@ -402,36 +398,37 @@ class MyAccountViewModel @ViewModelInject constructor(
      */
     fun capturePhoto(activity: Activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val hasStoragePermission: Boolean = ContextCompat.checkSelfPermission(
+            val hasStoragePermission: Boolean = hasPermissions(
                 activity,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED
-            val hasCameraPermission: Boolean = ContextCompat.checkSelfPermission(
+            )
+            val hasCameraPermission: Boolean = hasPermissions(
                 activity,
                 Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED
+            )
 
             if (!hasStoragePermission && !hasCameraPermission) {
-                ActivityCompat.requestPermissions(
-                    activity, arrayOf(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.CAMERA
-                    ),
-                    REQUEST_WRITE_STORAGE
+                requestPermission(
+                    activity,
+                    REQUEST_WRITE_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA
                 )
 
                 return
             } else if (!hasStoragePermission) {
-                ActivityCompat.requestPermissions(
-                    activity, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    REQUEST_WRITE_STORAGE
+                requestPermission(
+                    activity,
+                    REQUEST_WRITE_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
 
                 return
             } else if (!hasCameraPermission) {
-                ActivityCompat.requestPermissions(
-                    activity, arrayOf(Manifest.permission.CAMERA),
-                    REQUEST_CAMERA
+                requestPermission(
+                    activity,
+                    REQUEST_CAMERA,
+                    Manifest.permission.CAMERA
                 )
 
                 return
