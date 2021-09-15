@@ -32,7 +32,6 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
-import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
@@ -71,8 +70,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private lateinit var actionModeCallback: ActionModeCallback
 
     private lateinit var itemDecoration: SimpleDividerItemDecoration
-
-    private var selectedView = CameraUploadsFragment.ALL_VIEW
 
     private var currentZoom = ZOOM_DEFAULT
 
@@ -445,13 +442,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
-    private fun getSpanCount(isPortrait: Boolean): Int {
-        return if (selectedView != CameraUploadsFragment.ALL_VIEW) {
-            if (isPortrait) CameraUploadsFragment.SPAN_CARD_PORTRAIT else CameraUploadsFragment.SPAN_CARD_LANDSCAPE
-        } else {
-            getSpanCount(isPortrait, currentZoom)
-        }
-    }
+    private fun getSpanCount(isPortrait: Boolean) = getSpanCount(isPortrait, currentZoom)
 
     private fun RecyclerView.switchToLinear() {
         linearLayoutManager = LinearLayoutManager(context)
