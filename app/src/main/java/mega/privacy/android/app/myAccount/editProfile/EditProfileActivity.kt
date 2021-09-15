@@ -1,6 +1,8 @@
 package mega.privacy.android.app.myAccount.editProfile
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.*
 import android.os.Bundle
@@ -172,6 +174,28 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         viewModel.manageActivityResult(this, requestCode, resultCode, data, this)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (grantResults.isEmpty()) {
+            LogUtil.logWarning("Permissions ${permissions[0]} not granted")
+            return
+        }
+
+        // Take profile picture scenario
+        if (requestCode == REQUEST_CAMERA && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (PermissionUtils.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                checkTakePicture(this, TAKE_PICTURE_PROFILE_CODE)
+            } else {
+                showSnackbar(StringResourcesUtils.getString(R.string.denied_write_permissions))
+            }
+        }
     }
 
     private fun setupView() {

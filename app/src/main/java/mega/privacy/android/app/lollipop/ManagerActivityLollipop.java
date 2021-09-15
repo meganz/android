@@ -1091,21 +1091,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 		        	}
-	        	} else if (typesCameraPermission == TAKE_PROFILE_PICTURE) {
-					logDebug("TAKE_PROFILE_PICTURE");
-					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-						if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-							requestPermission(this,
-									REQUEST_WRITE_STORAGE,
-									Manifest.permission.WRITE_EXTERNAL_STORAGE);
-						}
-						else{
-							this.takeProfilePicture();
-							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
-						}
-					}
-
-				} else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
+	        	} else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
 						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					controlCallPermissions();
 				}
@@ -1133,20 +1119,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 							break;
 						}
-						else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
-							logDebug("TAKE_PROFILE_PICTURE");
-							if (!hasPermissions(this, Manifest.permission.CAMERA)){
-								requestPermission(this,
-										REQUEST_CAMERA,
-										Manifest.permission.CAMERA);
-							}
-							else{
-								this.takeProfilePicture();
-								typesCameraPermission = INVALID_TYPE_PERMISSIONS;
-							}
-
-							break;
-						}
 		        	}
 	        	}
 	        	else{
@@ -1159,18 +1131,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 						else{
 							checkTakePicture(this, TAKE_PHOTO_CODE);
-							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
-						}
-					}
-					else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
-						logDebug("TAKE_PROFILE_PICTURE");
-						if (!hasPermissions(this, Manifest.permission.CAMERA)){
-							requestPermission(this,
-									REQUEST_CAMERA,
-									Manifest.permission.CAMERA);
-						}
-						else{
-							this.takeProfilePicture();
 							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 					} else {
@@ -6907,10 +6867,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		linkJoinToChatLink = null;
 	}
 
-	public void takeProfilePicture(){
-		checkTakePicture(this, TAKE_PICTURE_PROFILE_CODE);
-	}
-
 	public void showPresenceStatusDialog(){
 		logDebug("showPresenceStatusDialog");
 
@@ -8440,8 +8396,51 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 fileIntent.setType(intent.getType());
                 startActivity(fileIntent);
             }
-        } else{
-			logWarning("No requestcode");
+        } else if (requestCode == PERMISSIONS_FRAGMENT) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (!Environment.isExternalStorageManager()) {
+					Toast.makeText(this,
+							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+							Toast.LENGTH_SHORT).show();
+				}
+
+				if (getPermissionsFragment() != null) {
+					pF.setNextPermission();
+				}
+			}
+		} else if (requestCode == REQUEST_WRITE_STORAGE || requestCode == REQUEST_READ_WRITE_STORAGE) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (!Environment.isExternalStorageManager()) {
+					Toast.makeText(this,
+							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+							Toast.LENGTH_SHORT).show();
+				} else {
+					switch (requestCode) {
+						case REQUEST_WRITE_STORAGE:
+							// Take picture scenarios
+							if (typesCameraPermission == TAKE_PICTURE_OPTION) {
+								if (!hasPermissions(this, Manifest.permission.CAMERA)) {
+									requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
+								} else {
+									checkTakePicture(this, TAKE_PHOTO_CODE);
+									typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+								}
+								break;
+							}
+
+							// General download scenario
+							nodeSaver.handleRequestPermissionsResult(requestCode);
+							break;
+
+						case REQUEST_READ_WRITE_STORAGE:
+							// Upload scenario
+							new Handler(Looper.getMainLooper()).post(this::showUploadPanel);
+							break;
+					}
+				}
+			}
+		} else {
+			logWarning("No request code processed");
 			super.onActivityResult(requestCode, resultCode, intent);
 		}
 	}
