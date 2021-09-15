@@ -253,7 +253,9 @@ class MyAccountViewModel @ViewModelInject constructor(
         // Check if the result is from the OS activity to request "All files access" permission on Android 11.
         // This piece of code must be here (before check 'resultCode != RESULT_OK' because the
         // result code from that permission activity is always RESULT_CANCELED (0).
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requestCode == REQUEST_WRITE_STORAGE && Environment.isExternalStorageManager()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && requestCode == REQUEST_WRITE_STORAGE
+            && Environment.isExternalStorageManager()
+        ) {
             if (!hasPermissions(activity, Manifest.permission.CAMERA)) {
                 requestPermission(
                     activity,
@@ -263,6 +265,8 @@ class MyAccountViewModel @ViewModelInject constructor(
             } else {
                 Util.checkTakePicture(activity, TAKE_PICTURE_PROFILE_CODE)
             }
+
+            return
         }
 
         if (resultCode != RESULT_OK) {
