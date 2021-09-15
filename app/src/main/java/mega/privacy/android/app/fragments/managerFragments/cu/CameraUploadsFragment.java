@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -32,6 +33,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.GridScaleGestureDetector;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
@@ -313,6 +315,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setupRecyclerView() {
         binding.cuList.setHasFixedSize(true);
         binding.cuList.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -320,6 +323,15 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 checkScroll();
+            }
+        });
+
+        GridScaleGestureDetector scaleDetector = new GridScaleGestureDetector(mManagerActivity);
+        binding.cuList.setOnTouchListener((v, event) -> {
+            if(event.getPointerCount() == 2) {
+                return scaleDetector.onTouchEvent(event);
+            } else {
+                return false;
             }
         });
 
