@@ -1068,11 +1068,11 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite">حساب برو لايت Pro Lite</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">حساب برو 1 PRO I</string>
+    <string name="my_account_pro1">حساب برو 1 Pro I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">حساب برو 2 PRO II</string>
+    <string name="my_account_pro2">حساب برو 2 Pro II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">حساب برو 3 PRO III</string>
+    <string name="my_account_pro3">حساب برو 3 Pro III</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">حساب برو لايت Pro Lite</string>
     <!--  -->
@@ -1216,7 +1216,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">تعيين الحماية بكلمة مرور</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(فقط لمشتركي PRO)</string>
+    <string name="subtitle_set_expiry_date">(فقط لمشتركي Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">إنشاء كلمة مرور</string>
     <!-- Hint of the dialog to get link with password -->

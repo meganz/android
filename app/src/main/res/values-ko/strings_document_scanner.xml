@@ -43,7 +43,7 @@
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">잘못된 글자</string>
     <!-- Snackbar text for incorrect name -->
-    <string name="scan_snackbar_incorrect_name">진행하기 전 파일 이름을 수정하세요</string>
+    <string name="scan_snackbar_incorrect_name">진행하기 전에 파일 이름을 수정하세요</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">%1$s 준비중. 잠시 기다리세요&#8230;</string>
     <!-- Error shown when the user writes a character not allowed -->

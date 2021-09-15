@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA fornisce uno spazio di archiviazione cloud e una chat criptata e controllata dall’utente tramite i browser web standard, insieme ad app dedicate per dispositivi mobili. Diversamente dagli altri provider di spazio di archiviazione cloud, i tuoi dati sono criptati e decriptati solo dai tuoi dispositivi e mai da noi.\n\nCarica i tuoi file dal tuo smartphone o tablet e poi cerca, archivia, scarica, streamma, visualizza, condividi, rinomina o elimina i tuoi file in qualsiasi momento, da qualsiasi dispositivo, ovunque tu sia. Condividi cartelle con i tuoi contatti e visualizza i loro aggiornamenti in tempo reale. Il processo di criptazione sottintende che non possiamo accedere ai tuoi dati o resettare la tua password, quindi DEVI ricordarla (se non hai una copia della tua Chiave di Recupero) o perderai accesso ai tuoi file archiviati.\n\nLe video chiamate criptate end-to-end di MEGA permettono una privacy totale, e sono state disponibili nei browser dal 2016. Sono state estese all’app per mobile di MEGA, con la cronologia delle chat accessibile su più dispositivi. Gli utenti possono anche aggiungere facilmente file in una chat dal loro Cloud Drive di MEGA.\n\nMEGA offre 20GB di spazio di archiviazione gratuito per tutti gli utenti registrati con bonus ad obiettivi, e offre piani a pagamento con limiti molto più alti:\n\n\nAbbonamento Pro Lite: €4.99 al mese o €49.99 all’anno ti dà 400GB di spazio di archiviazione e 1TB di banda di trasferimento mensile.\nAbbonamento Pro I: €9.99 al mese o €99.99 all’anno ti dà 2TB di spazio di archiviazione e 2TB di banda di trasferimento mensile.\nAbbonamento Pro II: €19.99 al mese o €199.99 all’anno ti dà 8TB di spazio di archiviazione e 8TB di banda di trasferimento mensile.\nAbbonamento Pro III: €29.99 al mese o €299.99 all’anno ti dà 16TB di spazio di archiviazione e 16TB di banda di trasferimento mensile.\n\nGli abbonamenti sono rinnovati automaticamente per periodi successivi della stessa durata e allo stesso prezzo del periodo inizialmente scelto. Per gestire i tuoi abbonamenti, clicca sull’icona del Play Store sul tuo dispositivo mobile, effettua l’accesso con il tuo Google ID (se non l’hai già fatto). Poi clicca sull’app di MEGA. Potrai gestire i tuoi abbonamenti da lì.\n\nPermessi dell’app:\nWRITE_EXTERNAL_STORAGE -&gt; Scarica i tuoi file da MEGA sul tuo dispositivo e carica file dal tuo dispositivo su MEGA\nCAMERA -&gt; Scatta una foto e carica le tue foto su MEGA\nREAD_CONTACTS -&gt; Aggiungi facilmente contatti dal tuo dispositivo come contatti MEGA\nRECORD_AUDIO e CAPTURE_VIDEO_OUTPUT (microfono e fotocamera) -&gt; MEGA fornisce chiamate audio/video criptate\n\n\nPer aumentare la confidenza degli utenti nel sistema MEGA, tutto il codice sorgente lato client è pubblicato, affinché i ricercatori di sicurezza interessati possano valutare il processo di criptazione. Il codice della nostra app per mobile è su: https://github.com/meganz/android \n\nPer maggiori informazioni, per favore dai un’occhiata al nostro sito web:\nVedi https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA fornisce uno spazio di archiviazione cloud e una chat criptata e controllata dall’utente tramite i browser web standard, insieme ad app dedicate per dispositivi mobili. Diversamente dagli altri provider di spazio di archiviazione cloud, i tuoi dati sono criptati e decriptati solo dai tuoi dispositivi e mai da noi.\n\nCarica i tuoi file dal tuo smartphone o tablet e poi cerca, archivia, scarica, streamma, visualizza, condividi, rinomina o elimina i tuoi file in qualsiasi momento, da qualsiasi dispositivo, ovunque tu sia. Condividi cartelle con i tuoi contatti e visualizza i loro aggiornamenti in tempo reale. Il processo di criptazione sottintende che non possiamo accedere ai tuoi dati o resettare la tua password, quindi DEVI ricordarla (se non hai una copia della tua Chiave di Recupero) o perderai accesso ai tuoi file archiviati.\n\nLe video chiamate criptate end-to-end di MEGA permettono una privacy totale, e sono state disponibili nei browser dal 2016. Sono state estese all’app per mobile di MEGA, con la cronologia delle chat accessibile su più dispositivi. Gli utenti possono anche aggiungere facilmente file in una chat dal loro Cloud Drive di MEGA.\n\nMEGA offre 20GB di spazio di archiviazione gratuito per tutti gli utenti registrati con bonus ad obiettivi, e offre piani a pagamento con limiti molto più alti:\n\n\nAbbonamento Pro Lite: €4,99 al mese o €49,99 all’anno ti dà 400GB di spazio di archiviazione e 1TB di banda di trasferimento mensile.\nAbbonamento Pro I: €9,99 al mese o €99,99 all’anno ti dà 2TB di spazio di archiviazione e 2TB di banda di trasferimento mensile.\nAbbonamento Pro II: €19,99 al mese o €199,99 all’anno ti dà 8TB di spazio di archiviazione e 8TB di banda di trasferimento mensile.\nAbbonamento Pro III: €29,99 al mese o €299,99 all’anno ti dà 16TB di spazio di archiviazione e 16TB di banda di trasferimento mensile.\n\nGli abbonamenti sono rinnovati automaticamente per periodi successivi della stessa durata e allo stesso prezzo del periodo inizialmente scelto. Per gestire i tuoi abbonamenti, clicca sull’icona del Play Store sul tuo dispositivo mobile, effettua l’accesso con il tuo Google ID (se non l’hai già fatto). Poi clicca sull’app di MEGA. Potrai gestire i tuoi abbonamenti da lì.\n\nPermessi dell’app:\nWRITE_EXTERNAL_STORAGE -&gt; Scarica i tuoi file da MEGA sul tuo dispositivo e carica file dal tuo dispositivo su MEGA\nCAMERA -&gt; Scatta una foto e carica le tue foto su MEGA\nREAD_CONTACTS -&gt; Aggiungi facilmente contatti dal tuo dispositivo come contatti MEGA\nRECORD_AUDIO e CAPTURE_VIDEO_OUTPUT (microfono e fotocamera) -&gt; MEGA fornisce chiamate audio/video criptate\n\n\nPer aumentare la confidenza degli utenti nel sistema MEGA, tutto il codice sorgente lato client è pubblicato, affinché i ricercatori di sicurezza interessati possano valutare il processo di criptazione. Il codice della nostra app per mobile è su: https://github.com/meganz/android \n\nPer maggiori informazioni, per favore dai un’occhiata al nostro sito web:\nVedi https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA is Cloud Storage with secure always-on privacy.</string>
+    <string name="short_description_text">MEGA è uno spazio di archiviazione cloud con privacy sicura e sempre attiva.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -87,7 +87,7 @@
     <!-- Error getting the root node -->
     <string name="error_general_nodes">Errore. Per favore, riprova.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
-    <string name="general_rk">MEGA-RECOVERYKEY</string>
+    <string name="general_rk">MEGA-CHIAVEDIRECUPERO</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">La cartella secondaria non esiste, per favore scegli una nuova cartella</string>
     <!-- when no external card exists -->
@@ -193,7 +193,7 @@
     <!-- when the user tries to log in to MEGA without a valid session -->
     <string name="error_server_expired_session">Sei stato disconnesso su questo dispositivo da un’altra posizione</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">Generating encryption keys</string>
+    <string name="login_generating_key">Generazione delle chiavi di criptazione</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">Connessione al server</string>
     <!-- Status text when updating the file manager -->
@@ -219,7 +219,7 @@
     <!--  -->
     <string name="tour_access_title">Accesso MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB of free storage</string>
+    <string name="tour_space_text">Registrati adesso e ottieni 20GB di spazio gratuito</string>
     <!--  -->
     <string name="tour_speed_text">I caricamenti sono veloci. Condividere rapidamente i file con tutti</string>
     <!--  -->
@@ -488,7 +488,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Richiesta inviata nuovamente</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
+    <string name="context_contact_request_sent">Richiesta inviata correttamente a %s. Vedi nella sezione Richieste inviate.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contatto cancellato</string>
     <!-- error message -->
@@ -580,7 +580,7 @@
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Cartella condivisa con %d contatti con successo</string>
     <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">File cannot be shared with %d contacts</string>
+    <string name="number_contact_file_not_shared_">Il file non può essere condiviso con %d contatti</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d cartelle condivise con successo</string>
     <!-- error message when sharing multiple files -->
@@ -590,13 +590,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">La cartella non è più condivisa</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">An error occurred. The folder is still shared with another contact</string>
+    <string name="context_no_removed_sharing_contacts">C’è stato un errore. La cartella è ancora condivisa con un altro contatto</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Seleziona solo un file</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Cestino pulisto con successo</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish Bin has not been emptied</string>
+    <string name="rubbish_bin_no_emptied">C’è stato un errore. Il Cestino non è stato svuotato</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Stai per annullare la tua iscrizione a MEGA. Per favore, facci sapere se c’è qualcosa che possiamo fare per farti cambiare idea.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -604,11 +604,11 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Invia</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
+    <string name="confirmation_cancel_subscriptions">Grazie del tuo feedback. Vuoi veramente annullare il tuo abbonamento MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Il tuo abbonamento non è stato annullato. Per favore, fornisci un motivo per la tua cancellazione</string>
     <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
-    <string name="message_user_purchased_subscription">Thanks. Your payment is processing. Please email us at support&#64;mega.co.nz if you have not received your upgrade within 24 hours.</string>
+    <string name="message_user_purchased_subscription">Grazie. Il tuo pagamento è in corso. Per favore, inviaci una email a support&#64;mega.co.nz se non hai ricevuto il tuo upgrade entro 24 ore.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Il tuo nuovo abbonamento diventerà effettivo quando scadrà l’abbonamento corrente, il nuovo prezzo ti verrà addebitato in quel momento.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -647,8 +647,8 @@
     <string name="upload_uploaded">caricato</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
-        <item quantity="one">Processing file</item>
-        <item quantity="other">Processing files</item>
+        <item quantity="one">Processando il file</item>
+        <item quantity="other">Processando i file</item>
     </plurals>
     <!-- error message when downloading a file -->
     <string name="error_temporary_unavaible">Risorsa temporaneamente non disponibile, riprova più tardi</string>
@@ -659,11 +659,11 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problema del file system</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">An error occurred when browsing local files.</string>
+    <string name="general_error">C’è stato un errore durante lo sfoglio dei file locali.</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Visualizzatore di immagini</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Used storage space</string>
+    <string name="my_account_used_space">Spazio di archiviazione utilizzato</string>
     <!-- menu item -->
     <string name="my_account_change_password">Modifica password</string>
     <!-- Dialog text overquota error -->
@@ -681,11 +681,11 @@
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
     <string name="my_account_change_password_dont_match">Le password non combaciano</string>
     <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">Select plan</string>
+    <string name="upgrade_select_pricing">Seleziona piano</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Mensilmente o Annualmente</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">There is no payment method set for this plan currently. Please select one.</string>
+    <string name="no_available_payment_method">Non c’è un metodo di pagamento impostato al momento per questo piano. Per favore, selezionane uno.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Mensilmente*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -695,7 +695,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">L’anteprima non è ancora stata scaricata. Per favore, attendi</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Not enough free memory to display preview. Please try again later.</string>
+    <string name="not_load_preview_low_memory">Non c’è abbastanza spazio libero per mostrare l’anteprima. Per favore, riprova più tardi.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Per favore, effettua il logout prima di creare l’account</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -709,7 +709,7 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Attiva le notifiche delle chiamate MEGA in arrivo</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">Please grant MEGA permission to display over other apps for calls.</string>
+    <string name="ask_for_display_over_msg">Per favore, dai a MEGA il permesso di stare sopra alle altre app durante le chiamate.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
     <string name="ask_for_display_over_explain">You can still manually grant permissions in the device Settings.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->

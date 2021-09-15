@@ -4027,22 +4027,22 @@
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">Groepen</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <string name="warning_get_links">Opties zoals “Decoderingssleutel afzonderlijk verzenden”, “Vervaldatum instellen” of “Wachtwoordbeveiliging instellen” zijn alleen beschikbaar voor afzonderlijke items.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
-    <string name="action_copy_all">Copy all</string>
+    <string name="action_copy_all">Alles kopiëren</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link successfully sent.</item>
-        <item quantity="other">Links successfully sent.</item>
+        <item quantity="one">Link succesvol verzonden.</item>
+        <item quantity="other">Links succesvol verzonden.</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Link copied to the clipboard.</item>
-        <item quantity="other">Links copied to the clipboard.</item>
+        <item quantity="one">Link gekopieerd naar het klembord.</item>
+        <item quantity="other">Links gekopieerd naar het klembord.</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
-        <item quantity="one">Get Link</item>
-        <item quantity="other">Get Links</item>
+        <item quantity="one">Link Ophalen</item>
+        <item quantity="other">Links Ophalen</item>
     </plurals>
 </resources>

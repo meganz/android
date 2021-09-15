@@ -608,7 +608,7 @@
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Votre abonnement n’a pas été annulé. Veuillez indiquer le motif de votre annulation.</string>
     <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
-    <string name="message_user_purchased_subscription">Merci. Votre paiement est en cours de traitement. Veuillez nous envoyer un courriel à support&#64;mega.co.nz si votre compte n’est pas surclassé dans les 24 heures.</string>
+    <string name="message_user_purchased_subscription">Merci. Votre paiement est en cours de traitement. Veuillez nous envoyer un courriel à support&#64;mega.co.nz si votre compte n’est pas surclassé dans les 24&#160;heures.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Votre nouvel abonnement prendra effet une fois que l’actuel aura expiré. Le nouveau prix vous sera alors facturé.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -4015,34 +4015,34 @@
     <string name="title_user_purchased_subscription">En attente de confirmation</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
-        <item quantity="one">1 connection</item>
-        <item quantity="other">%1$d connections</item>
+        <item quantity="one">1 connexion</item>
+        <item quantity="other">%1$d connexions</item>
     </plurals>
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
     <string name="section_recently_added">Ajoutés récemment</string>
     <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_groups">[B]Il n’y a aucun [/B][A]groupe[/A]</string>
+    <string name="context_empty_groups">[B]Aucun [/B][A]groupe[/A]</string>
     <!-- Section name for the “Contact Requests” section. Preferably one word. -->
     <string name="section_requests">Demandes</string>
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">Groupes</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <string name="warning_get_links">Les options telles qu’«&#160;Envoyer la clé de déchiffrement séparément&#160;», «&#160;Définir une date d’expiration&#160;» ou «&#160;Définir une protection par mot de passe&#160;» ne sont proposées que pour les éléments seuls.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
-    <string name="action_copy_all">Copy all</string>
+    <string name="action_copy_all">Tout copier</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link successfully sent.</item>
-        <item quantity="other">Links successfully sent.</item>
+        <item quantity="one">Le lien a été envoyé avec succès.</item>
+        <item quantity="other">Les liens ont été envoyés avec succès.</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Link copied to the clipboard.</item>
-        <item quantity="other">Links copied to the clipboard.</item>
+        <item quantity="one">Le lien a été copié dans le presse-papiers.</item>
+        <item quantity="other">Les liens ont été copiés dans le presse-papiers.</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
-        <item quantity="one">Get Link</item>
-        <item quantity="other">Get Links</item>
+        <item quantity="one">Obtenir le lien</item>
+        <item quantity="other">Obtenir les liens</item>
     </plurals>
 </resources>
