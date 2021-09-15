@@ -472,9 +472,8 @@ public class Constants {
     public static final int RICH_WARNING_CONFIRMATION = 2;
 
     public static final int TAKE_PICTURE_OPTION = 0;
-    public static final int TAKE_PROFILE_PICTURE = 1;
-    public static final int START_CALL_PERMISSIONS = 2;
-    public static final int RETURN_CALL_PERMISSIONS = 3;
+    public static final int START_CALL_PERMISSIONS = 1;
+    public static final int RETURN_CALL_PERMISSIONS = 2;
 
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";

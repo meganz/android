@@ -1091,21 +1091,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 		        	}
-	        	} else if (typesCameraPermission == TAKE_PROFILE_PICTURE) {
-					logDebug("TAKE_PROFILE_PICTURE");
-					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-						if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-							requestPermission(this,
-									REQUEST_WRITE_STORAGE,
-									Manifest.permission.WRITE_EXTERNAL_STORAGE);
-						}
-						else{
-							this.takeProfilePicture();
-							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
-						}
-					}
-
-				} else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
+	        	} else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
 						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					controlCallPermissions();
 				}
@@ -1133,20 +1119,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 							break;
 						}
-						else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
-							logDebug("TAKE_PROFILE_PICTURE");
-							if (!hasPermissions(this, Manifest.permission.CAMERA)){
-								requestPermission(this,
-										REQUEST_CAMERA,
-										Manifest.permission.CAMERA);
-							}
-							else{
-								this.takeProfilePicture();
-								typesCameraPermission = INVALID_TYPE_PERMISSIONS;
-							}
-
-							break;
-						}
 		        	}
 	        	}
 	        	else{
@@ -1159,18 +1131,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 						else{
 							checkTakePicture(this, TAKE_PHOTO_CODE);
-							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
-						}
-					}
-					else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
-						logDebug("TAKE_PROFILE_PICTURE");
-						if (!hasPermissions(this, Manifest.permission.CAMERA)){
-							requestPermission(this,
-									REQUEST_CAMERA,
-									Manifest.permission.CAMERA);
-						}
-						else{
-							this.takeProfilePicture();
 							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 					} else {
@@ -6907,10 +6867,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		linkJoinToChatLink = null;
 	}
 
-	public void takeProfilePicture(){
-		checkTakePicture(this, TAKE_PICTURE_PROFILE_CODE);
-	}
-
 	public void showPresenceStatusDialog(){
 		logDebug("showPresenceStatusDialog");
 
@@ -8462,15 +8418,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					switch (requestCode) {
 						case REQUEST_WRITE_STORAGE:
 							// Take picture scenarios
-							if (typesCameraPermission == TAKE_PICTURE_OPTION || typesCameraPermission == TAKE_PROFILE_PICTURE) {
+							if (typesCameraPermission == TAKE_PICTURE_OPTION) {
 								if (!hasPermissions(this, Manifest.permission.CAMERA)) {
 									requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
 								} else {
-									if (typesCameraPermission == TAKE_PICTURE_OPTION) {
-										checkTakePicture(this, TAKE_PHOTO_CODE);
-									} else if (typesCameraPermission == TAKE_PROFILE_PICTURE) {
-										this.takeProfilePicture();
-									}
+									checkTakePicture(this, TAKE_PHOTO_CODE);
 									typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 								}
 								break;

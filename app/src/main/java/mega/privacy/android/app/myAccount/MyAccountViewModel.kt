@@ -489,7 +489,6 @@ class MyAccountViewModel @ViewModelInject constructor(
      * Adds a photo as avatar.
      *
      * @param path           Path of the chosen photo or null if is a new taken photo.
-     * @param snackbarShower Callback to show the request result.
      */
     private fun addProfileAvatar(path: String?) {
         val app = MegaApplication.getInstance()
