@@ -6,6 +6,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -755,6 +756,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		initLoggerKarere();
 
 		checkAppUpgrade();
+		checkMegaStandbyBucket();
 
 		setupMegaApi();
 		setupMegaApiFolder();
@@ -1644,6 +1646,30 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private void removeStatusVideoAndSpeaker(long chatId){
 		hashMapSpeaker.remove(chatId);
 		hashMapVideo.remove(chatId);
+	}
+
+	/**
+	 * Get the current standby bucket of the app.
+	 * The system determines the standby state of the app based on app usage patterns.
+	 *
+	 * @return the current standby bucket of the app：
+	 * STANDBY_BUCKET_ACTIVE,
+	 * STANDBY_BUCKET_WORKING_SET,
+	 * STANDBY_BUCKET_FREQUENT,
+	 * STANDBY_BUCKET_RARE,
+	 * STANDBY_BUCKET_RESTRICTED,
+	 * STANDBY_BUCKET_NEVER
+	 */
+	public int checkMegaStandbyBucket(){
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+			UsageStatsManager usageStatsManager = (UsageStatsManager) getSystemService(USAGE_STATS_SERVICE);
+			if (usageStatsManager != null) {
+				int standbyBucket = usageStatsManager.getAppStandbyBucket();
+				logDebug("getAppStandbyBucket(): " +standbyBucket);
+				return standbyBucket;
+			}
+		}
+		return  -1;
 	}
 
 	public AppRTCAudioManager getAudioManager(){
