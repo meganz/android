@@ -38,6 +38,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -46,12 +49,12 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -90,10 +93,15 @@ import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class ContactFileListActivityLollipop extends PasscodeActivity
 		implements MegaGlobalListenerInterface, MegaRequestListenerInterface,
-		UploadBottomSheetDialogActionListener, ActionNodeCallback, SnackbarShower,
-		FilePrepareTask.ProcessedFilesCallback {
+		UploadBottomSheetDialogActionListener, ActionNodeCallback, SnackbarShower {
+
+	@Inject
+	FilePrepareUseCase filePrepareUseCase;
 
 	FrameLayout fragmentContainer;
 
@@ -706,17 +714,23 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				return;
 			}
 			intent.setAction(Intent.ACTION_GET_CONTENT);
-			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-			filePrepareTask.execute(intent);
-			ProgressDialog temp = null;
+
 			try {
-				temp = new ProgressDialog(this);
-				temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
-				temp.show();
+				statusDialog = new ProgressDialog(this);
+				statusDialog.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
+				statusDialog.show();
 			} catch (Exception e) {
 				return;
 			}
-			statusDialog = temp;
+
+			filePrepareUseCase.prepareFiles(intent)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((shareInfo, throwable) -> {
+						if (throwable == null) {
+							onIntentProcessed(shareInfo);
+						}
+					});
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
@@ -816,8 +830,12 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
         }
 	}
 
-	@Override
-	public void onIntentProcessed(List<ShareInfo> infos) {
+	/**
+	 * Handle processed upload intent.
+	 *
+	 * @param infos List<ShareInfo> containing all the upload info.
+	 */
+	private void onIntentProcessed(List<ShareInfo> infos) {
 		if (statusDialog != null) {
 			try {
 				statusDialog.dismiss();
