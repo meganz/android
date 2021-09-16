@@ -441,8 +441,8 @@ class CuViewModel extends BaseRxViewModel {
             } else if(mZoom == ZoomUtil.ZOOM_IN_1X) {
                 if (lastDayDate == null || lastDayDate.getDayOfYear() != modifyDate.getDayOfYear()) {
                     lastDayDate = modifyDate;
-                    String date = ofPattern(sameYear ? "dd MMMM" : "dd MMMM yyyy").format(lastDayDate);
-                    nodes.add(new CuNode(date, new Pair<>(date, "")));
+                    nodes.add(new CuNode(dateString, new Pair<>(ofPattern("dd MMMM").format(modifyDate),
+                            sameYear ? "" : ofPattern("yyyy").format(modifyDate))));
                 }
                 // For zoom in 1X, use preview file as thumbnail to avoid blur.
                 cuNode.setThumbnail(preview );

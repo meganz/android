@@ -5492,7 +5492,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                             ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
                         }
 
-                        updatePhotosFragmentOptionsMenu(mHomepageSearchable.shouldShowSearchMenu());
+                        updatePhotosFragmentOptionsMenu();
                     }
 				}
 			}
@@ -5588,13 +5588,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         }
     }
 
-    public void updatePhotosFragmentOptionsMenu(boolean visible) {
+    public void updatePhotosFragmentOptionsMenu() {
         if (zoomOutMenuItem == null || zoomInMenuItem == null) {
             return;
         }
 
-        zoomOutMenuItem.setVisible(visible);
-        zoomInMenuItem.setVisible(visible);
+        zoomOutMenuItem.setVisible(true);
+        zoomInMenuItem.setVisible(true);
     }
 
 	private void setGridListIcon() {

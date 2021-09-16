@@ -3,17 +3,21 @@ package mega.privacy.android.app.fragments.homepage
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.text.Spanned
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
+import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import nz.mega.sdk.*
 import java.io.File
+import java.lang.Exception
 import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ofPattern
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
@@ -124,7 +128,7 @@ class TypedNodesFetcher(
             }
 
             val modifyDate = Util.fromEpoch(node.modificationTime)
-            val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
+            val dateString = ofPattern("MMMM uuuu").format(modifyDate)
             val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
 
             // Photo "Month-Year" section headers
@@ -133,19 +137,25 @@ class TypedNodesFetcher(
                     ZoomUtil.ZOOM_OUT_2X -> {
                         if (lastYearDate == null || Year.from(lastYearDate) != Year.from(modifyDate)) {
                             lastYearDate = modifyDate
-                            addPhotoDateTitle(DateTimeFormatter.ofPattern("uuuu").format(modifyDate))
+                            addPhotoDateTitle(dateString, Pair(ofPattern("uuuu").format(modifyDate), ""))
                         }
                     }
                     ZoomUtil.ZOOM_IN_1X -> {
                         if (lastDayDate == null || lastDayDate.dayOfYear != modifyDate.dayOfYear) {
                             lastDayDate = modifyDate
-                            addPhotoDateTitle(DateTimeFormatter.ofPattern(if(sameYear) "dd MMMM" else "dd MMMM uuuu").format(modifyDate))
+
+                            addPhotoDateTitle(dateString, Pair(
+                                ofPattern("dd MMMM").format(modifyDate),
+                                if (sameYear) "" else ofPattern("uuuu").format(modifyDate)
+                            ))
                         }
                     }
                     else -> {
                         if (lastMonthDate == null || YearMonth.from(lastMonthDate) != YearMonth.from(modifyDate)) {
                             lastMonthDate = modifyDate
-                            addPhotoDateTitle(DateTimeFormatter.ofPattern(if(sameYear) "MMMM" else "MMMM uuuu").format(modifyDate))
+                            addPhotoDateTitle(dateString, Pair(ofPattern("MMMM").format(modifyDate),
+                                if (sameYear) "" else ofPattern("uuuu").format(modifyDate)
+                            ))
                         }
                     }
                 }
@@ -161,6 +171,7 @@ class TypedNodesFetcher(
                     node,
                     -1,
                     dateString,
+                    null,
                     thumbnail,
                     selected
                 )
@@ -187,7 +198,24 @@ class TypedNodesFetcher(
         }
     }
 
-    private fun addPhotoDateTitle(dateString: String) {
+    private fun formatDateTitle(date: Pair<String, String>) : Spanned {
+        var dateText =
+            if (TextUtil.isTextEmpty(date.second)) "[B]" + date.first + "[/B]" else StringResourcesUtils.getString(
+                R.string.cu_month_year_date,
+                date.first,
+                date.second
+            )
+        try {
+            dateText = dateText.replace("[B]", "<font face=\"sans-serif-medium\">")
+                .replace("[/B]", "</font>")
+        } catch (e: Exception) {
+            LogUtil.logWarning("Exception formatting text.", e)
+        }
+
+        return dateText.toSpannedHtmlText()
+    }
+
+    private fun addPhotoDateTitle(dateString: String, date: Pair<String, String>) {
         // RandomUUID() can ensure non-repetitive values in practical purpose
         fileNodesMap[UUID.randomUUID()] = PhotoNodeItem(
             PhotoNodeItem.TYPE_TITLE,
@@ -195,6 +223,7 @@ class TypedNodesFetcher(
             null,
             -1,
             dateString,
+            formatDateTitle(date),
             null,
             false
         )

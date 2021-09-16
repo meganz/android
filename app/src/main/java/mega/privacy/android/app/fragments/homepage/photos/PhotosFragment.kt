@@ -352,7 +352,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
-    override fun shouldShowSearchMenu(): Boolean = viewModel.shouldShowSearchMenu()
+    // As designer required, images section no longer has search option.
+    override fun shouldShowSearchMenu() = false
 
     override fun searchReady() {
         // Rotate screen in action mode, the keyboard would pop up again, hide it

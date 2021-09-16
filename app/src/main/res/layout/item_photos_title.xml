@@ -16,7 +16,7 @@
         android:layout_height="48dp"
         android:paddingHorizontal="16dp"
         android:gravity="center_vertical|start"
-        android:text="@{item.modifiedDate}"
-        android:textAppearance="@style/TextAppearance.Mega.Body2.Variant"
+        android:text="@{item.formattedDate}"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87"
         tools:text="July 2020" />
 </layout>
