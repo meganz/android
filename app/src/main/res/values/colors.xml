@@ -134,9 +134,11 @@
     <color name="blue_300">#00C0FD</color>
     <color name="blue_400">#00B2FC</color>
 
-    <color name="amber_700">#FFA003</color>
-    <color name="amber_600">#FFB300</color>
     <color name="amber_300">#FFD54F</color>
+    <color name="amber_400">#FFCA28</color>
+    <color name="amber_600">#FFB300</color>
+    <color name="amber_700">#FFA000</color>
+    <color name="amber_800">#FF8F00</color>
 
     <!-- For business admin account expired background color -->
     <color name="old_pink_800">#B00E5E</color>
@@ -462,5 +464,7 @@
     <color name="grey_100_060_grey_100">@color/grey_100_alpha_060</color>
     <color name="grey_038_grey_400">@color/grey_alpha_038</color>
     <color name="grey_010_white_009">@color/grey_010</color>
+    <color name="amber_800_amber_700">@color/amber_800</color>
+    <color name="red_400_red_300">@color/red_400</color>
 
 </resources>

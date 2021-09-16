@@ -131,7 +131,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     private fun setupAccountDetails() {
         if (megaApi.isBusinessAccount) {
             usageBinding.businessUpdate(viewModel)
-            paymentAlertBinding.businessUpdate(megaApi, viewModel)
+            paymentAlertBinding.businessUpdate(megaApi, viewModel, true)
             paymentAlertBinding.root.isVisible = true
         } else {
             usageBinding.update(viewModel)

@@ -28,13 +28,10 @@ import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.Scrollable
-import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
-import mega.privacy.android.app.myAccount.editProfile.EditProfileActivity
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.businessUpdate
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
-import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.*
@@ -363,7 +360,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         if (megaApi.isMasterBusinessAccount) {
             when (megaApi.businessStatus) {
                 MegaApiJava.BUSINESS_STATUS_EXPIRED, MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD -> {
-                    paymentAlertBinding.businessUpdate(megaApi, viewModel)
+                    paymentAlertBinding.businessUpdate(megaApi, viewModel, false)
                     expandPaymentInfoIfNeeded()
                 }
                 else -> setupPaymentDetails() //BUSINESS_STATUS_ACTIVE
