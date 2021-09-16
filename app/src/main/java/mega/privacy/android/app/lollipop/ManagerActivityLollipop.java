@@ -27,7 +27,6 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavOptions;
 import com.google.android.material.appbar.MaterialToolbar;
 import androidx.core.text.HtmlCompat;

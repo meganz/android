@@ -56,22 +56,24 @@ object ZoomUtil {
     fun disableButton(context: Context, menuItem: MenuItem) {
         menuItem.icon.let {
             DrawableCompat.setTint(it, ContextCompat.getColor(context, R.color.grey_038_white_038))
+            menuItem.setEnabled(false)
         }
     }
 
     fun enableButton(context: Context, menuItem: MenuItem) {
         menuItem.icon.let {
             DrawableCompat.setTint(it, ColorUtils.getThemeColor(context, R.attr.colorControlNormal))
+            menuItem.setEnabled(true)
         }
     }
 
-    fun getIcSelectedWidth(context: Context, zoom: Int) = when(zoom) {
+    fun getSelectedFrameWidth(context: Context, zoom: Int) = when(zoom) {
         ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_large)
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_size_small)
         else -> 0
     }
 
-    fun getIcelectedMargin(context: Context, zoom: Int) = when(zoom) {
+    fun getSelectedFrameMargin(context: Context, zoom: Int) = when(zoom) {
         ZOOM_DEFAULT -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_large)
         ZOOM_OUT_1X -> context.resources.getDimensionPixelSize(R.dimen.cu_fragment_ic_selected_margin_small)
         else -> 0

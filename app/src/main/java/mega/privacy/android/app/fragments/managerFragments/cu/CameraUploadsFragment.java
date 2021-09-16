@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -33,7 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.GridScaleGestureDetector;
+import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
@@ -263,7 +264,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         }
 
         currentZoom = mManagerActivity.getCurrentZoom();
-        viewModel.setmZoom(currentZoom);
+        viewModel.setZoom(currentZoom);
         viewModel.resetOpenedNode();
         mManagerActivity.updateCUViewTypes(View.VISIBLE);
         setupRecyclerView();
@@ -326,7 +327,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             }
         });
 
-        GridScaleGestureDetector scaleDetector = new GridScaleGestureDetector(mManagerActivity);
+        ScaleGestureDetector scaleDetector = new ScaleGestureDetector(mManagerActivity, new GestureScaleListener(mManagerActivity));
         binding.cuList.setOnTouchListener((v, event) -> {
             if(event.getPointerCount() == 2) {
                 return scaleDetector.onTouchEvent(event);
@@ -361,9 +362,9 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 params.leftMargin = params.rightMargin = imageMargin;
             }
 
-            int icSelectedWidth = ZoomUtil.INSTANCE.getIcSelectedWidth(context, currentZoom);
+            int icSelectedWidth = ZoomUtil.INSTANCE.getSelectedFrameWidth(context, currentZoom);
 
-            int icSelectedMargin = ZoomUtil.INSTANCE.getIcelectedMargin(context, currentZoom);
+            int icSelectedMargin = ZoomUtil.INSTANCE.getSelectedFrameMargin(context, currentZoom);
 
             CuItemSizeConfig itemSizeConfig = new CuItemSizeConfig(currentZoom, gridWidth,
                     icSelectedWidth, imageMargin,

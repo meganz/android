@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -23,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.GridScaleGestureDetector
+import mega.privacy.android.app.components.GestureScaleListener
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
@@ -185,7 +186,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         listView.setHasFixedSize(true)
 
 
-        val scaleDetector = GridScaleGestureDetector(activity as ManagerActivityLollipop)
+        val scaleDetector = ScaleGestureDetector(activity, GestureScaleListener(activity as ManagerActivityLollipop))
         listView.setOnTouchListener { _, event ->
 
             when (event.pointerCount) {

@@ -81,11 +81,11 @@ class CuViewModel extends BaseRxViewModel {
     private final Subject<Pair<Integer, CuNode>> mOpenNodeAction = PublishSubject.create();
     private final Subject<Object> mCreatingThumbnailFinished = PublishSubject.create();
     private final Subject<Object> mCreatingPreviewFinished = PublishSubject.create();
-    private final Subject<Object> creatingPreviewFinished = PublishSubject.create();
+    private final Subject<Object> mCreatePreviewForCardFinished = PublishSubject.create();
 
     private final MegaRequestListenerInterface mCreateThumbnailRequest;
     private final MegaRequestListenerInterface mCreatePreviewRequest;
-    private final MegaRequestListenerInterface createPreviewRequest;
+    private final MegaRequestListenerInterface mCreatePreviewForCardRequest;
     private final LongSparseArray<MegaNode> mSelectedNodes = new LongSparseArray<>(5);
     private boolean mSelecting;
     private int mRealNodeCount;
@@ -130,11 +130,11 @@ class CuViewModel extends BaseRxViewModel {
             }
         };
 
-        createPreviewRequest = new BaseListener(mAppContext) {
+        mCreatePreviewForCardRequest = new BaseListener(mAppContext) {
             @Override
             public void onRequestFinish(@NotNull MegaApiJava api, @NotNull MegaRequest request, @NotNull MegaError e) {
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    creatingPreviewFinished.onNext(true);
+                    mCreatePreviewForCardFinished.onNext(true);
                 }
             }
         };
@@ -152,7 +152,7 @@ class CuViewModel extends BaseRxViewModel {
         add(mCreatingPreviewFinished.throttleLatest(1, TimeUnit.SECONDS, true)
                 .subscribe(ignored -> loadNodes(), logErr("creatingPreviewFinished")));
 
-        add(creatingPreviewFinished.throttleLatest(1, TimeUnit.SECONDS, true)
+        add(mCreatePreviewForCardFinished.throttleLatest(1, TimeUnit.SECONDS, true)
                 .subscribe(ignored -> getCards(), logErr("creatingPreviewFinished")));
     }
 
@@ -571,7 +571,7 @@ class CuViewModel extends BaseRxViewModel {
                 .subscribe(node -> {
                     File preview = new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
                     if(!preview.exists()) {
-                        mMegaApi.getPreview(node, preview.getAbsolutePath(), createPreviewRequest);
+                        mMegaApi.getPreview(node, preview.getAbsolutePath(), mCreatePreviewForCardRequest);
                     }
                 }, logErr("CuViewModel getPreview")));
 
@@ -709,7 +709,7 @@ class CuViewModel extends BaseRxViewModel {
         return monthCards.size() - 1;
     }
 
-    public void setmZoom(int mZoom) {
-        this.mZoom = mZoom;
+    public void setZoom(int zoom) {
+        this.mZoom = zoom;
     }
 }
