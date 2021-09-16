@@ -1230,7 +1230,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         var isIntersectPreviously: Boolean
 
         floatingWindowContainer.apply {
-            // Control the position of the floating window in relation to the toolbar
+            // Control the position of the floating window in relation to the toolbar, including the banner
             val maxTop = if (bannerMuteLayout.isVisible) bannerMuteLayout.bottom else toolbar.bottom
 
             isIntersect = (maxTop - this.y) > 0
@@ -1245,11 +1245,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
             // Control the position of the floating window in relation to the bottom sheet panel and snack bar
             if (bSnackbarShown && bConsiderSnackbar) {
+                // The snack bar is shown and should consider the position of the snack bar
                 val bottom = this.y + this.height
                 val top = this.y
 
                 meetingActivity.snackbar.view.post {
-                    // When there is an intersection between the floating window and the snack bar, move the floating window.
+                    // When there is an intersection between the floating window and the snack bar, move the floating window up.
                     if (meetingActivity.snackbar.isShown && ((top.toInt() until bottom.toInt()) intersect (snackbarTop until snackbarBottom)).isNotEmpty()) {
                         shiftY = bottom - min(floatingBottomSheet.top, snackbarTop)
                         this.moveY(this.y - shiftY)
@@ -1261,6 +1262,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     this.moveY(this.y + shiftY)
                     shiftY = -1f
                 }
+
+                // When the bottom panel is expanded, keep the current position
+                if(bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED){
+                    return
+                }
+
                 val bottom = this.y + this.height
                 val top = floatingBottomSheet.top
                 val margin1 = bottom - top
