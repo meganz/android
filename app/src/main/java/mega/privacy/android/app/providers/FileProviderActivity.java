@@ -8,9 +8,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
@@ -18,7 +16,8 @@ import android.os.StatFs;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputLayout;
-import androidx.core.app.ActivityCompat;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.MenuItemCompat;
@@ -30,7 +29,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -65,7 +63,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
-import mega.privacy.android.app.components.MegaProgressDialog;
+import mega.privacy.android.app.components.MegaProgressDialogUtil;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
@@ -153,7 +151,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	private CloudDriveProviderFragmentLollipop cDriveProviderLol;
 	private IncomingSharesProviderFragmentLollipop iSharesProviderLol;
 
-	private MegaProgressDialog statusDialog;
+	private AlertDialog statusDialog;
 
 	private Button cancelButton;
 	private Button attachButton;
@@ -877,10 +875,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	}
 
 	public void downloadAndAttachAfterClick(long size, long[] hashes) {
-		MegaProgressDialog temp = null;
+		AlertDialog temp = null;
 		try {
-			temp = new MegaProgressDialog(this);
-			temp.setMessage(getString(R.string.context_preparing_provider));
+			temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
 			temp.show();
 		} catch (Exception e) {
 			return;
@@ -1072,10 +1069,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				break;
 			}
 			case R.id.attach_button: {
-				MegaProgressDialog temp;
+				AlertDialog temp;
 				try {
-					temp = new MegaProgressDialog(this);
-					temp.setMessage(getString(R.string.context_preparing_provider));
+					temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
 					temp.show();
 				} catch (Exception e) {
 					return;

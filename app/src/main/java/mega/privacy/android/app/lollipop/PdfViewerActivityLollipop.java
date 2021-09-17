@@ -66,7 +66,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.components.MegaProgressDialog;
+import mega.privacy.android.app.components.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -192,7 +192,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     public RelativeLayout uploadContainer;
     RelativeLayout pdfviewerContainer;
 
-    MegaProgressDialog statusDialog;
+    AlertDialog statusDialog;
 
     private boolean renamed = false;
     private String path;
@@ -1660,10 +1660,9 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
             MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
-            MegaProgressDialog temp;
+            AlertDialog temp;
             try{
-                temp = new MegaProgressDialog(this);
-                temp.setMessage(getString(R.string.context_moving));
+                temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
                 temp.show();
             }
             catch(Exception e){
@@ -1686,10 +1685,9 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
-            MegaProgressDialog temp;
+            AlertDialog temp;
             try{
-                temp = new MegaProgressDialog(this);
-                temp.setMessage(getString(R.string.context_copying));
+                temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
                 temp.show();
             }
             catch(Exception e){

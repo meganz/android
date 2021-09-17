@@ -4,13 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -39,8 +37,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -63,7 +59,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.components.MegaProgressDialog;
+import mega.privacy.android.app.components.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -148,7 +144,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	long toHandle = 0;
 	long fragmentHandle = -1;
 	int cont = 0;
-	MegaProgressDialog statusDialog;
+	AlertDialog statusDialog;
 	MultipleRequestListenerLink importLinkMultipleListener = null;
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
@@ -226,7 +222,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 	private class ActionBarCallBack implements ActionMode.Callback {
 
-		@SuppressLint("NonConstantResourceId")
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			switch(item.getItemId()){
@@ -282,8 +277,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			boolean showDownload = false;
 			
 			if (selected.size() != 0) {
-				selected.size();
-				showDownload = true;
+				if (selected.size() > 0) {
+					showDownload = true;
+				}
 				if(selected.size()==adapterList.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
@@ -304,8 +300,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		}
 		
 	}	
-	
-	@SuppressLint("NonConstantResourceId")
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -337,7 +332,13 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		float scaleW = getScaleW(outMetrics, density);
 		float scaleH = getScaleH(outMetrics, density);
 
-		float scaleText = Math.min(scaleH, scaleW);
+		float scaleText;
+		if (scaleH < scaleW){
+			scaleText = scaleH;
+		}
+		else{
+			scaleText = scaleW;
+		}
 
 		handler = new Handler();
 
@@ -401,20 +402,17 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		tB = (Toolbar) findViewById(R.id.toolbar_folder_link);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
+		aB.setDisplayHomeAsUpEnabled(true);
+		aB.setDisplayShowHomeEnabled(true);
 
-		if (aB != null) {
-			aB.setDisplayHomeAsUpEnabled(true);
-			aB.setDisplayShowHomeEnabled(true);
-		}
+		fileLinktB = (Toolbar) findViewById(R.id.toolbar_folder_link_file_link);
 
-		fileLinktB = findViewById(R.id.toolbar_folder_link_file_link);
-
-        fragmentContainer = findViewById(R.id.folder_link_fragment_container);
-		fileLinkFragmentContainer = findViewById(R.id.folder_link_file_link_fragment_container);
+        fragmentContainer = (RelativeLayout) findViewById(R.id.folder_link_fragment_container);
+		fileLinkFragmentContainer = (RelativeLayout) findViewById(R.id.folder_link_file_link_fragment_container);
 		fileLinkFragmentContainer.setVisibility(View.GONE);
 
-		emptyImageView = findViewById(R.id.folder_link_list_empty_image);
-		emptyTextView = findViewById(R.id.folder_link_list_empty_text);
+		emptyImageView = (ImageView) findViewById(R.id.folder_link_list_empty_image);
+		emptyTextView = (TextView) findViewById(R.id.folder_link_list_empty_text);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			emptyImageView.setImageResource(R.drawable.empty_folder_landscape);
@@ -433,15 +431,13 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					+ "\'>");
 			textToShow = textToShow.replace("[/B]", "</font>");
 		}
-		catch (Exception e){
-			logError(e.getMessage());
-		}
+		catch (Exception e){}
 		Spanned result = HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY);
 		emptyTextView.setText(result);
 		emptyImageView.setVisibility(View.GONE);
 		emptyTextView.setVisibility(View.GONE);
 
-		listView = findViewById(R.id.folder_link_list_view_browser);
+		listView = (RecyclerView) findViewById(R.id.folder_link_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
 		mLayoutManager = new LinearLayoutManager(this);
 		listView.setLayoutManager(mLayoutManager);
@@ -456,13 +452,13 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
             }
         });
 		
-		optionsBar = findViewById(R.id.options_folder_link_layout);
-		separator = findViewById(R.id.separator_3);
+		optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
+		separator = (View) findViewById(R.id.separator_3);
 
-		downloadButton = findViewById(R.id.folder_link_button_download);
+		downloadButton = (Button) findViewById(R.id.folder_link_button_download);
 		downloadButton.setOnClickListener(this);
 
-		importButton = findViewById(R.id.folder_link_import_button);
+		importButton = (Button) findViewById(R.id.folder_link_import_button);
 		importButton.setOnClickListener(this);
 
 		if (dbH == null){
@@ -477,14 +473,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			}
 		}
 
-		fileLinkIconView = findViewById(R.id.folder_link_file_link_icon);
+		fileLinkIconView = (ImageView) findViewById(R.id.folder_link_file_link_icon);
 		fileLinkIconView.getLayoutParams().width = scaleWidthPx(200, outMetrics);
 		fileLinkIconView.getLayoutParams().height = scaleHeightPx(200, outMetrics);
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) fileLinkIconView.getLayoutParams();
 		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
 		fileLinkIconView.setLayoutParams(params);
 
-		fileLinkNameView = findViewById(R.id.folder_link_file_link_name);
+		fileLinkNameView = (TextView) findViewById(R.id.folder_link_file_link_name);
 		fileLinkNameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		fileLinkNameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
 		fileLinkNameView.setSingleLine();
@@ -494,30 +490,30 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		nameViewParams.setMargins(scaleWidthPx(60, outMetrics), 0, 0, scaleHeightPx(20, outMetrics));
 		fileLinkNameView.setLayoutParams(nameViewParams);
 
-		fileLinkScrollView = findViewById(R.id.folder_link_file_link_scroll_layout);
+		fileLinkScrollView = (ScrollView) findViewById(R.id.folder_link_file_link_scroll_layout);
 
-		fileLinkSizeTitleView = findViewById(R.id.folder_link_file_link_info_menu_size);
+		fileLinkSizeTitleView = (TextView) findViewById(R.id.folder_link_file_link_info_menu_size);
 		//Left margin, Top margin
 		RelativeLayout.LayoutParams sizeTitleParams = (RelativeLayout.LayoutParams)fileLinkSizeTitleView.getLayoutParams();
 		sizeTitleParams.setMargins(scaleWidthPx(10, outMetrics), scaleHeightPx(15, outMetrics), 0, 0);
 		fileLinkSizeTitleView.setLayoutParams(sizeTitleParams);
 
-		fileLinkSizeTextView = findViewById(R.id.folder_link_file_link_size);
+		fileLinkSizeTextView = (TextView) findViewById(R.id.folder_link_file_link_size);
 		//Bottom margin
 		RelativeLayout.LayoutParams sizeTextParams = (RelativeLayout.LayoutParams)fileLinkSizeTextView.getLayoutParams();
 		sizeTextParams.setMargins(scaleWidthPx(10, outMetrics), 0, 0, scaleHeightPx(15, outMetrics));
 		fileLinkSizeTextView.setLayoutParams(sizeTextParams);
 
-		fileLinkOptionsBar = findViewById(R.id.options_folder_link_file_link_layout);
+		fileLinkOptionsBar = (LinearLayout) findViewById(R.id.options_folder_link_file_link_layout);
 
-		fileLinkDownloadButton = findViewById(R.id.folder_link_file_link_button_download);
+		fileLinkDownloadButton = (TextView) findViewById(R.id.folder_link_file_link_button_download);
 		fileLinkDownloadButton.setOnClickListener(this);
 		//Left and Right margin
 		LinearLayout.LayoutParams downloadTextParams = (LinearLayout.LayoutParams)fileLinkDownloadButton.getLayoutParams();
 		downloadTextParams.setMargins(scaleWidthPx(6, outMetrics), 0, scaleWidthPx(8, outMetrics), 0);
 		fileLinkDownloadButton.setLayoutParams(downloadTextParams);
 
-		fileLinkImportButton = findViewById(R.id.folder_link_file_link_button_import);
+		fileLinkImportButton = (TextView) findViewById(R.id.folder_link_file_link_button_import);
 		fileLinkImportButton.setOnClickListener(this);
 		//Left and Right margin
 		LinearLayout.LayoutParams importTextParams = (LinearLayout.LayoutParams)fileLinkImportButton.getLayoutParams();
@@ -525,7 +521,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		fileLinkImportButton.setLayoutParams(importTextParams);
 		fileLinkImportButton.setVisibility(View.INVISIBLE);
 
-		fileLinkInfoLayout = findViewById(R.id.folder_link_file_link_layout);
+		fileLinkInfoLayout = (RelativeLayout) findViewById(R.id.folder_link_file_link_layout);
 		FrameLayout.LayoutParams infoLayoutParams = (FrameLayout.LayoutParams)fileLinkInfoLayout.getLayoutParams();
 		infoLayoutParams.setMargins(0, 0, 0, scaleHeightPx(80, outMetrics));
 		fileLinkInfoLayout.setLayoutParams(infoLayoutParams);
@@ -678,9 +674,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			if(!isOnline(this)) {
 				try{
 					statusDialog.dismiss();
-				} catch(Exception ex) {
-					logError(ex.getMessage());
-				}
+				} catch(Exception ex) {}
 
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 				return;
@@ -696,8 +690,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				}
 			}
 
-			statusDialog = new MegaProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.general_importing));
+			statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
 			statusDialog.show();
 
 			if(adapterList != null && adapterList.isMultipleSelect()){
@@ -772,12 +765,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
 					decryptionIntroduced=false;
 					askForDecryptionKeyDialog();
+					return;
 				}
 				else if(e.getErrorCode() == MegaError.API_EARGS){
 					if(decryptionIntroduced){
 						logWarning("Incorrect key, ask again!");
 						decryptionIntroduced=false;
 						askForDecryptionKeyDialog();
+						return;
 					}
 					else{
 						try{
@@ -787,20 +782,23 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 							builder.setTitle(getString(R.string.general_error_word));
 							builder.setCancelable(false);
 
-							builder.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
-								dialog.dismiss();
-								Intent backIntent;
-								boolean closedChat = MegaApplication.isClosedChat();
-								if(closedChat){
-									if(folderLinkActivity != null)
-										backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-									else
-										backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
+							builder.setPositiveButton(getString(android.R.string.ok),new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
+									Intent backIntent;
+									boolean closedChat = MegaApplication.isClosedChat();
+									if(closedChat){
+										if(folderLinkActivity != null)
+											backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										else
+											backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
 
-									startActivity(backIntent);
+										startActivity(backIntent);
+									}
+
+									finish();
 								}
-
-								finish();
 							});
 
 							AlertDialog dialog = builder.create();
@@ -819,19 +817,22 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 						builder.setMessage(getString(R.string.general_error_folder_not_found));
 						builder.setTitle(getString(R.string.general_error_word));
 
-						builder.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
-							dialog.dismiss();
-							Intent backIntent;
-							boolean closedChat = MegaApplication.isClosedChat();
-							if(closedChat){
-								if(folderLinkActivity != null)
-									backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-								else
-									backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
-								startActivity(backIntent);
-							}
+						builder.setPositiveButton(getString(android.R.string.ok),new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+								Intent backIntent;
+								boolean closedChat = MegaApplication.isClosedChat();
+								if(closedChat){
+									if(folderLinkActivity != null)
+										backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+									else
+										backIntent = new Intent(FolderLinkActivityLollipop.this, ManagerActivityLollipop.class);
+									startActivity(backIntent);
+								}
 
-							finish();
+								finish();
+							}
 						});
 
 						AlertDialog dialog = builder.create();
@@ -903,15 +904,18 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 							builder.setPositiveButton(
 									getString(android.R.string.ok),
-									(dialog, which) -> {
-										dialog.dismiss();
-										boolean closedChat = MegaApplication.isClosedChat();
-										if(closedChat){
-											Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-											startActivity(backIntent);
-										}
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											dialog.dismiss();
+											boolean closedChat = MegaApplication.isClosedChat();
+											if(closedChat){
+												Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+												startActivity(backIntent);
+											}
 
-										finish();
+											finish();
+										}
 									});
 
 							AlertDialog dialog = builder.create();
@@ -937,12 +941,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 									parentHandle = MegaApiAndroid.base64ToHandle(folderSubHandle);
 									setSupportActionBar(fileLinktB);
 									aB = getSupportActionBar();
-
-									if (aB != null) {
-										aB.setDisplayHomeAsUpEnabled(true);
-										aB.setDisplayShowHomeEnabled(true);
-										aB.setTitle("");
-									}
+									aB.setDisplayHomeAsUpEnabled(true);
+									aB.setDisplayShowHomeEnabled(true);
+									aB.setTitle("");
 
 									fragmentContainer.setVisibility(View.GONE);
 									fileLinkFragmentContainer.setVisibility(View.VISIBLE);
@@ -965,7 +966,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 										}
 									}
 
-									Bitmap preview;
+									Bitmap preview = null;
 									preview = getPreviewFromCache(pN);
 									if (preview != null){
 										previewCache.put(pN.getHandle(), preview);
@@ -1043,7 +1044,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 						
 						builder.setPositiveButton(
 							getString(android.R.string.ok),
-								(dialog, which) -> {
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
 									dialog.dismiss();
 									boolean closedChat = MegaApplication.isClosedChat();
 									if(closedChat){
@@ -1052,7 +1055,8 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 									}
 
 					    			finish();
-								});
+								}
+							});
 										
 						AlertDialog dialog = builder.create();
 						dialog.show(); 
@@ -1083,14 +1087,17 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 					builder.setCancelable(false);
 					builder.setPositiveButton(
 							getString(android.R.string.ok),
-							(dialog, which) -> {
-								dialog.dismiss();
-								boolean closedChat = MegaApplication.isClosedChat();
-								if(closedChat){
-									Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
-									startActivity(backIntent);
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
+									boolean closedChat = MegaApplication.isClosedChat();
+									if(closedChat){
+										Intent backIntent = new Intent(folderLinkActivity, ManagerActivityLollipop.class);
+										startActivity(backIntent);
+									}
+									finish();
 								}
-								finish();
 							});
 
 					AlertDialog dialog = builder.create();
@@ -1443,10 +1450,8 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			fragmentContainer.setVisibility(View.VISIBLE);
 			setSupportActionBar(tB);
 			aB = getSupportActionBar();
-			if (aB != null) {
-				aB.setDisplayHomeAsUpEnabled(true);
-				aB.setDisplayShowHomeEnabled(true);
-			}
+			aB.setDisplayHomeAsUpEnabled(true);
+			aB.setDisplayShowHomeEnabled(true);
 			fileLinkFolderLink = false;
 			pN = null;
 			MegaNode parentNode = megaApiFolder.getParentNode(megaApiFolder.getNodeByHandle(parentHandle));
@@ -1535,7 +1540,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		downloadNodes(Collections.singletonList(selectedNode));
 	}
 
-	@SuppressLint("NonConstantResourceId")
 	@Override
 	public void onClick(View v) {
 		logDebug("onClick");
@@ -1645,9 +1649,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 		try{
 			statusDialog.dismiss();
-		} catch(Exception ex){
-			logError(ex.getMessage());
-		}
+		} catch(Exception ex){}
 
 		finish();
 	}

@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
@@ -49,7 +50,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.MegaProgressDialog;
+import mega.privacy.android.app.components.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -148,7 +149,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     private ActionMode actionMode;
     DisplayMetrics outMetrics;
 
-    MegaProgressDialog statusDialog;
+    AlertDialog statusDialog;
 
     MenuItem selectMenuItem;
     MenuItem unSelectMenuItem;
@@ -1158,8 +1159,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     public void showProgressForwarding() {
         logDebug("showProgressForwarding");
 
-        statusDialog = new MegaProgressDialog(this);
-        statusDialog.setMessage(getString(R.string.general_forwarding));
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_forwarding));
         statusDialog.show();
     }
 
@@ -1172,8 +1172,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     }
 
     public void importNodes(final long toHandle, final long[] importMessagesHandles) {
-        statusDialog = new MegaProgressDialog(this);
-        statusDialog.setMessage(getString(R.string.general_importing));
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
         statusDialog.show();
 
         MegaNode target = null;

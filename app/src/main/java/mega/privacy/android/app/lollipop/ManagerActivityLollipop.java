@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -123,7 +122,6 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
-import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -247,10 +245,10 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.components.MegaProgressDialog.dismissMegaProgressDialogIfExists;
-import static mega.privacy.android.app.components.MegaProgressDialog.getMegaProgressDialog;
-import static mega.privacy.android.app.components.MegaProgressDialog.isMegaProgressDialogShown;
-import static mega.privacy.android.app.components.MegaProgressDialog.showProcessFileDialog;
+import static mega.privacy.android.app.components.MegaProgressDialogUtil.dismissMegaProgressDialogIfExists;
+import static mega.privacy.android.app.components.MegaProgressDialogUtil.createProgressDialog;
+import static mega.privacy.android.app.components.MegaProgressDialogUtil.isMegaProgressDialogShown;
+import static mega.privacy.android.app.components.MegaProgressDialogUtil.showProcessFileDialog;
 import static mega.privacy.android.app.constants.EventConstants.*;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
@@ -620,8 +618,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private OfflineFragment pagerOfflineFragment;
 	private RecentsFragment pagerRecentsFragment;
 
-	MegaProgressDialog statusDialog;
-	private  MegaProgressDialog processFileDialog;
+	AlertDialog statusDialog;
+	private AlertDialog processFileDialog;
 
 	private AlertDialog permissionsDialog;
 	private AlertDialog presenceStatusDialog;
@@ -7110,7 +7108,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 
-		statusDialog = getMegaProgressDialog(this, StringResourcesUtils.getString(R.string.context_creating_folder));
+		statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_creating_folder));
 		megaApi.createFolder(title, parentNode, this);
 	}
 

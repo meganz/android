@@ -4,10 +4,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -18,7 +16,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
@@ -42,8 +39,6 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import kotlin.Unit;
@@ -55,7 +50,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ExtendedViewPager;
-import mega.privacy.android.app.components.MegaProgressDialog;
+import mega.privacy.android.app.components.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;
@@ -110,7 +105,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 
 	private DisplayMetrics outMetrics;
 
-	MegaProgressDialog statusDialog;
+	AlertDialog statusDialog;
 
 	AppBarLayout appBarLayout;
 	Toolbar tB;
@@ -1506,10 +1501,9 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
-			MegaProgressDialog temp;
+			AlertDialog temp;
 			try{
-				temp = new MegaProgressDialog(this);
-				temp.setMessage(getString(R.string.context_moving));
+				temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
 				temp.show();
 			}
 			catch(Exception e){
@@ -1536,10 +1530,9 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 			final int totalCopy = copyHandles.length;
 
-			MegaProgressDialog temp;
+			AlertDialog temp;
 			try{
-				temp = new MegaProgressDialog(this);
-				temp.setMessage(getString(R.string.context_copying));
+				temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
 				temp.show();
 			}
 			catch(Exception e){

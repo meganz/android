@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -59,7 +60,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.components.MegaProgressDialog;
+import mega.privacy.android.app.components.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
@@ -75,7 +76,7 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 
     MegaApplication app;
     DatabaseHandler dbH = null;
-	MegaProgressDialog temp = null;
+	AlertDialog temp = null;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	boolean folderzipped = false;
@@ -545,8 +546,7 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 				UnZipTask unZipTask = new UnZipTask(pathZip, position);
 				unZipTask.execute();
 				try{
-					temp = new MegaProgressDialog(this);
-					temp.setMessage(getString(R.string.unzipping_process));
+					temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.unzipping_process));
 					temp.show();
 				}
 				catch(Exception e){

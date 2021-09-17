@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -48,7 +47,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
-import mega.privacy.android.app.components.MegaProgressDialog;
+import mega.privacy.android.app.components.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler;
@@ -87,7 +86,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
     ActionBar aB;
 	DisplayMetrics outMetrics;
 	String url;
-	MegaProgressDialog statusDialog;
+	AlertDialog statusDialog;
 
 	File previewFile = null;
 	Bitmap preview = null;
@@ -432,10 +431,9 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 		if(this.isFinishing()) return;
 
-		MegaProgressDialog temp;
+		AlertDialog temp;
 		try {
-			temp = new MegaProgressDialog(this);
-			temp.setMessage(getString(R.string.general_loading));
+			temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_loading));
 			temp.show();
 		}
 		catch(Exception ex)
@@ -929,8 +927,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 				}
 			}
 
-			statusDialog = new MegaProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.general_importing));
+			statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
 			statusDialog.show();
 
 			if (document != null) {

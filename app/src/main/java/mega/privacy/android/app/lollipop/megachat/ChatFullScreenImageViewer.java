@@ -3,9 +3,9 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -15,7 +15,6 @@ import android.os.StatFs;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.ViewPager;
@@ -47,7 +46,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ExtendedViewPager;
-import mega.privacy.android.app.components.MegaProgressDialog;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -97,7 +95,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 	private boolean aBshown = true;
 
-	MegaProgressDialog statusDialog;
+	AlertDialog statusDialog;
 
 	float scaleText;
 	AppBarLayout appBarLayout;
@@ -187,8 +185,13 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
             importIcon.setVisible(false);
             saveForOfflineIcon.setVisible(false);
 
-			removeIcon.setVisible(messages.get(positionG).getUserHandle() == megaChatApi.getMyUserHandle()
-					&& messages.get(positionG).isDeletable());
+            if (messages.get(positionG).getUserHandle() == megaChatApi.getMyUserHandle()
+					&& messages.get(positionG).isDeletable()) {
+                removeIcon.setVisible(true);
+            }
+            else{
+                removeIcon.setVisible(false);
+            }
         }
         else if (node != null){
             downloadIcon.setVisible(true);
@@ -201,7 +204,12 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
                 saveForOfflineIcon.setVisible(true);
             }
 
-			removeIcon.setVisible(messages.get(positionG).getUserHandle() == megaChatApi.getMyUserHandle() && messages.get(positionG).isDeletable());
+            if (messages.get(positionG).getUserHandle()==megaChatApi.getMyUserHandle() && messages.get(positionG).isDeletable()) {
+                removeIcon.setVisible(true);
+            }
+            else {
+                removeIcon.setVisible(false);
+            }
         }
         else {
             downloadIcon.setVisible(false);
@@ -221,7 +229,6 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		nodeSaver.handleRequestPermissionsResult(requestCode);
 	}
 
-	@SuppressLint("NonConstantResourceId")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -294,7 +301,12 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 		float scaleW = getScaleW(outMetrics, density);
 		float scaleH = getScaleH(outMetrics, density);
-		scaleText = Math.min(scaleH, scaleW);
+		if (scaleH < scaleW){
+			scaleText = scaleH;
+		}
+		else{
+			scaleText = scaleW;
+		}
 		if (savedInstanceState != null){
 			isDeleteDialogShow = savedInstanceState.getBoolean("isDeleteDialogShow", false);
 
@@ -346,10 +358,10 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 		setContentView(dragToExit.wrapContentView(R.layout.activity_chat_full_screen_image_viewer));
 
-		relativeImageViewerLayout = findViewById(R.id.full_image_viewer_layout);
-		fragmentContainer = findViewById(R.id.chat_full_image_viewer_parent_layout);
-		appBarLayout = findViewById(R.id.app_bar);
-		viewPager = findViewById(R.id.image_viewer_pager);
+		relativeImageViewerLayout = (RelativeLayout) findViewById(R.id.full_image_viewer_layout);
+		fragmentContainer = (RelativeLayout) findViewById(R.id.chat_full_image_viewer_parent_layout);
+		appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
 		viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
 			// optional
@@ -379,11 +391,9 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		if (aB != null) {
-			aB.setHomeButtonEnabled(true);
-			aB.setDisplayHomeAsUpEnabled(true);
-			aB.setTitle(" ");
-		}
+		aB.setHomeButtonEnabled(true);
+		aB.setDisplayHomeAsUpEnabled(true);
+		aB.setTitle(" ");
 
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
@@ -391,7 +401,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		messageIds = intent.getLongArrayExtra("messageIds");
 		chatId = intent.getLongExtra("chatId", -1);
 
-		messages = new ArrayList<>();
+		messages = new ArrayList<MegaChatMessage>();
 
 		imageHandles = new ArrayList<Long>();
 
@@ -453,8 +463,8 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 		viewPager.setOnPageChangeListener(this);
 
-		bottomLayout = findViewById(R.id.chat_image_viewer_layout_bottom);
-		fileNameTextView = findViewById(R.id.chat_full_image_viewer_file_name);
+		bottomLayout = (RelativeLayout) findViewById(R.id.chat_image_viewer_layout_bottom);
+		fileNameTextView = (TextView) findViewById(R.id.chat_full_image_viewer_file_name);
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 			fileNameTextView.setMaxWidth(scaleWidthPx(300, outMetrics));
 		}
@@ -488,10 +498,12 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 	@Override
 	public void onPageSelected(int position) {
+		return;
 	}
 
 	@Override
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+		return;
 	}
 
 	@Override
@@ -508,9 +520,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 					if (tIV != null){
 						tIV.setZoom(1);
 					}
-				}catch(Exception e){
-					logError(e.getMessage());
-				}
+				}catch(Exception e){}
 				fileNameTextView.setText(messages.get(positionG).getMegaNodeList().get(0).getName());
 			}
 		}
@@ -670,7 +680,6 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 				try {
 					statusDialog.dismiss();
 				} catch (Exception ex) {
-					logError(ex.getMessage());
 				}
 
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
@@ -715,9 +724,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		if(!isOnline(this)||megaApi==null) {
 			try{
 				statusDialog.dismiss();
-			} catch(Exception ex) {
-				logError(ex.getMessage());
-			}
+			} catch(Exception ex) {};
 
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
 			return;
@@ -735,9 +742,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 			StatFs stat = new StatFs(parentPath);
 			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
 		}
-		catch(Exception ex){
-			logError(ex.getMessage());
-		}
+		catch(Exception ex){}
 		
 		
 		if (hashes == null){
@@ -765,9 +770,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 						try { 
 							copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 						}
-						catch(Exception e) {
-							logError(e.getMessage());
-						}
+						catch(Exception e) {}
 
 						try {
 
@@ -867,7 +870,12 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
 				tB.animate().translationY(-220).setDuration(ANIMATION_DURATION)
-						.withEndAction(() -> aB.hide()).start();
+						.withEndAction(new Runnable() {
+							@Override
+							public void run() {
+								aB.hide();
+							}
+						}).start();
 				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
 			} else {
 				aB.hide();

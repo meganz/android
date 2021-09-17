@@ -12,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -57,7 +56,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -68,8 +66,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.components.MegaProgressDialog;
-import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.components.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -102,7 +99,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.components.MegaProgressDialog.getMegaProgressDialog;
+import static mega.privacy.android.app.components.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
@@ -268,7 +265,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 	private MegaApiAndroid megaApi = null;
 	MegaChatApiAndroid megaChatApi;
 
-    MegaProgressDialog statusDialog;
+    AlertDialog statusDialog;
 	boolean publicLink=false;
 
 	private Handler handler;
@@ -404,7 +401,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                             if(permissionsDialog != null){
                                 permissionsDialog.dismiss();
                             }
-                            statusDialog = getMegaProgressDialog(fileInfoActivityLollipop, getString(R.string.context_permissions_changing_folder));
+                            statusDialog = createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_permissions_changing_folder));
                             cC.changePermissions(cC.getEmailShares(shares), item, node);
                         }
                     });
@@ -1595,10 +1592,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
                     if (moveToRubbish){
                         megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fileInfoActivityLollipop);
-                        MegaProgressDialog temp;
+                        AlertDialog temp;
                         try{
-                            temp = new MegaProgressDialog(fileInfoActivityLollipop);
-                            temp.setMessage(getString(R.string.context_move_to_trash));
+                            temp = MegaProgressDialogUtil.createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_move_to_trash));
                             temp.show();
                         }
                         catch(Exception e){
@@ -1608,10 +1604,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                     }
                     else{
                         megaApi.remove(megaApi.getNodeByHandle(handle), fileInfoActivityLollipop);
-                        MegaProgressDialog temp;
+                        AlertDialog temp;
                         try{
-                            temp = new MegaProgressDialog(fileInfoActivityLollipop);
-                            temp.setMessage(getString(R.string.context_delete_from_mega));
+                            temp = MegaProgressDialogUtil.createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_delete_from_mega));
                             temp.show();
                         }
                         catch(Exception e){
@@ -1899,10 +1894,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			moveToRubbish = false;
 
-            MegaProgressDialog temp;
+            AlertDialog temp;
 			try{
-				temp = new MegaProgressDialog(this);
-				temp.setMessage(getString(R.string.context_moving));
+				temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
 				temp.show();
 			}
 			catch(Exception e){
@@ -1924,10 +1918,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 			final int totalCopy = copyHandles.length;
 
-            MegaProgressDialog temp;
+            AlertDialog temp;
 			try{
-				temp = new MegaProgressDialog(this);
-				temp.setMessage(getString(R.string.context_copying));
+				temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
 				temp.show();
 			}
 			catch(Exception e){
@@ -1968,7 +1961,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                 final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
                 dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int item) {
-                        statusDialog = getMegaProgressDialog(fileInfoActivityLollipop, getString(R.string.context_sharing_folder));
+                        statusDialog = createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_sharing_folder));
                         permissionsDialog.dismiss();
                         nC.shareFolder(node, contactsData, item);
                     }
@@ -2420,7 +2413,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
         dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                statusDialog = getMegaProgressDialog(fileInfoActivityLollipop, getString(R.string.context_permissions_changing_folder));
+                statusDialog = createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_permissions_changing_folder));
                 permissionsDialog.dismiss();
                 cC.changePermission(selectedShare.getUser(), item, node, new ShareListener(fileInfoActivityLollipop, ShareListener.CHANGE_PERMISSIONS_LISTENER, 1));
             }
@@ -2443,7 +2436,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
     }
 
     public void removeShare(String email) {
-        statusDialog = getMegaProgressDialog(fileInfoActivityLollipop, getString(R.string.context_removing_contact_folder));
+        statusDialog = createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_removing_contact_folder));
         nC.removeShare(new ShareListener(fileInfoActivityLollipop, ShareListener.REMOVE_SHARE_LISTENER, 1), node, email);
     }
 
@@ -2490,7 +2483,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
     public void removeMultipleShares(ArrayList<MegaShare> shares){
         logDebug("removeMultipleShares");
-        statusDialog = getMegaProgressDialog(fileInfoActivityLollipop, getString(R.string.context_removing_contact_folder));
+        statusDialog = createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_removing_contact_folder));
         nC.removeShares(shares, node);
     }
     
