@@ -191,7 +191,7 @@
     <!-- when the user tries to log in to MEGA without a valid session -->
     <string name="error_server_expired_session">คุณได้ออกจากระบบในอุปกรณ์นี้จากตำแหน่งที่ตั้งอื่น</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">Generating encryption keys</string>
+    <string name="login_generating_key">กำลังสร้างคีย์การเข้ารหัส</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">กำลังเชื่อมต่อไปยังเซิร์ฟเวอร์</string>
     <!-- Status text when updating the file manager -->
@@ -217,7 +217,7 @@
     <!--  -->
     <string name="tour_access_title">การเข้าถึง MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB of free storage</string>
+    <string name="tour_space_text">ลงทะเบียนตอนนี้และรับพื้นที่เก็บข้อมูลฟรี 20 GB</string>
     <!--  -->
     <string name="tour_speed_text">อัปโหลดได้รวดเร็ว พร้อมกับแชร์ไปยังทุกคนได้รวดเร็วเช่นเดียวกัน</string>
     <!--  -->
@@ -399,8 +399,6 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">ลบลิงก์</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">รับลิงก์</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">ออก</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">ออกจากการแชร์</string>
@@ -481,7 +479,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">ส่งคำขอใหม่</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
+    <string name="context_contact_request_sent">ส่งคำขอไปที่ %s เรียบร้อยแล้ว ดูในแท็บคำขอที่ส่ง</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">รายการติดต่อถูกลบออกแล้ว</string>
     <!-- error message -->
@@ -573,7 +571,7 @@
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">โฟลเดอร์แชร์ด้วย %d รายชื่อผู้ติดต่อเรียบร้อยแล้ว</string>
     <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">File cannot be shared with %d contacts</string>
+    <string name="number_contact_file_not_shared_">ไม่สามารถแชร์ไฟล์กับผู้ติดต่อ %d ได้</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">โฟลเดอร์ %d แชร์สำเร็จแล้ว</string>
     <!-- error message when sharing multiple files -->
@@ -583,13 +581,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">โฟลเดอร์แชร์ร่วมกันไม่ได้</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">An error occurred. The folder is still shared with another contact</string>
+    <string name="context_no_removed_sharing_contacts">พบข้อผิดพลาด โฟลเดอร์ยังมีการแชร์กับผู้ติดต่อรายอื่นอยู่</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">เลือกไฟล์เพียงไฟล์เดียว</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">เคลียร์ถังขยะเรียบร้อยแล้ว</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish Bin has not been emptied</string>
+    <string name="rubbish_bin_no_emptied">พบข้อผิดพลาด ถังขยะยังไม่ได้ทำการล้างข้อมูล</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">คุณกำลังจะยกเลิกการสมัครใช้งาน MEGA กรุณาแจ้งให้เราทราบว่ามีอะไรที่เราสามารถทำได้เพื่อช่วยให้คุณสามารถรับประสบการณ์ใช้งานที่ดียิ่งขึ้น</string>
     <!-- hint cancel subscriptions dialog -->
@@ -597,11 +595,11 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">ส่ง</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
+    <string name="confirmation_cancel_subscriptions">ขอบคุณสำหรับคำติชมของคุณ คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการสมัครรับ MEGA ของคุณ</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">การสมัครสมาชิกของคุณยังไม่ถูกยกเลิก กรุณาระบุเหตุผลในการยกเลิกของคุณ</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">ขอบคุณที่สมัครเป็นสมาชิก %1$s %2$s!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">ขอบคุณ กำลังดำเนินการชำระเงินของคุณ กรุณาส่งอีเมลถึงเราที่ support&#64;mega.co.nz หากคุณยังไม่ได้รับการอัปเกรดภายใน 24 ชั่วโมง</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">การสมัครสมาชิกใหม่ของคุณจะมีผลเมื่อการสมัครสมาชิกปัจจุบันหมดอายุ ราคาใหม่จะถูกเรียกเก็บเงินในเวลานั้น</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -651,19 +649,17 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">มีปัญหาของระบบไฟล์</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">An error occurred when browsing local files.</string>
+    <string name="general_error">พบข้อผิดพลาดขณะเรียกดูไฟล์ในเครื่อง</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">ดูตัวอย่างภาพ</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Used storage space</string>
+    <string name="my_account_used_space">พื้นที่จัดเก็บที่ใช้แล้ว</string>
     <!-- menu item -->
     <string name="my_account_change_password">เปลี่ยนรหัสผ่าน</string>
     <!-- Dialog text overquota error -->
     <string name="overquota_alert_text">คุณใช้พื้นที่เก็บข้อมูลเกินขีดจำกัดแล้ว คุณต้องการอัปเกรดบัญชีของคุณหรือไม่</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">เซสชันล่าสุด</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">การเชื่อมต่อ</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">กำลังเปลี่ยนรหัสผ่าน</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -675,11 +671,11 @@
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
     <string name="my_account_change_password_dont_match">รหัสผ่านไม่ตรงกัน</string>
     <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">Select plan</string>
+    <string name="upgrade_select_pricing">เลือกแผน</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">ชำระต่อเนื่องอัตโนมัติแบบรายเดือนหรือรายปี</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">There is no payment method set for this plan currently. Please select one.</string>
+    <string name="no_available_payment_method">ขณะนี้คุณยังไม่มีการตั้งค่าวิธีการชำระเงินในแผนนี้ กรุณาเลือกหนึ่งรายการ</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">รายเดือน*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -689,7 +685,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">ยังไม่ได้ดาวน์โหลดตัวอย่าง กรุณารอสักครู่</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Not enough free memory to display preview. Please try again later.</string>
+    <string name="not_load_preview_low_memory">หน่วยความจำว่างไม่เพียงพอที่จะแสดงตัวอย่างนี้ กรุณาลองอีกครั้งในภายหลัง</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">กรุณาออกจากระบบก่อนที่จะสร้างบัญชีใหม่</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -703,9 +699,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">อนุญาตให้แจ้งเตือนเมื่อมีสายโทรเข้าจากแอป MEGA</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">Please grant MEGA permission to display over other apps for calls.</string>
+    <string name="ask_for_display_over_msg">กรุณาให้สิทธิ์ MEGA เพื่อแสดงทับแอปอื่น ๆ สำหรับโทร</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">You can still manually grant permissions in the device Settings.</string>
+    <string name="ask_for_display_over_explain">คุณสามารถตั้งค่าสิทธิ์ด้วยตนเองได้ที่ การตั้งค่าอุปกรณ์</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Wi-Fi เท่านั้น</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -719,7 +715,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">กำลังตรวจสอบไฟล์ที่จะอัปโหลด</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Initialising Camera Uploads</string>
+    <string name="settings_camera_notif_initializing_title">กำลังเริ่มต้นการอัปโหลดจากกล้อง</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">การอัปโหลดจากกล้องถูกปิดใช้งาน โฟลเดอร์ในเครื่องของคุณไม่พร้อมใช้งาน</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -737,9 +733,9 @@
     <!-- Setting to allow the user to select the preferred passcode type -->
     <string name="settings_passcode_option">ตัวเลือกรหัสผ่าน</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Video compression uses considerable amounts of power. Please plug in your device to charge if the videos to be compressed are larger than %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">การบีบอัดวิดีโอมีการใช้พลังงานจำนวนมาก หากวิดีโอที่จะบีบอัดมีขนาดใหญ่กว่า %s กรุณาเสียบปลั๊กอุปกรณ์เพื่อชาร์จ</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">If enabled, location information will be included with your pictures. Please be careful when sharing them.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">หากเปิดใช้งาน ข้อมูลตำแหน่งที่ตั้งจะรวมอยู่ในรูปภาพของคุณด้วย กรุณาแชร์อย่างระมัดระวัง</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">ขั้นสูง</string>
     <!-- Settings preference title for cache -->
@@ -791,7 +787,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_incorrect_code">รหัสไม่ถูกต้อง กรุณาลองใหม่หรือส่งอีกครั้ง</string>
     <!-- text message to remind user to resend verification code -->
-    <string name="verify_account_resend_label">Didn’t receive the code?</string>
+    <string name="verify_account_resend_label">ไม่ได้รับรหัสใช่หรือไม่</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">ส่งใหม่</string>
     <!-- error message that will show to user when host detected that the mobile number has been registered already -->
@@ -950,9 +946,9 @@
     <!-- title of the My Account screen -->
     <string name="my_account_title">ประเภทบัญชี</string>
     <!-- Label to indicate the date when the current subscription renews -->
-    <string name="renews_on">Renews on&#160;</string>
+    <string name="renews_on">ต่ออายุเมื่อ&#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="expires_on">Expires on&#160;</string>
+    <string name="expires_on">หมดอายุเมื่อ&#160;</string>
     <!--  -->
     <string name="free_account">ฟรี</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
@@ -1072,7 +1068,7 @@
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">คุณต้องเข้าสู่ระบบเพื่อดำเนินการนี้</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">You need to be logged in to complete your email change. Please log in again with your current email address and then tap on your confirmation link again.</string>
+    <string name="change_email_not_logged_in">คุณต้องเข้าสู่ระบบก่อนเพื่อให้การเปลี่ยนแปลงอีเมลของคุณเสร็จสมบูรณ์ กรุณาเข้าสู่ระบบอีกครั้งด้วยที่อยู่อีเมลปัจจุบันของคุณ จากนั้นแตะที่ลิงก์ยืนยันของคุณอีกครั้ง</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">ขอแสดงความยินดี อีเมลใหม่ของคุณสำหรับบัญชี MEGA นี้คือ: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
@@ -1116,21 +1112,21 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">อัพเกรดเดี๋ยวนี้</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Grow your cloud.[A]Get increased storage and transfer quotas with a Pro account.</string>
+    <string name="get_pro_account">ขยับขยายคลาวด์ของคุณ[A]รับพื้นที่เก็บข้อมูลที่เพิ่มขึ้นและโควต้าการถ่ายโอนด้วยบัญชี Pro</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s.[A]You can find the file with your Recovery Key in the Saved for Offline section.[A]Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
+    <string name="toast_master_key">บันทึกคีย์การกู้คืนบัญชี MEGA ไปที่: %1s.[A]คุณสามารถค้นหาไฟล์โดยการใช้คีย์การกู้คืนของคุณที่บันทึกไว้ในส่วนออฟไลน์[A]หมายเหตุ: เมื่อคุณออกจากระบบไฟล์ที่มีคีย์การกู้คืนของคุณจะถูกลบออกด้วยเช่นกัน กรุณาเก็บไฟล์ดังกล่าวนอกเหนือจากในบัญชี MEGA ของคุณไว้ในที่ปลอดภัย</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">This email address is already in use. Please use another email address.</string>
+    <string name="mail_already_used">อีเมลนี้ได้ถูกใช้งานไปแล้ว กรุณาใช้อีเมลอันอื่น</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">คุณได้ส่งคำขอลิงก์ยืนยันสำหรับที่อยู่อีเมลนั้นแล้ว</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">This is your existing email address.</string>
+    <string name="mail_same_as_old">นี่คืออีเมลที่คุณมีอยู่</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
     <string name="change_mail_text_last_step">นี่เป็นขั้นตอนสุดท้ายในการเปลี่ยนอีเมลของคุณ กรุณากรอกรหัสผ่านของคุณด้านล่าง</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">เปลี่ยนอีเมล</string>
     <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">You are running out of storage space.</string>
+    <string name="title_new_warning_out_space">คุณกำลังใช้พื้นที่เก็บข้อมูลไม่เพียงพอ</string>
     <!-- Text of the warning when the user is running out of space -->
     <string name="new_warning_out_space">ใช้ประโยชน์จากบัญชี MEGA ของคุณอย่างเต็มที่ด้วยการอัปเกรดเป็น Pro</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
@@ -1216,7 +1212,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">กำลังรอการยืนยันทางอีเมล</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Please check your email and tap the link to confirm your account.</string>
+    <string name="confirm_email_explanation">กรุณาตรวจสอบอีเมลของคุณและแตะลิงก์เพื่อยืนยันบัญชีของคุณ</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="other">%1$d รายการ</item>
@@ -1697,7 +1693,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s ได้รับเชิญไปแล้ว พิจารณาคำขอที่รอดำเนินการของคุณ</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">If you have misspelt your email address, correct it and tap [A]Resend[A].</string>
+    <string name="confirm_email_misspelled">หากคุณสะกดอีเมลผิด ให้แก้ไขแล้วแตะ[A]ส่งใหม่[A]</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">ส่งใหม่</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1863,7 +1859,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">เชิญเพื่อนและรับรางวัล</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each successful invite. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">รับพื้นที่เก็บข้อมูล %1$s ทุกครั้งเมื่อส่งคำเชิญให้เพื่อนได้สำเร็จ มีอายุใช้งาน 365 วัน</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">พื้นที่เก็บข้อมูล %1$s มีอายุใช้งาน 365 วัน</string>
     <!-- title of the section for unlocked rewards -->
@@ -1871,7 +1867,7 @@
     <!-- title of the section for unlocked storage quota -->
     <string name="unlocked_storage_title">โควต้าพื้นที่เก็บข้อมูล</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Invitation bonuses</string>
+    <string name="title_referral_bonuses">โบนัสคำเชิญ</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">ติดตั้งแอปของเราบนมือถือ</string>
     <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
@@ -1879,9 +1875,9 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">โบนัสการลงทะเบียน</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Get a MEGA Desktop App</string>
+    <string name="title_install_desktop">รับแอป MEGA เดสก์ทอป</string>
     <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Account base quota</string>
+    <string name="title_base_quota">โควต้าบัญชีเริ่มต้น</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">ไม่มีไฟล์ในการอัปโหลดจากกล้อง</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -1895,9 +1891,9 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">วิธีการทำงาน</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a MEGA Free account and to install a MEGA Mobile App. You will receive free storage as a bonus for every successful signup and app installation.</string>
+    <string name="first_paragraph_achievement_invite_friends">เชิญเพื่อนของคุณให้สร้างบัญชี MEGA ฟรีและติดตั้งแอป MEGA บนมือถือ คุณจะได้รับพื้นที่เก็บข้อมูลฟรีเป็นโบนัสทุกครั้งเมื่อเพื่อนของคุณลงทะเบียนและติดตั้งแอป</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">Free storage bonus applicable to new invitations only and where MEGA Mobile App or MEGA Desktop App is installed.</string>
+    <string name="second_paragraph_achievement_invite_friends">โบนัสพื้นที่เก็บข้อมูลฟรี เฉพาะคำเชิญใหม่และติดตั้งแอป MEGA บนมือถือหรือแอป MEGA เดสก์ทอปเท่านั้น</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">เลือกผู้ติดต่อจากรายชื่อในโทรศัพท์ของคุณหรือกรอกที่อยู่อีเมลพร้อมกัน</string>
     <!-- title of the dialog to confirm the contact request -->
@@ -1911,13 +1907,13 @@
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">เมื่อคุณติดตั้งแอป MEGA บนเดสก์ท็อป คุณจะได้รับพื้นที่เก็บข้อมูลฟรี %1$s มีอายุใช้งาน 365 วัน แอป MEGA บนเดสก์ท็อปสามารถใช้ได้ทั้ง Windows, macOS และ Linux distros เป็นส่วนใหญ่</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">When you install the MEGA Mobile App you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS and Android.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">เมื่อคุณติดตั้งแอป MEGA บนมือถือ คุณจะได้รับพื้นที่เก็บข้อมูลฟรี %1$s มีอายุการใช้งาน 365 วัน เรามีให้บริการทั้งแอปมือถือ iOS และ Android</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">เมื่อคุณตรวจสอบหมายเลขโทรศัพท์ คุณจะได้รับพื้นที่เก็บข้อมูลฟรี %1$s มีอายุใช้งาน 365 วัน</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">คุณได้รับพื้นที่เก็บข้อมูล %1$s จากการติดตั้งแอป MEGA ของเราบนเดสก์ท็อป</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing the MEGA Mobile App.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">คุณได้รับพื้นที่จัดเก็บ %1$s จากการติดตั้งแอป MEGA บนมือถือ</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="result_paragraph_info_achievement_add_phone">คุณได้รับพื้นที่เก็บข้อมูล %1$s จากการตรวจสอบหมายเลขโทรศัพท์ของคุณ</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -1939,11 +1935,11 @@
     <!-- Settings preference title for help centre -->
     <string name="settings_help_centre">ศูนย์ความช่วยเหลือ</string>
     <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Send feedback</string>
+    <string name="settings_help_preference">ส่งคำติชม</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">คำติชมเกี่ยวกับ Android</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">Please provide your feedback here:</string>
+    <string name="setting_feedback_body">กรุณาให้คำติชมของคุณที่นี่:</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">รูปแบบอุปกรณ์</string>
     <!-- mail body -->
@@ -1996,8 +1992,7 @@
     <string name="invalid_characters_defined">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">File name cannot be empty.</item>
-        <item quantity="other">File names cannot be empty.</item>
+        <item quantity="other">ชื่อไฟล์ต้องไม่ว่างเปล่า</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
     <string name="audio_play">ไฟล์เสียง</string>
@@ -2016,9 +2011,9 @@
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">เชื่อมต่อกับการแชทอีกครั้ง</string>
     <!-- Message show when a call cannot be established -->
-    <string name="call_error">An error has occurred and the call cannot be connected.</string>
+    <string name="call_error">พบข้อผิดพลาดและไม่สามารถเชื่อมต่อการโทรได้</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Like the MEGA Mobile App?</string>
+    <string name="title_evaluate_the_app_panel">ถูกใจใช่เลย แอปมือถือ MEGA หรือไม่</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">ใช่ ให้คะแนนแอปนี้</string>
     <!-- Label to show send feedback -->
@@ -2026,7 +2021,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">ตัวเลือกขั้นสูง</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA needs read and write permissions to your external storage to download files there.</string>
+    <string name="download_requires_permission">MEGA ต้องการสิทธิ์ในการอ่านและเขียนที่จัดเก็บข้อมูลภายนอกของคุณเพื่อดาวน์โหลดไฟล์ไว้ที่นั่น</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">การ์ด SD เก่าไม่สามารถใช้งานได้ กรุณาตั้งตำแหน่งดาวน์โหลดใหม่</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2036,7 +2031,7 @@
     <!-- Option of the sliding panel to go to QR code section -->
     <string name="choose_qr_option_panel">คิวอาร์โค้ดของฉัน</string>
     <!-- Title of the screen that shows the options to the QR code -->
-    <string name="section_qr_code">QR code</string>
+    <string name="section_qr_code">คิวอาร์โค้ด</string>
     <!-- Option in menu of section  My QR code to reset the QR code -->
     <string name="action_reset_qr">รีเซ็ตคิวอาร์โค้ด</string>
     <!-- Option in menu of section  My QR code to delete the QR code -->
@@ -2044,13 +2039,13 @@
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
     <string name="save_cloud_drive">ไปยังคลาวด์ไดร์ฟ</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
-    <string name="save_file_system">To file system</string>
+    <string name="save_file_system">ไปยังไฟล์ระบบ</string>
     <!-- Title of QR code section -->
-    <string name="section_my_code">My code</string>
+    <string name="section_my_code">โค้ดของฉัน</string>
     <!-- Title of QR code scan section -->
-    <string name="section_scan_code">Scan code</string>
+    <string name="section_scan_code">สแกนโค้ด</string>
     <!-- Title of QR code settings that permits or not contacts that scan my QR code will be automatically added to my contact list -->
-    <string name="settings_qrcode_autoaccept">Auto-accept</string>
+    <string name="settings_qrcode_autoaccept">ยอมรับอัตโนมัติ</string>
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">ผู้ใช้ MEGA ที่สแกนคิวอาร์โค้ดของคุณ จะถูกเพิ่มลงในรายชื่อผู้ติดต่อของคุณโดยอัตโนมัติ</string>
     <!-- Subtitle of QR code settings that reset the code -->
@@ -2086,9 +2081,9 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">ยังไม่ได้ส่งคำเชิญ %s อยู่ในรายชื่อติดต่อของคุณแล้ว</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
+    <string name="invite_not_sent_text_error">พบข้อผิดพลาดและยังไม่ได้ส่งคำเชิญ</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Generating QR code&#8230;</string>
+    <string name="generatin_qr">กำลังสร้างคิวอาร์โค้ด&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">สแกนคิวอาร์โค้ด</string>
     <!-- get the contact link and copy it -->
@@ -2166,7 +2161,7 @@
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">กำลังโทรหา</string>
     <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Tap to go back to the call</string>
+    <string name="action_notification_call_in_progress">แตะเพื่อกลับไปที่สายสนทนา</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">กลับไปที่สายสนทนา</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2176,7 +2171,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">บัญชีของคุณถูกระงับเนื่องจากมีการละเมิดเงื่อนไขการให้บริการของ MEGA หลายครั้ง กรุณาตรวจสอบกล่องจดหมายอีเมลของคุณ</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service including, but not limited to, clause 15.</string>
+    <string name="account_suspended_breache_ToS">บัญชีของคุณถูกยกเลิกเนื่องจากการละเมิดเงื่อนไขการให้บริการของ MEGA รวมถึงแต่ไม่จำกัดเพียงข้อที่ 15</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">กำลังโหลดไฟล์</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2437,7 +2432,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">ครั้งต่อไปที่คุณลงชื่อเข้าใช้บัญชีของคุณ ระบบจะขอให้คุณกรอกรหัส 6 หลักที่ได้รับจากแอปตัวรับรองความถูกต้องของคุณ</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your <b>Recovery Key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable Two-Factor Authentication.</string>
+    <string name="recommendation_2fa_enabled">กรุณาบันทึก<b>คีย์การกู้คืน</b>ของคุณไว้ในที่ปลอดภัย เพื่อหลีกเลี่ยงปัญหาในกรณีที่คุณไม่สามารถเข้าถึงแอปของคุณ หรือหากคุณต้องการปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัย</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">โค้ดไม่ถูกต้อง</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2483,13 +2478,13 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">ไม่ได้แชร์ไฟล์ %d ไฟล์</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Preview content</string>
+    <string name="preview_content">ดูตัวอย่างเนื้อหา</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
+    <string name="no_network_connection_on_play_file">ไม่มีการเชื่อมต่อกับเครือข่าย ไฟล์ยังไม่ได้ดาวน์โหลดและไม่สามารถสตรีมได้</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">ไม่สามารถอ่านไฟล์ได้</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">No network connection. Please reconnect to open the file.</string>
+    <string name="error_fail_to_open_file_no_network">ไม่มีการเชื่อมต่อกับเครือข่าย กรุณาเชื่อมต่อใหม่เพื่อเปิดไฟล์</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">ไฟล์มีอยู่แล้วในบันทึกแบบออฟไลน์</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2497,9 +2492,9 @@
         <item quantity="other">ไม่ได้ส่งต่อข้อความ</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
-    <string name="title_confirmation_disable_rich_links">Rich URL previews</string>
+    <string name="title_confirmation_disable_rich_links">แสดงตัวอย่าง URL</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">You are disabling rich URL previews. You can re-enable them in Settings. Do you want to continue?</string>
+    <string name="text_confirmation_disable_rich_links">คุณกำลังปิดการแสดงตัวอย่าง URL คุณสามารถเปิดใช้งานได้อีกครั้งในการตั้งค่า คุณต้องการดำเนินการต่อหรือไม่</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]สายที่ไม่ได้รับ[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2525,7 +2520,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">คืนค่าไปที่ %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">An error occurred. Item not restored.</string>
+    <string name="context_no_restored">พบข้อผิดพลาด ไม่สามารถกู้คืนได้</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">ส่งข้อความ</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -2541,9 +2536,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">การสนทนาที่จัดเก็บ (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Archive chat</string>
+    <string name="archive_chat_option">จัดเก็บแชท</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Unarchive chat</string>
+    <string name="unarchive_chat_option">ยกเลิกจัดเก็บการสนทนา</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">จัดเก็บ</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -2571,7 +2566,7 @@
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading_share">กำลังโหลดรายชื่อติดต่อ&#8230;</string>
     <!-- Title of the screen New Group -->
-    <string name="title_new_group">New group</string>
+    <string name="title_new_group">กลุ่มใหม่</string>
     <!-- Subtitle of the screen New Group -->
     <string name="subtitle_new_group">พิมพ์ชื่อกลุ่ม</string>
     <!-- Hint of edittext shown when it is creating a new group to guide user to type the name of the group -->
@@ -2711,7 +2706,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">หากวิดีโอที่บีบอัดมีขนาดใหญ่กว่า</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin clearing scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">หากต้องการปิดใช้งานตัวกำหนดเวลาล้างถังขยะหรือตั้งระยะเวลาเก็บรักษาให้นานขึ้น กรุณาสมัครแผน Pro</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">วัน</string>
     <!-- Title of the option to generate a public chat link -->
@@ -2953,17 +2948,17 @@
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">ข้อผิดพลาดคีย์ SSL</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGA is unable to establish a secure connection using SSL. You may be on a public Wi-Fi network with additional requirements.</string>
+    <string name="ssl_error_dialog_text">MEGA ไม่สามารถสร้างการเชื่อมต่อ SSL ที่ปลอดภัยได้ คุณอาจอยู่ในเครือข่าย Wi-Fi สาธารณะที่มาพร้อมกับข้อกำหนดเพิ่มเติม</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]ไม่มี[/B][A]แจ้งเตือน[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">ตั้งค่า MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed for exchanging encrypted messages and to make secure calls.</string>
+    <string name="setup_mega_explanation">MEGA ต้องได้รับอนุญาตจากคุณในการเข้าถึงสื่อและไฟล์ของคุณเพื่อทำการแชร์ อาจจำเป็นต้องใช้สิทธิ์การเข้าถึงอื่น ๆ ร่วมด้วยเพื่อใช้แลกเปลี่ยนข้อความและโทรออกที่เข้ารหัสได้อย่างปลอดภัย</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">อนุญาตให้เข้าถึงรูปภาพ มีเดียและไฟล์</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">MEGA needs your permission to access files for sharing.</string>
+    <string name="allow_acces_media_subtitle">MEGA ต้องได้รับอนุญาตจากคุณเพื่อเข้าถึงไฟล์เพื่อแชร์</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">เปิดใช้งานกล้อง</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -2971,7 +2966,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">เปิดใช้งานการโทร</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Grant access to your address book</string>
+    <string name="allow_acces_contact_title">ให้สิทธิ์เข้าถึงสมุดรายชื่อของคุณ</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">ค้นหารายชื่อจากสมุดรายชื่อของคุณได้อย่างง่ายดายบน MEGA</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -2979,9 +2974,9 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">อนุญาตให้เข้าถึงไมโครโฟนของคุณ เพื่อให้โทรแบบเข้ารหัสได้</string>
     <!-- General enable access -->
-    <string name="general_enable_access">Grant access</string>
+    <string name="general_enable_access">ให้สิทธิ์เข้าถึง</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
-    <string name="title_chat_shared_files_info">Shared files</string>
+    <string name="title_chat_shared_files_info">ไฟล์ที่ใช้ร่วมกัน</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">เอกสารแนบที่ส่งไปแล้ว</string>
     <!-- Message shown when a group call ends. -->
@@ -3023,17 +3018,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s ออกจากการโทร</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">Call cannot start because the maximum number of participants has been exceeded.</string>
+    <string name="call_error_too_many_participants_start">ไม่สามารถเริ่มการโทรได้ เนื่องจากเกินจำนวนผู้เข้าร่วมสูงสุดแล้ว</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">Call cannot be joined as the maximum number of participants has been exceeded.</string>
+    <string name="call_error_too_many_participants">ไม่สามารถเข้าร่วมการโทรได้ เนื่องจากเกินจำนวนผู้เข้าร่วมสูงสุดแล้ว</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Unable to join the group call due to the maximum number of participants reached</string>
+    <string name="call_error_too_many_participants_join">ไม่สามารถเข้าร่วมการโทรแบบกลุ่มได้ เนื่องจากมีผู้เข้าร่วมถึงจำนวนสูงสุดแล้ว</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Video call cannot be joined as the maximum number of participants has been exceeded.</string>
+    <string name="call_error_too_many_video">ไม่สามารถเข้าร่วมสนทนาทางวิดีโอได้ เนื่องจากเกินจำนวนผู้เข้าร่วมสูงสุดแล้ว</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">Call cannot be put on hold.</string>
+    <string name="call_error_call_on_hold">ไม่สามารถพักสายได้</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">An error has occurred and the file cannot be opened with this app.</string>
+    <string name="error_open_file_with">พบข้อผิดพลาดบางประการ ไม่สามารถเปิดไฟล์ด้วยแอปนี้ได้</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">สายเรียกเข้า&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3041,7 +3036,7 @@
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">ข้อความมีส่วนประกอบของเมตาดาต้าไม่ถูกต้อง</string>
     <!-- Title of the activity that sends a location -->
-    <string name="title_activity_maps">Send location</string>
+    <string name="title_activity_maps">ส่งตำแหน่งที่ตั้ง</string>
     <!-- Label layout on maps activity that permits send current location -->
     <string name="current_location_label">ส่งตำแหน่งปัจจุบันของคุณ</string>
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
@@ -3237,7 +3232,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">เริ่มแชทอย่างปลอดภัยกับผู้ติดต่อของคุณโดยใช้การเข้ารหัสแบบต้นทางถึงปลายทาง</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hi. Have secure conversations on MEGA with me and get 20 GB of free cloud storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">หวัดดี มาร่วมสนทนากับฉันบน MEGA อย่างปลอดภัยสิ แล้วรับพื้นที่เก็บข้อมูลบนคลาวด์ฟรี 20 GB ไปเลย%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">ไม่มีลิงก์แชท</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3283,7 +3278,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">แชท</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]ไม่มีไฟล์[/B]ใน[A]รายการล่าสุด[/A]ของคุณ</string>
+    <string name="context_empty_recents">[B]ไม่มีไฟล์ใน [/B][A]รายการล่าสุด[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s และอื่น ๆ อีก %2$d รายการ</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3344,8 +3339,8 @@
     <string name="business_management_alert">การจัดการผู้ใช้สามารถใช้ได้จากเว็บเบราว์เซอร์เดสก์ท็อปเท่านั้น</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">การใช้งาน</string>
-    <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Storage usage breakdown</string>
+    <!-- Title of usage storage details section in My Account -->
+    <string name="usage_storage_details_label">รายละเอียดการใช้พื้นที่เก็บข้อมูล</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">การใช้งานโดยรวม</string>
     <!-- Title of transfer section in Storage -->
@@ -3353,7 +3348,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">คุณไม่สามารถลบ %1$s ออกจากการเป็นผู้ติดต่อได้เนื่องจากเป็นส่วนหนึ่งของบัญชีธุรกิจของคุณ</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">A problem occurred with your last payment. Please access MEGA using a desktop browser for more information.</string>
+    <string name="grace_period_admin_alert">เกิดปัญหากับการชำระเงินครั้งล่าสุดของคุณ กรุณาไปที่เว็บ MEGA ผ่านเบราว์เซอร์เดสก์ท็อปเพื่อดูข้อมูลเพิ่มเติม</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">บัญชีธุรกิจของคุณหมดอายุแล้ว</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3361,7 +3356,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">บัญชีของคุณ[B]ถูกระงับ[/B]ในขณะนี้ คุณสามารถเรียกดูได้แค่ข้อมูลของคุณเท่านั้น</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your business account administrator can access your Camera Uploads.</string>
+    <string name="camera_uploads_business_alert">MEGA ไม่สามารถเข้าถึงข้อมูลของคุณได้ อย่างไรก็ตาม ผู้ดูแลระบบบัญชีธุรกิจของคุณจะยังสามารถเข้าถึงการอัปโหลดจากกล้องของคุณได้</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">มีบางอย่างผิดพลาด</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3429,7 +3424,7 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">ข้อผิดพลาดในสิทธิ์</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">You do not have the correct permissions to amend this file. Would you like to create a new file?</string>
+    <string name="alert_not_enough_permissions_revert">คุณไม่มีสิทธิ์ในการแก้ไขไฟล์นี้ คุณต้องการสร้างไฟล์ใหม่หรือไม่</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">สร้างเวอร์ชันเป็นไฟล์ใหม่เรียบร้อยแล้ว</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
@@ -3467,7 +3462,7 @@
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">ไม่มีโฟลเดอร์นี้</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">The file cannot be found in your Cloud Drive.</string>
+    <string name="warning_node_not_exists_in_cloud">ไม่พบไฟล์ในคลาวด์ไดร์ฟของคุณ</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">พื้นที่เก็บข้อมูลเต็มแล้ว</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -3519,7 +3514,7 @@
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">หมายเลขโทรศัพท์ของคุณถูกลบเรียบร้อยแล้ว</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
-    <string name="remove_phone_number_fail">Failed to remove your phone number.</string>
+    <string name="remove_phone_number_fail">ไม่สามารถลบหมายเลขโทรศัพท์ของคุณ</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">ค้นหาใน MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
@@ -3577,9 +3572,9 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%1$d%% จาก %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_enabled">Debugging info for chat messages enabled</string>
+    <string name="show_info_chat_msg_enabled">เปิดใช้งานข้อมูลการดีบักข้อความแชท</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Debugging info for chat messages is disabled</string>
+    <string name="show_info_chat_msg_disabled">ข้อมูลการดีบักข้อความแชทถูกปิดใช้งาน</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">คุณแสดงความรู้ถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
@@ -3662,14 +3657,10 @@
     <string name="button_copy_key">คัดลอกคีย์</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">คัดลอกรหัสผ่าน</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">คัดลอกลิงก์ไปยังคลิปบอร์ดแล้ว</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">คัดลอกคีย์ไปยังคลิปบอร์ดแล้ว</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">คัดลอกรหัสผ่านไปยังคลิปบอร์ดแล้ว</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">ส่งลิงก์สำเร็จแล้ว</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">ส่งลิงก์และคีย์สำเร็จแล้ว</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -3693,7 +3684,7 @@
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">ลิงก์: %1$s\n\nรหัสผ่าน: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA needs your permission to access your files for sharing.</string>
+    <string name="files_required_permissions_warning">MEGA ต้องได้รับอนุญาตจากคุณในการเข้าถึงไฟล์ของคุณเพื่อแชร์</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">รายการโปรด</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3743,7 +3734,7 @@
     <!-- Cookie dialog third party second subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle2">หมวดหมู่: คุกกี้สำหรับโฆษณา</string>
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Used by Google to:\n• customise the adverts Google shows on ours and other services and websites, based on such things as your location and other websites you’ve previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you tap on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="dialog_cookie_thirdparty_message">ใช้โดย Google เพื่อ:\n• ปรับแต่งโฆษณาที่ Google แสดงบนบริการของเราและเว็บไซต์อื่น ๆ ตามสิ่งต่าง ๆ เช่น ตำแหน่งที่ตั้งของคุณและเว็บไซต์อื่น ๆ ที่คุณเคยเข้าชม\n• ตรวจสอบว่าคุณแสดงโฆษณาบางรายการบ่อยเพียงใด\n• จัดให้มีการป้องกันการฉ้อโกง และ\n• กำหนดว่าเมื่อใดที่คุณแตะที่โฆษณาหนึ่ง ๆ จากนั้นจึงติดตามต่อเพื่อตอบสนองต่อโฆษณานั้นของคุณ\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">ยอมรับการใช้งานคุกกี้</string>
     <!-- Preference screen item title -->
@@ -3765,7 +3756,7 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_thirdparty_title">คุกกี้จากที่อื่น</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Tap on “More Information” below for details on all the third party Cookies we use.</string>
+    <string name="preference_cookies_thirdparty_summary">คุกกี้เหล่านี้ถูกควบคุมโดยบุคคลอื่นที่ไม่ใช่เรา เราใช้คุกกี้เหล่านี้เพื่อจัดหาประเภทของฟังก์ชันที่อธิบายไว้ข้างต้นแล้ว การไม่ยอมรับคุกกี้เหล่านี้จะมีผลกระทบที่แตกต่างกันไป ขึ้นอยู่กับประเภทของคุกกี้แต่ละคุกกี้จากที่อื่น แตะที่ “ข้อมูลเพิ่มเติม” ด้านล่างเพื่อดูรายละเอียดเกี่ยวกับคุกกี้จากที่อื่นทั้งหมดที่เราใช้</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">เปิดไว้เสมอ</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
@@ -3793,7 +3784,7 @@
     <!-- Label indicating a file was created successfully -->
     <string name="file_created">สร้างไฟล์แล้ว</string>
     <!-- Warning indicating a file was not created successfully -->
-    <string name="file_creation_failed">File creation failed. Please try again.</string>
+    <string name="file_creation_failed">สร้างไฟล์ล้มเหลว กรุณาลองอีกครั้ง</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">บันทึกไฟล์ลงใน %1$s แล้ว</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
@@ -3801,7 +3792,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">ไฟล์อัปเดตแล้ว</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">อัปเดตไฟล์ล้มเหลว ลองอีกครั้ง</string>
+    <string name="file_update_failed">อัปเดตไฟล์ล้มเหลว กรุณาลองอีกครั้ง</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">ไฟล์มีขนาดใหญ่เกินไปและไม่สามารถเปิดหรือดูตัวอย่างได้</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -3844,25 +3835,24 @@
     <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
-        <item quantity="one">Upload in progress, 1 file pending</item>
-        <item quantity="other">Upload in progress, %1$d files pending</item>
+        <item quantity="other">กำลังอยู่ในระหว่างอัปโหลด มี %1$d ไฟล์รอดำเนินการ</item>
     </plurals>
     <!-- Text to show as production api server option -->
     <string name="production_api_server">โปรดักชั่น (ใช้งานจริง)</string>
     <!-- Title to show in a dialog to change api server -->
     <string name="title_change_server">เปลี่ยนเซิร์ฟเวอร์</string>
     <!-- Show line numbers action -->
-    <string name="action_show_line_numbers">Show line numbers</string>
+    <string name="action_show_line_numbers">แสดงหมายเลขบรรทัด</string>
     <!-- Hide line numbers action -->
-    <string name="action_hide_line_numbers">Hide line numbers</string>
+    <string name="action_hide_line_numbers">ซ่อนหมายเลขบรรทัด</string>
     <!-- Indicates pagination progress. E.g.: 3/49 -->
-    <string name="pagination_progress">%1$s/%2$s</string>
+    <string name="pagination_progress">หน้า %1$s จาก %2$s</string>
     <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="error_share_owner_storage_quota">เจ้าของการแชร์ได้ใช้พื้นที่เก็บข้อมูลเกินโควต้า</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">ไม่สามารถส่งไฟล์ไปยังผู้ใช้ปลายทางได้ เนื่องจากเกินโควต้าการจัดเก็บข้อมูลแล้ว</string>
     <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">We are upgrading MEGAchat. Your calls might not be connected due to version incompatibility unless all parties update their MEGA apps to the latest version.</string>
+    <string name="version_incompatibility">เรากำลังอัปเกรด MEGAchat การโทรของคุณอาจไม่เชื่อมต่อเนื่องจากเวอร์ชันที่เข้ากันไม่ได้ เว้นแต่ทุกฝ่ายจะอัปเดตแอป MEGA เป็นเวอร์ชันล่าสุดแล้ว</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
     <string name="file_already_downloaded_and_file_pending_download">ดาวน์โหลดแล้ว 1 ไฟล์ อยู่ระหว่างดำเนินการ 1 ไฟล์</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
@@ -3905,4 +3895,58 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">ยืนยันการเปลี่ยน</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">จำเป็นต้องให้สิทธิ์ในการเข้าถึงที่เก็บข้อมูล</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">เพิ่มหมายเลขโทรศัพท์ของคุณ</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">คุณจำรหัสผ่านของคุณได้ไหม\nMEGA ไม่สามารถรีเซ็ตรหัสผ่านของคุณได้หากคุณลืมรหัสผ่าน</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">เปลี่ยนชื่อ</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">เพิ่มรูปภาพ</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">เพิ่มหมายเลขโทรศัพท์</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">MEGA ต้องการสิทธิ์ในการเขียนไปยังที่เก็บข้อมูลอุปกรณ์ของคุณเพื่อดำเนินการต่อไปได้</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">พรุ่งนี้ %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">รอการยืนยัน</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="other">มีคนรู้จัก %1$d คน</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">เพิ่มล่าสุด</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]ไม่มี[/B][A]กลุ่ม[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">คำขอ</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">กลุ่ม</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">ตัวเลือกต่าง ๆ เช่น “ส่งคีย์ถอดรหัสแบบแยกต่างหาก”, “ตั้งค่าวันหมดอายุ” หรือ “ตั้งค่าการป้องกันด้วยรหัสผ่าน” จะใช้ได้เฉพาะรายการเดียวเท่านั้น</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">คัดลอกทั้งหมด</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="other">ส่งลิงก์สำเร็จแล้ว</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="other">คัดลอกลิงก์ไปยังคลิปบอร์ดแล้ว</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="other">รับลิงก์</item>
+    </plurals>
 </resources>

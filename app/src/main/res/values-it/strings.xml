@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available in web browsers since 2016. It has been extended to the Mega Mobile App, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 20 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive periods of the same duration, at the same price as the initial period chosen. To manage your subscriptions, simply tap the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so). Then tap on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA fornisce uno spazio di archiviazione cloud e una chat criptata e controllata dall’utente tramite i browser web standard, insieme ad app dedicate per dispositivi mobili. Diversamente dagli altri provider di spazio di archiviazione cloud, i tuoi dati sono criptati e decriptati solo dai tuoi dispositivi e mai da noi.\n\nCarica i tuoi file dal tuo smartphone o tablet e poi cerca, archivia, scarica, streamma, visualizza, condividi, rinomina o elimina i tuoi file in qualsiasi momento, da qualsiasi dispositivo, ovunque tu sia. Condividi cartelle con i tuoi contatti e visualizza i loro aggiornamenti in tempo reale. Il processo di criptazione sottintende che non possiamo accedere ai tuoi dati o resettare la tua password, quindi DEVI ricordarla (se non hai una copia della tua Chiave di Recupero) o perderai accesso ai tuoi file archiviati.\n\nLe video chiamate criptate end-to-end di MEGA permettono una privacy totale, e sono state disponibili nei browser dal 2016. Sono state estese all’app per mobile di MEGA, con la cronologia delle chat accessibile su più dispositivi. Gli utenti possono anche aggiungere facilmente file in una chat dal loro Cloud Drive di MEGA.\n\nMEGA offre 20GB di spazio di archiviazione gratuito per tutti gli utenti registrati con bonus ad obiettivi, e offre piani a pagamento con limiti molto più alti:\n\n\nAbbonamento Pro Lite: €4,99 al mese o €49,99 all’anno ti dà 400GB di spazio di archiviazione e 1TB di banda di trasferimento mensile.\nAbbonamento Pro I: €9,99 al mese o €99,99 all’anno ti dà 2TB di spazio di archiviazione e 2TB di banda di trasferimento mensile.\nAbbonamento Pro II: €19,99 al mese o €199,99 all’anno ti dà 8TB di spazio di archiviazione e 8TB di banda di trasferimento mensile.\nAbbonamento Pro III: €29,99 al mese o €299,99 all’anno ti dà 16TB di spazio di archiviazione e 16TB di banda di trasferimento mensile.\n\nGli abbonamenti sono rinnovati automaticamente per periodi successivi della stessa durata e allo stesso prezzo del periodo inizialmente scelto. Per gestire i tuoi abbonamenti, clicca sull’icona del Play Store sul tuo dispositivo mobile, effettua l’accesso con il tuo Google ID (se non l’hai già fatto). Poi clicca sull’app di MEGA. Potrai gestire i tuoi abbonamenti da lì.\n\nPermessi dell’app:\nWRITE_EXTERNAL_STORAGE -&gt; Scarica i tuoi file da MEGA sul tuo dispositivo e carica file dal tuo dispositivo su MEGA\nCAMERA -&gt; Scatta una foto e carica le tue foto su MEGA\nREAD_CONTACTS -&gt; Aggiungi facilmente contatti dal tuo dispositivo come contatti MEGA\nRECORD_AUDIO e CAPTURE_VIDEO_OUTPUT (microfono e fotocamera) -&gt; MEGA fornisce chiamate audio/video criptate\n\n\nPer aumentare la confidenza degli utenti nel sistema MEGA, tutto il codice sorgente lato client è pubblicato, affinché i ricercatori di sicurezza interessati possano valutare il processo di criptazione. Il codice della nostra app per mobile è su: https://github.com/meganz/android \n\nPer maggiori informazioni, per favore dai un’occhiata al nostro sito web:\nVedi https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
-    <string name="short_description_text">MEGA is Cloud Storage with secure always-on privacy.</string>
+    <string name="short_description_text">MEGA è uno spazio di archiviazione cloud con privacy sicura e sempre attiva.</string>
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
@@ -87,7 +87,7 @@
     <!-- Error getting the root node -->
     <string name="error_general_nodes">Errore. Per favore, riprova.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
-    <string name="general_rk">MEGA-RECOVERYKEY</string>
+    <string name="general_rk">MEGA-CHIAVEDIRECUPERO</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">La cartella secondaria non esiste, per favore scegli una nuova cartella</string>
     <!-- when no external card exists -->
@@ -193,7 +193,7 @@
     <!-- when the user tries to log in to MEGA without a valid session -->
     <string name="error_server_expired_session">Sei stato disconnesso su questo dispositivo da un’altra posizione</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">Generating encryption keys</string>
+    <string name="login_generating_key">Generazione delle chiavi di criptazione</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">Connessione al server</string>
     <!-- Status text when updating the file manager -->
@@ -219,7 +219,7 @@
     <!--  -->
     <string name="tour_access_title">Accesso MEGA</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB of free storage</string>
+    <string name="tour_space_text">Registrati adesso e ottieni 20GB di spazio gratuito</string>
     <!--  -->
     <string name="tour_speed_text">I caricamenti sono veloci. Condividere rapidamente i file con tutti</string>
     <!--  -->
@@ -407,8 +407,6 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Elimina link</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">Ottieni il link</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Lascia</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">Abbandona</string>
@@ -490,7 +488,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Richiesta inviata nuovamente</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
+    <string name="context_contact_request_sent">Richiesta inviata correttamente a %s. Vedi nella sezione Richieste inviate.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contatto cancellato</string>
     <!-- error message -->
@@ -582,7 +580,7 @@
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Cartella condivisa con %d contatti con successo</string>
     <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">File cannot be shared with %d contacts</string>
+    <string name="number_contact_file_not_shared_">Il file non può essere condiviso con %d contatti</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d cartelle condivise con successo</string>
     <!-- error message when sharing multiple files -->
@@ -592,13 +590,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">La cartella non è più condivisa</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">An error occurred. The folder is still shared with another contact</string>
+    <string name="context_no_removed_sharing_contacts">C’è stato un errore. La cartella è ancora condivisa con un altro contatto</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Seleziona solo un file</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Cestino pulisto con successo</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish Bin has not been emptied</string>
+    <string name="rubbish_bin_no_emptied">C’è stato un errore. Il Cestino non è stato svuotato</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Stai per annullare la tua iscrizione a MEGA. Per favore, facci sapere se c’è qualcosa che possiamo fare per farti cambiare idea.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -606,11 +604,11 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Invia</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
+    <string name="confirmation_cancel_subscriptions">Grazie del tuo feedback. Vuoi veramente annullare il tuo abbonamento MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Il tuo abbonamento non è stato annullato. Per favore, fornisci un motivo per la tua cancellazione</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">Grazie per esserti abbonato a %1$s %2$s.</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">Grazie. Il tuo pagamento è in corso. Per favore, inviaci una email a support&#64;mega.co.nz se non hai ricevuto il tuo upgrade entro 24 ore.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Il tuo nuovo abbonamento diventerà effettivo quando scadrà l’abbonamento corrente, il nuovo prezzo ti verrà addebitato in quel momento.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -649,8 +647,8 @@
     <string name="upload_uploaded">caricato</string>
     <!-- Status text at the beginning of an upload, Status text at the beginning of an upload for 2 or more files -->
     <plurals name="upload_prepare">
-        <item quantity="one">Processing file</item>
-        <item quantity="other">Processing files</item>
+        <item quantity="one">Processando il file</item>
+        <item quantity="other">Processando i file</item>
     </plurals>
     <!-- error message when downloading a file -->
     <string name="error_temporary_unavaible">Risorsa temporaneamente non disponibile, riprova più tardi</string>
@@ -661,19 +659,17 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problema del file system</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">An error occurred when browsing local files.</string>
+    <string name="general_error">C’è stato un errore durante lo sfoglio dei file locali.</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Visualizzatore di immagini</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Used storage space</string>
+    <string name="my_account_used_space">Spazio di archiviazione utilizzato</string>
     <!-- menu item -->
     <string name="my_account_change_password">Modifica password</string>
     <!-- Dialog text overquota error -->
     <string name="overquota_alert_text">Hai superato il limite del tuo spazio di archiviazione. Vuoi fare l’upgrade ad un account PRO?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Ultima sessione</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Connessioni</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Modifica della password</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -685,11 +681,11 @@
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
     <string name="my_account_change_password_dont_match">Le password non combaciano</string>
     <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">Select plan</string>
+    <string name="upgrade_select_pricing">Seleziona piano</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Mensilmente o Annualmente</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">There is no payment method set for this plan currently. Please select one.</string>
+    <string name="no_available_payment_method">Non c’è un metodo di pagamento impostato al momento per questo piano. Per favore, selezionane uno.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Mensilmente*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -699,7 +695,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">L’anteprima non è ancora stata scaricata. Per favore, attendi</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Not enough free memory to display preview. Please try again later.</string>
+    <string name="not_load_preview_low_memory">Non c’è abbastanza spazio libero per mostrare l’anteprima. Per favore, riprova più tardi.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Per favore, effettua il logout prima di creare l’account</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -713,7 +709,7 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Attiva le notifiche delle chiamate MEGA in arrivo</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">Please grant MEGA permission to display over other apps for calls.</string>
+    <string name="ask_for_display_over_msg">Per favore, dai a MEGA il permesso di stare sopra alle altre app durante le chiamate.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
     <string name="ask_for_display_over_explain">You can still manually grant permissions in the device Settings.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
@@ -2597,9 +2593,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Chat archiviate (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Archive chat</string>
+    <string name="archive_chat_option">Sposta chat nell’archivio</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Unarchive chat</string>
+    <string name="unarchive_chat_option">Togli chat dall’archivio</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archivia</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -3343,13 +3339,13 @@
     <string name="invite_contact_action_button">Invita un amico tramite&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">1 file already downloaded.</item>
-        <item quantity="other">%d files already downloaded.</item>
+        <item quantity="one">1 file già scaricato.</item>
+        <item quantity="other">%d file già scaricati.</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">1 file pending.</item>
-        <item quantity="other">%d files pending.</item>
+        <item quantity="one">1 file in attesa.</item>
+        <item quantity="other">%d file in attesa.</item>
     </plurals>
     <!-- Title of the login screen -->
     <string name="login_to_mega">Effettua il login in MEGA</string>
@@ -3360,7 +3356,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Chat</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Nessun file nelle tue[/B] [A]Attività recenti[/A]</string>
+    <string name="context_empty_recents">[B]No files in [/B][A]Recents[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s e altri %2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3421,8 +3417,8 @@
     <string name="business_management_alert">La gestione degli utenti è possibile solo da un browser desktop.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Utilizzo</string>
-    <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Storage usage breakdown</string>
+    <!-- Title of usage storage details section in My Account -->
+    <string name="usage_storage_details_label">Scomposizione dell’utilizzo dell’archivio</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Utilizzo complessivo</string>
     <!-- Title of transfer section in Storage -->
@@ -3748,14 +3744,10 @@
     <string name="button_copy_key">Copia chiave</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Copia password</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">Link copiato negli appunti.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">Chiave copiata negli appunti.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Password copiata negli appunti.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">Link inviato con successo.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">Link e chiave inviati con successo.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -3887,7 +3879,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">File aggiornato</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">Aggiornamento del file fallito. Riprova.</string>
+    <string name="file_update_failed">File update failed. Please try again.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">Il file è troppo grande e non può essere aperto o visualizzato in anteprima.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -3897,7 +3889,7 @@
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
     <string name="file_extension_change_title">Cambio dell’estensione file</string>
     <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
-    <string name="file_extension_change_warning">You might not be able to open this file if you change its extension.</string>
+    <string name="file_extension_change_warning">Potresti non riuscire ad aprire questo se cambi la sua estensione.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">È già presente un file con lo stesso nome</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
@@ -3950,49 +3942,107 @@
     <!-- Content to show in a Snackbar to tip the incompatibility-->
     <string name="version_incompatibility">We are upgrading MEGAchat. Your calls might not be connected due to version incompatibility unless all parties update their MEGA apps to the latest version.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
-    <string name="file_already_downloaded_and_file_pending_download">1 file already downloaded. 1 file pending.</string>
+    <string name="file_already_downloaded_and_file_pending_download">1 file già scaricato. 1 file in attesa.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
-    <string name="file_already_downloaded_and_files_pending_download">1 file already downloaded. %d files pending.</string>
+    <string name="file_already_downloaded_and_files_pending_download">1 file già scaricato. %d file in attesa.</string>
     <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
-    <string name="files_already_downloaded_and_file_pending_download">%d files already downloaded. 1 file pending.</string>
+    <string name="files_already_downloaded_and_file_pending_download">%d file già scaricati. 1 file in attesa.</string>
     <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d files already downloaded. %2$d files pending.</string>
+    <string name="files_already_downloaded_and_files_pending_download">%1$d file già scaricati. %2$d in attesa.</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 item moved to the Rubbish Bin successfully and 1 item was not sent successfully</string>
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 oggetto spostato nel Cestino con successo e 1 oggetto non eliminato correttamente</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 item moved to the Rubbish Bin successfully and %d items were not sent successfully</string>
+    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 oggetto spostato nel Cestino con successo e %d oggetti non eliminati correttamente</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d items moved to the Rubbish Bin successfully and 1 item was not sent successfully</string>
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d oggetti spostati nel Cestino con successo e 1 oggetto non eliminato correttamente</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d items moved to the Rubbish Bin successfully and %2$d items were not sent successfully</string>
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d oggetti spostati nel Cestino con successo e %2$d oggetti non eliminati correttamente</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
-    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 item restored successfully and 1 item was not restored successfully</string>
+    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 oggetto ripristinato con successo e 1 oggetto non ripristinato correttamente</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 item restored successfully and %d items were not restored successfully</string>
+    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 oggetto ripristinato con successo e %d oggetti non ripristinati correttamente</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d items restored successfully and 1 item was not restored successfully</string>
+    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d oggetti ripristinati con successo e 1 oggetto non ripristinato correttamente</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d items restored successfully and %2$d items were not restored successfully</string>
+    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d oggetti ripristinati con successo e %2$d oggetti non ripristinati correttamente</string>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to the Rubbish Bin successfully</item>
-        <item quantity="other">%d items moved to the Rubbish Bin successfully</item>
+        <item quantity="one">1 oggetto spostato nel Cestino con successo</item>
+        <item quantity="other">%d oggetti spostati nel Cestino con successo</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item was not moved to the Rubbish Bin successfully</item>
-        <item quantity="other">%d items were not moved to the Rubbish Bin successfully</item>
+        <item quantity="one">1 oggetto non spostato nel Cestino correttamente</item>
+        <item quantity="other">%d oggetti non spostati nel Cestino correttamente</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item restored successfully</item>
-        <item quantity="other">%d items restored successfully</item>
+        <item quantity="one">1 oggetto ripristinato con successo</item>
+        <item quantity="other">%d oggetti ripristinati con successo</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item was not restored successfully</item>
-        <item quantity="other">%d items were not restored successfully</item>
+        <item quantity="one">1 oggetto non ripristinato correttamente</item>
+        <item quantity="other">%d oggetti non ripristinati correttamente</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
-    <string name="action_change_anyway">Change anyway</string>
+    <string name="action_change_anyway">Cambia lo stesso</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Serve il permesso per accedere all’archivio.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">Aggiungi il tuo numero di telefono</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">Ricordi la tua password?\nMEGA non può resettare la tua password nel caso in cui tu la dimentichi.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">Cambia nome</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">Aggiungi foto</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">Aggiungi numero di telefono</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">MEGA needs write permissions to your device storage to continue.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">Tomorrow, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">In attesa della conferma</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="one">1 connection</item>
+        <item quantity="other">%1$d connections</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Aggiunto recentemente</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Richieste</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Gruppi</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Copy all</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Link successfully sent.</item>
+        <item quantity="other">Links successfully sent.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link copied to the clipboard.</item>
+        <item quantity="other">Links copied to the clipboard.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Get Link</item>
+        <item quantity="other">Get Links</item>
+    </plurals>
 </resources>

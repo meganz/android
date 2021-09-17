@@ -414,8 +414,6 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Delete link</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">Obține linkul</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Părăsește</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">Părăsește partajarea</string>
@@ -617,8 +615,8 @@
     <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Abonamentul tău nu a fost anulat. Te rugăm să oferi un motiv pentru anulare</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">Îți mulțumim că te-ai abonat la %1$s %2$s!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">Thanks. Your payment is processing. Please email us at support&#64;mega.co.nz if you have not received your upgrade within 24 hours.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Noul tău abonament se va aplica odată ce cel actual expiră, noul preț va fi perceput la acel moment.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -680,8 +678,6 @@
     <string name="overquota_alert_text">Ai depășit limita de stocare. Dorești să upgradezi contul?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Ultima sesiune</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Conexiuni</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Se modifică parola</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -1177,13 +1173,13 @@
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">Editează</string>
     <!-- Alert Dialog to get link -->
-    <string name="title_set_expiry_date">Setează data de expirare</string>
+    <string name="title_set_expiry_date">Setează o dată de expirare</string>
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Setează protecție prin parolă</string>
     <!-- Subtitle of the dialog to get link -->
     <string name="subtitle_set_expiry_date">(NUMAI PRO)</string>
     <!-- Alert Dialog to get link with password -->
-    <string name="set_password_protection_dialog">Setează parolă</string>
+    <string name="set_password_protection_dialog">Setează o parolă</string>
     <!-- Hint of the dialog to get link with password -->
     <string name="hint_set_password_protection_dialog">Introdu parola</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -1342,7 +1338,7 @@
     <!-- Title of the section to choose the sound of incoming messages in the Contact Properties screen -->
     <string name="title_properties_chat_contact_message_sound">Sunet la mesaje</string>
     <!-- Title of the section to clear the chat content in the Contact Properties screen -->
-    <string name="title_properties_chat_clear_chat">Golește chatul</string>
+    <string name="title_properties_chat_clear_chat">Șterge chatul</string>
     <!-- Title of the section to share the contact in the Contact Properties screen -->
     <string name="title_properties_chat_share_contact">Partajează contactul</string>
     <!-- Title of the screen to select the ringtone of the calls -->
@@ -1352,9 +1348,9 @@
     <!-- Button to clear the chat history -->
     <string name="general_clear">Șterge</string>
     <!-- Message show when the history of a chat has been successfully deleted -->
-    <string name="clear_history_success">Istoricul chatului a fost golit</string>
+    <string name="clear_history_success">Istoricul chatului a fost șters</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">S-a produs o eroare. Istoricul chatului nu a fost golit cu succes</string>
+    <string name="clear_history_error">S-a produs o eroare. Istoricul chatului nu a fost șters cu succes</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Adaugă participanți</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1392,7 +1388,7 @@
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message_by">[A]Acest mesaj a fost șters de către [/A][B]%1$s[/B]</string>
     <!-- Confirmation before deleting messages -->
-    <string name="confirmation_delete_several_messages">Elimini mesaje?</string>
+    <string name="confirmation_delete_several_messages">Elimini mesajele?</string>
     <!-- Confirmation before deleting one message -->
     <string name="confirmation_delete_one_message">Elimini mesajul?</string>
     <!-- Label for the sliding panel of a group chat -->
@@ -1458,9 +1454,9 @@
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Acest mesaj a fost șters de către %1$s</string>
     <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">Istoricul chatului a fost golit</string>
+    <string name="history_cleared_message">Istoricul chatului a fost șters</string>
     <!-- Text shown when the chat history was cleared by someone -->
-    <string name="non_format_history_cleared_by">Istoricul chatului a fost golit de către %1$s</string>
+    <string name="non_format_history_cleared_by">Istoricul chatului a fost șters de către %1$s</string>
     <!-- chat message when the permissions for a user has been changed -->
     <string name="non_format_message_permissions_changed">%1$s a fost schimbat în %2$s de către %3$s</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -1474,11 +1470,11 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Copiat în clipboard</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Eroare privind chatul!</string>
+    <string name="chat_error_open_title">Eroare privind chatul</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Chatul nu a putut fi deschis cu succes</string>
     <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_choose_contact">Alege contactul</string>
+    <string name="menu_choose_contact">Alege un contact</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contact</item>
@@ -1490,13 +1486,13 @@
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
         <item quantity="one">Toate datele asociate cu contactul selectat vor fi pierdute definitiv.</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">Toate datele asociate cu contactele selectate vor fi pierdute definitiv.</item>
         <item quantity="other">Toate datele asociate cu contactele selectate vor fi pierdute definitiv.</item>
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
         <item quantity="one">Elimini contactul?</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">Elimini contactele?</item>
         <item quantity="other">Elimini contactele?</item>
     </plurals>
     <!-- option shown when a message could not be sent -->
@@ -1506,11 +1502,11 @@
     <!-- title of the menu for an uploading message with attachment -->
     <string name="title_message_uploading_options">Se încarcă atașamentul</string>
     <!-- message shown when a chat has no messages -->
-    <string name="no_conversation_history">Niciun istoric al conversațiilor</string>
+    <string name="no_conversation_history">Niciun istoric al conversației</string>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]tastează&#8230;[/A]</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">%1$s [A]tastează&#8230;[/A]</item>
         <item quantity="other">%1$s [A]tastează&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
@@ -1781,9 +1777,9 @@
     <!-- text_copyright_alert_second_paragraph -->
     <string name="copyright_alert_second_paragraph">Ai interdicția strică de a folosi serviciul de stocare în cloud MEGA pentru încălcarea drepturilor de autor. Nu poți încărca, descărca, stoca, partaja, afișa, distribui, reda în flux, trimite e-mail, oferi link, transmite sau altfel pune la dispoziție fișiere, date sau conținut care încalcă orice drept de autor sau alte drepturi de proprietate ale unei persoane sau entități.</string>
     <!-- text of the Agree button -->
-    <string name="copyright_alert_agree_button">De acord</string>
+    <string name="copyright_alert_agree_button">Sunt de acord</string>
     <!-- text of the Disagree button -->
-    <string name="copyright_alert_disagree_button">Dezacord</string>
+    <string name="copyright_alert_disagree_button">Nu sunt de acord</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">Afișează informații</string>
     <!-- Error message when removing public links of nodes. Plural. -->
@@ -2101,7 +2097,7 @@
     <!-- Message show when a call cannot be established -->
     <string name="call_error">An error has occurred and the call cannot be connected.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Like the MEGA Mobile App?</string>
+    <string name="title_evaluate_the_app_panel">Îți place aplicația mobilă MEGA?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Da, evaluează aplicația</string>
     <!-- Label to show send feedback -->
@@ -3432,7 +3428,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Chaturi</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Niciun fișier în [/B][A]Recente[/A]</string>
+    <string name="context_empty_recents">[B]No files in [/B][A]Recents[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s și încă %2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3493,7 +3489,7 @@
     <string name="business_management_alert">Gestionarea utilizatorilor este disponibilă doar de pe un browser web de desktop.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Utilizare</string>
-    <!-- Title of usage storage details section in Storage -->
+    <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">Storage usage breakdown</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Utilizare generală</string>
@@ -3746,7 +3742,7 @@
     <!-- Subtitle of the section to clear the chat content in the Manage chat history screen -->
     <string name="subtitle_properties_chat_clear">Delete all messages and files shared in this conversation. This action is irreversible.</string>
     <!-- Title of the history retention option -->
-    <string name="title_properties_history_retention">Curățarea istoricului</string>
+    <string name="title_properties_history_retention">Ștergerea istoricului</string>
     <!-- Subtitle of the history retention option when history retention is disabled -->
     <string name="subtitle_properties_history_retention">Șterge automat mesajele mai vechi de o anumită perioadă de timp.</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled -->
@@ -3756,40 +3752,40 @@
     <!-- SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week -->
     <string name="history_retention_option_one_week">O săptămână</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month -->
-    <string name="history_retention_option_one_month">One month</string>
+    <string name="history_retention_option_one_month">O lună</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted -->
-    <string name="history_retention_option_custom">Custom</string>
+    <string name="history_retention_option_custom">Personalizat</string>
     <!-- Title of the Manage chat history screen -->
-    <string name="title_properties_manage_chat">Manage chat history</string>
+    <string name="title_properties_manage_chat">Gestionează istoricul chatului</string>
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Șterge automat mesajele mai vechi de:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Sigur vrei să golești istoricul complet al mesajelor din această conversație?</string>
+    <string name="confirmation_clear_chat_history">Sigur vrei să ștergi istoricul complet al mesajelor din această conversație?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 an</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
     <plurals name="retention_time_picker_hours">
         <item quantity="one">oră</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">ore</item>
+        <item quantity="few">ore</item>
+        <item quantity="other">de ore</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <plurals name="retention_time_picker_days">
         <item quantity="one">zi</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">zile</item>
+        <item quantity="few">zile</item>
+        <item quantity="other">de zile</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several weeks -->
     <plurals name="retention_time_picker_weeks">
         <item quantity="one">săptămână</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">săptămâni</item>
+        <item quantity="few">săptămâni</item>
+        <item quantity="other">de săptămâni</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several months -->
     <plurals name="retention_time_picker_months">
         <item quantity="one">lună</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">luni</item>
+        <item quantity="few">luni</item>
+        <item quantity="other">de luni</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates a year -->
     <string name="retention_time_picker_year">an</string>
@@ -3807,11 +3803,12 @@
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
-        <item quantity="one">1 month</item>
-        <item quantity="other">%1$d months</item>
+        <item quantity="one">1 lună</item>
+        <item quantity="few">%1$d luni</item>
+        <item quantity="other">%1$d de luni</item>
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
-    <string name="title_select_transfers">Select transfers</string>
+    <string name="title_select_transfers">Selectează transferurile</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
     <string name="change_of_transfer_priority_failed">Modificarea priorității transferului „%1$s” a eșuat.</string>
     <!-- Title option to send separated the link and decryption key -->
@@ -3828,16 +3825,12 @@
     <string name="button_copy_key">Copiază cheia</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Copiază parola</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">Link copied to the clipboard.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Key copied to the clipboard.</string>
+    <string name="key_copied_clipboard">Cheie copiată în clipboard.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Parolă copiată în clipboard.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">Link successfully sent.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">Link and key successfully sent.</string>
+    <string name="link_and_key_sent">Linkul și cheia trimise cu succes.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_password_sent">Linkul și parola trimise cu succes.</string>
     <!-- Title of a warning recommending upgrade to Pro -->
@@ -3847,13 +3840,13 @@
     <!-- Meaning of links decryption key -->
     <string name="decryption_key_explanation">Sistemul nostru de criptare capăt-la-capăt necesită o cheie unică generată automat pentru acest fișier. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
     <!-- Reset password label -->
-    <string name="reset_password_label">Restează parola</string>
+    <string name="reset_password_label">Resetează parola</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
-    <string name="share_key_warning">Share the key for this link?</string>
+    <string name="share_key_warning">Partajezi cheia pentru acest link?</string>
     <!-- Warning show to the user when has set a password protection of a link and tries to share the link -->
-    <string name="share_password_warning">Share the password for this link?</string>
+    <string name="share_password_warning">Partajezi parola pentru acest link?</string>
     <!-- Button which action is share the password of a link -->
-    <string name="button_share_password">Share password</string>
+    <string name="button_share_password">Partajează parola</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
     <string name="share_link_with_key">Link: %1$s\n\nKey: %2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
@@ -4079,4 +4072,62 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Modifică oricum</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Permission needed to access storage.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">Adaugă numărul tău de telefon</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">Îți mai aduci aminte parola?\nMEGA nu îți poate reseta parola dacă o uiți.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">Modifică name</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">Add photo</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">Adaugă un număr de telefon</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">MEGA needs write permissions to your device storage to continue.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">Tomorrow, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">În așteptarea confirmării</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="one">1 connection</item>
+        <item quantity="other">%1$d connections</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Adăugate recent</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Cereri</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Grupuri</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Copy all</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Link successfully sent.</item>
+        <item quantity="other">Links successfully sent.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link copied to the clipboard.</item>
+        <item quantity="other">Links copied to the clipboard.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Get Link</item>
+        <item quantity="other">Get Links</item>
+    </plurals>
 </resources>
