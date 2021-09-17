@@ -18,10 +18,10 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
@@ -30,7 +30,6 @@ import mega.privacy.android.app.lollipop.TestPasswordActivity
 import mega.privacy.android.app.lollipop.VerifyTwoFactorActivity
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask
 import mega.privacy.android.app.myAccount.usecase.*
 import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.*
@@ -65,8 +64,9 @@ class MyAccountViewModel @ViewModelInject constructor(
     private val getFileVersionsOptionUseCase: GetFileVersionsOptionUseCase,
     private val queryRecoveryLinkUseCase: QueryRecoveryLinkUseCase,
     private val confirmCancelAccountUseCase: ConfirmCancelAccountUseCase,
-    private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase
-) : BaseRxViewModel(), FilePrepareTask.ProcessedFilesCallback {
+    private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase,
+    private val filePrepareUseCase: FilePrepareUseCase
+) : BaseRxViewModel() {
 
     companion object {
         private const val CLICKS_TO_CHANGE_API_SERVER = 5
@@ -317,9 +317,25 @@ class MyAccountViewModel @ViewModelInject constructor(
 
                 data.action = Intent.ACTION_GET_CONTENT
                 processingFile.value = true
-                FilePrepareTask(this).execute(data)
+                prepareAvatarFile(data)
             }
         }
+    }
+
+    /**
+     * Prepares a file to be set as avatar.
+     *
+     * @param data Intent containing the file to be set as avatar.
+     */
+    private fun prepareAvatarFile(data: Intent) {
+        filePrepareUseCase.prepareFile(data)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { info -> addProfileAvatar(info.fileAbsolutePath) },
+                onError = { error -> logWarning(error.message) }
+            )
+            .addTo(composite)
     }
 
     /**
@@ -551,10 +567,6 @@ class MyAccountViewModel @ViewModelInject constructor(
                 onError = { snackbarShower.showSnackbar(getString(R.string.error_deleting_user_avatar)) }
             )
             .addTo(composite)
-    }
-
-    override fun onIntentProcessed(info: MutableList<ShareInfo>) {
-        addProfileAvatar(info[0].fileAbsolutePath)
     }
 
     /**
