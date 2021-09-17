@@ -927,7 +927,7 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 					((ManagerActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isURL()) {
-					manageURLNode(requireContext(), megaApi, nodes.get(position));
+					manageURLNode(context, megaApi, nodes.get(position));
 				} else if (MimeTypeList.typeForName(nodes.get(position).getName()).isOpenableTextFile(nodes.get(position).getSize())) {
 					manageTextFileIntent(requireContext(), nodes.get(position), SEARCH_ADAPTER);
 				} else{
