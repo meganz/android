@@ -78,13 +78,12 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         if (nodeOffline != null) {
             optionInfoText.setText(R.string.general_info);
 
-            if (MimeTypeList.typeForName(nodeOffline.getName()).isVideoReproducible() || MimeTypeList.typeForName(nodeOffline.getName()).isVideo() || MimeTypeList.typeForName(nodeOffline.getName()).isAudio()
-                    || MimeTypeList.typeForName(nodeOffline.getName()).isImage() || MimeTypeList.typeForName(nodeOffline.getName()).isPdf()) {
-                optionOpenWith.setVisibility(View.VISIBLE);
-                separatorOpen.setVisibility(View.VISIBLE);
-            } else {
+            if (nodeOffline.isFolder()) {
                 optionOpenWith.setVisibility(View.GONE);
                 separatorOpen.setVisibility(View.GONE);
+            } else {
+                optionOpenWith.setVisibility(View.VISIBLE);
+                separatorOpen.setVisibility(View.VISIBLE);
             }
 
             nodeName.setText(nodeOffline.getName());
@@ -162,6 +161,15 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
     }
 
     private void openWith() {
+        if (MimeTypeList.typeForName(nodeOffline.getName()).isURL()) {
+            Uri uri = Uri.parse(getURLOfflineFileContent(file));
+
+            if (uri != null) {
+                startActivity(new Intent(Intent.ACTION_VIEW).setData(uri));
+                return;
+            }
+        }
+
         String type = MimeTypeList.typeForName(nodeOffline.getName()).getType();
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 

@@ -10,7 +10,6 @@ import android.view.Display;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 
@@ -29,9 +28,6 @@ public class BaseFragment extends Fragment {
     protected DisplayMetrics outMetrics;
 
     protected Activity mActivity;
-
-    /** The Loader to load Google Ads for this fragment */
-    protected GoogleAdsLoader mAdsLoader;
 
     public BaseFragment() {
         app = MegaApplication.getInstance();
@@ -59,16 +55,5 @@ public class BaseFragment extends Fragment {
 
     public DisplayMetrics getOutMetrics() {
         return outMetrics;
-    }
-
-    /**
-     * Init the Ads Loader and associate it with the Ad Slot
-     * Add it as the fragment lifecycle observer
-     * @param adSlot the Ads Slot Id, defined by API side
-     * @param loadImmediate load the Ads immediately or not
-     */
-    protected void initAdsLoader(String adSlot, Boolean loadImmediate) {
-        mAdsLoader = new GoogleAdsLoader(context, adSlot, loadImmediate);
-        getLifecycle().addObserver(mAdsLoader);
     }
 }

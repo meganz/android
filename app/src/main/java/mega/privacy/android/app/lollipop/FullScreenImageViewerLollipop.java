@@ -245,6 +245,7 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 		inflater.inflate(R.menu.activity_full_screen_image_viewer, menu);
 
 		getlinkIcon = menu.findItem(R.id.full_image_viewer_get_link);
+		getlinkIcon.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
 		getlinkIcon.setVisible(false);
 		removelinkIcon = menu.findItem(R.id.full_image_viewer_remove_link);
 		removelinkIcon.setVisible(false);

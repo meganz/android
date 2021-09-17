@@ -50,6 +50,7 @@ public class Constants {
     public static final int REQUEST_CODE_PICK_GIF = 1034;
     public static final int REQUEST_CODE_SEND_LINK = 1035;
     public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
+    public static final int REQUEST_CODE_SEND_SEVERAL_LINKS = 1037;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
@@ -81,6 +82,7 @@ public class Constants {
 
     public static final String EXTRA_STORAGE_STATE = "STORAGE_STATE";
     public static final String EXTRA_LINK = "EXTRA_LINK";
+    public static final String EXTRA_SEVERAL_LINKS = "EXTRA_SEVERAL_LINKS";
     public static final String EXTRA_KEY = "EXTRA_KEY";
     public static final String EXTRA_PASSWORD = "EXTRA_PASSWORD";
 
@@ -260,14 +262,12 @@ public class Constants {
     public static final String ACTION_SHARE_MSG = "ACTION_SHARE_MSG";
     public static final String ACTION_SHARE_NODE = "ACTION_SHARE_NODE";
     public static final String ACTION_REMOVE_LINK = "ACTION_REMOVE_LINK";
-    public static final String ACTION_GET_LINK = "ACTION_GET_LINK";
 
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN = "INTENT_FILTER_UPDATE_FULL_SCREEN";
 
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
-    public static final String BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS = "INTENT_UPDATE_2FA_SETTINGS";
     public static final String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE = "INTENT_CONNECTIVITY_CHANGE";
     public static final String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG = "INTENT_CONNECTIVITY_CHANGE_DIALOG";
     public static final String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
@@ -587,6 +587,7 @@ public class Constants {
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String NAME = "name";
     public static final String HANDLE = "handle";
+    public static final String HANDLE_LIST = "HANDLE_LIST";
     public static final String EMAIL = "email";
     public static final String UNKNOWN_USER_NAME_AVATAR = "unknown";
     public static final String VISIBLE_FRAGMENT = "VISIBLE_FRAGMENT";
@@ -647,6 +648,9 @@ public class Constants {
     public static final int THUMB_MARGIN_DP = 16;
     public static final int ICON_SIZE_DP = 48;
     public static final int ICON_MARGIN_DP = 12;
+
+    public static final float ALPHA_VIEW_DISABLED = 0.3f;
+    public static final float ALPHA_VIEW_ENABLED = 1.0f;
 
     // Thumbnail dimens for Browse file page
     public static final int THUMBNAIL_SIZE_DP = 36;
@@ -855,4 +859,6 @@ public class Constants {
     public final static float MAX_WIDTH_APPBAR_PORT = 200;
 
     public static final long ANIMATION_DURATION = 400;
+
+    public static final String URL_INDICATOR = "URL=";
 }

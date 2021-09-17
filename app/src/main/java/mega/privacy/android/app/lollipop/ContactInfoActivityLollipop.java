@@ -988,8 +988,9 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 		}
 		List<MegaUser> userList = new ArrayList<MegaUser>();
 		userList.add(user);
-		ContactController cC = new ContactController(this);
-		cC.pickFileToSend(userList);
+
+		Intent intent = ContactController.getPickFileToSendIntent(this, userList);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
 	}
 
 	public void sendMessageToChat(){
@@ -1222,7 +1223,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 					return;
 				}
 
-				chatC.selectChatsToAttachContact(user);
+				Intent intent = ChatController.getSelectChatsToAttachContactIntent(this, user);
+				startActivityForResult(intent, REQUEST_CODE_SELECT_CHAT);
 				break;
 			}
 			case R.id.chat_contact_properties_shared_folders_button:

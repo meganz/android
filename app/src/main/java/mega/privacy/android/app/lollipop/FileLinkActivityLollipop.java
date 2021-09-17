@@ -55,7 +55,6 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogH
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListenerLink;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.service.ads.GoogleAdsLoader;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -79,7 +78,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		SnackbarShower {
 
 	private static final String TAG_DECRYPT = "decrypt";
-	private static final String AD_SLOT = "and5";
 
 	FileLinkActivityLollipop fileLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -132,8 +130,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 
 	@Inject
     CookieDialogHandler cookieDialogHandler;
-
-	private GoogleAdsLoader mAdsLoader;
 
 	@Override
 	public void onDestroy(){
@@ -263,7 +259,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		}
 
 		fragmentContainer.post(() -> cookieDialogHandler.showDialogIfNeeded(this));
-		initAdsLoader();
 	}
 
 	@Override
@@ -271,17 +266,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		super.onConfigurationChanged(newConfig);
 
 		cookieDialogHandler.showDialogIfNeeded(this, true);
-	}
-
-	/**
-	 * Init the Ads Loader and associate it with tht Ad Slot
-	 * Add it as the fragment lifecycle observer
-	 * Set the Ads view container to the Ads Loader
-	 */
-	private void initAdsLoader() {
-		mAdsLoader = new GoogleAdsLoader(this, AD_SLOT, false);
-		getLifecycle().addObserver(mAdsLoader);
-		mAdsLoader.setAdViewContainer(findViewById(R.id.ad_view_container), getOutMetrics());
 	}
 
 	@Override
@@ -508,8 +492,6 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 					dbH.setLastPublicHandle(handle);
 					dbH.setLastPublicHandleTimeStamp();
 					dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
-
-					mAdsLoader.queryShowOrNotByHandle(handle);
 				}
 
 //				nameView.setText(document.getName());

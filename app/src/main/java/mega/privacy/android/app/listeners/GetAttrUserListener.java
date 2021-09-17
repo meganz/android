@@ -84,7 +84,7 @@ public class GetAttrUserListener extends BaseListener {
 
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateFirstName(context, request.getText(), request.getEmail());
+                    updateFirstName(request.getText(), request.getEmail());
                     MegaUser user = api.getContact(request.getEmail());
                     if (user != null) {
                         notifyFirstNameUpdate(context, user.getHandle());
@@ -94,7 +94,7 @@ public class GetAttrUserListener extends BaseListener {
 
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateLastName(context, request.getText(), request.getEmail());
+                    updateLastName(request.getText(), request.getEmail());
                     MegaUser user = api.getContact(request.getEmail());
                     if (user != null) {
                         notifyLastNameUpdate(context, user.getHandle());
