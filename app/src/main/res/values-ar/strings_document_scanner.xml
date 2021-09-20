@@ -1,51 +1,51 @@
 <?xml version="1.0"?>
 <resources>
-  <!-- Screen title for cropping current scan (Document scanner) -->
-  <string name="scan_title_crop">قص</string>
-  <!-- Screen title for saving current scan (Document scanner) -->
-  <string name="scan_title_save_scan">حفظ المسح الضوئي</string>
-  <!-- Label of the button to add a new page to the current document scan -->
-  <string name="scan_action_add">اضافة</string>
-  <!-- Action of a button to save something -->
-  <string name="scan_action_save">حفظ</string>
-  <!-- Action text to retake current scan picture (Document scanner) -->
-  <string name="scan_action_retake">إعادة إلتقاط</string>
-  <!-- Document scanner file name -->
-  <string name="scan_file_name">اسم الملف</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_file_type">نوع الملف</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_quality">جودة</string>
-  <!-- Input field description in the document save screen (Document scanner) -->
-  <string name="scan_destination">الوجهة</string>
-  <!-- Document scanner high quality option -->
-  <string name="scan_quality_high">عالية</string>
-  <!-- Document scanner medium quality option -->
-  <string name="scan_quality_medium">متوسطة</string>
-  <!-- Document scanner low quality option -->
-  <string name="scan_quality_low">منخفضة</string>
-  <!-- Title text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_title">تجاهل المسح الضوئي؟</string>
-  <!-- Body text shown on document scanner dialog to discard scan -->
-  <string name="scan_dialog_discard_body">سيتم فقدان المسح الضوئي الحالي</string>
-  <!-- Title text shown on document scanner dialog to discard scan all scans -->
-  <string name="scan_dialog_discard_all_title">تجاهل جميع مستندات المسح الضوئي؟</string>
-  <!-- Body text shown on document scanner dialog to discard all scans -->
-  <string name="scan_dialog_discard_all_body">سيتم فقدان المستند الحالي</string>
-  <!-- Action text shown on document scanner dialog to discard scans -->
-  <string name="scan_dialog_discard_action">تجاهل</string>
-  <!-- Body text shown on document scanner dialog to delete current scan -->
-  <string name="scan_dialog_delete_body">حذف المسح الضوئي الحالي؟</string>
-  <!-- Message shown when users deny camera permissions to scan documents -->
-  <string name="scan_requires_permission">تحتاج إلى إعطاء إذن الوصول للكاميرا لمسح المستندات ضوئيًا</string>
-  <!-- Error text for incorrect name -->
-  <string name="scan_incorrect_name">اسم غير صحيح</string>
-  <!-- Error text for invalid characters -->
-  <string name="scan_invalid_characters">عناصر غير صالحة</string>
-  <!-- Snackbar text for incorrect name -->
-  <string name="scan_snackbar_incorrect_name">صحح اسم الملف قبل المتابعة</string>
-  <!-- Dialog message showing file progress -->
-  <string name="scan_dialog_progress">جاري التحضير%1$s. يرجى الانتظار&#8230;</string>
-  <!-- Error shown when the user writes a character not allowed -->
-  <string name="scan_snackbar_invalid_characters">الأحرف التالية غير مسموح بها: ” * / : &lt; &gt; ? \ |</string>
+    <!-- Screen title for cropping current scan (Document scanner) -->
+    <string name="scan_title_crop">قص</string>
+    <!-- Screen title for saving current scan (Document scanner) -->
+    <string name="scan_title_save_scan">حفظ المسح الضوئي</string>
+    <!-- Label of the button to add a new page to the current document scan -->
+    <string name="scan_action_add">اضافة</string>
+    <!-- Action of a button to save something -->
+    <string name="scan_action_save">حفظ</string>
+    <!-- Action text to retake current scan picture (Document scanner) -->
+    <string name="scan_action_retake">إعادة إلتقاط</string>
+    <!-- Document scanner file name -->
+    <string name="scan_file_name">اسم الملف</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_file_type">نوع الملف</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_quality">جودة</string>
+    <!-- Input field description in the document save screen (Document scanner) -->
+    <string name="scan_destination">الوجهة</string>
+    <!-- Document scanner high quality option -->
+    <string name="scan_quality_high">عالية</string>
+    <!-- Document scanner medium quality option -->
+    <string name="scan_quality_medium">متوسطة</string>
+    <!-- Document scanner low quality option -->
+    <string name="scan_quality_low">منخفضة</string>
+    <!-- Title text shown on document scanner dialog to discard scan -->
+    <string name="scan_dialog_discard_title">تجاهل المسح الضوئي؟</string>
+    <!-- Body text shown on document scanner dialog to discard scan -->
+    <string name="scan_dialog_discard_body">سيتم فقدان المسح الضوئي الحالي</string>
+    <!-- Title text shown on document scanner dialog to discard scan all scans -->
+    <string name="scan_dialog_discard_all_title">تجاهل جميع مستندات المسح الضوئي؟</string>
+    <!-- Body text shown on document scanner dialog to discard all scans -->
+    <string name="scan_dialog_discard_all_body">سيتم فقدان المستند الحالي</string>
+    <!-- Action text shown on document scanner dialog to discard scans -->
+    <string name="scan_dialog_discard_action">تجاهل</string>
+    <!-- Body text shown on document scanner dialog to delete current scan -->
+    <string name="scan_dialog_delete_body">حذف المسح الضوئي الحالي؟</string>
+    <!-- Message shown when users deny camera permissions to scan documents -->
+    <string name="scan_requires_permission">تحتاج إلى إعطاء إذن الوصول للكاميرا لمسح المستندات ضوئيًا</string>
+    <!-- Error text for incorrect name -->
+    <string name="scan_incorrect_name">الاسم غير صالح</string>
+    <!-- Error text for invalid characters -->
+    <string name="scan_invalid_characters">عناصر غير صالحة</string>
+    <!-- Snackbar text for incorrect name -->
+    <string name="scan_snackbar_incorrect_name">يرجى تصحيح اسم الملف الخاص بك قبل المتابعة</string>
+    <!-- Dialog message showing file progress -->
+    <string name="scan_dialog_progress">جاري التحضير%1$s. يرجى الانتظار&#8230;</string>
+    <!-- Error shown when the user writes a character not allowed -->
+    <string name="scan_snackbar_invalid_characters">الأحرف التالية غير مسموح بها: ” * / : &lt; &gt; ? \ |</string>
 </resources>

@@ -2,11 +2,9 @@ package mega.privacy.android.app.components.dragger
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.util.DisplayMetrics
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.ViewTreeObserver
+import android.view.*
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -22,6 +20,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import java.util.*
+
 
 /**
  * Class that encapsulate all logic related to drag to exit support, and the enter animation.
@@ -74,7 +73,7 @@ class DragToExitSupport(
         draggable.setDragListener(this)
 
         val shadow = ImageView(context)
-        shadow.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_alpha_060));
+        shadow.setBackgroundColor(ContextCompat.getColor(context, R.color.grey_alpha_060))
 
         container.addView(
             shadow, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
@@ -134,22 +133,33 @@ class DragToExitSupport(
                 val thumbnailLocation =
                     launchIntent.getIntArrayExtra(INTENT_EXTRA_KEY_SCREEN_POSITION)
 
-                val displayMetrics = DisplayMetrics()
-                mainView.display.getMetrics(displayMetrics)
-
                 val leftDelta: Float
                 val topDelta: Float
                 val widthScale: Float
                 val heightScale: Float
 
                 if (thumbnailLocation == null) {
-                    leftDelta =
-                        displayMetrics.widthPixels / 2 - mainViewLocation[LOCATION_INDEX_LEFT].toFloat()
-                    topDelta =
-                        displayMetrics.heightPixels / 2 - mainViewLocation[LOCATION_INDEX_TOP].toFloat()
+                    val width: Int
+                    val height: Int
 
-                    widthScale = displayMetrics.widthPixels / 4 / mainView.width.toFloat()
-                    heightScale = displayMetrics.heightPixels / 4 / mainView.height.toFloat()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        val windowMetrics: WindowMetrics =
+                            context.getSystemService(WindowManager::class.java).currentWindowMetrics
+                        width = windowMetrics.bounds.width()
+                        height = windowMetrics.bounds.height()
+                    } else {
+                        val displayMetrics = DisplayMetrics()
+                        @Suppress("DEPRECATION")
+                        mainView.display.getMetrics(displayMetrics)
+                        width = displayMetrics.widthPixels
+                        height = displayMetrics.heightPixels
+                    }
+
+                    leftDelta = width / 2 - mainViewLocation[LOCATION_INDEX_LEFT].toFloat()
+                    topDelta = height / 2 - mainViewLocation[LOCATION_INDEX_TOP].toFloat()
+
+                    widthScale = width / 4 / mainView.width.toFloat()
+                    heightScale = height / 4 / mainView.height.toFloat()
                 } else {
                     leftDelta =
                         (thumbnailLocation[LOCATION_INDEX_LEFT] - mainViewLocation[LOCATION_INDEX_LEFT]).toFloat()
@@ -379,7 +389,8 @@ class DragToExitSupport(
                     val location = getThumbnailLocation(thumbnail)
                     if (!it.visible && location != null) {
                         LiveEventBus.get(
-                            EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION, ThumbnailLocationEvent::class.java
+                            EVENT_DRAG_TO_EXIT_THUMBNAIL_LOCATION,
+                            ThumbnailLocationEvent::class.java
                         ).post(ThumbnailLocationEvent(viewerFrom, location))
                     }
                 }

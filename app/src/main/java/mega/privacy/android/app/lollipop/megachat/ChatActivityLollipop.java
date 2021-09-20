@@ -32,7 +32,6 @@ import android.provider.MediaStore;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
@@ -82,6 +81,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.BuildConfig;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -89,6 +91,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.components.BubbleDrawable;
@@ -134,7 +137,6 @@ import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
@@ -200,6 +202,7 @@ import static mega.privacy.android.app.utils.LinksUtil.isMEGALinkAndRequiresTran
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
@@ -209,6 +212,9 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class ChatActivityLollipop extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
         MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener,
@@ -291,6 +297,9 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     private final static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
     private final static int TYPE_MESSAGE_NEW_MESSAGE = 1;
+
+    @Inject
+    FilePrepareUseCase filePrepareUseCase;
 
     private int currentRecordButtonState;
     private String mOutputFilePath;
@@ -3058,14 +3067,9 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     private boolean checkPermissions(String permission, int requestCode) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-
-        boolean hasPermission = (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED);
-
+        boolean hasPermission = hasPermissions(this, permission);
         if (!hasPermission) {
-            ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+            requestPermission(this, requestCode, permission);
             return false;
         }
 
@@ -3141,7 +3145,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 break;
             }
             case LOCATION_PERMISSION_REQUEST_CODE: {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                if (hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                     intent.putExtra(EDITING_MESSAGE, editingMessage);
                     if (messageToEdit != null) {
@@ -3336,18 +3340,23 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
 
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-            filePrepareTask.execute(intent);
-            ProgressDialog temp = null;
-            try{
-                temp = new ProgressDialog(this);
-                temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
-                temp.show();
-            }
-            catch(Exception e){
+
+            try {
+                statusDialog = new ProgressDialog(this);
+                statusDialog.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
+                statusDialog.show();
+            } catch (Exception e) {
                 return;
             }
-            statusDialog = temp;
+
+            filePrepareUseCase.prepareFiles(intent)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((shareInfo, throwable) -> {
+                        if (throwable == null) {
+                            onIntentProcessed(shareInfo);
+                        }
+                    });
         }
         else if (requestCode == REQUEST_CODE_SELECT_CHAT) {
             isForwardingMessage = false;
@@ -3818,13 +3827,9 @@ public class ChatActivityLollipop extends PasscodeActivity
                         handlerEmojiKeyboard.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    boolean hasStoragePermission = (ContextCompat.checkSelfPermission(chatActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                                    if (!hasStoragePermission) {
-                                        ActivityCompat.requestPermissions(chatActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_STORAGE);
-                                    } else {
-                                        chatActivity.attachFromFileStorage();
-                                    }
+                                boolean hasStoragePermission = hasPermissions(chatActivity, Manifest.permission.READ_EXTERNAL_STORAGE);
+                                if (!hasStoragePermission) {
+                                    requestPermission(chatActivity, REQUEST_READ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
                                 } else {
                                     chatActivity.attachFromFileStorage();
                                 }
@@ -3837,10 +3842,9 @@ public class ChatActivityLollipop extends PasscodeActivity
                         }
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                            boolean hasStoragePermission = hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE);
                             if (!hasStoragePermission) {
-                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_STORAGE);
-
+                                requestPermission(this, REQUEST_READ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
                             } else {
                                 this.attachFromFileStorage();
                             }
@@ -3928,10 +3932,9 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
-        }
-        else {
+        if (!hasPermissions(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            requestPermission(this, LOCATION_PERMISSION_REQUEST_CODE, Manifest.permission.ACCESS_FINE_LOCATION);
+        } else {
             Intent intent =  new Intent(getApplicationContext(), MapsActivity.class);
             intent.putExtra(EDITING_MESSAGE, editingMessage);
             if (messageToEdit != null) {
@@ -8317,10 +8320,12 @@ public class ChatActivityLollipop extends PasscodeActivity
         outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
     }
 
-    /*
-	 * Handle processed upload intent
-	 */
-    public void onIntentProcessed(List<ShareInfo> infos) {
+    /**
+     * Handle processed upload intent.
+     *
+     * @param infos List<ShareInfo> containing all the upload info.
+     */
+    private void onIntentProcessed(List<ShareInfo> infos) {
         logDebug("onIntentProcessedLollipop");
 
         if (infos == null) {

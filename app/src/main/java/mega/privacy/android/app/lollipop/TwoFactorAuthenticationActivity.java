@@ -43,6 +43,7 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_2FA_UPDATED;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_NEW_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.*;
@@ -612,9 +614,7 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
     }
 
     void update2FASetting () {
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS);
-        intent.putExtra(INTENT_EXTRA_KEY_ENABLED, true);
-        sendBroadcast(intent);
+        LiveEventBus.get(EVENT_2FA_UPDATED, Boolean.class).post(true);
     }
 
     void pasteClipboard() {

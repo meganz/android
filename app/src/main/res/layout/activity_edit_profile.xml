@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:id="@+id/container_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <include
+        android:id="@+id/header_layout"
+        layout="@layout/collapsing_app_bar_contact" />
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:id="@+id/options_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/change_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/change_name_action"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+
+            <include
+                android:id="@+id/change_name_separator"
+                layout="@layout/view_linear_layout_separator_16" />
+
+            <TextView
+                android:id="@+id/add_photo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/add_photo_action"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+
+            <include layout="@layout/view_linear_layout_separator_16" />
+
+            <TextView
+                android:id="@+id/change_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/change_mail_title_last_step"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+
+            <include
+                android:id="@+id/change_email_separator"
+                layout="@layout/view_linear_layout_separator_16" />
+
+            <TextView
+                android:id="@+id/change_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/my_account_change_password"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+
+            <include layout="@layout/view_linear_layout_separator_16" />
+
+            <LinearLayout
+                android:id="@+id/add_phone_number_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/add_phone_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="@string/add_phone_number_action"
+                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+
+                <include layout="@layout/view_linear_layout_separator" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/recovery_key_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/recovery_key_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="11dp"
+                    android:layout_marginTop="12dp"
+                    android:src="@drawable/ic_text_list"
+                    tool:ignore="ContentDescription" />
+
+                <LinearLayout
+                    android:id="@+id/recovery_key_text_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="13dp"
+                    android:layout_toEndOf="@+id/recovery_key_icon"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/recovery_key_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="@string/recovery_key_bottom_sheet"
+                        android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+
+                    <TextView
+                        android:id="@+id/recovery_key_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="@string/backup_recovery_key_subtitle"
+                        android:textAppearance="@style/TextAppearance.Mega.Body2.Grey54White54" />
+
+                    <Button
+                        android:id="@+id/recovery_key_button"
+                        style="@style/Widget.Mega.Button.Transparent"
+                        android:layout_marginStart="-5dp"
+                        android:text="@string/action_export_master_key" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <include layout="@layout/view_linear_layout_separator" />
+
+            <Button
+                android:id="@+id/logout_button"
+                style="@style/Widget.Mega.Button.Variant1"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginEnd="20dp"
+                android:text="@string/action_logout" />
+
+            <TextView
+                android:id="@+id/logout_warning_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="20dp"
+                android:textAppearance="@style/TextAppearance.Mega.Caption.Grey38Grey400"
+                tool:text="When you logout, files from your Offline section will be deleted from your device." />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleLargeInverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

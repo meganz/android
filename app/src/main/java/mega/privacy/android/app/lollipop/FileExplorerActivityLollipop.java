@@ -44,9 +44,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -56,6 +57,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -70,7 +72,6 @@ import mega.privacy.android.app.lollipop.megachat.ChatExplorerListItem;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
@@ -118,6 +119,8 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+import javax.inject.Inject;
+
 @AndroidEntryPoint
 public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		implements MegaRequestListenerInterface, MegaGlobalListenerInterface,
@@ -136,6 +139,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
     public static final String EXTRA_SHARE_ACTION = "share_action";
     public static final String EXTRA_SHARE_TYPE = "share_type";
     public static final String EXTRA_PARENT_HANDLE = "parent_handle";
+    public static final String EXTRA_SELECTED_FOLDER = "selected_folder";
 
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -166,6 +170,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	private static final int SHOW_TABS = 3;
 	private boolean isChatFirst;
 	private static final int DEFAULT_TAB_TO_REMOVE = -1;
+
+	@Inject
+	FilePrepareUseCase filePrepareUseCase;
 
 	private DatabaseHandler dbH;
 	private MegaPreferences prefs;
@@ -1664,10 +1671,12 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	/*
-	 * Handle processed upload intent
+	/**
+	 * Handle processed upload intent.
+	 *
+	 * @param infos List<ShareInfo> containing all the upload info.
 	 */
-	public void onIntentChatProcessed(List<ShareInfo> infos) {
+	private void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentChatProcessed");
 
 		if (getIntent() != null && getIntent().getAction() != ACTION_PROCESSED) {
@@ -1912,7 +1921,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			if(selectFile)
 			{
 				Intent intent = new Intent();
-				intent.putExtra("SELECT", handle);
+				intent.putExtra(EXTRA_SELECTED_FOLDER, handle);
 				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
@@ -1925,7 +1934,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				}
 
 				Intent intent = new Intent();
-				intent.putExtra("SELECT", parentNode.getHandle());
+				intent.putExtra(EXTRA_SELECTED_FOLDER, parentNode.getHandle());
 				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
@@ -2567,27 +2576,23 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					chatIntent.setAction(ACTION_CHAT_SUMMARY);
 					startActivity(chatIntent);
 				}
-			}
-			else{
-				if (filePreparedInfos == null){
-					FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-					filePrepareTask.execute(getIntent());
-					createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
-				}
-				else{
-                    onIntentChatProcessed(filePreparedInfos);
-				}
+
+				return Unit.INSTANCE;
 			}
 		}
-		else{
-			if (filePreparedInfos == null){
-				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-				filePrepareTask.execute(getIntent());
-				createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
-			}
-			else{
-				onIntentChatProcessed(filePreparedInfos);
-			}
+
+		if (filePreparedInfos == null) {
+			createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
+			filePrepareUseCase.prepareFiles(intent)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((shareInfo, throwable) -> {
+						if (throwable == null) {
+							onIntentProcessed(shareInfo);
+						}
+					});
+		} else {
+			onIntentProcessed(filePreparedInfos);
 		}
 
 		return Unit.INSTANCE;

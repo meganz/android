@@ -52,7 +52,7 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted;
-import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardDirName;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
@@ -437,7 +437,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             };
 
             if (!hasPermissions(context, PERMISSIONS)) {
-                ActivityCompat.requestPermissions((CameraUploadsPreferencesActivity) context, PERMISSIONS, REQUEST_CAMERA_UPLOAD);
+                requestPermission((CameraUploadsPreferencesActivity) context, REQUEST_CAMERA_UPLOAD, PERMISSIONS);
             } else {
                 ((CameraUploadsPreferencesActivity) context).checkIfShouldShowBusinessCUAlert();
             }
@@ -523,6 +523,9 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                     dbH.setSecondaryUploadEnabled(true);
                     // To prevent user switch on/off rapidly. After set backup, will be re-enabled.
                     secondaryMediaFolderOn.setEnabled(false);
+                    localSecondaryFolder.setEnabled(false);
+                    megaSecondaryFolder.setEnabled(false);
+
                     if (handleSecondaryMediaFolder == null || handleSecondaryMediaFolder == INVALID_HANDLE) {
                         megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads);
                     }
@@ -999,6 +1002,8 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         getPreferenceScreen().addPreference(secondaryMediaFolderOn);
         // To prevent user switch on/off rapidly. After set backup, will be re-enabled.
         cameraUploadOnOff.setEnabled(false);
+        localCameraUploadFolder.setEnabled(false);
+        megaCameraFolder.setEnabled(false);
 
         MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE));
     }
@@ -1213,9 +1218,25 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 if (cameraUploadOnOff != null) {
                     cameraUploadOnOff.setEnabled(true);
                 }
+
+                if (localCameraUploadFolder != null) {
+                    localCameraUploadFolder.setEnabled(true);
+                }
+
+                if (megaCameraFolder != null) {
+                    megaCameraFolder.setEnabled(true);
+                }
             case BACKUP_TYPE_MEDIA_UPLOADS:
                 if (secondaryMediaFolderOn != null) {
                     secondaryMediaFolderOn.setEnabled(true);
+                }
+
+                if (localSecondaryFolder != null) {
+                    localSecondaryFolder.setEnabled(true);
+                }
+
+                if (megaSecondaryFolder != null) {
+                    megaSecondaryFolder.setEnabled(true);
                 }
         }
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly">
 
@@ -17,7 +18,9 @@
         android:xlargeScreens="true"
         android:anyDensity="true"/>
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -38,9 +41,25 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
 
     <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
     <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
+
+    <queries>
+        <!-- Camera -->
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+
+        <!-- Content opened outside the app -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="application/*"/>
+        </intent>
+    </queries>
 
     <application
         android:name="mega.privacy.android.app.MegaApplication"
@@ -279,9 +298,8 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.activities.GetLinkActivity"
-            android:configChanges="screenSize|orientation"
-            android:label="@string/context_get_link_menu">
+            android:name="mega.privacy.android.app.getLink.GetLinkActivity"
+            android:configChanges="screenSize|orientation">
         </activity>
 
         <activity
@@ -416,9 +434,9 @@
             android:label="@string/app_name">
         </activity>
 
-        <activity android:name="mega.privacy.android.app.SMSVerificationActivity" />
+        <activity android:name="mega.privacy.android.app.smsVerification.SMSVerificationActivity" />
 
-        <activity android:name="mega.privacy.android.app.SMSVerificationReceiveTxtActivity"/>
+        <activity android:name="mega.privacy.android.app.smsVerification.SMSVerificationReceiveTxtActivity"/>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity"
@@ -503,6 +521,10 @@
             android:name="mega.privacy.android.app.textEditor.TextEditorActivity"
             android:launchMode="singleTop">
         </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.contacts.ContactsActivity"
+            android:launchMode="singleTop" />
 
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
@@ -627,6 +649,28 @@
             android:screenOrientation="sensorPortrait"
             android:theme="@style/DocumentScannerTheme"
             android:windowSoftInputMode="stateHidden|adjustNothing"/>
+
+        <activity
+            android:name="mega.privacy.android.app.myAccount.editProfile.EditProfileActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.myAccount.MyAccountActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity"
+            android:label="@string/action_upgrade_account"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.upgradeAccount.ChooseAccountActivity"
+            android:label="@string/choose_account_fragment"
+            android:launchMode="singleTop" />
 
         <receiver android:name=".psa.AlarmReceiver">
             <intent-filter>

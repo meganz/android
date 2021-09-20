@@ -45,10 +45,7 @@ public class QueryRecoveryLinkListener extends BaseListener {
                 case MegaError.API_OK:
                     Intent intent = null;
 
-                    if (matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEXS)) {
-                        intent = new Intent(openLinkActivity, ManagerActivityLollipop.class);
-                        intent.setAction(ACTION_CANCEL_ACCOUNT);
-                    } else if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
+                    if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
                         intent = new Intent(openLinkActivity, LoginActivityLollipop.class);
                         intent.putExtra(VISIBLE_FRAGMENT, TOUR_FRAGMENT);
                         if (request.getFlag()) {
@@ -56,9 +53,6 @@ public class QueryRecoveryLinkListener extends BaseListener {
                         } else {
                             intent.setAction(ACTION_PARK_ACCOUNT);
                         }
-                    } else if (matchRegexs(url, VERIFY_CHANGE_MAIL_LINK_REGEXS)) {
-                        intent = new Intent(openLinkActivity, ManagerActivityLollipop.class);
-                        intent.setAction(ACTION_CHANGE_MAIL);
                     }
 
                     if (intent != null) {
@@ -69,17 +63,13 @@ public class QueryRecoveryLinkListener extends BaseListener {
                     break;
 
                 case MegaError.API_EEXPIRED:
-                    if (matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEXS)) {
-                        openLinkActivity.setError(openLinkActivity.getString(R.string.cancel_link_expired));
-                    } else if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
+                    if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
                         openLinkActivity.setError(openLinkActivity.getString(R.string.recovery_link_expired));
                     }
                     break;
 
                 case MegaError.API_EACCESS:
-                    if (matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEXS)
-                            || matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)
-                            || matchRegexs(url, VERIFY_CHANGE_MAIL_LINK_REGEXS)) {
+                    if (matchRegexs(url, RESET_PASSWORD_LINK_REGEXS)) {
                         logWarning("Error opening link not related to this account: " + e.getErrorString() + "___" + e.getErrorCode());
                         openLinkActivity.setError(openLinkActivity.getString(R.string.error_not_logged_with_correct_account));
                     }
