@@ -97,7 +97,7 @@ public class SettingsChatFragment extends SettingsBaseFragment {
         }
 
         /*Chat video quality*/
-        chatAttachmentsChatListPreference.setValue(dbH.getChatVideoQuality() + "");
+        chatAttachmentsChatListPreference.setValueIndex(dbH.getChatVideoQuality());
         chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
 
         /*Rich URL Previews*/
@@ -175,7 +175,7 @@ public class SettingsChatFragment extends SettingsBaseFragment {
             case KEY_CHAT_SEND_ORIGINALS:
                 newStatus = Integer.parseInt((String) newValue);
                 dbH.setChatVideoQuality(newStatus);
-                chatAttachmentsChatListPreference.setValue(newStatus + "");
+                chatAttachmentsChatListPreference.setValueIndex(newStatus);
                 chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
                 break;
         }

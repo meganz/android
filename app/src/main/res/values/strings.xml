@@ -2278,10 +2278,12 @@
     <string name="settings_video_upload_quality">Video Quality</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
         <item>Original quality</item>
+        <item>High quality</item>
         <item>Medium quality</item>
+        <item>Low quality</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Missed call</string>
@@ -3660,7 +3662,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">This message has reached the maximum limit of %d reactions.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] changed the message clearing time to [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Clear chat history</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->

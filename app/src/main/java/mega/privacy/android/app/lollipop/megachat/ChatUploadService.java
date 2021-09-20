@@ -392,7 +392,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 
 			if (pendingMsg != null) {
-				sendOriginalAttachments = dbH.getChatVideoQuality() != VIDEO_QUALITY_ORIGINAL;
+				sendOriginalAttachments = dbH.getChatVideoQuality() == VIDEO_QUALITY_ORIGINAL;
 				logDebug("sendOriginalAttachments is " + sendOriginalAttachments);
 
 				if (chatId != -1) {
