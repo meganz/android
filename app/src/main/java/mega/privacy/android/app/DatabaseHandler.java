@@ -31,6 +31,8 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
 
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE;
@@ -42,7 +44,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 62;
+	private static final int DATABASE_VERSION = 63;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -157,7 +159,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_CHAT_NOTIFICATIONS_ENABLED = "chatnotifications";
 	private static final String KEY_CHAT_SOUND_NOTIFICATIONS = "chatnotificationsound";
 	private static final String KEY_CHAT_VIBRATION_ENABLED = "chatvibrationenabled";
-	private static final String KEY_CHAT_SEND_ORIGINALS = "sendoriginalsattachments";
+	private static final String KEY_CHAT_VIDEO_QUALITY = "chatvideoQuality";
 
 	private static final String KEY_INVALIDATE_SDK_CACHE = "invalidatesdkcache";
 
@@ -432,7 +434,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
 				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " + KEY_CHAT_SOUND_NOTIFICATIONS + " TEXT, "
-				+ KEY_CHAT_VIBRATION_ENABLED + " BOOLEAN, " + KEY_CHAT_SEND_ORIGINALS + " BOOLEAN" + ")";
+				+ KEY_CHAT_VIBRATION_ENABLED + " BOOLEAN, " + KEY_CHAT_VIDEO_QUALITY + " TEXT" + ")";
 		db.execSQL(CREATE_CHAT_TABLE);
 
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("
@@ -768,11 +770,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_SHOW_COPYRIGHT + " = '" + encrypt("true") + "';");
 		}
 
-		if (oldVersion <= 36){
-			db.execSQL("ALTER TABLE " + TABLE_CHAT_SETTINGS + " ADD COLUMN " + KEY_CHAT_SEND_ORIGINALS + " BOOLEAN;");
-			db.execSQL("UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SEND_ORIGINALS + " = '" + encrypt("false") + "';");
-		}
-
 		if (oldVersion <= 37){
 			db.execSQL("ALTER TABLE " + TABLE_CHAT_ITEMS + " ADD COLUMN " + KEY_CHAT_ITEM_WRITTEN_TEXT + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_CHAT_ITEMS + " SET " + KEY_CHAT_ITEM_WRITTEN_TEXT + " = '" + "" + "';");
@@ -922,6 +919,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
 			onCreate(db);
 			setAttributes(db, attr);
+		}
+
+		if (oldVersion <= 62 && oldVersion > 52) {
+			ChatSettings chatSettings = getChatSettingsFromDBv62(db);
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
+			onCreate(db);
+			setChatSettings(db, chatSettings);
 		}
 	}
 
@@ -1683,7 +1687,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String vibrationEnabled = decrypt(cursor.getString(4));
 				String chatStatus = decrypt(cursor.getString(5));
 				String sendOriginalAttachments = decrypt(cursor.getString(6));
-				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, sendOriginalAttachments);
+				String videoQuality = Boolean.parseBoolean(sendOriginalAttachments)
+						? VIDEO_QUALITY_ORIGINAL + ""
+						: VIDEO_QUALITY_MEDIUM + "";
+
+				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, videoQuality);
+			}
+		} catch (Exception e) {
+			logError("Exception opening or managing DB cursor", e);
+		}
+		return chatSettings;
+	}
+
+	/**
+	 * Get chat settings from the DB v62 (previous to remove the setting to enable/disable
+	 * the send original attachments). KEY_CHAT_SEND_ORIGINALS has been removed in DB v63.
+	 * @return Chat settings.
+	 */
+	private ChatSettings getChatSettingsFromDBv62(SQLiteDatabase db){
+		logDebug("getChatSettings");
+		ChatSettings chatSettings = null;
+
+		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
+		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
+			if (cursor != null && cursor.moveToFirst()) {
+				String notificationSound = decrypt(cursor.getString(2));
+				String vibrationEnabled = decrypt(cursor.getString(3));
+				String sendOriginalAttachments = decrypt(cursor.getString(4));
+				String videoQuality = Boolean.parseBoolean(sendOriginalAttachments)
+						? VIDEO_QUALITY_ORIGINAL + ""
+						: VIDEO_QUALITY_MEDIUM + "";
+
+				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, videoQuality);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -1704,8 +1739,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			if (cursor != null && cursor.moveToFirst()) {
 				String notificationSound = decrypt(cursor.getString(2));
 				String vibrationEnabled = decrypt(cursor.getString(3));
-				String sendOriginalAttachments = decrypt(cursor.getString(4));
-				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, sendOriginalAttachments);
+				String videoQuality = decrypt(cursor.getString(4));
+				chatSettings = new ChatSettings(notificationSound, vibrationEnabled, videoQuality);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -1737,26 +1772,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_CHAT_NOTIFICATIONS_ENABLED, "");
 		values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.getNotificationsSound()));
 		values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(chatSettings.getVibrationEnabled()));
-		values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(chatSettings.getSendOriginalAttachments()));
+		values.put(KEY_CHAT_VIDEO_QUALITY, encrypt(chatSettings.getVideoQuality()));
 
 		db.insert(TABLE_CHAT_SETTINGS, null, values);
 	}
 
-	public void setSendOriginalAttachments(String originalAttachments){
-        logDebug("setEnabledChat");
-		String selectQuery = "SELECT * FROM " + TABLE_CHAT_SETTINGS;
-		ContentValues values = new ContentValues();
-		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null && cursor.moveToFirst()) {
-				String UPDATE_CHAT_TABLE = "UPDATE " + TABLE_CHAT_SETTINGS + " SET " + KEY_CHAT_SEND_ORIGINALS + "= '" + encrypt(originalAttachments) + "' WHERE " + KEY_ID + " = '1'";
-				db.execSQL(UPDATE_CHAT_TABLE);
-			} else {
-				values.put(KEY_CHAT_SEND_ORIGINALS, encrypt(originalAttachments));
-				db.insert(TABLE_CHAT_SETTINGS, null, values);
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
+	public void setChatVideoQuality(int chatVideoQuality){
+        logDebug("setChatVideoQuality");
+        setIntValue(TABLE_CHAT_SETTINGS, KEY_CHAT_VIDEO_QUALITY, chatVideoQuality);
+	}
+
+	public int getChatVideoQuality(){
+		logDebug("setChatVideoQuality");
+		return getIntValue(TABLE_CHAT_SETTINGS, KEY_CHAT_VIDEO_QUALITY, VIDEO_QUALITY_MEDIUM);
 	}
 
 	public void setNotificationSoundChat(String sound){

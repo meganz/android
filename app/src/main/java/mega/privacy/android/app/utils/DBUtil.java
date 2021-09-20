@@ -174,20 +174,4 @@ public class DBUtil {
             return true;
         }
     }
-
-    public static boolean isSendOriginalAttachments() {
-        dbH = MegaApplication.getInstance().getDbH();
-
-        if (dbH != null) {
-            ChatSettings chatSettings = dbH.getChatSettings();
-
-            if (chatSettings != null) {
-                return Boolean.parseBoolean(chatSettings.getSendOriginalAttachments());
-            } else {
-                return false;
-            }
-        }
-
-        return false;
-    }
 }
