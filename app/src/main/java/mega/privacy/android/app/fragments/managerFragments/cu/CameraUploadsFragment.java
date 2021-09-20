@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -17,7 +18,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.app.ActivityCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -33,6 +33,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
@@ -69,6 +70,8 @@ import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 @AndroidEntryPoint
 public class CameraUploadsFragment extends BaseFragment implements CUGridViewAdapter.Listener,
         CUCardViewAdapter.Listener {
@@ -87,6 +90,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     private static final int SPAN_LARGE_GRID = 3;
     private static final int SPAN_SMALL_GRID_PORTRAIT = 5;
     private static final int SPAN_SMALL_GRID_LANDSCAPE = 7;
+
+    private static final int CAMERA_SETTINGS_RESULT_CODE = 100;
 
     @Inject
     SortOrderManagement sortOrderManagement;
@@ -182,7 +187,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
         mManagerActivity.setFirstLogin(false);
         viewModel.setEnableCUShown(false);
-        startCU();
+        showCameraUploadTip();
     }
 
     private void startCU() {
@@ -269,6 +274,16 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         setupOtherViews();
         observeLiveData();
         viewModel.getCards();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == CAMERA_SETTINGS_RESULT_CODE) {
+            logDebug("resultCode = "+resultCode);
+            startCU();
+        }
     }
 
     public void setViewTypes(LinearLayout cuViewTypes, TextView cuYearsButton,
@@ -701,4 +716,33 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     public void setDefaultView() {
         newViewClicked(ALL_VIEW);
     }
+
+    /**
+     * Show the dialog that can direct to the Camera Upload settings.
+     */
+    public void showCameraUploadTip(){
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.title_dcim_folder_dialog)
+                .setMessage(R.string.content_dcim_folder_dialog)
+                .setPositiveButton(R.string.action_settings, (dialog, which) -> enableCameraUpload(dialog, true))
+                .setNegativeButton(R.string.general_cancel, (dialog, which) -> enableCameraUpload(dialog, false))
+                .show()
+                .setCanceledOnTouchOutside(false);
+    }
+
+    /**
+     * Enable camera upload
+     *
+     * @param dialog The dialog that was dismissed will be passed into the method
+     * @param needSettings Need redirect to Settings or not
+     */
+    private void enableCameraUpload(DialogInterface dialog, Boolean needSettings) {
+        if (needSettings) {
+            startActivityForResult(new Intent(context, CameraUploadsPreferencesActivity.class),CAMERA_SETTINGS_RESULT_CODE);
+        } else {
+            startCU();
+        }
+        dialog.dismiss();
+    }
+
 }
