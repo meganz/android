@@ -39,11 +39,11 @@
     <!-- Message shown when users deny camera permissions to scan documents -->
     <string name="scan_requires_permission">تحتاج إلى إعطاء إذن الوصول للكاميرا لمسح المستندات ضوئيًا</string>
     <!-- Error text for incorrect name -->
-    <string name="scan_incorrect_name">اسم غير صالح</string>
+    <string name="scan_incorrect_name">الاسم غير صالح</string>
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">عناصر غير صالحة</string>
     <!-- Snackbar text for incorrect name -->
-    <string name="scan_snackbar_incorrect_name">صحح اسم الملف قبل المتابعة</string>
+    <string name="scan_snackbar_incorrect_name">يرجى تصحيح اسم الملف الخاص بك قبل المتابعة</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">جاري التحضير%1$s. يرجى الانتظار&#8230;</string>
     <!-- Error shown when the user writes a character not allowed -->

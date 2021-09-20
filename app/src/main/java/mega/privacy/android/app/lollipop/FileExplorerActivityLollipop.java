@@ -44,7 +44,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.Unit;
@@ -122,7 +121,7 @@ import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		implements MegaRequestListenerInterface, MegaGlobalListenerInterface,
 		MegaChatRequestListenerInterface, View.OnClickListener, MegaChatListenerInterface,
-		ActionNodeCallback, SnackbarShower {
+		ActionNodeCallback, SnackbarShower, FilePrepareTask.ProcessedFilesCallback {
 
 	private final static String SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH";
 	private final static String QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH";
@@ -136,6 +135,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
     public static final String EXTRA_SHARE_ACTION = "share_action";
     public static final String EXTRA_SHARE_TYPE = "share_type";
     public static final String EXTRA_PARENT_HANDLE = "parent_handle";
+    public static final String EXTRA_SELECTED_FOLDER = "selected_folder";
 
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -1664,10 +1664,11 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	/*
+	/**
 	 * Handle processed upload intent
 	 */
-	public void onIntentChatProcessed(List<ShareInfo> infos) {
+	@Override
+	public void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentChatProcessed");
 
 		if (getIntent() != null && getIntent().getAction() != ACTION_PROCESSED) {
@@ -1912,7 +1913,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			if(selectFile)
 			{
 				Intent intent = new Intent();
-				intent.putExtra("SELECT", handle);
+				intent.putExtra(EXTRA_SELECTED_FOLDER, handle);
 				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
@@ -1925,7 +1926,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				}
 
 				Intent intent = new Intent();
-				intent.putExtra("SELECT", parentNode.getHandle());
+				intent.putExtra(EXTRA_SELECTED_FOLDER, parentNode.getHandle());
 				intent.putStringArrayListExtra(SELECTED_CONTACTS, selectedContacts);
 				setResult(RESULT_OK, intent);
 				finishActivity();
@@ -2575,7 +2576,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 				}
 				else{
-                    onIntentChatProcessed(filePreparedInfos);
+                    onIntentProcessed(filePreparedInfos);
 				}
 			}
 		}
@@ -2586,7 +2587,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				createAndShowProgressDialog(false, getQuantityString(R.plurals.upload_prepare, 1));
 			}
 			else{
-				onIntentChatProcessed(filePreparedInfos);
+				onIntentProcessed(filePreparedInfos);
 			}
 		}
 

@@ -88,6 +88,9 @@ class ActionModeCallback constructor(
         val selectedNodes = viewModel.selectedNodes.value!!.map { it.node }
         val control = CloudStorageOptionControlUtil.Control()
 
+        menu?.findItem(R.id.cab_menu_share_link)?.title =
+            StringResourcesUtils.getQuantityString(R.plurals.get_links, selectedNodes.size)
+
         if (selectedNodes.size == 1
             && megaApi.checkAccess(selectedNodes[0], MegaShare.ACCESS_OWNER).errorCode
             == MegaError.API_OK

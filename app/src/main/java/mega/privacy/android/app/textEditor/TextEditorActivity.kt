@@ -33,8 +33,8 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
@@ -246,6 +246,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.activity_text_file_editor, menu)
         this.menu = menu
+
+        menu?.findItem(R.id.action_get_link)?.title =
+            StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
 
         refreshMenuOptionsVisibility()
 

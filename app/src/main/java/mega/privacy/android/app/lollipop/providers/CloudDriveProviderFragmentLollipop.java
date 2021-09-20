@@ -37,6 +37,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -98,6 +99,9 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			logDebug("onPrepareActionMode");
 			List<MegaNode> selected = adapter.getSelectedNodes();
+
+			menu.findItem(R.id.cab_menu_share_link)
+					.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
 
 			boolean showDownload = false;
 			boolean showRename = false;

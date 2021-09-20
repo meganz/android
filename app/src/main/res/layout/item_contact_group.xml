@@ -1,0 +1,64 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:minHeight="56dp">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/img_thumbnail_last"
+        android:layout_width="@dimen/image_group_size"
+        android:layout_height="@dimen/image_group_size"
+        android:layout_marginStart="29dp"
+        android:layout_marginTop="21dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:roundAsCircle="true"
+        app:roundingBorderColor="@color/white"
+        app:roundingBorderWidth="@dimen/image_group_border_size"
+        tools:placeholderImage="@android:drawable/ic_menu_camera" />
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/img_thumbnail_first"
+        android:layout_width="@dimen/image_group_size"
+        android:layout_height="@dimen/image_group_size"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="9dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:roundAsCircle="true"
+        app:roundingBorderColor="@color/white"
+        app:roundingBorderWidth="@dimen/image_group_border_size"
+        tools:placeholderImage="@android:drawable/ic_menu_camera" />
+
+    <androidx.emoji.widget.EmojiAppCompatTextView
+        android:id="@+id/txt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Mega.Body1"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/img_private"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/img_thumbnail_last"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginEnd="16dp"
+        tools:text="@tools:sample/full_names" />
+
+    <ImageView
+        android:id="@+id/img_private"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_private_chat"
+        app:tint="@color/teal_300"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

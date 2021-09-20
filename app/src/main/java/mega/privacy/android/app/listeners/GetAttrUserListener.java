@@ -7,7 +7,6 @@ import mega.privacy.android.app.AuthenticityCredentialsActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
@@ -85,7 +84,7 @@ public class GetAttrUserListener extends BaseListener {
 
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateFirstName(context, request.getText(), request.getEmail());
+                    updateFirstName(request.getText(), request.getEmail());
                     MegaUser user = api.getContact(request.getEmail());
                     if (user != null) {
                         notifyFirstNameUpdate(context, user.getHandle());
@@ -95,7 +94,7 @@ public class GetAttrUserListener extends BaseListener {
 
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateLastName(context, request.getText(), request.getEmail());
+                    updateLastName(request.getText(), request.getEmail());
                     MegaUser user = api.getContact(request.getEmail());
                     if (user != null) {
                         notifyLastNameUpdate(context, user.getHandle());
@@ -127,11 +126,7 @@ public class GetAttrUserListener extends BaseListener {
                 Intent intent = new Intent(ACTION_UPDATE_RB_SCHEDULER);
 
                 if (e.getErrorCode() == MegaError.API_ENOENT) {
-                    MyAccountInfo myAccountInfo = MegaApplication.getInstance().getMyAccountInfo();
-                    if (myAccountInfo == null)
-                        break;
-
-                    intent.putExtra(DAYS_COUNT, myAccountInfo.getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE
+                    intent.putExtra(DAYS_COUNT, MegaApplication.getInstance().getMyAccountInfo().getAccountType() == MegaAccountDetails.ACCOUNT_TYPE_FREE
                             ? DAYS_USER_FREE
                             : DAYS_USER_PRO);
                 } else {

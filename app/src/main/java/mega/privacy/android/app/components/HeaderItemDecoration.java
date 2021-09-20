@@ -15,7 +15,7 @@ public class HeaderItemDecoration extends SimpleDividerItemDecoration {
 
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
-        initItemDecoration(c, parent);
+        checkIfIsInitialized(c, parent);
 
         for (int i = 0; i < childCount; i++) {
             View child = parent.getChildAt(i);
