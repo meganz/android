@@ -13,7 +13,7 @@
             type="mega.privacy.android.app.fragments.homepage.photos.PhotosViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -39,10 +39,18 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_gravity="end"
             app:visibleGone="@{viewModel.items.size() > (viewModel.searchMode ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <include
+            android:id="@+id/photos_view_type"
+            layout="@layout/cu_view_type_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="@dimen/cu_view_type_button_vertical_margin"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

@@ -194,7 +194,7 @@ class TypedNodesFetcher(
         getThumbnailsFromServer()
 
         if(zoom == ZoomUtil.ZOOM_IN_1X) {
-            getPreviewsFromServer()
+            getPreviewsFromServer(getPreviewNodes, ::refreshLiveData)
         }
     }
 
@@ -258,8 +258,8 @@ class TypedNodesFetcher(
         }
     }
 
-    private suspend fun getPreviewsFromServer() {
-        for (item in getPreviewNodes) {
+    suspend fun getPreviewsFromServer(map: MutableMap<MegaNode, String>, refreshCallback: () -> Unit) {
+        for (item in map) {
             megaApi.getPreview(
                 item.key,
                 item.value,
@@ -278,7 +278,7 @@ class TypedNodesFetcher(
                             }
                         }
 
-                        refreshLiveData()
+                        refreshCallback.invoke()
                     }
                 })
 

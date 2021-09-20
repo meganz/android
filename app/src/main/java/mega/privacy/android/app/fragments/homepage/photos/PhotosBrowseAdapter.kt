@@ -91,6 +91,10 @@ class PhotosBrowseAdapter constructor(
         }
     }
 
+    fun getNodeAtPosition(position: Int): PhotoNodeItem? {
+        return if (position >= 0 && position < currentList.size) currentList[position] else null
+    }
+
     override fun getSectionTitle(position: Int) = if (position < 0 || position >= itemCount) {
         ""
     } else getItem(position).modifiedDate

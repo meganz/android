@@ -9,13 +9,14 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.utils.ZoomUtil
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaNode
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TypedFilesRepository @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ApplicationContext val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid
 ) {
     /** Live Data to notify the query result*/
@@ -38,6 +39,10 @@ class TypedFilesRepository @Inject constructor(
         withContext(Dispatchers.IO) {
             nodesFetcher.getNodeItems()
         }
+    }
+
+    suspend fun getPreviews(map: MutableMap<MegaNode, String>, refreshCallback: () -> Unit) {
+        nodesFetcher.getPreviewsFromServer(map, refreshCallback)
     }
 
     fun emitFiles() {

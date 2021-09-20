@@ -12,9 +12,12 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -23,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_tour.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.GestureScaleListener
 import mega.privacy.android.app.components.ListenScrollChangesHelper
@@ -33,11 +37,14 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.p
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
+import mega.privacy.android.app.fragments.managerFragments.cu.*
+import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment.*
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
+import mega.privacy.android.app.utils.StyleUtils.setTextStyle
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.ZoomUtil
@@ -48,6 +55,7 @@ import mega.privacy.android.app.utils.ZoomUtil.getSpanCount
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaNode
 import java.util.*
 
 @AndroidEntryPoint
@@ -59,10 +67,19 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private lateinit var binding: FragmentPhotosBinding
 
+    private lateinit var mManagerActivity: ManagerActivityLollipop
+
     private lateinit var listView: RecyclerView
+
+    private lateinit var viewTypePanel: View
+    private lateinit var yearsButton: TextView
+    private lateinit var monthsButton: TextView
+    private lateinit var daysButton: TextView
+    private lateinit var allButton: TextView
 
     private lateinit var browseAdapter: PhotosBrowseAdapter
     private lateinit var searchAdapter: PhotosSearchAdapter
+    private lateinit var cardAdapter: CUCardViewAdapter
 
     private lateinit var gridLayoutManager: GridLayoutManager
     private var linearLayoutManager: LinearLayoutManager? = null
@@ -74,16 +91,51 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private var currentZoom = ZOOM_DEFAULT
 
+    private var selectedView = ALL_VIEW
+
+    private val cardClickedListener = object : CUCardViewAdapter.Listener {
+
+        override fun onCardClicked(position: Int, @NonNull card: CUCard) {
+            when (selectedView) {
+                DAYS_VIEW -> {
+                    newViewClicked(ALL_VIEW)
+                    val photoPosition = browseAdapter.getNodePosition(card.node.handle)
+                    gridLayoutManager.scrollToPosition(photoPosition)
+
+                    val node = browseAdapter.getNodeAtPosition(photoPosition)
+                    node?.let {
+                        RunOnUIThreadUtils.post {
+                            openPhoto(it)
+                        }
+                    }
+                }
+                MONTHS_VIEW -> {
+                    newViewClicked(DAYS_VIEW)
+                    gridLayoutManager.scrollToPosition(viewModel.monthClicked(position, card))
+                }
+                YEARS_VIEW -> {
+                    newViewClicked(MONTHS_VIEW)
+                    gridLayoutManager.scrollToPosition(viewModel.yearClicked(position, card))
+                }
+            }
+
+            showViewTypePanel()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        currentZoom = (activity as ManagerActivityLollipop).currentZoom
+        mManagerActivity = activity as ManagerActivityLollipop
+        currentZoom = mManagerActivity.currentZoom
 
         binding = FragmentPhotosBinding.inflate(inflater, container, false).apply {
             viewModel = this@PhotosFragment.viewModel
         }
+
+        viewTypePanel = binding.photosViewType.root
 
         return binding.root
     }
@@ -94,6 +146,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         setupEmptyHint()
         setupListView()
+        setupTimePanel()
         setupListAdapter(currentZoom)
         setupFastScroller()
         setupActionMode()
@@ -105,6 +158,15 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             }
 
             actionModeViewModel.setNodesData(it.filter { nodeItem -> nodeItem.type == PhotoNodeItem.TYPE_PHOTO })
+        }
+
+        viewModel.dateCards.observe(viewLifecycleOwner, ::showCards)
+
+        viewModel.refreshCards.observe(viewLifecycleOwner) {
+            if(it && selectedView != ALL_VIEW) {
+                viewModel.refreshing()
+                showCards(viewModel.dateCards.value)
+            }
         }
 
         observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_PHOTOS)
@@ -122,6 +184,89 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         ft.detach(this)
         ft.attach(this)
         ft.commitNowAllowingStateLoss()
+    }
+
+    private fun setupTimePanel() {
+        yearsButton = binding.photosViewType.yearsButton.apply {
+            setOnClickListener {
+                newViewClicked(YEARS_VIEW)
+            }
+        }
+        monthsButton = binding.photosViewType.monthsButton.apply {
+            setOnClickListener {
+                newViewClicked(MONTHS_VIEW)
+            }
+        }
+        daysButton = binding.photosViewType.daysButton.apply {
+            setOnClickListener {
+                newViewClicked(DAYS_VIEW)
+            }
+        }
+        allButton = binding.photosViewType.allButton.apply {
+            setOnClickListener {
+                newViewClicked(ALL_VIEW)
+            }
+        }
+
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            val params = viewTypePanel.layoutParams
+            params.width = outMetrics.heightPixels
+            viewTypePanel.layoutParams = params
+        }
+
+        updateViewSelected()
+    }
+
+    private fun updateViewSelected() {
+        setViewTypeButtonStyle(allButton, false)
+        setViewTypeButtonStyle(daysButton, false)
+        setViewTypeButtonStyle(monthsButton, false)
+        setViewTypeButtonStyle(yearsButton, false)
+
+        when (selectedView) {
+            DAYS_VIEW -> setViewTypeButtonStyle(daysButton, true)
+            MONTHS_VIEW -> setViewTypeButtonStyle(monthsButton, true)
+            YEARS_VIEW -> setViewTypeButtonStyle(yearsButton, true)
+            else -> setViewTypeButtonStyle(allButton, true)
+        }
+
+        mManagerActivity.updatePhotosFragmentOptionsMenu()
+    }
+
+    private fun setViewTypeButtonStyle(textView: TextView, enabled: Boolean) {
+        textView.setBackgroundResource(
+            if (enabled)
+                R.drawable.background_18dp_rounded_selected_button
+            else
+                R.drawable.background_18dp_rounded_unselected_button
+        )
+
+        setTextStyle(
+            context,
+            textView,
+            if (enabled) R.style.TextAppearance_Mega_Subtitle2_Medium_WhiteGrey87 else R.style.TextAppearance_Mega_Subtitle2_Normal_Grey87White87,
+            if (enabled) R.color.white_grey_087 else R.color.grey_087_white_087,
+            false
+        )
+    }
+
+    private fun newViewClicked(selectedView: Int) {
+        if (this.selectedView == selectedView) return
+
+        this.selectedView = selectedView
+        setupListAdapter(currentZoom)
+
+        when (selectedView) {
+            DAYS_VIEW, MONTHS_VIEW, YEARS_VIEW -> showCards(viewModel.dateCards.value)
+            else -> {}
+        }
+
+        updateViewSelected()
+
+        val params = viewTypePanel.layoutParams as CoordinatorLayout.LayoutParams
+        params.behavior =
+            if (selectedView != ALL_VIEW) CustomHideBottomViewOnScrollBehaviour<LinearLayout>() else null
+        viewTypePanel.layoutParams = params
     }
 
     private fun doIfOnline(operation: () -> Unit) {
@@ -146,7 +291,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline {
-                (activity as ManagerActivityLollipop).showNodeOptionsPanel(
+                mManagerActivity.showNodeOptionsPanel(
                     it.node,
                     MODE5
                 )
@@ -170,7 +315,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
         listView
     ) { v: View?, _, _, _, _ ->
-        (activity as ManagerActivityLollipop).changeAppBarElevation(v!!.canScrollVertically(-1))
+        mManagerActivity.changeAppBarElevation(v!!.canScrollVertically(-1))
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -185,8 +330,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         listView.clipToPadding = false
         listView.setHasFixedSize(true)
 
-
-        val scaleDetector = ScaleGestureDetector(activity, GestureScaleListener(activity as ManagerActivityLollipop))
+        val scaleDetector = ScaleGestureDetector(activity, GestureScaleListener(mManagerActivity))
         listView.setOnTouchListener { _, event ->
 
             when (event.pointerCount) {
@@ -208,8 +352,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private fun observeItemLongClick() =
         actionModeViewModel.longClick.observe(viewLifecycleOwner, EventObserver {
-            if(currentZoom == ZOOM_DEFAULT || currentZoom == ZOOM_OUT_1X) {
+            if (currentZoom == ZOOM_DEFAULT || currentZoom == ZOOM_OUT_1X) {
                 doIfOnline { actionModeViewModel.enterActionMode(it) }
+                animateBottomView()
             }
         })
 
@@ -223,7 +368,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 actionModeCallback.nodeCount = viewModel.getRealPhotoCount()
 
                 if (actionMode == null) {
-                    (activity as ManagerActivityLollipop).hideKeyboardSearch()
+                    mManagerActivity.hideKeyboardSearch()
                     actionMode = (activity as AppCompatActivity).startSupportActionMode(
                         actionModeCallback
                     )
@@ -311,14 +456,22 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun observeActionModeDestroy() =
         actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
             actionMode = null
-            (activity as ManagerActivityLollipop).showKeyboardForSearch()
+            mManagerActivity.showKeyboardForSearch()
+            animateBottomView()
         })
 
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
+    private fun getSpanCount(isPortrait: Boolean): Int {
+        return if (selectedView != ALL_VIEW) {
+            if (isPortrait) SPAN_CARD_PORTRAIT else SPAN_CARD_LANDSCAPE
+        } else {
+            getSpanCount(isPortrait, currentZoom)
+        }
+    }
+
     fun setupListAdapter(zoom: Int) {
         currentZoom = zoom
-        browseAdapter = PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel, currentZoom)
         searchAdapter = PhotosSearchAdapter(actionModeViewModel, itemOperationViewModel)
 
         searchAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -334,21 +487,56 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             listView.switchToLinear()
             listView.adapter = searchAdapter
         } else {
-            val params = listView.layoutParams as ConstraintLayout.LayoutParams
+            val isPortrait =
+                resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+            val spanCount = getSpanCount(isPortrait)
+            val params = listView.layoutParams as CoordinatorLayout.LayoutParams
+            gridLayoutManager = GridLayoutManager(context, spanCount)
+            listView.switchBackToGrid()
 
-            if (currentZoom == ZOOM_IN_1X) {
-                params.rightMargin = 0
-                params.leftMargin = 0
-            }else{
-                val margin = ZoomUtil.getMargin(context, currentZoom)
-                params.leftMargin = margin
-                params.rightMargin = margin
+            if (selectedView == ALL_VIEW) {
+                browseAdapter =
+                    PhotosBrowseAdapter(actionModeViewModel, itemOperationViewModel, currentZoom)
+
+                if (currentZoom == ZOOM_IN_1X) {
+                    params.rightMargin = 0
+                    params.leftMargin = 0
+                } else {
+                    val margin = ZoomUtil.getMargin(context, currentZoom)
+                    params.leftMargin = margin
+                    params.rightMargin = margin
+                }
+
+                gridLayoutManager.apply {
+                    val imageMargin = ZoomUtil.getMargin(context, currentZoom)
+                    spanSizeLookup = browseAdapter.getSpanSizeLookup(spanCount)
+
+                    val itemDimen = if (currentZoom == ZOOM_IN_1X) {
+                        outMetrics.widthPixels
+                    } else {
+                        ((outMetrics.widthPixels - imageMargin * spanCount * 2) - imageMargin * 2) / spanCount
+                    }
+                    browseAdapter.setItemDimen(itemDimen)
+                }
+
+                browseAdapter.submitList(viewModel.items.value)
+                listView.adapter = browseAdapter
+            } else {
+                val cardMargin =
+                    resources.getDimensionPixelSize(if (isPortrait) R.dimen.card_margin_portrait else R.dimen.card_margin_landscape)
+
+                val cardWidth: Int =
+                    (outMetrics.widthPixels - cardMargin * spanCount * 2 - cardMargin * 2) / spanCount
+
+                cardAdapter =
+                    CUCardViewAdapter(selectedView, cardWidth, cardMargin, cardClickedListener)
+                cardAdapter.setHasStableIds(true)
+                params.leftMargin = cardMargin
+                params.rightMargin = cardMargin
+                listView.adapter = cardAdapter
             }
 
-            configureGridLayoutManager()
-
             listView.layoutParams = params
-            listView.adapter = browseAdapter
         }
     }
 
@@ -358,7 +546,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     override fun searchReady() {
         // Rotate screen in action mode, the keyboard would pop up again, hide it
         if (actionMode != null) {
-            RunOnUIThreadUtils.post { (activity as ManagerActivityLollipop).hideKeyboardSearch() }
+            RunOnUIThreadUtils.post { mManagerActivity.hideKeyboardSearch() }
         }
 
         if (viewModel.searchMode) return
@@ -403,6 +591,19 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
+    fun shouldShowZoomMenuItem() = selectedView == ALL_VIEW
+
+    private fun showViewTypePanel() {
+        val params = viewTypePanel.layoutParams as CoordinatorLayout.LayoutParams
+        params.setMargins(
+            0, 0, 0,
+            resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
+        )
+        viewTypePanel.animate().translationY(0f).setDuration(175)
+            .withStartAction{ viewTypePanel.visibility = View.VISIBLE }
+            .withEndAction{ viewTypePanel.layoutParams = params }.start()
+    }
+
     override fun searchQuery(query: String) {
         if (viewModel.searchQuery == query) return
 
@@ -444,7 +645,18 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
-    private fun getSpanCount(isPortrait: Boolean) = getSpanCount(isPortrait, currentZoom)
+    private fun showCards(dateCards: List<List<CUCard>?>?) {
+        val index = when(selectedView) {
+            DAYS_VIEW -> 0
+            MONTHS_VIEW -> 1
+            YEARS_VIEW -> 2
+            else -> -1
+        }
+
+        if(index != -1) {
+            cardAdapter.submitList(dateCards?.get(index))
+        }
+    }
 
     private fun RecyclerView.switchToLinear() {
         linearLayoutManager = LinearLayoutManager(context)
@@ -454,6 +666,29 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun RecyclerView.switchBackToGrid() {
         linearLayoutManager = null
         listView.layoutManager = gridLayoutManager
+    }
+
+    /**
+     * Shows or hides the bottom view and animates the transition.
+     */
+    fun animateBottomView() {
+        val deltaY = viewTypePanel.height.toFloat() + resources.getDimensionPixelSize(R.dimen.cu_view_type_button_vertical_margin)
+
+        if (viewTypePanel.isVisible) {
+            viewTypePanel
+                .animate()
+                .translationYBy(deltaY)
+                .setDuration(ANIMATION_DURATION)
+                .withEndAction { viewTypePanel.visibility = View.GONE }
+                .start()
+        } else {
+            viewTypePanel
+                .animate()
+                .translationYBy(-deltaY)
+                .setDuration(ANIMATION_DURATION)
+                .withStartAction { viewTypePanel.visibility = View.VISIBLE }
+                .start()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

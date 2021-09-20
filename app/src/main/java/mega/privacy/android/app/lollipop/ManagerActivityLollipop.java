@@ -5593,8 +5593,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             return;
         }
 
-        zoomOutMenuItem.setVisible(true);
-        zoomInMenuItem.setVisible(true);
+        PhotosFragment photosFragment = getFragmentByType(PhotosFragment.class);
+        boolean shouldShow = photosFragment.shouldShowZoomMenuItem();
+
+        zoomOutMenuItem.setVisible(shouldShow);
+        zoomInMenuItem.setVisible(shouldShow);
     }
 
 	private void setGridListIcon() {
