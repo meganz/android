@@ -4383,8 +4383,12 @@
     <string name="title_user_purchased_subscription">بانتظار التأكيد</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
-        <item quantity="one">1 connection</item>
-        <item quantity="other">%1$d connections</item>
+        <item quantity="zero">%1$d وسيلة تواصل</item>
+        <item quantity="one">1 وسيلة تواصل</item>
+        <item quantity="two">%1$d وسيلتا تواصل</item>
+        <item quantity="few">%1$d وسائل التواصل</item>
+        <item quantity="many">%1$d وسيلة تواصل</item>
+        <item quantity="other">%1$d وسيلة تواصل</item>
     </plurals>
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
     <string name="section_recently_added">تمت إضافته مؤخراً</string>
