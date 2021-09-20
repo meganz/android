@@ -9,6 +9,7 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
+import android.os.Build;
 import android.view.Surface;
 
 import java.io.File;
@@ -20,6 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import mega.privacy.android.app.lollipop.megachat.ChatUploadService;
 import mega.privacy.android.app.utils.conversion.VideoCompressionCallback;
 
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_HIGH;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 import androidx.annotation.Nullable;
@@ -29,7 +32,6 @@ public class VideoDownsampling {
     private static final int TIMEOUT_USEC = 10000;
 
     private static final String OUTPUT_VIDEO_MIME_TYPE = "video/avc";
-    private static final int OUTPUT_VIDEO_BIT_RATE = 1280 * 720;
     private static final int OUTPUT_VIDEO_FRAME_RATE = 30;
     private static final int OUTPUT_VIDEO_IFRAME_INTERVAL = 10;
     private static final int OUTPUT_VIDEO_COLOR_FORMAT = MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface;
@@ -40,8 +42,15 @@ public class VideoDownsampling {
     private static final int OUTPUT_AUDIO_AAC_PROFILE = MediaCodecInfo.CodecProfileLevel.AACObjectHE;
     private static final int OUTPUT_AUDIO_SAMPLE_RATE_HZ = 44100;
 
-    private int mWidth = 1280;
-    private int mHeight = 720;
+    private static final int BIT_RATE_MEDIUM = 3000000;
+    private static final int SHORT_SIDE_SIZE_MEDIUM = 720;
+    private static final int BIT_RATE_LOW = 1500000;
+    private static final int SHORT_SIDE_SIZE_LOW = 480;
+
+    protected int quality = VIDEO_QUALITY_MEDIUM;
+
+    private int mWidth;
+    private int mHeight;
 
     static Context context;
 
@@ -78,8 +87,10 @@ public class VideoDownsampling {
         isRunning = running;
     }
 
-    public void changeResolution(File f, String inputFile, long idMessage) throws Throwable {
+    public void changeResolution(File f, String inputFile, long idMessage, int quality) throws Throwable {
         logDebug("changeResolution");
+
+        this.quality = quality;
 
         queue.add(new VideoUpload(f.getAbsolutePath(), inputFile, f.length(), idMessage));
 
@@ -154,16 +165,87 @@ public class VideoDownsampling {
             videoExtractor = createExtractor(mInputFile);
             int videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor);
             MediaFormat inputFormat = videoExtractor.getTrackFormat(videoInputTrack);
+            MediaMetadataRetriever m = new MediaMetadataRetriever();
+            m.setDataSource(mInputFile);
 
-            resetWidthAndHeight(mInputFile);
+            getRealWidthAndHeight(m);
 
-            MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE, mWidth, mHeight);
+            int resultWidth = mWidth;
+            int resultHeight = mHeight;
+            int bitrate;
+            int shortSideByQuality = quality == VIDEO_QUALITY_MEDIUM ?
+                    SHORT_SIDE_SIZE_MEDIUM
+                    : SHORT_SIDE_SIZE_LOW;
+
+            int shortSide = Math.min(mWidth, mHeight);
+            int frameRate = inputFormat.containsKey(MediaFormat.KEY_FRAME_RATE)
+                    ? inputFormat.getInteger(MediaFormat.KEY_FRAME_RATE)
+                    : OUTPUT_VIDEO_FRAME_RATE;
+
+            if (quality == VIDEO_QUALITY_HIGH) {
+                bitrate = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
+            } else {
+                bitrate = quality == VIDEO_QUALITY_MEDIUM ? BIT_RATE_MEDIUM : BIT_RATE_LOW;
+                frameRate = Math.min(frameRate, OUTPUT_VIDEO_FRAME_RATE);
+
+                if (shortSide > shortSideByQuality) {
+                    if (mWidth > mHeight) {
+                        resultWidth = mWidth * shortSideByQuality / mHeight;
+                        resultHeight = shortSideByQuality;
+                    } else {
+                        resultWidth = shortSideByQuality;
+                        resultHeight = mHeight * shortSideByQuality / mWidth;
+                    }
+                }
+            }
+
+            MediaCodecInfo.VideoCapabilities capabilities = videoCodecInfo
+                    .getCapabilitiesForType(OUTPUT_VIDEO_MIME_TYPE).getVideoCapabilities();
+
+            boolean supported = capabilities.areSizeAndRateSupported(resultWidth, resultHeight, frameRate);
+
+            if (!supported) {
+                logError("Sizes width: " + resultWidth + " height: " + resultHeight + " not supported.");
+
+                for (int i = shortSideByQuality; i< shortSide; i++) {
+                    if (mWidth > mHeight) {
+                        resultWidth = mWidth * i / mHeight;
+                        resultHeight = i;
+                    } else {
+                        resultWidth = i;
+                        resultHeight = mHeight * i / mWidth;
+                    }
+
+                    supported = capabilities.areSizeAndRateSupported(resultWidth, resultHeight, frameRate);
+
+                    if (supported) {
+                        break;
+                    }
+                }
+
+                if (!supported) {
+                    logError("Latest sizes width: " + resultWidth + " height: " + resultHeight + " not supported.");
+                    return;
+                }
+            }
+
+            MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE, resultWidth, resultHeight);
+
+            MediaCodecInfo.CodecProfileLevel[] profileLevels = videoCodecInfo
+                    .getCapabilitiesForType(OUTPUT_VIDEO_MIME_TYPE).profileLevels;
+
+            outputVideoFormat.setInteger(MediaFormat.KEY_PROFILE, profileLevels[0].profile);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                outputVideoFormat.setInteger(MediaFormat.KEY_LEVEL, profileLevels[0].level);
+            }
+
             outputVideoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, OUTPUT_VIDEO_COLOR_FORMAT);
-            outputVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_VIDEO_BIT_RATE);
-            outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, OUTPUT_VIDEO_FRAME_RATE);
+            outputVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
+            outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
             outputVideoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, OUTPUT_VIDEO_IFRAME_INTERVAL);
 
-            AtomicReference<Surface> inputSurfaceReference = new AtomicReference<Surface>();
+            AtomicReference<Surface> inputSurfaceReference = new AtomicReference<>();
             videoEncoder = createVideoEncoder(videoCodecInfo, outputVideoFormat, inputSurfaceReference);
             inputSurface = new InputSurface(inputSurfaceReference.get());
             inputSurface.makeCurrent();
@@ -194,8 +276,7 @@ public class VideoDownsampling {
                 if (videoExtractor != null)
                     videoExtractor.release();
             } catch(Exception e) {
-                if (exception == null)
-                    exception = e;
+                exception = e;
             }
             try {
                 if (audioExtractor != null)
@@ -276,11 +357,13 @@ public class VideoDownsampling {
         }
     }
 
-    private void resetWidthAndHeight(String mInputFile) {
-        MediaMetadataRetriever m = new MediaMetadataRetriever();
-        m.setDataSource(mInputFile);
+    private void getRealWidthAndHeight(MediaMetadataRetriever m) {
+        mWidth = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        mHeight = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
         Bitmap thumbnail = m.getFrameAtTime();
-        int inputWidth = thumbnail.getWidth(), inputHeight = thumbnail.getHeight();
+        int inputWidth = thumbnail.getWidth();
+        int inputHeight = thumbnail.getHeight();
+
         if (inputWidth > inputHeight) {
             if (mWidth < mHeight) {
                 int w = mWidth;

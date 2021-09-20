@@ -1778,7 +1778,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         totalUploaded = 0;
         totalToUpload = 0;
 
-        mVideoCompressor = new VideoCompressor(this, this);
+        mVideoCompressor = new VideoCompressor(this, this, Integer.parseInt(prefs.getUploadVideoQuality()));
         mVideoCompressor.setPendingList(fullList);
         mVideoCompressor.setOutputRoot(tempRoot);
         long totalPendingSizeInMB = mVideoCompressor.getTotalInputSize() / (1024 * 1024);

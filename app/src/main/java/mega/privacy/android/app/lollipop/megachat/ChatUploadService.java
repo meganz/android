@@ -66,6 +66,7 @@ import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_AC
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RETRY_PENDING_MESSAGE;
 import static mega.privacy.android.app.constants.BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD;
 import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_MESSAGE_ID;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.DBUtil.*;
@@ -500,7 +501,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						videoDownsampling = new VideoDownsampling(this);
 					}
 
-					videoDownsampling.changeResolution(file, outFile.getAbsolutePath(), pendingMsg.getId());
+					videoDownsampling.changeResolution(file, outFile.getAbsolutePath(),
+							pendingMsg.getId(), VIDEO_QUALITY_MEDIUM);
 				}
 
 			} catch (Throwable throwable) {
