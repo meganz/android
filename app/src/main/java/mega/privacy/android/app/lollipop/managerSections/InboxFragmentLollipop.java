@@ -688,7 +688,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			}
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
 		} else if (MimeTypeList.typeForName(node.getName()).isURL()) {
-			manageURLNode(requireContext(), megaApi, node);
+			manageURLNode(context, megaApi, node);
 		} else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
 			manageTextFileIntent(requireContext(), node, INBOX_ADAPTER);
 		} else {

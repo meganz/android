@@ -161,6 +161,8 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                     notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
 
                     logDebug("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+
+                    new RatingHandlerImpl(megaApplication.getApplicationContext()).showRatingBaseOnContacts();
                 }
             }
         }

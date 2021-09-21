@@ -65,8 +65,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
@@ -76,7 +74,6 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -103,7 +100,6 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
 import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
 import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
@@ -154,14 +150,12 @@ import static mega.privacy.android.app.utils.Util.getScaleW;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class PdfViewerActivityLollipop extends PasscodeActivity
         implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener,
         OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface,
-        MegaTransferListenerInterface, ActionNodeCallback, SnackbarShower,
-        FilePrepareTask.ProcessedFilesCallback {
+        MegaTransferListenerInterface, ActionNodeCallback, SnackbarShower {
 
     MegaApplication app = null;
     MegaApiAndroid megaApi;
@@ -912,41 +906,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         nodeSaver.handleRequestPermissionsResult(requestCode);
-    }
-
-    @Override
-    public void onIntentProcessed(List<ShareInfo> infos) {
-
-        if (statusDialog != null) {
-            try {
-                statusDialog.dismiss();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        logDebug("Intent processed!");
-
-        if (infos == null) {
-            logError("Error: infos is NULL");
-        } else {
-            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-                showOverDiskQuotaPaywallWarning();
-                return;
-            }
-
-            MegaNode parentNode = megaApi.getRootNode();
-            showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
-            for (ShareInfo info : infos) {
-
-                Intent intent = new Intent(this, UploadService.class);
-                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-                startService(intent);
-            }
-        }
     }
 
     public  void setToolbarVisibilityShow () {

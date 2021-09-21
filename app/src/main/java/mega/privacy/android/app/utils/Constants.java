@@ -268,7 +268,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN = "INTENT_FILTER_UPDATE_FULL_SCREEN";
 
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
-    public static final String BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS = "INTENT_UPDATE_2FA_SETTINGS";
     public static final String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE = "INTENT_CONNECTIVITY_CHANGE";
     public static final String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG = "INTENT_CONNECTIVITY_CHANGE_DIALOG";
     public static final String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
@@ -472,9 +471,8 @@ public class Constants {
     public static final int RICH_WARNING_CONFIRMATION = 2;
 
     public static final int TAKE_PICTURE_OPTION = 0;
-    public static final int TAKE_PROFILE_PICTURE = 1;
-    public static final int START_CALL_PERMISSIONS = 2;
-    public static final int RETURN_CALL_PERMISSIONS = 3;
+    public static final int START_CALL_PERMISSIONS = 1;
+    public static final int RETURN_CALL_PERMISSIONS = 2;
 
     public static final String MAIL_ANDROID = "androidfeedback@mega.nz";
     public static final String MAIL_SUPPORT = "support@mega.nz";
