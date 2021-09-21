@@ -49,7 +49,7 @@ public class VideoDownsampling {
     private static final int BIT_RATE_LOW = 1500000;
     private static final int SHORT_SIDE_SIZE_LOW = 480;
 
-    protected int quality = VIDEO_QUALITY_MEDIUM;
+    protected int quality;
 
     private int mWidth;
     private int mHeight;

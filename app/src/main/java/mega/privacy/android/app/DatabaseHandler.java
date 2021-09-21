@@ -369,7 +369,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               															//29
                 + KEY_SMALL_GRID_CAMERA + " BOOLEAN,"               															//30
                 + KEY_AUTO_PLAY + " BOOLEAN,"                       															//31
-                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT,"               															//32
+                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT DEFAULT '" + encrypt(String.valueOf(VIDEO_QUALITY_MEDIUM))+ "',"			//32
                 + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          															//33
                 + KEY_CHARGING_ON_SIZE + " TEXT,"                   															//34
                 + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       															//35
@@ -433,8 +433,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_NONCONTACT_TABLE);
 
 		String CREATE_CHAT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CHAT_SETTINGS + "("
-				+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " + KEY_CHAT_SOUND_NOTIFICATIONS + " TEXT, "
-				+ KEY_CHAT_VIBRATION_ENABLED + " BOOLEAN, " + KEY_CHAT_VIDEO_QUALITY + " TEXT" + ")";
+				+ KEY_ID + " INTEGER PRIMARY KEY, " 																//0
+				+ KEY_CHAT_NOTIFICATIONS_ENABLED + " BOOLEAN, " 													//1
+				+ KEY_CHAT_SOUND_NOTIFICATIONS + " TEXT, "															//2
+				+ KEY_CHAT_VIBRATION_ENABLED + " BOOLEAN, " 														//3
+				+ KEY_CHAT_VIDEO_QUALITY + " TEXT DEFAULT '"  + encrypt(String.valueOf(VIDEO_QUALITY_MEDIUM)) + "'"	//4
+				+ ")";
 		db.execSQL(CREATE_CHAT_TABLE);
 
 		String CREATE_COMPLETED_TRANSFER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_COMPLETED_TRANSFERS + "("

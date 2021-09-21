@@ -52,8 +52,6 @@ public class MegaPreferences{
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
-	public final static int ORIGINAL = 0;
-	public final static int MEDIUM = 1;
 	public final static int CHARGING_ON_SIZE_DEFAULT = 200;
 
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String passcodeLockEnabled, String passcodeLockCode, String storageAskAlways,

@@ -406,7 +406,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private boolean shouldCompressVideo() {
         String qualitySetting = prefs.getUploadVideoQuality();
-        return qualitySetting != null && Integer.parseInt(qualitySetting) == VIDEO_QUALITY_MEDIUM;
+        return qualitySetting != null && Integer.parseInt(qualitySetting) != VIDEO_QUALITY_ORIGINAL;
     }
 
     private void extractMedia(Cursor cursor, boolean isSecondary, boolean isVideo) {
@@ -1759,7 +1759,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private boolean isCompressedVideoPending() {
-        return dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS).size() > 0 && String.valueOf(VIDEO_QUALITY_MEDIUM).equals(prefs.getUploadVideoQuality());
+        return dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS).size() > 0 && !String.valueOf(VIDEO_QUALITY_ORIGINAL).equals(prefs.getUploadVideoQuality());
     }
 
     private boolean isCompressorAvailable() {
