@@ -1,5 +1,7 @@
 package mega.privacy.android.app;
 
+import static android.media.MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaCodec;
@@ -230,16 +232,7 @@ public class VideoDownsampling {
             }
 
             MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE, resultWidth, resultHeight);
-
-            MediaCodecInfo.CodecProfileLevel[] profileLevels = videoCodecInfo
-                    .getCapabilitiesForType(OUTPUT_VIDEO_MIME_TYPE).profileLevels;
-
-            outputVideoFormat.setInteger(MediaFormat.KEY_PROFILE, profileLevels[0].profile);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                outputVideoFormat.setInteger(MediaFormat.KEY_LEVEL, profileLevels[0].level);
-            }
-
+            outputVideoFormat.setInteger(MediaFormat.KEY_PROFILE, AVCProfileBaseline);
             outputVideoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, OUTPUT_VIDEO_COLOR_FORMAT);
             outputVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
             outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
