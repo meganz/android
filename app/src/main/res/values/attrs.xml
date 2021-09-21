@@ -136,4 +136,20 @@
         <attr name="name" format="string"/>
     </declare-styleable>
 
+    <declare-styleable name="OnOffFab">
+        <attr name="is_on" format="boolean" />
+        <attr name="on_icon" format="reference" />
+        <attr name="off_icon" format="reference" />
+        <attr name="on_icon_tint" format="color" />
+        <attr name="off_icon_tint" format="color" />
+        <attr name="on_background_tint" format="color" />
+        <attr name="off_background_tint" format="color" />
+        <attr name="disable_icon" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="LeftMeetingItem">
+        <attr name="item_icon" format="reference"/>
+        <attr name="title" format="string"/>
+        <attr name="subTitle" format="string"/>
+    </declare-styleable>
 </resources>

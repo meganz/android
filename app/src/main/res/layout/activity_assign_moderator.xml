@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/ic_remove"
+        app:subtitle="@string/pick_new_moderator_message"
+        app:title="@string/assign_moderator" />
+
+    <RelativeLayout
+        android:id="@+id/moderator_adds_container"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/selected_participant_list"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:nestedScrollingEnabled="false"
+            android:orientation="horizontal" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_participant_title"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:text="@string/participants_chat_label"
+        android:textAppearance="@android:style/TextAppearance.Small"
+        android:textColor="@color/black"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/moderator_adds_container" />
+
+    <RelativeLayout
+        android:id="@+id/rl_participant_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@id/bt_cancel"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_participant_title">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/participant_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:choiceMode="multipleChoice"
+            android:nestedScrollingEnabled="false"
+            android:orientation="vertical" />
+
+    </RelativeLayout>
+
+
+    <Button
+        android:id="@+id/bt_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="32dp"
+        android:enabled="false"
+        android:text="@string/general_ok"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+
+    <Button
+        android:id="@+id/bt_cancel"
+        style="?attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="15dp"
+        android:text="@string/button_cancel"
+        android:textColor="@color/teal_300"
+        app:layout_constraintBaseline_toBaselineOf="@id/bt_ok"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/bt_ok" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
