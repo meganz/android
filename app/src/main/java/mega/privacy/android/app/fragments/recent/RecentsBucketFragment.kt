@@ -183,7 +183,7 @@ class RecentsBucketFragment : BaseFragment() {
                 openAudioVideo(index, node, isMedia, localPath)
             }
             mime.isURL -> {
-                manageURLNode(requireContext(), megaApi, node)
+                manageURLNode(context, megaApi, node)
             }
             mime.isPdf -> {
                 openPdf(index, node, localPath)

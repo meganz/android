@@ -45,7 +45,7 @@ public class RecordView extends RelativeLayout {
     private final static int LESS_SECOND_RECORD = 5;
     private final static int FINISH_SOUND = 6;
     private final static int SOUND_START = R.raw.record_start;
-    private final static int SOUND_END = R.raw.record_finished;
+    private final static int SOUND_END = R.raw.sent_voice;
     private final static int SOUND_ERROR = R.raw.record_error;
     private final static int SECONDS_ALLOWED = 1;
     private final static int TIME_ANIMATION = 500;

@@ -780,7 +780,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			}
 			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
 		} else if (MimeTypeList.typeForName(node.getName()).isURL()) {
-			manageURLNode(requireContext(), megaApi, node);
+			manageURLNode(context, megaApi, node);
 		} else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
 			logDebug("itemClick:isFile:isPdf");
 			MegaNode file = node;

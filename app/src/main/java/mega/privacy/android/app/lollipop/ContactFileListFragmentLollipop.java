@@ -722,7 +722,7 @@ public class ContactFileListFragmentLollipop extends ContactFileBaseFragment {
 					((ContactFileListActivityLollipop) context).overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isURL()){
-					manageURLNode(requireContext(), megaApi, contactNodes.get(position));
+					manageURLNode(context, megaApi, contactNodes.get(position));
 				} else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isOpenableTextFile(contactNodes.get(position).getSize())) {
 					manageTextFileIntent(requireContext(), contactNodes.get(position), CONTACT_FILE_ADAPTER);
 				} else {

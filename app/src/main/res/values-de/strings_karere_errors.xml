@@ -7,11 +7,11 @@
     <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
     <string name="error_access">Zugriff verweigert</string>
     <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
-    <string name="error_noent">Resource does not exist.</string>
+    <string name="error_noent">Die Ressource existiert nicht.</string>
     <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
-    <string name="error_exist">Resource already exists.</string>
+    <string name="error_exist">Die Ressource existiert bereits.</string>
     <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
     <string name="error_unknown">Unbekannter Fehler</string>
     <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
-    <string name="error_toomany">Too many uses for this resource.</string>
+    <string name="error_toomany">Zu viele gleichzeitige Verwendungen für diese Ressource.</string>
 </resources>
