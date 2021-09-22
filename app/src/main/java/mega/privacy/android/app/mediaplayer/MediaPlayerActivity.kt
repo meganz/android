@@ -11,6 +11,8 @@ import android.os.Bundle
 import android.os.IBinder
 import android.view.*
 import androidx.activity.viewModels
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -291,18 +293,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
     private fun setupNavDestListener() {
         navController.addOnDestinationChangedListener { _, dest, args ->
-            if (isAudioPlayer()) {
-                toolbar.elevation = 0F
-
-                val color = ContextCompat.getColor(
-                    this,
-                    if (dest.id == R.id.main_player) R.color.grey_020_grey_800 else R.color.white_dark_grey
-                )
-
-                window.statusBarColor = color
-            } else {
-                window.statusBarColor = Color.BLACK
-            }
+            setupToolbarColors()
 
             when (dest.id) {
                 R.id.main_player -> {
@@ -913,31 +904,55 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
-    fun showToolbarElevation(withElevation: Boolean) {
-        // This is the actual color when using Util.changeToolBarElevation, but video player
-        // use different toolbar theme (to force dark theme), which breaks
-        // Util.changeToolBarElevation, so we just use the actual color here.
+    fun setupToolbarColors(showElevation: Boolean = false) {
+        val isDarkMode = Util.isDarkMode(this)
+        val isMainPlayer = navController.currentDestination?.id == R.id.main_player
+        @ColorRes val toolbarBackgroundColor: Int
+        @ColorInt val statusBarColor: Int
+        val toolbarElevation: Float
 
-        if (!isAudioPlayer() || Util.isDarkMode(this)) {
-            toolbar.setBackgroundColor(
-                when {
-                    withElevation -> ContextCompat.getColor(this, R.color.action_mode_background)
-                    isAudioPlayer() -> Color.TRANSPARENT
-                    else -> ContextCompat.getColor(this, R.color.dark_grey)
+        when {
+            isAudioPlayer() && isMainPlayer -> {
+                toolbarElevation = 0F
+                toolbarBackgroundColor = android.R.color.transparent
+                statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
+            }
+            isDarkMode -> {
+                toolbarElevation = 0F
+                toolbarBackgroundColor = if (showElevation) {
+                    R.color.action_mode_background
+                } else {
+                    R.color.dark_grey
                 }
-            )
-
-            ColorUtils.changeStatusBarColorForElevation(this, withElevation)
-        } else {
-            toolbar.setBackgroundColor(
-                when {
-                    withElevation -> Color.WHITE
-                    else -> Color.TRANSPARENT
+                statusBarColor = if (showElevation) {
+                    val elevation = resources.getDimension(R.dimen.toolbar_elevation)
+                    ColorUtils.getColorForElevation(this, elevation)
+                } else {
+                    ContextCompat.getColor(this, android.R.color.transparent)
                 }
-            )
-            toolbar.elevation =
-                if (withElevation) resources.getDimension(R.dimen.toolbar_elevation) else 0F
+            }
+            else -> {
+                toolbarElevation = if (showElevation) {
+                    resources.getDimension(R.dimen.toolbar_elevation)
+                } else {
+                    0F
+                }
+                toolbarBackgroundColor = if (showElevation) {
+                    R.color.white
+                } else {
+                    android.R.color.transparent
+                }
+                statusBarColor = if (isAudioPlayer()) {
+                    ContextCompat.getColor(this, R.color.white_dark_grey)
+                } else {
+                    ContextCompat.getColor(this, R.color.black)
+                }
+            }
         }
+
+        window?.statusBarColor = statusBarColor
+        toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
+        toolbar.elevation = toolbarElevation
     }
 
     fun setDraggable(draggable: Boolean) {
