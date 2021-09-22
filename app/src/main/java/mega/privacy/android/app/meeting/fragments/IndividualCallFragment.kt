@@ -605,7 +605,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         } else {
             inMeetingViewModel.getSession(clientId)?.let { session ->
                 videoListener?.let {
-                    if (session.canRecvVideoHiRes() && session.isHiResVideo) {
+                    if (session.canRecvVideoHiRes()) {
                         logDebug("Removing HiRes video of client ID $clientId")
                         inMeetingViewModel.stopHiResVideo(session, chatId)
                     }
