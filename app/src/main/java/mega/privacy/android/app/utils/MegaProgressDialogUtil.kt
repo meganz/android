@@ -1,4 +1,4 @@
-package mega.privacy.android.app.components
+package mega.privacy.android.app.utils
 
 import androidx.appcompat.app.AlertDialog
 import android.content.Context
@@ -71,25 +71,5 @@ object MegaProgressDialogUtil {
         }
 
         return dialog
-    }
-
-    /**
-     * Checks if a MegaProgressDialog is shown.
-     *
-     * @param dialog    The dialog to check.
-     * @return True if the dialog is showing, false otherwise.
-     */
-    @JvmStatic
-    fun isMegaProgressDialogShown(dialog: AlertDialog?): Boolean =
-        dialog?.isShowing == true
-
-    /**
-     * Dismisses a AlertDialog.
-     *
-     * @param dialog    AlertDialog to dismiss.
-     */
-    @JvmStatic
-    fun dismissMegaProgressDialogIfExists(dialog: AlertDialog?) {
-        dialog?.dismiss()
     }
 }

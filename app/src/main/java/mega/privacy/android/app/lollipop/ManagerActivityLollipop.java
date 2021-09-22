@@ -248,10 +248,10 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.components.MegaProgressDialogUtil.dismissMegaProgressDialogIfExists;
-import static mega.privacy.android.app.components.MegaProgressDialogUtil.createProgressDialog;
-import static mega.privacy.android.app.components.MegaProgressDialogUtil.isMegaProgressDialogShown;
-import static mega.privacy.android.app.components.MegaProgressDialogUtil.showProcessFileDialog;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog;
 import static mega.privacy.android.app.constants.EventConstants.*;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
@@ -1310,7 +1310,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		nodeAttacher.saveState(outState);
 		nodeSaver.saveState(outState);
 
-		outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isMegaProgressDialogShown(processFileDialog));
+		outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog));
 	}
 
 	@Override
@@ -3516,7 +3516,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			miniAudioPlayerController = null;
 		}
 
-        dismissMegaProgressDialogIfExists(processFileDialog);
+		dismissAlertDialogIfExists(processFileDialog);
 
 		nodeSaver.destroy();
 
@@ -6198,7 +6198,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     		return;
     	}
 
-		dismissMegaProgressDialogIfExists(statusDialog);
+		dismissAlertDialogIfExists(statusDialog);
 
 		logDebug("DRAWERITEM: " + drawerItem);
 
@@ -9057,8 +9057,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentProcessedLollipop");
 
-		dismissMegaProgressDialogIfExists(statusDialog);
-		dismissMegaProgressDialogIfExists(processFileDialog);
+		dismissAlertDialogIfExists(statusDialog);
+		dismissAlertDialogIfExists(processFileDialog);
 
 		MegaNode parentNode = getCurrentParentNode(getCurrentParentHandle(), -1);
 		if(parentNode == null){
@@ -9505,7 +9505,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
 			logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
 
-			dismissMegaProgressDialogIfExists(statusDialog);
+			dismissAlertDialogIfExists(statusDialog);
 
 			if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_contact_invitation_resent), -1);
@@ -9554,7 +9554,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
-			dismissMegaProgressDialogIfExists(statusDialog);
+			dismissAlertDialogIfExists(statusDialog);
 
 			if (e.getErrorCode() == MegaError.API_OK){
 //				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_LONG).show();
@@ -9683,7 +9683,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			logDebug("requestFinish " + MegaRequest.TYPE_REMOVE);
 			if (e.getErrorCode() == MegaError.API_OK){
-				dismissMegaProgressDialogIfExists(statusDialog);
+				dismissAlertDialogIfExists(statusDialog);
 				refreshAfterRemoving();
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
 				resetAccountDetailsTimeStamp();
@@ -9696,7 +9696,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else if (request.getType() == MegaRequest.TYPE_COPY){
 			logDebug("TYPE_COPY");
 
-			dismissMegaProgressDialogIfExists(statusDialog);
+			dismissAlertDialogIfExists(statusDialog);
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Show snackbar!!!!!!!!!!!!!!!!!!!");
@@ -9739,7 +9739,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-			dismissMegaProgressDialogIfExists(statusDialog);
+			dismissAlertDialogIfExists(statusDialog);
             if (e.getErrorCode() == MegaError.API_OK){
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -10132,7 +10132,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		logDebug("onNodesUpdateLollipop");
-		dismissMegaProgressDialogIfExists(statusDialog);
+		dismissAlertDialogIfExists(statusDialog);
 
 		boolean updateContacts = false;
 
@@ -10794,7 +10794,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void copyError(){
 		try {
-			dismissMegaProgressDialogIfExists(statusDialog);
+			dismissAlertDialogIfExists(statusDialog);
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 		}
 		catch (Exception ex) {}
