@@ -121,7 +121,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     public InvitationContactInfo getItem(int position) {
-        if (position < contactData.size()) {
+        if (position >= 0 && position < contactData.size()) {
             return contactData.get(position);
         }
         return null;
