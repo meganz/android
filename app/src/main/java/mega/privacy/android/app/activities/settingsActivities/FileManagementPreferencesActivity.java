@@ -233,15 +233,15 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
      */
     public void showClearRubbishBinDialog() {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(getString(R.string.context_clear_rubbish));
-        builder.setMessage(getString(R.string.clear_rubbish_confirmation));
+        builder.setTitle(StringResourcesUtils.getString(R.string.context_clear_rubbish));
+        builder.setMessage(StringResourcesUtils.getString(R.string.clear_rubbish_confirmation));
 
-        builder.setPositiveButton(getString(R.string.general_clear),
+        builder.setPositiveButton(StringResourcesUtils.getString(R.string.general_clear),
                 (dialog, whichButton) -> {
                     NodeController nC = new NodeController(this);
                     nC.cleanRubbishBin();
                 });
-        builder.setNegativeButton(getString(android.R.string.cancel), null);
+        builder.setNegativeButton(StringResourcesUtils.getString(android.R.string.cancel), null);
         clearRubbishBinDialog = builder.create();
         clearRubbishBinDialog.show();
     }
@@ -251,15 +251,15 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
      */
     public void showConfirmationClearAllVersions() {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(getString(R.string.settings_file_management_delete_versions));
-        builder.setMessage(getString(R.string.text_confirmation_dialog_delete_versions));
+        builder.setTitle(StringResourcesUtils.getString(R.string.settings_file_management_delete_versions));
+        builder.setMessage(StringResourcesUtils.getString(R.string.text_confirmation_dialog_delete_versions));
 
-        builder.setPositiveButton(getString(R.string.context_delete),
+        builder.setPositiveButton(StringResourcesUtils.getString(R.string.context_delete),
                 (dialog, whichButton) -> {
                     NodeController nC = new NodeController(this);
                     nC.clearAllVersions();
                 });
-        builder.setNegativeButton(getString(android.R.string.cancel), null);
+        builder.setNegativeButton(StringResourcesUtils.getString(android.R.string.cancel), null);
         clearRubbishBinDialog = builder.create();
         clearRubbishBinDialog.show();
     }
@@ -274,19 +274,19 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         builder.setView(v);
 
         TextView title = v.findViewById(R.id.dialog_title);
-        title.setText(getString(R.string.settings_rb_scheduler_enable_title));
+        title.setText(StringResourcesUtils.getString(R.string.settings_rb_scheduler_enable_title));
         TextView text = v.findViewById(R.id.dialog_text);
-        text.setText(getString(R.string.settings_rb_scheduler_alert_disabling));
+        text.setText(StringResourcesUtils.getString(R.string.settings_rb_scheduler_alert_disabling));
 
         Button firstButton = v.findViewById(R.id.dialog_first_button);
-        firstButton.setText(getString(R.string.button_plans_almost_full_warning));
+        firstButton.setText(StringResourcesUtils.getString(R.string.button_plans_almost_full_warning));
         firstButton.setOnClickListener(v1 -> {
             generalDialog.dismiss();
             showUpgradeAccount();
         });
 
         Button secondButton = v.findViewById(R.id.dialog_second_button);
-        secondButton.setText(getString(R.string.button_not_now_rich_links));
+        secondButton.setText(StringResourcesUtils.getString(R.string.button_not_now_rich_links));
         secondButton.setOnClickListener(v12 -> generalDialog.dismiss());
 
         generalDialog = builder.create();
@@ -375,7 +375,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         input.setSingleLine();
         input.setTextColor(ColorUtils.getThemeColor(this, android.R.attr.textColorSecondary));
-        input.setHint(getString(R.string.hint_days));
+        input.setHint(StringResourcesUtils.getString(R.string.hint_days));
         input.setImeOptions(EditorInfo.IME_ACTION_DONE);
         input.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -384,14 +384,14 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
             }
             return false;
         });
-        input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
+        input.setImeActionLabel(StringResourcesUtils.getString(R.string.general_create), EditorInfo.IME_ACTION_DONE);
         input.requestFocus();
 
         final TextView text = new TextView(FileManagementPreferencesActivity.this);
         if (myAccountInfo.getAccountType() > MegaAccountDetails.ACCOUNT_TYPE_FREE) {
-            text.setText(getString(R.string.settings_rb_scheduler_enable_period_PRO));
+            text.setText(StringResourcesUtils.getString(R.string.settings_rb_scheduler_enable_period_PRO));
         } else {
-            text.setText(getString(R.string.settings_rb_scheduler_enable_period_FREE));
+            text.setText(StringResourcesUtils.getString(R.string.settings_rb_scheduler_enable_period_FREE));
         }
 
         float density = getResources().getDisplayMetrics().density;
@@ -406,8 +406,8 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         text.setLayoutParams(params_text_error);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle(getString(R.string.settings_rb_scheduler_select_days_title));
-        builder.setPositiveButton(getString(R.string.general_ok),
+        builder.setTitle(StringResourcesUtils.getString(R.string.settings_rb_scheduler_select_days_title));
+        builder.setPositiveButton(StringResourcesUtils.getString(R.string.general_ok),
                 (dialog, whichButton) -> {
 
                 });
