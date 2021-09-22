@@ -117,6 +117,22 @@
         <item name="android:textColor">?attr/colorSecondary</item>
     </style>
 
+    <!-- Chip -->
+    <style name="Widget.Mega.Chip.New" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="chipBackgroundColor">?colorSecondary</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Caption.Medium</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:checkable">false</item>
+        <item name="android:clickable">false</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="chipMinTouchTargetSize">0dp</item>
+        <item name="chipStartPadding">0dp</item>
+        <item name="chipEndPadding">0dp</item>
+        <item name="textStartPadding">7dp</item>
+        <item name="textEndPadding">7dp</item>
+        <item name="chipMinHeight">20dp</item>
+    </style>
+
     <!--  For ListPreference  -->
     <style name="ThemeOverlay.Mega.MaterialAlertDialog.ListPreference">
         <item name="colorControlNormal">@color/grey_054_white_054</item>
@@ -205,31 +221,24 @@
         <item name="colorOnSecondary">@color/teal_300_black</item>
     </style>
 
-    <!-- My Account "UPGRADE" Button, outlined in Light, solid white in Dark -->
-    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton" >
-        <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
-        <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
+    <!-- My Account, Edit profile "LOGOUT" Button -->
+    <style name="Widget.Mega.Button.Variant1" parent="Widget.Mega.Button.OutlinedButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="strokeColor">@color/grey_012_white_012</item>
+        <item name="backgroundTint">@color/grey_010_white_009</item>
+        <item name="android:textColor">?android:attr/colorAccent</item>
+        <item name="android:paddingStart">@dimen/btn_21_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/btn_21_padding_horizontal</item>
         <item name="android:paddingTop">@dimen/btn_transparent_padding_vertical</item>
         <item name="android:paddingBottom">@dimen/btn_transparent_padding_vertical</item>
     </style>
 
-    <!-- My Account "CHANGE PASSWORD" Button, solid white in Light, outlined in Dark -->
-    <style name="Widget.Mega.Button.Variant2">
-        <item name="strokeColor">@color/white</item>
-        <item name="backgroundTint">@color/white</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:elevation">2dp</item>
-        <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
-        <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
-    </style>
-
-    <!-- My Account "LOGOUT" Button, grey outlined in Light, outlined in Dark -->
-    <style name="Widget.Mega.Button.Variant3" parent="Widget.Mega.Button.OutlinedButton">
-        <item name="strokeColor">@color/grey_alpha_026</item>
-        <item name="backgroundTint">@color/white</item>
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="android:paddingLeft">@dimen/btn_21_padding_horizontal</item>
-        <item name="android:paddingRight">@dimen/btn_21_padding_horizontal</item>
+    <!-- My Account "UPGRADE" Button -->
+    <style name="Widget.Mega.Button.Variant2" parent="Widget.Mega.Button.OutlinedButton">
+        <item name="strokeColor">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:textColor">@color/white_black</item>
     </style>
 
     <!--  Same in dark mode and light mode  -->
@@ -635,6 +644,18 @@
         <item name="android:layout_height">4dp</item>
         <item name="minHeight">4dp</item>
         <item name="maxHeight">4dp</item>
+    </style>
+
+    <style name="Widget.Mega.SearchView" parent="Widget.AppCompat.SearchView.ActionBar">
+        <item name="background">@null</item>
+    </style>
+
+    <style name="Widget.Mega.EmptyTextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:drawablePadding">12dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Body2</item>
+        <item name="drawableTint">@color/grey_100_grey_600</item>
     </style>
 
 </resources>

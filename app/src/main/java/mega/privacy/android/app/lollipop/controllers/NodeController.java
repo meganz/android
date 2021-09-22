@@ -5,16 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import java.io.File;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.GetLinkActivity;
+import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.listeners.RemoveVersionsListener;
@@ -34,10 +32,8 @@ import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.listeners.ShareListener.*;
 import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -93,7 +89,7 @@ public class NodeController {
         logDebug("copyNodes");
 
         if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -147,7 +143,7 @@ public class NodeController {
         logDebug("moveNodes");
 
         if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -283,8 +279,6 @@ public class NodeController {
         logDebug("exportLink");
         if (!isOnline(context)) {
             showSnackbar(context, getString(R.string.error_server_connection_problem));
-        } else if(context instanceof GetLinkActivity) {
-            megaApi.exportNode(document, new ExportListener(context));
         } else if(context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, ((MegaRequestListenerInterface) context));
         }
@@ -294,8 +288,6 @@ public class NodeController {
         logDebug("exportLinkTimestamp: " + timestamp);
         if (!isOnline(context)) {
             showSnackbar(context, getString(R.string.error_server_connection_problem));
-        } else if (context instanceof GetLinkActivity) {
-            megaApi.exportNode(document, timestamp, new ExportListener(context));
         } else if (context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, timestamp, ((MegaRequestListenerInterface) context));
         }
@@ -307,7 +299,7 @@ public class NodeController {
 
     public void removeLinks(ArrayList<MegaNode> nodes){
         if (!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -324,7 +316,7 @@ public class NodeController {
         //TODO shareMultipleFolders
 
         if (!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -595,7 +587,7 @@ public class NodeController {
 
     public void shareFolder(MegaNode node, ArrayList<String> selectedContacts, int permissions) {
         if (!isOnline(context)) {
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -611,7 +603,7 @@ public class NodeController {
     public void shareFolders(long[] nodeHandles, ArrayList<String> contactsData, int permissions){
 
         if(!isOnline(context)){
-            ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -636,115 +628,5 @@ public class NodeController {
     public void clearAllVersions(){
         logDebug("clearAllVersions");
         megaApi.removeVersions(new RemoveVersionsListener(context));
-    }
-
-    public void deleteOffline(MegaOffline selectedNode){
-        logDebug("deleteOffline");
-        dbH = DatabaseHandler.getDbHandler(context);
-
-        //Delete children
-        ArrayList<MegaOffline> mOffListChildren = dbH.findByParentId(selectedNode.getId());
-        if (mOffListChildren.size() > 0) {
-            //The node have childrens, delete
-            deleteChildrenDB(mOffListChildren);
-        }
-
-        removeNodePhysically(selectedNode);
-
-        dbH.removeById(selectedNode.getId());
-
-        //Check if the parent has to be deleted
-
-        int parentId = selectedNode.getParentId();
-        MegaOffline parentNode = dbH.findById(parentId);
-
-        if (parentNode != null) {
-            logDebug("Parent to check: " + parentNode.getName());
-            checkParentDeletion(parentNode);
-        }
-    }
-
-    private void removeNodePhysically(MegaOffline megaOffline) {
-        logDebug("Remove the node physically");
-        try {
-            File offlineFile = getOfflineFile(context, megaOffline);
-            deleteFolderAndSubfolders(context, offlineFile);
-        } catch (Exception e) {
-            logError("EXCEPTION: deleteOffline - adapter", e);
-        }
-    }
-
-    public void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
-
-        logDebug("Size: " + mOffListChildren.size());
-        MegaOffline mOffDelete=null;
-
-        for(int i=0; i<mOffListChildren.size(); i++){
-
-            mOffDelete=mOffListChildren.get(i);
-
-            logDebug("Children " + i + ": "+ mOffDelete.getHandle());
-            ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
-            if(mOffListChildren2.size()>0){
-                //The node have children, delete
-                deleteChildrenDB(mOffListChildren2);
-            }
-
-            int lines = dbH.removeById(mOffDelete.getId());
-            logDebug("Deleted: " + lines);
-        }
-    }
-
-    public void checkParentDeletion (MegaOffline parentToDelete){
-        logDebug("parentToDelete: " + parentToDelete.getHandle());
-
-        ArrayList<MegaOffline> mOffListChildren=dbH.findByParentId(parentToDelete.getId());
-        File destination = null;
-        if(mOffListChildren.size()<=0){
-            logDebug("The parent has NO children");
-            //The node have NO childrens, delete it
-
-            dbH.removeById(parentToDelete.getId());
-
-            removeNodePhysically(parentToDelete);
-
-            int parentId = parentToDelete.getParentId();
-            if(parentId==-1){
-                File rootIncomingFile = getOfflineFile(context, parentToDelete);
-
-                if(isFileAvailable(rootIncomingFile)){
-                    String[] fileList = rootIncomingFile.list();
-                    if(fileList!=null){
-                        if(rootIncomingFile.list().length==0){
-                            try{
-                                rootIncomingFile.delete();
-                            }
-                            catch(Exception e){
-                                logError("EXCEPTION: deleteParentIncoming: " + destination, e);
-                            };
-                        }
-                    }
-                }
-                else{
-                    logWarning("rootIncomingFile is NULL");
-                }
-            }
-            else{
-                //Check if the parent has to be deleted
-
-                parentToDelete = dbH.findById(parentId);
-                if(parentToDelete != null){
-                    logDebug("Parent to check: " + parentToDelete.getHandle());
-                    checkParentDeletion(parentToDelete);
-
-                }
-            }
-
-        }
-        else{
-            logDebug("The parent has children!!! RETURN!!");
-            return;
-        }
-
     }
 }

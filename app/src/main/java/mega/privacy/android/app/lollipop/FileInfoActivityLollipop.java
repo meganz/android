@@ -85,6 +85,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.LocationInfo;
 import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.ContactUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -893,6 +894,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         downloadMenuItem = menu.findItem(R.id.cab_menu_file_info_download);
         shareMenuItem = menu.findItem(R.id.cab_menu_file_info_share_folder);
         getLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_get_link);
+        getLinkMenuItem.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
         editLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_edit_link);
         removeLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_remove_link);
         renameMenuItem = menu.findItem(R.id.cab_menu_file_info_rename);

@@ -35,8 +35,9 @@
             app:drawableStartCompat="@drawable/ic_sort_name_descending"
             tools:text="Name (descending)" />
 
-        <View
+        <include
             android:id="@+id/sort_by_name_separator"
+            layout="@layout/view_linear_layout_separator_72"
             style="@style/BottomSheetItemDivider" />
 
         <TextView
@@ -51,8 +52,9 @@
             android:text="@string/sortby_size_smallest_first"
             app:drawableStartCompat="@drawable/ic_sort_smallest" />
 
-        <View
+        <include
             android:id="@+id/sort_by_size_separator"
+            layout="@layout/view_linear_layout_separator_72"
             style="@style/BottomSheetItemDivider" />
 
         <TextView
@@ -67,8 +69,9 @@
             android:text="@string/sortby_date_oldest"
             app:drawableStartCompat="@drawable/ic_sort_oldest" />
 
-        <View
+        <include
             android:id="@+id/sort_by_date_separator"
+            layout="@layout/view_linear_layout_separator_72"
             style="@style/BottomSheetItemDivider" />
 
         <TextView

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="88dp"
+    android:layout_marginEnd="16dp">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/thumbnail_image"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="12dp"
+        app:layout_constraintEnd_toStartOf="@+id/name_text"
+        app:layout_constraintTop_toTopOf="parent"
+        app:roundedCornerRadius="4dp"
+        tools:placeholderImage="@drawable/ic_image_list" />
+
+    <androidx.emoji.widget.EmojiTextView
+        android:id="@+id/name_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="12dp"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Grey87White87"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="IMG_20171123_17220.jpg" />
+
+    <TextView
+        android:id="@+id/link_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="72dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey54White60"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/name_text"
+        tools:text="https://mega.nz/file/b0cXHSzJ#bmwrasiifhawigheoehivohierv" />
+
+    <TextView
+        android:id="@+id/info_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="72dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Mega.Caption.Grey54White60"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/link_text"
+        tools:text="6.5 MB" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

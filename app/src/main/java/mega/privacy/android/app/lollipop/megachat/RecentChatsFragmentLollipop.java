@@ -1503,22 +1503,19 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     public boolean checkPermissionsCall() {
         logDebug("checkPermissionsCall() ");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            boolean hasCameraPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED);
-            if (!hasCameraPermission) {
-                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
-                return false;
-            }
-
-            boolean hasRecordAudioPermission = (ContextCompat.checkSelfPermission(((ManagerActivityLollipop) context), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED);
-            if (!hasRecordAudioPermission) {
-                ActivityCompat.requestPermissions(((ManagerActivityLollipop) context), new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO);
-                return false;
-            }
-
-            return true;
+        boolean hasCameraPermission = hasPermissions(((ManagerActivityLollipop) context), Manifest.permission.CAMERA);
+        if (!hasCameraPermission) {
+            requestPermission(((ManagerActivityLollipop) context), REQUEST_CAMERA, Manifest.permission.CAMERA);
+            return false;
         }
+
+        boolean hasRecordAudioPermission = hasPermissions(((ManagerActivityLollipop) context), Manifest.permission.RECORD_AUDIO);
+        if (!hasRecordAudioPermission) {
+            requestPermission(((ManagerActivityLollipop) context), REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
+            return false;
+        }
+
         return true;
     }
 

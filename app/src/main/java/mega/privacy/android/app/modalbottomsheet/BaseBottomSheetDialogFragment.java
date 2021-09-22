@@ -2,6 +2,7 @@ package mega.privacy.android.app.modalbottomsheet;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -18,12 +19,15 @@ import androidx.annotation.Nullable;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.interfaces.ActivityLauncher;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -35,7 +39,7 @@ import static mega.privacy.android.app.utils.LogUtil.logError;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
-public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
+public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment implements ActivityLauncher {
     protected static final int HEIGHT_HEADER_RADIO_GROUP = 56;
     protected static final int HEIGHT_HEADER_LARGE = 81;
     protected static final int HEIGHT_HEADER_LOW = 48;
@@ -236,5 +240,15 @@ public class BaseBottomSheetDialogFragment extends BottomSheetDialogFragment {
         }
 
         return peekHeight;
+    }
+
+    @Override
+    public void launchActivity(@NotNull Intent intent) {
+        startActivity(intent);
+    }
+
+    @Override
+    public void launchActivityForResult(@NotNull Intent intent, int requestCode) {
+        startActivityForResult(intent, requestCode);
     }
 }

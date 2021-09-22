@@ -66,7 +66,7 @@
         android:id="@+id/cab_menu_share_link"
         android:icon="@drawable/ic_link_white"
         android:orderInCategory="160"
-        android:title="@string/context_get_link_menu"
+        android:title="@{@plurals/get_links(one)}"
         android:visible="false"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="never"

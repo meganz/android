@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/photo_bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:id="@+id/items_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/capture_photo_action"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/take_photo_avatar_panel"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:drawableStartCompat="@drawable/ic_media"
+                app:drawableTint="?android:attr/textColorSecondary" />
+
+            <TextView
+                android:id="@+id/choose_photo_action"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/choose_photo_avatar_panel"
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                app:drawableStartCompat="@drawable/ic_choose_photo"
+                app:drawableTint="?android:attr/textColorSecondary" />
+
+            <include
+                android:id="@+id/delete_separator"
+                layout="@layout/view_linear_layout_separator_72" />
+
+            <TextView
+                android:id="@+id/delete_picture_action"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:drawablePadding="@dimen/bottom_sheet_drawable_padding"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/delete_avatar_panel"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Red"
+                app:drawableStartCompat="@drawable/ic_remove"
+                app:drawableTint="@color/red_600_red_300" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

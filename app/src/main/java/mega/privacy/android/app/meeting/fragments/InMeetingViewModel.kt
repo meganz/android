@@ -902,19 +902,23 @@ class InMeetingViewModel @ViewModelInject constructor(
      * @param status if it's grid view or speaker view
      */
     @ExperimentalCoroutinesApi
-    fun createCurrentParticipants(list: MegaHandleList, status: String) {
-        _callLiveData.value = inMeetingRepository.getMeeting(currentChatId)
-        for (i in 0 until list.size()) {
-            getSession(list[i])?.let { session ->
-                createParticipant(session, status)?.let { participantCreated ->
-                    logDebug("Adding current participant... ${participantCreated.clientId}")
-                    participants.value?.add(participantCreated)
+    fun createCurrentParticipants(list: MegaHandleList?, status: String) {
+        list?.let { listParticipants ->
+            if (listParticipants.size() > 0) {
+                _callLiveData.value = inMeetingRepository.getMeeting(currentChatId)
+                for (i in 0 until list.size()) {
+                    getSession(list[i])?.let { session ->
+                        createParticipant(session, status)?.let { participantCreated ->
+                            logDebug("Adding current participant... ${participantCreated.clientId}")
+                            participants.value?.add(participantCreated)
+                        }
+                    }
                 }
+
+                participants.value = participants.value
+                logDebug("Num of participants: " + participants.value?.size)
             }
         }
-
-        participants.value = participants.value
-        logDebug("Num of participants: " + participants.value?.size)
     }
 
     /**
@@ -1062,11 +1066,11 @@ class InMeetingViewModel @ViewModelInject constructor(
         if (participant.videoListener == null) return
 
         getSession(participant.clientId)?.let {
-            if (participant.hasHiRes && it.canRecvVideoHiRes() && it.isHiResVideo) {
+            if (participant.hasHiRes && it.canRecvVideoHiRes()) {
                 logDebug("Stop HiResolution and remove listener, clientId = ${participant.clientId}")
                 stopHiResVideo(it, currentChatId)
 
-            } else if (!participant.hasHiRes && it.canRecvVideoLowRes() && it.isLowResVideo) {
+            } else if (!participant.hasHiRes && it.canRecvVideoLowRes()) {
                 logDebug("Stop LowResolution and remove listener, clientId = ${participant.clientId}")
                 stopLowResVideo(it, currentChatId)
             }
@@ -1460,7 +1464,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         chatId: Long
     ) {
         session?.let { sessionParticipant ->
-            if (sessionParticipant.canRecvVideoHiRes() && sessionParticipant.isHiResVideo) {
+            if (sessionParticipant.canRecvVideoHiRes()) {
                 logDebug("Removing HiRes for remote video, clientId ${sessionParticipant.clientid}")
                 val list: MegaHandleList = MegaHandleList.createInstance()
                 list.addMegaHandle(sessionParticipant.clientid)
@@ -1508,7 +1512,7 @@ class InMeetingViewModel @ViewModelInject constructor(
         chatId: Long
     ) {
         session?.let { sessionParticipant ->
-            if (sessionParticipant.canRecvVideoLowRes() && sessionParticipant.isLowResVideo) {
+            if (sessionParticipant.canRecvVideoLowRes()) {
                 logDebug("Removing LowRes for remote video, clientId ${sessionParticipant.clientid}")
                 val list: MegaHandleList = MegaHandleList.createInstance()
                 list.addMegaHandle(sessionParticipant.clientid)

@@ -1,9 +1,5 @@
 package mega.privacy.android.app;
 
-import static android.content.Intent.ACTION_SCREEN_OFF;
-import static android.content.Intent.ACTION_SCREEN_ON;
-import static android.content.Intent.ACTION_USER_PRESENT;
-
 import android.app.Activity;
 import android.app.Application;
 import android.app.Notification;
@@ -38,19 +34,25 @@ import androidx.emoji.text.EmojiCompat;
 import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.lifecycle.Observer;
 import androidx.multidex.MultiDexApplication;
-import androidx.preference.PreferenceManager;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
+import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.app.di.MegaApiFolder;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
+import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
 import dagger.hilt.android.HiltAndroidApp;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.components.PushNotificationSettingManagement;
@@ -58,31 +60,24 @@ import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes;
 import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider;
-import mega.privacy.android.app.di.MegaApi;
-import mega.privacy.android.app.di.MegaApiFolder;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.fcm.KeepAliveService;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
-import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase;
-import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetCuAttributeListener;
-import mega.privacy.android.app.listeners.GlobalChatListener;
 import mega.privacy.android.app.listeners.GlobalListener;
+import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.MyAccountInfo;
-import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager;
 import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
-import mega.privacy.android.app.service.ads.AdsLibInitializer;
-import mega.privacy.android.app.utils.CallUtil;
+import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.ThemeHelper;
+
 import nz.mega.sdk.MegaAccountSession;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -109,7 +104,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import static mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT;
@@ -117,7 +111,6 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_COMPO
 import static mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_STATUS_CHANGE;
-import static mega.privacy.android.app.sync.BackupToolsKt.initCuSync;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER;
 import static mega.privacy.android.app.utils.ChangeApiServerUtil.API_SERVER_PREFERENCES;
@@ -164,13 +157,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	GetCookieSettingsUseCase getCookieSettingsUseCase;
 	@Inject
 	SortOrderManagement sortOrderManagement;
+	@Inject
+	MyAccountInfo myAccountInfo;
 
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
 	final static public String APP_KEY = "6tioyn8ka5l6hty";
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
 
-	MyAccountInfo myAccountInfo;
 	boolean esid = false;
 
 	private int storageState = MegaApiJava.STORAGE_STATE_UNKNOWN; //Default value
@@ -343,7 +337,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					}
 				} else if (e.getErrorCode() == MegaError.API_ESID) {
 					logWarning("TYPE_LOGOUT:API_ESID");
-					myAccountInfo = new MyAccountInfo();
+					myAccountInfo.resetDefaults();
 
 					esid = true;
 
@@ -372,7 +366,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER, new GetCuAttributeListener(getApplicationContext()));
 
 					// Init CU sync data after login successfully
-					initCuSync();
+					new CUBackupInitializeChecker(megaApi).initCuSync();
 
 					//Login check resumed pending transfers
 					TransfersManagement.checkResumedPendingTransfers();
@@ -468,7 +462,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				logDebug ("Account details request");
 				if (e.getErrorCode() == MegaError.API_OK){
 
-					boolean storage = (request.getNumDetails() & myAccountInfo.hasStorageDetails) != 0;
+					boolean storage = (request.getNumDetails() & MyAccountInfo.HAS_STORAGE_DETAILS) != 0;
 					if (storage) {
 						dbH.setAccountDetailsTimeStamp();
 					}
@@ -477,7 +471,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 						myAccountInfo.setAccountInfo(request.getMegaAccountDetails());
 						myAccountInfo.setAccountDetails(request.getNumDetails());
 
-						boolean sessions = (request.getNumDetails() & myAccountInfo.hasSessionsDetails) != 0;
+						boolean sessions = (request.getNumDetails() & MyAccountInfo.HAS_SESSIONS_DETAILS) != 0;
 						if (sessions) {
 							MegaAccountSession megaAccountSession = request.getMegaAccountDetails().getSession(0);
 
@@ -493,7 +487,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 							}
 						}
 
-						logDebug("onRequest TYPE_ACCOUNT_DETAILS: " + myAccountInfo.getUsedPerc());
+						logDebug("onRequest TYPE_ACCOUNT_DETAILS: " + myAccountInfo.getUsedPercentage());
 					}
 
 					sendBroadcastUpdateAccountDetails();
@@ -773,7 +767,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			megaApi.useHttpsOnly(useHttpsOnly);
 		}
 
-		myAccountInfo = new MyAccountInfo();
+		myAccountInfo.resetDefaults();
 
 		if (dbH != null) {
 			dbH.resetExtendedAccountDetailsTimestamp();
@@ -832,8 +826,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		ContextUtils.initialize(getApplicationContext());
 
 		Fresco.initialize(this);
-
-		AdsLibInitializer.INSTANCE.init(this);
 	}
 
 	public void askForFullAccountInfo(){
@@ -1840,7 +1832,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public void resetMyAccountInfo() {
-    	myAccountInfo = new MyAccountInfo();
+    	myAccountInfo.resetDefaults();
 	}
 
 	public int getStorageState() {

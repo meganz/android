@@ -25,7 +25,7 @@ import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showConfirmRemoveLinkDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager.buildTempFile
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
 import mega.privacy.android.app.utils.Constants.*

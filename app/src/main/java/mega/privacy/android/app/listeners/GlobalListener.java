@@ -22,8 +22,11 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED;
+import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
+import static mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE;
+import static mega.privacy.android.app.utils.Constants.EXTRA_STORAGE_STATE;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER;
 
 public class GlobalListener implements MegaGlobalListenerInterface {
@@ -128,7 +131,7 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
         Intent intent = new Intent(BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE);
         intent.setAction(ACTION_ON_ACCOUNT_UPDATE);
-        MegaApplication.getInstance().sendBroadcast(intent);
+        megaApplication.sendBroadcast(intent);
 
         api.getPaymentMethods(null);
         api.getAccountDetails(null);
@@ -163,6 +166,8 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                     notificationBuilder.showAcceptanceContactRequestNotification(cr.getTargetEmail());
 
                     logDebug("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
+
+                    new RatingHandlerImpl(megaApplication.getApplicationContext()).showRatingBaseOnContacts();
                 }
 
                 if(cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED){

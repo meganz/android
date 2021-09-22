@@ -300,7 +300,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         true,
                         inMeetingViewModel.isCallOnHold()
                     )
-                    checkCurrentParticipants()
+
+                    if (it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+                        checkCurrentParticipants()
+                    }
+
                     checkMenuItemsVisibility()
                     checkChildFragments()
                     controlVideoLocalOneToOneCall(it.hasLocalVideo())

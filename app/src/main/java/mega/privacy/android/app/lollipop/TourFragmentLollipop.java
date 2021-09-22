@@ -36,6 +36,7 @@ import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment;
 import mega.privacy.android.app.utils.TextUtil;
 
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
@@ -270,7 +271,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
         intent.setData(dataUri);
         if (key != null) {
-            intent.putExtra("MK", key);
+            intent.putExtra(EXTRA_MASTER_KEY, key);
             intent.setAction(ACTION_RESET_PASS_FROM_LINK);
         } else {
             intent.setAction(ACTION_RESET_PASS_FROM_PARK_ACCOUNT);

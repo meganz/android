@@ -118,6 +118,7 @@
     <dimen name="toolbar_elevation">4dp</dimen>
     <dimen name="drawer_item_height">48dp</dimen>
 
+    <dimen name="bottom_sheet_drawable_padding">32dp</dimen>
     <!-- My account page button padding -->
     <dimen name="btn_21_padding_horizontal">21dp</dimen>
 
@@ -144,4 +145,9 @@
     <dimen name="text_editor_padding_end_with_nLines">12dp</dimen>
     <dimen name="line_number_size">10sp</dimen>
 
+    <dimen name="image_contact_size">40dp</dimen>
+    <dimen name="image_contact_text_size">20sp</dimen>
+    <dimen name="image_group_size">26dp</dimen>
+    <dimen name="image_group_text_size">15sp</dimen>
+    <dimen name="image_group_border_size">1dp</dimen>
 </resources>
