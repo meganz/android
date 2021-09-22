@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -16,7 +15,6 @@ import android.os.StatFs;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.ViewPager;
@@ -44,7 +42,6 @@ import java.util.Map;
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ExtendedViewPager;
@@ -53,16 +50,12 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -118,8 +111,6 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 	private ExtendedViewPager viewPager;
 
 	static ChatFullScreenImageViewer fullScreenImageViewer;
-    private MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 
 	MegaNode nodeToImport;
 
@@ -320,33 +311,14 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 		dbH = DatabaseHandler.getDbHandler(this);
 
-		MegaApplication app = (MegaApplication)getApplication();
-
 		if(isOnline(this)){
-			megaApi = app.getMegaApi();
-
-			if((megaApi==null||megaApi.getRootNode()==null) && !chatC.isInAnonymousMode()){
-				logDebug("Refresh session - sdk");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
+			if ((megaApi == null || megaApi.getRootNode() == null) && !chatC.isInAnonymousMode()) {
+				refreshSession();
 				return;
 			}
 		}
 
-		if (megaChatApi == null) {
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-
-		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-			logDebug("Refresh session - karere");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
+		if (shouldRefreshSessionDueToKarere()) {
 			return;
 		}
 

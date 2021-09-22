@@ -63,7 +63,6 @@ import java.util.List;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
@@ -86,10 +85,7 @@ import mega.privacy.android.app.utils.LocationInfo;
 import mega.privacy.android.app.utils.CameraUploadUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -265,8 +261,6 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 	boolean availableOfflineBoolean = false;
 
 	private ContactController cC;
-	private MegaApiAndroid megaApi = null;
-	MegaChatApiAndroid megaChatApi;
 
 	ProgressDialog statusDialog;
 	boolean publicLink=false;
@@ -506,9 +500,12 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
 		super.onCreate(savedInstanceState);
         logDebug("onCreate");
+
+        if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+            return;
+        }
 
         fileInfoActivityLollipop = this;
         handler = new Handler();
@@ -645,34 +642,6 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         versionsLayout = (RelativeLayout) findViewById(R.id.file_properties_versions_layout);
         versionsButton = (Button) findViewById(R.id.file_properties_text_number_versions);
         separatorVersions = (View) findViewById(R.id.separator_versions);
-
-        if (megaApi == null){
-            MegaApplication app = (MegaApplication)getApplication();
-            megaApi = app.getMegaApi();
-        }
-        if(megaApi==null||megaApi.getRootNode()==null){
-            logDebug("Refresh session - sdk");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return;
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-        }
-
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-            logDebug("Refresh session - karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return;
-        }
 
         megaApi.addGlobalListener(this);
 

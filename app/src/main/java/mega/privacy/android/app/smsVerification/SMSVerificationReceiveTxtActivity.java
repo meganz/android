@@ -682,10 +682,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
                     public void run() {
                         //haven't logged in, if has credential will auto-login
                         if(api.isLoggedIn() == 0 || api.getRootNode() == null) {
-                            Intent intent = new Intent(getApplicationContext(), LoginActivityLollipop.class);
-                            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
+                            refreshSession();
                         } else {
                             setResult(RESULT_OK);
                         }

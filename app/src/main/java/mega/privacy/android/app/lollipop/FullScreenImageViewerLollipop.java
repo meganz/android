@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -19,7 +18,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
@@ -50,7 +48,6 @@ import java.util.List;
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -69,8 +66,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -164,8 +159,6 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
 	private ExtendedViewPager viewPager;
 
 	private FullScreenImageViewerLollipop fullScreenImageViewer;
-    private MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 
     private ArrayList<String> paths;
 	private String offlinePathDirectory;
@@ -823,34 +816,18 @@ public class FullScreenImageViewerLollipop extends PasscodeActivity
                 positionG -= placeholderCount;
             }
         }
-        MegaApplication app = (MegaApplication)getApplication();
-		if (isFolderLink ){
-			megaApi = app.getMegaApiFolder();
-		}else{
-			megaApi = app.getMegaApi();
+
+		if (isFolderLink) {
+			megaApi = megaApiFolder;
 		}
 
 		if(isOnline(this) && !isFileLink) {
-			if (megaApi == null || megaApi.getRootNode() == null) {
-				logDebug("Refresh session - sdk");
-				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-				intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intentLogin);
-				finish();
+			if (shouldRefreshSessionDueToSDK()) {
 				return;
 			}
 		}
 
-		if (megaChatApi == null) {
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-			Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-			intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-			intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intentLogin);
-			finish();
+		if (shouldRefreshSessionDueToKarere()) {
 			return;
 		}
 

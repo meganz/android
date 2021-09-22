@@ -19,7 +19,6 @@ import android.os.Handler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
@@ -56,12 +55,10 @@ import mega.privacy.android.app.components.OnSwipeTouchListener;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.utils.TextUtil;
 
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatError;
@@ -687,15 +684,10 @@ public class ChatCallActivity extends BaseActivity implements MegaChatRequestLis
             megaChatApi.retryPendingConnections(false, null);
         }
 
-        if (megaApi == null || megaApi.getRootNode() == null || megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-            logWarning("Refresh session - sdk || karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         fragmentContainer = findViewById(R.id.file_info_fragment_container);
 
