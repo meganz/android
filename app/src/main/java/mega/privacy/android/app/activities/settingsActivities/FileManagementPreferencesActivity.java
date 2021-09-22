@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -31,6 +33,7 @@ import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.tasks.ManageOfflineTask;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaAccountDetails;
@@ -46,10 +49,13 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private static final int RB_SCHEDULER_MINIMUM_PERIOD = 6;
     private static final int RB_SCHEDULER_MAXIMUM_PERIOD = 31;
 
+    private static final String CLEAR_OFFLINE_SHOWN = "CLEAR_OFFLINE_SHOWN";
+
     @Inject
     MyAccountInfo myAccountInfo;
 
     private SettingsFileManagementFragment sttFileManagement;
+    private AlertDialog clearOfflineDialog;
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog newFolderDialog;
     private AlertDialog generalDialog;
@@ -195,11 +201,22 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         registerReceiver(updateFileVersionsReceiver,
                 new IntentFilter(ACTION_UPDATE_FILE_VERSIONS));
+
+        if (savedInstanceState != null && savedInstanceState.getBoolean(CLEAR_OFFLINE_SHOWN, false)) {
+            showClearOfflineDialog();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(CLEAR_OFFLINE_SHOWN, AlertDialogUtil.isAlertDialogShown(clearOfflineDialog));
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
         unregisterReceiver(cacheSizeUpdateReceiver);
         unregisterReceiver(offlineSizeUpdateReceiver);
         unregisterReceiver(networkReceiver);
@@ -208,22 +225,21 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         unregisterReceiver(resetVersionInfoReceiver);
         unregisterReceiver(updateRBSchedulerReceiver);
         unregisterReceiver(updateFileVersionsReceiver);
+
+        AlertDialogUtil.dismissAlertDialogIfExists(clearOfflineDialog);
     }
 
     /**
      * Show Clear Offline confirmation dialog.
      */
     public void showClearOfflineDialog() {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setMessage(StringResourcesUtils.getString(R.string.clear_offline_confirmation));
+        clearOfflineDialog = new MaterialAlertDialogBuilder(this)
+                .setMessage(StringResourcesUtils.getString(R.string.clear_offline_confirmation))
+                .setPositiveButton(StringResourcesUtils.getString(R.string.general_clear), (dialog, whichButton) ->
+                        new ManageOfflineTask(true).execute())
+                .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
+                .create();
 
-        builder.setPositiveButton(StringResourcesUtils.getString(R.string.general_clear),
-                (dialog, whichButton) -> {
-                    ManageOfflineTask clearOfflineTask = new ManageOfflineTask(true);
-                    clearOfflineTask.execute();
-                });
-        builder.setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null);
-        AlertDialog clearOfflineDialog = builder.create();
         clearOfflineDialog.show();
     }
 
