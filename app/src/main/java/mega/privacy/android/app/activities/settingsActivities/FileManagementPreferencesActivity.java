@@ -49,8 +49,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     @Inject
     MyAccountInfo myAccountInfo;
 
-    private SettingsFileManagementFragment sttFileManagment;
-    private AlertDialog clearOfflineDialog;
+    private SettingsFileManagementFragment sttFileManagement;
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog newFolderDialog;
     private AlertDialog generalDialog;
@@ -58,12 +57,12 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver cacheSizeUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+            if (intent == null || intent.getAction() == null || sttFileManagement == null)
                 return;
 
             if (intent.getAction().equals(ACTION_UPDATE_CACHE_SIZE_SETTING)) {
                 String size = intent.getStringExtra(CACHE_SIZE);
-                sttFileManagment.setCacheSize(size);
+                sttFileManagement.setCacheSize(size);
             }
         }
     };
@@ -71,11 +70,11 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver resetVersionInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+            if (intent == null || intent.getAction() == null || sttFileManagement == null)
                 return;
 
             if (intent.getAction().equals(ACTION_RESET_VERSION_INFO_SETTING)) {
-                sttFileManagment.resetVersionsInfo();
+                sttFileManagement.resetVersionsInfo();
             }
         }
     };
@@ -83,12 +82,12 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver offlineSizeUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+            if (intent == null || intent.getAction() == null || sttFileManagement == null)
                 return;
 
             if (intent.getAction().equals(ACTION_UPDATE_OFFLINE_SIZE_SETTING)) {
                 String size = intent.getStringExtra(OFFLINE_SIZE);
-                sttFileManagment.setOfflineSize(size);
+                sttFileManagement.setOfflineSize(size);
             }
         }
     };
@@ -96,11 +95,11 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver updateCUSettingsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+            if (intent == null || intent.getAction() == null || sttFileManagement == null)
                 return;
 
             if (intent.getAction().equals(ACTION_REFRESH_CLEAR_OFFLINE_SETTING)) {
-                sttFileManagment.taskGetSizeOffline();
+                sttFileManagement.taskGetSizeOffline();
             }
         }
     };
@@ -108,14 +107,14 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+            if (intent == null || intent.getAction() == null || sttFileManagement == null)
                 return;
 
             if (intent.getAction().equals(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)) {
                 int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE);
                 if (actionType == UPDATE_ACCOUNT_DETAILS) {
                     if (!isFinishing()) {
-                        sttFileManagment.setRubbishInfo();
+                        sttFileManagement.setRubbishInfo();
                     }
                 }
             }
@@ -125,15 +124,15 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+            if (intent == null || intent.getAction() == null || sttFileManagement == null)
                 return;
 
             int actionType = intent.getIntExtra(ACTION_TYPE, INVALID_VALUE);
 
             if (actionType == GO_OFFLINE) {
-                sttFileManagment.setOnlineOptions(false);
+                sttFileManagement.setOnlineOptions(false);
             } else if (actionType == GO_ONLINE) {
-                sttFileManagment.setOnlineOptions(true);
+                sttFileManagement.setOnlineOptions(true);
             }
         }
     };
@@ -141,13 +140,13 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver updateRBSchedulerReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+            if (intent == null || intent.getAction() == null || sttFileManagement == null)
                 return;
 
             long daysCount = intent.getLongExtra(DAYS_COUNT, INVALID_VALUE);
 
             if (daysCount != INVALID_VALUE) {
-                sttFileManagment.updateRBScheduler(daysCount);
+                sttFileManagement.updateRBScheduler(daysCount);
             }
         }
     };
@@ -155,10 +154,10 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     private final BroadcastReceiver updateFileVersionsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null || sttFileManagment == null)
+            if (intent == null || intent.getAction() == null || sttFileManagement == null)
                 return;
 
-            sttFileManagment.updateEnabledFileVersions();
+            sttFileManagement.updateEnabledFileVersions();
         }
     };
 
@@ -168,8 +167,8 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
         setTitle(R.string.settings_file_management_category);
 
-        sttFileManagment = new SettingsFileManagementFragment();
-        replaceFragment(sttFileManagment);
+        sttFileManagement = new SettingsFileManagementFragment();
+        replaceFragment(sttFileManagement);
 
         registerReceiver(cacheSizeUpdateReceiver,
                 new IntentFilter(ACTION_UPDATE_CACHE_SIZE_SETTING));
@@ -224,7 +223,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
                     clearOfflineTask.execute();
                 });
         builder.setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null);
-        clearOfflineDialog = builder.create();
+        AlertDialog clearOfflineDialog = builder.create();
         clearOfflineDialog.show();
     }
 
@@ -354,8 +353,8 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
      * Method required to reset the rubbish bin info.
      */
     public void resetRubbishInfo() {
-        if (sttFileManagment != null) {
-            sttFileManagment.resetRubbishInfo();
+        if (sttFileManagement != null) {
+            sttFileManagement.resetRubbishInfo();
         }
     }
 
@@ -412,8 +411,8 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
 
                 });
         builder.setNegativeButton(getString(android.R.string.cancel), (dialog, which) -> {
-            if (isEnabling && sttFileManagment != null) {
-                sttFileManagment.updateRBScheduler(0);
+            if (isEnabling && sttFileManagement != null) {
+                sttFileManagement.updateRBScheduler(0);
             }
         });
         builder.setView(layout);
@@ -421,8 +420,6 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         newFolderDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         newFolderDialog.show();
 
-        newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            controlOptionOfRbSchedulerValueDialog(input.getText().toString().trim(), input);
-        });
+        newFolderDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> controlOptionOfRbSchedulerValueDialog(input.getText().toString().trim(), input));
     }
 }
