@@ -104,8 +104,7 @@ public class SettingsFileManagementFragment extends SettingsBaseFragment {
 
         switch (preference.getKey()) {
             case KEY_OFFLINE:
-                ManageOfflineTask clearOfflineTask = new ManageOfflineTask(true);
-                clearOfflineTask.execute();
+                ((FileManagementPreferencesActivity) context).showClearOfflineDialog();
                 break;
 
             case KEY_CACHE:

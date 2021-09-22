@@ -30,7 +30,9 @@ import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.listeners.SetAttrUserListener;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.lollipop.tasks.ManageOfflineTask;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaAccountDetails;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
@@ -48,6 +50,7 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
     MyAccountInfo myAccountInfo;
 
     private SettingsFileManagementFragment sttFileManagment;
+    private AlertDialog clearOfflineDialog;
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog newFolderDialog;
     private AlertDialog generalDialog;
@@ -206,6 +209,23 @@ public class FileManagementPreferencesActivity extends PreferencesBaseActivity {
         unregisterReceiver(resetVersionInfoReceiver);
         unregisterReceiver(updateRBSchedulerReceiver);
         unregisterReceiver(updateFileVersionsReceiver);
+    }
+
+    /**
+     * Show Clear Offline confirmation dialog.
+     */
+    public void showClearOfflineDialog() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setMessage(StringResourcesUtils.getString(R.string.clear_offline_confirmation));
+
+        builder.setPositiveButton(StringResourcesUtils.getString(R.string.general_clear),
+                (dialog, whichButton) -> {
+                    ManageOfflineTask clearOfflineTask = new ManageOfflineTask(true);
+                    clearOfflineTask.execute();
+                });
+        builder.setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null);
+        clearOfflineDialog = builder.create();
+        clearOfflineDialog.show();
     }
 
     /**
