@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -67,6 +66,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -191,7 +191,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     public RelativeLayout uploadContainer;
     RelativeLayout pdfviewerContainer;
 
-    ProgressDialog statusDialog;
+    AlertDialog statusDialog;
 
     private boolean renamed = false;
     private String path;
@@ -1659,10 +1659,9 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
             MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
-            ProgressDialog temp;
+            AlertDialog temp;
             try{
-                temp = new ProgressDialog(this);
-                temp.setMessage(getString(R.string.context_moving));
+                temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
                 temp.show();
             }
             catch(Exception e){
@@ -1685,10 +1684,9 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
-            ProgressDialog temp;
+            AlertDialog temp;
             try{
-                temp = new ProgressDialog(this);
-                temp.setMessage(getString(R.string.context_copying));
+                temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
                 temp.show();
             }
             catch(Exception e){

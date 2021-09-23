@@ -2,16 +2,13 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -40,8 +37,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -64,6 +59,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -148,7 +144,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	long toHandle = 0;
 	long fragmentHandle = -1;
 	int cont = 0;
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 	MultipleRequestListenerLink importLinkMultipleListener = null;
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
@@ -304,7 +300,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		}
 		
 	}	
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -692,8 +688,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				}
 			}
 
-			statusDialog = new ProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.general_importing));
+			statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
 			statusDialog.show();
 
 			if(adapterList != null && adapterList.isMultipleSelect()){
