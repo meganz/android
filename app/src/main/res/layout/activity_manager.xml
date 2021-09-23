@@ -33,21 +33,7 @@
                     android:minHeight="?attr/actionBarSize" />
 
                 <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/sliding_tabs_contacts"
-                    style="@style/Widget.Mega.TabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginStart="@dimen/standard_margin" />
-
-                <com.google.android.material.tabs.TabLayout
                     android:id="@+id/sliding_tabs_shares"
-                    style="@style/Widget.Mega.TabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/sliding_tabs_my_account"
                     style="@style/Widget.Mega.TabLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -94,19 +80,7 @@
                 android:elevation="16dp" />
 
             <mega.privacy.android.app.components.CustomViewPager
-                android:id="@+id/contact_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <mega.privacy.android.app.components.CustomViewPager
                 android:id="@+id/shares_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/my_account_tabs_pager"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" />

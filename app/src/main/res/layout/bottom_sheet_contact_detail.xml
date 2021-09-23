@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/header"
+        layout="@layout/item_contact_data" />
+
+    <View
+        android:id="@+id/divider_header"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/grey_012_white_012" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:id="@+id/layout_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/option_info"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_info"
+                app:drawableStartCompat="@drawable/info_ic" />
+
+            <View
+                android:id="@+id/divider_info"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/option_call"
+                style="@style/BottomSheetOption"
+                android:text="@string/call_button"
+                app:drawableStartCompat="@drawable/ic_call_fille" />
+
+            <TextView
+                android:id="@+id/option_send_message"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_send_message"
+                app:drawableStartCompat="@drawable/ic_chat" />
+
+            <TextView
+                android:id="@+id/option_send_file"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_send_file"
+                app:drawableStartCompat="@drawable/ic_send_to_contact" />
+
+            <TextView
+                android:id="@+id/option_share_contact"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_send_contact"
+                app:drawableStartCompat="@drawable/ic_share_to_contact" />
+
+            <TextView
+                android:id="@+id/option_share_folder"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_share_folder"
+                app:drawableStartCompat="@drawable/ic_share" />
+
+            <View
+                android:id="@+id/divider_share"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/option_remove"
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/context_remove"
+                app:drawableStartCompat="@drawable/ic_remove" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

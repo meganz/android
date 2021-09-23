@@ -1,12 +1,16 @@
 package mega.privacy.android.app.utils;
 
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.text.Spanned;
 import androidx.core.text.HtmlCompat;
 
-import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.R;
 
+import static mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL;
 import static mega.privacy.android.app.utils.Constants.STRING_SEPARATOR;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
@@ -14,6 +18,8 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityStr
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
 public class TextUtil {
+
+    private static final String COPIED = "Copied Text";
 
     public static boolean isTextEmpty(String string) {
         return string == null || string.isEmpty() || string.trim().isEmpty();
@@ -207,5 +213,19 @@ public class TextUtil {
      */
     public static String addStringSeparator(String text) {
         return isTextEmpty(text) ? text : text + STRING_SEPARATOR;
+    }
+
+    /**
+     * Copies some content to the ClipBoard.
+     *
+     * @param activity   Activity from which the content has to be copied.
+     * @param textToCopy Content to copy.
+     */
+    public static void copyToClipboard(Activity activity, String textToCopy) {
+        ClipboardManager clipManager =
+                (ClipboardManager) activity.getSystemService(BaseActivity.CLIPBOARD_SERVICE);
+
+        ClipData clip = ClipData.newPlainText(COPIED_TEXT_LABEL, textToCopy);
+        clipManager.setPrimaryClip(clip);
     }
 }

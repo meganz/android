@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!-- Label to show that an SDK operation has been complete successfully. -->
-  <string name="error_ok">Geen fout</string>
-  <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
-  <string name="error_args">Ongeldige invoer</string>
-  <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-  <string name="error_access">Toegang geweigerd</string>
-  <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
-  <string name="error_noent">Bron bestaat niet.</string>
-  <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
-  <string name="error_exist">Bron bestaat al.</string>
-  <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-  <string name="error_unknown">Onbekende fout</string>
-  <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
-  <string name="error_toomany">Deze bron wordt te veel gebruikt.</string>
+    <!-- Label to show that an SDK operation has been complete successfully. -->
+    <string name="error_ok">Geen fout</string>
+    <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
+    <string name="error_args">Ongeldige invoer</string>
+    <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
+    <string name="error_access">Toegang geweigerd</string>
+    <!-- Label to show that an error related to a non-existent resource occurs during a Mega Chat operation. -->
+    <string name="error_noent">Bron bestaat niet.</string>
+    <!-- Label to show that an error related to an already existing resource occurs during a Mega Chat operation. -->
+    <string name="error_exist">Bron bestaat al.</string>
+    <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
+    <string name="error_unknown">Onbekende fout</string>
+    <!-- Label to show that an error related to too many uses for a resource occurs during a Mega Chat operation. -->
+    <string name="error_toomany">Deze bron wordt te veel gebruikt.</string>
 </resources>

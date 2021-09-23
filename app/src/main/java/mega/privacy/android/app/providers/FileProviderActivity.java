@@ -3,16 +3,12 @@ package mega.privacy.android.app.providers;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
@@ -20,7 +16,8 @@ import android.os.StatFs;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputLayout;
-import androidx.core.app.ActivityCompat;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.MenuItemCompat;
@@ -32,7 +29,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -67,6 +63,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
@@ -98,6 +95,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getCloudRootHandle;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -153,7 +151,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	private CloudDriveProviderFragmentLollipop cDriveProviderLol;
 	private IncomingSharesProviderFragmentLollipop iSharesProviderLol;
 
-	private ProgressDialog statusDialog;
+	private AlertDialog statusDialog;
 
 	private Button cancelButton;
 	private Button attachButton;
@@ -877,10 +875,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	}
 
 	public void downloadAndAttachAfterClick(long size, long[] hashes) {
-		ProgressDialog temp = null;
+		AlertDialog temp = null;
 		try {
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.context_preparing_provider));
+			temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
 			temp.show();
 		} catch (Exception e) {
 			return;
@@ -897,13 +894,11 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 		logDebug("downloadAndAttach");
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
+		boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		if (!hasStoragePermission) {
+			requestPermission(this,
+					REQUEST_WRITE_STORAGE,
+					Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		}
 
 		if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
@@ -1074,10 +1069,9 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				break;
 			}
 			case R.id.attach_button: {
-				ProgressDialog temp = null;
+				AlertDialog temp;
 				try {
-					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.context_preparing_provider));
+					temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
 					temp.show();
 				} catch (Exception e) {
 					return;

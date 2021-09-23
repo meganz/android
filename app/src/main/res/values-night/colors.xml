@@ -118,6 +118,7 @@
     <!-- Colors for empty content hint text. Use non-alpha colors, for
      <font color=""> doesn't support alpha -->
     <color name="grey_300_grey_600">@color/grey_600</color>
+    <color name="grey_100_grey_600">@color/grey_600</color>
 
     <!-- Turn on camera uploads -->
     <color name="teal_300_dark_grey">@color/dark_grey</color>
@@ -256,7 +257,6 @@
 
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/grey_alpha_080</color>
-
     <!--  SnackBar background  -->
     <color name="grey_alpha_087_white">@color/white</color>
 
@@ -279,5 +279,21 @@
     <!-- For fast scroller -->
     <color name="scroll_handle">@color/teal_100</color>
     <color name="scroll_bubble_text_color">@color/dark_grey</color>
+
+    <!--   my account -->
+    <color name="grey_020_black">@color/black</color>
+    <color name="grey_050_grey_700">@color/grey_700</color>
+    <color name="grey_050_grey_900">@color/grey_900</color>
+    <color name="white_087_white">@color/white</color>
+    <color name="orange_600_orange_300">@color/orange_300</color>
+    <color name="red_300_red_200">@color/red_200</color>
+    <color name="blue_400_blue_300">@color/blue_300</color>
+    <color name="grey_020_grey_087">@color/grey_alpha_087</color>
+    <color name="white_grey_900">@color/grey_900</color>
+    <color name="grey_100_060_grey_100">@color/grey_100</color>
+    <color name="grey_038_grey_400">@color/grey_400</color>
+    <color name="grey_010_white_009">@color/white_alpha_009</color>
+    <color name="amber_800_amber_700">@color/amber_700</color>
+    <color name="red_400_red_300">@color/red_300</color>
 
 </resources>

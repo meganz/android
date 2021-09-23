@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="full_description_text">MEGA provides user controlled encrypted cloud storage and chat through standard web browsers, together with dedicated apps for mobile devices. Unlike other cloud storage providers, your data is encrypted and decrypted by your client devices only and never by us.\n\nUpload your files from your smartphone or tablet then search, store, download, stream, view, share, rename or delete your files any time, from any device, anywhere. Share folders with your contacts and see their updates in real time. The encryption process means we cannot access or reset your password so you MUST remember it (unless you have your Recovery Key backed up) or you will lose access to your stored files.\n\nEnd-to-end user encrypted MEGA video chat allows for total privacy, and has been available through the browser since 2016. It has been extended to our mobile app, with chat history accessible across multiple devices. Users can also easily add files to a chat from their MEGA Cloud Drive.\n\nMEGA offers a generous 50 GB free storage for all registered users with bonus achievements, and offers paid plans with much higher limits:\n\n\nPro Lite subscription: 4.99 € per month or 49.99 € per year gives you 400 GB of storage space and 1 TB of transfer quota per month.\nPro I subscription: 9.99 € per month or 99.99 € per year gives you 2 TB of storage space and 2 TB of transfer quota per month.\nPro II subscription: 19.99 € per month or 199.99 € per year gives you 8 TB of storage space and 8 TB of transfer quota per month.\nPro III subscription: 29.99 € per month or 299.99 € per year gives you 16 TB of storage space and 16 TB of transfer quota per month.\n\nSubscriptions are renewed automatically for successive subscription periods of the same duration and at the same price as the initial period chosen. To manage your subscriptions, simply click on the Play Store icon on your mobile device, sign in with your Google ID (if you haven’t already done so) and then click on the MEGA app. You’ll be able to manage your subscription there.\n\nApp Permissions:\nWRITE_EXTERNAL_STORAGE -&gt; Download your files from MEGA to your device and upload files from your device to MEGA\nCAMERA -&gt; Take a picture and upload your photos to MEGA\nREAD_CONTACTS -&gt; Easily add contacts from your device as MEGA contacts\nRECORD_AUDIO and CAPTURE_VIDEO_OUTPUT (mic and camera) -&gt; MEGA provides for end-to-end encrypted audio/video calls\n\n\nTo enhance users’ confidence in the MEGA system, all of the client-side code is published, so interested security researchers can evaluate the encryption process. The code of our mobile app is located on: https://github.com/meganz/android \n\nFor more info, please check our website:\nSee https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
+    <string name="full_description_text">MEGA oferă stocare în cloud criptată, controlată de utilizatori, și chat prin intermediul browserelor web standard, împreună cu aplicații dedicate pentru dispozitivele mobile. Spre deosebire de ceilalți furnizori de stocare în cloud, datele tale sunt criptate și decriptate doar de către dispozitivele client ale tale și niciodată de către noi.\n\nÎncarcă fișierele de pe smartphone sau tabletă, apoi caută, stochează, descarcă, redă în flux, vezi, partajează, redenumește sau șterge fișierele oricând, de pe orice dispozitiv, oriunde. Partajează folderele cu contactele tale și vezi modificările acestora în timp real. Procesul de criptare înseamnă că nu putem să îți accesăm sau să îți resetăm parola astfel încât TREBUIE să o reții (excepție făcând cazul în care ai cheia de recuperare păstrată ca backup) sau vei pierde accesul la fișierele tale stocate.\n\nChatul video MEGA criptat între utilizatori capăt-la-capăt MEGA permite confidențialitate totală și a fost disponibil în browserele web începând cu 2016. Acesta a fost extins pe aplicația mobilă Mega, cu istoricul chaturilor accesibil pe mai multe dispozitive. De asemenea, utilizatorii pot adăuga cu ușurință fișiere într-un chat din unitatea lor cloud MEGA.\n\nMEGA oferă un spațiu de stocare generos de 20 GB gratuit pentru toți utilizatorii înregistrați cu realizările bonus și oferă planuri plătite cu limite mult mai mari:\n\n\nAbonamentul Pro Lite: 4,99€ pe lună sau 49,99€ pe an îți oferă 400 GB spațiu de stocare și 1 TB cotă de transfer pe lună.\nAbonamentul Pro I: 9,99€ pe lună sau 99,99€ pe an îți oferă 2 TB spațiu de stocare și 2 TB cotă de transfer pe lună.\nAbonamentul Pro II: 19,99€ pe lună sau 199,99€ pe an îți oferă 8 TB spațiu de stocare și 8 TB cotă de transfer pe lună.\nAbonamentul Pro III: 29,99€ pe lună sau 299,99€ pe an îți oferă 16 TB spațiu de stocare și 16 TB cotă de transfer pe lună.\n\nAbonamentele sunt reînnoite automat pentru perioade succesive de aceeași durată, la același preț ca și perioada inițială aleasă. Pentru a gestiona abonamentele, atinge pictograma Magazin Play de pe dispozitivul mobil, autentifică-te cu ID-ul Google (dacă nu ai făcut deja acest lucru). Apoi atinge aplicația MEGA. Vei putea gestiona abonamentul de acolo.\n\nPermisiunile aplicației:\nWRITE_EXTERNAL_STORAGE -&gt; Descarcă fișiere de pe MEGA pe dispozitiv și încarcă fișiere de pe dispozitiv pe MEGA\nCAMERA -&gt; Realizează o fotografie și încarcă fotografiile pe MEGA\nREAD_CONTACTS -&gt; Adaugă cu ușurință contacte de pe dispozitiv ca contacte MEGA\nRECORD_AUDIO și CAPTURE_VIDEO_OUTPUT (microfon și cameră) -&gt; MEGA oferă apeluri audio/video criptate capăt-la-capăt\n\n\nPentru a spori încrederea utilizatorilor în sistemul MEGA, tot codul pe partea de client este publicat, astfel încât cercetătorii de securitate interesați pot evalua procesul de criptare. Codul pentru aplicația noastră mobilă se află la adresa: https://github.com/meganz/android \n\nPentru mai multe informații, te rugăm să consulți site-ul nostru web:\nVezi https://mega.nz/terms \n\n\nDesktop - https://mega.nz/</string>
     <!-- Short description text of the app in the Google Play page of the app (character limit 80) -->
     <string name="short_description_text">MEGA, serviciul de stocare în cloud cu confidențialitate puternică mereu activă.</string>
     <!-- PRO Lite account -->
@@ -25,11 +25,11 @@
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_upload">Selectează fișiere</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
-    <string name="general_select_to_download">Selectează folderul</string>
+    <string name="general_select_to_download">Selectează un folder</string>
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
     <string name="general_create">Creează</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="general_download">Descărcare</string>
+    <string name="general_download">Descarcă</string>
     <!-- button -->
     <string name="general_add">Adaugă</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -45,7 +45,7 @@
     <!-- button -->
     <string name="general_export">Exportă</string>
     <!-- Answer for confirmation dialog. -->
-    <string name="general_ok">Ok</string>
+    <string name="general_ok">OK</string>
     <!-- Skip a step of a configuration process. -->
     <string name="general_skip">Omite</string>
     <!-- Label for a button to stop some process. For example stop the Camera Uploads -->
@@ -101,11 +101,11 @@
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">Deconectează-te</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="action_add">Încărcare</string>
+    <string name="action_add">Încarcă</string>
     <!-- Menu item -->
     <string name="action_create_folder">Creează un folder nou</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Create new text file</string>
+    <string name="action_create_txt">Creează un fișier text nou</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">Deschide un link</string>
     <!-- Menu item -->
@@ -143,7 +143,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Abonamentul a fost anulat</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Nu am putut anula abonamentul tău. Te rugăm să contactezi support&#64;mega.nz pentru asistență</string>
+    <string name="cancel_subscription_error">Nu am putut să îți anulăm abonamentul. Te rugăm să contactezi support&#64;mega.nz pentru asistență</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Închide alte sesiuni</string>
     <!-- Message after kill all opened sessions -->
@@ -194,7 +194,7 @@
     <!-- when the user tries to log in to MEGA without a valid session -->
     <string name="error_server_expired_session">Ai fost deconectat de pe acest dispozitiv dintr-o altă locație</string>
     <!-- the first step when logging in is calculate the private and public encryption keys -->
-    <string name="login_generating_key">Se calculează cheile de criptare</string>
+    <string name="login_generating_key">Se generează cheile de criptare</string>
     <!-- Message displayed while the app is connecting to a MEGA server -->
     <string name="login_connecting_to_server">Se conectează la server</string>
     <!-- Status text when updating the file manager -->
@@ -220,7 +220,7 @@
     <!--  -->
     <string name="tour_access_title">MEGA Acces</string>
     <!-- Full description text of the app in the Google Play page of the app (character limit 4000) -->
-    <string name="tour_space_text">Register now and get 20 GB+ of free space</string>
+    <string name="tour_space_text">Register now and get 20 GB of free storage</string>
     <!--  -->
     <string name="tour_speed_text">Încărcările sunt rapide. Partajează rapid fișiere cu toți.</string>
     <!--  -->
@@ -258,15 +258,16 @@
     <!--  -->
     <string name="create_account_creating_account">Se conectează la server: Crearea contului</string>
     <!--  -->
-    <string name="cancel_transfer_confirmation">Ștergi acest transfer?</string>
+    <string name="cancel_transfer_confirmation">Anulezi acest transfer?</string>
     <!--  -->
-    <string name="cancel_all_transfer_confirmation">Ștergi toate transferurile?</string>
+    <string name="cancel_all_transfer_confirmation">Anulezi toate transferurile?</string>
     <!-- Label for any ‘Cancel all’ button to cancel transfers - (String as short as possible). -->
     <string name="cancel_all_action">Anulează toate</string>
     <!-- Warning to confirm remove selected transfers. Plural more than 1 transfer -->
     <plurals name="cancel_selected_transfers">
-        <item quantity="one">The selected transfer will be cancelled.</item>
-        <item quantity="other">The selected transfers will be cancelled.</item>
+        <item quantity="one">Transferul selectat va fi anulat.</item>
+        <item quantity="few">Transferurile selectate vor fi anulate.</item>
+        <item quantity="other">Transferurile selectate vor fi anulate.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
     <string name="section_cloud_drive">Unitate cloud</string>
@@ -315,7 +316,7 @@
     <!-- message when there are no files in the Cloud drive -->
     <string name="file_browser_empty_cloud_drive">Niciun fișier în unitatea cloud</string>
     <!-- Text that indicates that a folder is currently empty -->
-    <string name="file_browser_empty_folder">Niciun fișier în folder</string>
+    <string name="file_browser_empty_folder">Folder gol</string>
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">ALEGE CONTUL</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
@@ -395,7 +396,7 @@
         <item quantity="other">Folderele sunt goale.</item>
     </plurals>
     <!-- Hint how to cancel the download -->
-    <string name="download_touch_to_cancel">Apasă pentru anulare</string>
+    <string name="download_touch_to_cancel">Atinge pentru a anula</string>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vezi transferurile</string>
     <!-- Warning message -->
@@ -404,7 +405,7 @@
     <string name="intent_not_available">Nu există nicio aplicație disponibilă pentru a executa acest fișier pe dispozitiv</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
     <string name="intent_not_available_location">There are no apps available on your device to open this location</string>
-    <!-- message when trying to open file but there isn’t any app that open that file. Example: a user try to open a txt but doesn’t have any app to open txt -->
+    <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">You may not have any apps installed which support this file type</string>
     <!-- to share an image using Facebook, Whatsapp, etc -->
     <string name="context_share_image">Partajează imaginea folosind</string>
@@ -412,8 +413,6 @@
     <string name="context_get_link">Partajează linkul</string>
     <!-- Delete a link label -->
     <string name="context_delete_link">Delete link</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">Obține linkul</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Părăsește</string>
     <!-- Title alert before leaving a share. -->
@@ -433,7 +432,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Redenumește</string>
     <!-- Title of a dialog to rename a node. The place holder is to set the current name of the node. -->
-    <string name="rename_dialog_title">Rename %1$s</string>
+    <string name="rename_dialog_title">Redenumește %1$s</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="context_open_link_title">Deschide un link</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -443,7 +442,7 @@
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Se pregătește fișierul</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_download">Descărcare</string>
+    <string name="context_download">Descarcă</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_move">Mută</string>
     <!-- while moving a file or folder -->
@@ -451,7 +450,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_copy">Copiază</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_upload">Încărcare</string>
+    <string name="context_upload">Încarcă</string>
     <!-- while copying a file or folder -->
     <string name="context_copying">Se copiază</string>
     <!-- menu item -->
@@ -505,7 +504,7 @@
     <!-- success message when chaning the permissionss -->
     <string name="context_permissions_changed">Permisiuni modificate</string>
     <!-- error message -->
-    <string name="context_permissions_not_changed">Eroare. Permisiunile nu au fost modificate</string>
+    <string name="context_permissions_not_changed">Eroare. Permisiunile nemodificate</string>
     <!-- message when trying to create a folder that already exists -->
     <string name="context_folder_already_exists">Folderul există deja</string>
     <!-- message when trying to create a invite a contact already that is already added -->
@@ -537,11 +536,7 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d elemente nu au fost mutate cu succes</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Mutat în coșul de gunoi cu succes</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_moved_to_rubbish">%d elemente mutate în coșul de gunoi cu succes</string>
-    <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved_to_rubbish">&#160;și %d elemente nu au fost trimise cu succes</string>
+    <string name="context_correctly_moved_to_rubbish">Mutat cu succes în coșul de gunoi</string>
     <!-- error message -->
     <string name="context_no_moved">Eroare. Nu a fost mutat</string>
     <!-- success message when sharing a folder -->
@@ -593,7 +588,7 @@
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Folder partajat cu succes cu %d contacte</string>
     <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Fișierul nu poate fi partajat cu %d contacte</string>
+    <string name="number_contact_file_not_shared_">File cannot be shared with %d contacts</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d foldere partajate cu succes</string>
     <!-- error message when sharing multiple files -->
@@ -603,13 +598,13 @@
     <!-- success message when removing all the contacts of a shared folder -->
     <string name="context_correctly_removed_sharing_contacts">Folderul nu mai este partajat</string>
     <!-- error message when removing all the contacts of a shared folder -->
-    <string name="context_no_removed_sharing_contacts">Eroare. Folderul este în continuare partajat cu un alt contact</string>
+    <string name="context_no_removed_sharing_contacts">An error occurred. The folder is still shared with another contact</string>
     <!-- option available for just one file -->
     <string name="context_select_one_file">Selectează un singur fișier</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Coșul de gunoi golit cu succes</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Eroare. Coșul de gunoi nu a fost golit</string>
+    <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish Bin has not been emptied</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Ești pe cale să anulezi abonamentul MEGA. Te rugăm să ne spui dacă există ceva ce putem face pentru a te răzgândi.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -617,11 +612,11 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Trimite</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Îți mulțumim pentru feedback! Sigur vrei să anulezi abonamentul MEGA?</string>
+    <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
-    <string name="reason_cancel_subscriptions">Abonamentul tău nu a fost anulat. Te rugăm să furnizezi un motiv pentru anulare</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">Îți mulțumim că te-ai abonat la %1$s %2$s!</string>
+    <string name="reason_cancel_subscriptions">Abonamentul tău nu a fost anulat. Te rugăm să oferi un motiv pentru anulare</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">Thanks. Your payment is processing. Please email us at support&#64;mega.co.nz if you have not received your upgrade within 24 hours.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Noul tău abonament se va aplica odată ce cel actual expiră, noul preț va fi perceput la acel moment.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -672,19 +667,17 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problemă cu sistemul de fișiere</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Eroare petrecută la executarea acțiunii</string>
+    <string name="general_error">A apărut o eroare la răsfoirea fișierelor locale.</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Vizualizator de imagini</string>
     <!-- Headline for the amount of storage space is used -->
-    <string name="my_account_used_space">Spațiu folosit</string>
+    <string name="my_account_used_space">Used storage space</string>
     <!-- menu item -->
     <string name="my_account_change_password">Modifică parola</string>
     <!-- Dialog text overquota error -->
     <string name="overquota_alert_text">Ai depășit limita de stocare. Dorești să upgradezi contul?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Ultima sesiune</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Conexiuni</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Se modifică parola</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -694,13 +687,13 @@
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Confirmă parola nouă</string>
     <!-- when changing the password or creating the account, the password is required twice and check that both times are the same -->
-    <string name="my_account_change_password_dont_match">Parola nu coincide</string>
+    <string name="my_account_change_password_dont_match">Parolele nu coincid</string>
     <!-- title of the selection of the pro account wanted -->
-    <string name="upgrade_select_pricing">Selectează tipul contului</string>
+    <string name="upgrade_select_pricing">Select plan</string>
     <!-- the user has to decide the way of payment -->
     <string name="select_membership_1">Abonament recurent lunar sau anual</string>
     <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">În acest moment, nicio metodă de plată nu este disponibilă pentru acest plan</string>
+    <string name="no_available_payment_method">There is no payment method set for this plan currently. Please select one.</string>
     <!-- button to decide monthly payment. The asterisk is needed -->
     <string name="upgrade_per_month">Anual*</string>
     <!-- button to decide annually payment. The asterisk is needed -->
@@ -710,7 +703,7 @@
     <!-- before sharing an image, the preview has to be downloaded -->
     <string name="full_image_viewer_not_preview">Previzualizarea nu a fost descărcată încă. Te rugăm să aștepți</string>
     <!-- due to device is low on memory, cannot load an image preview temporarily -->
-    <string name="not_load_preview_low_memory">Previzualizarea nu se poate încărca din cauza memoriei insuficiente disponibile. Te rugăm să încerci din nou mai târziu.</string>
+    <string name="not_load_preview_low_memory">Not enough free memory to display preview. Please try again later.</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Te rugăm să te deconectezi înainte de a crea contul</string>
     <!-- message shown in the screen when there are not any active transfer -->
@@ -724,9 +717,9 @@
     <!-- Dialog title, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
     <string name="ask_for_display_over_title">Permite notificări pentru apelurile MEGA primite</string>
     <!-- Dialog message, to explain why MEGA needs the ’display over other apps’ permission (Android 10) -->
-    <string name="ask_for_display_over_msg">MEGA are nevoie de autorizarea ta pentru a permite interfața de apel să apară de pe fundal.</string>
+    <string name="ask_for_display_over_msg">Please grant MEGA permission to display over other apps for calls.</string>
     <!-- Prompt text shows when the user doesn’t want to make MEGA grant the ’display over other apps’ permission for now (Android 10) -->
-    <string name="ask_for_display_over_explain">Nu-ți fă griji, poți totuși să acorzi manual permisiunile din setările dispozitivului.</string>
+    <string name="ask_for_display_over_explain">You can still manually grant permissions in the device Settings.</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. only when Wi-Fi connected -->
     <string name="cam_sync_wifi">Numai Wi-Fi</string>
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
@@ -740,7 +733,7 @@
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Se verifică fișierele care să fie încărcate</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Se inițializează încărcări cameră</string>
+    <string name="settings_camera_notif_initializing_title">Initialising Camera Uploads</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Încărcările cameră au fost dezactivate. Folderul tău local este indisponibil.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -756,11 +749,11 @@
     <!-- Settings of the Passcode -->
     <string name="settings_passcode_lock">Passcode lock</string>
     <!-- Setting to allow the user to select the preferred passcode type -->
-    <string name="settings_passcode_option">Passcode options</string>
+    <string name="settings_passcode_option">Opțiuni pentru codul de acces</string>
     <!-- Helper text to explain why we have this `Require me to plug in` setting, placeholder - 100 to 1000 in MB -->
-    <string name="settings_camera_upload_charging_helper_label">Comprimarea video consumă multă energie, MEGA îți va solicita să încarci în mod activ dispozitivul dacă videoclipurile care urmează să fie comprimate sunt mai mari de %s.</string>
+    <string name="settings_camera_upload_charging_helper_label">Video compression uses considerable amounts of power. Please plug in your device to charge if the videos to be compressed are larger than %s.</string>
     <!-- Helper text to explain the things to note if enable the feature of including GPS info -->
-    <string name="settings_camera_upload_include_gps_helper_label">Dacă aceasta este activată, vei încărca informații despre locul în care au fost făcute fotografiile, așa că ai grijă când le împărtășești.</string>
+    <string name="settings_camera_upload_include_gps_helper_label">If enabled, location information will be included with your pictures. Please be careful when sharing them.</string>
     <!-- Settings category title for cache and offline files -->
     <string name="settings_advanced_features">Avansat</string>
     <!-- Settings preference title for cache -->
@@ -812,7 +805,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_incorrect_code">Cod greșit. Te rugăm să încerci din nou sau să retrimiți.</string>
     <!-- text message to remind user to resend verification code -->
-    <string name="verify_account_resend_label">Nu ai primit un cod?</string>
+    <string name="verify_account_resend_label">Nu ai primit codul?</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Retrimite</string>
     <!-- error message that will show to user when host detected that the mobile number has been registered already -->
@@ -842,11 +835,11 @@
         <item>Importă de pe dispozitiv</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Activează încărcări cameră</string>
+    <string name="settings_camera_upload_on">Activează Încărcări cameră</string>
     <!-- settings option -->
-    <string name="settings_camera_upload_turn_on">Pornește încărcări cameră</string>
+    <string name="settings_camera_upload_turn_on">Pornește Încărcări cameră</string>
     <!-- settings option -->
-    <string name="settings_camera_upload_off">Dezactivează încărcări cameră</string>
+    <string name="settings_camera_upload_off">Dezactivează Încărcări cameră</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Mod de încărcare</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -869,21 +862,21 @@
         <item>Fotografii și videoclipuri</item>
     </string-array>
     <!-- Option to choose that the camera sync will only be enable when the device is charging -->
-    <string name="settings_camera_upload_charging">Doar când se încarcă</string>
+    <string name="settings_camera_upload_charging">Doar când dispozitivul se încarcă</string>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Include etichetele locațiilor</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
-    <string name="settings_camera_upload_require_plug_in">Solicită-mi să încarc în mod activ dispozitivul</string>
+    <string name="settings_camera_upload_require_plug_in">Solicită-mi încărcarea activă a dispozitivului</string>
     <!-- Option to choose that the camera sync will maintain the local file names when uploading -->
     <string name="settings_keep_file_names">Păstrează numele fișierelor precum în dispozitiv</string>
     <!-- The location of where the user photos or videos are stored in the device. -->
-    <string name="settings_local_camera_upload_folder">Folder local cameră</string>
+    <string name="settings_local_camera_upload_folder">Folder local pentru cameră</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">Folderul încărcări cameră MEGA</string>
+    <string name="settings_mega_camera_upload_folder">Folder pentru Încărcări cameră MEGA</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
-    <string name="settings_local_secondary_folder">Folderul local secundar</string>
+    <string name="settings_local_secondary_folder">Folder local secundar</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
-    <string name="settings_mega_secondary_folder">Folderul secundar MEGA</string>
+    <string name="settings_mega_secondary_folder">Folder secundar MEGA</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_only_photos">Numai fotografii</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -897,7 +890,7 @@
     <!-- Settings option to change Passcode. -->
     <string name="settings_change_passcode">Modifică codul de acces</string>
     <!-- Settings option screen to change Passcode. -->
-    <string name="title_change_passcode">Change passcode lock</string>
+    <string name="title_change_passcode">Modifică blocarea prin codul de acces</string>
     <!-- Settings option to set the timer to ask for passcode. -->
     <string name="settings_require_passcode">Necesită cod de acces</string>
     <!-- Option available to choose in some context to make an action immediately. -->
@@ -906,8 +899,9 @@
     <string name="pin_lock_enter">Introdu</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="one">1 failed passcode attempt</item>
-        <item quantity="other">%1$d failed passcode attempts</item>
+        <item quantity="one">1 încercare eșuată pentru codul de acces</item>
+        <item quantity="few">%1$d încercări eșuate pentru codul de acces</item>
+        <item quantity="other">%1$d de încercări eșuate pentru codul de acces</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">You will be logged out and your offline files will be deleted after 10 failed attempts</string>
@@ -916,8 +910,8 @@
     <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
     <plurals name="pin_lock_incorrect_alert">
         <item quantity="one">Cod de acces greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Cod de acces greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
+        <item quantity="few">Cod de acces greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
+        <item quantity="other">Cod de acces greșit, te rugăm să încerci din nou. Ai %2d de încercări rămase</item>
     </plurals>
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">Codurile de acces nu coincid. Încearcă din nou.</string>
@@ -973,14 +967,14 @@
     <string name="zip_browser_activity">Răsfoitor ZIP</string>
     <!-- title of the My Account screen -->
     <string name="my_account_title">Tipul contului</string>
+    <!-- Label to indicate the date when the current subscription renews -->
+    <string name="renews_on">Se reînoiește &#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="renews_on">Se reînnoiește pe&#160;</string>
-    <!-- title of the Expiration Date -->
-    <string name="expires_on">Expiră pe&#160;</string>
+    <string name="expires_on">Expiră&#160;</string>
     <!--  -->
     <string name="free_account">Gratuit</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
-    <string name="camera_uploads_created">Folderul încărcări cameră a fost creat</string>
+    <string name="camera_uploads_created">Folderul Încărcări cameră a fost creat</string>
     <!-- category in sort by action -->
     <string name="sortby_name">Nume</string>
     <!-- sort files alphabetically ascending -->
@@ -1011,34 +1005,26 @@
     <string name="sortby_type_photo_first">Fotografii</string>
     <!-- sort option, sort media files by videos first -->
     <string name="sortby_type_video_first">Videoclipuri</string>
-    <!-- sort files by date newest first -->
-    <string name="sort_by_newest_date">Cele mai noi date</string>
-    <!-- sort files by date oldest first -->
-    <string name="sort_by_oldest_date">Cele mai vechi date</string>
-    <!-- sort files by largest size -->
-    <string name="sort_by_largest_size">Cele mai mari dimensiuni</string>
-    <!-- sort files by smallest size -->
-    <string name="sort_by_smallest_size">Cele mai mici dimensiuni</string>
     <!-- Title to choose the type of Passcode -->
     <string name="pin_lock_type">Tipul codului de acces</string>
     <!-- Passcode with 4 digits -->
-    <string name="four_pin_lock">Cod de acces din 4 cifre</string>
+    <string name="four_pin_lock">4 cifre</string>
     <!-- Passcode with 6 digits -->
-    <string name="six_pin_lock">Cod de acces din 6 cifre</string>
+    <string name="six_pin_lock">6 cifre</string>
     <!-- Passcode alphanumeric -->
-    <string name="AN_pin_lock">Cod de acces alfanumeric</string>
+    <string name="AN_pin_lock">Alfanumeric</string>
     <!-- Confirmation message when enabling logs in the app -->
     <string name="settings_enable_logs">Jurnalele sunt acum activate</string>
     <!-- Confirmation message when disabling logs in the app -->
     <string name="settings_disable_logs">Jurnalele sunt acum dezactivate</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
-    <string name="error_unable_to_setup_cloud_folder">Nu se poate configura folderul Încărcări cameră al MEGA</string>
+    <string name="error_unable_to_setup_cloud_folder">Nu se poate configura folderul Încărcări cameră MEGA</string>
     <!-- Message displayed when the user denies the required permissions during the logs activation -->
     <string name="logs_not_enabled_permissions">Jurnalele nu au fost activate deoarece ai refuzat permisiunile necesare</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Deschide locația</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
-    <string name="servers_busy">Procesul durează mai mult decât era de așteptat. Te rugăm să aștepți&#8230;</string>
+    <string name="servers_busy">Acest proces durează mai mult decât era de așteptat. Te rugăm să aștepți.</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Cont gratuit</string>
     <!-- Type of account info added to the feedback email sent to support -->
@@ -1088,7 +1074,7 @@
     <!-- Hint of the text where the user can write his e-mail -->
     <string name="edit_text_insert_mail">e-mailul se introduce aici</string>
     <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="text_alert_reset_with_MK">Te rugăm să introduci adresa ta de e-mail mai jos. Vei primi un link de recuperare care îți va permite să trimiți cheia de recuperare și să îți resetezi parola.</string>
+    <string name="text_alert_reset_with_MK">Te rugăm să introduci adresa de e-mail mai jos. Vei primi un link de recuperare care îți va permite să trimiți cheia de recuperare și să îți resetezi parola.</string>
     <!-- Hint of the text when the user can write his master key -->
     <string name="edit_text_insert_mk">Cheia de recuperare se introduce aici</string>
     <!-- Hint of the text where the user can write his password -->
@@ -1102,15 +1088,15 @@
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">A apărut o eroare, te rugăm să încerci din nou.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
-    <string name="alert_not_logged_in">Trebuie să fii autentificat pentru a efectua această acțiune.</string>
+    <string name="alert_not_logged_in">Trebuie să fii autentificat(ă) pentru a efectua această acțiune.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">Trebuie să fii autentificat pentru a finaliza modificarea e-mailului. Te rugăm să te autentifici din nou cu adresa de e-mail actuală și apoi dă clic pe linkul de confirmare din nou.</string>
+    <string name="change_email_not_logged_in">Trebuie să fii autentificat(ă) pentru a finaliza modificarea e-mailului. Te rugăm să te autentifici din nou cu adresa de e-mail actuală și apoi atinge linkul de confirmare din nou.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Felicitări, noua adresă de e-mail pentru acest cont MEGA este: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Incorect</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Intrare nevalidă</string>
+    <string name="invalid_input">Input nevalid</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_title">Adresă de e-mail nevalidă</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -1122,7 +1108,7 @@
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Parola ta a fost modificată.</string>
     <!-- Title of the dialog to park an account -->
-    <string name="park_account_dialog_title">Cont parcat</string>
+    <string name="park_account_dialog_title">Parchează contul</string>
     <!-- Button to park an account -->
     <string name="park_account_button">Parchează</string>
     <!-- Title of the screen to park an account -->
@@ -1136,7 +1122,7 @@
     <!-- Text shown in the last alert dialog to park an account -->
     <string name="park_account_text_last_step">Acesta este ultimul pas pentru a-ți parca contul, te rugăm să introduci noua parolă. Datele tale vor fi păstrate pentru cel puțin 60 de zile. Dacă îți aduci aminte parola contului parcat, te rugăm să contactezi support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
-    <string name="title_enter_new_password">Introdu parola nouă</string>
+    <string name="title_enter_new_password">Introdu noua parolă</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">Acest link de recuperare a expirat, te rugăm să încerci din nou.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
@@ -1148,21 +1134,21 @@
     <!-- Button to upgrade the account to PRO account in the panel that appears randomly -->
     <string name="my_account_upgrade_pro_panel">Upgradează acum</string>
     <!-- Message to promote PRO accounts -->
-    <string name="get_pro_account">Îmbunătățește-ți capacitatea în cloud![A]Obține mai mult spațiu și cotă de transfer cu un cont PRO!</string>
+    <string name="get_pro_account">Grow your cloud.[A]Get increased storage and transfer quotas with a Pro account.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">I s-a făcut backup cheii de recuperare în: %1s.[A]Cât timp fișierul rămâne în această cale, o vei găsi în secțiunea Salvate pentru offline.[A]Notă: Aceasta va fi ștearsă dacă te deconectezi, te rugăm să o stochezi într-un loc sigur.</string>
+    <string name="toast_master_key">Cheia de recuperare a contului MEGA a fost salvată în: %1s.[A]Poți găsi fișierul cu cheia de recuperare în secțiunea Salvate pentru offline.[A]Notă: deoarece fișierul cu cheia de recuperare va fi șters atunci când te deconectezi, te rugăm să o păstrezi într-un loc sigur în afara contului MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
-    <string name="mail_already_used">Eroare. Această adresă de e-mail este folosită deja.</string>
+    <string name="mail_already_used">This email address is already in use. Please use another email address.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
     <string name="mail_changed_confirm_requested">Ai solicitat deja un link de confirmare pentru acea adresă de e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the email is the same as the old -->
-    <string name="mail_same_as_old">E-mailul nou și cel vechi nu trebuie să coincidă</string>
+    <string name="mail_same_as_old">This is your existing email address.</string>
     <!-- Text shown in the last alert dialog to change the email associated to an account -->
     <string name="change_mail_text_last_step">Acesta este ultimul pas pentru a-ți modifica e-mailul. Te rugăm să introduci parola mai jos.</string>
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Modifică e-mailul</string>
     <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">Rămâi fără spațiu!</string>
+    <string name="title_new_warning_out_space">Rămâi fără spațiu de stocare.</string>
     <!-- Text of the warning when the user is running out of space -->
     <string name="new_warning_out_space">Beneficiază pe deplin de contul tău MEGA upgradându-l la Pro.</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
@@ -1188,13 +1174,13 @@
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">Editează</string>
     <!-- Alert Dialog to get link -->
-    <string name="title_set_expiry_date">Setează data de expirare</string>
+    <string name="title_set_expiry_date">Setează o dată de expirare</string>
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Setează protecție prin parolă</string>
     <!-- Subtitle of the dialog to get link -->
     <string name="subtitle_set_expiry_date">(NUMAI PRO)</string>
     <!-- Alert Dialog to get link with password -->
-    <string name="set_password_protection_dialog">Setează parolă</string>
+    <string name="set_password_protection_dialog">Setează o parolă</string>
     <!-- Hint of the dialog to get link with password -->
     <string name="hint_set_password_protection_dialog">Introdu parola</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -1252,7 +1238,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">În așteptarea confirmării e-mailului.</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Te rugăm să verifici e-mailul și să dai clic pe link pentru a confirma contul.</string>
+    <string name="confirm_email_explanation">Please check your email and tap the link to confirm your account.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 element</item>
@@ -1260,7 +1246,7 @@
         <item quantity="other">%1$d de elemente</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_delete_account">Contul de utilizator asociat a fost desființat din cauza mai multor încălcări ale Termenilor de utilizare a serviciului nostru.</string>
+    <string name="file_link_unavaible_delete_account">Contul de utilizator asociat a fost desființat din cauza încălcărilor multiple ale Termenilor noastre de utilizare a serviciului.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">Cheia de decriptare furnizată pentru linkul folderului este nevalidă.</string>
     <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
@@ -1353,7 +1339,7 @@
     <!-- Title of the section to choose the sound of incoming messages in the Contact Properties screen -->
     <string name="title_properties_chat_contact_message_sound">Sunet la mesaje</string>
     <!-- Title of the section to clear the chat content in the Contact Properties screen -->
-    <string name="title_properties_chat_clear_chat">Golește chatul</string>
+    <string name="title_properties_chat_clear_chat">Șterge chatul</string>
     <!-- Title of the section to share the contact in the Contact Properties screen -->
     <string name="title_properties_chat_share_contact">Partajează contactul</string>
     <!-- Title of the screen to select the ringtone of the calls -->
@@ -1363,9 +1349,9 @@
     <!-- Button to clear the chat history -->
     <string name="general_clear">Șterge</string>
     <!-- Message show when the history of a chat has been successfully deleted -->
-    <string name="clear_history_success">Istoricul chatului a fost golit</string>
+    <string name="clear_history_success">Istoricul chatului a fost șters</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">S-a produs o eroare. Istoricul chatului nu a fost golit cu succes</string>
+    <string name="clear_history_error">S-a produs o eroare. Istoricul chatului nu a fost șters cu succes</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Adaugă participanți</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1399,11 +1385,11 @@
     <!-- Info label about the status of the user -->
     <string name="invalid_status">Fără conexiune</string>
     <!-- Text shown when a message has been deleted in the chat -->
-    <string name="text_deleted_message">Acest mesaj a fost șters.</string>
+    <string name="text_deleted_message">Acest mesaj a fost șters</string>
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message_by">[A]Acest mesaj a fost șters de către [/A][B]%1$s[/B]</string>
     <!-- Confirmation before deleting messages -->
-    <string name="confirmation_delete_several_messages">Elimini mesaje?</string>
+    <string name="confirmation_delete_several_messages">Elimini mesajele?</string>
     <!-- Confirmation before deleting one message -->
     <string name="confirmation_delete_one_message">Elimini mesajul?</string>
     <!-- Label for the sliding panel of a group chat -->
@@ -1469,9 +1455,9 @@
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Acest mesaj a fost șters de către %1$s</string>
     <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">Istoricul chatului a fost golit</string>
+    <string name="history_cleared_message">Istoricul chatului a fost șters</string>
     <!-- Text shown when the chat history was cleared by someone -->
-    <string name="non_format_history_cleared_by">Istoricul chatului a fost golit de către %1$s</string>
+    <string name="non_format_history_cleared_by">Istoricul chatului a fost șters de către %1$s</string>
     <!-- chat message when the permissions for a user has been changed -->
     <string name="non_format_message_permissions_changed">%1$s a fost schimbat în %2$s de către %3$s</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -1485,11 +1471,11 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Copiat în clipboard</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Eroare privind chatul!</string>
+    <string name="chat_error_open_title">Eroare privind chatul</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Chatul nu a putut fi deschis cu succes</string>
     <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_choose_contact">Alege contactul</string>
+    <string name="menu_choose_contact">Alege un contact</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contact</item>
@@ -1501,13 +1487,13 @@
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
         <item quantity="one">Toate datele asociate cu contactul selectat vor fi pierdute definitiv.</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">Toate datele asociate cu contactele selectate vor fi pierdute definitiv.</item>
         <item quantity="other">Toate datele asociate cu contactele selectate vor fi pierdute definitiv.</item>
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
         <item quantity="one">Elimini contactul?</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">Elimini contactele?</item>
         <item quantity="other">Elimini contactele?</item>
     </plurals>
     <!-- option shown when a message could not be sent -->
@@ -1517,11 +1503,11 @@
     <!-- title of the menu for an uploading message with attachment -->
     <string name="title_message_uploading_options">Se încarcă atașamentul</string>
     <!-- message shown when a chat has no messages -->
-    <string name="no_conversation_history">Niciun istoric al conversațiilor</string>
+    <string name="no_conversation_history">Niciun istoric al conversației</string>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]tastează&#8230;[/A]</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">%1$s [A]tastează&#8230;[/A]</item>
         <item quantity="other">%1$s [A]tastează&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
@@ -1559,7 +1545,7 @@
     <!-- Label for the option of action menu to change the chat status -->
     <string name="set_status_option_label">Setează statusul</string>
     <!-- Label for the option of setting to change the colour theme -->
-    <string name="set_color_theme_label">Colour theme</string>
+    <string name="set_color_theme_label">Temă cromatică</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_dismiss">Înlătură</string>
     <!-- Label for any ‘Not available’ button, link, text, title, etc. - (String as short as possible). -->
@@ -1658,32 +1644,32 @@
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_notification">
         <item quantity="one">Se încarcă %1$d din %2$d fișier</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se încarcă %1$d din %2$d fișiere</item>
+        <item quantity="few">Se încarcă %1$d din %2$d fișiere</item>
+        <item quantity="other">Se încarcă %1$d din %2$d de fișiere</item>
     </plurals>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_paused_notification">
         <item quantity="one">Se încarcă %1$d din %2$d fișier (pus pe pauză)</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se încarcă %1$d din %2$d fișiere (puse pe pauză)</item>
+        <item quantity="few">Se încarcă %1$d din %2$d fișiere (puse pe pauză)</item>
+        <item quantity="other">Se încarcă %1$d din %2$d de fișiere (puse pe pauză)</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_notification">
         <item quantity="one">Se încarcă %1$d din %2$d folder</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se încarcă %1$d din %2$d foldere</item>
+        <item quantity="few">Se încarcă %1$d din %2$d foldere</item>
+        <item quantity="other">Se încarcă %1$d din %2$d de foldere</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_paused_notification">
         <item quantity="one">Se încarcă %1$d din %2$d folder (pus pe pauză)</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se încarcă %1$d din %2$d foldere (puse pe pauză)</item>
+        <item quantity="few">Se încarcă %1$d din %2$d foldere (puse pe pauză)</item>
+        <item quantity="other">Se încarcă %1$d din %2$d de foldere (puse pe pauză)</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d fișier încărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere încărcate</item>
+        <item quantity="few">%1$d fișiere încărcate</item>
+        <item quantity="other">%1$d de fișiere încărcate</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
@@ -1694,16 +1680,16 @@
     <!-- Text of the notification shown when the folder upload service has finished, Text of the notification shown when the folder upload service has finished - plural  e.g. Uploaded 2 folders -->
     <plurals name="folder_upload_service_final_notification">
         <item quantity="one">%1$d folder încărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d foldere încărcate</item>
+        <item quantity="few">%1$d foldere încărcate</item>
+        <item quantity="other">%1$d de foldere încărcate</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
     <string name="general_total_size">Dimensiune totală: %1$s</string>
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
         <item quantity="one">%1$d fișier neîncărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere neîncărcate</item>
+        <item quantity="few">%1$d fișiere neîncărcate</item>
+        <item quantity="other">%1$d de fișiere neîncărcate</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
     <plurals name="copied_service_upload">
@@ -1720,32 +1706,32 @@
     <!-- Text of the notification shown when the download service has finished, Plural -->
     <plurals name="download_service_final_notification">
         <item quantity="one">%1$d fișier descărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere descărcate</item>
+        <item quantity="few">%1$d fișiere descărcate</item>
+        <item quantity="other">%1$d de fișiere descărcate</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
         <item quantity="one">%1$d din %2$d fișier descărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d din %2$d fișiere descărcate</item>
+        <item quantity="few">%1$d din %2$d fișiere descărcate</item>
+        <item quantity="other">%1$d din %2$d de fișiere descărcate</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
         <item quantity="one">%1$d fișier nedescărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere nedescărcate</item>
+        <item quantity="few">%1$d fișiere nedescărcate</item>
+        <item quantity="other">%1$d de fișiere nedescărcate</item>
     </plurals>
     <!-- Text of the notification shown when the download service is running, Plural -->
     <plurals name="download_service_notification">
         <item quantity="one">Se descarcă %1$d din %2$d fișier</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se descarcă %1$d din %2$d fișiere</item>
+        <item quantity="few">Se descarcă %1$d din %2$d fișiere</item>
+        <item quantity="other">Se descarcă %1$d din %2$d de fișiere</item>
     </plurals>
     <!-- Text of the notification shown when the download service is paused, Plural -->
     <plurals name="download_service_paused_notification">
         <item quantity="one">Se descarcă %1$d din %2$d fișier (pus pe pauză)</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se descarcă %1$d din %2$d fișiere (puse pe pauză)</item>
+        <item quantity="few">Se descarcă %1$d din %2$d fișiere (puse pe pauză)</item>
+        <item quantity="other">Se descarcă %1$d din %2$d de fișiere (puse pe pauză)</item>
     </plurals>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Cotă de transfer insuficientă</string>
@@ -1760,15 +1746,13 @@
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
     <plurals name="new_general_num_files">
         <item quantity="one">%1$d fișier</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere</item>
+        <item quantity="few">%1$d fișiere</item>
+        <item quantity="other">%1$d de fișiere</item>
     </plurals>
     <!-- Menu option -->
     <string name="general_view">Vezi fișierele</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="add_to_cloud">Importă</string>
-    <!-- Menu option to choose save to Offline section -->
-    <string name="save_for_offline">Salvează pentru offline</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Adaugă în unitatea cloud</string>
     <!-- Menu option -->
@@ -1782,7 +1766,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s a fost invitat deja. Consultă cererile în așteptare.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">Dacă ți-ai scris greșit adresa de e-mail, corecteaz-o și dă clic pe [A]Retrimite[A].</string>
+    <string name="confirm_email_misspelled">Dacă ți-ai scris greșit adresa de e-mail, corecteaz-o și atinge [A]Retrimite[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Retrimite</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1792,11 +1776,11 @@
     <!-- text_copyright_alert_first_paragraph -->
     <string name="copyright_alert_first_paragraph">MEGA respectă drepturile de autor ale celorlalți și impune utilizatorilor serviciului de stocare în cloud MEGA să se conformeze cu legislațiile privind drepturile de autor.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Ai interdicția strică de a folosi serviciul de stocare în cloud MEGA pentru încălcarea drepturilor de autor. Nu poți încărca, descărca, stoca, partaja, afișa, distribui, reda în flux, trimite e-mail, oferi link, transmite sau altfel pune la dispoziție fișiere, date sau conținut care încalcă orice drept de autor sau alte drepturi de proprietate ale unei persoane sau entități.</string>
+    <string name="copyright_alert_second_paragraph">Îți este strict interzis să folosești serviciul de stocare în cloud MEGA pentru încălcarea drepturilor de autor. Nu poți încărca, descărca, stoca, partaja, afișa, distribui, reda în flux, trimite e-mail, oferi link, transmite sau altfel pune la dispoziție fișiere, date sau conținut care încalcă orice drept de autor sau alte drepturi de proprietate ale unei persoane sau entități.</string>
     <!-- text of the Agree button -->
-    <string name="copyright_alert_agree_button">De acord</string>
+    <string name="copyright_alert_agree_button">Sunt de acord</string>
     <!-- text of the Disagree button -->
-    <string name="copyright_alert_disagree_button">Dezacord</string>
+    <string name="copyright_alert_disagree_button">Nu sunt de acord</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">Afișează informații</string>
     <!-- Error message when removing public links of nodes. Plural. -->
@@ -1886,7 +1870,7 @@
     <!-- label to indicate the state of an upload in chat -->
     <string name="attachment_uploading_state_uploading">Se încarcă&#8230;</string>
     <!--  -->
-    <string name="attachment_uploading_state_compressing">Compressing&#8230;</string>
+    <string name="attachment_uploading_state_compressing">Se comprimă&#8230;</string>
     <!--  -->
     <string name="attachment_uploading_state_error">Eroare. Nu a fost trimis.</string>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded and the number of files pending -->
@@ -1954,23 +1938,23 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invită prieteni și obține recompense</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each referral. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each successful invite. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s of storage. Valid for 365 days.</string>
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Recompense deblocate</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">Cotă de stocare</string>
+    <string name="unlocked_storage_title">Storage quota</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_referral_bonuses">Bonusuri pentru recomandări</string>
-    <!-- title of the section for install a mobile app in achivements section (maximum 24 chars) -->
-    <string name="title_install_app">Instalează o aplicație mobilă</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 24 chars) -->
-    <string name="title_add_phone">Adaugă un nr. de tel. mobil</string>
+    <string name="title_referral_bonuses">Invitation bonuses</string>
+    <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
+    <string name="title_install_app">Instalează aplicația noastră mobilă</string>
+    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
+    <string name="title_add_phone">Adaugă un număr de telefon</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bonus de înregistrare</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Instalează aplicația desktop MEGA</string>
+    <string name="title_install_desktop">Get a MEGA Desktop App</string>
     <!-- title of the section for base quota in achivements section -->
     <string name="title_base_quota">Cotă de bază a contului</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
@@ -1986,9 +1970,9 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cum funcționează</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and install our mobile app. For every successful signup and app install you receive bonus storage.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a MEGA Free account and to install a MEGA Mobile App. You will receive free storage as a bonus for every successful signup and app installation.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">Nu vei primi credit pentru invitarea cuiva care a folosit MEGA anterior și nu vei fi notificat despre o astfel de respingere. Contactele invitate trebuie să instaleze aplicația mobilă MEGA sau aplicația desktop MEGA pe dispozitivele acestora.</string>
+    <string name="second_paragraph_achievement_invite_friends">Free storage bonus applicable to new invitations only and where MEGA Mobile App or MEGA Desktop App is installed.</string>
     <!-- explanation of screen to invite friends and get an achievement -->
     <string name="card_title_invite_friends">Selectează contacte din lista de contacte a telefonului sau introdu mai multe adrese de e-mail.</string>
     <!-- title of the dialog to confirm the contact request -->
@@ -2002,15 +1986,15 @@
     <!-- info paragraph about the achievement install megasync -->
     <string name="paragraph_info_achievement_install_desktop">When you install MEGA desktop app you get %1$s of complimentary storage space, valid for 365 days. MEGA desktop app is available for Windows, macOS and most Linux distros.</string>
     <!-- info paragraph about the achievement install mobile app -->
-    <string name="paragraph_info_achievement_install_mobile_app">When you install our mobile app you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS, Android and Windows Phone.</string>
+    <string name="paragraph_info_achievement_install_mobile_app">When you install the MEGA Mobile App you get %1$s of complimentary storage space, valid for 365 days. We provide mobile apps for iOS and Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">When you verify your phone number you get %1$s of complimentary storage space, valid for 365 days.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">You have received %1$s storage space for installing our MEGA desktop app.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
-    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing our mobile app.</string>
+    <string name="result_paragraph_info_achievement_install_mobile_app">You have received %1$s storage space for installing the MEGA Mobile App.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">You have received %1$s storage space for verifying your phone number.</string>
+    <string name="result_paragraph_info_achievement_add_phone">Ai primit %1$s spațiu de stocare pentru verificarea numărului de telefon.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Ai primit %1$s spațiu de stocare ca bonus de înregistrare gratuită.</string>
     <!-- info paragraph about the completed achievement registration -->
@@ -2018,13 +2002,13 @@
     <!-- menu items -->
     <plurals name="context_share_folders">
         <item quantity="one">Partajează folderul</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Foldere partajate</item>
+        <item quantity="few">Partajează folderele</item>
+        <item quantity="other">Partajează folderele</item>
     </plurals>
     <!-- confirmation message before leaving some incoming shared folders -->
     <plurals name="confirmation_leave_share_folder">
         <item quantity="one">Dacă părăsești folderul, nu vei putea să îl vezi din nou.</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">Dacă părăsești aceste foldere, nu vei putea să le vezi din nou.</item>
         <item quantity="other">Dacă părăsești aceste foldere, nu vei putea să le vezi din nou.</item>
     </plurals>
     <!-- Info of a contact if there is no folders shared with him -->
@@ -2038,13 +2022,13 @@
     <!-- mail subject -->
     <string name="setting_feedback_subject">Feedback pentru Android</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">Te rugăm să scrii feedbackul aici:</string>
+    <string name="setting_feedback_body">Te rugăm să furnizezi feedbackul aici:</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">Modelul dispozitivului</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Versiunea Android</string>
     <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">New text file</string>
+    <string name="dialog_title_new_text_file">Fișier text nou</string>
     <!-- Title of the dialog to create a new file by inserting the name -->
     <string name="dialog_title_new_file">Fișier nou</string>
     <!-- Input field description in the create file dialog. -->
@@ -2082,7 +2066,7 @@
     <!-- the user can’t choose this date -->
     <string name="snackbar_search_by_date">Data cerută nu este validă</string>
     <!-- Error shown when the user left a name empty -->
-    <string name="empty_name">Invalid name</string>
+    <string name="empty_name">Nume nevalid</string>
     <!-- Error shown when the user left names empty and names typed with not allowed characters -->
     <string name="general_incorrect_names">Please correct your filenames before proceeding</string>
     <!-- Error text for invalid characters -->
@@ -2091,13 +2075,14 @@
     <string name="invalid_characters_defined">Următoarele caractere nu sunt permise: ” * / : &lt; &gt; ? \ |</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
-        <item quantity="one">Please name your file before proceeding</item>
-        <item quantity="other">Please name your files before proceeding</item>
+        <item quantity="one">Numele fișierului nu poate fi gol.</item>
+        <item quantity="few">Numele fișierelor nu pot fi goale.</item>
+        <item quantity="other">Numele fișierelor nu pot fi goale.</item>
     </plurals>
     <!-- Label shown when audio file is playing -->
     <string name="audio_play">Fișier audio</string>
     <!-- when open PDF Viewer, the pdf that it try to open is damaged or does not exist -->
-    <string name="corrupt_pdf_dialog_text">Eroare: Fișierul PDF este corupt sau nu există.</string>
+    <string name="corrupt_pdf_dialog_text">Eroare. Fișierul PDF este corupt sau nu există.</string>
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Contul utilizatorului</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
@@ -2111,9 +2096,9 @@
     <!-- Info label about the connectivity state of the chat -->
     <string name="invalid_connection_state">Se reconectează la chat</string>
     <!-- Message show when a call cannot be established -->
-    <string name="call_error">Eroare: Apelul nu poate fi stabilit</string>
+    <string name="call_error">An error has occurred and the call cannot be connected.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Ești fericit cu această aplicație?</string>
+    <string name="title_evaluate_the_app_panel">Îți place aplicația mobilă MEGA?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Da, evaluează aplicația</string>
     <!-- Label to show send feedback -->
@@ -2121,7 +2106,7 @@
     <!-- title of the section advanced options on the get link screen -->
     <string name="link_advanced_options">Opțiuni avansate</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
-    <string name="download_requires_permission">MEGA are nevoie de permisiunea ta pentru a descărca fișiere</string>
+    <string name="download_requires_permission">MEGA needs read and write permissions to your external storage to download files there.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
     <string name="old_sdcard_unavailable">Cardul SD vechi este indisponibil, te rugăm să setezi o nouă locație de descărcare.</string>
     <!-- Dialog title to ask download to internal storage or external storage. -->
@@ -2181,7 +2166,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of is already a contact -->
     <string name="invite_not_sent_text_already_contact">Invitația nu a fost trimisă. %s este deja în lista de contacte.</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
-    <string name="invite_not_sent_text_error">Invitația nu a fost trimisă. A apărut o eroare la procesarea acesteia.</string>
+    <string name="invite_not_sent_text_error">An error occurred and the invitation has not been sent.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Se generează codul QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
@@ -2261,7 +2246,7 @@
     <!-- Text displayed in several parts when there is a call in progress (notification, recent chats list, etc). -->
     <string name="title_notification_call_in_progress">Apel în desfășurare</string>
     <!-- Subtitle of the notification shown on the action bar when there is a call in progress -->
-    <string name="action_notification_call_in_progress">Clic pentru a te întoarce la apel</string>
+    <string name="action_notification_call_in_progress">Atinge pentru a întoarce la apel</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Revino la apel</string>
     <!-- When it lists contacts of MEGA, the title of list’s header -->
@@ -2271,7 +2256,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to multiple breaches of Terms of Service -->
     <string name="account_suspended_multiple_breaches_ToS">Contul tău a fost suspendat din cauza mai multor încălcări ale Termenilor de utilizare a serviciului MEGA. Te rugăm să-ți verifici căsuța de e-mail.</string>
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
-    <string name="account_suspended_breache_ToS">Contul tău a fost desființat din cauza unei încălcări a Termenilor de utilizare a serviciului MEGA, cum ar fi abuzul drepturilor altora; partajarea și/sau importarea de date ilegale; ori abuzul de sistem.</string>
+    <string name="account_suspended_breache_ToS">Your account was terminated due to a breach of MEGA’s Terms of Service including, but not limited to, clause 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Se încarcă fișierele</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
@@ -2301,8 +2286,8 @@
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
     <plurals name="number_of_versions">
         <item quantity="one">%1$d versiune</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d versiuni</item>
+        <item quantity="few">%1$d versiuni</item>
+        <item quantity="other">%1$d de versiuni</item>
     </plurals>
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">Versiuni</string>
@@ -2552,7 +2537,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Data viitoare când te autentifici în contul ți se va cere să introduci un cod din 6 cifre furnizat de aplicația de autentificare.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Ia în considerare exportarea <b>cheii de recuperare</b> în cazul în care pierzi accesul la aplicație sau vrei ca în viitor să dezactivezi autentificarea cu doi factori.</string>
+    <string name="recommendation_2fa_enabled">Please save your <b>Recovery Key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable Two-Factor Authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Cod nevalid</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2586,9 +2571,9 @@
     <!-- Label shown when Two-Factor Authentication has been enabled to alert user that has to back up his Recovery Key before finish the process -->
     <string name="backup_rk_2fa_end">Exportă cheia de recuperare pentru a termina</string>
     <!-- Title of dialog shown when it tries to open an authentication app and there is no installed -->
-    <string name="no_authentication_apps_title">Two-Factor Authentication App</string>
+    <string name="no_authentication_apps_title">Aplicație de autentificare cu doi factori</string>
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
-    <string name="open_play_store_2fa">Would you like to open Google Play so you can install an Authenticator App?</string>
+    <string name="open_play_store_2fa">Dorești să deschizi Google Play pentru a putea instala o aplicație de autentificare?</string>
     <!-- Label Play Store -->
     <string name="play_store_label">Magazin Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
@@ -2598,13 +2583,13 @@
     <!-- error message when importing multiple files from chat -->
     <string name="number_no_imported_from_chat">%d fișiere nu au fost partajate</string>
     <!-- button’s text to open a full screen image -->
-    <string name="preview_content">Previzualizează conținutul</string>
+    <string name="preview_content">Preview content</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
-    <string name="no_network_connection_on_play_file">Redarea în flux nu poate fi executată și fișierul nu a fost descărcat</string>
+    <string name="no_network_connection_on_play_file">No network connection. File has not been downloaded and cannot be streamed.</string>
     <!-- message shown when the user open a file, the file is not been opened due to unknown reason -->
     <string name="error_fail_to_open_file_general">Unable to open file.</string>
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
-    <string name="error_fail_to_open_file_no_network">Nu am putut deschide fișierul din cauza lipsei de conexiune la rețea.</string>
+    <string name="error_fail_to_open_file_no_network">Nicio conexiune la rețea. Te rugăm să te reconectezi pentru a deschide fișierul.</string>
     <!-- message when trying to save for offline a file that already exists -->
     <string name="file_already_exists">Fișierul există deja în Salvate pentru offline</string>
     <!-- Error message if forwarding a message failed, many messages -->
@@ -2616,7 +2601,7 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">Previzualizări îmbogățite ale URL-urilor</string>
     <!-- Text of the dialog to disable the rich links previews on chat -->
-    <string name="text_confirmation_disable_rich_links">Dezactivezi definitiv previzualizările îmbogățite ale URL-urilor. Poți reactiva previzualizările îmbogățite ale URL-urilor din setări. Vrei să continui?</string>
+    <string name="text_confirmation_disable_rich_links">You are disabling rich URL previews. You can re-enable them in Settings. Do you want to continue?</string>
     <!-- Message shown when a call ends. -->
     <string name="call_missed_messages">[A]Apel ratat[/A]</string>
     <!-- Message shown when a call ends. -->
@@ -2642,7 +2627,7 @@
     <!-- success message when a node was restore from Rubbish bin -->
     <string name="context_correctly_node_restored">Restaurat în %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
-    <string name="context_no_restored">Eroare: Nu a fost restaurat</string>
+    <string name="context_no_restored">An error occurred. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Trimite mesaj</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
@@ -2660,7 +2645,7 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Chaturi arhivate (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Arhivează chatul</string>
+    <string name="archive_chat_option">Archive chat</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
     <string name="unarchive_chat_option">Dezarhivează chatul</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -2681,10 +2666,6 @@
     <string name="inactive_chat">Chat inactiv</string>
     <!-- Subtitle of chat screen when the chat is archived -->
     <string name="archived_chat">Chat arhivat</string>
-    <!-- error message when restoring several nodes from rubbish -->
-    <string name="number_incorrectly_restored_from_rubbish">%d elemente nu au fost restaurate cu succes</string>
-    <!-- success message when restoring several nodes from rubbish -->
-    <string name="number_correctly_restored_from_rubbish">%d elemente restaurate cu succes</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Atinge pentru a te alătura apelului</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2694,7 +2675,7 @@
     <!-- Message shown while the contact list from the device and from MEGA is being read and then shown to the user -->
     <string name="contacts_list_empty_text_loading_share">Se încarcă contactele&#8230;</string>
     <!-- Title of the screen New Group -->
-    <string name="title_new_group">Grup nou</string>
+    <string name="title_new_group">New group</string>
     <!-- Subtitle of the screen New Group -->
     <string name="subtitle_new_group">Tastează numele grupului</string>
     <!-- Hint of edittext shown when it is creating a new group to guide user to type the name of the group -->
@@ -2778,7 +2759,7 @@
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="video_button">Video</string>
     <!-- Title of file explorer to send a link -->
-    <string name="title_file_explorer_send_link">Send link to&#8230;</string>
+    <string name="title_file_explorer_send_link">Trimite linkul către&#8230;</string>
     <!-- Title of chat explorer to send a link or file to a chat -->
     <string name="title_chat_explorer">Trimite către&#8230;</string>
     <!-- Title of cloud explorer to upload a link or file -->
@@ -2836,7 +2817,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Dacă videoclipurile spre comprimare sunt mai mari de</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Pentru a dezactiva planificatorul de golire a coșului de gunoi sau pentru a seta o perioadă de păstrare mai lungă, trebuie să te abonezi la un plan PRO.</string>
+    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin clearing scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">zile</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3032,9 +3013,9 @@
     <!-- error message pops up when user selected an invalid folder for camera upload -->
     <string name="error_invalid_folder_selected">Folder nevalid selectat</string>
     <!-- Indicates the content of a folder is 1 folder and 1 file. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_one_file">1 folder · 1 file</string>
+    <string name="one_folder_one_file">1 folder · 1 fișier</string>
     <!-- Indicates the content of a folder is 1 folder and some files. The placeholder is to set the number of files. e.g. 1 folder · 7 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
-    <string name="one_folder_several_files">1 folder · %1$d files</string>
+    <string name="one_folder_several_files">1 folder · %1$d fișiere</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
     <plurals name="num_files_with_parameter">
         <item quantity="one">%d fișier</item>
@@ -3049,34 +3030,35 @@
     </plurals>
     <!-- Indicates the content of a folder is some folders and some files. Plural of files. e.g. 7 folders · 2 files. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. -->
     <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folders · 1 file</item>
-        <item quantity="other">%1$d folders · %2$d files</item>
+        <item quantity="one">%1$d foldere · 1 fișier</item>
+        <item quantity="few">%1$d foldere · %2$d fișiere</item>
+        <item quantity="other">%1$d foldere · %2$d de fișiere</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder. Placeholders are: email who added the folders or files, number of folders added, number of files added -->
     <string name="subtitle_notification_added_folders_and_files">[A]%1$s[/A][B] a adăugat %2$s și %3$s[/B]</string>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of file. 2 files -->
     <plurals name="subtitle_notification_added_files">
         <item quantity="one">[A]%1$s [/A][B]a adăugat %2$d fișier.[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">[A]%1$s [/A][B]a adăugat %2$d fișiere.[/B]</item>
+        <item quantity="few">[A]%1$s [/A][B]a adăugat %2$d fișiere.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]a adăugat %2$d de fișiere.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for deletions inside an existing shared folder, Plural of item. 2 items -->
     <plurals name="subtitle_notification_deleted_items">
         <item quantity="one">[A]%1$s [/A][B]a șters %2$d element.[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">[A]%1$s [/A][B]a șters %2$d elemente.[/B]</item>
+        <item quantity="few">[A]%1$s [/A][B]a șters %2$d elemente.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]a șters %2$d de elemente.[/B]</item>
     </plurals>
     <!-- Subtitle of the historic notification for new additions inside an existing shared folder, Plural of folder. 2 folders -->
     <plurals name="subtitle_notification_added_folders">
         <item quantity="one">[A]%1$s [/A][B]a adăugat %2$d folder.[/B]</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">[A]%1$s [/A][B]a adăugat %2$d foldere.[/B]</item>
+        <item quantity="few">[A]%1$s [/A][B]a adăugat %2$d foldere.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]a adăugat %2$d de foldere.[/B]</item>
     </plurals>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
     <plurals name="subtitle_of_group_chat">
         <item quantity="one">%d participant</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%d participanți</item>
+        <item quantity="few">%d participanți</item>
+        <item quantity="other">%d de participanți</item>
     </plurals>
     <!--  -->
     <string name="custom_subtitle_of_group_chat">%1$s și încă %2$d</string>
@@ -3087,23 +3069,23 @@
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]De la[/A] %s / [A]lună[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
-    <string name="upgrade_comment">* Abonarea recurentă poate fi anulată în orice moment înainte de data de reînnoire.</string>
+    <string name="upgrade_comment">* Abonamentul recurent poate fi anulat în orice moment înainte de data de reînnoire.</string>
     <!-- Message shown when a call starts. -->
     <string name="call_started_messages">Apel început</string>
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">Eroare privind cheia SSL</string>
     <!-- Text of the dialog to inform about a SSL error -->
-    <string name="ssl_error_dialog_text">MEGA nu se poate conecta securizat prin SSL. S-ar putea să fii pe o rețea Wi-Fi publică cu cerințe suplimentare.</string>
+    <string name="ssl_error_dialog_text">MEGA is unable to establish a secure connection using SSL. You may be on a public Wi-Fi network with additional requirements.</string>
     <!-- Text of the empty screen for the notifications section -->
     <string name="context_empty_notifications">[B]Nicio [/B][A]notificare[/A]</string>
     <!-- Permissions screen title -->
     <string name="general_setup_mega">Configurare MEGA</string>
     <!-- Permissions screen explanation -->
-    <string name="setup_mega_explanation">MEGA are nevoie de acces la fotografiile, conținutul media și fișierele tale, astfel încât să poți să le partajezi cu prietenii, să faci schimb de mesaje criptate și să efectuezi apeluri securizate.</string>
+    <string name="setup_mega_explanation">MEGA needs your permission to access your media and files for sharing. Other access permissions may be needed for exchanging encrypted messages and to make secure calls.</string>
     <!-- Title of the screen asking permissions for files -->
     <string name="allow_acces_media_title">Permite accesul la fotografii, conținut media și fișiere.</string>
     <!-- Subtitle of the screen asking permissions for files -->
-    <string name="allow_acces_media_subtitle">Pentru a partaja fotografii, conținut media și fișiere, MEGA are nevoie de permisiunea ta.</string>
+    <string name="allow_acces_media_subtitle">MEGA are nevoie de permisiunea ta ca să acceseze fișierele pentru partajare.</string>
     <!-- Title of the screen asking permissions for camera -->
     <string name="allow_acces_camera_title">Activează camera</string>
     <!-- Subtitle of the screen asking permissions for camera -->
@@ -3111,7 +3093,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Activează apelurile</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Activează accesul la agenda de adrese</string>
+    <string name="allow_acces_contact_title">Grant access to your address book</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Descoperă cu ușurință contactele din agenda de adrese pe MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3119,9 +3101,9 @@
     <!-- Subtitle of the screen asking permissions for microphone -->
     <string name="allow_acces_calls_subtitle_microphone">Permite accesul la microfon pentru a efectua apeluri criptate.</string>
     <!-- General enable access -->
-    <string name="general_enable_access">Activează accesul</string>
+    <string name="general_enable_access">Acordă acces</string>
     <!-- Title of the option on chat info screen to list all the files sent to the chat -->
-    <string name="title_chat_shared_files_info">Fișiere partajate</string>
+    <string name="title_chat_shared_files_info">Shared files</string>
     <!-- Error mesage when trying to remove an uploading attachment that has already finished -->
     <string name="error_message_already_sent">Atașament trimis deja</string>
     <!-- Message shown when a group call ends. -->
@@ -3169,17 +3151,17 @@
     <!-- Text to indicate that a contact has left a group call -->
     <string name="contact_left_the_call">%1$s a părăsit apelul.</string>
     <!-- Warning show when a call cannot start because there are too many participants in the group chat -->
-    <string name="call_error_too_many_participants_start">Nu ai permisiunea de a iniția un apel deoarece limita de participanți a fost depășită.</string>
+    <string name="call_error_too_many_participants_start">Call cannot start because the maximum number of participants has been exceeded.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group call -->
-    <string name="call_error_too_many_participants">Nu ți se permite să te alături acestui apel deoarece acesta a atins numărul maxim de participanți.</string>
+    <string name="call_error_too_many_participants">Call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a call cannot be established because there are too many participants in the group -->
-    <string name="call_error_too_many_participants_join">Nu ți se permite să te alături acestui apel deoarece grupul a atins numărul maxim de participanți la chat.</string>
+    <string name="call_error_too_many_participants_join">Unable to join the group call due to the maximum number of participants reached</string>
     <!-- Message show when a user cannot activate the video in a group call because the max number of videos has been reached -->
-    <string name="call_error_too_many_video">Nu ți se permite să activezi funcția video deoarece acest apel a atins numărul maxim de participanți care folosesc funcția video.</string>
+    <string name="call_error_too_many_video">Video call cannot be joined as the maximum number of participants has been exceeded.</string>
     <!-- Message show when a user cannot put the call on hold -->
-    <string name="call_error_call_on_hold">Nu ai permisiunea de a pune apelul în așteptare.</string>
+    <string name="call_error_call_on_hold">Call cannot be put on hold.</string>
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
-    <string name="error_open_file_with">Eroare. Fișierul nu poate fi deschis.</string>
+    <string name="error_open_file_with">An error has occurred and the file cannot be opened with this app.</string>
     <!-- Subtitle of the call screen when a incoming call is just starting -->
     <string name="incoming_call_starting">Apel de intrare&#8230;</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
@@ -3397,7 +3379,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="recent_chat_empty_text">Începe să chatuiești în siguranță cu contactele tale folosind criptarea capăt-la-capăt</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">Hi! Have secure conversations on MEGA with me and get up to 20 GB+ free storage. %1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">Hi. Have secure conversations on MEGA with me and get 20 GB of free cloud storage. %1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Niciun link de chat disponibil.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -3426,15 +3408,15 @@
     <string name="invite_contact_chooser_title">Invită un prieten via</string>
     <!-- Action button label -->
     <string name="invite_contact_action_button">Invită un prieten via&#8230;</string>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that has already been downloaded in plural. placeholder: number of files -->
+    <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">%d fișier descărcat deja.&#160;</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%d fișiere descărcate deja.&#160;</item>
+        <item quantity="one">1 fișier descărcat deja.</item>
+        <item quantity="few">%d fișiere descărcate deja.</item>
+        <item quantity="other">%d de fișiere descărcate deja.</item>
     </plurals>
-    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending in plural. placeholder: number of files -->
+    <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">%d fișier în așteptare.</item>
+        <item quantity="one">1 fișier în așteptare.</item>
         <item quantity="few">%d fișiere în așteptare.</item>
         <item quantity="other">%d de fișiere în așteptare.</item>
     </plurals>
@@ -3447,7 +3429,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Chaturi</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Niciun fișier în [/B][A]Recente[/A]</string>
+    <string name="context_empty_recents">[B]No files in [/B][A]Recents[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s și încă %2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3503,13 +3485,13 @@
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
     <string name="payment_required_label">Plată necesară</string>
     <!-- Business expired account Overdue payment page header. -->
-    <string name="payment_overdue_label">Plată restantă</string>
+    <string name="payment_overdue_label">Plata este întârziată</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">Gestionarea utilizatorilor este disponibilă doar de pe un browser web de desktop.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Utilizare</string>
-    <!-- Title of usage storage details section in Storage -->
-    <string name="usage_storage_details_label">Detalii privind utilizarea spațiului de stocare</string>
+    <!-- Title of usage storage details section in My Account -->
+    <string name="usage_storage_details_label">Storage usage breakdown</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Utilizare generală</string>
     <!-- Title of transfer section in Storage -->
@@ -3517,7 +3499,7 @@
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
     <string name="error_remove_business_contact">Nu poți elimina pe %1$s ca contact, deoarece face parte din contul tău business.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
-    <string name="grace_period_admin_alert">A fost o problemă cu ultima plată. Te rugăm să accesezi MEGA folosind un browser desktop pentru mai multe informații.</string>
+    <string name="grace_period_admin_alert">A problem occurred with your last payment. Please access MEGA using a desktop browser for more information.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Contul tău business a expirat</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
@@ -3525,7 +3507,7 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">În prezent, contul tău este [B]suspendat[/B]. Poți răsfoi numai prin datele tale.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">Deși MEGA nu îți poate accesa datele, administratorul contului tău business poate controla și vedea încărcările cameră din contul tău de utilizator</string>
+    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your business account administrator can access your Camera Uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Ceva a mers prost</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
@@ -3567,7 +3549,7 @@
     <!-- Locked accounts description text by bad use of user password. This text is 2 of 2 paragraph of a description -->
     <string name="locked_accounts_text_2">Parola ta s-a scurs și acum este folosită de persoane rău-intenționate pentru a se autentifica în conturile tale, inclusiv, dar nu numai, în contul tău MEGA.</string>
     <!-- Button to add a nickname for a user -->
-    <string name="add_nickname">Setează pseudonim</string>
+    <string name="add_nickname">Setează un pseudonim</string>
     <!-- Button to update a nickname for a user -->
     <string name="edit_nickname">Editează pseudonimul</string>
     <!-- Label showing that a nickname has been added -->
@@ -3593,7 +3575,7 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">Eroare privind permisiunile</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">Nu ai permisiunile necesare pentru a reveni la versiunea anterioară pentru acest fișier. Pentru a continua, putem crea un nou fișier cu datele readuse la versiunea anterioară. Dorești să continui?</string>
+    <string name="alert_not_enough_permissions_revert">You do not have the correct permissions to amend this file. Would you like to create a new file?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Versiunea a fost creată cu succes ca un fișier nou.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
@@ -3623,17 +3605,17 @@
     <!-- Text warning of transfer over quota -->
     <string name="warning_transfer_over_quota">Transferurile tale au fost întrerupte. Upgradează contul sau așteaptă %s pentru a continua.</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">Transfer peste cotă</string>
+    <string name="label_transfer_over_quota">Cotă de transfer depășită</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">Stocare peste cotă</string>
+    <string name="label_storage_over_quota">Cotă de stocare depășită</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Obține o cotă de transfer mai mare</string>
     <!-- Warning show to the user when a folder does not exist -->
     <string name="warning_folder_not_exists">Folderul nu există.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Fișierul nu există în unitatea cloud.</string>
+    <string name="warning_node_not_exists_in_cloud">Fișierul nu poate fi găsit în unitatea ta cloud.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_header">Stocare plină</string>
+    <string name="over_disk_quota_paywall_header">Spațiu de stocare plin</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_title">Datele tale sunt în pericol!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
@@ -3687,7 +3669,7 @@
     <!-- Text show in a snackbar when phone has successfully reset. -->
     <string name="remove_phone_number_success">Numărul tău de telefon a fost eliminat cu succes.</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
-    <string name="remove_phone_number_fail">Eliminarea numărului tău de telefon a eșuat.</string>
+    <string name="remove_phone_number_fail">Eșec la eliminarea numărului de telefon.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
     <string name="search_hint">Caută în MEGA</string>
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
@@ -3721,11 +3703,11 @@
     <!-- Text that indicates that there’s no photo to show -->
     <string name="homepage_empty_hint_photos">Nicio fotografie găsită</string>
     <!-- Text that indicates that there’s no document to show -->
-    <string name="homepage_empty_hint_documents">No documents found</string>
+    <string name="homepage_empty_hint_documents">Niciun document găsit</string>
     <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">No audio files found</string>
+    <string name="homepage_empty_hint_audio">Niciun fișier audio găsit</string>
     <!-- Text that indicates that there’s no video to show -->
-    <string name="homepage_empty_hint_video">No videos found</string>
+    <string name="homepage_empty_hint_video">Niciun videoclip găsit</string>
     <!-- Title of the screen to attach GIFs -->
     <string name="search_giphy_title">Caută pe GIPHY</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
@@ -3745,23 +3727,23 @@
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
     <string name="progress_size_indicator">%1$d%% din %2$s</string>
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_enabled">Enabled special info for chat messages</string>
+    <string name="show_info_chat_msg_enabled">Debugging info for chat messages enabled</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Disabled special info for chat messages</string>
+    <string name="show_info_chat_msg_disabled">Debugging info for chat messages is disabled</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Ai atins limita maximă de %d reacții.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Acest mesaj a atins limita maximă de %d reacții.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] a modificat perioada de ștergere a mesajelor în[/B][A] %2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Golește istoricul chatului</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
-    <string name="retention_history_disabled">[A]%1$s[/A][B] disabled message clearing.[/B]</string>
+    <string name="retention_history_disabled">[A]%1$s[/A][B] a dezactivat ștergerea mesajelor.[/B]</string>
     <!-- Subtitle of the section to clear the chat content in the Manage chat history screen -->
     <string name="subtitle_properties_chat_clear">Delete all messages and files shared in this conversation. This action is irreversible.</string>
     <!-- Title of the history retention option -->
-    <string name="title_properties_history_retention">Curățarea istoricului</string>
+    <string name="title_properties_history_retention">Ștergerea istoricului</string>
     <!-- Subtitle of the history retention option when history retention is disabled -->
     <string name="subtitle_properties_history_retention">Șterge automat mesajele mai vechi de o anumită perioadă de timp.</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled -->
@@ -3769,42 +3751,42 @@
     <!-- Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one day -->
     <string name="history_retention_option_one_day">O zi</string>
     <!-- SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week -->
-    <string name="history_retention_option_one_week">One week</string>
+    <string name="history_retention_option_one_week">O săptămână</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month -->
-    <string name="history_retention_option_one_month">One month</string>
+    <string name="history_retention_option_one_month">O lună</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted -->
-    <string name="history_retention_option_custom">Custom</string>
+    <string name="history_retention_option_custom">Personalizat</string>
     <!-- Title of the Manage chat history screen -->
-    <string name="title_properties_manage_chat">Manage chat history</string>
+    <string name="title_properties_manage_chat">Gestionează istoricul chatului</string>
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Șterge automat mesajele mai vechi de:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Clear the full message history for this conversation?</string>
+    <string name="confirmation_clear_chat_history">Sigur vrei să ștergi istoricul complet al mesajelor din această conversație?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 an</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
     <plurals name="retention_time_picker_hours">
         <item quantity="one">oră</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">ore</item>
+        <item quantity="few">ore</item>
+        <item quantity="other">de ore</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <plurals name="retention_time_picker_days">
         <item quantity="one">zi</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">zile</item>
+        <item quantity="few">zile</item>
+        <item quantity="other">de zile</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several weeks -->
     <plurals name="retention_time_picker_weeks">
         <item quantity="one">săptămână</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">săptămâni</item>
+        <item quantity="few">săptămâni</item>
+        <item quantity="other">de săptămâni</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several months -->
     <plurals name="retention_time_picker_months">
         <item quantity="one">lună</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">luni</item>
+        <item quantity="few">luni</item>
+        <item quantity="other">de luni</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates a year -->
     <string name="retention_time_picker_year">an</string>
@@ -3822,39 +3804,36 @@
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
-        <item quantity="one">1 month</item>
-        <item quantity="other">%1$d months</item>
+        <item quantity="one">1 lună</item>
+        <item quantity="few">%1$d luni</item>
+        <item quantity="other">%1$d de luni</item>
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
-    <string name="title_select_transfers">Select transfers</string>
+    <string name="title_select_transfers">Selectează transferurile</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">The priority change of the transfer ”%1$s” failed.</string>
+    <string name="change_of_transfer_priority_failed">Modificarea priorității transferului „%1$s” a eșuat.</string>
     <!-- Title option to send separated the link and decryption key -->
-    <string name="option_send_decryption_key_separately">Send decryption key separately</string>
+    <string name="option_send_decryption_key_separately">Trimite separat cheia de decriptare</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">Export link and decryption key separately.</string>
+    <string name="explanation_send_decryption_key_separately">Exportă linkul și cheia de decriptare separat.</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">Află mai multe</string>
     <!-- Label key referring to a link decryption key -->
-    <string name="key_label">Key</string>
+    <string name="key_label">Cheie</string>
     <!-- Button which action is share the decryption key of a link -->
-    <string name="button_share_key">Share key</string>
+    <string name="button_share_key">Partajează cheia</string>
     <!-- Button which action is copy the decryption key of a link -->
     <string name="button_copy_key">Copiază cheia</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Copiază parola</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">Link copied to the clipboard.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Key copied to the clipboard.</string>
+    <string name="key_copied_clipboard">Cheie copiată în clipboard.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">Password copied to the clipboard.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">Link successfully sent.</string>
+    <string name="password_copied_clipboard">Parolă copiată în clipboard.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">Link and key successfully sent.</string>
+    <string name="link_and_key_sent">Linkul și cheia trimise cu succes.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">Link and password successfully sent.</string>
+    <string name="link_and_password_sent">Linkul și parola trimise cu succes.</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Upgradează la Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3862,19 +3841,19 @@
     <!-- Meaning of links decryption key -->
     <string name="decryption_key_explanation">Sistemul nostru de criptare capăt-la-capăt necesită o cheie unică generată automat pentru acest fișier. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
     <!-- Reset password label -->
-    <string name="reset_password_label">Restează parola</string>
+    <string name="reset_password_label">Resetează parola</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
-    <string name="share_key_warning">Share the key for this link?</string>
+    <string name="share_key_warning">Partajezi cheia pentru acest link?</string>
     <!-- Warning show to the user when has set a password protection of a link and tries to share the link -->
-    <string name="share_password_warning">Share the password for this link?</string>
+    <string name="share_password_warning">Partajezi parola pentru acest link?</string>
     <!-- Button which action is share the password of a link -->
-    <string name="button_share_password">Share password</string>
+    <string name="button_share_password">Partajează parola</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
     <string name="share_link_with_key">Link: %1$s\n\nKey: %2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
     <string name="share_link_with_password">Link: %1$s\n\nPassword: %2$s</string>
     <!-- Warning show to the user when the app needs permissions to share files and the user has denied them. -->
-    <string name="files_required_permissions_warning">MEGA are nevoie de permisiunea ta pentru a partaja fișiere.</string>
+    <string name="files_required_permissions_warning">MEGA needs your permission to access your files for sharing.</string>
     <!-- Context menu item. Allows user to add file/folder to favourites -->
     <string name="file_properties_favourite">Favorit</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
@@ -3900,7 +3879,7 @@
     <!-- A user can mark a folder or file with grey colour. -->
     <string name="label_grey">Gri</string>
     <!-- Text that indicates the song is now playing -->
-    <string name="audio_player_now_playing">Now playing</string>
+    <string name="audio_player_now_playing">Se redă acum</string>
     <!-- Text that indicates the song is now playing, but paused -->
     <string name="audio_player_now_playing_paused">Now playing (paused)</string>
     <!-- Title of the song info screen -->
@@ -3914,19 +3893,17 @@
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Înainte de a continua</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_alert_message">We use local storage and similar technologies (’Cookies’) to provide our services to you, enhance your experience with our services and customize the adverts you see, including through third parties. Accept our use of Cookies from the beginning of your visit or customise Cookies in Cookie Settings. Read more in our [A]Cookie Policy[/A].</string>
+    <string name="dialog_cookie_alert_message">Folosim spațiul de stocare local și tehnologii similare („Cookie-uri”) pentru a-ți oferi serviciile noastre, pentru a-ți îmbunătăți experiența cu serviciile noastre și pentru a personaliza anunțurile pe care le vezi, inclusiv prin intermediul unor terțe părți. Acceptă folosirea cookie-urilor de la începutul vizitei tale sau personalizează cookie-urile în Setări privind cookie-urile. Citește mai multe în [A]Politica noastră privind cookie-urile[/A].</string>
     <!-- Cookie dialog message showed when there are unsaved settings. -->
     <string name="dialog_cookie_alert_unsaved">Cookie Settings unsaved.</string>
     <!-- Snackbar message showed when there settings has been saved successfully. -->
     <string name="dialog_cookie_snackbar_saved">Cookie Settings changes have been saved</string>
-    <!-- Cookie dialog third party title -->
-    <string name="dialog_cookie_thirdparty_title">Cookie-uri terță parte</string>
     <!-- Cookie dialog third party first subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle1">Cookie-uri de publicitate Google</string>
     <!-- Cookie dialog third party second subtitle -->
     <string name="dialog_cookie_thirdparty_subtitle2">Categorie: Cookie-uri de publicitate</string>
     <!-- Cookie dialog third party message. Please, keep the placeholders to format the string. -->
-    <string name="dialog_cookie_thirdparty_message">Used by Google to:\n• customise the adverts Google shows on ours and other services and websites, based on such things as your location and other websites you’ve previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you click on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
+    <string name="dialog_cookie_thirdparty_message">Used by Google to:\n• customise the adverts Google shows on ours and other services and websites, based on such things as your location and other websites you’ve previously visited;\n• monitor how often you are displayed certain adverts;\n• provide fraud prevention; and\n• determine when you tap on a particular advert and then to track the following actions you take in response to that advert.\nhttps://policies.google.com/technologies/partner-sites</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Acceptă cookie-urile</string>
     <!-- Preference screen item title -->
@@ -3948,23 +3925,19 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_thirdparty_title">Cookie-uri terță parte</string>
     <!-- Preference screen item summary. Please, keep the placeholders to format the string. -->
-    <string name="preference_cookies_thirdparty_summary">Acestea sunt cookie-uri care sunt controlate de altcineva decât noi; folosim aceste cookie-uri pentru a furniza tipurile de funcționalități descrise mai sus. Neacceptarea acestor cookie-uri va avea implicații diferite în funcție de ce tip de cookie este fiecare cookie terță parte. Dă clic pe „Mai multe informații” de mai jos pentru detalii despre toate cookie-urile terță parte pe care le folosim.</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_privacy">Politica de confidențialitate</string>
-    <!-- Preference screen item action button -->
-    <string name="preference_cookies_policies_cookie">Politica privind cookie-urile</string>
+    <string name="preference_cookies_thirdparty_summary">These are Cookies which are controlled by someone other than us; we use these Cookies to provide the types of functionality described above. Not accepting these Cookies will have different implications depending on what type of Cookie each third party Cookie is. Tap on “More Information” below for details on all the third party Cookies we use.</string>
     <!-- Preference screen item state description -->
     <string name="preference_cookies_always_on">Always On</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
     <string name="menu_scan_document">Scan document</string>
     <!-- Message displayed when clicking on a contact attached to the chat that is not my contact -->
-    <string name="user_is_not_contact">%s is not in your contacts list</string>
+    <string name="user_is_not_contact">%s is not in your contact list</string>
     <!-- Option of color theme, light mode. -->
     <string name="theme_light">Deschisă</string>
     <!-- Option of color theme, dark mode. -->
     <string name="theme_dark">Întunecată</string>
     <!-- Option of color theme, follow the system setting. -->
-    <string name="theme_system_default">System default</string>
+    <string name="theme_system_default">Implicită a sistemului</string>
     <!-- Option of color theme, follow the system battery saver settings. -->
     <string name="theme_battery_saver">Set by Battery Saver</string>
     <!-- Prompt text shows when need to user select SD card root from SAF(Storage Access Framework, a system app). -->
@@ -3972,23 +3945,23 @@
     <!-- Cloud Drive screen subtitle indicating a destination is required to be selected -->
     <string name="cloud_drive_select_destination">Selectează destinația</string>
     <!-- Warning which alerts the user before discard changes -->
-    <string name="discard_changes_warning">Discard changes and close the editor?</string>
+    <string name="discard_changes_warning">Înlături modificările și închizi editorul?</string>
     <!-- Action discard -->
-    <string name="discard_close_action">Discard and close</string>
+    <string name="discard_close_action">Înlătură și închide</string>
     <!-- Label indicating saving a file is in progress -->
     <string name="saving_file">Saving file&#8230;</string>
     <!-- Label indicating a file was created successfully -->
-    <string name="file_created">File created</string>
+    <string name="file_created">Fișier creat</string>
     <!-- Warning indicating a file was not created successfully -->
-    <string name="file_creation_failed">File creation failed. Try again.</string>
+    <string name="file_creation_failed">File creation failed. Please try again.</string>
     <!-- Label indicating a file was saved to some folder. e.g.: File saved to Cloud Drive -->
     <string name="file_saved_to">File saved to %1$s</string>
     <!-- Warning indicating a file was not saved to some folder. e.g.: File not saved to Cloud Drive. Try again -->
-    <string name="file_saved_to_failed">File not saved to %1$s. Try again.</string>
+    <string name="file_saved_to_failed">Fișier nesalvat în %1$s. Încearcă din nou.</string>
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">File updated</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">File update failed. Try again.</string>
+    <string name="file_update_failed">File update failed. Please try again.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">File is too large and can’t be opened or previewed.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -3996,21 +3969,9 @@
     <!-- Error shown when the user writes a file name without extension -->
     <string name="file_without_extension_warning">To proceed you need to type a file extension</string>
     <!-- Title of the warning dialog indicating the renamed name file extension is not the same -->
-    <string name="file_extension_change_title">File extension change</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholders show the file extensions. e.g. You may not be able to access this file if you change it from ".jpg" to ".txt" -->
-    <string name="file_extension_change_warning">Este posibil să nu poți accesa acest fișier dacă modifici extensia din „.%1$s” în „.%2$s”</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from empty to ".txt" -->
-    <string name="file_extension_change_warning_old_empty">Este posibil să nu poți accesa acest fișier dacă adaugi extensia „.%1$s”</string>
-    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. The placeholder shows the file extension. e.g. You may not be able to access this file if you change it from ".jpg" to empty -->
-    <string name="file_extension_change_warning_new_empty">Este posibil să nu poți accesa acest fișier dacă elimini extensia „.%1$s”</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension -->
-    <string name="action_use_empty_new_extension">Elimină extensia</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to use the new extension. The placeholder shows the file extension. e.g. Use .txt -->
-    <string name="action_use_new_extension">Use .%1$s</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension -->
-    <string name="action_keep_empty_old_extension">Fără extensie</string>
-    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to keep the old extension. The placeholder shows the file extension. e.g. Keep .jpg -->
-    <string name="action_keep_old_extension">Keep .%1$s</string>
+    <string name="file_extension_change_title">Modificarea extensiei fișierului</string>
+    <!-- Text of the warning dialog indicating the renamed name file extension is not the same. -->
+    <string name="file_extension_change_warning">Este posibil să nu poți deschide acest fișier dacă îi modifici extensia.</string>
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">Există deja un fișier cu același nume</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
@@ -4049,7 +4010,7 @@
     <!-- Text to show as production api server option -->
     <string name="production_api_server">Production</string>
     <!-- Title to show in a dialog to change api server -->
-    <string name="title_change_server">Change server</string>
+    <string name="title_change_server">Schimbă serverul</string>
     <!-- Show line numbers action -->
     <string name="action_show_line_numbers">Show line numbers</string>
     <!-- Hide line numbers action -->
@@ -4057,9 +4018,117 @@
     <!-- Indicates pagination progress. E.g.: 3/49 -->
     <string name="pagination_progress">%1$s/%2$s</string>
     <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
-    <string name="error_share_owner_storage_quota">Proprietarul partajării depăște cota de stocare.</string>
+    <string name="error_share_owner_storage_quota">Proprietarul partajării depășește cota de stocare.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">Fișierul nu poate fi trimis deoarece utilizatorul țintă și-a depășit cota sa de stocare.</string>
     <!-- Content to show in a Snackbar to tip the incompatibility-->
-    <string name="version_incompatibility">We are upgrading MEGAchat. Your call might not be connected due to version incompatibility issues.</string>
+    <string name="version_incompatibility">We are upgrading MEGAchat. Your calls might not be connected due to version incompatibility unless all parties update their MEGA apps to the latest version.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 file is being downloaded -->
+    <string name="file_already_downloaded_and_file_pending_download">1 fișier descărcat deja, 1 fișier în așteptare.</string>
+    <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and multiple files are being downloaded. Placeholder: number of files -->
+    <string name="file_already_downloaded_and_files_pending_download">1 fișier descărcat deja, %d fișiere în așteptare.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
+    <string name="files_already_downloaded_and_file_pending_download">%d fișiere descărcate deja, 1 fișier în așteptare.</string>
+    <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
+    <string name="files_already_downloaded_and_files_pending_download">%1$d fișiere descărcate deja, %2$d fișiere în așteptare.</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 element a fost mutat cu succes în coșul de gunoi și 1 element nu a fost trimis cu succes</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 element a fost mutat cu succes în coșul de gunoi și %d elemente nu au fost trimise cu succes</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d elemente au fost mutate cu succes în coșul de gunoi și 1 element nu a fost trimis cu succes</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d elemente au fost mutate cu succes în coșul de gunoi și %2$d elemente nu au fost trimise cu succes</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
+    <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 element a fost restaurat cu succes și 1 element nu a fost restaurat cu succes</string>
+    <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
+    <string name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">1 element a fost restaurat cu succes și %d elemente nu au fost restaurate cu succes</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
+    <string name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">%d elemente au fost restaurate cu succes și 1 element nu a fost restaurat cu succes</string>
+    <!-- Message displayed when multiple nodes (files and folders) have been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholders: number of nodes -->
+    <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d elemente au fost restaurate cu succes și %2$d elemente nu au fost restaurate cu succes</string>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_correctly_moved_to_rubbish">
+        <item quantity="one">1 element mutat cu succes în coșul de gunoi</item>
+        <item quantity="few">%d elemente mutate cu succes în coșul de gunoi</item>
+        <item quantity="other">%d de elemente mutate cu succes în coșul de gunoi</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_moved_to_rubbish">
+        <item quantity="one">1 element nu a fost mutat cu succes în coșul de gunoi</item>
+        <item quantity="few">%d elemente nu au fost mutate cu succes în coșul de gunoi</item>
+        <item quantity="other">%d de elemente nu au fost mutate cu succes în coșul de gunoi</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_correctly_restored_from_rubbish">
+        <item quantity="one">1 element restaurat cu succes</item>
+        <item quantity="few">%d elemente restaurate cu succes</item>
+        <item quantity="other">%d de elemente restaurate cu succes</item>
+    </plurals>
+    <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
+    <plurals name="number_incorrectly_restored_from_rubbish">
+        <item quantity="one">1 element nu a fost restaurat cu succes</item>
+        <item quantity="few">%d elemente nu au fost restaurate cu succes</item>
+        <item quantity="other">%d de elemente nu au fost restaurate cu succes</item>
+    </plurals>
+    <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
+    <string name="action_change_anyway">Modifică oricum</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Permission needed to access storage.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">Adaugă numărul tău de telefon</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">Îți mai aduci aminte parola?\nMEGA nu îți poate reseta parola dacă o uiți.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">Modifică name</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">Add photo</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">Adaugă un număr de telefon</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">MEGA needs write permissions to your device storage to continue.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">Tomorrow, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">În așteptarea confirmării</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="one">1 connection</item>
+        <item quantity="other">%1$d connections</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Adăugate recent</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Cereri</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Grupuri</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Copy all</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Link successfully sent.</item>
+        <item quantity="other">Links successfully sent.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link copied to the clipboard.</item>
+        <item quantity="other">Links copied to the clipboard.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Get Link</item>
+        <item quantity="other">Get Links</item>
+    </plurals>
 </resources>

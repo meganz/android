@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <!-- Label to show that an SDK operation has been complete successfully. -->
-  <string name="api_ok">오류 없음</string>
-  <!-- Label to show that an Internal error occurs during a SDK operation. -->
-  <string name="api_einternal">내부 오류</string>
-  <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
-  <string name="api_eargs">잘못된 인수</string>
-  <!-- Label to show that a request error occurs during a SDK operation. -->
-  <string name="api_eagain">요청이 실패함, 재시도중</string>
-  <!-- Label to show that the rate limit has been reached during a SDK operation. -->
-  <string name="api_eratelimit">비율 제한 초과</string>
-  <!-- Label to show that a SDK operation has failed permanently. -->
-  <string name="api_efailed">영구적으로 실패함</string>
-  <!-- Error shown when terms of service are breached during download. -->
-  <string name="api_etoomany_ec_download">이용 약관 침해됨</string>
-  <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
-  <string name="api_etoomay">너무 많은 동시 연결 또는 전송</string>
-  <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
-  <string name="api_erange">범위를 벗어남</string>
-  <!-- State to indicate something has expired (achivements of business status account for instance) -->
-  <string name="api_eexpired">만료됨</string>
-  <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
-  <string name="api_enoent">발견되지 않음</string>
-  <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
-  <string name="api_ecircular">순환 연결 감지</string>
-  <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
-  <string name="api_eaccess">접근이 거부됨</string>
-  <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
-  <string name="api_eexist">이미 존재합니다</string>
-  <!-- Label to show that an error related with an Incomplete SDK operation. -->
-  <string name="api_eincomplete">완료되지 않음</string>
-  <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-  <string name="api_ekey">잘못된 키/복호화 오류</string>
-  <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
-  <string name="api_esid">세션 ID 오류</string>
-  <!-- Error shown when download a file that has violated ToS/AUP. -->
-  <string name="api_eblocked_ec_import_ec_download">이용 약관 위반으로 인하여 접근 불가</string>
-  <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
-  <string name="api_eblocked">차단됨</string>
-  <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
-  <string name="api_eoverquota">할당량 초과</string>
-  <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
-  <string name="api_etempunavail">일시적으로 이용이 불가능합니다</string>
-  <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
-  <string name="api_etoomanyconnections">연결 초과</string>
-  <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
-  <string name="api_ewrite">쓰기 오류</string>
-  <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
-  <string name="api_eread">읽기 오류</string>
-  <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
-  <string name="api_eappkey">잘못된 어플리케이션 키</string>
-  <!-- Error shown when SSL check has failed -->
-  <string name="api_essl">SSL 인증 실패</string>
-  <!-- Label shown when current account does not have enough quota to complete the operation -->
-  <string name="api_egoingoverquota">충분하지 않은 할당량</string>
-  <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
-  <string name="api_emfarequired">2단계 인증이 필요합니다.</string>
-  <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
-  <string name="api_emasteronly">관리자가 아닌 이용자의 접근이 금지됨</string>
-  <!-- A dialog title shown to users when their business account is expired. -->
-  <string name="api_ebusinesspastdue">당신의 비즈니스 계정이 만료되었습니다</string>
-  <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
-  <string name="payment_ecard">신용 카드 거절됨</string>
-  <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
-  <string name="payment_ebilling">결제 실패</string>
-  <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
-  <string name="payment_efraud">사기 방지에 의해 거절됨</string>
-  <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
-  <string name="payment_etoomay">요청이 너무 많습니다</string>
-  <!-- Label to show that an error of Balance occurs during a SDK operation. -->
-  <string name="payment_ebalance">잔고 오류</string>
-  <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
-  <string name="payment_egeneric_api_error_unknown">알 수 없는 오류</string>
-  <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
-  <string name="api_error_http">HTTP 오류</string>
-  <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
-  <string name="api_ecircular_ec_upload">재귀적 디렉토리 구조로 인하여 전송을 실패하였습니다</string>
+    <!-- Label to show that an SDK operation has been complete successfully. -->
+    <string name="api_ok">오류 없음</string>
+    <!-- Label to show that an Internal error occurs during a SDK operation. -->
+    <string name="api_einternal">내부 오류</string>
+    <!-- Label to show that an error of Invalid argument occurs during a SDK operation. -->
+    <string name="api_eargs">잘못된 인수</string>
+    <!-- Label to show that a request error occurs during a SDK operation. -->
+    <string name="api_eagain">요청이 실패함, 재시도중</string>
+    <!-- Label to show that the rate limit has been reached during a SDK operation. -->
+    <string name="api_eratelimit">비율 제한 초과</string>
+    <!-- Label to show that a SDK operation has failed permanently. -->
+    <string name="api_efailed">영구적으로 실패함</string>
+    <!-- Error shown when terms of service are breached during download. -->
+    <string name="api_etoomany_ec_download">이용 약관 침해됨</string>
+    <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
+    <string name="api_etoomay">너무 많은 동시 연결 또는 전송</string>
+    <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
+    <string name="api_erange">범위를 벗어남</string>
+    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <string name="api_eexpired">만료됨</string>
+    <!-- Label to show that an error related with a resource Not found occurs during a SDK operation. -->
+    <string name="api_enoent">발견되지 않음</string>
+    <!-- Label to show that an error related with a circular linkage occurs during a SDK operation. -->
+    <string name="api_ecircular">순환 연결 감지</string>
+    <!-- Label to show that an error related with an denied access occurs during a SDK operation. -->
+    <string name="api_eaccess">접근이 거부됨</string>
+    <!-- Label to show that an error related with an existent resource occurs during a SDK operation. -->
+    <string name="api_eexist">이미 존재합니다</string>
+    <!-- Label to show that an error related with an Incomplete SDK operation. -->
+    <string name="api_eincomplete">완료되지 않음</string>
+    <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
+    <string name="api_ekey">잘못된 키/복호화 오류</string>
+    <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
+    <string name="api_esid">세션 ID 오류</string>
+    <!-- Error shown when download a file that has violated ToS/AUP. -->
+    <string name="api_eblocked_ec_import_ec_download">이용 약관 위반으로 인하여 접근 불가</string>
+    <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
+    <string name="api_eblocked">차단됨</string>
+    <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
+    <string name="api_eoverquota">할당량 초과</string>
+    <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
+    <string name="api_etempunavail">일시적으로 이용이 불가능합니다</string>
+    <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
+    <string name="api_etoomanyconnections">연결 초과</string>
+    <!-- Label to show that an error related with an write error occurs during a SDK operation. -->
+    <string name="api_ewrite">쓰기 오류</string>
+    <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
+    <string name="api_eread">읽기 오류</string>
+    <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
+    <string name="api_eappkey">잘못된 어플리케이션 키</string>
+    <!-- Error shown when SSL check has failed -->
+    <string name="api_essl">SSL 인증 실패</string>
+    <!-- Label shown when current account does not have enough quota to complete the operation -->
+    <string name="api_egoingoverquota">충분하지 않은 할당량</string>
+    <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
+    <string name="api_emfarequired">2단계 인증이 필요합니다.</string>
+    <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
+    <string name="api_emasteronly">관리자가 아닌 이용자의 접근이 금지됨</string>
+    <!-- A dialog title shown to users when their business account is expired. -->
+    <string name="api_ebusinesspastdue">당신의 비즈니스 계정이 만료되었습니다</string>
+    <!-- Label to show that an error of Credit card rejected occurs during a SDK operation. -->
+    <string name="payment_ecard">신용 카드 거절됨</string>
+    <!-- Label to show that an error of Billing failed occurs during a SDK operation. -->
+    <string name="payment_ebilling">결제 실패</string>
+    <!-- Label to show that an error of Rejected by fraud protection occurs during a SDK operation. -->
+    <string name="payment_efraud">사기 방지에 의해 거절됨</string>
+    <!-- Message shown when the SDK is waiting for the server to complete a request due to a rate limit (API error -4) - (String as short as possible). -->
+    <string name="payment_etoomay">요청이 너무 많습니다</string>
+    <!-- Label to show that an error of Balance occurs during a SDK operation. -->
+    <string name="payment_ebalance">잔고 오류</string>
+    <!-- Label to show that an error related with an unknown error occurs during a SDK operation. -->
+    <string name="payment_egeneric_api_error_unknown">알 수 없는 오류</string>
+    <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
+    <string name="api_error_http">HTTP 오류</string>
+    <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
+    <string name="api_ecircular_ec_upload">재귀적 디렉토리 구조로 인하여 전송을 실패하였습니다</string>
 </resources>

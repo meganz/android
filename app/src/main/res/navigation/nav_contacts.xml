@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/contacts"
+    app:startDestination="@id/contact_list">
+
+    <fragment
+        android:id="@+id/contact_list"
+        android:name="mega.privacy.android.app.contacts.list.ContactListFragment"
+        android:label="@string/section_contacts"
+        tools:layout="@layout/fragment_contact_list">
+
+        <action
+            android:id="@+id/action_list_to_requests"
+            app:destination="@id/contact_requests" />
+
+        <action
+            android:id="@+id/action_list_to_groups"
+            app:destination="@id/contact_groups" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/contact_requests"
+        android:name="mega.privacy.android.app.contacts.requests.ContactRequestsFragment"
+        android:label="@string/section_requests"
+        tools:layout="@layout/fragment_contact_requests">
+
+        <argument
+            android:name="isOutgoing"
+            android:defaultValue="false"
+            app:argType="boolean" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/contact_groups"
+        android:name="mega.privacy.android.app.contacts.group.ContactGroupsFragment"
+        android:label="@string/section_groups"
+        tools:layout="@layout/fragment_contact_groups" />
+
+</navigation>

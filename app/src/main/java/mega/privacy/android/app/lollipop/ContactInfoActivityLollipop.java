@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -55,9 +54,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import kotlin.Unit;
 import mega.privacy.android.app.AuthenticityCredentialsActivity;
@@ -89,6 +86,7 @@ import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialo
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -114,6 +112,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
@@ -123,8 +122,6 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.getDescription;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -148,12 +145,9 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 	private ChatController chatC;
 	private ContactController cC;
 
-	private final static int MAX_WIDTH_APPBAR_LAND = 400;
-	private final static int MAX_WIDTH_APPBAR_PORT = 200;
-
 	RelativeLayout imageLayout;
 	AlertDialog permissionsDialog;
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 	AlertDialog setNicknameDialog;
 	ContactInfoActivityLollipop contactInfoActivityLollipop;
 	CoordinatorLayout fragmentContainer;
@@ -482,7 +476,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			setSupportActionBar(toolbar);
 			aB = getSupportActionBar();
 
-			imageLayout = findViewById(R.id.chat_contact_properties_image_layout);
+			imageLayout = findViewById(R.id.image_layout);
 
 			collapsingToolbar = findViewById(R.id.collapse_toolbar);
 
@@ -519,7 +513,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 			aB.setHomeButtonEnabled(true);
 			aB.setDisplayHomeAsUpEnabled(true);
 
-			contactPropertiesImage = findViewById(R.id.chat_contact_properties_toolbar_image);
+			contactPropertiesImage = findViewById(R.id.toolbar_image);
 
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -992,8 +986,9 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 		}
 		List<MegaUser> userList = new ArrayList<MegaUser>();
 		userList.add(user);
-		ContactController cC = new ContactController(this);
-		cC.pickFileToSend(userList);
+
+		Intent intent = ContactController.getPickFileToSendIntent(this, userList);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
 	}
 
 	public void sendMessageToChat(){
@@ -1121,7 +1116,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
                     contactPropertiesImage.setImageBitmap(imBitmap);
 
                     if (imBitmap != null && !imBitmap.isRecycled()) {
-                        int colorBackground = getDominantColor1(imBitmap);
+                        int colorBackground = getDominantColor(imBitmap);
                         imageLayout.setBackgroundColor(colorBackground);
                     }
                 }
@@ -1143,82 +1138,12 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 					contactPropertiesImage.setImageBitmap(imBitmap);
 
 					if (imBitmap != null && !imBitmap.isRecycled()) {
-						int colorBackground = getDominantColor1(imBitmap);
+						int colorBackground = getDominantColor(imBitmap);
 						imageLayout.setBackgroundColor(colorBackground);
 					}
 				}
 			}
 		}
-	}
-
-	public int getDominantColor1(Bitmap bitmap) {
-
-		if (bitmap == null)
-			throw new NullPointerException();
-
-		int width = bitmap.getWidth();
-		int height = bitmap.getHeight();
-		int size = width * height;
-		int pixels[] = new int[size];
-
-		Bitmap bitmap2 = bitmap.copy(Bitmap.Config.ARGB_4444, false);
-
-		bitmap2.getPixels(pixels, 0, width, 0, 0, width, height);
-
-		final List<HashMap<Integer, Integer>> colorMap = new ArrayList<HashMap<Integer, Integer>>();
-		colorMap.add(new HashMap<Integer, Integer>());
-		colorMap.add(new HashMap<Integer, Integer>());
-		colorMap.add(new HashMap<Integer, Integer>());
-
-		int color = 0;
-		int r = 0;
-		int g = 0;
-		int b = 0;
-		Integer rC, gC, bC;
-		logDebug("pixels.length: " + pixels.length);
-		int j=0;
-		//for (int i = 0; i < pixels.length; i++) {
-		while (j < pixels.length){
-
-			color = pixels[j];
-
-			r = Color.red(color);
-			g = Color.green(color);
-			b = Color.blue(color);
-
-			rC = colorMap.get(0).get(r);
-			if (rC == null)
-				rC = 0;
-			colorMap.get(0).put(r, ++rC);
-
-			gC = colorMap.get(1).get(g);
-			if (gC == null)
-				gC = 0;
-			colorMap.get(1).put(g, ++gC);
-
-			bC = colorMap.get(2).get(b);
-			if (bC == null)
-				bC = 0;
-			colorMap.get(2).put(b, ++bC);
-			j = j+width+1;
-		}
-
-		int[] rgb = new int[3];
-		for (int i = 0; i < 3; i++) {
-			int max = 0;
-			int val = 0;
-			for (Map.Entry<Integer, Integer> entry : colorMap.get(i).entrySet()) {
-				if (entry.getValue() > max) {
-					max = entry.getValue();
-					val = entry.getKey();
-				}
-			}
-			rgb[i] = val;
-		}
-
-		int dominantColor = Color.rgb(rgb[0], rgb[1], rgb[2]);
-
-		return dominantColor;
 	}
 
 	private void setDefaultAvatar() {
@@ -1296,7 +1221,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 					return;
 				}
 
-				chatC.selectChatsToAttachContact(user);
+				Intent intent = ChatController.getSelectChatsToAttachContactIntent(this, user);
+				startActivityForResult(intent, REQUEST_CODE_SELECT_CHAT);
 				break;
 			}
 			case R.id.chat_contact_properties_shared_folders_button:
@@ -1470,7 +1396,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						statusDialog = getProgressDialog(contactInfoActivityLollipop, getString(R.string.context_sharing_folder));
+						statusDialog = createProgressDialog(contactInfoActivityLollipop, StringResourcesUtils.getString(R.string.context_sharing_folder));
 						permissionsDialog.dismiss();
 						nC.shareFolder(parent, selectedContacts, item);
 					}
@@ -1492,16 +1418,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
-            
-            ProgressDialog temp = null;
-            try {
-                temp = new ProgressDialog(this);
-                temp.setMessage(getString(R.string.context_copying));
-                temp.show();
-            } catch (Exception e) {
-                return;
-            }
-            statusDialog = temp;
+
+            statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_copying));
             
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
