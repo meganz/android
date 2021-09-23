@@ -61,6 +61,18 @@ public class MegaApiUtils {
     }
 
     /**
+     * Gets the string to show as content of a folder link.
+     *
+     * @param n The folder to get its string content.
+     * @return The string to show as content of the folder.
+     */
+    public static String getMegaNodeFolderLinkInfo(MegaNode n) {
+        MegaApiJava megaApiFolder = MegaApplication.getInstance().getMegaApiFolder();
+
+        return getFolderInfo(megaApiFolder.getNumChildFolders(n), megaApiFolder.getNumChildFiles(n));
+    }
+
+    /**
      * Gets the string to show as content of a list of nodes.
      *
      * @param nodes The list of nodes to get its string content.
