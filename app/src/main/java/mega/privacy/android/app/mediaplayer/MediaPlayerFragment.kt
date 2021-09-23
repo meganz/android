@@ -91,7 +91,6 @@ class MediaPlayerFragment : Fragment() {
         tryObservePlaylist()
 
         if (!isVideoPlayer()) {
-//            (activity as? MediaPlayerActivity)?.setupStatusBarColor()
             delayHideToolbar()
         }
     }

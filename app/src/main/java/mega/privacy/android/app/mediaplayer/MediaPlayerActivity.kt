@@ -10,7 +10,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.*
-import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -134,6 +133,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -222,12 +222,18 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 
-            @Suppress("DEPRECATION")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 window?.setDecorFitsSystemWindows(false)
             } else {
                 window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            }
+        } else {
+            if (!Util.isDarkMode(this)) {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                }
             }
         }
 
@@ -951,14 +957,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             }
         }
 
-        if (!isDarkMode) {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            }
-        }
-
-        window?.statusBarColor = statusBarColor
+        window.statusBarColor = statusBarColor
         toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
         toolbar.elevation = toolbarElevation
     }
