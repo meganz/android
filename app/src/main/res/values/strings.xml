@@ -3660,7 +3660,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">This message has reached the maximum limit of %d reactions.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] changed the message clearing time to [/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] changed the message clearing time to [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Clear chat history</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -4126,7 +4126,7 @@
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Tap the Meeting link sent to you or paste it here</string>
     <!-- Banner text to indicate poor network quality-->
-    <string name="slow_connection_meeting">Poor connection</string>
+    <string name="slow_connection_meeting">Poor connection quality</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
     <string name="meeting_has_ended">Meeting has ended</string>
     <!-- error message shown when a meeting link is not well formed-->
@@ -4134,11 +4134,11 @@
     <!-- Warning show to the user when the app needs permissions to start a meeting.-->
     <string name="meeting_permission_info">Access permissions needed for MEGA</string>
     <!-- Message of a dialog to show user the permissions that needed-->
-    <string name="meeting_permission_info_message">Please grant MEGA access to your microphone and camera for meetings.</string>
+    <string name="meeting_permission_info_message">MEGA needs access to your microphone and camera for meetings.</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">Got it</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_required_permissions_warning">Go to settings to allow MEGA to access your camera and microphone.</string>
+    <string name="meeting_required_permissions_warning">Go to Settings to allow MEGA to access your camera and microphone.</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">View meeting chat</string>
     <!-- the content of tips when the user uses the meeting first time-->
@@ -4146,7 +4146,7 @@
     <!-- the content of tips when the user enters recent chat page first time-->
     <string name="tip_create_meeting">Tap to create a new meeting</string>
     <!-- the content of tips when the user enters start conversation page first time-->
-    <string name="tip_setup_meeting">Quickly set up a MEGA Meeting with our new encrypted meeting feature</string>
+    <string name="tip_setup_meeting">Quickly set up a MEGA meeting with our new encrypted meeting feature</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">You are the new moderator.</string>
     <!-- the content of snack bar when copied meeting link-->
@@ -4170,7 +4170,7 @@
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
-    <string name="ongoing_call_content">You cannot make another call. Please end your first call before making another.</string>
+    <string name="ongoing_call_content">Another call in progress. Please end your current call before making another.</string>
     <!-- The hint text when changing meeting name-->
     <string name="new_meeting_name">New meeting name</string>
     <!-- The content of dialog when failed for creating meeting-->

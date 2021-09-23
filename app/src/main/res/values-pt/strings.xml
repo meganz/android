@@ -169,7 +169,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Você tem certeza de que quer cancelar o login?</string>
     <!-- Login button -->
-    <string name="login_text">Entrar</string>
+    <string name="login_text">Fazer login</string>
     <!-- email label -->
     <string name="email_text">Email</string>
     <!-- password label -->
@@ -1458,7 +1458,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Copiado ao bloco de notas</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Erro no chat!</string>
+    <string name="chat_error_open_title">Erro no chat</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Não foi possível abrir o chat corretamente</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -2485,7 +2485,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Autenticação de dois fatores ativada</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Na próxima vez que você fizer login na sua conta, você deverá inserir um código de seis dígitos proporcionado pelo seu aplicativo de autenticação.</string>
+    <string name="description_2fa_enabled">Na próxima vez que você fizer login na sua conta, você deverá digitar um código de seis dígitos proporcionado pelo seu aplicativo de autenticação.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Salve a sua <b>chave de recuperação</b> em um lugar seguro para evitar problemas caso você perca o acesso ao seu aplicativo e queira desativar a autenticação de dois fatores.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -4106,7 +4106,7 @@
     <!-- assign moderator option when the moderator leave meeting-->
     <string name="assign_moderator">Converter em moderador</string>
     <!-- leave anyway option when the moderator leave meeting-->
-    <string name="leave_anyway">Sair de qualquer forma</string>
+    <string name="leave_anyway">Sair mesmo assim</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
     <string name="pick_new_moderator_message">Selecione um ou mais novos moderadores.</string>
     <!-- The title of dialog for changing meeting name-->
@@ -4146,7 +4146,7 @@
     <!-- the content of tips when the user enters recent chat page first time-->
     <string name="tip_create_meeting">Toque para criar uma nova reunião</string>
     <!-- the content of tips when the user enters start conversation page first time-->
-    <string name="tip_setup_meeting">Configure rapidamente uma reunião criptografada com o nosso novo recurso MEGA Meeting</string>
+    <string name="tip_setup_meeting">Programe rapidamente uma reunião criptografada com o novo recurso do MEGA</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Você é o novo moderador.</string>
     <!-- the content of snack bar when copied meeting link-->

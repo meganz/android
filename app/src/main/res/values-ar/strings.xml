@@ -4464,7 +4464,7 @@
     <!-- Invite contacts as participants of the meeting-->
     <string name="invite_participants">قم بدعوة مشاركين</string>
     <!-- The number of participants in the meeting-->
-    <string name="participants_number">(%d) مشارك</string>
+    <string name="participants_number">المشاركون (%d)</string>
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">إظهار كعرض قائمة</string>
     <!-- Make the participant as moderator in the meeting-->
@@ -4484,7 +4484,7 @@
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">تغيير اسم الاجتماع</string>
     <!-- The number of participants in the meeting on meeting info page-->
-    <string name="info_participants_number">مشاركون: %d</string>
+    <string name="info_participants_number">المشاركون: %d</string>
     <!-- The name of moderators in the meeting on meeting info page-->
     <string name="info_moderator_name">مشرف:%s</string>
     <!-- The literal meeting link text-->

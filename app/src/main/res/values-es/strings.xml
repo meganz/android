@@ -318,7 +318,7 @@
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">ELEGIR CUENTA</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">Sin conexión</string>
+    <string name="file_properties_available_offline">Disponible sin conexión</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">Tamaño</string>
     <!-- When the file/folder was last modified -->
@@ -1458,7 +1458,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Copiado en el portapapeles</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">¡Error del chat!</string>
+    <string name="chat_error_open_title">Error del chat</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">No se ha podido abrir el chat</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -2485,7 +2485,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Autenticación de dos factores activada</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">La próxima vez que inicies sesión en su cuenta, tendrás que introducir un código de 6 dígitos proporcionado por tu aplicación de autenticación.</string>
+    <string name="description_2fa_enabled">La próxima vez que inicies sesión en tu cuenta, tendrás que introducir un código de 6 dígitos proporcionado por tu aplicación de autenticación.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Guarda tu <b>Clave de recuperación</b>en un lugar seguro en caso de que pierdas el acceso a tu aplicación o quieras desactivar la autenticación de dos factores.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
