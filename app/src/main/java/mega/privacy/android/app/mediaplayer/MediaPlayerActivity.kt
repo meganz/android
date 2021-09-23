@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.*
+import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
@@ -947,6 +948,13 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 } else {
                     ContextCompat.getColor(this, R.color.black)
                 }
+            }
+        }
+
+        if (!isDarkMode) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             }
         }
 
