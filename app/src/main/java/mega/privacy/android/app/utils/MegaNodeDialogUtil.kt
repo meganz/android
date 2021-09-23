@@ -613,8 +613,7 @@ object MegaNodeDialogUtil {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(getString(R.string.confirmation_move_to_rubbish))
                 .setPositiveButton(getString(R.string.general_move)) { _, _ ->
-                    val progress = android.app.ProgressDialog(activity)
-                    progress.setMessage(getString(R.string.context_move_to_trash))
+                    val progress = MegaProgressDialogUtil.createProgressDialog(activity,getString(R.string.context_move_to_trash))
 
                     megaApi.moveNode(
                         node, rubbishNode,
@@ -636,8 +635,7 @@ object MegaNodeDialogUtil {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(getString(R.string.confirmation_delete_from_mega))
                 .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
-                    val progress = android.app.ProgressDialog(activity)
-                    progress.setMessage(getString(R.string.context_delete_from_mega))
+                    val progress = MegaProgressDialogUtil.createProgressDialog(activity, getString(R.string.context_delete_from_mega))
 
                     megaApi.remove(node, RemoveListener {
                         progress.dismiss()

@@ -418,6 +418,18 @@
         <item name="android:textColor">@color/red_400</item>
     </style>
 
+    <style name="TextAppearance.Mega.Body2.Red400Red300">
+        <item name="android:textColor">@color/red_400_red_300</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Amber400">
+        <item name="android:textColor">@color/amber_400</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Body2.Amber800Amber700">
+        <item name="android:textColor">@color/amber_800_amber_700</item>
+    </style>
+
     <style name="TextAppearance.Mega.Body2.Teal300Teal200">
         <item name="android:textColor">@color/teal_300_teal_200</item>
     </style>

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.lollipop;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -13,6 +12,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.ContextCompat;
@@ -57,6 +57,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.components.CustomViewPager;
@@ -235,7 +236,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	private ChatExplorerFragment chatExplorer;
 	private ImportFilesFragment importFileFragment;
 
-	private ProgressDialog statusDialog;
+	private AlertDialog statusDialog;
 
 	private List<ShareInfo> filePreparedInfos;
 
@@ -1767,10 +1768,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	 * @param message Message to display into the progress dialog
 	 */
 	private void createAndShowProgressDialog(boolean cancelable, String message) {
-		ProgressDialog temp;
+		AlertDialog temp;
 		try {
-			temp = new ProgressDialog(this);
-			temp.setMessage(message);
+			temp = MegaProgressDialogUtil.createProgressDialog(this, message);
 			temp.setCancelable(cancelable);
 			temp.setCanceledOnTouchOutside(cancelable);
 			temp.show();
@@ -2053,8 +2053,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			if (!exists){
 				statusDialog = null;
 				try {
-					statusDialog = new ProgressDialog(this);
-					statusDialog.setMessage(getString(R.string.context_creating_folder));
+					statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_creating_folder));
 					statusDialog.show();
 				}
 				catch(Exception e){
@@ -2083,8 +2082,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				if (!exists){
 					statusDialog = null;
 					try {
-						statusDialog = new ProgressDialog(this);
-						statusDialog.setMessage(getString(R.string.context_creating_folder));
+						statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_creating_folder));
 						statusDialog.show();
 					}
 					catch(Exception e){
