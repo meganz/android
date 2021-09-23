@@ -1458,7 +1458,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Gekopieerd naar het klembord</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Gespreksfout!</string>
+    <string name="chat_error_open_title">Gespreksfout</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Het gesprek kon niet correct geopend worden</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -2814,7 +2814,7 @@
     <!-- error message shown when a chat link is not well formed -->
     <string name="invalid_chat_link_args">Ongeldige Gesprekslink</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
-    <string name="ekr_label">Coderingssleutel Rotatie</string>
+    <string name="ekr_label">Coderingssleutel rotatie</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Het roteren van de coderingssleutel is iets veiliger, maar u kunt geen chatlink maken en nieuwe deelnemers zullen geen eerdere berichten zien.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -4060,7 +4060,7 @@
     <!-- Button that join a meeting as guest -->
     <string name="btn_join_meeting_as_guest">Aansluiten als gast</string>
     <!-- Hint shown to guide user on meeting name -->
-    <string name="type_meeting_name">%s&quot;s vergadering</string>
+    <string name="type_meeting_name">%s”s vergadering</string>
     <!-- General label for reject the call. -->
     <string name="general_reject">Ophangen</string>
     <!-- General label for microphone -->

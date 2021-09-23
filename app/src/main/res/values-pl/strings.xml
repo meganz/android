@@ -1494,7 +1494,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Skopiowana do schowka</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Błąd czatu!</string>
+    <string name="chat_error_open_title">Błąd</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Ten czat nie został otwarty prawidłowo</string>
     <!-- Menu option to add a contact to your contact list. -->
