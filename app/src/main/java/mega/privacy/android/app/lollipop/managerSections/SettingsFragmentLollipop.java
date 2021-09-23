@@ -226,7 +226,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         logDebug("onViewCreated");
 
@@ -241,7 +241,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
         getListView().addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 checkScroll();
             }
@@ -270,6 +270,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
      * Method for controlling whether or not to display the action bar elevation.
      */
     public void checkScroll() {
+        if (getListView() == null) {
+            return;
+        }
+
         ((ManagerActivityLollipop) context)
                 .changeAppBarElevation(getListView().canScrollVertically(SCROLLING_UP_DIRECTION));
     }
