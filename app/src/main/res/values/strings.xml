@@ -3658,7 +3658,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">This message has reached the maximum limit of %d reactions.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] changed the message clearing time to [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Clear chat history</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -4043,4 +4043,6 @@
         <item quantity="one">Get Link</item>
         <item quantity="other">Get Links</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Clear all offline files?</string>
 </resources>

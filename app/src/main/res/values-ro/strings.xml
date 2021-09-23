@@ -29,7 +29,7 @@
     <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
     <string name="general_create">Creează</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="general_download">Descărcare</string>
+    <string name="general_download">Descarcă</string>
     <!-- button -->
     <string name="general_add">Adaugă</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -101,11 +101,11 @@
     <!-- Button where the user can sign off or logout -->
     <string name="action_logout">Deconectează-te</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="action_add">Încărcare</string>
+    <string name="action_add">Încarcă</string>
     <!-- Menu item -->
     <string name="action_create_folder">Creează un folder nou</string>
     <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Create new text file</string>
+    <string name="action_create_txt">Creează un fișier text nou</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">Deschide un link</string>
     <!-- Menu item -->
@@ -414,8 +414,6 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Delete link</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">Obține linkul</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Părăsește</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">Părăsește partajarea</string>
@@ -434,7 +432,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_rename">Redenumește</string>
     <!-- Title of a dialog to rename a node. The place holder is to set the current name of the node. -->
-    <string name="rename_dialog_title">Rename %1$s</string>
+    <string name="rename_dialog_title">Redenumește %1$s</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="context_open_link_title">Deschide un link</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -444,7 +442,7 @@
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Se pregătește fișierul</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_download">Descărcare</string>
+    <string name="context_download">Descarcă</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_move">Mută</string>
     <!-- while moving a file or folder -->
@@ -452,7 +450,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_copy">Copiază</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_upload">Încărcare</string>
+    <string name="context_upload">Încarcă</string>
     <!-- while copying a file or folder -->
     <string name="context_copying">Se copiază</string>
     <!-- menu item -->
@@ -617,8 +615,8 @@
     <string name="confirmation_cancel_subscriptions">Thank you for your feedback. Are you sure you want to cancel your MEGA subscription?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Abonamentul tău nu a fost anulat. Te rugăm să oferi un motiv pentru anulare</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">Îți mulțumim că te-ai abonat la %1$s %2$s!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">Thanks. Your payment is processing. Please email us at support&#64;mega.co.nz if you have not received your upgrade within 24 hours.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Noul tău abonament se va aplica odată ce cel actual expiră, noul preț va fi perceput la acel moment.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -680,8 +678,6 @@
     <string name="overquota_alert_text">Ai depășit limita de stocare. Dorești să upgradezi contul?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Ultima sesiune</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Conexiuni</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Se modifică parola</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -839,11 +835,11 @@
         <item>Importă de pe dispozitiv</item>
     </string-array>
     <!-- settings option -->
-    <string name="settings_camera_upload_on">Activează încărcări cameră</string>
+    <string name="settings_camera_upload_on">Activează Încărcări cameră</string>
     <!-- settings option -->
-    <string name="settings_camera_upload_turn_on">Pornește încărcări cameră</string>
+    <string name="settings_camera_upload_turn_on">Pornește Încărcări cameră</string>
     <!-- settings option -->
-    <string name="settings_camera_upload_off">Dezactivează încărcări cameră</string>
+    <string name="settings_camera_upload_off">Dezactivează Încărcări cameră</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Mod de încărcare</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
@@ -866,21 +862,21 @@
         <item>Fotografii și videoclipuri</item>
     </string-array>
     <!-- Option to choose that the camera sync will only be enable when the device is charging -->
-    <string name="settings_camera_upload_charging">Doar când se încarcă</string>
+    <string name="settings_camera_upload_charging">Doar când dispozitivul se încarcă</string>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
     <string name="settings_camera_upload_include_gps">Include etichetele locațiilor</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
-    <string name="settings_camera_upload_require_plug_in">Solicită-mi să încarc în mod activ dispozitivul</string>
+    <string name="settings_camera_upload_require_plug_in">Solicită-mi încărcarea activă a dispozitivului</string>
     <!-- Option to choose that the camera sync will maintain the local file names when uploading -->
     <string name="settings_keep_file_names">Păstrează numele fișierelor precum în dispozitiv</string>
     <!-- The location of where the user photos or videos are stored in the device. -->
-    <string name="settings_local_camera_upload_folder">Folder local cameră</string>
+    <string name="settings_local_camera_upload_folder">Folder local pentru cameră</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">Folderul încărcări cameră MEGA</string>
+    <string name="settings_mega_camera_upload_folder">Folder pentru Încărcări cameră MEGA</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
-    <string name="settings_local_secondary_folder">Folderul local secundar</string>
+    <string name="settings_local_secondary_folder">Folder local secundar</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
-    <string name="settings_mega_secondary_folder">Folderul secundar MEGA</string>
+    <string name="settings_mega_secondary_folder">Folder secundar MEGA</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_only_photos">Numai fotografii</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -894,7 +890,7 @@
     <!-- Settings option to change Passcode. -->
     <string name="settings_change_passcode">Modifică codul de acces</string>
     <!-- Settings option screen to change Passcode. -->
-    <string name="title_change_passcode">Change passcode lock</string>
+    <string name="title_change_passcode">Modifică blocarea prin codul de acces</string>
     <!-- Settings option to set the timer to ask for passcode. -->
     <string name="settings_require_passcode">Necesită cod de acces</string>
     <!-- Option available to choose in some context to make an action immediately. -->
@@ -903,8 +899,9 @@
     <string name="pin_lock_enter">Introdu</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="one">1 failed passcode attempt</item>
-        <item quantity="other">%1$d failed passcode attempts</item>
+        <item quantity="one">1 încercare eșuată pentru codul de acces</item>
+        <item quantity="few">%1$d încercări eșuate pentru codul de acces</item>
+        <item quantity="other">%1$d de încercări eșuate pentru codul de acces</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">You will be logged out and your offline files will be deleted after 10 failed attempts</string>
@@ -913,8 +910,8 @@
     <!-- Error message when not typing the Passcode correctly and have several attempts left. The placeholder is to display the number of attempts left in runtime. -->
     <plurals name="pin_lock_incorrect_alert">
         <item quantity="one">Cod de acces greșit, te rugăm să încerci din nou. Ai 1 încercare rămasă</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Cod de acces greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
+        <item quantity="few">Cod de acces greșit, te rugăm să încerci din nou. Ai %2d încercări rămase</item>
+        <item quantity="other">Cod de acces greșit, te rugăm să încerci din nou. Ai %2d de încercări rămase</item>
     </plurals>
     <!-- Error message when not typing the Passcode correctly (two times) -->
     <string name="pin_lock_not_match">Codurile de acces nu coincid. Încearcă din nou.</string>
@@ -973,11 +970,11 @@
     <!-- Label to indicate the date when the current subscription renews -->
     <string name="renews_on">Se reînoiește &#160;</string>
     <!-- title of the Expiration Date -->
-    <string name="expires_on">Expires on&#160;</string>
+    <string name="expires_on">Expiră&#160;</string>
     <!--  -->
     <string name="free_account">Gratuit</string>
     <!-- info message shown to the user when the Camera Uploads folder has been created -->
-    <string name="camera_uploads_created">Folderul încărcări cameră a fost creat</string>
+    <string name="camera_uploads_created">Folderul Încărcări cameră a fost creat</string>
     <!-- category in sort by action -->
     <string name="sortby_name">Nume</string>
     <!-- sort files alphabetically ascending -->
@@ -1011,9 +1008,9 @@
     <!-- Title to choose the type of Passcode -->
     <string name="pin_lock_type">Tipul codului de acces</string>
     <!-- Passcode with 4 digits -->
-    <string name="four_pin_lock">Cod de acces din 4 cifre</string>
+    <string name="four_pin_lock">4 cifre</string>
     <!-- Passcode with 6 digits -->
-    <string name="six_pin_lock">Cod de acces din 6 cifre</string>
+    <string name="six_pin_lock">6 cifre</string>
     <!-- Passcode alphanumeric -->
     <string name="AN_pin_lock">Alfanumeric</string>
     <!-- Confirmation message when enabling logs in the app -->
@@ -1021,13 +1018,13 @@
     <!-- Confirmation message when disabling logs in the app -->
     <string name="settings_disable_logs">Jurnalele sunt acum dezactivate</string>
     <!-- Snackbar error message triggered by host error when user is trying to setup MEGA Camera Uploads folder in settings page -->
-    <string name="error_unable_to_setup_cloud_folder">Nu se poate configura folderul Încărcări cameră al MEGA</string>
+    <string name="error_unable_to_setup_cloud_folder">Nu se poate configura folderul Încărcări cameră MEGA</string>
     <!-- Message displayed when the user denies the required permissions during the logs activation -->
     <string name="logs_not_enabled_permissions">Jurnalele nu au fost activate deoarece ai refuzat permisiunile necesare</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Deschide locația</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
-    <string name="servers_busy">Procesul durează mai mult decât era de așteptat. Te rugăm să aștepți&#8230;</string>
+    <string name="servers_busy">Acest proces durează mai mult decât era de așteptat. Te rugăm să aștepți.</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Cont gratuit</string>
     <!-- Type of account info added to the feedback email sent to support -->
@@ -1077,7 +1074,7 @@
     <!-- Hint of the text where the user can write his e-mail -->
     <string name="edit_text_insert_mail">e-mailul se introduce aici</string>
     <!-- Text of the alert message to ask for the link to reset the pass with the MK -->
-    <string name="text_alert_reset_with_MK">Te rugăm să introduci adresa ta de e-mail mai jos. Vei primi un link de recuperare care îți va permite să trimiți cheia de recuperare și să îți resetezi parola.</string>
+    <string name="text_alert_reset_with_MK">Te rugăm să introduci adresa de e-mail mai jos. Vei primi un link de recuperare care îți va permite să trimiți cheia de recuperare și să îți resetezi parola.</string>
     <!-- Hint of the text when the user can write his master key -->
     <string name="edit_text_insert_mk">Cheia de recuperare se introduce aici</string>
     <!-- Hint of the text where the user can write his password -->
@@ -1091,15 +1088,15 @@
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">A apărut o eroare, te rugăm să încerci din nou.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
-    <string name="alert_not_logged_in">Trebuie să fii autentificat pentru a efectua această acțiune.</string>
+    <string name="alert_not_logged_in">Trebuie să fii autentificat(ă) pentru a efectua această acțiune.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
-    <string name="change_email_not_logged_in">You need to be logged in to complete your email change. Please log in again with your current email address and then tap on your confirmation link again.</string>
+    <string name="change_email_not_logged_in">Trebuie să fii autentificat(ă) pentru a finaliza modificarea e-mailului. Te rugăm să te autentifici din nou cu adresa de e-mail actuală și apoi atinge linkul de confirmare din nou.</string>
     <!-- Text displayed to inform that the email was successfully changed. Please keep the placeholder, it will be replaced with the new email address. -->
     <string name="email_changed">Felicitări, noua adresă de e-mail pentru acest cont MEGA este: %1$s</string>
     <!-- Error when the user leaves empty the password field -->
     <string name="invalid_string">Incorect</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
-    <string name="invalid_input">Intrare nevalidă</string>
+    <string name="invalid_input">Input nevalid</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
     <string name="invalid_email_title">Adresă de e-mail nevalidă</string>
     <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
@@ -1111,7 +1108,7 @@
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Parola ta a fost modificată.</string>
     <!-- Title of the dialog to park an account -->
-    <string name="park_account_dialog_title">Cont parcat</string>
+    <string name="park_account_dialog_title">Parchează contul</string>
     <!-- Button to park an account -->
     <string name="park_account_button">Parchează</string>
     <!-- Title of the screen to park an account -->
@@ -1125,7 +1122,7 @@
     <!-- Text shown in the last alert dialog to park an account -->
     <string name="park_account_text_last_step">Acesta este ultimul pas pentru a-ți parca contul, te rugăm să introduci noua parolă. Datele tale vor fi păstrate pentru cel puțin 60 de zile. Dacă îți aduci aminte parola contului parcat, te rugăm să contactezi support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
-    <string name="title_enter_new_password">Introdu parola nouă</string>
+    <string name="title_enter_new_password">Introdu noua parolă</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
     <string name="recovery_link_expired">Acest link de recuperare a expirat, te rugăm să încerci din nou.</string>
     <!-- Text of the alert after opening the recovery link to reset pass being logged. -->
@@ -1151,7 +1148,7 @@
     <!-- Title of the alert dialog to change the email associated to an account -->
     <string name="change_mail_title_last_step">Modifică e-mailul</string>
     <!-- Iitle of the warning when the user is running out of space -->
-    <string name="title_new_warning_out_space">You are running out of storage space.</string>
+    <string name="title_new_warning_out_space">Rămâi fără spațiu de stocare.</string>
     <!-- Text of the warning when the user is running out of space -->
     <string name="new_warning_out_space">Beneficiază pe deplin de contul tău MEGA upgradându-l la Pro.</string>
     <!-- Iitle of sliding panel to choose the option to edit the profile picture -->
@@ -1177,13 +1174,13 @@
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">Editează</string>
     <!-- Alert Dialog to get link -->
-    <string name="title_set_expiry_date">Setează data de expirare</string>
+    <string name="title_set_expiry_date">Setează o dată de expirare</string>
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">Setează protecție prin parolă</string>
     <!-- Subtitle of the dialog to get link -->
     <string name="subtitle_set_expiry_date">(NUMAI PRO)</string>
     <!-- Alert Dialog to get link with password -->
-    <string name="set_password_protection_dialog">Setează parolă</string>
+    <string name="set_password_protection_dialog">Setează o parolă</string>
     <!-- Hint of the dialog to get link with password -->
     <string name="hint_set_password_protection_dialog">Introdu parola</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -1342,7 +1339,7 @@
     <!-- Title of the section to choose the sound of incoming messages in the Contact Properties screen -->
     <string name="title_properties_chat_contact_message_sound">Sunet la mesaje</string>
     <!-- Title of the section to clear the chat content in the Contact Properties screen -->
-    <string name="title_properties_chat_clear_chat">Golește chatul</string>
+    <string name="title_properties_chat_clear_chat">Șterge chatul</string>
     <!-- Title of the section to share the contact in the Contact Properties screen -->
     <string name="title_properties_chat_share_contact">Partajează contactul</string>
     <!-- Title of the screen to select the ringtone of the calls -->
@@ -1352,9 +1349,9 @@
     <!-- Button to clear the chat history -->
     <string name="general_clear">Șterge</string>
     <!-- Message show when the history of a chat has been successfully deleted -->
-    <string name="clear_history_success">Istoricul chatului a fost golit</string>
+    <string name="clear_history_success">Istoricul chatului a fost șters</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">S-a produs o eroare. Istoricul chatului nu a fost golit cu succes</string>
+    <string name="clear_history_error">S-a produs o eroare. Istoricul chatului nu a fost șters cu succes</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Adaugă participanți</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1392,7 +1389,7 @@
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="text_deleted_message_by">[A]Acest mesaj a fost șters de către [/A][B]%1$s[/B]</string>
     <!-- Confirmation before deleting messages -->
-    <string name="confirmation_delete_several_messages">Elimini mesaje?</string>
+    <string name="confirmation_delete_several_messages">Elimini mesajele?</string>
     <!-- Confirmation before deleting one message -->
     <string name="confirmation_delete_one_message">Elimini mesajul?</string>
     <!-- Label for the sliding panel of a group chat -->
@@ -1458,9 +1455,9 @@
     <!-- Text shown when a message has been deleted in the chat -->
     <string name="non_format_text_deleted_message_by">Acest mesaj a fost șters de către %1$s</string>
     <!-- Text shown when the chat history has been successfully deleted. -->
-    <string name="history_cleared_message">Istoricul chatului a fost golit</string>
+    <string name="history_cleared_message">Istoricul chatului a fost șters</string>
     <!-- Text shown when the chat history was cleared by someone -->
-    <string name="non_format_history_cleared_by">Istoricul chatului a fost golit de către %1$s</string>
+    <string name="non_format_history_cleared_by">Istoricul chatului a fost șters de către %1$s</string>
     <!-- chat message when the permissions for a user has been changed -->
     <string name="non_format_message_permissions_changed">%1$s a fost schimbat în %2$s de către %3$s</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -1474,11 +1471,11 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Copiat în clipboard</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Eroare privind chatul!</string>
+    <string name="chat_error_open_title">Eroare privind chatul</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Chatul nu a putut fi deschis cu succes</string>
     <!-- Menu option to add a contact to your contact list. -->
-    <string name="menu_choose_contact">Alege contactul</string>
+    <string name="menu_choose_contact">Alege un contact</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contact</item>
@@ -1490,13 +1487,13 @@
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
         <item quantity="one">Toate datele asociate cu contactul selectat vor fi pierdute definitiv.</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">Toate datele asociate cu contactele selectate vor fi pierdute definitiv.</item>
         <item quantity="other">Toate datele asociate cu contactele selectate vor fi pierdute definitiv.</item>
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
         <item quantity="one">Elimini contactul?</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">Elimini contactele?</item>
         <item quantity="other">Elimini contactele?</item>
     </plurals>
     <!-- option shown when a message could not be sent -->
@@ -1506,11 +1503,11 @@
     <!-- title of the menu for an uploading message with attachment -->
     <string name="title_message_uploading_options">Se încarcă atașamentul</string>
     <!-- message shown when a chat has no messages -->
-    <string name="no_conversation_history">Niciun istoric al conversațiilor</string>
+    <string name="no_conversation_history">Niciun istoric al conversației</string>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]tastează&#8230;[/A]</item>
-        <item quantity="few">empty</item>
+        <item quantity="few">%1$s [A]tastează&#8230;[/A]</item>
         <item quantity="other">%1$s [A]tastează&#8230;[/A]</item>
     </plurals>
     <!-- text that appear when there are more than 2 people writing at that time in a chat. For example User1, user2 and more are typing… -->
@@ -1647,32 +1644,32 @@
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_notification">
         <item quantity="one">Se încarcă %1$d din %2$d fișier</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se încarcă %1$d din %2$d fișiere</item>
+        <item quantity="few">Se încarcă %1$d din %2$d fișiere</item>
+        <item quantity="other">Se încarcă %1$d din %2$d de fișiere</item>
     </plurals>
     <!-- Text of the notification shown when the upload service is running, Plural -->
     <plurals name="upload_service_paused_notification">
         <item quantity="one">Se încarcă %1$d din %2$d fișier (pus pe pauză)</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se încarcă %1$d din %2$d fișiere (puse pe pauză)</item>
+        <item quantity="few">Se încarcă %1$d din %2$d fișiere (puse pe pauză)</item>
+        <item quantity="other">Se încarcă %1$d din %2$d de fișiere (puse pe pauză)</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_notification">
         <item quantity="one">Se încarcă %1$d din %2$d folder</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se încarcă %1$d din %2$d foldere</item>
+        <item quantity="few">Se încarcă %1$d din %2$d foldere</item>
+        <item quantity="other">Se încarcă %1$d din %2$d de foldere</item>
     </plurals>
     <!-- Text of the notification shown when the folder upload service is running, Text of the notification shown when the folder upload service is running - plural e.g. Uploading 1 of 2 folders -->
     <plurals name="folder_upload_service_paused_notification">
         <item quantity="one">Se încarcă %1$d din %2$d folder (pus pe pauză)</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se încarcă %1$d din %2$d foldere (puse pe pauză)</item>
+        <item quantity="few">Se încarcă %1$d din %2$d foldere (puse pe pauză)</item>
+        <item quantity="other">Se încarcă %1$d din %2$d de foldere (puse pe pauză)</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_final_notification">
         <item quantity="one">%1$d fișier încărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere încărcate</item>
+        <item quantity="few">%1$d fișiere încărcate</item>
+        <item quantity="other">%1$d de fișiere încărcate</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
@@ -1691,8 +1688,8 @@
     <!-- Text of the notification shown when the upload service has finished with any transfer error, Plural -->
     <plurals name="upload_service_failed">
         <item quantity="one">%1$d fișier neîncărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere neîncărcate</item>
+        <item quantity="few">%1$d fișiere neîncărcate</item>
+        <item quantity="other">%1$d de fișiere neîncărcate</item>
     </plurals>
     <!-- Text of the notification shown when the upload service has finished with any copied file instead uploaded, Plural -->
     <plurals name="copied_service_upload">
@@ -1709,32 +1706,32 @@
     <!-- Text of the notification shown when the download service has finished, Plural -->
     <plurals name="download_service_final_notification">
         <item quantity="one">%1$d fișier descărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere descărcate</item>
+        <item quantity="few">%1$d fișiere descărcate</item>
+        <item quantity="other">%1$d de fișiere descărcate</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any error, Plural -->
     <plurals name="download_service_final_notification_with_details">
         <item quantity="one">%1$d din %2$d fișier descărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d din %2$d fișiere descărcate</item>
+        <item quantity="few">%1$d din %2$d fișiere descărcate</item>
+        <item quantity="other">%1$d din %2$d de fișiere descărcate</item>
     </plurals>
     <!-- Text of the notification shown when the download service has finished with any transfer error, Plural -->
     <plurals name="download_service_failed">
         <item quantity="one">%1$d fișier nedescărcat</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere nedescărcate</item>
+        <item quantity="few">%1$d fișiere nedescărcate</item>
+        <item quantity="other">%1$d de fișiere nedescărcate</item>
     </plurals>
     <!-- Text of the notification shown when the download service is running, Plural -->
     <plurals name="download_service_notification">
         <item quantity="one">Se descarcă %1$d din %2$d fișier</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se descarcă %1$d din %2$d fișiere</item>
+        <item quantity="few">Se descarcă %1$d din %2$d fișiere</item>
+        <item quantity="other">Se descarcă %1$d din %2$d de fișiere</item>
     </plurals>
     <!-- Text of the notification shown when the download service is paused, Plural -->
     <plurals name="download_service_paused_notification">
         <item quantity="one">Se descarcă %1$d din %2$d fișier (pus pe pauză)</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">Se descarcă %1$d din %2$d fișiere (puse pe pauză)</item>
+        <item quantity="few">Se descarcă %1$d din %2$d fișiere (puse pe pauză)</item>
+        <item quantity="other">Se descarcă %1$d din %2$d de fișiere (puse pe pauză)</item>
     </plurals>
     <!-- Title of the alert when the transfer quota is exceeded. -->
     <string name="title_depleted_transfer_overquota">Cotă de transfer insuficientă</string>
@@ -1749,8 +1746,8 @@
     <!-- this is used for example when downloading 1 file or 2 files, Plural of file. 2 files -->
     <plurals name="new_general_num_files">
         <item quantity="one">%1$d fișier</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">%1$d fișiere</item>
+        <item quantity="few">%1$d fișiere</item>
+        <item quantity="other">%1$d de fișiere</item>
     </plurals>
     <!-- Menu option -->
     <string name="general_view">Vezi fișierele</string>
@@ -1769,7 +1766,7 @@
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s a fost invitat deja. Consultă cererile în așteptare.</string>
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
-    <string name="confirm_email_misspelled">If you have misspelt your email address, correct it and tap [A]Resend[A].</string>
+    <string name="confirm_email_misspelled">Dacă ți-ai scris greșit adresa de e-mail, corecteaz-o și atinge [A]Retrimite[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Retrimite</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
@@ -1779,11 +1776,11 @@
     <!-- text_copyright_alert_first_paragraph -->
     <string name="copyright_alert_first_paragraph">MEGA respectă drepturile de autor ale celorlalți și impune utilizatorilor serviciului de stocare în cloud MEGA să se conformeze cu legislațiile privind drepturile de autor.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Ai interdicția strică de a folosi serviciul de stocare în cloud MEGA pentru încălcarea drepturilor de autor. Nu poți încărca, descărca, stoca, partaja, afișa, distribui, reda în flux, trimite e-mail, oferi link, transmite sau altfel pune la dispoziție fișiere, date sau conținut care încalcă orice drept de autor sau alte drepturi de proprietate ale unei persoane sau entități.</string>
+    <string name="copyright_alert_second_paragraph">Îți este strict interzis să folosești serviciul de stocare în cloud MEGA pentru încălcarea drepturilor de autor. Nu poți încărca, descărca, stoca, partaja, afișa, distribui, reda în flux, trimite e-mail, oferi link, transmite sau altfel pune la dispoziție fișiere, date sau conținut care încalcă orice drept de autor sau alte drepturi de proprietate ale unei persoane sau entități.</string>
     <!-- text of the Agree button -->
-    <string name="copyright_alert_agree_button">De acord</string>
+    <string name="copyright_alert_agree_button">Sunt de acord</string>
     <!-- text of the Disagree button -->
-    <string name="copyright_alert_disagree_button">Dezacord</string>
+    <string name="copyright_alert_disagree_button">Nu sunt de acord</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">Afișează informații</string>
     <!-- Error message when removing public links of nodes. Plural. -->
@@ -2101,7 +2098,7 @@
     <!-- Message show when a call cannot be established -->
     <string name="call_error">An error has occurred and the call cannot be connected.</string>
     <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Like the MEGA Mobile App?</string>
+    <string name="title_evaluate_the_app_panel">Îți place aplicația mobilă MEGA?</string>
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">Da, evaluează aplicația</string>
     <!-- Label to show send feedback -->
@@ -3432,7 +3429,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Chaturi</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]Niciun fișier în [/B][A]Recente[/A]</string>
+    <string name="context_empty_recents">[B]No files in [/B][A]Recents[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s și încă %2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3488,12 +3485,12 @@
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
     <string name="payment_required_label">Plată necesară</string>
     <!-- Business expired account Overdue payment page header. -->
-    <string name="payment_overdue_label">Plată restantă</string>
+    <string name="payment_overdue_label">Plata este întârziată</string>
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">Gestionarea utilizatorilor este disponibilă doar de pe un browser web de desktop.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Utilizare</string>
-    <!-- Title of usage storage details section in Storage -->
+    <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">Storage usage breakdown</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Utilizare generală</string>
@@ -3746,7 +3743,7 @@
     <!-- Subtitle of the section to clear the chat content in the Manage chat history screen -->
     <string name="subtitle_properties_chat_clear">Delete all messages and files shared in this conversation. This action is irreversible.</string>
     <!-- Title of the history retention option -->
-    <string name="title_properties_history_retention">Curățarea istoricului</string>
+    <string name="title_properties_history_retention">Ștergerea istoricului</string>
     <!-- Subtitle of the history retention option when history retention is disabled -->
     <string name="subtitle_properties_history_retention">Șterge automat mesajele mai vechi de o anumită perioadă de timp.</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that history retention option is disabled -->
@@ -3756,40 +3753,40 @@
     <!-- SLabel for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one week -->
     <string name="history_retention_option_one_week">O săptămână</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that automatically deleted messages older than one month -->
-    <string name="history_retention_option_one_month">One month</string>
+    <string name="history_retention_option_one_month">O lună</string>
     <!-- Label for the dialog box option to configure history retention. This option will indicate that messages older than a custom date will be deleted -->
-    <string name="history_retention_option_custom">Custom</string>
+    <string name="history_retention_option_custom">Personalizat</string>
     <!-- Title of the Manage chat history screen -->
-    <string name="title_properties_manage_chat">Manage chat history</string>
+    <string name="title_properties_manage_chat">Gestionează istoricul chatului</string>
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Șterge automat mesajele mai vechi de:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Sigur vrei să golești istoricul complet al mesajelor din această conversație?</string>
+    <string name="confirmation_clear_chat_history">Sigur vrei să ștergi istoricul complet al mesajelor din această conversație?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 an</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
     <plurals name="retention_time_picker_hours">
         <item quantity="one">oră</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">ore</item>
+        <item quantity="few">ore</item>
+        <item quantity="other">de ore</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <plurals name="retention_time_picker_days">
         <item quantity="one">zi</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">zile</item>
+        <item quantity="few">zile</item>
+        <item quantity="other">de zile</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several weeks -->
     <plurals name="retention_time_picker_weeks">
         <item quantity="one">săptămână</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">săptămâni</item>
+        <item quantity="few">săptămâni</item>
+        <item quantity="other">de săptămâni</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several months -->
     <plurals name="retention_time_picker_months">
         <item quantity="one">lună</item>
-        <item quantity="few">empty</item>
-        <item quantity="other">luni</item>
+        <item quantity="few">luni</item>
+        <item quantity="other">de luni</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates a year -->
     <string name="retention_time_picker_year">an</string>
@@ -3807,11 +3804,12 @@
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
-        <item quantity="one">1 month</item>
-        <item quantity="other">%1$d months</item>
+        <item quantity="one">1 lună</item>
+        <item quantity="few">%1$d luni</item>
+        <item quantity="other">%1$d de luni</item>
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
-    <string name="title_select_transfers">Select transfers</string>
+    <string name="title_select_transfers">Selectează transferurile</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
     <string name="change_of_transfer_priority_failed">Modificarea priorității transferului „%1$s” a eșuat.</string>
     <!-- Title option to send separated the link and decryption key -->
@@ -3828,16 +3826,12 @@
     <string name="button_copy_key">Copiază cheia</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Copiază parola</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">Link copied to the clipboard.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Key copied to the clipboard.</string>
+    <string name="key_copied_clipboard">Cheie copiată în clipboard.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Parolă copiată în clipboard.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">Link successfully sent.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">Link and key successfully sent.</string>
+    <string name="link_and_key_sent">Linkul și cheia trimise cu succes.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_password_sent">Linkul și parola trimise cu succes.</string>
     <!-- Title of a warning recommending upgrade to Pro -->
@@ -3847,13 +3841,13 @@
     <!-- Meaning of links decryption key -->
     <string name="decryption_key_explanation">Sistemul nostru de criptare capăt-la-capăt necesită o cheie unică generată automat pentru acest fișier. În mod implicit, este creat un link cu această cheie, însă poți exporta cheia de decriptare separat pentru un strat de securitate suplimentar.</string>
     <!-- Reset password label -->
-    <string name="reset_password_label">Restează parola</string>
+    <string name="reset_password_label">Resetează parola</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
-    <string name="share_key_warning">Share the key for this link?</string>
+    <string name="share_key_warning">Partajezi cheia pentru acest link?</string>
     <!-- Warning show to the user when has set a password protection of a link and tries to share the link -->
-    <string name="share_password_warning">Share the password for this link?</string>
+    <string name="share_password_warning">Partajezi parola pentru acest link?</string>
     <!-- Button which action is share the password of a link -->
-    <string name="button_share_password">Share password</string>
+    <string name="button_share_password">Partajează parola</string>
     <!-- String to share a link with its decryption key separately. Please keep the place holders, are to set the link and the key. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Key: asfAFG3345g -->
     <string name="share_link_with_key">Link: %1$s\n\nKey: %2$s</string>
     <!-- String to share a link protected with password with its password.Please keep the place holders, are to set the link and the password. Example: Link: https://mega.nz/file/kC42xRSK#Ud2QsvpIVYmCd1a9QUhk42wXv10jCSyPSWnXEwYX2VE Password: asfAFG3345g -->
@@ -4079,4 +4073,62 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Modifică oricum</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Permission needed to access storage.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">Adaugă numărul tău de telefon</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">Îți mai aduci aminte parola?\nMEGA nu îți poate reseta parola dacă o uiți.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">Modifică name</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">Add photo</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">Adaugă un număr de telefon</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">MEGA needs write permissions to your device storage to continue.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">Tomorrow, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">În așteptarea confirmării</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="one">1 connection</item>
+        <item quantity="other">%1$d connections</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Adăugate recent</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Cereri</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Grupuri</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Copy all</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Link successfully sent.</item>
+        <item quantity="other">Links successfully sent.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link copied to the clipboard.</item>
+        <item quantity="other">Links copied to the clipboard.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Get Link</item>
+        <item quantity="other">Get Links</item>
+    </plurals>
 </resources>
