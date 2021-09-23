@@ -1958,11 +1958,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (shareInfos != null && shareInfos.size() > 0) {
                         if (hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                             toSharePage();
-                        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        } else {
                             PermissionUtils.requestPermission((LoginActivityLollipop) context,
                                     READ_MEDIA_PERMISSION, Manifest.permission.READ_EXTERNAL_STORAGE);
-                        } else {
-                            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_MEDIA_PERMISSION);
                         }
 
                         return;
