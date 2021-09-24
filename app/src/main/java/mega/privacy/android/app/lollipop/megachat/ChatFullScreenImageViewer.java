@@ -3,7 +3,7 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -90,7 +90,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 
 	private boolean aBshown = true;
 
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 
 	float scaleText;
 	AppBarLayout appBarLayout;
@@ -784,9 +784,7 @@ public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPag
 				MegaNode node = megaApi.getNodeByHandle(hash);
 				if(node != null){
 					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-					if (node.getType() == MegaNode.TYPE_FOLDER) {
-//						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
-					} else {
+					if (node.getType() != MegaNode.TYPE_FOLDER) {
 						dlFiles.put(node, parentPath);
 					}
 					

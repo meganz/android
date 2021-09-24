@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -72,6 +71,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
@@ -82,7 +82,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -133,7 +132,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	DisplayMetrics outMetrics;
 
 	private androidx.appcompat.app.AlertDialog renameDialog;
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 
 	MegaNode selectedNode = null;
 
@@ -293,8 +292,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			if (!exists) {
 				statusDialog = null;
 				try {
-					statusDialog = new ProgressDialog(this);
-					statusDialog.setMessage(getString(R.string.context_creating_folder));
+					statusDialog = createProgressDialog(this, getString(R.string.context_creating_folder));
 					statusDialog.show();
 				} catch (Exception e) {
 					return;
@@ -320,8 +318,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				if (!exists) {
 					statusDialog = null;
 					try {
-						statusDialog = new ProgressDialog(this);
-						statusDialog.setMessage(getString(R.string.context_creating_folder));
+						statusDialog = createProgressDialog(this, getString(R.string.context_creating_folder));
 						statusDialog.show();
 					} catch (Exception e) {
 						return;
@@ -617,10 +614,9 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				return;
 			}
 
-			ProgressDialog temp = null;
+			AlertDialog temp;
 			try {
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_copying));
+				temp = createProgressDialog(this, getString(R.string.context_copying));
 				temp.show();
 			} catch (Exception e) {
 				return;
@@ -667,10 +663,9 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			moveToRubbish = false;
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
-			ProgressDialog temp = null;
+			AlertDialog temp;
 			try {
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_moving));
+				temp = createProgressDialog(this, getString(R.string.context_moving));
 				temp.show();
 			} catch (Exception e) {
 				return;
@@ -687,8 +682,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 
 			try {
-				statusDialog = new ProgressDialog(this);
-				statusDialog.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
+				statusDialog = createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
 				statusDialog.show();
 			} catch (Exception e) {
 				return;
@@ -721,7 +715,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
-					statusDialog = getProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
+					statusDialog = createProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
 					permissionsDialog.dismiss();
 					new NodeController(this).shareFolder(parent, selectedContacts, item);
 				});

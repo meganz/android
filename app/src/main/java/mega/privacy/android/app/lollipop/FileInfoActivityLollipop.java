@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -58,7 +56,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -68,7 +65,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.components.RoundedImageView;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -98,6 +95,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
@@ -116,7 +114,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDi
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -262,7 +259,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 	private ContactController cC;
 
-	ProgressDialog statusDialog;
+    AlertDialog statusDialog;
 	boolean publicLink=false;
 
 	private Handler handler;
@@ -294,7 +291,6 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
  	private MegaShare selectedShare;
     final int MAX_NUMBER_OF_CONTACTS_IN_LIST = 5;
-    private RecyclerView listView;
     private ArrayList<MegaShare> listContacts;
     private ArrayList<MegaShare> fullListContacts;
     private Button moreButton;
@@ -309,7 +305,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
     private int currentColorFilter;
 
-    private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null) return;
@@ -332,7 +328,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         }
     };
 
-    private BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver contactUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent == null || intent.getAction() == null) return;
@@ -380,6 +376,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
     private class ActionBarCallBack implements ActionMode.Callback {
         
+        @SuppressLint("NonConstantResourceId")
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             logDebug("onActionItemClicked");
@@ -398,7 +395,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                             if(permissionsDialog != null){
                                 permissionsDialog.dismiss();
                             }
-                            statusDialog = getProgressDialog(fileInfoActivityLollipop, getString(R.string.context_permissions_changing_folder));
+                            statusDialog = createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_permissions_changing_folder));
                             cC.changePermissions(cC.getEmailShares(shares), item, node);
                         }
                     });
@@ -461,16 +458,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                 deleteShare = true;
 
                 MenuItem unselect = menu.findItem(R.id.cab_menu_unselect_all);
-                if(selected.size()==adapter.getItemCount()){
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-                    unselect.setTitle(getString(R.string.action_unselect_all));
-                    unselect.setVisible(true);
-                }
-                else{
-                    menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-                    unselect.setTitle(getString(R.string.action_unselect_all));
-                    unselect.setVisible(true);
-                }
+                menu.findItem(R.id.cab_menu_select_all).setVisible(selected.size() != adapter.getItemCount());
+                unselect.setTitle(getString(R.string.action_unselect_all));
+                unselect.setVisible(true);
             }
             else{
                 menu.findItem(R.id.cab_menu_select_all).setVisible(true);
@@ -534,7 +524,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         permissionInfo = (TextView) findViewById(R.id.file_properties_permission_info);
         permissionInfo.setVisibility(View.GONE);
 
-        fragmentContainer = (CoordinatorLayout) findViewById(R.id.file_info_fragment_container);
+        fragmentContainer = findViewById(R.id.file_info_fragment_container);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -542,50 +532,50 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
         collapsingToolbar = findViewById(R.id.file_info_collapse_toolbar);
 
-        nestedScrollView = (NestedScrollView) findViewById(R.id.nested_layout);
+        nestedScrollView = findViewById(R.id.nested_layout);
         nestedScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> changeViewElevation(aB, v.canScrollVertically(-1) && v.getVisibility() == View.VISIBLE, outMetrics));
 
         aB.setDisplayShowTitleEnabled(false);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
 
-        iconToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_icon_layout);
+        iconToolbarLayout = findViewById(R.id.file_info_icon_layout);
 
-        iconToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_icon);
+        iconToolbarView = findViewById(R.id.file_info_toolbar_icon);
         CollapsingToolbarLayout.LayoutParams params = (CollapsingToolbarLayout.LayoutParams) iconToolbarLayout.getLayoutParams();
         Rect rect = new Rect();
         getWindow().getDecorView().getWindowVisibleDisplayFrame(rect);
         params.setMargins(dp2px(16, outMetrics), dp2px(90, outMetrics) + rect.top, 0, dp2px(14, outMetrics));
         iconToolbarLayout.setLayoutParams(params);
 
-        imageToolbarLayout = (RelativeLayout) findViewById(R.id.file_info_image_layout);
-        imageToolbarView = (ImageView) findViewById(R.id.file_info_toolbar_image);
+        imageToolbarLayout = findViewById(R.id.file_info_image_layout);
+        imageToolbarView = findViewById(R.id.file_info_toolbar_image);
         imageToolbarLayout.setVisibility(View.GONE);
 
         //Available Offline Layout
-        availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
+        availableOfflineLayout = findViewById(R.id.available_offline_layout);
         availableOfflineLayout.setVisibility(View.VISIBLE);
-        availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
-        offlineSwitch = (SwitchMaterial) findViewById(R.id.file_properties_switch);
+        availableOfflineView = findViewById(R.id.file_properties_available_offline_text);
+        offlineSwitch = findViewById(R.id.file_properties_switch);
 
         //Share with Layout
-        sharedLayout = (RelativeLayout) findViewById(R.id.file_properties_shared_layout);
+        sharedLayout = findViewById(R.id.file_properties_shared_layout);
         sharedLayout.setOnClickListener(this);
-        usersSharedWithTextButton = (Button) findViewById(R.id.file_properties_shared_info_button);
+        usersSharedWithTextButton = findViewById(R.id.file_properties_shared_info_button);
         usersSharedWithTextButton.setOnClickListener(this);
         dividerSharedLayout = findViewById(R.id.divider_shared_layout);
-        appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
+        appBarLayout = findViewById(R.id.app_bar);
 
         //Owner Layout
-        ownerLayout = (RelativeLayout) findViewById(R.id.file_properties_owner_layout);
-        ownerRoundeImage= (RoundedImageView) findViewById(R.id.contact_list_thumbnail);
-        ownerLinear = (LinearLayout) findViewById(R.id.file_properties_owner_linear);
+        ownerLayout = findViewById(R.id.file_properties_owner_layout);
+        ownerRoundeImage= findViewById(R.id.contact_list_thumbnail);
+        ownerLinear = findViewById(R.id.file_properties_owner_linear);
         ownerLabel =  findViewById(R.id.file_properties_owner_label);
-        ownerLabelowner = (TextView) findViewById(R.id.file_properties_owner_label_owner);
+        ownerLabelowner = findViewById(R.id.file_properties_owner_label_owner);
         String ownerString = "("+getString(R.string.file_properties_owner)+")";
         ownerLabelowner.setText(ownerString);
-        ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
-        ownerState = (ImageView) findViewById(R.id.file_properties_owner_state_icon);
+        ownerInfo = findViewById(R.id.file_properties_owner_info);
+        ownerState = findViewById(R.id.file_properties_owner_state_icon);
         if(!isScreenInPortrait(this)){
             ownerLabel.setMaxWidthEmojis(dp2px(MAX_WIDTH_FILENAME_LAND, outMetrics));
             ownerInfo.setMaxWidth(dp2px(MAX_WIDTH_FILENAME_LAND_2, outMetrics));
@@ -598,50 +588,50 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         //Info Layout
 
         //Size Layout
-        sizeLayout = (RelativeLayout) findViewById(R.id.file_properties_size_layout);
-        sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
-        sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
+        sizeLayout = findViewById(R.id.file_properties_size_layout);
+        sizeTitleTextView  = findViewById(R.id.file_properties_info_menu_size);
+        sizeTextView = findViewById(R.id.file_properties_info_data_size);
 
         //Folder Versions Layout
-        folderVersionsLayout = (RelativeLayout) findViewById(R.id.file_properties_folder_versions_layout);
-        folderVersionsText = (TextView) findViewById(R.id.file_properties_info_data_folder_versions);
+        folderVersionsLayout = findViewById(R.id.file_properties_folder_versions_layout);
+        folderVersionsText = findViewById(R.id.file_properties_info_data_folder_versions);
         folderVersionsLayout.setVisibility(View.GONE);
 
-        folderCurrentVersionsLayout = (RelativeLayout) findViewById(R.id.file_properties_folder_current_versions_layout);
-        folderCurrentVersionsText = (TextView) findViewById(R.id.file_properties_info_data_folder_current_versions);
+        folderCurrentVersionsLayout = findViewById(R.id.file_properties_folder_current_versions_layout);
+        folderCurrentVersionsText = findViewById(R.id.file_properties_info_data_folder_current_versions);
         folderCurrentVersionsLayout.setVisibility(View.GONE);
 
-        folderPreviousVersionsLayout = (RelativeLayout) findViewById(R.id.file_properties_folder_previous_versions_layout);
-        folderPreviousVersionsText = (TextView) findViewById(R.id.file_properties_info_data_folder_previous_versions);
+        folderPreviousVersionsLayout = findViewById(R.id.file_properties_folder_previous_versions_layout);
+        folderPreviousVersionsText = findViewById(R.id.file_properties_info_data_folder_previous_versions);
         folderPreviousVersionsLayout.setVisibility(View.GONE);
 
         //Content Layout
-        contentLayout = (RelativeLayout) findViewById(R.id.file_properties_content_layout);
-        contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
-        contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);
+        contentLayout = findViewById(R.id.file_properties_content_layout);
+        contentTitleTextView  = findViewById(R.id.file_properties_info_menu_content);
+        contentTextView = findViewById(R.id.file_properties_info_data_content);
 
-        dividerLinkLayout = (View) findViewById(R.id.divider_link_layout);
-        publicLinkLayout = (RelativeLayout) findViewById(R.id.file_properties_link_layout);
-        publicLinkCopyLayout = (RelativeLayout) findViewById(R.id.file_properties_copy_layout);
+        dividerLinkLayout = findViewById(R.id.divider_link_layout);
+        publicLinkLayout = findViewById(R.id.file_properties_link_layout);
+        publicLinkCopyLayout = findViewById(R.id.file_properties_copy_layout);
 
-        publicLinkText = (TextView) findViewById(R.id.file_properties_link_text);
+        publicLinkText = findViewById(R.id.file_properties_link_text);
         publicLinkDate = findViewById(R.id.file_properties_link_date);
-        publicLinkButton = (Button) findViewById(R.id.file_properties_link_button);
+        publicLinkButton = findViewById(R.id.file_properties_link_button);
         publicLinkButton.setText(getString(R.string.context_copy));
         publicLinkButton.setOnClickListener(this);
 
         //Added Layout
-        addedLayout = (RelativeLayout) findViewById(R.id.file_properties_added_layout);
-        addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
+        addedLayout = findViewById(R.id.file_properties_added_layout);
+        addedTextView = findViewById(R.id.file_properties_info_data_added);
 
         //Modified Layout
-        modifiedLayout = (RelativeLayout) findViewById(R.id.file_properties_created_layout);
-        modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_created);
+        modifiedLayout = findViewById(R.id.file_properties_created_layout);
+        modifiedTextView = findViewById(R.id.file_properties_info_data_created);
 
         //Versions Layout
-        versionsLayout = (RelativeLayout) findViewById(R.id.file_properties_versions_layout);
-        versionsButton = (Button) findViewById(R.id.file_properties_text_number_versions);
-        separatorVersions = (View) findViewById(R.id.separator_versions);
+        versionsLayout = findViewById(R.id.file_properties_versions_layout);
+        versionsButton = findViewById(R.id.file_properties_text_number_versions);
+        separatorVersions = findViewById(R.id.separator_versions);
 
         megaApi.addGlobalListener(this);
 
@@ -712,7 +702,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
             logWarning("Extras is NULL");
         }
 
-        listView = (RecyclerView)findViewById(R.id.file_info_contact_list_view);
+        RecyclerView listView = findViewById(R.id.file_info_contact_list_view);
         //listView.addOnItemTouchListener(this);
         listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
         listView.addItemDecoration(new SimpleDividerItemDecoration(this));
@@ -722,12 +712,12 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         //get shared contact list and max number can be displayed in the list is five
         setContactList();
 
-        moreButton = (Button)findViewById(R.id.more_button);
+        moreButton = findViewById(R.id.more_button);
         moreButton.setOnClickListener(this);
         setMoreButtonText();
 
         //setup adapter
-        adapter = new MegaFileInfoSharedContactLollipopAdapter(this,node,listContacts,listView);
+        adapter = new MegaFileInfoSharedContactLollipopAdapter(this,node,listContacts, listView);
         adapter.setShareList(listContacts);
         adapter.setPositionClicked(-1);
         adapter.setMultipleSelect(false);
@@ -989,7 +979,8 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         sendToChatMenuItem.setIcon(drawableChat);
     }
 
-	@Override
+	@SuppressLint("NonConstantResourceId")
+    @Override
 	public boolean onOptionsItemSelected(MenuItem item) {
         logDebug("onOptionsItemSelected");
 
@@ -1031,10 +1022,10 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 				LayoutInflater inflater = getLayoutInflater();
 				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
-				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
-				TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
-				TextView symbol = (TextView) dialoglayout.findViewById(R.id.dialog_link_symbol);
-				TextView removeText = (TextView) dialoglayout.findViewById(R.id.dialog_link_text_remove);
+				TextView url = dialoglayout.findViewById(R.id.dialog_link_link_url);
+				TextView key = dialoglayout.findViewById(R.id.dialog_link_link_key);
+				TextView symbol = dialoglayout.findViewById(R.id.dialog_link_symbol);
+				TextView removeText = dialoglayout.findViewById(R.id.dialog_link_text_remove);
 
 				((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(10, outMetrics), 0);
 
@@ -1065,22 +1056,14 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 				builder.setView(dialoglayout);
 
-				builder.setPositiveButton(getString(R.string.context_remove), new DialogInterface.OnClickListener() {
+				builder.setPositiveButton(getString(R.string.context_remove), (dialog, which) -> {
+                    typeExport=TYPE_EXPORT_REMOVE;
+                    megaApi.disableExport(node, fileInfoActivityLollipop);
+                });
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						typeExport=TYPE_EXPORT_REMOVE;
-						megaApi.disableExport(node, fileInfoActivityLollipop);
-					}
-				});
+				builder.setNegativeButton(getString(R.string.general_cancel), (dialog, which) -> {
 
-				builder.setNegativeButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-
-					}
-				});
+                });
 
 				removeLinkDialog = builder.create();
 				removeLinkDialog.show();
@@ -1168,8 +1151,8 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 				modifiedTextView.setText("");
 			}
 
-			Bitmap thumb = null;
-			Bitmap preview = null;
+			Bitmap thumb;
+			Bitmap preview;
 			thumb = getThumbnailFromCache(node);
 			if (thumb != null){
 				imageToolbarView.setImageBitmap(thumb);
@@ -1394,7 +1377,8 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         isShareContactExpanded = !isShareContactExpanded;
     }
 
-	@Override
+	@SuppressLint("NonConstantResourceId")
+    @Override
 	public void onClick(View v) {
 
         hideMultipleSelect();
@@ -1407,15 +1391,10 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 			}
 			case R.id.file_properties_link_button:{
                 logDebug("Copy link button");
-				if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-					android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-					clipboard.setText(node.getPublicLink());
-				} else {
-					android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-					android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", node.getPublicLink());
-					clipboard.setPrimaryClip(clip);
-				}
-				showSnackbar(SNACKBAR_TYPE, getString(R.string.file_properties_get_link), -1);
+                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", node.getPublicLink());
+                clipboard.setPrimaryClip(clip);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.file_properties_get_link), -1);
 				break;
 			}
 			case R.id.file_properties_shared_layout:
@@ -1518,13 +1497,10 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 	 * Display keyboard
 	 */
 	private void showKeyboardDelayed(final View view) {
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
+		handler.postDelayed(() -> {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        }, 50);
 	}
 
 	public void showCopy(){
@@ -1575,56 +1551,46 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
 		MegaNode parent = nC.getParent(node);
 
-		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-			moveToRubbish = true;
-		}
-		else{
-			moveToRubbish = false;
-		}
+        moveToRubbish = parent.getHandle() != megaApi.getRubbishNode().getHandle();
 
-		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		        switch (which){
-					case DialogInterface.BUTTON_POSITIVE:
-						//TODO remove the outgoing shares
-						//Check if the node is not yet in the rubbish bin (if so, remove it)
+		DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    //TODO remove the outgoing shares
+                    //Check if the node is not yet in the rubbish bin (if so, remove it)
 
-						if (moveToRubbish){
-							megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fileInfoActivityLollipop);
-							ProgressDialog temp = null;
-							try{
-								temp = new ProgressDialog(fileInfoActivityLollipop);
-								temp.setMessage(getString(R.string.context_move_to_trash));
-								temp.show();
-							}
-							catch(Exception e){
-								return;
-							}
-							statusDialog = temp;
-						}
-						else{
-							megaApi.remove(megaApi.getNodeByHandle(handle), fileInfoActivityLollipop);
-							ProgressDialog temp = null;
-							try{
-								temp = new ProgressDialog(fileInfoActivityLollipop);
-								temp.setMessage(getString(R.string.context_delete_from_mega));
-								temp.show();
-							}
-							catch(Exception e){
-								return;
-							}
-							statusDialog = temp;
-						}
+                    if (moveToRubbish){
+                        megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fileInfoActivityLollipop);
+                        AlertDialog temp;
+                        try{
+                            temp = MegaProgressDialogUtil.createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_move_to_trash));
+                            temp.show();
+                        }
+                        catch(Exception e){
+                            return;
+                        }
+                        statusDialog = temp;
+                    }
+                    else{
+                        megaApi.remove(megaApi.getNodeByHandle(handle), fileInfoActivityLollipop);
+                        AlertDialog temp;
+                        try{
+                            temp = MegaProgressDialogUtil.createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_delete_from_mega));
+                            temp.show();
+                        }
+                        catch(Exception e){
+                            return;
+                        }
+                        statusDialog = temp;
+                    }
 
-						break;
+                    break;
 
-					case DialogInterface.BUTTON_NEGATIVE:
-						//No button clicked
-						break;
-					}
-		    }
-		};
+                case DialogInterface.BUTTON_NEGATIVE:
+                    //No button clicked
+                    break;
+                }
+        };
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
 		if (moveToRubbish){
@@ -1724,7 +1690,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 			try {
 				statusDialog.dismiss();
 			}
-			catch (Exception ex) {}
+			catch (Exception ex) {
+                logDebug(ex.getMessage());
+            }
 
 			if (moveToRubbish){
 				moveToRubbish = false;
@@ -1821,7 +1789,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 		} else if(request.getType() == MegaApiJava.USER_ATTR_AVATAR){
 			try{
 				statusDialog.dismiss();
-			}catch (Exception ex){}
+			}catch (Exception ex){
+			    logError(ex.getMessage());
+            }
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				boolean avatarExists = false;
@@ -1893,10 +1863,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			moveToRubbish = false;
 
-			ProgressDialog temp = null;
+            AlertDialog temp;
 			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_moving));
+				temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
 				temp.show();
 			}
 			catch(Exception e){
@@ -1918,10 +1887,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 			final int totalCopy = copyHandles.length;
 
-			ProgressDialog temp = null;
+            AlertDialog temp;
 			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_copying));
+				temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
 				temp.show();
 			}
 			catch(Exception e){
@@ -1942,7 +1910,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 						statusDialog.dismiss();
 						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 					}
-					catch (Exception ex) {}
+					catch (Exception ex) {
+					    logError(ex.getMessage());
+                    }
 				}
 			}
 		}
@@ -1960,7 +1930,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                 final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
                 dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int item) {
-                        statusDialog = getProgressDialog(fileInfoActivityLollipop, getString(R.string.context_sharing_folder));
+                        statusDialog = createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_sharing_folder));
                         permissionsDialog.dismiss();
                         nC.shareFolder(node, contactsData, item);
                     }
@@ -2008,31 +1978,27 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 			return;
 		}
 		MegaNode n = null;
-		Iterator<MegaNode> it = nodes.iterator();
-		while (it.hasNext()){
-			MegaNode nodeToCheck = it.next();
-			if (nodeToCheck != null){
-				if (nodeToCheck.getHandle() == node.getHandle()){
-					thisNode = true;
-					n = nodeToCheck;
-					break;
-				}
-				else{
-                    if(node.isFolder()){
+        for (MegaNode nodeToCheck : nodes) {
+            if (nodeToCheck != null) {
+                if (nodeToCheck.getHandle() == node.getHandle()) {
+                    thisNode = true;
+                    n = nodeToCheck;
+                    break;
+                } else {
+                    if (node.isFolder()) {
                         MegaNode parent = megaApi.getNodeByHandle(nodeToCheck.getParentHandle());
-                        while(parent!=null){
-                            if(parent.getHandle() == node.getHandle()){
+                        while (parent != null) {
+                            if (parent.getHandle() == node.getHandle()) {
                                 updateContentFoder = true;
                                 break;
                             }
                             parent = megaApi.getNodeByHandle(parent.getParentHandle());
                         }
-                    }
-                    else{
-                        if(nodeVersions!=null){
-                            for(int j=0; j<nodeVersions.size();j++){
-                                if(nodeToCheck.getHandle()==nodeVersions.get(j).getHandle()){
-                                    if(anyChild==false){
+                    } else {
+                        if (nodeVersions != null) {
+                            for (int j = 0; j < nodeVersions.size(); j++) {
+                                if (nodeToCheck.getHandle() == nodeVersions.get(j).getHandle()) {
+                                    if (anyChild == false) {
                                         anyChild = true;
                                         break;
                                     }
@@ -2040,9 +2006,9 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
                             }
                         }
                     }
-				}
-			}
-		}
+                }
+            }
+        }
 
 		if(updateContentFoder){
 		    megaApi.getFolderInfo(node, this);
@@ -2416,7 +2382,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
         final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
         dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int item) {
-                statusDialog = getProgressDialog(fileInfoActivityLollipop, getString(R.string.context_permissions_changing_folder));
+                statusDialog = createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_permissions_changing_folder));
                 permissionsDialog.dismiss();
                 cC.changePermission(selectedShare.getUser(), item, node, new ShareListener(fileInfoActivityLollipop, ShareListener.CHANGE_PERMISSIONS_LISTENER, 1));
             }
@@ -2439,7 +2405,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
     }
 
     public void removeShare(String email) {
-        statusDialog = getProgressDialog(fileInfoActivityLollipop, getString(R.string.context_removing_contact_folder));
+        statusDialog = createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_removing_contact_folder));
         nC.removeShare(new ShareListener(fileInfoActivityLollipop, ShareListener.REMOVE_SHARE_LISTENER, 1), node, email);
     }
 
@@ -2486,7 +2452,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 
     public void removeMultipleShares(ArrayList<MegaShare> shares){
         logDebug("removeMultipleShares");
-        statusDialog = getProgressDialog(fileInfoActivityLollipop, getString(R.string.context_removing_contact_folder));
+        statusDialog = createProgressDialog(fileInfoActivityLollipop, getString(R.string.context_removing_contact_folder));
         nC.removeShares(shares, node);
     }
     

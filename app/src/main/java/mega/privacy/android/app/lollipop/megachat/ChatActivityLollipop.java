@@ -5,7 +5,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -91,6 +90,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
@@ -319,8 +319,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     private long typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;
     private AlertDialog dialogCall;
 
-    ProgressDialog dialog;
-    ProgressDialog statusDialog;
+    AlertDialog dialog;
+    AlertDialog statusDialog;
 
     boolean retryHistory = false;
 
@@ -3214,8 +3214,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void showProgressForwarding(){
         logDebug("showProgressForwarding");
 
-        statusDialog = new ProgressDialog(this);
-        statusDialog.setMessage(getString(R.string.general_forwarding));
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_forwarding));
         statusDialog.show();
     }
 
@@ -3335,8 +3334,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             intent.setAction(Intent.ACTION_GET_CONTENT);
 
             try {
-                statusDialog = new ProgressDialog(this);
-                statusDialog.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
+                statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
                 statusDialog.show();
             } catch (Exception e) {
                 return;
@@ -3472,8 +3470,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     public void importNodes(final long toHandle, final long[] importMessagesHandles){
         logDebug("importNode: " + toHandle +  " -> " + importMessagesHandles.length);
-        statusDialog = new ProgressDialog(this);
-        statusDialog.setMessage(getString(R.string.general_importing));
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
         statusDialog.show();
 
         MegaNode target = null;

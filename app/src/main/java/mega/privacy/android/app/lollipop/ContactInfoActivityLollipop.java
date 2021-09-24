@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -87,6 +86,7 @@ import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialo
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -111,6 +111,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
@@ -120,7 +121,6 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -146,7 +146,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 
 	RelativeLayout imageLayout;
 	AlertDialog permissionsDialog;
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 	AlertDialog setNicknameDialog;
 	ContactInfoActivityLollipop contactInfoActivityLollipop;
 	CoordinatorLayout fragmentContainer;
@@ -1368,7 +1368,7 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						statusDialog = getProgressDialog(contactInfoActivityLollipop, getString(R.string.context_sharing_folder));
+						statusDialog = createProgressDialog(contactInfoActivityLollipop, StringResourcesUtils.getString(R.string.context_sharing_folder));
 						permissionsDialog.dismiss();
 						nC.shareFolder(parent, selectedContacts, item);
 					}
@@ -1390,16 +1390,8 @@ public class ContactInfoActivityLollipop extends PasscodeActivity
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
                 return;
             }
-            
-            ProgressDialog temp = null;
-            try {
-                temp = new ProgressDialog(this);
-                temp.setMessage(getString(R.string.context_copying));
-                temp.show();
-            } catch (Exception e) {
-                return;
-            }
-            statusDialog = temp;
+
+            statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_copying));
             
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
