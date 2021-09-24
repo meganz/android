@@ -1206,11 +1206,8 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
         return false;
     }
 
-    private void refreshSession() {
-        Intent intent = new Intent(this, LoginActivityLollipop.class);
-        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+    protected void refreshSession() {
+        navigateToLogin();
         finish();
     }
 

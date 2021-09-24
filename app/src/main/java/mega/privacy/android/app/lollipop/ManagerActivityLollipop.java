@@ -878,7 +878,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					showOnlineMode();
 				}
 				else if(actionType == START_RECONNECTION){
-					startConnection();
+					refreshSession();
 				}
 			}
 		}
@@ -1527,11 +1527,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	    float density  = getResources().getDisplayMetrics().density;
 
 	    if (dbH.getEphemeral() != null){
-            Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            refreshSession();
             return;
 		}
 
@@ -2103,11 +2099,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 				}
 			}
-			Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
+
+			refreshSession();
 			return;
 		}
 		else{
@@ -3995,7 +3988,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						startConnection();
+						refreshSession();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -4015,15 +4008,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             reconnectDialog.show();
 		}
 		catch (Exception e){}
-	}
-
-	public void startConnection(){
-		logDebug("startConnection");
-		Intent intent = new Intent(this, LoginActivityLollipop.class);
-		intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		startActivity(intent);
-		finish();
 	}
 
 	public void showOfflineMode() {
