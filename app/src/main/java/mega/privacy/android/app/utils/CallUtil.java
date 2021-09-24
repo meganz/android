@@ -1237,8 +1237,10 @@ public class CallUtil {
      */
     public static void incomingCall(MegaHandleList listAllCalls, long chatId, int callStatus) {
         if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(chatId) ||
-                MegaApplication.getChatManagement().isNotificationShown(chatId))
+                MegaApplication.getChatManagement().isNotificationShown(chatId)){
+            logDebug("The chat is not notifiable or the notification is already being displayed");
             return;
+        }
 
         MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
         if (chatRoom == null) {

@@ -48,7 +48,8 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 continue;
             }
 
-            boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
+            String myUserHandle = api.getMyUserHandle();
+            boolean isMyChange = myUserHandle != null && myUserHandle.equals(MegaApiJava.userHandleToBase64(user.getHandle()));
 
             if(user.getChanges() == 0 && !isMyChange){
                 LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long.class).post(user.getHandle());

@@ -498,6 +498,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
         isAdded: Boolean,
         position: Int,
     ) {
+
+        listView.recycledViewPool.clear()
         adapter.submitList(participants) {
             logDebug("List updated " + adapter.currentList.size)
             if (isAdded) {
