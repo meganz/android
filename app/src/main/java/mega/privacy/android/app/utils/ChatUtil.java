@@ -1739,7 +1739,7 @@ public class ChatUtil {
      *
      * @param removedMessages List of deleted messages
      * @param message         The message selected.
-     * @return True if it's removed. False, otherwise.
+     * @return True if it's removed, rejected or in sending or manual sending status . False, otherwise.
      */
     public static boolean isMsgRemovedOrHasRejectedOrManualSendingStatus(ArrayList<RemovedMessage> removedMessages, MegaChatMessage message) {
         int status = message.getStatus();

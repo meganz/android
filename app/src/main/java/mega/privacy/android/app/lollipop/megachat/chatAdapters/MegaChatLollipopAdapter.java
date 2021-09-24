@@ -8095,9 +8095,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
         ViewHolderMessageChat holder = (ViewHolderMessageChat) view.getTag();
         int currentPosition = holder.getAdapterPosition();
 
-        if (isMultipleSelect() || currentPosition < 1 || messages.get(currentPosition - 1).isUploading())
+        if (isMultipleSelect() || currentPosition < 1 || messages.get(currentPosition - 1).isUploading()){
             return true;
-
+        }
         if(MegaApplication.isShowInfoChatMessages()){
             ((ChatActivityLollipop) context).showMessageInfo(currentPosition);
         }

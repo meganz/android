@@ -575,7 +575,7 @@ public class ChatActivityLollipop extends PasscodeActivity
      * @param messageSelected The message selected.
      * @return True if it's removed. False, otherwise.
      */
-    public boolean hasMessagesRemoved(MegaChatMessage messageSelected) {
+    public boolean hasMessagesRemovedOrPending(MegaChatMessage messageSelected) {
         return  ChatUtil.isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, messageSelected);
     }
 
@@ -7431,9 +7431,17 @@ public class ChatActivityLollipop extends PasscodeActivity
     private void showGeneralChatMessageBottomSheet(AndroidMegaChatMessage message, int position) {
         selectedPosition = position;
 
-        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
+        if (message == null || isBottomSheetDialogShown(bottomSheetDialogFragment))
+            return;
 
         selectedMessageId = message.getMessage().getMsgId();
+
+        if (MegaApplication.getInstance().getMegaChatApi().getMessage(idChat, selectedMessageId) == null) {
+            if (!isOnline(this)) {
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+            }
+            return;
+        }
         bottomSheetDialogFragment = new GeneralChatMessageBottomSheet();
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
