@@ -61,6 +61,7 @@ public class ChatManagement {
     private boolean inTemporaryState = false;
     private boolean isDisablingLocalVideo = false;
     private boolean isScreenOn = true;
+    private boolean isScreenBroadcastRegister = false;
 
     public ChatManagement() {
         chatRoomListener = new ChatRoomListener();
@@ -194,8 +195,9 @@ public class ChatManagement {
     }
 
     public void addNotificationShown(long chatId) {
-        if (isNotificationShown(chatId))
+        if (isNotificationShown(chatId)){
             return;
+        }
 
         notificationShown.add(chatId);
     }
@@ -250,10 +252,10 @@ public class ChatManagement {
             MegaApplication.getInstance().unregisterProximitySensor();
         }
 
-        unregisterScreenReceiver();
         clearIncomingCallNotification(callId);
         removeValues(chatId);
         setRequestSentCall(callId, false);
+        unregisterScreenReceiver();
     }
 
     /**
@@ -301,8 +303,10 @@ public class ChatManagement {
      * @param chatId The chat ID
      */
     public void checkToShowIncomingGroupCallNotification(MegaChatCall call, long chatId) {
-        if(call.isRinging() || isNotificationShown(chatId))
+        if(call.isRinging() || isNotificationShown(chatId)){
+            logDebug("Call is ringing or notification is shown");
             return;
+        }
 
         MegaChatRoom chatRoom = app.getMegaChatApi().getChatRoom(chatId);
         if (chatRoom == null) {
@@ -320,14 +324,22 @@ public class ChatManagement {
     }
 
     public void registerScreenReceiver(){
+        if(isScreenBroadcastRegister)
+            return;
+
         IntentFilter filterScreen = new IntentFilter();
         filterScreen.addAction(ACTION_SCREEN_OFF);
         filterScreen.addAction(ACTION_USER_PRESENT);
         MegaApplication.getInstance().registerReceiver(screenOnOffReceiver, filterScreen);
+        isScreenBroadcastRegister = true;
     }
 
     public void unregisterScreenReceiver(){
+        if(!isScreenBroadcastRegister)
+            return;
+
         MegaApplication.getInstance().unregisterReceiver(screenOnOffReceiver);
+        isScreenBroadcastRegister = false;
     }
 
     /**
