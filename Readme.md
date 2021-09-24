@@ -64,6 +64,22 @@ sudo apt install build-essential swig automake libtool autoconf cmake
 
 10. Open the project with Android Studio, let it build the project and hit _*Run*_.
 
+### Contributing Guide
+
+1. Fork this repository
+
+2. Clone this repository to your local machine
+```
+$ git clone git@github.com:Akohjesse/Retro.Mp3.git
+```
+
+3. Pull changes that might have been made overtime
+```
+git pull
+```
+
+4. Make a pull request for the issue or feature you have resolved or fixed.
+
 ### Notice
 
 To use the *geolocation feature* you need a *Google Maps API key*:
