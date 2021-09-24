@@ -48,7 +48,7 @@ import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 
-import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
+import static mega.privacy.android.app.fragments.offline.OfflineFragment.SHOW_OFFLINE_WARNING;
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
 import static mega.privacy.android.app.textEditor.TextEditorViewModel.SHOW_LINE_NUMBERS;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -390,6 +390,9 @@ public class AccountController {
 
         //clear text editor preference
         PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_LINE_NUMBERS, false).apply();
+
+        //clear offline warning preference
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_OFFLINE_WARNING, true).apply();
 
         removeEmojisSharedPreferences();
 

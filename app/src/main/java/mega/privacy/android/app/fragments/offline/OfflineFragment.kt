@@ -19,6 +19,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -59,6 +60,11 @@ import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
+
+    companion object {
+        const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"
+        const val SHOW_OFFLINE_WARNING = "SHOW_OFFLINE_WARNING"
+    }
 
     @Inject
     lateinit var sortOrderManagement: SortOrderManagement
@@ -170,6 +176,8 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     private fun setupView() {
+        setupOfflineWarning()
+
         adapter =
             OfflineAdapter(isList(), sortByHeaderViewModel, object : OfflineAdapterListener {
                 override fun onNodeClicked(position: Int, node: OfflineNode) {
@@ -259,6 +267,19 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
 
         binding.emptyHintText.text = textToShow.toSpannedHtmlText()
+    }
+
+    private fun setupOfflineWarning() {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        binding.offlineWarningLayout.isVisible =
+            preferences.getBoolean(SHOW_OFFLINE_WARNING, true)
+
+        binding.offlineWarningClose.setOnClickListener {
+            preferences.edit().putBoolean(SHOW_OFFLINE_WARNING, false).apply()
+            binding.offlineWarningLayout.isVisible = false
+            checkScroll()
+        }
     }
 
     private fun setupRecyclerView(rv: RecyclerView) {
@@ -697,7 +718,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         if (rv != null) {
             callManager {
-                it.changeAppBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
+                it.changeAppBarElevation(rv.canScrollVertically(-1)
+                        || viewModel.selecting
+                        || binding.offlineWarningLayout.isVisible)
             }
             LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair::class.java)
                 .post(Pair(this, rv.canScrollVertically(-1)))
@@ -818,10 +841,5 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         viewModel.clearSelection()
         checkScroll()
-    }
-
-
-    companion object {
-        const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"
     }
 }
