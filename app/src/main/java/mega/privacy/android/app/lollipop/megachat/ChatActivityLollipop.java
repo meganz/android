@@ -5,7 +5,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,7 +31,6 @@ import android.provider.MediaStore;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
@@ -92,6 +90,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
@@ -320,8 +319,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     private long typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;
     private AlertDialog dialogCall;
 
-    ProgressDialog dialog;
-    ProgressDialog statusDialog;
+    AlertDialog dialog;
+    AlertDialog statusDialog;
 
     boolean retryHistory = false;
 
@@ -330,9 +329,6 @@ public class ChatActivityLollipop extends PasscodeActivity
     private boolean lastSeenReceived;
     private int positionToScroll = INVALID_VALUE;
     private int positionNewMessagesLayout = INVALID_VALUE;
-
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
 
     Handler handlerReceive;
     Handler handlerSend;
@@ -939,11 +935,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
         if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR || megaChatApi.getInitState() == MegaChatApi.INIT_NOT_DONE) {
             logDebug("Refresh session - karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            refreshSession();
             return;
         }
 
@@ -3222,8 +3214,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void showProgressForwarding(){
         logDebug("showProgressForwarding");
 
-        statusDialog = new ProgressDialog(this);
-        statusDialog.setMessage(getString(R.string.general_forwarding));
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_forwarding));
         statusDialog.show();
     }
 
@@ -3343,8 +3334,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             intent.setAction(Intent.ACTION_GET_CONTENT);
 
             try {
-                statusDialog = new ProgressDialog(this);
-                statusDialog.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
+                statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
                 statusDialog.show();
             } catch (Exception e) {
                 return;
@@ -3480,8 +3470,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     public void importNodes(final long toHandle, final long[] importMessagesHandles){
         logDebug("importNode: " + toHandle +  " -> " + importMessagesHandles.length);
-        statusDialog = new ProgressDialog(this);
-        statusDialog.setMessage(getString(R.string.general_importing));
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
         statusDialog.show();
 
         MegaNode target = null;
@@ -3843,7 +3832,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         }
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                            boolean hasStoragePermission = hasPermissions(this, Manifest.permission.READ_EXTERNAL_STORAGE);
                             if (!hasStoragePermission) {
                                 requestPermission(this, REQUEST_READ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
                             } else {

@@ -1,7 +1,5 @@
 package mega.privacy.android.app.lollipop.megachat;
 
-
-import android.content.Intent;
 import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.FragmentTransaction;
@@ -20,17 +18,12 @@ import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatListItem;
@@ -46,7 +39,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -59,9 +51,6 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
     FloatingActionButton fab;
 
     private BadgeDrawerArrowDrawable badgeDrawable;
-
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
 
     public long selectedChatItemId;
 
@@ -84,31 +73,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
         logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
-        if (megaApi == null){
-            megaApi = ((MegaApplication)getApplication()).getMegaApi();
-        }
-
-        if(megaApi==null||megaApi.getRootNode()==null){
-            logDebug("Refresh session - sdk");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return;
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-        }
-
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-            logDebug("Refresh session - karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+        if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()){
             return;
         }
 

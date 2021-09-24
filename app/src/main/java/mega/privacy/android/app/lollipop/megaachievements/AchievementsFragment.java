@@ -190,12 +190,6 @@ public class AchievementsFragment extends BaseFragment implements OnClickListene
 		TextView textReferralBonusesStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_referral);
 		textReferralBonusesStorage.setText(storageSpaceString);
 
-		TextView figureBaseQuotaStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_base_quota);
-		figureBaseQuotaStorage.setText(getSizeString(0));
-
-		TextView textBaseQuotaStorage = (TextView) v.findViewById(R.id.unlocked_storage_title_base_quota);
-		textBaseQuotaStorage.setText(storageQuotaString);
-
 		figureInstallAppStorage = (TextView) v.findViewById(R.id.figure_unlocked_storage_text_install_app);
 
 		figureInstallAppStorage.setText(getSizeString(0));
