@@ -6032,6 +6032,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         }
     }
 
+    public void restoreDefaultZoom() {
+        zoomViewModel.setZoom(ZOOM_DEFAULT);
+		ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
+		ZoomUtil.INSTANCE.enableButton(this, zoomOutMenuItem);
+    }
+
 	private void hideItemsWhenSearchSelected() {
         textSubmitted = false;
         if (createFolderMenuItem != null) {

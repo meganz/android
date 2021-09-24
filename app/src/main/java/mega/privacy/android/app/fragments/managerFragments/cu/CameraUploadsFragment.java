@@ -688,6 +688,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     public void onCardClicked(int position, @NonNull CUCard card) {
         switch (selectedView) {
             case DAYS_VIEW:
+                mManagerActivity.restoreDefaultZoom();
                 card = viewModel.dayClicked(position, card);
                 newViewClicked(ALL_VIEW);
                 int cuNodePosition = gridAdapter.getNodePosition(card.getNode().getHandle());

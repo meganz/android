@@ -98,6 +98,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         override fun onCardClicked(position: Int, @NonNull card: CUCard) {
             when (selectedView) {
                 DAYS_VIEW -> {
+                    mManagerActivity.restoreDefaultZoom()
                     newViewClicked(ALL_VIEW)
                     val photoPosition = browseAdapter.getNodePosition(card.node.handle)
                     gridLayoutManager.scrollToPosition(photoPosition)
