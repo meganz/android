@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
@@ -19,7 +18,6 @@ import android.provider.ContactsContract;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuItemCompat;
@@ -69,7 +67,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
@@ -89,10 +86,8 @@ import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.HighLightHintHelper;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatListenerInterface;
@@ -134,9 +129,6 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
     public static final String EXTRA_ONLY_CREATE_GROUP = "onlyCreateGroup";
 
     private DisplayMetrics outMetrics;
-    private MegaApplication app;
-    private MegaApiAndroid megaApi;
-    private MegaChatApiAndroid megaChatApi;
     private DatabaseHandler dbH = null;
     private int contactType = 0;
     // Determine if open this page from meeting
@@ -1588,6 +1580,10 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
 
         super.onCreate(savedInstanceState);
 
+        if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()){
+            return;
+        }
+
         if (getIntent() != null){
             contactType = getIntent().getIntExtra("contactType", CONTACT_TYPE_MEGA);
             isFromMeeting = getIntent().getBooleanExtra(INTENT_EXTRA_IS_FROM_MEETING, false);
@@ -1623,32 +1619,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
         outMetrics = new DisplayMetrics ();
         display.getMetrics(outMetrics);
 
-        app = (MegaApplication)getApplication();
-        megaApi = app.getMegaApi();
         megaApi.addGlobalListener(this);
-        if(megaApi==null||megaApi.getRootNode()==null){
-            logDebug("Refresh session - sdk");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return;
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-        }
-
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-            logDebug("Refresh session - karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-            return;
-        }
 
         addContactActivityLollipop = this;
 

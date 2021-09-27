@@ -329,7 +329,7 @@ class MyAccountInfo @Inject constructor(
         firstLetter = firstLetter?.toUpperCase(Locale.getDefault())
     }
 
-    fun setProductAccounts(p: MegaPricing) {
+    fun setProductAccounts(p: MegaPricing, c: MegaCurrency) {
         if (productAccounts == null) {
             productAccounts = ArrayList()
         } else {
@@ -350,7 +350,7 @@ class MyAccountInfo @Inject constructor(
                 p.getGBStorage(i),
                 p.getGBTransfer(i),
                 p.getAmount(i),
-                p.getCurrency(i),
+                c.currencyName,
                 p.isBusinessType(i)
             )
 

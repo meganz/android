@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -65,10 +64,9 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.ShareInfo;
-import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -76,7 +74,6 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
@@ -104,7 +101,6 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.TYPE_EXPORT_REMOVE;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
-import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER;
 import static mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE;
 import static mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE;
@@ -155,14 +151,12 @@ import static mega.privacy.android.app.utils.Util.getScaleW;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
-import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class PdfViewerActivityLollipop extends PasscodeActivity
         implements MegaGlobalListenerInterface, OnPageChangeListener, OnLoadCompleteListener,
         OnPageErrorListener, MegaRequestListenerInterface, MegaChatRequestListenerInterface,
-        MegaTransferListenerInterface, ActionNodeCallback, SnackbarShower,
-        FilePrepareTask.ProcessedFilesCallback {
+        MegaTransferListenerInterface, ActionNodeCallback, SnackbarShower {
 
     MegaApplication app = null;
     MegaApiAndroid megaApi;
@@ -198,7 +192,7 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
     public RelativeLayout uploadContainer;
     RelativeLayout pdfviewerContainer;
 
-    ProgressDialog statusDialog;
+    AlertDialog statusDialog;
 
     private boolean renamed = false;
     private String path;
@@ -913,41 +907,6 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         nodeSaver.handleRequestPermissionsResult(requestCode);
-    }
-
-    @Override
-    public void onIntentProcessed(List<ShareInfo> infos) {
-
-        if (statusDialog != null) {
-            try {
-                statusDialog.dismiss();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        logDebug("Intent processed!");
-
-        if (infos == null) {
-            logError("Error: infos is NULL");
-        } else {
-            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
-                showOverDiskQuotaPaywallWarning();
-                return;
-            }
-
-            MegaNode parentNode = megaApi.getRootNode();
-            showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.upload_began, infos.size(), infos.size()), -1);
-            for (ShareInfo info : infos) {
-
-                Intent intent = new Intent(this, UploadService.class);
-                intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-                intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-                intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-                intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-                startService(intent);
-            }
-        }
     }
 
     public  void setToolbarVisibilityShow () {
@@ -1701,10 +1660,9 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
 
             MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
-            ProgressDialog temp;
+            AlertDialog temp;
             try{
-                temp = new ProgressDialog(this);
-                temp.setMessage(getString(R.string.context_moving));
+                temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
                 temp.show();
             }
             catch(Exception e){
@@ -1727,10 +1685,9 @@ public class PdfViewerActivityLollipop extends PasscodeActivity
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
-            ProgressDialog temp;
+            AlertDialog temp;
             try{
-                temp = new ProgressDialog(this);
-                temp.setMessage(getString(R.string.context_copying));
+                temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
                 temp.show();
             }
             catch(Exception e){

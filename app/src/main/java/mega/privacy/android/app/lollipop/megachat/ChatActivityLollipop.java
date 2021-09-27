@@ -3,7 +3,6 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -82,6 +81,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.BuildConfig;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -89,6 +91,8 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
@@ -139,7 +143,6 @@ import mega.privacy.android.app.lollipop.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.lollipop.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopAdapter;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
@@ -224,14 +227,17 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class ChatActivityLollipop extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface,
         MegaChatListenerInterface, MegaChatRoomListenerInterface, View.OnClickListener,
         StoreDataBeforeForward<ArrayList<AndroidMegaChatMessage>>, ChatManagementCallback,
-        SnackbarShower, AttachNodeToChatListener, FilePrepareTask.ProcessedFilesCallback,
-        StartChatCallListener.StartChatCallCallback, HangChatCallListener.OnCallHungUpCallback,
-        AnswerChatCallListener.OnCallAnsweredCallback, SetCallOnHoldListener.OnCallOnHoldCallback,
-        LoadPreviewListener.OnPreviewLoadedCallback, LoadPreviewListener.OnChatPreviewLoadedCallback {
+        SnackbarShower, AttachNodeToChatListener, StartChatCallListener.StartChatCallCallback,
+        HangChatCallListener.OnCallHungUpCallback, AnswerChatCallListener.OnCallAnsweredCallback,
+        SetCallOnHoldListener.OnCallOnHoldCallback, LoadPreviewListener.OnPreviewLoadedCallback,
+        LoadPreviewListener.OnChatPreviewLoadedCallback {
 
     private static final int MAX_NAMES_PARTICIPANTS = 3;
     private static final int INVALID_LAST_SEEN_ID = 0;
@@ -310,6 +316,9 @@ public class ChatActivityLollipop extends PasscodeActivity
     private final static int TYPE_MESSAGE_JUMP_TO_LEAST = 0;
     private final static int TYPE_MESSAGE_NEW_MESSAGE = 1;
 
+    @Inject
+    FilePrepareUseCase filePrepareUseCase;
+
     private int currentRecordButtonState;
     private String mOutputFilePath;
     private int keyboardHeight;
@@ -328,8 +337,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     private long typeErrorReaction = REACTION_ERROR_DEFAULT_VALUE;
     private AlertDialog dialogCall;
 
-    ProgressDialog dialog;
-    ProgressDialog statusDialog;
+    AlertDialog dialog;
+    AlertDialog statusDialog;
 
     boolean retryHistory = false;
 
@@ -338,9 +347,6 @@ public class ChatActivityLollipop extends PasscodeActivity
     private boolean lastSeenReceived;
     private int positionToScroll = INVALID_VALUE;
     private int positionNewMessagesLayout = INVALID_VALUE;
-
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
 
     Handler handlerReceive;
     Handler handlerSend;
@@ -1092,11 +1098,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
         if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR || megaChatApi.getInitState() == MegaChatApi.INIT_NOT_DONE) {
             logDebug("Refresh session - karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            refreshSession();
             return;
         }
 
@@ -3402,8 +3404,7 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void showProgressForwarding(){
         logDebug("showProgressForwarding");
 
-        statusDialog = new ProgressDialog(this);
-        statusDialog.setMessage(getString(R.string.general_forwarding));
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_forwarding));
         statusDialog.show();
     }
 
@@ -3526,18 +3527,22 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
 
             intent.setAction(Intent.ACTION_GET_CONTENT);
-            FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-            filePrepareTask.execute(intent);
-            ProgressDialog temp = null;
-            try{
-                temp = new ProgressDialog(this);
-                temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
-                temp.show();
-            }
-            catch(Exception e){
+
+            try {
+                statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
+                statusDialog.show();
+            } catch (Exception e) {
                 return;
             }
-            statusDialog = temp;
+
+            filePrepareUseCase.prepareFiles(intent)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((shareInfo, throwable) -> {
+                        if (throwable == null) {
+                            onIntentProcessed(shareInfo);
+                        }
+                    });
         }
         else if (requestCode == REQUEST_CODE_SELECT_CHAT) {
             isForwardingMessage = false;
@@ -3660,8 +3665,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
     public void importNodes(final long toHandle, final long[] importMessagesHandles){
         logDebug("importNode: " + toHandle +  " -> " + importMessagesHandles.length);
-        statusDialog = new ProgressDialog(this);
-        statusDialog.setMessage(getString(R.string.general_importing));
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
         statusDialog.show();
 
         MegaNode target = null;
@@ -8393,10 +8397,11 @@ public class ChatActivityLollipop extends PasscodeActivity
     }
 
     /**
-	 * Handle processed upload intent
-	 */
-    @Override
-    public void onIntentProcessed(List<ShareInfo> infos) {
+     * Handle processed upload intent.
+     *
+     * @param infos List<ShareInfo> containing all the upload info.
+     */
+    private void onIntentProcessed(List<ShareInfo> infos) {
         logDebug("onIntentProcessedLollipop");
 
         if (infos == null) {

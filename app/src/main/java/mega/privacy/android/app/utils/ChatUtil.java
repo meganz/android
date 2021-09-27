@@ -215,7 +215,7 @@ public class ChatUtil {
         Button shareButton = v.findViewById(R.id.share_button);
         shareButton.setOnClickListener(v13 -> {
             Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-            sharingIntent.setType(PLAIN_TEXT_SHARE_TYPE);
+            sharingIntent.setType(TYPE_TEXT_PLAIN);
             sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink);
             context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
             dismissShareChatLinkDialog(context, shareLinkDialog);
