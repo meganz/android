@@ -1,6 +1,7 @@
 package mega.privacy.android.app.imageviewer
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,9 +11,14 @@ import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.attacher.MegaAttacher
+import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.interfaces.PermissionRequester
+import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
@@ -20,9 +26,10 @@ import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
+import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
-class ImageViewerActivity : BaseActivity() {
+class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower {
 
     companion object {
         private const val OFFSCREEN_PAGE_LIMIT = 3
@@ -54,6 +61,15 @@ class ImageViewerActivity : BaseActivity() {
                 viewModel.setCurrentPosition(position)
             }
         }
+    }
+    private val nodeAttacher by lazy { WeakReference(MegaAttacher(this)) }
+    private val nodeSaver by lazy {
+        WeakReference(
+            NodeSaver(
+                this, this, this,
+                showSaveToDeviceConfirmDialog(this)
+            )
+        )
     }
 
     private lateinit var binding: ActivityImageViewerBinding
@@ -137,11 +153,18 @@ class ImageViewerActivity : BaseActivity() {
                 true
             }
             R.id.action_download -> {
-                //do something
+                nodeSaver.get()?.saveHandle(viewModel.getCurrentHandle(), fromMediaViewer = true)
                 true
             }
             R.id.action_save_gallery -> {
-                //do something
+                nodeSaver.get()?.saveHandle(
+                    viewModel.getCurrentHandle(),
+                    highPriority = false,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    needSerialize = true,
+                    downloadToGallery = true
+                )
                 true
             }
             R.id.action_get_link -> {
@@ -149,7 +172,7 @@ class ImageViewerActivity : BaseActivity() {
                 true
             }
             R.id.action_chat -> {
-                //do something
+                nodeAttacher.get()?.attachNode(viewModel.getCurrentHandle())
                 true
             }
             R.id.action_more -> {
@@ -158,4 +181,20 @@ class ImageViewerActivity : BaseActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        when {
+            nodeAttacher.get()?.handleActivityResult(requestCode, resultCode, intent, this) == true -> {
+                return
+            }
+            nodeSaver.get()?.handleActivityResult(requestCode, resultCode, intent) == true -> {
+                return
+            }
+            else -> super.onActivityResult(requestCode, resultCode, intent)
+        }
+    }
+
+    override fun showSnackbar(type: Int, content: String?, chatId: Long) {
+        showSnackbar(type, binding.root, content, chatId)
+    }
 }

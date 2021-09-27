@@ -137,9 +137,17 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false
+        needSerialize: Boolean = false,
+        downloadToGallery: Boolean = false
     ) {
-        saveHandles(listOf(handle), highPriority, isFolderLink, fromMediaViewer, needSerialize)
+        saveHandles(
+            listOf(handle),
+            highPriority,
+            isFolderLink,
+            fromMediaViewer,
+            needSerialize,
+            downloadToGallery
+        )
     }
 
     /**
@@ -158,7 +166,8 @@ class NodeSaver(
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false
+        needSerialize: Boolean = false,
+        downloadToGallery: Boolean = false
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
@@ -172,7 +181,13 @@ class NodeSaver(
             }
 
             MegaNodeSaving(
-                nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer, needSerialize
+                totalSize = nodesTotalSize(nodes),
+                highPriority = highPriority,
+                isFolderLink = isFolderLink,
+                nodes = nodes,
+                fromMediaViewer = fromMediaViewer,
+                needSerialize = needSerialize,
+                downloadToGallery = downloadToGallery
             )
         }
     }
