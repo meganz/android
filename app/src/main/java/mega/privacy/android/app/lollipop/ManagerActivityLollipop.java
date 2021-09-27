@@ -2828,7 +2828,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void destroySMSVerificationFragment() {
         if (!isTablet(this)) {
             logDebug("mobile, all orientation");
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
         }
         onAskingSMSVerificationFragment = false;
         svF = null;
@@ -2848,7 +2848,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		//In mobile, allow all orientation after permission screen
 		if (!isTablet(this)) {
 			logDebug("Mobile, all orientation");
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
 		}
 
 		turnOnNotifications = false;
