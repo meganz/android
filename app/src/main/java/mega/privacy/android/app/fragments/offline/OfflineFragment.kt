@@ -267,6 +267,8 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
 
         binding.emptyHintText.text = textToShow.toSpannedHtmlText()
+
+        checkScroll()
     }
 
     private fun setupOfflineWarning() {
@@ -283,16 +285,21 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     private fun setupRecyclerView(rv: RecyclerView) {
-        rv.setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
-        rv.clipToPadding = false
-        rv.setHasFixedSize(true)
-        rv.itemAnimator = noChangeRecyclerViewItemAnimator()
-        rv.addOnScrollListener(object : OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                checkScroll()
+        rv.apply {
+            setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
+            clipToPadding = false
+            setHasFixedSize(true)
+            itemAnimator = noChangeRecyclerViewItemAnimator()
+
+            if (!args.rootFolderOnly) {
+                addOnScrollListener(object : OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        checkScroll()
+                    }
+                })
             }
-        })
+        }
     }
 
     private fun observeLiveData() {
@@ -714,17 +721,15 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     override fun checkScroll() {
-        val rv = recyclerView
+        val rv = recyclerView ?: return
 
-        if (rv != null) {
-            callManager {
-                it.changeAppBarElevation(rv.canScrollVertically(-1)
-                        || viewModel.selecting
-                        || binding.offlineWarningLayout.isVisible)
-            }
-            LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair::class.java)
-                .post(Pair(this, rv.canScrollVertically(-1)))
+        callManager {
+            it.changeAppBarElevation(!args.rootFolderOnly
+                    && (rv.canScrollVertically(SCROLLING_UP_DIRECTION) || viewModel.selecting || binding.offlineWarningLayout.isVisible))
         }
+
+        LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair::class.java)
+            .post(Pair(this, rv.canScrollVertically(SCROLLING_UP_DIRECTION)))
     }
 
     fun setSearchQuery(query: String?) {
