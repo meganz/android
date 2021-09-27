@@ -14,18 +14,21 @@ import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.utils.LogUtil.logError
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageUseCase: GetImageUseCase,
     private val getImageHandlesUseCase: GetImageHandlesUseCase
 ) : BaseRxViewModel() {
 
-    private val currentPositionLiveData = MutableLiveData(0)
-
+    private var currentHandle = INVALID_HANDLE
+    private val currentPosition = MutableLiveData(0)
     private val images: MutableLiveData<List<ImageItem>> = MutableLiveData()
 
+    fun getCurrentHandle(): Long = currentHandle
+
     fun getCurrentImage(): LiveData<ImageItem?> =
-        Transformations.switchMap(currentPositionLiveData) { position -> getImage(position) }
+        Transformations.switchMap(currentPosition) { position -> getImage(position) }
 
     fun getImagesHandle(): LiveData<List<Long>> =
         images.map { items -> items.map(ImageItem::handle) }
@@ -100,7 +103,10 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun setPosition(position: Int) {
-        currentPositionLiveData.value = position
+    fun setCurrentPosition(position: Int) {
+        currentPosition.value = position
+        images.value?.get(position)?.handle?.let { handle ->
+            currentHandle = handle
+        }
     }
 }

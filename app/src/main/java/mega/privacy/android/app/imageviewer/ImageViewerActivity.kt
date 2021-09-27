@@ -51,7 +51,7 @@ class ImageViewerActivity : BaseActivity() {
                     isVisible = itemCount > 1
                 }
 
-                viewModel.setPosition(position)
+                viewModel.setCurrentPosition(position)
             }
         }
     }
@@ -106,7 +106,7 @@ class ImageViewerActivity : BaseActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.setPosition(nodePosition)
+        viewModel.setCurrentPosition(nodePosition)
         viewModel.getImagesHandle().observe(this) { handles ->
             pagerAdapter.submitList(handles) {
                 if (!defaultPageSet) {
@@ -145,9 +145,7 @@ class ImageViewerActivity : BaseActivity() {
                 true
             }
             R.id.action_get_link -> {
-                viewModel.getCurrentImage().value?.handle?.let { currentHandle ->
-                    LinksUtil.showGetLinkActivity(this, currentHandle)
-                }
+                LinksUtil.showGetLinkActivity(this, viewModel.getCurrentHandle())
                 true
             }
             R.id.action_chat -> {
