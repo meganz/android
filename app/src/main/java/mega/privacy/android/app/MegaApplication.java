@@ -423,10 +423,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 					dbH.setPricingTimestamp();
 
-					if(myAccountInfo!=null){
-						myAccountInfo.setProductAccounts(p);
-						myAccountInfo.setPricing(p);
-					}
+					myAccountInfo.setProductAccounts(p, request.getCurrency());
+					myAccountInfo.setPricing(p);
 
 					Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS);
 					intent.putExtra(ACTION_TYPE, UPDATE_GET_PRICING);

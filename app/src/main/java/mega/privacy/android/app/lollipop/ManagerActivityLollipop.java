@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
@@ -120,12 +119,12 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -147,7 +146,6 @@ import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.components.transferWidget.TransfersManagement;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment;
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections;
@@ -190,7 +188,6 @@ import mega.privacy.android.app.lollipop.megachat.RecentChatsFragmentLollipop;
 import mega.privacy.android.app.lollipop.qrcode.QRCodeActivity;
 import mega.privacy.android.app.lollipop.qrcode.ScanCodeFragment;
 import mega.privacy.android.app.lollipop.tasks.CheckOfflineNodesTask;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.lollipop.tasks.FillDBContactsTask;
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
@@ -251,11 +248,11 @@ import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_EMAIL_UPDATED;
-import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_NAME_UPDATED;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog;
+import static mega.privacy.android.app.constants.EventConstants.*;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
@@ -273,7 +270,6 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
@@ -290,7 +286,6 @@ import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.getHumanizedTime;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -303,8 +298,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaChatRequestListenerInterface, OnNavigationItemSelectedListener,
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
-		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-		FilePrepareTask.ProcessedFilesCallback {
+		ChatManagementCallback, ActionNodeCallback, SnackbarShower {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -322,6 +316,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public static final String JOINING_CHAT_LINK = "JOINING_CHAT_LINK";
     public static final String LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK";
     public static final String CONNECTED = "CONNECTED";
+    private static final String PROCESS_FILE_DIALOG_SHOWN = "PROGRESS_DIALOG_SHOWN";
 
     private static final String SMALL_GRID = "SMALL_GRID";
 
@@ -361,6 +356,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	MyAccountInfo myAccountInfo;
 	@Inject
 	InviteContactUseCase inviteContactUseCase;
+	@Inject
+	FilePrepareUseCase filePrepareUseCase;
 
 	public ArrayList<Integer> transfersInProgress;
 	public MegaTransferData transferData;
@@ -623,7 +620,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private OfflineFragment pagerOfflineFragment;
 	private RecentsFragment pagerRecentsFragment;
 
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
+	private AlertDialog processFileDialog;
 
 	private AlertDialog permissionsDialog;
 	private AlertDialog presenceStatusDialog;
@@ -822,19 +820,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	};
 
-	private BroadcastReceiver receiverUpdate2FA = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent != null) {
-				boolean enabled = intent.getBooleanExtra(INTENT_EXTRA_KEY_ENABLED, false);
-				is2FAEnabled = enabled;
-				if (getSettingsFragment() != null) {
-					sttFLol.update2FAPreference(enabled);
-				}
-			}
-		}
-	};
-
 	private final BroadcastReceiver receiverUpdateOrder = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -893,7 +878,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					showOnlineMode();
 				}
 				else if(actionType == START_RECONNECTION){
-					startConnection();
+					refreshSession();
 				}
 			}
 		}
@@ -1091,21 +1076,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 		        	}
-	        	} else if (typesCameraPermission == TAKE_PROFILE_PICTURE) {
-					logDebug("TAKE_PROFILE_PICTURE");
-					if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-						if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-							requestPermission(this,
-									REQUEST_WRITE_STORAGE,
-									Manifest.permission.WRITE_EXTERNAL_STORAGE);
-						}
-						else{
-							this.takeProfilePicture();
-							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
-						}
-					}
-
-				} else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
+	        	} else if ((typesCameraPermission == RETURN_CALL_PERMISSIONS || typesCameraPermission == START_CALL_PERMISSIONS) &&
 						grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					controlCallPermissions();
 				}
@@ -1133,20 +1104,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 							break;
 						}
-						else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
-							logDebug("TAKE_PROFILE_PICTURE");
-							if (!hasPermissions(this, Manifest.permission.CAMERA)){
-								requestPermission(this,
-										REQUEST_CAMERA,
-										Manifest.permission.CAMERA);
-							}
-							else{
-								this.takeProfilePicture();
-								typesCameraPermission = INVALID_TYPE_PERMISSIONS;
-							}
-
-							break;
-						}
 		        	}
 	        	}
 	        	else{
@@ -1159,18 +1116,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 						else{
 							checkTakePicture(this, TAKE_PHOTO_CODE);
-							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
-						}
-					}
-					else if (typesCameraPermission==TAKE_PROFILE_PICTURE){
-						logDebug("TAKE_PROFILE_PICTURE");
-						if (!hasPermissions(this, Manifest.permission.CAMERA)){
-							requestPermission(this,
-									REQUEST_CAMERA,
-									Manifest.permission.CAMERA);
-						}
-						else{
-							this.takeProfilePicture();
 							typesCameraPermission = INVALID_TYPE_PERMISSIONS;
 						}
 					} else {
@@ -1364,6 +1309,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		nodeAttacher.saveState(outState);
 		nodeSaver.saveState(outState);
+
+		outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog));
 	}
 
 	@Override
@@ -1399,10 +1346,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 
 		boolean selectDrawerItemPending = true;
-		//upload from device, progress dialog should show when screen orientation changes.
-        if (shouldShowDialog) {
-            showProcessFileDialog(this,null);
-        }
 
 		getLifecycle().addObserver(cookieDialogHandler);
 
@@ -1469,6 +1412,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			nodeAttacher.restoreState(savedInstanceState);
 			nodeSaver.restoreState(savedInstanceState);
+
+			//upload from device, progress dialog should show when screen orientation changes.
+			if (savedInstanceState.getBoolean(PROCESS_FILE_DIALOG_SHOWN, false)) {
+				processFileDialog = showProcessFileDialog(this,null);
+			}
 		}
 		else{
 			logDebug("Bundle is NULL");
@@ -1496,9 +1444,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		filter.addAction(ACTION_STORAGE_STATE_CHANGED);
 		registerReceiver(updateMyAccountReceiver, filter);
 
-		registerReceiver(receiverUpdate2FA,
-				new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS));
-
 		registerReceiver(networkReceiver,
 				new IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE));
 
@@ -1511,6 +1456,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
 				.observeForever(refreshAddPhoneNumberButtonObserver);
+
+        LiveEventBus.get(EVENT_2FA_UPDATED, Boolean.class)
+                .observe(this, this::update2FAEnableState);
 
 		IntentFilter filterTransfers = new IntentFilter(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE);
 		filterTransfers.addAction(ACTION_TRANSFER_OVER_QUOTA);
@@ -1579,11 +1527,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	    float density  = getResources().getDisplayMetrics().density;
 
 	    if (dbH.getEphemeral() != null){
-            Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            refreshSession();
             return;
 		}
 
@@ -1688,6 +1632,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 					return Unit.INSTANCE;
 				});
+		getLifecycle().addObserver(miniAudioPlayerController);
 
         //Set navigation view
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -2155,11 +2100,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 				}
 			}
-			Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
+
+			refreshSession();
 			return;
 		}
 		else{
@@ -2422,7 +2364,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						openContactLink(getIntent().getLongExtra(CONTACT_HANDLE, -1));
 					}
 					else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
-						update2FASetting();
+						update2FAEnableState();
 					}
 					else if(getIntent().getAction().equals(ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE)){
 						long chatId = getIntent().getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
@@ -2967,10 +2909,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		checkTransferOverQuotaOnResume();
 
-		if (miniAudioPlayerController != null) {
-			miniAudioPlayerController.onResume();
-		}
-
 		LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
 	}
 
@@ -3344,7 +3282,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 				}
 				else if (getIntent().getAction().equals(ACTION_REFRESH_API_SERVER)){
-					update2FASetting();
+					update2FAEnableState();
 				}
 				else if (getIntent().getAction().equals(ACTION_OPEN_FOLDER)) {
 					logDebug("Open after LauncherFileExplorerActivityLollipop ");
@@ -3532,7 +3470,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(chatRoomMuteUpdateReceiver);
 		unregisterReceiver(contactUpdateReceiver);
 		unregisterReceiver(updateMyAccountReceiver);
-		unregisterReceiver(receiverUpdate2FA);
 		unregisterReceiver(networkReceiver);
 		unregisterReceiver(receiverUpdateOrder);
 		unregisterReceiver(receiverUpdateView);
@@ -3564,10 +3501,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         	newTextFileDialog.dismiss();
 		}
 
-        if (miniAudioPlayerController != null) {
-			miniAudioPlayerController.onDestroy();
-			miniAudioPlayerController = null;
-		}
+		dismissAlertDialogIfExists(processFileDialog);
 
 		nodeSaver.destroy();
 
@@ -3576,7 +3510,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private void cancelSearch() {
 		if (getSearchFragment() != null) {
-			sFLol.cancelPreviousAsyncTask();
+			sFLol.cancelPreviousSearch();
 		}
 	}
 
@@ -4046,7 +3980,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which){
 					case DialogInterface.BUTTON_POSITIVE:
-						startConnection();
+						refreshSession();
 						break;
 
 					case DialogInterface.BUTTON_NEGATIVE:
@@ -4066,15 +4000,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             reconnectDialog.show();
 		}
 		catch (Exception e){}
-	}
-
-	public void startConnection(){
-		logDebug("startConnection");
-		Intent intent = new Intent(this, LoginActivityLollipop.class);
-		intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		startActivity(intent);
-		finish();
 	}
 
 	public void showOfflineMode() {
@@ -4339,17 +4264,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
-	public void setBottomNavigationMenuItemChecked (int item) {
-		if (bNV != null && bNV.getMenu() != null) {
-			if(item == HIDDEN_BNV) {
+	public void setBottomNavigationMenuItemChecked(int item) {
+		if (bNV != null) {
+			if (item == HIDDEN_BNV) {
 				showHideBottomNavigationView(true);
-			}
-			else if (bNV.getMenu().getItem(item) != null) {
+			} else if (bNV.getMenu().getItem(item) != null) {
 				if (!bNV.getMenu().getItem(item).isChecked()) {
 					bNV.getMenu().getItem(item).setChecked(true);
 				}
 			}
 		}
+
+		boolean isCameraUploadItem = item == CAMERA_UPLOADS_BNV;
+		updateMiniAudioPlayerVisibility(!isCameraUploadItem);
 	}
 
 	private void setTabsVisibility() {
@@ -5665,6 +5592,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		    			}
 		    		}
 		    		else if (drawerItem == DrawerItem.TRANSFERS){
+
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
 						selectDrawerItemLollipop(drawerItem);
@@ -6248,9 +6176,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     		return;
     	}
 
-		try {
-			statusDialog.dismiss();
-		} catch (Exception ignored) {}
+		dismissAlertDialogIfExists(statusDialog);
 
 		logDebug("DRAWERITEM: " + drawerItem);
 
@@ -6907,10 +6833,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		linkJoinToChatLink = null;
 	}
 
-	public void takeProfilePicture(){
-		checkTakePicture(this, TAKE_PICTURE_PROFILE_CODE);
-	}
-
 	public void showPresenceStatusDialog(){
 		logDebug("showPresenceStatusDialog");
 
@@ -7122,18 +7044,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 
-		statusDialog = null;
-		try {
-			statusDialog = new ProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.context_creating_folder));
-			statusDialog.show();
-		}
-		catch(Exception e){
-			logDebug("Exception showing 'Creating folder' dialog");
-			e.printStackTrace();
-			return;
-		}
-
+		statusDialog = createProgressDialog(this, StringResourcesUtils.getString(R.string.context_creating_folder));
 		megaApi.createFolder(title, parentNode, this);
 	}
 
@@ -7733,28 +7644,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	public void showStatusDialog(String text){
-		ProgressDialog temp = null;
-		try{
-			temp = new ProgressDialog(managerActivity);
-			temp.setMessage(text);
-			temp.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		statusDialog = temp;
-	}
-
-	public void dismissStatusDialog(){
-		if (statusDialog != null){
-			try{
-				statusDialog.dismiss();
-			}
-			catch(Exception ex){}
-		}
-	}
-
 	public void setFirstNavigationLevel(boolean firstNavigationLevel){
 		logDebug("Set value to: " + firstNavigationLevel);
 		this.firstNavigationLevel = firstNavigationLevel;
@@ -8052,7 +7941,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		super.showConfirmationEnableLogsKarere();
 	}
 
-	public void update2FASetting(){
+	public void update2FAEnableState(){
 		logDebug("update2FAVisibility");
 		if (getSettingsFragment() != null) {
 			try {
@@ -8088,45 +7977,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("Intent type: " + intent.getType());
 
 			intent.setAction(Intent.ACTION_GET_CONTENT);
-			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-			filePrepareTask.execute(intent);
-			showProcessFileDialog(this,intent);
-		}
-		else if (requestCode == CHOOSE_PICTURE_PROFILE_CODE && resultCode == RESULT_OK) {
+			processFileDialog = showProcessFileDialog(this,intent);
 
-			if (resultCode == RESULT_OK) {
-				if (intent == null) {
-					logWarning("Intent NULL");
-					return;
-				}
-
-				boolean isImageAvailable = checkProfileImageExistence(intent.getData());
-				if(!isImageAvailable){
-					logError("Error when changing avatar: image not exist");
-					showSnackbar(SNACKBAR_TYPE, getString(R.string.error_changing_user_avatar_image_not_available), -1);
-					return;
-				}
-
-				intent.setAction(Intent.ACTION_GET_CONTENT);
-				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-				filePrepareTask.execute(intent);
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(this);
-					temp.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
-
-			}
-			else {
-				logWarning("resultCode for CHOOSE_PICTURE_PROFILE_CODE: " + resultCode);
-			}
-		}
-		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
+			filePrepareUseCase.prepareFiles(intent)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((shareInfo, throwable) -> {
+						if (throwable == null) {
+							onIntentProcessed(shareInfo);
+						}
+					});
+		} else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 
 			if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 				requestPermission(this,
@@ -8440,8 +8301,51 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 fileIntent.setType(intent.getType());
                 startActivity(fileIntent);
             }
-        } else{
-			logWarning("No requestcode");
+        } else if (requestCode == PERMISSIONS_FRAGMENT) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (!Environment.isExternalStorageManager()) {
+					Toast.makeText(this,
+							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+							Toast.LENGTH_SHORT).show();
+				}
+
+				if (getPermissionsFragment() != null) {
+					pF.setNextPermission();
+				}
+			}
+		} else if (requestCode == REQUEST_WRITE_STORAGE || requestCode == REQUEST_READ_WRITE_STORAGE) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (!Environment.isExternalStorageManager()) {
+					Toast.makeText(this,
+							StringResourcesUtils.getString(R.string.snackbar_storage_permission_denied_android_11),
+							Toast.LENGTH_SHORT).show();
+				} else {
+					switch (requestCode) {
+						case REQUEST_WRITE_STORAGE:
+							// Take picture scenarios
+							if (typesCameraPermission == TAKE_PICTURE_OPTION) {
+								if (!hasPermissions(this, Manifest.permission.CAMERA)) {
+									requestPermission(this, REQUEST_CAMERA, Manifest.permission.CAMERA);
+								} else {
+									checkTakePicture(this, TAKE_PHOTO_CODE);
+									typesCameraPermission = INVALID_TYPE_PERMISSIONS;
+								}
+								break;
+							}
+
+							// General download scenario
+							nodeSaver.handleRequestPermissionsResult(requestCode);
+							break;
+
+						case REQUEST_READ_WRITE_STORAGE:
+							// Upload scenario
+							new Handler(Looper.getMainLooper()).post(this::showUploadPanel);
+							break;
+					}
+				}
+			}
+		} else {
+			logWarning("No request code processed");
 			super.onActivityResult(requestCode, resultCode, intent);
 		}
 	}
@@ -9124,18 +9028,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	/**
-	 * Handle processed upload intent
+	 * Handle processed upload intent.
+	 *
+	 * @param infos List<ShareInfo> containing all the upload info.
 	 */
-	@Override
-	public void onIntentProcessed(List<ShareInfo> infos) {
+	private void onIntentProcessed(List<ShareInfo> infos) {
 		logDebug("onIntentProcessedLollipop");
-		if (statusDialog != null) {
-			try {
-				statusDialog.dismiss();
-			}
-			catch(Exception ex){}
-		}
-		dissmisDialog();
+
+		dismissAlertDialogIfExists(statusDialog);
+		dismissAlertDialogIfExists(processFileDialog);
 
 		MegaNode parentNode = getCurrentParentNode(getCurrentParentHandle(), -1);
 		if(parentNode == null){
@@ -9582,11 +9483,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){
 			logDebug("MegaRequest.TYPE_INVITE_CONTACT finished: " + request.getNumber());
 
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
-
+			dismissAlertDialogIfExists(statusDialog);
 
 			if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_contact_invitation_resent), -1);
@@ -9635,10 +9532,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
+			dismissAlertDialogIfExists(statusDialog);
 
 			if (e.getErrorCode() == MegaError.API_OK){
 //				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_LONG).show();
@@ -9767,14 +9661,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			logDebug("requestFinish " + MegaRequest.TYPE_REMOVE);
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (statusDialog != null){
-					if (statusDialog.isShowing()){
-						try {
-							statusDialog.dismiss();
-						}
-						catch (Exception ex) {}
-					}
-				}
+				dismissAlertDialogIfExists(statusDialog);
 				refreshAfterRemoving();
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_removed), -1);
 				resetAccountDetailsTimeStamp();
@@ -9787,10 +9674,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else if (request.getType() == MegaRequest.TYPE_COPY){
 			logDebug("TYPE_COPY");
 
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
+			dismissAlertDialogIfExists(statusDialog);
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				logDebug("Show snackbar!!!!!!!!!!!!!!!!!!!");
@@ -9833,10 +9717,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-			try {
-				statusDialog.dismiss();
-			}
-			catch (Exception ex) {}
+			dismissAlertDialogIfExists(statusDialog);
             if (e.getErrorCode() == MegaError.API_OK){
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_created), -1);
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -9880,13 +9761,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				sttFLol.reEnable2faSwitch();
 			}
 
-			if (e.getErrorCode() == MegaError.API_OK) {
-				is2FAEnabled = request.getFlag();
-
-				if (getSettingsFragment() != null) {
-					sttFLol.update2FAPreference(is2FAEnabled);
-				}
-			}
+            if (e.getErrorCode() == MegaError.API_OK) {
+                update2FAEnableState(request.getFlag());
+            }
 		}
 		else if(request.getType() == MegaRequest.TYPE_FOLDER_INFO) {
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -9904,6 +9781,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		}
 	}
+
+    /**
+     * Update 2FA SwitchPreference's enable state.
+     *
+     * @param isEnabled true, turn on SwitchPreference, false, turn off.
+     */
+    private void update2FAEnableState(boolean isEnabled) {
+        is2FAEnabled = isEnabled;
+
+        if (getSettingsFragment() != null) {
+            sttFLol.update2FAPreference(is2FAEnabled);
+        }
+    }
 
 	/**
 	 * Updates own firstName/lastName and fullName data in UI and DB.
@@ -10220,10 +10110,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		logDebug("onNodesUpdateLollipop");
-		try {
-			statusDialog.dismiss();
-		}
-		catch (Exception ex) {}
+		dismissAlertDialogIfExists(statusDialog);
 
 		boolean updateContacts = false;
 
@@ -10885,7 +10772,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void copyError(){
 		try {
-			statusDialog.dismiss();
+			dismissAlertDialogIfExists(statusDialog);
 			showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 		}
 		catch (Exception ex) {}

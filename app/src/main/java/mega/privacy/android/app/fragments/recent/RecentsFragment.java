@@ -382,7 +382,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
-            manageURLNode(requireContext(), megaApi, node);
+            manageURLNode(context, megaApi, node);
             return;
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);

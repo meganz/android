@@ -14,7 +14,7 @@ import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ChatUtil.showConfirmationRemoveChatLink
 import mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL
-import mega.privacy.android.app.utils.Constants.PLAIN_TEXT_SHARE_TYPE
+import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 
 class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment() {
 
@@ -65,7 +65,7 @@ class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment(
 
         binding.shareManageChatLinkOption.setOnClickListener {
             val sharingIntent = Intent(Intent.ACTION_SEND)
-            sharingIntent.type = PLAIN_TEXT_SHARE_TYPE
+            sharingIntent.type = TYPE_TEXT_PLAIN
             sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink)
             startActivity(Intent.createChooser(sharingIntent, getString(R.string.context_share)))
 

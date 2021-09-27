@@ -624,7 +624,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             String subject = getString(R.string.setting_feedback_subject) + " v" + versionApp;
 
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
-            emailIntent.setType("text/plain");
+            emailIntent.setType(TYPE_TEXT_PLAIN);
             emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {MAIL_ANDROID});
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
             emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());
