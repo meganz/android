@@ -1,7 +1,9 @@
 package mega.privacy.android.app;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
+import android.app.ApplicationExitInfo;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -48,8 +50,12 @@ import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.GlobalChatListener;
 import org.webrtc.ContextUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import dagger.hilt.android.HiltAndroidApp;
@@ -75,6 +81,7 @@ import mega.privacy.android.app.lollipop.megachat.BadgeIntentService;
 import mega.privacy.android.app.lollipop.megachat.calls.CallService;
 import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.ThemeHelper;
@@ -105,6 +112,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static android.app.ApplicationExitInfo.REASON_CRASH_NATIVE;
 import static android.media.AudioManager.STREAM_RING;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_ACTIVITY;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -757,6 +765,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		checkAppUpgrade();
 		checkMegaStandbyBucket();
+		getTombstoneInfo();
 
 		setupMegaApi();
 		setupMegaApiFolder();
@@ -1670,6 +1679,33 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 		}
 		return  -1;
+	}
+
+	/**
+	 * Get the tombstone information.
+	 */
+	public void getTombstoneInfo(){
+		ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+		List<ApplicationExitInfo> exitReasons;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+			exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 5);
+			for (ApplicationExitInfo aei : exitReasons) {
+				if (aei.getReason() == REASON_CRASH_NATIVE) {
+					// Get the tombstone input stream.
+					try {
+						InputStream tombstoneInputStream = aei.getTraceInputStream();
+						if(tombstoneInputStream != null) {
+							// The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
+							TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
+							logError("Tombstone Info" + tombstone.toString());
+							tombstoneInputStream.close();
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 
 	public AppRTCAudioManager getAudioManager(){
