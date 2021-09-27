@@ -3,23 +3,29 @@ package mega.privacy.android.app.imageviewer
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.map
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
+import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.utils.LogUtil.logError
 
 class ImageViewerViewModel @ViewModelInject constructor(
-    private val getImageUseCase: GetImageUseCase
+    private val getImageUseCase: GetImageUseCase,
+    private val getImageHandlesUseCase: GetImageHandlesUseCase
 ) : BaseRxViewModel() {
 
-    var defaultPosition = 0
+    private val currentPositionLiveData = MutableLiveData(0)
 
     private val images: MutableLiveData<List<ImageItem>> = MutableLiveData()
+
+    fun getCurrentImage(): LiveData<ImageItem?> =
+        Transformations.switchMap(currentPositionLiveData) { position -> getImage(position) }
 
     fun getImagesHandle(): LiveData<List<Long>> =
         images.map { items -> items.map(ImageItem::handle) }
@@ -31,7 +37,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         images.map { items -> items.getOrNull(position) }
 
     fun retrieveSingleImage(nodeHandle: Long) {
-        getImageUseCase.getImages(listOf(nodeHandle))
+        getImageHandlesUseCase.get(listOf(nodeHandle))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -46,7 +52,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun retrieveImagesFromParent(parentNodeHandle: Long, childOrder: Int) {
-        getImageUseCase.getChildImages(parentNodeHandle, childOrder)
+        getImageHandlesUseCase.getChildren(parentNodeHandle, childOrder)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -61,7 +67,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun retrieveImages(nodeHandles: List<Long>) {
-        getImageUseCase.getImages(nodeHandles)
+        getImageHandlesUseCase.get(nodeHandles)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -76,7 +82,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun loadSingleImage(nodeHandle: Long, fullSize: Boolean) {
-        getImageUseCase.getProgressiveImage(nodeHandle, fullSize)
+        getImageUseCase.get(nodeHandle, fullSize)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -92,5 +98,9 @@ class ImageViewerViewModel @ViewModelInject constructor(
                 }
             )
             .addTo(composite)
+    }
+
+    fun setPosition(position: Int) {
+        currentPositionLiveData.value = position
     }
 }

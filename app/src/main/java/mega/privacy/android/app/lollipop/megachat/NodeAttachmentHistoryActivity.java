@@ -45,7 +45,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -54,6 +60,11 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
+import mega.privacy.android.app.imageviewer.data.ImageItem;
+import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -104,6 +115,9 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class NodeAttachmentHistoryActivity extends PasscodeActivity
         implements MegaChatRequestListenerInterface, MegaRequestListenerInterface, OnClickListener,
         MegaChatListenerInterface, MegaChatNodeHistoryListenerInterface,
@@ -111,6 +125,9 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
+
+    @Inject
+    GetImageHandlesUseCase getImageHandlesUseCase;
 
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -708,6 +725,30 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     }
 
     public void showFullScreenViewer(long msgId) {
+        Long[] messageIds = messages.stream()
+                .map(megaChatMessage ->
+                        megaChatMessage.getMsgId()
+                )
+                .toArray(Long[]::new);
+
+        getImageHandlesUseCase.getFromChatMessages(chatId, messageIds)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((handles, throwable) -> {
+                    if (throwable == null) {
+                        int position = 0;
+                        for (int i = 0; i < handles.size(); i++) {
+                            ImageItem item = handles.get(i);
+
+                        }
+
+                        Intent intent = new Intent(this, ImageViewerActivity.class);
+                        intent.putExtra(INTENT_EXTRA_KEY_POSITION, position);
+                        intent.putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, handles.toArray());
+                        startActivity(intent);
+                    }
+                });
+
         logDebug("Message ID: " + msgId);
         int position = 0;
         boolean positionFound = false;
@@ -741,6 +782,41 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         intent.putExtra("messageIds", array);
         startActivity(intent);
     }
+/*
+    public void showFullScreenViewer(long msgId) {
+        logDebug("Message ID: " + msgId);
+        int position = 0;
+        boolean positionFound = false;
+        List<Long> ids = new ArrayList<>();
+        for (int i = 0; i < messages.size(); i++) {
+            MegaChatMessage msg = messages.get(i);
+            ids.add(msg.getMsgId());
+
+            if (msg.getMsgId() == msgId) {
+                positionFound = true;
+            }
+            if (!positionFound) {
+                MegaNodeList nodeList = msg.getMegaNodeList();
+                if (nodeList.size() == 1) {
+                    MegaNode node = nodeList.get(0);
+                    if (MimeTypeList.typeForName(node.getName()).isImage()) {
+                        position++;
+                    }
+                }
+            }
+        }
+
+        Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
+        intent.putExtra("position", position);
+        intent.putExtra("chatId", chatId);
+
+        long[] array = new long[ids.size()];
+        for (int i = 0; i < ids.size(); i++) {
+            array[i] = ids.get(i);
+        }
+        intent.putExtra("messageIds", array);
+        startActivity(intent);
+    }*/
 
     private void updateActionModeTitle() {
         logDebug("updateActionModeTitle");

@@ -157,7 +157,7 @@
 
         <activity
             android:name="mega.privacy.android.app.imageviewer.ImageViewerActivity"
-            android:label="@string/full_screen_image_viewer_label"
+            android:label=""
             android:launchMode="singleTop"
             android:theme="@style/Theme.Mega.FullScreen.Draggable"
             android:windowSoftInputMode="stateAlwaysHidden" />

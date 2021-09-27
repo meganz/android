@@ -2,6 +2,8 @@ package mega.privacy.android.app.imageviewer
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
@@ -10,7 +12,9 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
+import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
@@ -37,7 +41,17 @@ class ImageViewerActivity : BaseActivity() {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 val itemCount = binding.viewPager.adapter?.itemCount ?: 0
-                showCurrentImageData(position, itemCount)
+
+                binding.txtPageCount.apply {
+                    text = getString(
+                        R.string.wizard_steps_indicator,
+                        position + 1,
+                        itemCount
+                    )
+                    isVisible = itemCount > 1
+                }
+
+                viewModel.setPosition(position)
             }
         }
     }
@@ -50,7 +64,6 @@ class ImageViewerActivity : BaseActivity() {
         setContentView(binding.root)
 
         setupView()
-        setupObservers()
 
         when {
             parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
@@ -66,6 +79,13 @@ class ImageViewerActivity : BaseActivity() {
                 error("Invalid params")
             }
         }
+
+        setupObservers()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.activity_image_viewer, menu)
+        return true
     }
 
     override fun onDestroy() {
@@ -76,6 +96,7 @@ class ImageViewerActivity : BaseActivity() {
     @SuppressLint("WrongConstant")
     private fun setupView() {
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding.viewPager.apply {
             adapter = pagerAdapter
@@ -85,7 +106,7 @@ class ImageViewerActivity : BaseActivity() {
     }
 
     private fun setupObservers() {
-        viewModel.defaultPosition = nodePosition
+        viewModel.setPosition(nodePosition)
         viewModel.getImagesHandle().observe(this) { handles ->
             pagerAdapter.submitList(handles) {
                 if (!defaultPageSet) {
@@ -96,18 +117,47 @@ class ImageViewerActivity : BaseActivity() {
                 }
             }
         }
+        viewModel.getCurrentImage().observe(this, ::showCurrentImage)
     }
 
-    private fun showCurrentImageData(position: Int, itemCount: Int) {
-        viewModel.getImage(position).observe(this) { imageItem ->
-            imageItem?.name?.let { binding.txtTitle.text = it }
+    private fun showCurrentImage(item: ImageItem?) {
+        if (item != null) {
+            binding.txtTitle.text = item.name
         }
-
-        binding.txtPageCount.isVisible = itemCount > 1
-        binding.txtPageCount.text = getString(
-            R.string.wizard_steps_indicator,
-            position + 1,
-            itemCount
-        )
     }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean =
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            R.id.action_download -> {
+                //do something
+                true
+            }
+            R.id.action_save_gallery -> {
+                //do something
+                true
+            }
+            R.id.action_get_link -> {
+                viewModel.getCurrentImage().value?.handle?.let { currentHandle ->
+                    LinksUtil.showGetLinkActivity(this, currentHandle)
+                }
+                true
+            }
+            R.id.action_chat -> {
+                //do something
+                true
+            }
+            R.id.action_more -> {
+                //do something
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
 }

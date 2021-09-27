@@ -1701,4 +1701,7 @@ object MegaNodeUtil {
                 }
             )
     }
+
+    fun MegaNode.isImage(): Boolean =
+        this.isFile && MimeTypeList.typeForName(name).isImage
 }
