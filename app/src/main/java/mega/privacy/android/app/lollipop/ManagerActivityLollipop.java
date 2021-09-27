@@ -1632,6 +1632,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 					return Unit.INSTANCE;
 				});
+		getLifecycle().addObserver(miniAudioPlayerController);
 
         //Set navigation view
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -2908,10 +2909,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		checkTransferOverQuotaOnResume();
 
-		if (miniAudioPlayerController != null) {
-			miniAudioPlayerController.onResume();
-		}
-
 		LiveEventBus.get(EVENT_FAB_CHANGE, Boolean.class).observeForever(fabChangeObserver);
 	}
 
@@ -3502,11 +3499,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         if (newTextFileDialog != null) {
         	newTextFileDialog.dismiss();
-		}
-
-        if (miniAudioPlayerController != null) {
-			miniAudioPlayerController.onDestroy();
-			miniAudioPlayerController = null;
 		}
 
 		dismissAlertDialogIfExists(processFileDialog);
@@ -4272,17 +4264,19 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		drawerLayout.closeDrawer(Gravity.LEFT);
 	}
 
-	public void setBottomNavigationMenuItemChecked (int item) {
-		if (bNV != null && bNV.getMenu() != null) {
-			if(item == HIDDEN_BNV) {
+	public void setBottomNavigationMenuItemChecked(int item) {
+		if (bNV != null) {
+			if (item == HIDDEN_BNV) {
 				showHideBottomNavigationView(true);
-			}
-			else if (bNV.getMenu().getItem(item) != null) {
+			} else if (bNV.getMenu().getItem(item) != null) {
 				if (!bNV.getMenu().getItem(item).isChecked()) {
 					bNV.getMenu().getItem(item).setChecked(true);
 				}
 			}
 		}
+
+		boolean isCameraUploadItem = item == CAMERA_UPLOADS_BNV;
+		updateMiniAudioPlayerVisibility(!isCameraUploadItem);
 	}
 
 	private void setTabsVisibility() {
