@@ -1552,10 +1552,19 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 
 			MegaChatRoom chatRoom = megaChatApi.getChatRoom(currentChatId);
-			if (callStatus == CALL_STATUS_USER_NO_PRESENT && chatRoom != null &&
-					(chatRoom.isGroup() || chatRoom.isMeeting()) && !getChatManagement().isOpeningMeetingLink(currentChatId)) {
-				showGroupCallNotification(currentChatId);
-				return;
+			if (callStatus == CALL_STATUS_USER_NO_PRESENT && chatRoom != null) {
+				if ((chatRoom.isGroup() || chatRoom.isMeeting()) && !getChatManagement().isOpeningMeetingLink(currentChatId)) {
+					logDebug("Show incoming group call notification");
+					showGroupCallNotification(currentChatId);
+					return;
+				}
+
+				if (!chatRoom.isGroup() && !chatRoom.isMeeting() && openCallChatId != chatRoom.getChatId()) {
+					logDebug("Show incoming one to one call screen");
+					MegaChatCall callToLaunch = megaChatApi.getChatCall(chatRoom.getChatId());
+					launchCallActivity(callToLaunch);
+					return;
+				}
 			}
 		}
 
