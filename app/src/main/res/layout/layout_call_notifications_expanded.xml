@@ -186,8 +186,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_transfers_pause"
-                    app:tint="@color/teal_300_teal_200" />
+                    android:src="@drawable/ic_hold_call" />
 
                 <TextView
                     android:id="@+id/second_button_text"

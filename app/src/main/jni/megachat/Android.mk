@@ -63,6 +63,7 @@ LOCAL_STATIC_LIBRARIES += libws
 endif
 
 ifeq ($(DISABLE_WEBRTC),false)
+LOCAL_SRC_FILES += $(addprefix sdk/src/, sfu.cpp)
 LOCAL_SRC_FILES += $(addprefix sdk/src/, rtcCrypto.cpp)
 LOCAL_SRC_FILES += $(addprefix sdk/src/rtcModule/, webrtc.cpp webrtcAdapter.cpp rtcStats.cpp)
 LOCAL_STATIC_LIBRARIES += webrtc
