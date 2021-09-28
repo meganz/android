@@ -1198,8 +1198,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							if (chatRoom != null) {
 								megaChatApi.getUserFirstname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
 								megaChatApi.getUserLastname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
-								megaChatApi.getUserEmail(chat.getLastMessageHandle(), listener);
 							}
+							megaChatApi.getUserEmail(chat.getLastMessageHandle(), listener);
 						}
 						else{
 							logDebug("Name already asked and no name received: handle " + chat.getLastMessageSender());
