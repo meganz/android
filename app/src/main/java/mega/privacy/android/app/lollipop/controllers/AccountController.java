@@ -13,10 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Build;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 import androidx.print.PrintHelper;
 import androidx.appcompat.app.AlertDialog;
@@ -32,10 +29,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.OpenLinkActivity;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel;
 import mega.privacy.android.app.jobservices.SyncRecord;
-import mega.privacy.android.app.listeners.LogoutListener;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.TestPasswordActivity;
@@ -48,7 +45,6 @@ import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 
-import static mega.privacy.android.app.lollipop.qrcode.MyCodeFragment.*;
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
 import static mega.privacy.android.app.textEditor.TextEditorViewModel.SHOW_LINE_NUMBERS;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -418,6 +414,8 @@ public class AccountController {
 
     static public void logout(Context context, MegaApiAndroid megaApi) {
         logDebug("logout");
+
+        MegaApplication.setLoggingOut(true);
 
         BackupToolsKt.removeBackupsBeforeLogout();
 
