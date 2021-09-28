@@ -137,7 +137,11 @@ public class VideoCaptureUtils{
      */
     static public boolean isFrontCameraInUse() {
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        return isFrontCamera(megaChatApi.getVideoDeviceSelected());
+        String deviceName = megaChatApi.getVideoDeviceSelected();
+
+        if(deviceName == null) return false;
+
+        return isFrontCamera(deviceName);
     }
 
     /**

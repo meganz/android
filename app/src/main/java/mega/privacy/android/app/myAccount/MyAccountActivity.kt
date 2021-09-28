@@ -89,6 +89,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (shouldRefreshSessionDueToSDK()) {
+            return
+        }
+
         binding = ActivityMyAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

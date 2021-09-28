@@ -74,6 +74,7 @@ public class AppRTCBluetoothManager {
   private BluetoothHeadset bluetoothHeadset;
   private BluetoothDevice bluetoothDevice;
   private final BroadcastReceiver bluetoothHeadsetReceiver;
+  private boolean isFirstConnection = false;
 
   // Runs when the Bluetooth timeout expires. We use that timeout after calling
   // startScoAudio() or stopScoAudio() because we're not guaranteed to get a
@@ -102,6 +103,7 @@ public class AppRTCBluetoothManager {
       Log.d(TAG, "BluetoothServiceListener.onServiceConnected: BT state=" + bluetoothState);
       // Android only supports one connected Bluetooth Headset at a time.
       bluetoothHeadset = (BluetoothHeadset) proxy;
+      isFirstConnection = true;
       updateAudioDeviceState();
       Log.d(TAG, "onServiceConnected done: BT state=" + bluetoothState);
     }
@@ -151,7 +153,7 @@ public class AppRTCBluetoothManager {
         } else if (state == BluetoothHeadset.STATE_DISCONNECTING) {
             // No action needed.
         } else if (state == BluetoothHeadset.STATE_DISCONNECTED) {
-            // Bluetooth is probably powered off during the call.
+          // Bluetooth is probably powered off during the call.
           stopScoAudio();
           updateAudioDeviceState();
         }
@@ -354,7 +356,7 @@ public class AppRTCBluetoothManager {
     audioManager.stopBluetoothSco();
     audioManager.setBluetoothScoOn(false);
     bluetoothState = State.SCO_DISCONNECTING;
-      Log.d(TAG, "stopScoAudio done: BT state=" + bluetoothState + ", "
+    Log.d(TAG, "stopScoAudio done: BT state=" + bluetoothState + ", "
             + "SCO is on: " + isScoOn());
   }
 
@@ -385,12 +387,18 @@ public class AppRTCBluetoothManager {
     if (devices.isEmpty()) {
       bluetoothDevice = null;
       bluetoothState = State.HEADSET_UNAVAILABLE;
-        Log.d(TAG, "No connected bluetooth headset");
+      Log.d(TAG, "No connected bluetooth headset");
     } else {
       // Always use first device in list. Android only supports one device.
       bluetoothDevice = devices.get(0);
       bluetoothState = State.HEADSET_AVAILABLE;
-        Log.d(TAG, "Connected bluetooth headset: "
+
+      if(isFirstConnection){
+        apprtcAudioManager.changeUserSelectedAudioDeviceForHeadphone(AppRTCAudioManager.AudioDevice.BLUETOOTH);
+        isFirstConnection = false;
+      }
+
+      Log.d(TAG, "Connected bluetooth headset: "
               + "name=" + bluetoothDevice.getName() + ", "
               + "state=" + stateToString(bluetoothHeadset.getConnectionState(bluetoothDevice))
               + ", SCO audio=" + bluetoothHeadset.isAudioConnected(bluetoothDevice));

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.preference.PreferenceManager
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.components.transferWidget.TransfersManagement
 import nz.mega.sdk.MegaApiJava
 
 /**
@@ -117,19 +116,16 @@ abstract class RatingHandler(val context: Context) {
             return false
         }
 
+        val app = MegaApplication.getInstance()
+        val megaApi = app.megaApi
+
         // Exclude ODQ & OBQ accounts
-        if (TransfersManagement.isOnTransferOverQuota()
-            && MegaApplication.getInstance().storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
+        if (megaApi.bandwidthOverquotaDelay > 0
+            && app.storageState == MegaApiJava.STORAGE_STATE_PAYWALL) {
             return false
         }
 
-        val app = MegaApplication.getInstance()
-        if (app != null && app.megaApi != null) {
-            val totalNum = app.megaApi.numNodes
-            return totalNum >= FILES_NUM_LIMIT
-        }
-
-        return false
+        return megaApi.numNodes >= FILES_NUM_LIMIT
     }
 
     /**

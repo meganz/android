@@ -446,7 +446,7 @@
     <!-- while copying a file or folder -->
     <string name="context_copying">Copie</string>
     <!-- menu item -->
-    <string name="context_move_to_trash">Déplacer vers la corbeille</string>
+    <string name="context_move_to_trash">Déplacer vers la Corbeille</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Supprimer de MEGA</string>
     <!-- Input field description in the create folder dialog. -->
@@ -458,9 +458,9 @@
     <!-- Menu item -->
     <string name="context_download_to">Enregistrer sous</string>
     <!-- Menu option title -->
-    <string name="context_clear_rubbish">Vider la corbeille</string>
+    <string name="context_clear_rubbish">Vider la Corbeille</string>
     <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
-    <string name="clear_rubbish_confirmation">Vous êtes sur le point de supprimer définitivement tous les éléments contenus dans votre corbeille.</string>
+    <string name="clear_rubbish_confirmation">Vous êtes sur le point de supprimer définitivement tous les éléments contenus dans votre Corbeille.</string>
     <!-- send cancel subscriptions dialog -->
     <string name="context_send">Envoyer</string>
     <!-- send the file to inbox -->
@@ -528,7 +528,7 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d éléments ont été déplacés avec succès</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">A été déplacé vers la corbeille avec succès</string>
+    <string name="context_correctly_moved_to_rubbish">A été déplacé vers la Corbeille avec succès</string>
     <!-- error message -->
     <string name="context_no_moved">Erreur. N’a pas été déplacé</string>
     <!-- success message when sharing a folder -->
@@ -594,9 +594,9 @@
     <!-- option available for just one file -->
     <string name="context_select_one_file">Ne sélectionner qu’un fichier</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">La corbeille a été vidée avec succès</string>
+    <string name="rubbish_bin_emptied">La Corbeille a été vidée avec succès</string>
     <!-- error message when emptying the RB -->
-    <string name="rubbish_bin_no_emptied">Une erreur est survenue. La corbeille n’a pas été vidée</string>
+    <string name="rubbish_bin_no_emptied">Une erreur est survenue. La Corbeille n’a pas été vidée</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">Vous êtes sur le point d’annuler votre abonnement MEGA. Si nous pouvons faire quoi que ce soit pour vous faire changer d’idée, n’hésitez pas à nous le communiquer.</string>
     <!-- hint cancel subscriptions dialog -->
@@ -1301,16 +1301,16 @@
     <!-- Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again. -->
     <string name="mute_chatroom_notification_option_forever">Jusqu’à ce que je les réactive</string>
     <!-- Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour -->
-    <string name="success_muting_a_chat_for_specific_time">Les notifications de la conversation seront mises en sourdine pendant %s</string>
+    <string name="success_muting_a_chat_for_specific_time">Il n’y aura pas de notifications pour cette conversation pendant %s</string>
     <!-- Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15 -->
     <plurals name="success_muting_chat_until_specific_time">
-        <item quantity="one">Les notifications des conversations seront en sourdine jusqu’à %1$s</item>
-        <item quantity="other">Les notifications des conversations seront en sourdine jusqu’à %1$s</item>
+        <item quantity="one">Il n’y aura pas de notifications pour cette conversation jusqu’à %1$s</item>
+        <item quantity="other">Il n’y aura pas de notifications pour cette conversation jusqu’à %1$s</item>
     </plurals>
     <!-- Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00 -->
     <plurals name="success_muting_chat_until_specific_date_and_time">
-        <item quantity="one">Les notifications des conversations seront en sourdine jusqu’à %1$s %2$s h</item>
-        <item quantity="other">Les notifications des conversations seront en sourdine jusqu’à %1$s %2$s h</item>
+        <item quantity="one">Il n’y aura pas de notifications pour cette conversation jusqu’à %1$s %2$s h</item>
+        <item quantity="other">Il n’y aura pas de notifications pour cette conversation jusqu’à %1$s %2$s h</item>
     </plurals>
     <!-- Message when select the option Do not disturb but the notifications are already muted -->
     <string name="notifications_are_already_muted">Les notifications des conversations sont en sourdine</string>
@@ -1883,13 +1883,13 @@
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Suppression du contact du dossier partagé</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish">Déplacer vers la corbeille ?</string>
+    <string name="confirmation_move_to_rubbish">Déplacer vers la Corbeille ?</string>
     <!-- confirmation message before removing CU folder -->
-    <string name="confirmation_move_cu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la corbeille ? Téléversements de l’appareil photo sera désactivée.</string>
+    <string name="confirmation_move_cu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Téléversements de l’appareil photo sera désactivée.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la corbeille ? Téléversements des médias secondaires sera désactivée.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Voulez-vous vraiment déplacer ce dossier vers la Corbeille ? Téléversements des médias secondaires sera désactivée.</string>
     <!-- confirmation message before removing a file -->
-    <string name="confirmation_move_to_rubbish_plural">Déplacer vers la corbeille ?</string>
+    <string name="confirmation_move_to_rubbish_plural">Déplacer vers la Corbeille ?</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_delete_from_mega">Supprimer de MEGA ?</string>
     <!-- label to indicate the state of an upload in chat -->
@@ -2152,7 +2152,7 @@
     <!-- Text of the empty screen when there are not chat conversations -->
     <string name="context_empty_chat_recent">[B]Invitez vos amis à [/B][A]dialoguer en ligne[/A][B] et profitez de notre plateforme chiffrée en toute confidentialité et sécurité.[/B]</string>
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
-    <string name="context_empty_rubbish_bin">[A]La corbeille[/A] [B]est vide[/B]</string>
+    <string name="context_empty_rubbish_bin">[A]La Corbeille[/A] [B]est vide[/B]</string>
     <!-- Text of the empty screen when there are not elements in  Inbox -->
     <string name="context_empty_inbox">[B]Aucun fichier dans votre [/B][A]boîte de réception[/A]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
@@ -2746,9 +2746,9 @@
     <!-- When app is retrieving push message -->
     <string name="retrieving_message_title">Récupération du message</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality -->
-    <string name="settings_rb_scheduler_enable_title">Programmateur de vidage de la corbeille</string>
+    <string name="settings_rb_scheduler_enable_title">Programmateur de vidage de la Corbeille</string>
     <!-- Subtitle of Rubbish bin scheduler option in settings to enable or disable the functionality in free accounts -->
-    <string name="settings_rb_scheduler_enable_subtitle">La corbeille est vidée pour vous automatiquement.</string>
+    <string name="settings_rb_scheduler_enable_subtitle">La Corbeille est vidée pour vous automatiquement.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
     <string name="settings_rb_scheduler_enable_period_PRO">La fréquence minimale est 7 jours.</string>
     <!-- Title of Rubbish bin scheduler option in settings to enable or disable the functionality in PRO accounts -->
@@ -2764,7 +2764,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Si les vidéos à compresser dépassent</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">Pour désactiver le programmateur de vidage de la corbeille ou pour définir une période de conservation plus longue, veuillez souscrire un abonnement&#160;Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Pour désactiver le programmateur de vidage de la Corbeille ou pour définir une période de conservation plus longue, veuillez souscrire un abonnement&#160;Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">jours</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3950,13 +3950,13 @@
     <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
     <string name="files_already_downloaded_and_files_pending_download">%1$d fichiers sont déjà téléchargés, %2$d fichiers sont en attente.</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
-    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 élément a été déplacé vers la corbeille avec succès et 1 ne l’a pas été</string>
+    <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 élément a été déplacé vers la Corbeille avec succès et 1 ne l’a pas été</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
-    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 élément a été déplacé vers la corbeille avec succès et %d ne l’ont pas été</string>
+    <string name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">1 élément a été déplacé vers la Corbeille avec succès et %d ne l’ont pas été</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
-    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d éléments ont été déplacé vers la corbeille avec succès et 1 ne l’a pas été</string>
+    <string name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">%d éléments ont été déplacé vers la Corbeille avec succès et 1 ne l’a pas été</string>
     <!-- Message displayed when multiple nodes (files and folders) have been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholders: number of nodes -->
-    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d éléments ont été déplacé vers la corbeille avec succès et %2$d ne l’ont pas été</string>
+    <string name="nodes_correctly_and_nodes_incorrectly_moved_to_rubbish">%1$d éléments ont été déplacé vers la Corbeille avec succès et %2$d ne l’ont pas été</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 node has not been restored successfully -->
     <string name="node_correctly_and_node_incorrectly_restored_from_rubbish">1 élément a été restauré de la corbeille avec succès et 1 ne l’a pas été</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and multiple nodes have not been restored successfully. Placeholder: number of nodes -->
@@ -3967,13 +3967,13 @@
     <string name="nodes_correctly_and_nodes_incorrectly_restored_from_rubbish">%1$d éléments ont été restaurés de la corbeille avec succès et %2$d ne l’ont pas été</string>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 élément a été déplacé vers la corbeille avec succès.</item>
-        <item quantity="other">%d éléments ont été déplacés vers la corbeille avec succès.</item>
+        <item quantity="one">1 élément a été déplacé vers la Corbeille avec succès.</item>
+        <item quantity="other">%d éléments ont été déplacés vers la Corbeille avec succès.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 élément n’a pas été déplacé vers la corbeille avec succès.</item>
-        <item quantity="other">%d éléments n’ont pas été déplacés vers la corbeille avec succès.</item>
+        <item quantity="one">1 élément n’a pas été déplacé vers la Corbeille avec succès.</item>
+        <item quantity="other">%d éléments n’ont pas été déplacés vers la Corbeille avec succès.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
@@ -4045,4 +4045,138 @@
         <item quantity="one">Obtenir le lien</item>
         <item quantity="other">Obtenir les liens</item>
     </plurals>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">Vous êtes la seule personne ici</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">Réunion</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">Commencer/Se joindre à une réunion</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">Nouvelle réunion</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">Me joindre à une réunion</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">Commencer une réunion</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">Me joindre en tant qu’invité</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">Réunion de %s</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">Raccrocher</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">Micro</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">Votre microphone est coupé</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">Votre microphone est en fonction</string>
+    <!-- General label for camera -->
+    <string name="general_camera">Caméra</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">Votre caméra est activée.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">Votre caméra est désactivée.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">Attente</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">Haut-parleur</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">Casque d’écoute</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">Le casque d’écoute est activé</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">Le haut-parleur est activé</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">Le haut-parleur est désactivé</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">Mettre fin</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">Inviter des participants</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">Participants (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">Afficher dans la vue principale</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">Désigner comme modérateur</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">Quitter la réunion maintenant ?</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">Aucun modérateur</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">Avant de quitter la réunion, veuillez nommer un ou plusieurs nouveaux modérateurs.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">Désigner comme modérateur</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">La quitter quand même</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">Veuillez assigner un ou plusieurs nouveaux modérateurs.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">Changer le nom de la réunion</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">Participants&#160;: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">Modérateur&#160;: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">Lien de la réunion</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">Durée</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">Me joindre à la réunion en tant qu’invité</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">Vous avez reçu une invitation à une réunion.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">Touchez le lien de réunion qui vous a été envoyé ou collez-le ici</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">La connexion est de mauvaise qualité</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">La réunion est terminée</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">Le lien de la réunion est invalide</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">MEGA a besoin d’autorisations d’accès</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">MEGA a besoin d’accéder à votre microphone et à votre appareil photo pour les réunions.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">J’ai compris</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">Dans vos Paramètres, autorisez MEGA à accéder à votre appareil photo et à votre microphone.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">Afficher l’historique de la réunion</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">Invitez d’autres participants à la réunion. Balayez vers le haut pour en inviter.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">Touchez pour créer une nouvelle réunion</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">Mettez rapidement en place une réunion&#160;MEGA grâce à notre nouvelle fonction de réunion chiffrée</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">Vous êtes le nouveau modérateur.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">Le lien de la réunion a été copié.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%s a commencé une réunion. Touchez pour vous y joindre.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">Réunion&#160;MEGA</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">Réunion vidéo chiffrée de bout en bout</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">Veuillez saisir un lien de réunion valide</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">Plus que de simples réunions</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">Votre vie privée compte</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">Joignez-vous à la plus grande plateforme de stockage nuagique et de collaboration sécurisée au monde.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">Obtenez 20&#160;Go gratuitement</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">Inscrivez-vous maintenant et profitez gratuitement de fonctions évoluées de collaboration.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">Un autre appel est en cours. Veuillez mettre fin à cet appel avant d’en faire un autre.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">Nom de la nouvelle réunion</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">Échec de création de la réunion.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](moi)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">Vue principale</string>
 </resources>
