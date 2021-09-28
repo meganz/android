@@ -18,21 +18,24 @@ public class TourImageAdapter extends PagerAdapter {
 			R.drawable.tour1,
 			R.drawable.tour2,
 			R.drawable.tour3,
-			R.drawable.tour4
+			R.drawable.tour4,
+			R.drawable.tour5
 	};
 
 	int[] barTitles = new int[] {
 			R.string.title_tour_one,
 			R.string.title_tour_two,
 			R.string.title_tour_three,
-			R.string.title_tour_four
+			R.string.title_tour_four,
+			R.string.title_tour_five
 	};
 
 	int[] barTexts = new int[] {
 			R.string.content_tour_one,
 			R.string.content_tour_two,
 			R.string.content_tour_three,
-			R.string.content_tour_four
+			R.string.content_tour_four,
+			R.string.content_tour_five
 	};
 
 	private Activity activity;

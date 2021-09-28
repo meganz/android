@@ -8,8 +8,7 @@ import android.os.IBinder
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 import mega.privacy.android.app.R
@@ -24,10 +23,10 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
  * @param playerView the ExoPlayer view
  * @param onPlayerVisibilityChanged a callback for mini player view visibility change
  */
-class MiniAudioPlayerController(
+class MiniAudioPlayerController constructor(
     private val playerView: PlayerView,
-    private val onPlayerVisibilityChanged: () -> Unit,
-) {
+    private val onPlayerVisibilityChanged: (() -> Unit)? = null,
+) : LifecycleObserver {
     private val context = playerView.context
 
     private val trackName = playerView.findViewById<TextView>(R.id.track_name)
@@ -59,7 +58,7 @@ class MiniAudioPlayerController(
                 service.service.metadata.observeForever(metadataObserver)
 
                 if (visible()) {
-                    onPlayerVisibilityChanged()
+                    onPlayerVisibilityChanged?.invoke()
                 }
             }
         }
@@ -104,19 +103,21 @@ class MiniAudioPlayerController(
         }
     }
 
-    /**
-     * activity onResume event.
-     */
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun onResume() {
         val service = playerService
         if (service != null) {
             setupPlayerView(service.exoPlayer)
         }
+        playerView.onResume()
     }
 
-    /**
-     * activity onDestroy event.
-     */
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onPause() {
+        playerView.onPause()
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
         audioPlayerPlaying.removeObserver(audioPlayerPlayingObserver)
         onAudioPlayerServiceStopped()
@@ -146,7 +147,7 @@ class MiniAudioPlayerController(
             context.unbindService(connection)
         }
 
-        onPlayerVisibilityChanged()
+        onPlayerVisibilityChanged?.invoke()
     }
 
     private fun setupPlayerView(player: SimpleExoPlayer) {

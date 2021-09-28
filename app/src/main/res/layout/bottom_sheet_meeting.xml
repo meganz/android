@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/meeting_bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="10dp"
+    android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/rl_start_meeting"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_weight="1" >
+
+            <ImageView
+                android:id="@+id/iv_start_meeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_meeting_start"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/tv_start_meeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/iv_start_meeting"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="@string/new_meeting"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_join_meeting"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent">
+
+            <ImageView
+                android:id="@+id/iv_join_meeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_meeting_join"
+                tools:ignore="ContentDescription" />
+
+
+            <TextView
+                android:id="@+id/tv_join_meeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/iv_join_meeting"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="15dp"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="@string/join_meeting"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+        </RelativeLayout>
+</LinearLayout>

@@ -6,6 +6,7 @@
     <color name="white">#FFFFFF</color>
 
     <color name="white_alpha_005">#0DFFFFFF</color>
+    <color name="white_alpha_007">#12FFFFFF</color>
     <color name="white_alpha_008">#14FFFFFF</color>
     <color name="white_alpha_009">#17FFFFFF</color>
     <color name="white_alpha_012">#1FFFFFFF</color>
@@ -32,7 +33,9 @@
     <color name="dark_grey">#121212</color>
     <color name="dark_grey_alpha_050">#80121212</color>
     <color name="dark_grey_alpha_054">#8A121212</color>
+    <color name="dark_grey_alpha_066">#A8121212</color>
     <color name="dark_grey_alpha_070">#B3121212</color>
+    <color name="dark_grey_border_color">#646464</color>
 
     <color name="grey_010">#FAFAFA</color>
     <color name="grey_020">#F5F5F5</color>
@@ -62,6 +65,7 @@
     <color name="grey_alpha_032">#52000000</color>
     <color name="grey_alpha_033">#54000000</color>
     <color name="grey_alpha_038">#61000000</color>
+    <color name="grey_alpha_040">#66000000</color>
     <color name="grey_alpha_045">#73000000</color>
     <color name="grey_alpha_050">#80000000</color>
     <color name="grey_alpha_054">#8A000000</color>
@@ -69,6 +73,7 @@
     <color name="grey_alpha_070">#B3000000</color>
     <color name="grey_alpha_080">#CC000000</color>
     <color name="grey_alpha_087">#DE000000</color>
+    <color name="grey_alpha_090">#E6000000</color>
 
     <color name="teal_050">#DCF4F0</color>
     <color name="teal_100">#A9E3D8</color>
@@ -80,11 +85,13 @@
 
     <color name="teal_200_alpha_038">#616DD2BF</color>
 
-    <color name="teal_300_alpha_006">#0F00B092</color>
+
+    <color name="teal_300_alpha_020">#3300BFA5</color>
     <color name="teal_300_alpha_038">#6100BFA5</color>
     <color name="teal_300_alpha_050">#8000BFA5</color>
     <color name="teal_300_alpha_090">#E600BFA5</color>
 
+    <color name="teal_400_alpha_006">#0F00B092</color>
     <color name="teal_400_alpha_036">#5C00B092</color>
     <color name="teal_400_alpha_050">#8000B092</color>
     <color name="teal_400_alpha_090">#E600B092</color>
@@ -213,7 +220,7 @@
     <color name="grey_012_white_015">@color/grey_alpha_012</color>
 
     <!-- chat reaction contact emoji background fill -->
-    <color name="teal_300_006_teal_400_050">@color/teal_300_alpha_006</color>
+    <color name="teal_300_006_teal_400_050">@color/teal_400_alpha_006</color>
 
     <!-- chat reaction contact emoji background border -->
     <color name="teal_300_teal_600">@color/teal_300</color>
@@ -275,6 +282,9 @@
 
     <!-- Date picker background color -->
     <color name="white_grey_800">@color/white</color>
+
+    <!-- Meeting bottom floating panel background -->
+    <color name="white_grey_900">@color/white</color>
 
     <!-- Emoji keyboard background -->
     <color name="grey_010_grey_800">@color/grey_010</color>
@@ -341,6 +351,8 @@
 
     <color name="grey_200_grey_600">@color/grey_200</color>
 
+    <color name="grey_700_grey_600">@color/grey_700</color>
+
     <!-- homepage upload FAB tint -->
     <color name="grey_900_grey_050">@color/grey_900</color>
 
@@ -404,6 +416,9 @@
     <!-- For disabled borderless button-->
     <color name="teal_300_038_teal_200_038">@color/teal_300_alpha_038</color>
 
+    <!-- local camera background-->
+    <color name="black_87_opacity">@color/teal_300_alpha_038</color>
+
     <!-- Label red -->
     <color name="salmon_400_salmon_300">@color/salmon_400</color>
     <!-- Label green -->
@@ -430,6 +445,17 @@
 
     <!--  Background of text editor name layout  -->
     <color name="white_090_grey_080">@color/white_alpha_090</color>
+
+    <!--  Background of panel when expand-->
+    <color name="grey_070_dark_grey_066">@color/grey_alpha_070</color>
+    <!--  Background of share link and invite button-->
+    <color name="grey_020_grey_040">@color/grey_020</color>
+    <!--  title color of share link and invite button-->
+    <color name="grey_600_white">@color/grey_600</color>
+    <!--  background of bottom menu button when expand-->
+    <color name="grey_060_white_054">@color/grey_600</color>
+    <!--  background of bottom menu button when collapse-->
+    <color name="grey_032_white_054">@color/grey_alpha_032</color>
 
     <!--  SnackBar background  -->
     <color name="grey_alpha_087_white">@color/grey_alpha_087</color>
@@ -460,7 +486,6 @@
     <color name="red_300_red_200">@color/red_300</color>
     <color name="blue_400_blue_300">@color/blue_400</color>
     <color name="grey_020_grey_087">@color/grey_020</color>
-    <color name="white_grey_900">@color/white</color>
     <color name="grey_100_060_grey_100">@color/grey_100_alpha_060</color>
     <color name="grey_038_grey_400">@color/grey_alpha_038</color>
     <color name="grey_010_white_009">@color/grey_010</color>

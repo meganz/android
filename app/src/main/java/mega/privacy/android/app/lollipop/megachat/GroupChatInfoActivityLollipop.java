@@ -1050,10 +1050,8 @@ public class GroupChatInfoActivityLollipop extends PasscodeActivity
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
         logDebug("Chat ID: " + chatid + ", New state: " + newState);
-
         MegaChatRoom chatRoom = api.getChatRoom(chatid);
-        if (MegaApplication.isWaitingForCall() && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
-                && chatRoom != null && chatRoom.getPeerHandle(0) == MegaApplication.getUserWaitingForCall()) {
+        if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
             startCallWithChatOnline(this, api.getChatRoom(chatid));
         }
     }
