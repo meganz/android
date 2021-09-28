@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
+
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -87,6 +88,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
 
     static boolean isBackFromLoginPage;
     static boolean isFetchingNodes;
+
+    private static boolean clipboardRead;
 
     private BroadcastReceiver updateMyAccountReceiver = new BroadcastReceiver() {
         @Override
@@ -175,11 +178,10 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         relativeContainer = (RelativeLayout) findViewById(R.id.relative_container_login);
 
         intentReceived = getIntent();
-        if(savedInstanceState!=null) {
+        if (savedInstanceState != null) {
             logDebug("Bundle is NOT NULL");
             visibleFragment = savedInstanceState.getInt(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-        }
-        else{
+        } else {
             if (intentReceived != null) {
                 visibleFragment = intentReceived.getIntExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
                 logDebug("There is an intent! VisibleFragment: " + visibleFragment);
@@ -215,7 +217,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home: {
                 switch (visibleFragment) {
                     case LOGIN_FRAGMENT: {
@@ -310,7 +312,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
             }
         }
 
-        if( ((MegaApplication) getApplication()).isEsid()){
+        if (((MegaApplication) getApplication()).isEsid()) {
             showAlertLoggedOut();
         }
     }
@@ -347,7 +349,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     public void showAlertLoggedOut() {
         logDebug("showAlertLoggedOut");
         ((MegaApplication) getApplication()).setEsid(false);
-        if(!isFinishing()){
+        if (!isFinishing()) {
             final androidx.appcompat.app.AlertDialog.Builder dialogBuilder = new androidx.appcompat.app.AlertDialog.Builder(this);
 
             dialogBuilder.setTitle(getString(R.string.title_alert_logged_out));
@@ -486,11 +488,9 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                     } catch (Exception ex) {
                         logError("Exception", ex);
                     }
-                }
-                else if (intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)) {
+                } else if (intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)) {
                     showConfirmationCancelAllTransfers();
-                }
-                else if (intent.getAction().equals(ACTION_OVERQUOTA_TRANSFER)) {
+                } else if (intent.getAction().equals(ACTION_OVERQUOTA_TRANSFER)) {
                     showGeneralTransferOverQuotaWarning();
                 }
                 intent.setAction(null);
@@ -578,15 +578,14 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         logDebug("onRequestFinish - " + request.getRequestString() + "_" + e.getErrorCode());
 
-        if(request.getType() == MegaRequest.TYPE_LOGOUT){
+        if (request.getType() == MegaRequest.TYPE_LOGOUT) {
 
-            if(accountBlocked!=null){
+            if (accountBlocked != null) {
                 showSnackbar(accountBlocked);
             }
-            accountBlocked=null;
+            accountBlocked = null;
 
-        }
-        else if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT){
+        } else if (request.getType() == MegaRequest.TYPE_CREATE_ACCOUNT) {
             try {
                 if (request.getParamType() == 1) {
                     if (e.getErrorCode() == MegaError.API_OK) {
@@ -597,15 +596,21 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
                     } else {
                         cancelConfirmationAccount();
                     }
+                } // In case getParamType == 3 (creating ephemeral account ++) we don't need to trigger a fetch nodes (sdk performs internal)
+
+                if (request.getParamType() == 4) {
+                    if (e.getErrorCode() == MegaError.API_OK && megaApi != null) {
+                        //Resuming ephemeral account ++, we need to trigger a fetch nodes
+                        megaApi.fetchNodes();
+                    }
                 }
-            }
-            catch (Exception exc){
+            } catch (Exception exc) {
                 logError("Exception", exc);
             }
         }
     }
 
-    public void cancelConfirmationAccount(){
+    public void cancelConfirmationAccount() {
         logDebug("cancelConfirmationAccount");
         dbH.clearEphemeral();
         dbH.clearCredentials();
@@ -637,7 +642,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         super.onPause();
     }
 
-    public void showAB(Toolbar tB){
+    public void showAB(Toolbar tB) {
         setSupportActionBar(tB);
         aB = getSupportActionBar();
         aB.show();
@@ -679,8 +684,8 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
         });
     }
 
-    public void hideAB(){
-        if (aB != null){
+    public void hideAB() {
+        if (aB != null) {
             aB.hide();
         }
     }

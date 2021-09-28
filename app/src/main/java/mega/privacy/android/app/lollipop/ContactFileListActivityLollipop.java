@@ -41,7 +41,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -60,10 +59,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.documentscanner.DocumentScannerActivity;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -108,8 +104,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	MegaUser contact;
 	String fullName = "";
 
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 	AlertDialog permissionsDialog;
 
 	ContactFileListFragmentLollipop cflF;
@@ -355,40 +349,17 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		logDebug("onCreate first");
 		super.onCreate(savedInstanceState);
+
+		if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+			return;
+		}
+
 		if (savedInstanceState == null) {
 			this.setParentHandle(-1);
 		} else {
 			this.setParentHandle(savedInstanceState.getLong(PARENT_HANDLE, -1));
 
 			nodeSaver.restoreState(savedInstanceState);
-		}
-
-		if (megaApi == null) {
-			megaApi = ((MegaApplication) getApplication()).getMegaApi();
-		}
-
-		if (megaApi == null || megaApi.getRootNode() == null) {
-			logDebug("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
-		}
-
-		if (megaChatApi == null) {
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-
-		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-			logDebug("Refresh session - karere");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
 		}
 
 		megaApi.addGlobalListener(this);
