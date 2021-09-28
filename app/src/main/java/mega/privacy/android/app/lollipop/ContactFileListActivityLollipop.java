@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -42,7 +41,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
@@ -61,10 +59,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.documentscanner.DocumentScannerActivity;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -76,6 +71,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
@@ -86,7 +82,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
@@ -109,8 +104,6 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	MegaUser contact;
 	String fullName = "";
 
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 	AlertDialog permissionsDialog;
 
 	ContactFileListFragmentLollipop cflF;
@@ -139,7 +132,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 	DisplayMetrics outMetrics;
 
 	private androidx.appcompat.app.AlertDialog renameDialog;
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 
 	MegaNode selectedNode = null;
 
@@ -299,8 +292,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			if (!exists) {
 				statusDialog = null;
 				try {
-					statusDialog = new ProgressDialog(this);
-					statusDialog.setMessage(getString(R.string.context_creating_folder));
+					statusDialog = createProgressDialog(this, getString(R.string.context_creating_folder));
 					statusDialog.show();
 				} catch (Exception e) {
 					return;
@@ -326,8 +318,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				if (!exists) {
 					statusDialog = null;
 					try {
-						statusDialog = new ProgressDialog(this);
-						statusDialog.setMessage(getString(R.string.context_creating_folder));
+						statusDialog = createProgressDialog(this, getString(R.string.context_creating_folder));
 						statusDialog.show();
 					} catch (Exception e) {
 						return;
@@ -358,40 +349,17 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		logDebug("onCreate first");
 		super.onCreate(savedInstanceState);
+
+		if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+			return;
+		}
+
 		if (savedInstanceState == null) {
 			this.setParentHandle(-1);
 		} else {
 			this.setParentHandle(savedInstanceState.getLong(PARENT_HANDLE, -1));
 
 			nodeSaver.restoreState(savedInstanceState);
-		}
-
-		if (megaApi == null) {
-			megaApi = ((MegaApplication) getApplication()).getMegaApi();
-		}
-
-		if (megaApi == null || megaApi.getRootNode() == null) {
-			logDebug("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
-		}
-
-		if (megaChatApi == null) {
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-
-		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-			logDebug("Refresh session - karere");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
 		}
 
 		megaApi.addGlobalListener(this);
@@ -646,10 +614,9 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				return;
 			}
 
-			ProgressDialog temp = null;
+			AlertDialog temp;
 			try {
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_copying));
+				temp = createProgressDialog(this, getString(R.string.context_copying));
 				temp.show();
 			} catch (Exception e) {
 				return;
@@ -696,10 +663,9 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			moveToRubbish = false;
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
-			ProgressDialog temp = null;
+			AlertDialog temp;
 			try {
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_moving));
+				temp = createProgressDialog(this, getString(R.string.context_moving));
 				temp.show();
 			} catch (Exception e) {
 				return;
@@ -716,8 +682,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 
 			try {
-				statusDialog = new ProgressDialog(this);
-				statusDialog.setMessage(getQuantityString(R.plurals.upload_prepare, 1));
+				statusDialog = createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
 				statusDialog.show();
 			} catch (Exception e) {
 				return;
@@ -750,7 +715,7 @@ public class ContactFileListActivityLollipop extends PasscodeActivity
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
-					statusDialog = getProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
+					statusDialog = createProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
 					permissionsDialog.dismiss();
 					new NodeController(this).shareFolder(parent, selectedContacts, item);
 				});

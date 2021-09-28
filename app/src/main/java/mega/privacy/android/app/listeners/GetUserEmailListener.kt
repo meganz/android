@@ -12,6 +12,12 @@ class GetUserEmailListener(context: Context?) : BaseListener(context) {
     private var callback: OnUserEmailUpdateCallback? = null
     private var position = INVALID_POSITION
 
+    constructor(context: Context?, callback: OnUserEmailUpdateCallback) : this(
+        context
+    ) {
+        this.callback = callback
+    }
+
     constructor(context: Context?, callback: OnUserEmailUpdateCallback, position: Int) : this(
         context
     ) {
@@ -25,6 +31,7 @@ class GetUserEmailListener(context: Context?) : BaseListener(context) {
         }
 
         if (e.errorCode == MegaError.API_OK) {
+            logDebug("Email recovered")
             dBH.setNonContactEmail(request.email, request.nodeHandle.toString())
             callback?.onUserEmailUpdate(request.email, request.nodeHandle, position)
         } else {

@@ -886,15 +886,15 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             holder.imageView.setLayoutParams(params);
 
             holder.textViewFileSize.setVisibility(View.VISIBLE);
-            holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
+            holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
+                    ? getMegaNodeFolderLinkInfo(node)
+                    : getMegaNodeFolderInfo(node));
 
             holder.versionsIcon.setVisibility(View.GONE);
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? ManagerActivityLollipop.DrawerItem.SHARED_ITEMS : ManagerActivityLollipop.DrawerItem.CLOUD_DRIVE));
 
-            if (type == FOLDER_LINK_ADAPTER) {
-                holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
-            } else if (type == CONTACT_FILE_ADAPTER|| type == CONTACT_SHARED_FOLDER_ADAPTER){
+            if (type == CONTACT_FILE_ADAPTER|| type == CONTACT_SHARED_FOLDER_ADAPTER){
                 boolean firstLevel;
                 if(type == CONTACT_FILE_ADAPTER){
                     firstLevel = ((ContactFileListFragmentLollipop) fragment).isEmptyParentHandleStack();
