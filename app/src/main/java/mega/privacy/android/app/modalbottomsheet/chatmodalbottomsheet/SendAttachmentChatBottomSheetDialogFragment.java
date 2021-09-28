@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
@@ -24,7 +23,7 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
 
         contentView = View.inflate(getContext(), R.layout.send_attatchment_chat_bottom_sheet, null);
         mainLinearLayout = contentView.findViewById(R.id.send_attachment_chat_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.send_attachment_chat_items_layout);
+        itemsLayout = contentView.findViewById(R.id.send_attachment_chat_items_layout);
 
         contentView.findViewById(R.id.send_attachment_chat_from_cloud_layout).setOnClickListener(this);
         contentView.findViewById(R.id.send_attachment_chat_from_filesystem_layout).setOnClickListener(this);
@@ -32,26 +31,26 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
         contentView.findViewById(R.id.send_attachment_chat_location_layout).setOnClickListener(this);
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.send_attachment_chat_from_cloud_layout:
-                ((ChatActivityLollipop) context).sendFromCloud();
+                ((ChatActivityLollipop) requireActivity()).sendFromCloud();
                 break;
 
             case R.id.send_attachment_chat_from_filesystem_layout:
-                ((ChatActivityLollipop) context).sendFromFileSystem();
+                ((ChatActivityLollipop) requireActivity()).sendFromFileSystem();
                 break;
 
             case R.id.send_attachment_chat_contact_layout:
-                ((ChatActivityLollipop) context).chooseContactsDialog();
+                ((ChatActivityLollipop) requireActivity()).chooseContactsDialog();
                 break;
 
             case R.id.send_attachment_chat_location_layout:
-                ((ChatActivityLollipop) context).sendLocation();
+                ((ChatActivityLollipop) requireActivity()).sendLocation();
                 break;
         }
 

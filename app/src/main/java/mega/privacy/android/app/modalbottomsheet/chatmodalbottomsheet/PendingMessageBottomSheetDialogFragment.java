@@ -38,8 +38,8 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, INVALID_HANDLE);
         } else {
-            chatId = ((ChatActivityLollipop) context).idChat;
-            messageId = ((ChatActivityLollipop) context).selectedMessageId;
+            chatId = ((ChatActivityLollipop) requireActivity()).idChat;
+            messageId = ((ChatActivityLollipop) requireActivity()).selectedMessageId;
         }
 
         logDebug("Chat ID: " + chatId + "Message ID: " + messageId);
@@ -53,7 +53,7 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
 
         contentView = View.inflate(getContext(), R.layout.msg_not_sent_bottom_sheet, null);
         mainLinearLayout = contentView.findViewById(R.id.msg_not_sent_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.items_layout);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         TextView titleSlidingPanel = contentView.findViewById(R.id.msg_not_sent_title_text);
         LinearLayout optionRetryLayout = contentView.findViewById(R.id.msg_not_sent_retry_layout);
@@ -71,7 +71,7 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
                 TextView resumeText = optionRetryLayout.findViewById(R.id.msg_not_sent_retry_text);
                 resumeText.setText(R.string.option_resume_transfers);
                 ImageView resumeIcon = optionRetryLayout.findViewById(R.id.msg_not_sent_retry_image);
-                resumeIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_resume_transfers));
+                resumeIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_resume_transfers));
                 resumeIcon.setAlpha(1F);
                 optionRetryLayout.setOnClickListener(this);
                 TextView deleteText = optionDeleteLayout.findViewById(R.id.msg_not_sent_delete_text);
@@ -92,7 +92,7 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW);
     }
 
     @Override
@@ -101,14 +101,14 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
             case R.id.msg_not_sent_retry_layout:
                 if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD) && isUploadingMessage) {
                     megaApi.pauseTransfers(false);
-                    ((ChatActivityLollipop) context).updatePausedUploadingMessages();
+                    ((ChatActivityLollipop) requireActivity()).updatePausedUploadingMessages();
                 } else {
-                    ((ChatActivityLollipop) context).retryPendingMessage(messageId);
+                    ((ChatActivityLollipop) requireActivity()).retryPendingMessage(messageId);
                 }
                 break;
 
             case R.id.msg_not_sent_delete_layout:
-                ((ChatActivityLollipop) context).removePendingMsg(messageId);
+                ((ChatActivityLollipop) requireActivity()).removePendingMsg(messageId);
                 break;
         }
 

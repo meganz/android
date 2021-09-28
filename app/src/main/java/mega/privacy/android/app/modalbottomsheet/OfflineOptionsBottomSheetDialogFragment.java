@@ -42,8 +42,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         if (savedInstanceState != null) {
             String handle = savedInstanceState.getString(HANDLE);
             nodeOffline = dbH.findByHandle(handle);
-        } else if (context instanceof ManagerActivityLollipop) {
-            nodeOffline = ((ManagerActivityLollipop) context).getSelectedOfflineNode();
+        } else if (requireActivity() instanceof ManagerActivityLollipop) {
+            nodeOffline = ((ManagerActivityLollipop) requireActivity()).getSelectedOfflineNode();
         }
     }
 
@@ -54,7 +54,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_offline_item, null);
         mainLinearLayout = contentView.findViewById(R.id.offline_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.items_layout);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         contentView.findViewById(R.id.option_download_layout).setOnClickListener(this);
         contentView.findViewById(R.id.option_properties_layout).setOnClickListener(this);
@@ -72,8 +72,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
 
         View separatorOpen = contentView.findViewById(R.id.separator_open);
 
-        nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
-        nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
+        nodeName.setMaxWidth(scaleWidthPx(200, getResources().getDisplayMetrics()));
+        nodeInfo.setMaxWidth(scaleWidthPx(200, getResources().getDisplayMetrics()));
 
         if (nodeOffline != null) {
             optionInfoText.setText(R.string.general_info);
@@ -89,7 +89,7 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             nodeName.setText(nodeOffline.getName());
 
             logDebug("Set node info");
-            file = getOfflineFile(context, nodeOffline);
+            file = getOfflineFile(requireContext(), nodeOffline);
             if (!isFileAvailable(file)) return;
 
             if (file.isDirectory()) {
@@ -118,14 +118,14 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                 nodeThumb.setImageResource(R.drawable.ic_folder_list);
             }
 
-            if (nodeOffline.isFolder() && !isOnline(context)) {
+            if (nodeOffline.isFolder() && !isOnline(requireContext())) {
                 optionShare.setVisibility(View.GONE);
                 contentView.findViewById(R.id.separator_share).setVisibility(View.GONE);
             }
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
 
@@ -134,8 +134,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.option_delete_offline_layout:
-                if (context instanceof ManagerActivityLollipop) {
-                    ((ManagerActivityLollipop) context)
+                if (requireActivity() instanceof ManagerActivityLollipop) {
+                    ((ManagerActivityLollipop) requireActivity())
                             .showConfirmationRemoveFromOffline(nodeOffline,
                                     this::setStateBottomSheetBehaviorHidden);
                 }
@@ -144,10 +144,10 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
                 openWith();
                 break;
             case R.id.option_share_layout:
-                shareOfflineNode(context, nodeOffline);
+                shareOfflineNode(requireContext(), nodeOffline);
                 break;
             case R.id.option_download_layout:
-                ((ManagerActivityLollipop) context).saveOfflineNodesToDevice(
+                ((ManagerActivityLollipop) requireActivity()).saveOfflineNodesToDevice(
                         Collections.singletonList(nodeOffline));
                 break;
             case R.id.option_properties_layout:
@@ -174,16 +174,16 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mediaIntent.setDataAndType(FileProvider.getUriForFile(context, AUTHORITY_STRING_FILE_PROVIDER, file), type);
+            mediaIntent.setDataAndType(FileProvider.getUriForFile(requireContext(), AUTHORITY_STRING_FILE_PROVIDER, file), type);
         } else {
             mediaIntent.setDataAndType(Uri.fromFile(file), type);
         }
         mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
-        if (isIntentAvailable(context, mediaIntent)) {
+        if (isIntentAvailable(requireContext(), mediaIntent)) {
             startActivity(mediaIntent);
         } else {
-            Toast.makeText(context, getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
         }
     }
 

@@ -2,6 +2,7 @@ package mega.privacy.android.app.modalbottomsheet
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import androidx.core.view.isVisible
 import mega.privacy.android.app.databinding.BottomSheetPhotoBinding
 import mega.privacy.android.app.lollipop.controllers.AccountController
@@ -12,12 +13,12 @@ class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)
 
-        val callback = context as PhotoCallback
+        val callback = requireActivity() as PhotoCallback
         val binding = BottomSheetPhotoBinding.inflate(layoutInflater, null, false)
 
         contentView = binding.root
         mainLinearLayout = binding.photoBottomSheet
-        items_layout = binding.itemsLayout
+        itemsLayout = binding.itemsLayout
 
         binding.capturePhotoAction.setOnClickListener {
             callback.capturePhoto()
@@ -30,7 +31,7 @@ class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.deletePictureAction.apply {
-            isVisible = AccountController(requireContext()).existsAvatar()
+            isVisible = AccountController(requireActivity()).existsAvatar()
 
             if (isVisible) {
                 setOnClickListener {
@@ -45,7 +46,7 @@ class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW)
     }
 
     interface PhotoCallback {

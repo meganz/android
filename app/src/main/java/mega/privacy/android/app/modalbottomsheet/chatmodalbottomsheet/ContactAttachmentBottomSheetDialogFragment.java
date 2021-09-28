@@ -2,7 +2,6 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
@@ -21,6 +19,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
@@ -62,9 +61,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 message = new AndroidMegaChatMessage(messageMega);
             }
         } else {
-            chatId = ((ContactAttachmentActivityLollipop) context).chatId;
-            messageId = ((ContactAttachmentActivityLollipop) context).messageId;
-            email = ((ContactAttachmentActivityLollipop) context).selectedEmail;
+            chatId = ((ContactAttachmentActivityLollipop) requireActivity()).chatId;
+            messageId = ((ContactAttachmentActivityLollipop) requireActivity()).messageId;
+            email = ((ContactAttachmentActivityLollipop) requireActivity()).selectedEmail;
         }
 
         MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
@@ -73,7 +72,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         }
 
         logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
-        chatC = new ChatController(context);
+        chatC = new ChatController(requireActivity());
     }
 
     @SuppressLint("RestrictedApi")
@@ -90,12 +89,12 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         mainLinearLayout = contentView.findViewById(R.id.contact_attachment_bottom_sheet);
         LinearLayout titleContact = contentView.findViewById(R.id.contact_attachment_chat_title_layout);
         View separatorTitleContact = contentView.findViewById(R.id.contact_title_separator);
-        items_layout = contentView.findViewById(R.id.items_layout);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         titleNameContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_name_text);
         stateIcon = contentView.findViewById(R.id.contact_attachment_state_circle);
-        stateIcon.setMaxWidth(scaleWidthPx(6, outMetrics));
-        stateIcon.setMaxHeight(scaleHeightPx(6, outMetrics));
+        stateIcon.setMaxWidth(scaleWidthPx(6, getResources().getDisplayMetrics()));
+        stateIcon.setMaxHeight(scaleHeightPx(6, getResources().getDisplayMetrics()));
 
         titleMailContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_mail_text);
         contactImageView = contentView.findViewById(R.id.contact_attachment_thumbnail);
@@ -112,12 +111,12 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         View separatorInfo = contentView.findViewById(R.id.separator_info);
 
-        if (isScreenInPortrait(context)) {
-            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
-            titleMailContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+        if (isScreenInPortrait(requireContext())) {
+            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT));
+            titleMailContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT));
         } else {
-            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
-            titleMailContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND));
+            titleMailContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND));
         }
 
         titleContact.setVisibility(View.VISIBLE);
@@ -195,7 +194,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
                 titleMailContactChatPanel.setText(name);
 
-                String email = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
+                String email = StringResourcesUtils.getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 titleNameContactChatPanel.setText(email);
 
                 setImageAvatar(INVALID_HANDLE,null, userCount + "", contactImageView);
@@ -254,7 +253,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 optionInvite.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     @Override
@@ -270,14 +269,14 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         switch (v.getId()) {
             case R.id.option_info_layout:
-                if (!isOnline(context)) {
-                    ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                if (!isOnline(requireContext())) {
+                    ((ChatActivityLollipop) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 
                 long contactHandle = MEGACHAT_INVALID_HANDLE;
                 String contactEmail = null;
-                if (context instanceof ChatActivityLollipop) {
+                if (requireActivity() instanceof ChatActivityLollipop) {
                     contactEmail = message.getMessage().getUserEmail(0);
                     contactHandle = message.getMessage().getUserHandle(0);
                 } else if (position != -1) {
@@ -290,25 +289,25 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 if (contactHandle != MEGACHAT_INVALID_HANDLE) {
                     MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
                     boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() && contactHandle == chatRoom.getPeerHandle(0);
-                    ContactUtil.openContactInfoActivity(context, contactEmail, isChatRoomOpen);
+                    ContactUtil.openContactInfoActivity(requireActivity(), contactEmail, isChatRoomOpen);
                 }
                 break;
 
             case R.id.option_view_layout:
                 logDebug("View option");
-                ContactUtil.openContactAttachmentActivity(context, chatId, messageId);
+                ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
                 break;
 
             case R.id.option_invite_layout:
-                if (!isOnline(context)) {
-                    ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                if (!isOnline(requireContext())) {
+                    ((ChatActivityLollipop) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 
-                ContactController cC = new ContactController(context);
+                ContactController cC = new ContactController(requireActivity());
                 ArrayList<String> contactEmails;
 
-                if (context instanceof ChatActivityLollipop) {
+                if (requireActivity() instanceof ChatActivityLollipop) {
                     if (numUsers == 1) {
                         cC.inviteContact(message.getMessage().getUserEmail(0));
                     } else {
@@ -327,9 +326,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 break;
 
             case R.id.option_start_conversation_layout:
-                if (context instanceof ChatActivityLollipop) {
+                if (requireActivity() instanceof ChatActivityLollipop) {
                     if (numUsers == 1) {
-                        ((ChatActivityLollipop) context).startConversation(message.getMessage().getUserHandle(0));
+                        ((ChatActivityLollipop) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
                         dismissAllowingStateLoss();
                     } else {
                         logDebug("Num users to invite: " + numUsers);
@@ -339,13 +338,13 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                             long userHandle = message.getMessage().getUserHandle(j);
                             contactHandles.add(userHandle);
                         }
-                        ((ChatActivityLollipop) context).startGroupConversation(contactHandles);
+                        ((ChatActivityLollipop) requireActivity()).startGroupConversation(contactHandles);
                     }
                 } else {
                     logDebug("Instance of ContactAttachmentActivityLollipop");
                     logDebug("position: " + position);
                     long userHandle = message.getMessage().getUserHandle(position);
-                    ((ContactAttachmentActivityLollipop) context).startConversation(userHandle);
+                    ((ContactAttachmentActivityLollipop) requireActivity()).startConversation(userHandle);
                 }
                 break;
         }

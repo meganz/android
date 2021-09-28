@@ -143,13 +143,13 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         contentView = binding.root
         mainLinearLayout = binding.root.linear_layout
-        items_layout = binding.root.linear_layout
+        itemsLayout = binding.root.linear_layout
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW)
     }
 
     private fun setSelectedColor(text: TextView) {
-        val colorSecondary = ColorUtils.getThemeColor(context, R.attr.colorSecondary)
+        val colorSecondary = ColorUtils.getThemeColor(requireContext(), R.attr.colorSecondary)
         text.setTextColor(colorSecondary)
 
         var icon = text.compoundDrawablesRelative[0] ?: return

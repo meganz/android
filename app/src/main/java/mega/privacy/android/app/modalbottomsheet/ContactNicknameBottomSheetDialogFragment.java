@@ -20,8 +20,8 @@ public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDia
 
         if (savedInstanceState != null) {
             nickname = savedInstanceState.getString(EXTRA_USER_NICKNAME, null);
-        } else if (context instanceof ContactInfoActivityLollipop) {
-            contactInfoActivityLollipop = ((ContactInfoActivityLollipop) context);
+        } else if (requireActivity() instanceof ContactInfoActivityLollipop) {
+            contactInfoActivityLollipop = ((ContactInfoActivityLollipop) requireActivity());
             nickname = contactInfoActivityLollipop.getNickname();
         }
     }
@@ -50,12 +50,12 @@ public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDia
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_nickname, null);
         mainLinearLayout = contentView.findViewById(R.id.nickname_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.items_layout);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
         contentView.findViewById(R.id.edit_nickname_layout).setOnClickListener(this);
         contentView.findViewById(R.id.remove_nickname_layout).setOnClickListener(this);
         dialog.setContentView(contentView);
 
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW);
     }
 
     @Override

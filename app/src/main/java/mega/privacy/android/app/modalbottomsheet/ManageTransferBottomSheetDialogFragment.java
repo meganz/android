@@ -20,6 +20,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetManageTransferBinding;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setThumbnail;
@@ -44,7 +45,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        managerActivity = (ManagerActivityLollipop) context;
+        managerActivity = (ManagerActivityLollipop) requireActivity();
 
         if (savedInstanceState == null) {
             transfer = managerActivity.getSelectedTransfer();
@@ -60,7 +61,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
         BottomSheetManageTransferBinding binding = BottomSheetManageTransferBinding.inflate(getLayoutInflater());
         contentView = binding.getRoot();
         mainLinearLayout = contentView.findViewById(R.id.manage_transfer_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
+        itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         if (transfer == null) return;
 
@@ -90,21 +91,21 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
             type.setImageResource(R.drawable.ic_upload_transfers);
         }
 
-        location.setTextColor(ContextCompat.getColor(context, R.color.grey_054_white_054));
+        location.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey_054_white_054));
         RelativeLayout.LayoutParams params =  (RelativeLayout.LayoutParams) stateIcon.getLayoutParams();
-        params.rightMargin = dp2px(5, context.getResources().getDisplayMetrics());
+        params.rightMargin = dp2px(5, getResources().getDisplayMetrics());
 
         switch (transfer.getState()) {
             case STATE_COMPLETED:
                 location.setText(transfer.getPath());
-                stateIcon.setColorFilter(ContextCompat.getColor(context, R.color.green_500_300), PorterDuff.Mode.SRC_IN);
+                stateIcon.setColorFilter(ContextCompat.getColor(requireContext(), R.color.green_500_300), PorterDuff.Mode.SRC_IN);
                 stateIcon.setImageResource(R.drawable.ic_transfers_completed);
                 retryOption.setVisibility(View.GONE);
                 break;
 
             case STATE_FAILED:
-                location.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
-                location.setText(String.format("%s: %s", context.getString(R.string.failed_label), transfer.getError()));
+                location.setTextColor(ColorUtils.getThemeColor(requireContext(), R.attr.colorError));
+                location.setText(String.format("%s: %s", StringResourcesUtils.getString(R.string.failed_label), transfer.getError()));
                 params.rightMargin = 0;
                 stateIcon.setImageBitmap(null);
                 viewInFolderOption.setVisibility(View.GONE);
@@ -140,21 +141,21 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
             thumb = getThumbnailFromFolder(node, getContext());
         }
 
-        if (setThumbnail(context, thumb, thumbnail, transfer.getFileName())) {
+        if (setThumbnail(requireContext(), thumb, thumbnail, transfer.getFileName())) {
             RelativeLayout.LayoutParams typeParams = (RelativeLayout.LayoutParams) type.getLayoutParams();
             typeParams.topMargin = typeParams.rightMargin = MARGIN_TRANSFER_TYPE_ICON_WITH_THUMBNAIL;
             type.setLayoutParams(typeParams);
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.option_view_layout:
-                if (transfer.getType() == TYPE_UPLOAD && !isOnline(context)) {
+                if (transfer.getType() == TYPE_UPLOAD && !isOnline(requireContext())) {
                     managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
                     break;
                 }
@@ -163,7 +164,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
 
             case R.id.option_get_link_layout:
-                if (!isOnline(context)) {
+                if (!isOnline(requireContext())) {
                     managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
                     break;
                 }
@@ -176,7 +177,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
 
             case R.id.option_retry_layout:
-                if (!isOnline(context)) {
+                if (!isOnline(requireContext())) {
                     managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
                     break;
                 }

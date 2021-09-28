@@ -8,10 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Locale;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.VersionsFileActivity;
@@ -20,7 +17,6 @@ import nz.mega.sdk.MegaNode;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -37,8 +33,8 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
-        } else if (context instanceof VersionsFileActivity) {
-            node = ((VersionsFileActivity) context).getSelectedNode();
+        } else if (requireActivity() instanceof VersionsFileActivity) {
+            node = ((VersionsFileActivity) requireActivity()).getSelectedNode();
         }
     }
 
@@ -54,7 +50,7 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_versions_file, null);
         mainLinearLayout = contentView.findViewById(R.id.versions_file_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
+        itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         ImageView nodeThumb = contentView.findViewById(R.id.versions_file_thumbnail);
         TextView nodeName = contentView.findViewById(R.id.versions_file_name_text);
@@ -72,17 +68,17 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         View separatorRevert = contentView.findViewById(R.id.separator_revert);
         View separatorDelete = contentView.findViewById(R.id.separator_delete);
 
-        nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
-        nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
+        nodeName.setMaxWidth(scaleWidthPx(200, getResources().getDisplayMetrics()));
+        nodeInfo.setMaxWidth(scaleWidthPx(200, getResources().getDisplayMetrics()));
 
         nodeName.setText(node.getName());
         nodeInfo.setText(getFileInfo(node));
 
-        setNodeThumbnail(context, node, nodeThumb);
+        setNodeThumbnail(requireContext(), node, nodeThumb);
 
         boolean isRevertVisible;
 
-        switch (((VersionsFileActivity) context).getAccessLevel()) {
+        switch (((VersionsFileActivity) requireActivity()).getAccessLevel()) {
             case ACCESS_READWRITE:
                 isRevertVisible = true;
                 optionDelete.setVisibility(View.GONE);
@@ -103,7 +99,7 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
 
         }
 
-        if (!isRevertVisible || ((VersionsFileActivity) context).getSelectedPosition() == 0) {
+        if (!isRevertVisible || ((VersionsFileActivity) requireActivity()).getSelectedPosition() == 0) {
             optionRevert.setVisibility(View.GONE);
             separatorRevert.setVisibility(View.GONE);
         } else {
@@ -112,7 +108,7 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     @Override
@@ -124,16 +120,16 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
 
         switch (v.getId()) {
             case R.id.option_download_layout:
-                ((VersionsFileActivity) context).downloadNodes(Collections.singletonList(node));
+                ((VersionsFileActivity) requireActivity()).downloadNodes(Collections.singletonList(node));
                 break;
 
             case R.id.option_revert_layout:
-                ((VersionsFileActivity) context).checkRevertVersion();
+                ((VersionsFileActivity) requireActivity()).checkRevertVersion();
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.option_delete_layout:
-                ((VersionsFileActivity) context).showConfirmationRemoveVersion();
+                ((VersionsFileActivity) requireActivity()).showConfirmationRemoveVersion();
                 break;
         }
 

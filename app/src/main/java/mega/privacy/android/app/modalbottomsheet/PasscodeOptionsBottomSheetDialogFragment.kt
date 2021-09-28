@@ -66,13 +66,13 @@ class PasscodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
 
         contentView = binding.root
         mainLinearLayout = binding.parentLayout
-        items_layout = mainLinearLayout
+        itemsLayout = mainLinearLayout
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW)
     }
 
     private fun setSelectedColor(text: TextView) =
-        text.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary))
+        text.setTextColor(ColorUtils.getThemeColor(requireContext(), R.attr.colorSecondary))
 
     private fun changePasscodeType(type: String) {
         (requireActivity() as PasscodeLockActivity).setPasscodeType(type)

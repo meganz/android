@@ -36,8 +36,8 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, INVALID_HANDLE);
         } else {
-            chatId = ((ChatActivityLollipop) context).idChat;
-            messageId = ((ChatActivityLollipop) context).selectedMessageId;
+            chatId = ((ChatActivityLollipop) requireActivity()).idChat;
+            messageId = ((ChatActivityLollipop) requireActivity()).selectedMessageId;
         }
 
         MegaChatMessage messageMega = megaChatApi.getManualSendingMessage(chatId, messageId);
@@ -56,7 +56,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
 
         contentView = View.inflate(getContext(), R.layout.msg_not_sent_bottom_sheet, null);
         mainLinearLayout = contentView.findViewById(R.id.msg_not_sent_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.items_layout);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         TextView titleSlidingPanel = contentView.findViewById(R.id.msg_not_sent_title_text);
         LinearLayout optionRetryLayout = contentView.findViewById(R.id.msg_not_sent_retry_layout);
@@ -91,7 +91,7 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW);
     }
 
     @Override
@@ -108,10 +108,10 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
                     if (nodeList != null) {
                         long nodeHandle = nodeList.get(0).getHandle();
 
-                        ((ChatActivityLollipop) context).removeMsgNotSent();
+                        ((ChatActivityLollipop) requireActivity()).removeMsgNotSent();
                         megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
 
-                        ((ChatActivityLollipop) context).retryNodeAttachment(nodeHandle);
+                        ((ChatActivityLollipop) requireActivity()).retryNodeAttachment(nodeHandle);
                     } else {
                         logWarning("Error the nodeList cannot be recovered");
                     }
@@ -125,29 +125,29 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
                         handleList.addMegaHandle(handle);
                     }
 
-                    ((ChatActivityLollipop) context).removeMsgNotSent();
+                    ((ChatActivityLollipop) requireActivity()).removeMsgNotSent();
                     megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
 
-                    ((ChatActivityLollipop) context).retryContactAttachment(handleList);
+                    ((ChatActivityLollipop) requireActivity()).retryContactAttachment(handleList);
                 } else {
-                    ((ChatActivityLollipop) context).removeMsgNotSent();
+                    ((ChatActivityLollipop) requireActivity()).removeMsgNotSent();
                     megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
 
                     if (selectedMessage.getMessage().isEdited()) {
                         logDebug("Message is edited --> edit");
                         if (originalMsg != null) {
-                            ((ChatActivityLollipop) context).editMessageMS(selectedMessage.getMessage().getContent(), originalMsg);
+                            ((ChatActivityLollipop) requireActivity()).editMessageMS(selectedMessage.getMessage().getContent(), originalMsg);
                         }
                     } else {
                         logDebug("Message NOT edited --> send");
-                        ((ChatActivityLollipop) context).sendMessage(selectedMessage.getMessage().getContent());
+                        ((ChatActivityLollipop) requireActivity()).sendMessage(selectedMessage.getMessage().getContent());
                     }
                 }
 
                 break;
 
             case R.id.msg_not_sent_delete_layout:
-                ((ChatActivityLollipop) context).removeMsgNotSent();
+                ((ChatActivityLollipop) requireActivity()).removeMsgNotSent();
                 megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
                 break;
         }

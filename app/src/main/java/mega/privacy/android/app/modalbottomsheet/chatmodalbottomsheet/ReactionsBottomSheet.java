@@ -35,15 +35,15 @@ public class ReactionsBottomSheet extends BaseBottomSheetDialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!(context instanceof ChatActivityLollipop))
+        if (!(requireActivity() instanceof ChatActivityLollipop))
             return;
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
         } else {
-            chatId = ((ChatActivityLollipop) context).idChat;
-            messageId = ((ChatActivityLollipop) context).selectedMessageId;
+            chatId = ((ChatActivityLollipop) requireActivity()).idChat;
+            messageId = ((ChatActivityLollipop) requireActivity()).selectedMessageId;
         }
 
         MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
@@ -59,19 +59,19 @@ public class ReactionsBottomSheet extends BaseBottomSheetDialogFragment {
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_reaction, null);
         mainLayout = contentView.findViewById(R.id.bottom_sheet);
         reactionsKeyboard = contentView.findViewById(R.id.reaction_keyboard);
-        reactionsKeyboard.initReaction(dp2px(HEIGHT_REACTIONS_KEYBOARD, outMetrics));
+        reactionsKeyboard.initReaction(dp2px(HEIGHT_REACTIONS_KEYBOARD));
         reactionsKeyboard.setOnEmojiSelectedListener(emoji -> {
-            addReactionInMsg(context, chatId, message.getMessage().getMsgId(), emoji, true);
+            addReactionInMsg(requireActivity(), chatId, message.getMessage().getMsgId(), emoji, true);
             closeDialog();
         });
 
         dialog.setContentView(contentView);
-        mBehavior = BottomSheetBehavior.from((View) mainLayout.getParent());
-        mBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+        BottomSheetBehavior behavior = BottomSheetBehavior.from((View) mainLayout.getParent());
+        behavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                 if (newState == BottomSheetBehavior.STATE_DRAGGING) {
-                    mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                 }
             }
 
@@ -79,7 +79,7 @@ public class ReactionsBottomSheet extends BaseBottomSheetDialogFragment {
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
             }
         });
-        mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     @Override

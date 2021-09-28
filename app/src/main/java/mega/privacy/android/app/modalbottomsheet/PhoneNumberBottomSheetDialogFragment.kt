@@ -13,9 +13,9 @@ class PhoneNumberBottomSheetDialogFragment: BaseBottomSheetDialogFragment() {
 
         val phoneNumberCallback = context as PhoneNumberCallback
 
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_phonenumber, null)
+        contentView = View.inflate(requireContext(), R.layout.bottom_sheet_phonenumber, null)
         mainLinearLayout = contentView.findViewById(R.id.phonenumber_bottom_sheet)
-        items_layout = contentView.findViewById(R.id.items_layout)
+        itemsLayout = contentView.findViewById(R.id.items_layout)
 
         contentView.findViewById<View>(R.id.modify_phonenumber_layout).setOnClickListener {
             phoneNumberCallback.showRemovePhoneNumberConfirmation(true)
@@ -28,7 +28,7 @@ class PhoneNumberBottomSheetDialogFragment: BaseBottomSheetDialogFragment() {
         }
 
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW)
     }
 
     interface PhoneNumberCallback {

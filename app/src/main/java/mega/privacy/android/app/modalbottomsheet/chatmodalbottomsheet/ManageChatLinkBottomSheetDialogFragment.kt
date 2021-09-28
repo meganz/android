@@ -49,10 +49,10 @@ class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment(
         binding = BottomSheetManageChatLinkBinding.inflate(layoutInflater)
         contentView = binding.root.rootView
         mainLinearLayout = binding.manageChatLinkBottomSheet
-        items_layout = binding.itemsLayout
+        itemsLayout = binding.itemsLayout
 
         binding.copyManageChatLinkOption.setOnClickListener {
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, chatLink)
             clipboard.setPrimaryClip(clip)
 
@@ -82,7 +82,7 @@ class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment(
         }
 
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

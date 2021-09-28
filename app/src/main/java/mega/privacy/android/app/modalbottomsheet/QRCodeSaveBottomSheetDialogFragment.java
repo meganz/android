@@ -7,6 +7,7 @@ import android.view.View;
 
 import java.io.File;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
@@ -44,7 +45,7 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         File qrFile = buildQrFile(getActivity(), myEmail + QR_IMAGE_FILE_NAME);
 
         if (isFileAvailable(qrFile)) {
-            if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
+            if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
                 showOverDiskQuotaPaywallWarning();
                 return;
             }
@@ -77,12 +78,12 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_qr_code, null);
         mainLinearLayout = contentView.findViewById(R.id.qr_code_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.items_layout);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         contentView.findViewById(R.id.qr_code_saveTo_cloud_layout).setOnClickListener(this);
         contentView.findViewById(R.id.qr_code_saveTo_fileSystem_layout).setOnClickListener(this);
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LOW);
     }
 }

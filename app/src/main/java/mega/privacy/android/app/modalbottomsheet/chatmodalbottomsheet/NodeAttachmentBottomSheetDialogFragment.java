@@ -24,6 +24,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaNode;
@@ -65,19 +66,19 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             chatId = savedInstanceState.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
             handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
-        } else if (context instanceof NodeAttachmentHistoryActivity) {
-            chatId = ((NodeAttachmentHistoryActivity) context).chatId;
-            messageId = ((NodeAttachmentHistoryActivity) context).selectedMessageId;
+        } else if (requireActivity() instanceof NodeAttachmentHistoryActivity) {
+            chatId = ((NodeAttachmentHistoryActivity) requireActivity()).chatId;
+            messageId = ((NodeAttachmentHistoryActivity) requireActivity()).selectedMessageId;
         }
 
         logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
-        messageMega = getMegaChatMessage(context, megaChatApi, chatId, messageId);
+        messageMega = getMegaChatMessage(requireActivity(), megaChatApi, chatId, messageId);
         if (messageMega != null) {
             message = new AndroidMegaChatMessage(messageMega);
         }
 
         chatRoom = megaChatApi.getChatRoom(chatId);
-        chatC = new ChatController(context);
+        chatC = new ChatController(requireActivity());
         dbH = DatabaseHandler.getDbHandler(getActivity());
     }
 
@@ -102,7 +103,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         mainLinearLayout = contentView.findViewById(R.id.node_attachment_bottom_sheet);
         titleLayout = contentView.findViewById(R.id.node_attachment_title_layout);
         titleSeparator = contentView.findViewById(R.id.title_separator);
-        items_layout = contentView.findViewById(R.id.items_layout);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         nodeThumb = contentView.findViewById(R.id.node_attachment_thumbnail);
         nodeName = contentView.findViewById(R.id.node_attachment_name_text);
@@ -125,12 +126,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             optionImport.setVisibility(View.GONE);
         }
 
-        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            nodeName.setMaxWidth(scaleWidthPx(275, outMetrics));
-            nodeInfo.setMaxWidth(scaleWidthPx(275, outMetrics));
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            nodeName.setMaxWidth(scaleWidthPx(275, getResources().getDisplayMetrics()));
+            nodeInfo.setMaxWidth(scaleWidthPx(275, getResources().getDisplayMetrics()));
         } else {
-            nodeName.setMaxWidth(scaleWidthPx(210, outMetrics));
-            nodeInfo.setMaxWidth(scaleWidthPx(210, outMetrics));
+            nodeName.setMaxWidth(scaleWidthPx(210, getResources().getDisplayMetrics()));
+            nodeInfo.setMaxWidth(scaleWidthPx(210, getResources().getDisplayMetrics()));
         }
 
         if (handle == INVALID_HANDLE) {
@@ -166,7 +167,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                 if (count == 1) {
                     nodeName.setText(node.getName());
                 } else {
-                    nodeName.setText(context.getResources().getQuantityString(R.plurals.new_general_num_files, count, count));
+                    nodeName.setText(StringResourcesUtils.getQuantityString(R.plurals.new_general_num_files, count, count));
                 }
 
                 if (nodeList.size() == count) {
@@ -179,14 +180,14 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             showSingleNodeSelected();
         }
 
-        offlineSwitch.setChecked(availableOffline(context, node));
+        offlineSwitch.setChecked(availableOffline(requireContext(), node));
         offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     private void showSingleNodeSelected() {
-        setNodeThumbnail(context, node, nodeThumb);
+        setNodeThumbnail(requireContext(), node, nodeThumb);
         nodeName.setText(node.getName());
         nodeInfo.setText(getSizeString(node.getSize()));
         optionView.setVisibility(View.GONE);
@@ -205,8 +206,8 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     @Override
     public void onClick(View v) {
 
-        if (!isOnline(context)) {
-            ((ChatActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+        if (!isOnline(requireContext())) {
+            ((ChatActivityLollipop) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
             return;
         }
 
@@ -220,7 +221,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                     logWarning("The selected node is NULL");
                     return;
                 }
-                ((ChatActivityLollipop) context).downloadNodeList(nodeList);
+                ((ChatActivityLollipop) requireActivity()).downloadNodeList(nodeList);
                 break;
 
             case R.id.option_import_layout:
@@ -238,14 +239,14 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                     return;
                 }
 
-                if (availableOffline(context, node)) {
+                if (availableOffline(requireContext(), node)) {
                     MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
-                    removeOffline(mOffDelete, dbH, context);
-                } else if (context instanceof SnackbarShower) {
+                    removeOffline(mOffDelete, dbH, requireContext());
+                } else if (requireActivity() instanceof SnackbarShower) {
                     ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
                     messages.add(message);
                     chatC.saveForOfflineWithAndroidMessages(messages,
-                            megaChatApi.getChatRoom(chatId), (SnackbarShower) context);
+                            megaChatApi.getChatRoom(chatId), (SnackbarShower) requireActivity());
                 }
                 break;
         }

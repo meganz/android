@@ -30,8 +30,8 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
             node = megaApi.getNodeByHandle(handle);
-        } else if (context instanceof FolderLinkActivityLollipop) {
-            node = ((FolderLinkActivityLollipop) context).getSelectedNode();
+        } else if (requireActivity() instanceof FolderLinkActivityLollipop) {
+            node = ((FolderLinkActivityLollipop) requireActivity()).getSelectedNode();
         }
     }
 
@@ -42,7 +42,7 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_folder_link, null);
         mainLinearLayout = contentView.findViewById(R.id.folder_link_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.items_layout);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         ImageView nodeThumb = contentView.findViewById(R.id.folder_link_thumbnail);
         TextView nodeName = contentView.findViewById(R.id.folder_link_name_text);
@@ -53,8 +53,8 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         optionDownload.setOnClickListener(this);
         optionImport.setOnClickListener(this);
 
-        nodeName.setMaxWidth(scaleWidthPx(200, outMetrics));
-        nodeInfo.setMaxWidth(scaleWidthPx(200, outMetrics));
+        nodeName.setMaxWidth(scaleWidthPx(200, getResources().getDisplayMetrics()));
+        nodeInfo.setMaxWidth(scaleWidthPx(200, getResources().getDisplayMetrics()));
 
         if (dbH != null) {
             if (dbH.getCredentials() != null) {
@@ -64,7 +64,7 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
             }
         }
 
-        if (isOnline(context)) {
+        if (isOnline(requireContext())) {
             nodeName.setText(node.getName());
 
             if (node.isFolder()) {
@@ -73,12 +73,12 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
             } else {
                 long nodeSize = node.getSize();
                 nodeInfo.setText(getSizeString(nodeSize));
-                setNodeThumbnail(context, node, nodeThumb);
+                setNodeThumbnail(requireContext(), node, nodeThumb);
             }
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
+        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
 
@@ -92,11 +92,11 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         switch (v.getId()) {
 
             case R.id.option_download_layout:
-                ((FolderLinkActivityLollipop) context).downloadNode();
+                ((FolderLinkActivityLollipop) requireActivity()).downloadNode();
                 break;
 
             case R.id.option_import_layout:
-                ((FolderLinkActivityLollipop) context).importNode();
+                ((FolderLinkActivityLollipop) requireActivity()).importNode();
                 break;
 
         }
