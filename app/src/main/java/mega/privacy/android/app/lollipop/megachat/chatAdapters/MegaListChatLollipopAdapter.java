@@ -1195,10 +1195,11 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageHandle();
 
 							ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageHandle(), chat.isPreview());
-
-							megaChatApi.getUserFirstname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
-							megaChatApi.getUserLastname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
-							megaChatApi.getUserEmail(chat.getLastMessageHandle(), listener);
+							if (chatRoom != null) {
+								megaChatApi.getUserFirstname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
+								megaChatApi.getUserLastname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
+								megaChatApi.getUserEmail(chat.getLastMessageHandle(), listener);
+							}
 						}
 						else{
 							logDebug("Name already asked and no name received: handle " + chat.getLastMessageSender());
