@@ -170,7 +170,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Sigur vrei să anulezi procesul actual de autentificare?</string>
     <!-- Login button -->
-    <string name="login_text">Autentificare</string>
+    <string name="login_text">Autentifică-te</string>
     <!-- email label -->
     <string name="email_text">E-mail</string>
     <!-- password label -->
@@ -2535,7 +2535,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Autentificarea cu doi factori activată</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Data viitoare când te autentifici în contul ți se va cere să introduci un cod din 6 cifre furnizat de aplicația de autentificare.</string>
+    <string name="description_2fa_enabled">Data viitoare când te autentifici în cont ți se va cere să introduci un cod din 6 cifre furnizat de aplicația de autentificare.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Please save your <b>Recovery Key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable Two-Factor Authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -3567,7 +3567,7 @@
     <!-- Text shown when the Internet connection is retrieved and there is a call is in progress -->
     <string name="connected_message">Te-ai întors.</string>
     <!-- Text shown in a call when the own internet connection is of low quality -->
-    <string name="poor_internet_connection_message">Conexiune la internet slabă</string>
+    <string name="poor_internet_connection_message">Conexiune slabă la internet</string>
     <!-- Text is displayed while a voice clip is being recorded -->
     <string name="recording_layout">Se înregistrează&#8230;</string>
     <!-- Text shown for the action create new file -->
@@ -3575,7 +3575,7 @@
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
     <string name="permissions_error_label">Eroare privind permisiunile</string>
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
-    <string name="alert_not_enough_permissions_revert">You do not have the correct permissions to amend this file. Would you like to create a new file?</string>
+    <string name="alert_not_enough_permissions_revert">Nu ai permisiunile corecte pentru a modifica acest fișier. Dorești să creezi un fișier nou?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
     <string name="version_as_new_file_created">Versiunea a fost creată cu succes ca un fișier nou.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
@@ -4131,4 +4131,138 @@
         <item quantity="one">Get Link</item>
         <item quantity="other">Get Links</item>
     </plurals>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">Ești singura persoană de aici</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">Întâlnire</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">Începe/Alătură-te unei întâlniri</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">Întâlnire nouă</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">Alătură-te întâlnirii</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">Începe o întâlnire</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">Alătură-te ca invitat</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">Întâlnirea lui %s</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">Închide</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">Microfon</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">Microfonul este amuțit</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">Microfonul nu mai este amuțit</string>
+    <!-- General label for camera -->
+    <string name="general_camera">Cameră</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">Camera este pornită.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">Camera este oprită.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">Pune în așteptare</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">Difuzor</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">Căști</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">Căștile sunt active</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">Difuzorul este activat</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">Difuzorul este dezactivat</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">Încheie</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">Invită participanți</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">Participanți (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">Afișează în vizualizarea principală</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">Desemnează un moderator</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">Părăsești întâlnirea acum?</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">Niciun moderator</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">Înainte de a părăsi, te rugăm să desemnezi unul sau mai mulți moderatori noi pentru această întâlnire.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">Desemnează ca moderator</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">Părăsește oricum</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">Te rugăm să desemnezi unul sau mai mulți moderatori noi.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">Schimbă numele întâlnirii</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">Participanți: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">Moderator: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">Linkul întâlnirii</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">Durată</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">Alătură-te întâlnirii ca invitat</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">Ești invitat la o întâlnire.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">Atinge linkul întâlnirii care ți-a fost trimis sau lipește-l aici</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">Calitate slabă a conexiunii</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">Întâlnirea s-a încheiat</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">Link nevalid al întâlnirii</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">Permisiuni de acces necesare pentru MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">MEGA are nevoie de acces la microfon și cameră pentru întâlniri.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Am înțeles</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">Mergi la Setări pentru a permite MEGA să acceseze camera și microfonul.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">Vezi chatul întâlnirii</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">Invită mai mulți participanți la întâlnire. Glisează în sus pentru a invita.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">Atinge pentru a crea o nouă întâlnire</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">Configurează rapid o întâlnire MEGA cu noua noastră funcție de întâlniri criptată</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">Ești noul moderator.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">Linkul întâlnirii copiat.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%s a început o întâlnire. Atinge pentru a te alătura.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">Întâlnire MEGA</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">Întâlnire video criptată capăt-la-capăt</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">Te rugăm să introduci un link valid al întâlnirii</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">Mai mult decât simple întâlniri</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">Intimitatea ta contează</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">Alătură-te celei mai mari platforme de stocare în cloud și colaborare securizate din lume.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">Obține 20 GB gratuit</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">Înscrie-te acum și bucură-te gratuit de funcțiile avansate de colaborare.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">Un alt apel în curs. Te rugăm să închei apelul actual înainte de a efectua altul.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">Noul nume al întâlnirii</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">Eșec la crearea întâlnirii.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](eu)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">Vizualizare principală</string>
 </resources>

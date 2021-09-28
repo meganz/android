@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="createviewmodel"
+            type="mega.privacy.android.app.meeting.fragments.CreateMeetingViewModel" />
+        <variable
+            name="sharedviewmodel"
+            type="mega.privacy.android.app.meeting.activity.MeetingActivityViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/create_meeting"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/grey_900"
+        tools:context=".meeting.fragments.CreateMeetingFragment">
+
+        <LinearLayout
+            android:id="@+id/main_bk"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/grey_700"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/edit_first_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <SurfaceView
+            android:id="@+id/localSurfaceView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/mask"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/grey_alpha_060"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+        <RelativeLayout
+            android:id="@+id/meeting_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" >
+            <mega.privacy.android.app.components.twemoji.EmojiEditText
+                android:id="@+id/type_meeting_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@android:color/transparent"
+                android:backgroundTint="?attr/colorSurface"
+                android:gravity="center"
+                android:hint="@string/type_meeting_name"
+                android:inputType="text"
+                android:maxLength="100"
+                android:maxLines="1"
+                android:minWidth="100dp"
+                android:singleLine="true"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Variant"
+                android:text="@={createviewmodel.meetingName}"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textColorHint="#9B9B9B"
+                android:visibility="visible" />
+
+            <mega.privacy.android.app.components.RoundedImageView
+                android:id="@+id/meeting_thumbnail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:layout_below="@id/type_meeting_edit_text"
+                android:layout_centerHorizontal="true"
+                android:scaleType="fitCenter"
+                app:border_color="@color/dark_grey_border_color"
+                app:border_width="4dp"
+                app:corner_radius="100dp" />
+        </RelativeLayout>
+
+
+        <View
+            android:id="@+id/fab_tip_location"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            app:layout_constraintBottom_toTopOf="@id/on_off_fab"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/meeting_info"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <include
+            android:id="@+id/on_off_fab"
+            layout="@layout/meeting_component_onofffab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toTopOf="@id/edit_first_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            bind:viewmodelFab="@{sharedviewmodel}" />
+
+        <EditText
+            android:id="@+id/edit_first_name"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:hint="@string/first_name_text"
+            android:maxLength="50"
+            android:paddingVertical="16dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textColorHint="#9B9B9B"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
+            app:layout_constraintEnd_toStartOf="@id/guideline2" />
+
+        <EditText
+            android:id="@+id/edit_last_name"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:hint="@string/lastname_text"
+            android:maxLength="50"
+            android:paddingVertical="16dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textColorHint="#9B9B9B"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/btn_start_join_meeting"
+            app:layout_constraintStart_toEndOf="@id/guideline2" />
+
+        <Button
+            android:id="@+id/btn_start_join_meeting"
+            style="?attr/materialButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="40dp"
+            android:backgroundTint="@color/drawer_upgrade_button_background_selector"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:text="@string/btn_start_meeting"
+            android:textColor="@color/white_dark_grey"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

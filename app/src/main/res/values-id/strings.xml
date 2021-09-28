@@ -2430,7 +2430,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">Otentikasi Dua Faktor Diaktifkan</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">Lain kali Anda login ke akun Anda, Anda akan diminta memasukkan kode 6-digit  yang disediakan oleh aplikasi Otentikasi Anda.</string>
+    <string name="description_2fa_enabled">Lain kali anda masuk ke akun anda, anda akan diminta memasukkan kode 6-digit  yang disediakan oleh Aplikasi Otentikasi anda.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">Tolong simpan<b>Kunci Pemulihan</b> anda di lokasi yang aman, untuk menghindari masalah jika anda kehilangan akses ke aplikasi anda, atau jika anda ingin menonaktifkan Otentikasi Dua Faktor.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2756,7 +2756,7 @@
     <!-- error message shown when a chat link is not well formed -->
     <string name="invalid_chat_link_args">Tautan Obrolan tidak valid</string>
     <!-- When it is creating a new group chat, this option permits to establish it private or public -->
-    <string name="ekr_label">Rotasi Kunci Enkripsi</string>
+    <string name="ekr_label">Rotasi kunci enkripsi</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="ekr_explanation">Rotasi kunci enkripsi sedikit lebih aman, tetapi tidak memungkinkan anda membuat  tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -3949,4 +3949,138 @@
     <plurals name="get_links">
         <item quantity="other">Dapatkan Tautan</item>
     </plurals>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">Anda sendirian di sini</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">Pertemuan</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">Mulai/Bergabung pertemuan</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">Buat pertemuan</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">Gabung pertemuan</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">Mulai pertemuan</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">Gabung sebagai tamu</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">Pertemuan %s</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">Matikan</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">Mikrofon</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">Mikrofon anda mati</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">Mikrofon anda nyala</string>
+    <!-- General label for camera -->
+    <string name="general_camera">Kamera</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">Kamera anda nyala</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">Kamera anda mati</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">Tahan</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">Suara</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">Headphone</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">Headphone sedang aktif</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">Suara nyala</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">Suara mati</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">Matikan</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">Undang peserta</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">Peserta (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">Tampilan di tampilan utama</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">Jadikan moderator</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">Tinggalkan pertemuan sekarang?</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">Tidak ada moderator</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">Sebelum meninggalkan, harap tetapkan satu atau lebih moderator baru untuk pertemuan.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">Jadikan moderator</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">Tetap pergi</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">Harap tetapkan satu atau lebih moderator baru.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">Ubah nama pertemuan</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">Peserta: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">Moderator: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">Link pertemuan</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">Durasi</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">Gabung pertemuan sebagai tamu</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">Anda diundang ke petemuan.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">Ketuk link Pertemuan yang dikirimkan kepada anda atau tempel di sini</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">Kualitas sambungan buruk</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">Pertemuan telah berakhir</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">Link pertemuan tidak valid</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">Izin akses diperlukan untuk MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">MEGA membutuhkan akses ke mikrofon dan kamera anda untuk rapat.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Saya mengerti</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">Buka Pengaturan untuk mengizinkan MEGA mengakses kamera dan mikrofon anda.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">Lihat obrolan pertemuan</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">Undang lebih banyak peserta ke pertemuan. Geser ke atas untuk mengundang.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">Ketuk untuk membuat pertemuan baru</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">Siapkan Pertemuan MEGA dengan cepat dengan fitur rapat terenkripsi baru kami</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">Anda adalah moderator baru.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">Tautan pertemuan disalin.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%smemulai sebuah pertemuan. Ketuk untuk bergabung.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA Pertemuan</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">Pertemuan video terenkripsi menyeluruh</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">Harap masukkan tautan pertemuan yang benar</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">Lebih dari sekedar pertemuan</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">Privasi anda penting</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">Bergabunglah dengan platform kolaborasi dan penyimpanan cloud aman terbesar di dunia.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">Dapatkan 20 GB gratis</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">Daftar sekarang dan nikmati fitur kolaborasi lanjutan secara gratis.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">Panggilan lain sedang berlangsung. Harap akhiri panggilan anda saat ini sebelum melakukan panggilan lain.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">Nama pertemuan baru</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">Gagal membuat rapat.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](saya)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">Tampilan utama</string>
 </resources>
