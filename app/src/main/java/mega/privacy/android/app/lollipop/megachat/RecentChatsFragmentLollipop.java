@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
@@ -14,6 +15,7 @@ import android.os.Looper;
 import android.os.Parcelable;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -23,6 +25,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableString;
@@ -50,6 +53,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
+import androidx.lifecycle.Observer;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
@@ -69,6 +73,7 @@ import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaListChatLolli
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.AskForDisplayOverDialog;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.HighLightHintHelper;
 import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -76,10 +81,12 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
+import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatListItem;
 import nz.mega.sdk.MegaChatRoom;
 
 import static android.app.Activity.RESULT_OK;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_RINGING_STATUS_CHANGE;
 import static mega.privacy.android.app.lollipop.AddContactActivityLollipop.FROM_RECENT;
 import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -174,6 +181,24 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
     private AskForDisplayOverDialog askForDisplayOverDialog;
 
+    private static final String SP_KEY_IS_HINT_SHOWN_RECENT_CHATS = "is_hint_shown_recent_chats";
+    private boolean isHintShowing;
+
+    private HighLightHintHelper highLightHintHelper;
+
+    private final Observer<MegaChatCall> callRingingStatusObserver = call -> {
+        if (megaChatApi.getNumCalls() == 0 || adapter == null) {
+            logError("Calls not found");
+            return;
+        }
+
+        int position = getPositionFromChatId(chats, call.getChatid());
+        if (call.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT &&
+                call.isRinging() && position != INVALID_POSITION) {
+            adapterList.setLastMessage(position, null);
+        }
+    };
+
     public static RecentChatsFragmentLollipop newInstance() {
         logDebug("newInstance");
         RecentChatsFragmentLollipop fragment = new RecentChatsFragmentLollipop();
@@ -223,6 +248,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         contactGetter.setMegaContactUpdater(this);
 
         askForDisplayOverDialog = new AskForDisplayOverDialog(context);
+
+        highLightHintHelper = new HighLightHintHelper(requireActivity());
     }
 
     @Override
@@ -430,10 +457,33 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         } else {
             bannerContainer.setVisibility(View.GONE);
         }
-        if(askForDisplayOverDialog != null) {
+
+        LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observe(this, callRingingStatusObserver);
+
+        // Workaround: wait for R.id.action_menu_open_meeting initialized.
+        new Handler().postDelayed(() -> {
+            if (shouldShowMeetingHint(context, SP_KEY_IS_HINT_SHOWN_RECENT_CHATS) || isHintShowing) {
+                highLightHintHelper.showHintForMeetingIcon(R.id.action_menu_open_meeting, () -> {
+                    hintShown(context, SP_KEY_IS_HINT_SHOWN_RECENT_CHATS);
+                    highLightHintHelper.dismissPopupWindow();
+                    isHintShowing = false;
+                    askForDisplayOver();
+                    return null;
+                });
+
+                isHintShowing = true;
+            } else {
+                askForDisplayOver();
+            }
+        }, 300);
+
+        return v;
+    }
+
+    private void askForDisplayOver() {
+        if (askForDisplayOverDialog != null) {
             askForDisplayOverDialog.showDialog();
         }
-        return v;
     }
 
     private boolean showInviteBanner() {
@@ -886,21 +936,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
-                long chatHandleToUpdate = item.getChatId();
-                int indexToReplace = -1;
-                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                while (itrReplace.hasNext()) {
-                    MegaChatListItem chat = itrReplace.next();
-                    if (chat != null) {
-                        if (chat.getChatId() == chatHandleToUpdate) {
-                            indexToReplace = itrReplace.nextIndex() - 1;
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                if (indexToReplace != -1) {
+                int indexToReplace = getPositionFromChatId(chats, item.getChatId());
+                if (indexToReplace != INVALID_POSITION) {
                     logDebug("Index to replace: " + indexToReplace);
                     chats.set(indexToReplace, item);
                     if (item.getUnreadCount() == 0) {
@@ -915,25 +952,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
 
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_LAST_TS)) {
             logDebug("Change last ts: " + item.getChanges());
-
-            long chatHandleToUpdate = item.getChatId();
-            int indexToReplace = -1;
-            if (chats != null && !chats.isEmpty()) {
-                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                while (itrReplace.hasNext()) {
-                    MegaChatListItem chat = itrReplace.next();
-                    if (chat != null) {
-                        if (chat.getChatId() == chatHandleToUpdate) {
-                            indexToReplace = itrReplace.nextIndex() - 1;
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            if (indexToReplace != -1) {
+            int indexToReplace = getPositionFromChatId(chats, item.getChatId());
+            if (indexToReplace != INVALID_POSITION) {
                 logDebug("Index to replace: " + indexToReplace);
                 chats.set(indexToReplace, item);
                 if (indexToReplace == 0) {
@@ -949,21 +969,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
-                long chatHandleToUpdate = item.getChatId();
-                int indexToReplace = -1;
-                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                while (itrReplace.hasNext()) {
-                    MegaChatListItem chat = itrReplace.next();
-                    if (chat != null) {
-                        if (chat.getChatId() == chatHandleToUpdate) {
-                            indexToReplace = itrReplace.nextIndex() - 1;
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                if (indexToReplace != -1) {
+                int indexToReplace = getPositionFromChatId(chats, item.getChatId());
+                if (indexToReplace != INVALID_POSITION) {
                     logDebug("Index to replace: " + indexToReplace);
                     chats.set(indexToReplace, item);
                     onTitleChange(indexToReplace);
@@ -976,21 +983,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
-                long chatHandleToUpdate = item.getChatId();
-                int indexToReplace = -1;
-                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                while (itrReplace.hasNext()) {
-                    MegaChatListItem chat = itrReplace.next();
-                    if (chat != null) {
-                        if (chat.getChatId() == chatHandleToUpdate) {
-                            indexToReplace = itrReplace.nextIndex() - 1;
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                if (indexToReplace != -1) {
+                int indexToReplace = getPositionFromChatId(chats, item.getChatId());
+                if (indexToReplace != INVALID_POSITION) {
                     logDebug("Index to replace: " + indexToReplace);
                     chats.set(indexToReplace, item);
                     onLastMessageChange(indexToReplace);
@@ -1003,21 +997,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             logDebug("Change closed: MegaChatListItem.CHANGE_TYPE_CLOSED");
             logDebug("Own privilege: " + item.getOwnPrivilege());
             if (adapterList.getItemCount() != 0) {
-                long chatHandleToRemove = item.getChatId();
-                int indexToRemove = -1;
-                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                while (itrReplace.hasNext()) {
-                    MegaChatListItem chat = itrReplace.next();
-                    if (chat != null) {
-                        if (chat.getChatId() == chatHandleToRemove) {
-                            indexToRemove = itrReplace.nextIndex() - 1;
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                if (indexToRemove != -1) {
+                int indexToRemove = getPositionFromChatId(chats, item.getChatId());
+                if (indexToRemove != INVALID_POSITION) {
                     logDebug("Index to replace: " + indexToRemove);
                     chats.remove(indexToRemove);
 
@@ -1043,21 +1024,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                     if (adapterList == null || adapterList.getItemCount()==0){
                         setChats();
                     } else {
-                        long chatHandleToRemove = item.getChatId();
-                        int indexToRemove = -1;
-                        ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                        while (itrReplace.hasNext()) {
-                            MegaChatListItem chat = itrReplace.next();
-                            if (chat != null) {
-                                if (chat.getChatId() == chatHandleToRemove) {
-                                    indexToRemove = itrReplace.nextIndex() - 1;
-                                    break;
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                        if (indexToRemove != -1) {
+                        int indexToRemove = getPositionFromChatId(chats, item.getChatId());
+                        if (indexToRemove != INVALID_POSITION) {
                             logDebug("Index to replace: " + indexToRemove);
                             chats.remove(indexToRemove);
 
@@ -1104,22 +1072,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
                 } else {
                     logDebug("New unarchived element: remove from Archive list");
                     if (adapterList.getItemCount() != 0) {
-
-                        long chatHandleToRemove = item.getChatId();
-                        int indexToRemove = -1;
-                        ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                        while (itrReplace.hasNext()) {
-                            MegaChatListItem chat = itrReplace.next();
-                            if (chat != null) {
-                                if (chat.getChatId() == chatHandleToRemove) {
-                                    indexToRemove = itrReplace.nextIndex() - 1;
-                                    break;
-                                }
-                            } else {
-                                break;
-                            }
-                        }
-                        if (indexToRemove != -1) {
+                        int indexToRemove = getPositionFromChatId(chats, item.getChatId());
+                        if (indexToRemove != INVALID_POSITION) {
                             logDebug("Index to replace: " + indexToRemove);
                             chats.remove(indexToRemove);
 
@@ -1145,21 +1099,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if (adapterList == null || adapterList.getItemCount() == 0) {
                 setChats();
             } else {
-                long chatHandleToUpdate = item.getChatId();
-                int indexToReplace = -1;
-                ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
-                while (itrReplace.hasNext()) {
-                    MegaChatListItem chat = itrReplace.next();
-                    if (chat != null) {
-                        if (chat.getChatId() == chatHandleToUpdate) {
-                            indexToReplace = itrReplace.nextIndex() - 1;
-                            break;
-                        }
-                    } else {
-                        break;
-                    }
-                }
-                if (indexToReplace != -1) {
+                int indexToReplace = getPositionFromChatId(chats, item.getChatId());
+                if (indexToReplace != INVALID_POSITION) {
                     logDebug("Index to replace: " + indexToReplace);
                     chats.set(indexToReplace, item);
                     adapterList.notifyItemChanged(indexToReplace);
@@ -1426,6 +1367,7 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, listView.getLayoutManager().onSaveInstanceState());
         }
         outState.putBoolean(KEY_DIALOG_IS_SHOWING, isExplanationDialogShowing);
+        outState.putBoolean(KEY_HINT_IS_SHOWING, isHintShowing);
     }
 
     @Override
@@ -1451,6 +1393,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         if (context instanceof ManagerActivityLollipop) {
             ((ManagerActivityLollipop) context).setSearchQuery("");
         }
+
+        // Avoid window leak.
+        highLightHintHelper.dismissPopupWindow();
     }
 
     @Override
@@ -1512,6 +1457,8 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
             if(isExplanationDialogShowing) {
                 showExplanationDialog();
             }
+
+            isHintShowing = savedInstanceState.getBoolean(KEY_HINT_IS_SHOWING);
         }
     }
 
@@ -1861,7 +1808,9 @@ public class RecentChatsFragmentLollipop extends RotatableFragment implements Vi
         @Override
         protected Void doInBackground(String... strings) {
             ArrayList<MegaChatListItem> chatsToSearch = new ArrayList<>();
-            chatsToSearch.addAll(chats);
+            if (chats != null) {
+                chatsToSearch.addAll(chats);
+            }
 
             if (context instanceof ManagerActivityLollipop) {
                 ArrayList<MegaChatListItem> archivedChats = megaChatApi.getArchivedChatListItems();

@@ -54,7 +54,6 @@ import mega.privacy.android.app.listeners.GetAttrUserListener;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
@@ -198,13 +197,7 @@ public class GroupChatInfoActivityLollipop extends PasscodeActivity
         groupChatInfoActivity = this;
         chatC = new ChatController(this);
 
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-            logDebug("Refresh session - karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+        if (shouldRefreshSessionDueToKarere()) {
             return;
         }
 
@@ -1057,10 +1050,8 @@ public class GroupChatInfoActivityLollipop extends PasscodeActivity
     @Override
     public void onChatConnectionStateUpdate(MegaChatApiJava api, long chatid, int newState) {
         logDebug("Chat ID: " + chatid + ", New state: " + newState);
-
         MegaChatRoom chatRoom = api.getChatRoom(chatid);
-        if (MegaApplication.isWaitingForCall() && newState == MegaChatApi.CHAT_CONNECTION_ONLINE
-                && chatRoom != null && chatRoom.getPeerHandle(0) == MegaApplication.getUserWaitingForCall()) {
+        if (isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
             startCallWithChatOnline(this, api.getChatRoom(chatid));
         }
     }

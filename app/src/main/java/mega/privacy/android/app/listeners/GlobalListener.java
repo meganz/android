@@ -18,11 +18,9 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE;
-import static mega.privacy.android.app.constants.BroadcastConstants.EVENT_NUMBER;
-import static mega.privacy.android.app.constants.BroadcastConstants.EVENT_TEXT;
+import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_USER_VISIBILITY_CHANGE;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.ACTION_STORAGE_STATE_CHANGED;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS;
@@ -50,7 +48,12 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                 continue;
             }
 
-            boolean isMyChange = api.getMyUserHandle().equals(MegaApiJava.userHandleToBase64(user.getHandle()));
+            String myUserHandle = api.getMyUserHandle();
+            boolean isMyChange = myUserHandle != null && myUserHandle.equals(MegaApiJava.userHandleToBase64(user.getHandle()));
+
+            if(user.getChanges() == 0 && !isMyChange){
+                LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long.class).post(user.getHandle());
+            }
 
             if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && isMyChange) {
                 MegaApplication.getPushNotificationSettingManagement().updateMegaPushNotificationSetting();
@@ -81,6 +84,11 @@ public class GlobalListener implements MegaGlobalListenerInterface {
             if (user.hasChanged(MegaUser.CHANGE_TYPE_DISABLE_VERSIONS) && isMyChange) {
                 api.getFileVersionsOption(new GetAttrUserListener(megaApplication));
                 break;
+            }
+
+            // Receive the avatar change, send the event
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange() == 0){
+                LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long.class).post(user.getHandle());
             }
         }
     }
@@ -138,7 +146,6 @@ public class GlobalListener implements MegaGlobalListenerInterface {
         if (requests == null) return;
 
         megaApplication.updateAppBadge();
-
         notifyNotificationCountChange(api);
 
         for (int i = 0; i < requests.size(); i++) {
@@ -154,7 +161,6 @@ public class GlobalListener implements MegaGlobalListenerInterface {
 
                     logDebug("IPC: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
                 } else if ((cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED) && (cr.isOutgoing())) {
-
                     ContactsAdvancedNotificationBuilder notificationBuilder;
                     notificationBuilder = ContactsAdvancedNotificationBuilder.newInstance(megaApplication, megaApplication.getMegaApi());
 
@@ -163,6 +169,10 @@ public class GlobalListener implements MegaGlobalListenerInterface {
                     logDebug("ACCEPT OPR: " + cr.getSourceEmail() + " cr.isOutgoing: " + cr.isOutgoing() + " cr.getStatus: " + cr.getStatus());
 
                     new RatingHandlerImpl(megaApplication.getApplicationContext()).showRatingBaseOnContacts();
+                }
+
+                if(cr.getStatus() == MegaContactRequest.STATUS_ACCEPTED){
+                    LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long.class).post(cr.getHandle());
                 }
             }
         }

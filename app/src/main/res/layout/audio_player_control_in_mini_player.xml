@@ -11,12 +11,13 @@
         style="@style/Widget.Mega.TimeBar"
         android:layout_width="0dp"
         android:layout_height="2dp"
-        app:buffered_color="@color/grey_200_grey_600"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:played_color="@color/teal_300_teal_200"
+        app:scrubber_disabled_size="0dp"
+        app:scrubber_dragged_size="0dp"
         app:scrubber_enabled_size="0dp"
+        app:buffered_color="@color/grey_200_grey_600"
         app:unplayed_color="@color/grey_200_grey_600" />
 
     <View

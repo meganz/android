@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -18,6 +19,7 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
@@ -32,7 +34,13 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
+import javax.inject.Inject;
+
+@AndroidEntryPoint
 public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+
+    @Inject
+    PasscodeManagement passcodeManagement;
 
     private MegaChatRoom selectedChat;
     private long chatId = INVALID_HANDLE;
@@ -182,8 +190,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             } else {
                 optionContactInfoChat.setVisibility(View.GONE);
                 optionStartConversationChat.setVisibility(View.GONE);
-                optionInvite.setVisibility(View.VISIBLE);
-
+                optionInvite.setVisibility(chatC.getParticipantEmail(participantHandle) == null ? View.GONE : View.VISIBLE);
                 titleMailContactChatPanel.setVisibility(View.GONE);
             }
 
@@ -237,7 +244,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             case R.id.contact_list_option_call_layout:
                 startNewCall((GroupChatInfoActivityLollipop) context,
                         (SnackbarShower) context,
-                        megaApi.getContact(chatC.getParticipantEmail(participantHandle)));
+                        megaApi.getContact(chatC.getParticipantEmail(participantHandle)), passcodeManagement);
                 break;
 
             case R.id.change_permissions_group_participants_chat_layout:

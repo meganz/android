@@ -28,6 +28,7 @@ import mega.privacy.android.app.lollipop.controllers.ContactController
 import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES
 import mega.privacy.android.app.utils.Constants.CHAT_ID
@@ -38,6 +39,7 @@ import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
 import nz.mega.sdk.MegaUser
+import javax.inject.Inject
 
 /**
  * Bottom Sheet Dialog that represents the UI for a dialog containing contact information.
@@ -66,6 +68,9 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
             }
     }
+
+    @Inject
+    lateinit var passcodeManagement: PasscodeManagement
 
     private val viewModel by viewModels<ContactListViewModel>({ requireParentFragment() })
     private val userHandle by extraNotNull<Long>(USER_HANDLE)
@@ -158,7 +163,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionCall.setOnClickListener {
-            CallUtil.startNewCall(activity, activity as SnackbarShower, megaUser)
+            CallUtil.startNewCall(activity, activity as SnackbarShower, megaUser, passcodeManagement)
             dismiss()
         }
 
