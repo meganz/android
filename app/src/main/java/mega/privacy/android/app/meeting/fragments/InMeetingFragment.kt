@@ -268,13 +268,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION,
                 MegaChatCall.CALL_STATUS_DESTROYED -> {
                     if (inMeetingViewModel.amIAGuest()) {
-                        logDebug("Finishing the activity as guest")
                         disableCamera()
                         removeUI()
-                        AccountController.logout(
-                            meetingActivity,
-                            MegaApplication.getInstance().megaApi
-                        )
+                        finishActivityAsGuest()
                     } else {
                         finishActivity()
                     }
@@ -2602,11 +2598,26 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         inMeetingViewModel.leaveMeeting()
         if (inMeetingViewModel.amIAGuest()) {
-            logDebug("Finishing the activity as guest")
-            AccountController.logout(meetingActivity, MegaApplication.getInstance().megaApi)
+            finishActivityAsGuest()
         } else {
             checkIfAnotherCallShouldBeShown()
         }
+    }
+
+    /**
+     * Method to control when I am a guest and my participation in the meeting ends
+     */
+    private fun finishActivityAsGuest() {
+        val chatId = inMeetingViewModel.getChatId()
+        val callId = inMeetingViewModel.getCall()?.callId
+        logDebug("Finishing the activity as guest: chatId $chatId, callId $callId")
+        if (chatId != MEGACHAT_INVALID_HANDLE && callId != MEGACHAT_INVALID_HANDLE) {
+            MegaApplication.getChatManagement().controlCallFinished(callId!!, chatId)
+        }
+        AccountController.logout(
+            meetingActivity,
+            MegaApplication.getInstance().megaApi
+        )
     }
 
     /**
