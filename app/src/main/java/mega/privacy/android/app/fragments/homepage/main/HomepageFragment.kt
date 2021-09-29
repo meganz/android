@@ -5,10 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
@@ -21,6 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -49,8 +47,10 @@ import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -58,6 +58,21 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
+
+    companion object {
+        private const val FAB_ANIM_DURATION = 200L
+        private const val FAB_MASK_OUT_DELAY = 200L
+        private const val ALPHA_TRANSPARENT = 0f
+        private const val ALPHA_OPAQUE = 1f
+        private const val FAB_DEFAULT_ANGEL = 0f
+        private const val FAB_ROTATE_ANGEL = 135f
+        private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
+        private const val KEY_CONTACT_TYPE = "contactType"
+        private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
+        const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
+        private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
+        private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
+    }
 
     private val viewModel: HomePageViewModel by viewModels()
 
@@ -802,18 +817,16 @@ class HomepageFragment : Fragment() {
         fabMaskMain.show()
     }
 
-    companion object {
-        private const val FAB_ANIM_DURATION = 200L
-        private const val FAB_MASK_OUT_DELAY = 200L
-        private const val ALPHA_TRANSPARENT = 0f
-        private const val ALPHA_OPAQUE = 1f
-        private const val FAB_DEFAULT_ANGEL = 0f
-        private const val FAB_ROTATE_ANGEL = 135f
-        private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
-        private const val KEY_CONTACT_TYPE = "contactType"
-        private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
-        const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
-        private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
-        private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
+    /**
+     * Shows the dialog which informs the start screen can be changed.
+     */
+    private fun showChooseStartScreenDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setView(R.layout.dialog_choose_start_screen)
+            .setPositiveButton(
+                StringResourcesUtils.getString(R.string.change_setting_action)
+            ) { _, _ -> callManager { manager -> manager.moveToSettingsSectionStartScreen() } }
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
+            .show()
     }
 }

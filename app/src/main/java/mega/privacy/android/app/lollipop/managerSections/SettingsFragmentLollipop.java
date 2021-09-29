@@ -288,7 +288,10 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             goToCategoryStorage();
         } else if (((ManagerActivityLollipop) context).openSettingsQR) {
             goToCategoryQR();
+        } else if (((ManagerActivityLollipop) context).openSettingsStartScreen) {
+            goToSectionStartScreen();
         }
+
         if (listView != null) {
             listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
@@ -581,6 +584,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     public void goToCategoryQR() {
         scrollToPreference(qrCodeAutoAcceptSwitch);
+    }
+
+    public void goToSectionStartScreen() {
+        scrollToPreference(startScreen);
+        startActivity(new Intent(context, StartScreenPreferencesActivity.class));
     }
 
     private void refreshAccountInfo() {

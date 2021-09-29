@@ -435,6 +435,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     public boolean openFolderRefresh = false;
 
+    public boolean openSettingsStartScreen;
     public boolean openSettingsStorage = false;
     public boolean openSettingsQR = false;
 	boolean newAccount = false;
@@ -4640,16 +4641,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
     			supportInvalidateOptionsMenu();
 
-    			if (getSettingsFragment() != null){
-					if (openSettingsStorage){
+				if (getSettingsFragment() != null) {
+					if (openSettingsStorage) {
 						sttFLol.goToCategoryStorage();
-					}
-					else if (openSettingsQR){
-						logDebug ("goToCategoryQR");
+					} else if (openSettingsQR) {
+						logDebug("goToCategoryQR");
 						sttFLol.goToCategoryQR();
+					} else if (openSettingsStartScreen) {
+						sttFLol.goToSectionStartScreen();
 					}
-				}
-				else {
+				} else {
 					sttFLol = new SettingsFragmentLollipop();
 				}
 
@@ -4956,21 +4957,36 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		isEnable2FADialogShown = true;
 	}
 
-	public void moveToSettingsSection(){
-		drawerItem=DrawerItem.SETTINGS;
+	/**
+	 * Opens the settings section.
+	 */
+	public void moveToSettingsSection() {
+		drawerItem = DrawerItem.SETTINGS;
 		selectDrawerItemLollipop(drawerItem);
 	}
 
-	public void moveToSettingsSectionStorage(){
+	/**
+	 * Opens the settings section and scrolls to storage category.
+	 */
+	public void moveToSettingsSectionStorage() {
 		openSettingsStorage = true;
-		drawerItem=DrawerItem.SETTINGS;
-		selectDrawerItemLollipop(drawerItem);
+		moveToSettingsSection();
 	}
 
+	/**
+	 * Opens the settings section and scrolls to QR setting.
+	 */
 	public void moveToSettingsSectionQR(){
 		openSettingsQR = true;
-		drawerItem=DrawerItem.SETTINGS;
-		selectDrawerItemLollipop(drawerItem);
+		moveToSettingsSection();
+	}
+
+	/**
+	 * Opens the settings section and scrolls to start screen setting.
+	 */
+	public void moveToSettingsSectionStartScreen() {
+		openSettingsStartScreen = true;
+		moveToSettingsSection();
 	}
 
 	/**
@@ -4979,6 +4995,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void resetSettingsScrollIfNecessary() {
 		openSettingsStorage = false;
 		openSettingsQR = false;
+		openSettingsStartScreen = false;
 
 		if (getSettingsFragment() != null) {
 			sttFLol.goToFirstCategory();
