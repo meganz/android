@@ -84,7 +84,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                (requireActivity() as MediaPlayerActivity).showToolbarElevation(
+                (requireActivity() as MediaPlayerActivity).setupToolbarColors(
                     recyclerView.canScrollVertically(-1)
                 )
             }
