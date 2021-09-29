@@ -53,6 +53,7 @@ import android.telephony.TelephonyManager;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -137,6 +138,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class Util {
 
@@ -1400,7 +1402,7 @@ public class Util {
     }
 
 	public static void checkTakePicture(Activity activity, int option) {
-		if (isNecessaryDisableLocalCamera() != -1) {
+		if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
 			if(option == TAKE_PHOTO_CODE) {
 				showConfirmationOpenCamera(activity, ACTION_TAKE_PICTURE, false);
 			}else if(option == TAKE_PICTURE_PROFILE_CODE){
@@ -1678,4 +1680,13 @@ public class Util {
     public static boolean isSimplifiedChinese() {
         return Locale.getDefault().toLanguageTag().contains(HANS);
     }
+
+	/**
+	 * Method to know the current orientation of the device
+	 *
+	 * @return current orientation of the device
+	 */
+	public static int getCurrentOrientation() {
+		return MegaApplication.getInstance().getApplicationContext().getResources().getConfiguration().orientation;
+	}
 }

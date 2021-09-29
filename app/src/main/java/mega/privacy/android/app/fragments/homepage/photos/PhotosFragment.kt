@@ -30,6 +30,7 @@ import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -81,6 +82,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
+        setupMiniAudioPlayer()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
@@ -128,6 +130,13 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 )
             }
         })
+    }
+
+    private fun setupMiniAudioPlayer() {
+        val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
+            shouldVisible = true
+        }
+        lifecycle.addObserver(audioPlayerController)
     }
 
     /**

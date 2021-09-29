@@ -191,7 +191,6 @@ public final class EmojiManager {
     return num;
   }
   public @NonNull List<EmojiRange> findAllEmojis(@Nullable final CharSequence text) {
-    logDebug("findAllEmojis");
     final List<EmojiRange> result = new ArrayList<>();
     try {
       verifyInstalled();
