@@ -58,7 +58,7 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     }
 
     protected void initItemDecoration(Canvas c, RecyclerView parent) {
-        left = (int) MegaApplication.getInstance().getResources().getDimension(R.dimen.divider_width) + parent.getPaddingLeft();
+        left = (int) MegaApplication.getInstance().getResources().getDimension(R.dimen.bottom_sheet_item_divider_margin_start) + parent.getPaddingLeft();
         right = parent.getWidth() - parent.getPaddingRight();
 
         // Canvas.clipRect(left, top, right, bottom) reduces the region of the screen that future draw operations can write to

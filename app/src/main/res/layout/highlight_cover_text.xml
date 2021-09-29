@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="56dp"
+    android:background="@drawable/background_button_corner_without_border">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="@string/new_meeting"
+        android:textAppearance="@style/TextAppearance.Mega.Subtitle1.AccentColor.Variant1"
+        tools:ignore="RtlSymmetry" />
+
+</RelativeLayout>

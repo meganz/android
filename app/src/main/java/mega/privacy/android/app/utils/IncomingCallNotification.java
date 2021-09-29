@@ -20,15 +20,12 @@ import java.lang.annotation.Target;
 
 import mega.privacy.android.app.activities.AskForDisplayOverActivity;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
 import nz.mega.sdk.MegaChatRoom;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
-import static mega.privacy.android.app.utils.Constants.CALL_ID;
-import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Util.isAndroid10;
 
 public class IncomingCallNotification {
@@ -74,17 +71,13 @@ public class IncomingCallNotification {
     public static void toIncomingCall(Context context, MegaChatCall callToLaunch, MegaChatApiAndroid megaChatApi) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         createChannel(notificationManager);
-        Intent intent = new Intent(context, ChatCallActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(CHAT_ID, callToLaunch.getChatid());
-        intent.putExtra(CALL_ID, callToLaunch.getId());
         @NoMeaning int i = 0;
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, i, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = CallUtil.getPendingIntentMeetingRinging(context, callToLaunch.getChatid(), i);
         NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(context, INCOMING_CALL_CHANNEL_ID);
         mBuilderCompat
                 .setSmallIcon(R.drawable.ic_stat_notify)
                 .setContentText(context.getString(R.string.notification_subtitle_incoming))
-                .setAutoCancel(false)
+                .setAutoCancel(true)
                 .addAction(R.drawable.ic_phone_white, context.getString(R.string.notification_incoming_action), pendingIntent)
                 .setFullScreenIntent(pendingIntent, true)
                 .setOngoing(true)
