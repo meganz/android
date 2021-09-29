@@ -1069,13 +1069,24 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.no_conversation_history));
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 				((ViewHolderNormalChatList)holder).textViewDate.setVisibility(View.GONE);
-			} else if (messageType == LAST_MSG_LOADING) {
+				return;
+			} 
+			
+			if (messageType == LAST_MSG_LOADING) {
 				logDebug("Message Type -> LOADING");
 				((ViewHolderNormalChatList)holder).textViewContent.setText(context.getString(R.string.general_loading));
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 				((ViewHolderNormalChatList)holder).textViewDate.setVisibility(View.GONE);
+				return;
 			}
-			else if(messageType==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
+			
+			MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
+			if (chatRoom == null) {
+				logError("The chat room is null");
+				return;
+			}
+
+			if(messageType==MegaChatMessage.TYPE_ALTER_PARTICIPANTS){
 				logDebug("Message Type -> TYPE_ALTER_PARTICIPANTS");
 				int privilege = chat.getLastMessagePriv();
 				logDebug("Privilege: " + privilege);
@@ -1083,8 +1094,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				if(chat.getLastMessageHandle()==megaChatApi.getMyUserHandle()){
 					logDebug("I have changed the permissions");
-
-					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 					String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 					if (isTextEmpty(fullNameAction)) {
 						if(!((ViewHolderNormalChatList)holder).nameRequestedAction){
@@ -1183,8 +1192,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 				}
 				else{
-
-					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageHandle());
 
 					if(isTextEmpty(fullNameTitle)){
@@ -1195,10 +1202,9 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 							((ViewHolderNormalChatList)holder).userHandle = chat.getLastMessageHandle();
 
 							ChatNonContactNameListener listener = new ChatNonContactNameListener(context, holder, this, chat.getLastMessageHandle(), chat.isPreview());
-							if (chatRoom != null) {
-								megaChatApi.getUserFirstname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
-								megaChatApi.getUserLastname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
-							}
+							
+							megaChatApi.getUserFirstname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
+							megaChatApi.getUserLastname(chat.getLastMessageHandle(), chatRoom.getAuthorizationToken(), listener);
 							megaChatApi.getUserEmail(chat.getLastMessageHandle(), listener);
 						}
 						else{
@@ -1407,7 +1413,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					}
 					else{
 						logDebug("I was change by someone");
-						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 						String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 
 						if(isTextEmpty(fullNameAction)){
@@ -1452,8 +1457,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				}
 				else{
 					logDebug("Participant privilege change!");
-
-					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 					String fullNameTitle = cC.getParticipantFullName(chat.getLastMessageHandle());
 
 					if(isTextEmpty(fullNameTitle)){
@@ -1563,7 +1566,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					textToShow = String.format(context.getString(R.string.history_cleared_by),toCDATA(myFullName));
 				}
 				else{
-					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 					String fullNameAction = cC.getParticipantFullName(chat.getLastMessageSender());
 					if(isTextEmpty(fullNameAction)){
                         if(!(((ViewHolderNormalChatList)holder).nameRequestedAction)){
@@ -1604,10 +1606,10 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 				((ViewHolderNormalChatList)holder).textViewContent.setText(result);
 
 				((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
-			} else if (messageType == MegaChatMessage.TYPE_SET_RETENTION_TIME) {
+			} 
+			else if (messageType == MegaChatMessage.TYPE_SET_RETENTION_TIME) {
 				String text;
 				String fullName;
-				MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 				String timeFormatted = transformSecondsInString(chatRoom.getRetentionTime());
 
 				if (chat.getLastMessageSender() == megaChatApi.getMyUserHandle()) {
@@ -1750,10 +1752,12 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 
 				((ViewHolderNormalChatList)holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 
-			}else if(messageType==MegaChatMessage.TYPE_CALL_STARTED){
+			}
+			else if(messageType==MegaChatMessage.TYPE_CALL_STARTED){
 				logDebug("Message type TYPE_CALL_STARTED");
 				updateLastCallMessage(holder, chat);
-			}else if(messageType==MegaChatMessage.TYPE_CALL_ENDED){
+			}
+			else if(messageType==MegaChatMessage.TYPE_CALL_ENDED){
 				logDebug("Message type TYPE_CALL_ENDED");
 
 				String messageContent = chat.getLastMessage();
@@ -1918,8 +1922,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						logDebug("The last message NOT mine" + lastMsgSender);
 
 						if(chat.isGroup()){
-							MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-
 							((ViewHolderNormalChatList)holder).currentPosition = position;
 							((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
@@ -1991,8 +1993,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						logDebug("The last message NOT mine: " + lastMsgSender);
 
 						if(chat.isGroup()){
-							MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-
 							((ViewHolderNormalChatList)holder).currentPosition = position;
 							((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
@@ -2074,8 +2074,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						giphyTextContent = TextUtils.concat(me, myMessage);
 						contentColor = R.color.grey_054_white_054;
 					} else if (chat.isGroup()) {
-						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-
 						((ViewHolderNormalChatList) holder).currentPosition = position;
 						((ViewHolderNormalChatList) holder).userHandle = lastMsgSender;
 
@@ -2124,8 +2122,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						logDebug("The last message NOT mine: " + lastMsgSender);
 
 						if(chat.isGroup()){
-							MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-
 							((ViewHolderNormalChatList)holder).currentPosition = position;
 							((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
@@ -2179,7 +2175,8 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 						}
 					}
 				}
-			} else if (messageType == MegaChatMessage.TYPE_CONTACT_ATTACHMENT && lastMessage != null && lastMessage.getUsersCount() > 1) {
+			} 
+			else if (messageType == MegaChatMessage.TYPE_CONTACT_ATTACHMENT && lastMessage != null && lastMessage.getUsersCount() > 1) {
 				long contactsCount = lastMessage.getUsersCount();
 				String contactAttachmentMessage = converterShortCodes(context.getString(R.string.contacts_sent, String.valueOf(contactsCount)));
 				Spannable myMessage = new SpannableString(contactAttachmentMessage);
@@ -2193,7 +2190,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
 					((ViewHolderNormalChatList) holder).textViewContent.setText(indexedText);
 				} else if (chat.isGroup()) {
-					MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
 					long lastMsgSender = chat.getLastMessageSender();
 
 					((ViewHolderNormalChatList) holder).currentPosition = position;
@@ -2276,8 +2272,6 @@ public class MegaListChatLollipopAdapter extends RecyclerView.Adapter<MegaListCh
 					logDebug("The last message NOT mine: " + lastMsgSender);
 
 					if(chat.isGroup()){
-						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chat.getChatId());
-
 						((ViewHolderNormalChatList)holder).currentPosition = position;
 						((ViewHolderNormalChatList)holder).userHandle = lastMsgSender;
 
