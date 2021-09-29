@@ -5,7 +5,6 @@ import android.app.Dialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
-import kotlinx.android.synthetic.main.bottom_sheet_meeting.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
@@ -19,8 +18,8 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
         super.setupDialog(dialog, style)
 
         val binding = BottomSheetMeetingBinding.inflate(LayoutInflater.from(context), null, false)
-        contentView = binding.root;
-        mainLinearLayout = binding.root.meeting_bottom_sheet
+        contentView = binding.root
+        mainLinearLayout = binding.meetingBottomSheet
 
         binding.ivStartMeeting.setOnClickListener(this)
         binding.ivJoinMeeting.setOnClickListener(this)

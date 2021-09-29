@@ -15,7 +15,6 @@ import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.individual_call_fragment.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.RoundedImageView
@@ -211,11 +210,19 @@ class IndividualCallFragment : MeetingBaseFragment() {
             )
         }
 
-        binding.root.let {
-            rootLayout = it as ConstraintLayout
-            videoSurfaceView = it.video
-            avatarImageView = it.avatar
-            onHoldImageView = it.on_hold_icon
+        // The cast is essential here not repeated code.
+        if(binding is SelfFeedFloatingWindowFragmentBinding) {
+            rootLayout = binding.root
+            videoSurfaceView = binding.video
+            avatarImageView = binding.avatar
+            onHoldImageView = binding.onHoldIcon
+        }
+
+        if(binding is IndividualCallFragmentBinding) {
+            rootLayout = binding.root
+            videoSurfaceView = binding.video
+            avatarImageView = binding.avatar
+            onHoldImageView = binding.onHoldIcon
         }
 
         return binding.root

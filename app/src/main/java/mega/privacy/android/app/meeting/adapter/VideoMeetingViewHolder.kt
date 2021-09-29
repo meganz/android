@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_participant_video.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
@@ -85,11 +84,11 @@ class VideoMeetingViewHolder(
             }
 
 
-            (binding.root.mute_icon.layoutParams as ConstraintLayout.LayoutParams).apply {
+            (binding.muteIcon.layoutParams as ConstraintLayout.LayoutParams).apply {
                 bottomMargin = 0
             }
 
-            (binding.root.moderator_icon.layoutParams as ConstraintLayout.LayoutParams).apply {
+            (binding.moderatorIcon.layoutParams as ConstraintLayout.LayoutParams).apply {
                 bottomMargin = 0
             }
 

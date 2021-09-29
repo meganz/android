@@ -10,7 +10,6 @@ import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -46,7 +45,7 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_IS_GUEST = "is_guest"
     }
 
-    private lateinit var binding: ActivityMeetingBinding
+    public lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
     private var meetingAction: String? = null
@@ -84,7 +83,7 @@ class MeetingActivity : PasscodeActivity() {
         decorView.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets? ->
             val defaultInsets = v.onApplyWindowInsets(insets)
 
-            toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
+            binding.toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
 
             @Suppress("DEPRECATION")
             defaultInsets.replaceSystemWindowInsets(
