@@ -43,7 +43,7 @@
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">Caratteri non ammessi</string>
     <!-- Snackbar text for incorrect name -->
-    <string name="scan_snackbar_incorrect_name">Correggi il nome del tuo file prima di procedere</string>
+    <string name="scan_snackbar_incorrect_name">Per favore, correggi il nome del tuo file prima di procedere</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">Preparazione di %1$s. Per favore, attendi&#8230;</string>
     <!-- Error shown when the user writes a character not allowed -->

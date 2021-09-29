@@ -1,25 +1,43 @@
 package mega.privacy.android.app.lollipop;
 
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH;
+import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_ZIP_BROWSER;
+import static mega.privacy.android.app.utils.Constants.ZIP_ADAPTER;
+import static mega.privacy.android.app.utils.FileUtil.getDownloadLocation;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
+import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
+import static mega.privacy.android.app.utils.Util.getMediaIntent;
+import static mega.privacy.android.app.utils.Util.scaleHeightPx;
+
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.app.ActionBar;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -30,7 +48,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
@@ -40,24 +57,15 @@ import java.util.zip.ZipInputStream;
 
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
-
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
-import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class ZipBrowserActivityLollipop extends PasscodeActivity {
 
@@ -68,14 +76,12 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 
     MegaApplication app;
     DatabaseHandler dbH = null;
-    MegaPreferences prefs = null;
-    ProgressDialog temp = null;
+	AlertDialog temp = null;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	boolean folderzipped = false;
 
 	RelativeLayout zipLayout;
-	//ListView listView;
 	RecyclerView recyclerView;
 	LinearLayoutManager mLayoutManager;
 
@@ -97,6 +103,7 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 	/*
 	 * Background task to unzip the file.zip
 	 */
+	@SuppressLint("StaticFieldLeak")
 	private class UnZipTask extends AsyncTask<String, Void, String> {
 		String pathZipTask;
 		int position;
@@ -172,8 +179,8 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 			catch(IOException e) {
 				e.printStackTrace();
 				return false;
-			}			
-		
+			}
+
 			return true;
 		}
 	}
@@ -191,7 +198,7 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 
 		zipBrowserActivityLollipop = this;
 
-		zipNodes = new ArrayList<ZipEntry>();
+		zipNodes = new ArrayList<>();
 			
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -206,17 +213,17 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 		display.getMetrics(outMetrics);	
 		
 		setContentView(R.layout.activity_zip_browser);
-		tB = (Toolbar) findViewById(R.id.toolbar);
+		tB = findViewById(R.id.toolbar);
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		
-		aB.setHomeButtonEnabled(true);
-		aB.setDisplayHomeAsUpEnabled(true);
-		aB.setTitle(getString(R.string.zip_browser_activity));
-
-		zipLayout = (RelativeLayout) findViewById(R.id.zip_layout);
-		recyclerView = (RecyclerView) findViewById(R.id.zip_list_view_browser);
+		if(aB != null) {
+			aB.setHomeButtonEnabled(true);
+			aB.setDisplayHomeAsUpEnabled(true);
+			aB.setTitle(getString(R.string.zip_browser_activity));
+		}
+		zipLayout = findViewById(R.id.zip_layout);
+		recyclerView = findViewById(R.id.zip_list_view_browser);
 		recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 		recyclerView.setClipToPadding(false);
 		recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
@@ -246,12 +253,7 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 			while (zipEntries.hasMoreElements()) {
 				try {
 					ZipEntry element = zipEntries.nextElement();
-					if (element.getName().startsWith(currentFolder+"/")) {
-						folderzipped = true;
-					}
-					else {
-						folderzipped = false;
-					}
+					folderzipped = element.getName().startsWith(currentFolder + "/");
 
 					String[] pE = element.getName().split("/");
 
@@ -303,17 +305,14 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 	}
 
 	void orderZips () {
-		Collections.sort(zipNodes, new Comparator<ZipEntry>(){
-
-			public int compare(ZipEntry z1, ZipEntry z2) {
-				String name1 = z1.getName();
-				String name2 = z2.getName();
-				int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
-				if (res == 0) {
-					res = name1.compareTo(name2);
-				}
-				return res;
+		Collections.sort(zipNodes, (z1, z2) -> {
+			String name1 = z1.getName();
+			String name2 = z2.getName();
+			int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
+			if (res == 0) {
+				res = name1.compareTo(name2);
 			}
+			return res;
 		});
 	}
 	
@@ -321,11 +320,9 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("OnOptionsItemSelected");
 		int id = item.getItemId();
-		switch(id){
-			case android.R.id.home:{
-				onBackPressed();
-				return true;
-			}
+		if (id == android.R.id.home) {
+			onBackPressed();
+			return true;
 		}
 		return true;
 	}
@@ -504,8 +501,7 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 				String toastMessage = getString(R.string.general_already_downloaded) + ": " + absolutePath;
 				Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 			}
-			return;
-		}		
+		}
 	}
 
 	public void showSnackbar(String s){
@@ -514,7 +510,7 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 
 	
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
+	protected void onSaveInstanceState(@NonNull Bundle outState) {
         logDebug("onSaveInstaceState");
     	super.onSaveInstanceState(outState);
 	}
@@ -536,31 +532,28 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 			adapterList.setNodes(zipNodes);
 		}
 		else{
-			String checkFolder = null;
+			String checkFolder;
 			int index = pathZip.lastIndexOf(".");
 			checkFolder = pathZip.substring(0, index);
 
-			if(checkFolder!=null){
-				File check = new File(checkFolder);
+			File check = new File(checkFolder);
 
-				if(check.exists()){
-                    logDebug("Already unzipped");
-					openFile(position);
-				}
-				else{
-					UnZipTask unZipTask = new UnZipTask(pathZip, position);
-					unZipTask.execute();
-					try{
-						temp = new ProgressDialog(this);
-						temp.setMessage(getString(R.string.unzipping_process));
-						temp.show();
-					}
-					catch(Exception e){
-						return;
-					}
-				}
-
+			if(check.exists()){
+				logDebug("Already unzipped");
+				openFile(position);
 			}
+			else{
+				UnZipTask unZipTask = new UnZipTask(pathZip, position);
+				unZipTask.execute();
+				try{
+					temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.unzipping_process));
+					temp.show();
+				}
+				catch(Exception e){
+					logError(e.getMessage());
+				}
+			}
+
 		}
 	}
 
@@ -666,22 +659,18 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 		else{
 			currentFolder= pathZip;
 		}
-		
-		if(currentFolder.length()>0){
-			aB.setTitle("ZIP "+currentFolder);
-		}
-		else {
+
+		if (currentFolder.length() <= 0) {
 			parts = pathZip.split("/");
-			if(parts.length>0){
-				currentFolder= parts[parts.length-1];
+			if (parts.length > 0) {
+				currentFolder = parts[parts.length - 1];
 				currentFolder = currentFolder.replace(".zip", "");
+			} else {
+				currentFolder = pathZip;
 			}
-			else{
-				currentFolder= pathZip;
-			}
-			
-			aB.setTitle("ZIP "+currentFolder);
+
 		}
+		aB.setTitle("ZIP "+currentFolder);
 		//log("setFolder: "+currentFolder);
 		adapterList.setFolder(currentFolder);
 	}

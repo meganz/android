@@ -216,4 +216,13 @@
         android:visible="false"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_menu_open_meeting"
+        android:icon="@drawable/ic_videocam_white"
+        android:orderInCategory="180"
+        android:title="@string/start_join_meeting"
+        android:visible="false"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="ifRoom"
+        />
 </menu>

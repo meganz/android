@@ -517,7 +517,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
         } else if (mimeType.isURL()) {
-            manageURLNode(requireContext(), megaApi, node);
+            manageURLNode(context, megaApi, node);
             return;
         } else if (mimeType.isPdf()) {
             logDebug("isFile:isPdf");

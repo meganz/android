@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/meeting_name"
+        style="@style/BottomSheetInfoItem"
+        android:layout_width="wrap_content"
+        android:paddingRight="0dp"
+        android:text="meeting"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_edit"
+        app:layout_constraintBottom_toTopOf="@id/moderator_name"
+        app:layout_constraintLeft_toRightOf="@id/meeting_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/colorSecondary" />
+
+    <TextView
+        android:id="@+id/moderator_name"
+        style="@style/BottomSheetInfoItem"
+        android:text="meeting"
+        app:drawableStartCompat="@drawable/ic_moderator"
+        app:drawableTint="?attr/colorSecondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/meeting_name" />
+
+    <TextView
+        android:id="@+id/participant_size"
+        style="@style/BottomSheetInfoItem"
+        android:text="meeting"
+        app:drawableStartCompat="@drawable/ic_participants"
+        app:drawableTint="?attr/colorSecondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/moderator_name" />
+
+    <TextView
+        android:id="@+id/copy_link"
+        style="@style/BottomSheetInfoItem"
+        android:singleLine="true"
+        android:text="meeting"
+        android:visibility="gone"
+        app:drawableStartCompat="@drawable/ic_copy"
+        app:drawableTint="?attr/colorSecondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/participant_size" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginTop="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/copy_link">
+
+        <Button
+            android:id="@+id/share_link"
+            style="?attr/materialButtonStyle"
+            android:layout_width="0dp"
+            android:layout_marginRight="6dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/grey_020_grey_040"
+            android:drawableTop="@drawable/ic_social_share_white"
+            android:stateListAnimator="@null"
+            android:text="@string/context_get_link"
+            android:textAllCaps="false"
+            android:textColor="@color/grey_600_white"
+            app:drawableTint="?attr/colorSecondary" />
+
+        <Button
+            android:id="@+id/invite"
+            style="?attr/materialButtonStyle"
+            android:layout_width="0dp"
+            android:layout_marginLeft="6dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/grey_020_grey_040"
+            android:drawableTop="@drawable/ic_invite_contact"
+            android:stateListAnimator="@null"
+            android:text="@string/invite_participants"
+            android:textAllCaps="false"
+            android:textColor="@color/grey_600_white"
+            app:drawableTint="?attr/colorSecondary" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

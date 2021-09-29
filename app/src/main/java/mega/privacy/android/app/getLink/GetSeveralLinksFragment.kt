@@ -56,7 +56,7 @@ class GetSeveralLinksFragment : Fragment() {
             R.id.action_share -> {
                 startActivity(
                     Intent(Intent.ACTION_SEND)
-                        .setType(PLAIN_TEXT_SHARE_TYPE)
+                        .setType(TYPE_TEXT_PLAIN)
                         .putExtra(Intent.EXTRA_TEXT, viewModel.getLinksString())
                 )
             }

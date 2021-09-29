@@ -43,7 +43,7 @@
     <!-- Error text for invalid characters -->
     <string name="scan_invalid_characters">Karakter salah</string>
     <!-- Snackbar text for incorrect name -->
-    <string name="scan_snackbar_incorrect_name">Perbaiki nama file anda sebelum melanjutkan</string>
+    <string name="scan_snackbar_incorrect_name">Harap perbaiki nama file anda sebelum melanjutkan</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">Menyiapkan %1$s. Harap tunggu&#8230;</string>
     <!-- Error shown when the user writes a character not allowed -->

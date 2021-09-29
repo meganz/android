@@ -439,8 +439,6 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">حذف الرابط</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">إحصل على الرابط</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">غادر</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">مغادرة المشاركة</string>
@@ -645,8 +643,8 @@
     <string name="confirmation_cancel_subscriptions">شكرا لك على ملاحظاتك. هل أنت متأكد أنك تريد إلغاء اشتراك ميغا MEGA الخاص بك؟</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">لم يتم إلغاء اشتراكك. يرجى تقديم سبب لإلغائه</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">شكراً لاشتراكك في %1$s %2$s!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">شكراً. دفعتك قيد المعالجة. يرجى مراسلتنا عبر البريد الإلكتروني على support&#64;mega.co.nz إذا لم تستلم ترقيتك في غضون 24 ساعة.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">سيصبح اشتراكك الجديد سارياً بمجرد انتهاء الاشتراك الحالي، وسيتم تحصيل السعر الجديد في ذلك الوقت.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -712,8 +710,6 @@
     <string name="overquota_alert_text">لقد تجاوزت حد السعة التخزينية. هل ترغب في ترقية حسابك؟</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">آخر جلسة</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">وسائل التواصل</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">تغيير كلمة المرور</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -1072,11 +1068,11 @@
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite">حساب برو لايت Pro Lite</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">حساب برو 1 PRO I</string>
+    <string name="my_account_pro1">حساب برو 1 Pro I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">حساب برو 2 PRO II</string>
+    <string name="my_account_pro2">حساب برو 2 Pro II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">حساب برو 3 PRO III</string>
+    <string name="my_account_pro3">حساب برو 3 Pro III</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">حساب برو لايت Pro Lite</string>
     <!--  -->
@@ -1220,7 +1216,7 @@
     <!-- Title of the dialog to get link with password -->
     <string name="title_set_password_protection">تعيين الحماية بكلمة مرور</string>
     <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(فقط لمشتركي PRO)</string>
+    <string name="subtitle_set_expiry_date">(فقط لمشتركي Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">إنشاء كلمة مرور</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1333,7 +1329,7 @@
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">أخفق تحديث الأذونات لجهات الاتصال %d</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
-    <string name="contacts_list_empty_text_loading">جار ترفيع جهات الاتصال من الهاتف&#8230;</string>
+    <string name="contacts_list_empty_text_loading">جار تحميل جهات الاتصال من الهاتف&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">تم إرسال %d طلبات بالفعل.</string>
     <!-- success message when reinviting multiple contacts -->
@@ -1667,7 +1663,7 @@
     <!-- Dialog to confirm the reconnect action -->
     <string name="confirmation_to_reconnect">تم استرداد اتصال الشبكة. هل تريد الاتصال بميغا MEGA؟</string>
     <!-- Message shown meanwhile the app is waiting for a the chat status -->
-    <string name="loading_status">جاري ترفيع الحالة&#8230;</string>
+    <string name="loading_status">جاري تحميل الحالة&#8230;</string>
     <!-- Error when a message cannot be edited -->
     <string name="error_editing_message">لا يمكن تعديل هذه الرسالة</string>
     <!-- Label to show the number of transfers in progress, Plural -->
@@ -2402,7 +2398,7 @@
     <!-- Message error shown when trying to log in on an account has been suspended due to breach of Terms of Service -->
     <string name="account_suspended_breache_ToS">تم إنهاء حسابك بسبب خرق لشروط الخدمة لدى ميغا MEGA بما في ذلك على سبيل المثال لا الحصر ، البند 15.</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
-    <string name="file_storage_loading">ترفيع ملفات</string>
+    <string name="file_storage_loading">تحميل الملفات</string>
     <!-- In a chat conversation when you try to send device’s images but there aren’t available images -->
     <string name="file_storage_empty_folder">لا توجد ملفات</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3000,7 +2996,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">إذا كانت مقاطع الفيديو المراد ضغطها أكبر من</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">لتعطيل الافراغ المجدول لسلة المحذوفات أو لتحديد زمن أطول للاحتفاظ، يجب ان تشترك بباقة برو Pro.</string>
+    <string name="settings_rb_scheduler_alert_disabling">لتعطيل الإفراغ المجدول لسلة المحذوفات أو لتحديد زمن أطول للاحتفاظ، يرجى الاشتراك بباقة برو Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">أيام</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3300,7 +3296,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">تمكين المكالمات</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">تمكين الوصول إلى دفتر العناوين الخاص بك</string>
+    <string name="allow_acces_contact_title">منح حق الوصول إلى دفتر العناوين الخاص بك</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">اكتشف جهات الاتصال بسهولة من دفتر العناوين الخاص بك على ميغا MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3464,7 +3460,7 @@
     <!-- In APP, text used to ask for access to contacts -->
     <string name="grant_mega_access_contacts">امنح ميغا MEGA حق الوصول إلى دفتر العناوين الخاص بك لاكتشاف جهات الاتصال الخاصة بك على ميغا MEGA.</string>
     <!-- Getting registered contacts -->
-    <string name="get_registered_contacts">جارٍ ترفيع جهات الاتصال على ميغا MEGA &#8230;</string>
+    <string name="get_registered_contacts">جارٍ تحميل جهات الاتصال على ميغا MEGA &#8230;</string>
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">لم يتم ارسال المحتوى إلى %d محادثات</string>
     <!-- Label shown when a new group chat has been created correctly -->
@@ -3672,7 +3668,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">محادثات</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]لا توجد نشاطات في [/B][A]نشاطك مؤخراً[/A]</string>
+    <string name="context_empty_recents">[B]لا توجد ملفات في [/B][A]مؤخراً[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s و %2$d مزيد</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3733,7 +3729,7 @@
     <string name="business_management_alert">إدارة المستخدم متاحة فقط من متصفح سطح المكتب.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">الاستخدام</string>
-    <!-- Title of usage storage details section in Storage -->
+    <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">تفاصيل توزيع استخدام مساحة التخزين</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">الإستخدام الكلي</string>
@@ -3926,7 +3922,7 @@
     <!-- Error message when trying to login and the account is blocked -->
     <string name="error_account_blocked">تم حظر حسابك. يرجى التواصل مع support&#64;mega.nz</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">تم تعطيل حسابك من قبل مديرك. يرجى الاتصال مع مدير حساب الاعمال خاصتك للحصول على مزيد من التفاصيل.</string>
+    <string name="error_business_disabled">تم إلغاء تفعيل حسابك من قبل مديرك. يرجى الاتصال مع مدير حساب الاعمال خاصتك للحصول على مزيد من التفاصيل.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
     <string name="error_business_removed">تمت إزالة حسابك من قبل مشرف الحساب الخاص بك. يرجى الاتصال بمشرف حساب الأعمال لمزيد من التفاصيل.</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -4096,14 +4092,10 @@
     <string name="button_copy_key">نسخ المفتاح</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">انسخ كلمة المرور</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">تم نسخ الرابط إلى الحافظة.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">تم نسخ المفتاح إلى الحافظة.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">تم نسخ كلمة المرور إلى الحافظة.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">تم إرسال الرابط بنجاح.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">تم إرسال الرابط والمفتاح بنجاح.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -4235,7 +4227,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">تم تحديث الملف</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">فشل تحديث الملف. حاول مرة أخرى.</string>
+    <string name="file_update_failed">فشل تحديث الملف. يرجى المحاولة مرة أخرى.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">الملف كبير جدًا ولا يمكن فتحه أو معاينته.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -4363,4 +4355,200 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">تغيير على أي حال</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">مطلوب إذن الوصول إلى التخزين.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s بيتابايت PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s اكسابايت EB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">اضف رقم هاتفك</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">هل تتذكر كلمة المرور الخاصة بك؟\nلا يمكن لميغا MEGA إعادة تعيين كلمة المرور الخاصة بك إذا نسيتها.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">تغيير الإسم</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">إضافة صورة</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">إضافة رقم هاتف</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">يحتاج ميغا MEGA إلى أذونات الكتابة لمساحة تخزين جهازك للمتابعة.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">غداً %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">بانتظار التأكيد</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="zero">%1$d وسيلة تواصل</item>
+        <item quantity="one">1 وسيلة تواصل</item>
+        <item quantity="two">%1$d وسيلتا تواصل</item>
+        <item quantity="few">%1$d وسائل التواصل</item>
+        <item quantity="many">%1$d وسيلة تواصل</item>
+        <item quantity="other">%1$d وسيلة تواصل</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">تمت إضافته مؤخراً</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]لا يوجد [/B][A]مجموعات[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">الطلبات</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">مجموعات</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Copy all</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Link successfully sent.</item>
+        <item quantity="other">Links successfully sent.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link copied to the clipboard.</item>
+        <item quantity="other">Links copied to the clipboard.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Get Link</item>
+        <item quantity="other">Get Links</item>
+    </plurals>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">انت الوحيد هنا</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">اجتماع</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">ابدأ/ انضم إلى الاجتماع</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">اجتماع جديد</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">أنضم إلى الاجتماع</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">ابدأ الاجتماع</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">انضم كضيف</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">اجتماع %s</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">إنهاء</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">ميكروفون</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">تم كتم صوت الميكروفون خاصتك</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">تم إعادة صوت الميكروفون خاصتك</string>
+    <!-- General label for camera -->
+    <string name="general_camera">الكاميرا</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">تم تشغيل الكاميرا خاصتك.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">تم إيقاف تشغيل الكاميرا خاصتك.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">تعليق</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">مكبر الصوت</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">سماعات الأذن</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">سماعات الأذن مفعلة</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">مكبر الصوت قيد التشغيل</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">مكبر الصوت متوقف</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">إنهاء</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">قم بدعوة مشاركين</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">المشاركون (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">إظهار كعرض قائمة</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">التعيين كمشرف</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">هل تريد مغادرة الاجتماع الآن؟</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">لا يوجد مشرف</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">قبل المغادرة، يرجى تعيين مشرف جديد أو أكثر للاجتماع.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">التعيين كمشرف</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">غادر على أي حال</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">يرجى تعيين مشرف جديد أو أكثر.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">تغيير اسم الاجتماع</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">المشاركون: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">مشرف:%s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">رابط الاجتماع</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">مدة</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">انضم إلى الاجتماع كضيف</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">أنت مدعو إلى اجتماع.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">اضغط على رابط الاجتماع المرسل إليك أو الصقه هنا</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">جودة اتصال رديئة</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">تم إنهاء الاجتماع</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">رابط الاجتماع غير صالح</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">أذونات الوصول المطلوبة لميغا MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">تحتاج ميغا MEGA إلى الوصول إلى الميكروفون والكاميرا الخاصة بك للاجتماعات.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">فهمت ذلك</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">انتقل إلى الإعدادات للسماح لميغا MEGA بالوصول إلى الكاميرا والميكروفون.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">عرض محادثة الاجتماع</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">قم بدعوة المزيد من المشاركين إلى الاجتماع. اسحب لأعلى للدعوة.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">انقر لإنشاء اجتماع جديد</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">قم بإعداد اجتماع ميغا MEGA بسرعة باستخدام ميزة الاجتماع المشفرة الجديدة الخاصة بنا</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">أنت المشرف الجديد.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">رابط الاجتماع الذي تم نسخه.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">قام %s ببدء اجتماع. انقر للانضمام.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">اجتماع ميغا MEGA</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">اجتماع فيديو مشفر من طرف إلى طرف</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">الرجاء إدخال رابط صالح للاجتماع</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">أكثر من مجرد اجتماعات</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">خصوصيتك مهمة</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">انضم إلى أكبر منصة تخزين وتعاون سحابية آمنة في العالم.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">احصل على 20 جيجابايت مجاناً</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">اشترك الآن واستمتع بميزات التعاون المتقدمة مجانًا.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">مكالمة أخرى جارية. يرجى إنهاء مكالمتك الحالية قبل إجراء أخرى.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">اسم الاجتماع الجديد</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">فشل إنشاء اجتماع.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](أنا)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">عرض كقائمة</string>
 </resources>

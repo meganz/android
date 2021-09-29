@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_meeting"
+    app:startDestination="@id/createMeetingFragment">
+
+    <action
+        android:id="@+id/action_global_inMeeting"
+        app:destination="@id/inMeetingFragment"
+        app:popUpTo="@id/nav_meeting"
+        app:popUpToInclusive="true" />
+
+    <fragment
+        android:id="@+id/createMeetingFragment"
+        android:name="mega.privacy.android.app.meeting.fragments.CreateMeetingFragment"
+        android:label="fragment_create_meeting">
+    </fragment>
+    <fragment
+        android:id="@+id/joinMeetingFragment"
+        android:name="mega.privacy.android.app.meeting.fragments.JoinMeetingFragment"
+        android:label="fragment_join_meeting">
+    </fragment>
+    <fragment
+        android:id="@+id/joinMeetingAsGuestFragment"
+        android:name="mega.privacy.android.app.meeting.fragments.JoinMeetingAsGuestFragment"
+        android:label="fragment_join_meeting_as_guest">
+    </fragment>
+    <fragment
+        android:id="@+id/inMeetingFragment"
+        android:name="mega.privacy.android.app.meeting.fragments.InMeetingFragment"
+        android:label="fragment_in_meeting"
+        tools:layout="@layout/in_meeting_fragment">
+
+        <argument
+            android:name="action"
+            app:argType="string"
+            android:defaultValue="in_meeting"/>
+        <argument
+            android:name="chatId"
+            app:argType="long"
+            android:defaultValue="0L"/>
+        <argument
+            android:name="publicChatHandle"
+            app:argType="long"
+            android:defaultValue="0L"/>
+        <argument
+            android:name="meetingName"
+            app:argType="string"
+            android:defaultValue=""/>
+        <argument
+            android:name="meetingLink"
+            app:argType="string"
+            android:defaultValue=""/>
+        <argument
+            android:name="firstName"
+            app:argType="string"
+            android:defaultValue=""/>
+        <argument
+            android:name="lastName"
+            app:argType="string"
+            android:defaultValue=""/>
+    </fragment>
+    <fragment
+        android:id="@+id/ringingMeetingFragment"
+        android:name="mega.privacy.android.app.meeting.fragments.RingingMeetingFragment"
+        android:label="fragment_ringing_meeting">
+    </fragment>
+</navigation>

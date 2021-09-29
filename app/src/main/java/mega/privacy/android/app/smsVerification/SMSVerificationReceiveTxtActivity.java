@@ -49,6 +49,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER;
 import static mega.privacy.android.app.smsVerification.SMSVerificationActivity.*;
 import static mega.privacy.android.app.lollipop.LoginFragmentLollipop.*;
+import static mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT;
 import static mega.privacy.android.app.utils.LogUtil.*;
 
 public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implements MegaRequestListenerInterface, View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener {
@@ -682,10 +683,7 @@ public class SMSVerificationReceiveTxtActivity extends PasscodeActivity implemen
                     public void run() {
                         //haven't logged in, if has credential will auto-login
                         if(api.isLoggedIn() == 0 || api.getRootNode() == null) {
-                            Intent intent = new Intent(getApplicationContext(), LoginActivityLollipop.class);
-                            intent.putExtra("visibleFragment", Constants. LOGIN_FRAGMENT);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
+                            refreshSession();
                         } else {
                             setResult(RESULT_OK);
                         }

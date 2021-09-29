@@ -74,8 +74,8 @@ class MediaPlayerFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return if (MediaPlayerActivity.isAudioPlayer(activity?.intent)) {
+    ): View =
+        if (MediaPlayerActivity.isAudioPlayer(activity?.intent)) {
             val binding = FragmentAudioPlayerBinding.inflate(inflater, container, false)
             audioPlayerVH = AudioPlayerViewHolder(binding)
             binding.root
@@ -84,7 +84,6 @@ class MediaPlayerFragment : Fragment() {
             videoPlayerVH = VideoPlayerViewHolder(binding)
             binding.root
         }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_900">
+
+    <ImageView
+        android:id="@+id/reconnecting"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:src="@drawable/ic_call_cancelled"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/meeting_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <FrameLayout
+        android:id="@+id/self_feed_floating_window_container"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="125dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:id="@+id/snackbar_position"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="125dp"
+        android:background="@android:color/transparent"
+        android:orientation="vertical" />
+
+    <include
+        android:id="@+id/bottom_floating_panel"
+        layout="@layout/meeting_bottom_floating_panel" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
