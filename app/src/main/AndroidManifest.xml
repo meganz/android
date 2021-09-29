@@ -686,6 +686,12 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
             android:launchMode="singleTask"/>
 
+        <activity
+            android:name="mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity"
+            android:label="@string/start_screen_setting"
+            android:launchMode="singleTop">
+        </activity>
+
     </application>
 
 </manifest>
