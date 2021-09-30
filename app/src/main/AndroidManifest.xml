@@ -76,8 +76,7 @@
         android:roundIcon="@mipmap/ic_launcher_mega_round"
         android:theme="@style/Theme.Mega"
         android:usesCleartextTraffic="true"
-        android:screenOrientation="fullUser"
-        android:manageSpaceActivity="mega.privacy.android.app.lollipop.ManagerActivityLollipop" >
+        android:screenOrientation="fullUser" >
 
         <meta-data
             android:name="fontProviderRequests"
