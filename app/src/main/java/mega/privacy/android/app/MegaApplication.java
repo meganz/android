@@ -736,6 +736,8 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		initLoggerKarere();
 
 		checkAppUpgrade();
+		checkMegaStandbyBucket();
+		getTombstoneInfo();
 
 		setupMegaApi();
 		setupMegaApiFolder();
@@ -1647,27 +1649,30 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	 * Get the tombstone information.
 	 */
 	public void getTombstoneInfo(){
-		ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
-		List<ApplicationExitInfo> exitReasons;
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-			exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 5);
-			for (ApplicationExitInfo aei : exitReasons) {
-				if (aei.getReason() == REASON_CRASH_NATIVE) {
-					// Get the tombstone input stream.
-					try {
-						InputStream tombstoneInputStream = aei.getTraceInputStream();
-						if(tombstoneInputStream != null) {
-							// The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
-							TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
-							logError("Tombstone Info" + tombstone.toString());
-							tombstoneInputStream.close();
+		new Thread(() -> {
+			logDebug("getTombstoneInfo");
+			ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+			List<ApplicationExitInfo> exitReasons;
+			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+				exitReasons = activityManager.getHistoricalProcessExitReasons(/* packageName = */ null, /* pid = */ 0, /* maxNum = */ 3);
+				for (ApplicationExitInfo aei : exitReasons) {
+					if (aei.getReason() == REASON_CRASH_NATIVE) {
+						// Get the tombstone input stream.
+						try {
+							InputStream tombstoneInputStream = aei.getTraceInputStream();
+							if(tombstoneInputStream != null) {
+								// The tombstone parser built with protoc uses the tombstone schema, then parses the trace.
+								TombstoneProtos.Tombstone tombstone = TombstoneProtos.Tombstone.parseFrom(tombstoneInputStream);
+								logError("Tombstone Info" + tombstone.toString());
+								tombstoneInputStream.close();
+							}
+						} catch (IOException e) {
+							e.printStackTrace();
 						}
-					} catch (IOException e) {
-						e.printStackTrace();
 					}
 				}
 			}
-		}
+		}).start();
 	}
 	public AppRTCAudioManager getAudioManager() {
 		return rtcAudioManager;
