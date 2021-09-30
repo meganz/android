@@ -482,6 +482,7 @@ public class AddContactActivityLollipop extends PasscodeActivity implements View
                 setRecyclersVisibility();
                 setSendInvitationVisibility();
                 visibilityFastScroller();
+                setSearchVisibility();
 
                 if (isConfirmAddShown) {
                     if (isAsyncTaskRunning(queryIfContactSouldBeAddedTask)) {
