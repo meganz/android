@@ -7290,6 +7290,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if(CallUtil.participatingInACall()){
 			showConfirmationInACall(this);
 		} else {
+			// For android 12, need android.permission.BLUETOOTH_CONNECT permission
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+				boolean hasPermission = hasPermissions(this, Manifest.permission.BLUETOOTH_CONNECT);
+				if (!hasPermission) {
+					requestPermission(this, REQUEST_BT_CONNECT, Manifest.permission.BLUETOOTH_CONNECT);
+					return;
+				}
+			}
 			openMeetingToCreate(this);
 		}
 	}
