@@ -514,7 +514,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			switch(this)
 			{
 				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
-				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
+				case CAMERA_UPLOADS: return context.getString(R.string.sortby_type_photo_first);
 				case INBOX: return context.getString(R.string.section_inbox);
 				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
 				case SETTINGS: return context.getString(R.string.action_settings);
@@ -3867,7 +3867,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
 				} else {
 					setFirstNavigationLevel(true);
-					aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
+					aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
 				}
 				break;
 			}
@@ -3877,7 +3877,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				switch (mHomepageScreen) {
 					case PHOTOS:
-						titleId = R.string.sortby_type_photo_first;
+						titleId = R.string.section_images;
 						break;
 					case DOCUMENTS:
 						titleId = R.string.section_documents;
