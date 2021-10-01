@@ -595,8 +595,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                     dialogCall.dismiss();
                 }
 
-                if((call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION ||
-                        call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) &&
+                if(call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION&&
                         call.getTermCode() == MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS){
                     showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
                 }
