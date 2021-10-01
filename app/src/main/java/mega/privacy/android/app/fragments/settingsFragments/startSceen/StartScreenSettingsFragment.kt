@@ -10,16 +10,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.constants.SettingsConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.app.databinding.FragmentStartScreenSettingsBinding
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CAMERA_UPLOADS
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.SHARED_ITEMS
 
+/**
+ * Settings fragment to choose the preferred start screen.
+ */
 class StartScreenSettingsFragment : Fragment() {
-
-    companion object {
-        private const val CLOUD_DRIVE = 0
-        private const val CAMERA_UPLOADS = 1
-        private const val HOME = 2
-        private const val CHAT = 3
-        private const val SHARED_ITEMS = 4
-    }
 
     private val viewModel by activityViewModels<StartScreenViewModel>()
 

@@ -262,6 +262,9 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.EventConstants.*;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartBottomNavigationItem;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartDrawerItem;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.HOMEPAGE_UPLOAD;
@@ -341,11 +344,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public static final int PENDING_TAB = 0;
 	public static final int COMPLETED_TAB = 1;
 
-	private static final int CLOUD_DRIVE_BNV = 0;
-	private static final int CAMERA_UPLOADS_BNV = 1;
-	private static final int HOMEPAGE_BNV = 2;
-	private static final int CHAT_BNV = 3;
-	private static final int SHARED_BNV = 4;
+	public static final int CLOUD_DRIVE_BNV = 0;
+	public static final int CAMERA_UPLOADS_BNV = 1;
+	public static final int HOMEPAGE_BNV = 2;
+	public static final int CHAT_BNV = 3;
+	public static final int SHARED_BNV = 4;
 	private static final int HIDDEN_BNV = 5;
 	// 8dp + 56dp(Fab's size) + 8dp
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
@@ -1902,8 +1905,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         if (!isOnline(this)){
 			logDebug("No network -> SHOW OFFLINE MODE");
 
-			if(drawerItem==null){
-				drawerItem = DrawerItem.HOMEPAGE;
+			if (drawerItem == null) {
+				drawerItem = getStartDrawerItem(this);
 			}
 
 			selectDrawerItemLollipop(drawerItem);
@@ -2407,7 +2410,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			setNotificationsTitleSection();
 
 			if (drawerItem == null) {
-	        	drawerItem = DrawerItem.HOMEPAGE;
+	        	drawerItem = getStartDrawerItem(this);
+
 	        	Intent intent = getIntent();
 	        	if (intent != null){
 	        		boolean upgradeAccount = getIntent().getBooleanExtra(EXTRA_UPGRADE_ACCOUNT, false);
@@ -4040,14 +4044,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("DrawerItem on start offline: " + drawerItem);
 			if (drawerItem == null) {
 				logWarning("drawerItem == null --> On start OFFLINE MODE");
-				drawerItem = DrawerItem.HOMEPAGE;
+				drawerItem = getStartDrawerItem(this);
+
 				if (bNV != null) {
 					Menu bNVMenu = bNV.getMenu();
 					if (bNVMenu != null) {
 						disableNavigationViewMenu(bNVMenu);
 					}
 				}
-				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+
 				selectDrawerItemLollipop(drawerItem);
 			} else {
 				if (bNV != null) {
@@ -5256,7 +5261,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			Menu bNVMenu = bNV.getMenu();
 			if (bNVMenu != null) {
 				if (drawerItem == null) {
-					drawerItem = DrawerItem.CLOUD_DRIVE;
+					drawerItem = getStartDrawerItem(this);
 				}
 
 				if (drawerItem == DrawerItem.CLOUD_DRIVE) {
@@ -5620,9 +5625,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		    			}
 		    		}
 		    		else if (drawerItem == DrawerItem.TRANSFERS){
-
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV);
+						drawerItem = getStartDrawerItem(this);
 						selectDrawerItemLollipop(drawerItem);
 						return true;
 		    		} else if (drawerItem == DrawerItem.HOMEPAGE) {
@@ -6222,7 +6225,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE) {
 		    if (!isCloudAdded() || fbFLol.onBackPressed() == 0) {
-				backToDrawerItem(-1);
+		    	performOnBack();
 			}
 		} else if (drawerItem == DrawerItem.RUBBISH_BIN) {
 			rubbishBinFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager()
@@ -6252,32 +6255,32 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			switch (getTabItemShares()) {
 				case INCOMING_TAB:
 					if (!isIncomingAdded() || inSFLol.onBackPressed() == 0) {
-						backToDrawerItem(-1);
+						performOnBack();
 					}
 					break;
 				case OUTGOING_TAB:
 					if (!isOutgoingAdded() || outSFLol.onBackPressed() == 0) {
-						backToDrawerItem(-1);
+						performOnBack();
 					}
 					break;
 				case LINKS_TAB:
 					if (!isLinksAdded() || lF.onBackPressed() == 0) {
-						backToDrawerItem(-1);
+						performOnBack();
 					}
 					break;
 				default:
-					backToDrawerItem(-1);
+					performOnBack();
 					break;
 			}
         } else if (drawerItem == DrawerItem.CHAT) {
 			if (getChatsFragment() != null && isFabExpanded) {
                 collapseFab();
             } else {
-                backToDrawerItem(-1);
+				performOnBack();
             }
 		} else if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
 			if (getCameraUploadFragment() == null || cuFragment.onBackPressed() == 0){
-				backToDrawerItem(-1);
+				performOnBack();
 			}
     	} else if (drawerItem == DrawerItem.SEARCH) {
 			if (getSearchFragment() == null || sFLol.onBackPressed() == 0) {
@@ -6288,13 +6291,27 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             if(fragment != null && fragment.isFabExpanded()) {
                 fragment.collapseFab();
             } else {
-            	// The Psa requires the activity to load the new PSA even though the app
-				// is on the background. So don't call super.onBackPressed() since it will destroy
-				// this activity and its embedded web browser fragment.
-				moveTaskToBack(false);
-            }
+				performOnBack();
+			}
         } else {
 			handleBackPressIfFullscreenOfflineFragmentOpened();
+		}
+	}
+
+	/**
+	 * Closes the app if the current DrawerItem is the same as the preferred one.
+	 * If not, sets the current DrawerItem as the preferred one.
+	 */
+	private void performOnBack() {
+		int startItem = getStartBottomNavigationItem(this);
+
+		if (shouldCloseApp(startItem, drawerItem)) {
+			// The Psa requires the activity to load the new PSA even though the app is on the
+			// background. So don't call super.onBackPressed() since it will destroy this activity
+			// and its embedded web browser fragment.
+			moveTaskToBack(false);
+		} else {
+			backToDrawerItem(startItem);
 		}
 	}
 
@@ -7485,8 +7502,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void skipInitialCUSetup() {
 		setFirstLogin(false);
-		drawerItem = DrawerItem.HOMEPAGE;
-		setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+		drawerItem = getStartDrawerItem(this);
 		selectDrawerItemLollipop(drawerItem);
 	}
 

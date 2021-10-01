@@ -45,6 +45,7 @@ import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 
+import static mega.privacy.android.app.constants.SettingsConstants.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
 import static mega.privacy.android.app.textEditor.TextEditorViewModel.SHOW_LINE_NUMBERS;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -386,6 +387,10 @@ public class AccountController {
 
         //clear text editor preference
         PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_LINE_NUMBERS, false).apply();
+
+        //clear user interface preferences
+        context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+                .edit().clear().apply();
 
         removeEmojisSharedPreferences();
 
