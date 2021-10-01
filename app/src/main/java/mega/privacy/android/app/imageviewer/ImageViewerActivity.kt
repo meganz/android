@@ -16,6 +16,7 @@ import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -146,19 +147,21 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         return super.onPrepareOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean =
-        when (item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val currentNodeHandle = viewModel.getCurrentHandle()
+
+        return when (item.itemId) {
             android.R.id.home -> {
                 onBackPressed()
                 true
             }
             R.id.action_download -> {
-                nodeSaver.get()?.saveHandle(viewModel.getCurrentHandle(), fromMediaViewer = true)
+                nodeSaver.get()?.saveHandle(currentNodeHandle, fromMediaViewer = true)
                 true
             }
             R.id.action_save_gallery -> {
                 nodeSaver.get()?.saveHandle(
-                    viewModel.getCurrentHandle(),
+                    currentNodeHandle,
                     highPriority = false,
                     isFolderLink = false,
                     fromMediaViewer = false,
@@ -168,19 +171,21 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_get_link -> {
-                LinksUtil.showGetLinkActivity(this, viewModel.getCurrentHandle())
+                LinksUtil.showGetLinkActivity(this, currentNodeHandle)
                 true
             }
             R.id.action_chat -> {
-                nodeAttacher.get()?.attachNode(viewModel.getCurrentHandle())
+                nodeAttacher.get()?.attachNode(currentNodeHandle)
                 true
             }
             R.id.action_more -> {
-                //do something
+                ImageBottomSheetDialogFragment.newInstance(currentNodeHandle)
+                    .show(supportFragmentManager)
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when {

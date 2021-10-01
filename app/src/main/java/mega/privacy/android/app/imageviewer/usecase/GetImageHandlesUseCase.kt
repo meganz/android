@@ -7,7 +7,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
 
 class GetImageHandlesUseCase @Inject constructor(

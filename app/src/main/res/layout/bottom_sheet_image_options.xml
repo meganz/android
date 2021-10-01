@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:padding="16dp">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/img_thumbnail"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:roundedCornerRadius="4dp"
+            tools:placeholderImage="@android:drawable/ic_menu_camera" />
+
+        <TextView
+            android:id="@+id/txt_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="40dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Mega.Body1"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/img_thumbnail"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="IMG_20170710.jpg" />
+
+        <TextView
+            android:id="@+id/txt_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
+            android:drawablePadding="5dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
+            app:drawableStartCompat="@drawable/ic_baseline_history"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/txt_name"
+            app:layout_constraintTop_toBottomOf="@id/txt_name"
+            tools:text="4.6 MB · 30 Dec 2020 17:58" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/grey_012_white_012" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:id="@+id/layout_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/option_info"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_file_info"
+                app:drawableStartCompat="@drawable/info_ic" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/option_favorite"
+                style="@style/BottomSheetOption"
+                android:text="@string/file_properties_favourite"
+                app:drawableStartCompat="@drawable/ic_add_favourite" />
+
+            <LinearLayout
+                android:id="@+id/option_label_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="?selectableItemBackground"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/option_label"
+                    style="@style/BottomSheetOption"
+                    android:layout_width="wrap_content"
+                    android:background="@null"
+                    android:text="@string/file_properties_label"
+                    app:drawableStartCompat="@drawable/ic_label" />
+
+                <TextView
+                    android:id="@+id/option_label_current"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:drawablePadding="8dp"
+                    android:gravity="end|center_vertical"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="16sp"
+                    tools:drawableRight="@drawable/ic_circle_label"
+                    tools:text="@string/label_red"
+                    tools:textColor="@color/salmon_400_salmon_300" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/option_open_with"
+                style="@style/BottomSheetOption"
+                android:text="@string/external_play"
+                app:drawableStartCompat="@drawable/ic_open_with" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/option_download"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_save_to_device"
+                app:drawableStartCompat="@drawable/ic_save_to_device" />
+
+            <TextView
+                android:id="@+id/option_gallery"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_save_to_gallery"
+                app:drawableStartCompat="@drawable/ic_save_gallery" />
+
+            <LinearLayout
+                android:id="@+id/option_offline_layout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/option_offline"
+                    style="@style/BottomSheetOption"
+                    android:layout_width="wrap_content"
+                    android:text="@string/file_properties_available_offline"
+                    app:drawableStartCompat="@drawable/ic_save_offline" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/file_properties_switch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/option_manage_link"
+                style="@style/BottomSheetOption"
+                android:text="@string/edit_link_option"
+                app:drawableStartCompat="@drawable/link_ic" />
+
+            <TextView
+                android:id="@+id/option_remove_link"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_remove_link_menu"
+                app:drawableStartCompat="@drawable/ic_remove_link" />
+
+            <TextView
+                android:id="@+id/option_send_to_contact"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_send_file_inbox"
+                app:drawableStartCompat="@drawable/ic_send_to_contact" />
+
+            <TextView
+                android:id="@+id/option_share"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_share"
+                app:drawableStartCompat="@drawable/ic_social_share_white" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/option_rename"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_rename"
+                app:drawableStartCompat="@drawable/ic_rename" />
+
+            <TextView
+                android:id="@+id/option_move"
+                style="@style/BottomSheetOption"
+                android:text="@string/general_move"
+                app:drawableStartCompat="@drawable/ic_move" />
+
+            <TextView
+                android:id="@+id/option_copy"
+                style="@style/BottomSheetOption"
+                android:text="@string/context_copy"
+                app:drawableStartCompat="@drawable/ic_menu_copy" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="72dp"
+                android:background="@color/grey_012_white_012" />
+
+            <TextView
+                android:id="@+id/rubbish_bin_option"
+                style="@style/BottomSheetOption.Red"
+                android:text="@string/context_move_to_trash"
+                app:drawableStartCompat="@drawable/ic_rubbish_bin" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

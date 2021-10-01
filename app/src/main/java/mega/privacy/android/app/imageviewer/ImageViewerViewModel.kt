@@ -13,12 +13,15 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
+import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaNode
 
 class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageUseCase: GetImageUseCase,
-    private val getImageHandlesUseCase: GetImageHandlesUseCase
+    private val getImageHandlesUseCase: GetImageHandlesUseCase,
+    private val getNodeUseCase: GetNodeUseCase
 ) : BaseRxViewModel() {
 
     private var currentHandle = INVALID_HANDLE
@@ -101,6 +104,33 @@ class ImageViewerViewModel @ViewModelInject constructor(
                 }
             )
             .addTo(composite)
+    }
+
+    fun getNode(nodeHandle: Long): LiveData<MegaNode> {
+        val result = MutableLiveData<MegaNode>()
+        getNodeUseCase.get(nodeHandle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { node ->
+                    result.value = node
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+        return result
+    }
+
+    fun markNodeAsFavorite(nodeHandle: Long, isFavorite: Boolean) {
+        getNodeUseCase.markAsFavorite(nodeHandle, isFavorite)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
     }
 
     fun setCurrentPosition(position: Int) {
