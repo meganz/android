@@ -168,7 +168,7 @@
                     app:drawableStartCompat="@drawable/ic_save_offline" />
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/file_properties_switch"
+                    android:id="@+id/switch_offline"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="16dp"
@@ -191,7 +191,9 @@
                 android:id="@+id/option_remove_link"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_remove_link_menu"
-                app:drawableStartCompat="@drawable/ic_remove_link" />
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/ic_remove_link"
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/option_send_to_contact"
@@ -236,7 +238,7 @@
                 android:background="@color/grey_012_white_012" />
 
             <TextView
-                android:id="@+id/rubbish_bin_option"
+                android:id="@+id/option_rubbish_bin"
                 style="@style/BottomSheetOption.Red"
                 android:text="@string/context_move_to_trash"
                 app:drawableStartCompat="@drawable/ic_rubbish_bin" />

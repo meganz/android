@@ -1446,7 +1446,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 						}
 
                         logDebug("Handle to save for offline : " + node.getHandle());
-                        saveOffline(destination, node, this, fileInfoActivityLollipop);
+                        saveOffline(destination, node, fileInfoActivityLollipop);
 
 						supportInvalidateOptionsMenu();
 					}
@@ -1481,7 +1481,7 @@ public class FileInfoActivityLollipop extends PasscodeActivity implements OnClic
 									return;
 								}
 							}
-							saveOffline(destination, node, this, fileInfoActivityLollipop);
+							saveOffline(destination, node, fileInfoActivityLollipop);
 						}
 						else{
                             logWarning("result=findIncomingParentHandle NOT result!");

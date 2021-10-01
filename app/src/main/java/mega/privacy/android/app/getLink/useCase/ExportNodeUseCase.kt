@@ -1,5 +1,6 @@
 package mega.privacy.android.app.getLink.useCase
 
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -21,11 +22,12 @@ class ExportNodeUseCase @Inject constructor(
     /**
      * Launches a request to export a node.
      *
-     * @param node MegaNode to export.
+     * @param nodeHandle MegaNode handle to export.
      * @return Single<String> The link if the request finished with success, error if not.
      */
-    fun export(node: MegaNode): Single<String> =
+    fun export(nodeHandle: Long): Single<String> =
         Single.create { emitter ->
+            val node = megaApi.getNodeByHandle(nodeHandle)
             megaApi.exportNode(node, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
                     if (error.errorCode == MegaError.API_OK) {
@@ -89,5 +91,25 @@ class ExportNodeUseCase @Inject constructor(
                     }
                 ))
             }
+        }
+
+    fun disableExport(nodeHandle: Long): Completable =
+        Completable.create { emitter ->
+            val node = megaApi.getNodeByHandle(nodeHandle)
+            megaApi.disableExport(node, OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            emitter.onComplete()
+                        }
+                        MegaError.API_EBUSINESSPASTDUE -> {
+                            emitter.onError(IllegalStateException("Business account status is expired"))
+                        }
+                        else -> {
+                            emitter.onError(error.toThrowable())
+                        }
+                    }
+                }
+            ))
         }
 }

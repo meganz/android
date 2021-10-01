@@ -1,5 +1,7 @@
 package mega.privacy.android.app.imageviewer
 
+import android.app.Activity
+import android.content.Context
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,18 +12,20 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.MegaNodeItem
 import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaNode
 
 class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageUseCase: GetImageUseCase,
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
-    private val getNodeUseCase: GetNodeUseCase
+    private val getNodeUseCase: GetNodeUseCase,
+    private val exportNodeUseCase: ExportNodeUseCase
 ) : BaseRxViewModel() {
 
     private var currentHandle = INVALID_HANDLE
@@ -106,19 +110,21 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun getNode(nodeHandle: Long): LiveData<MegaNode> {
-        val result = MutableLiveData<MegaNode>()
-        getNodeUseCase.get(nodeHandle)
+    fun getNode(context: Context, nodeHandle: Long): LiveData<MegaNodeItem?> {
+        val result = MutableLiveData<MegaNodeItem?>()
+        getNodeUseCase.get(context, nodeHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { node ->
-                    result.value = node
+                onSuccess = { item ->
+                    result.value = item
                 },
                 onError = { error ->
+                    result.value = null
                     logError(error.stackTraceToString())
                 }
             )
+            .addTo(composite)
         return result
     }
 
@@ -131,6 +137,88 @@ class ImageViewerViewModel @ViewModelInject constructor(
                     logError(error.stackTraceToString())
                 }
             )
+            .addTo(composite)
+    }
+
+    fun setNodeAvailableOffline(
+        activity: Activity,
+        nodeHandle: Long,
+        setAvailableOffline: Boolean
+    ) {
+        getNodeUseCase.setNodeAvailableOffline(activity, nodeHandle, setAvailableOffline)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
+
+    fun removeLink(nodeHandle: Long) {
+        exportNodeUseCase.disableExport(nodeHandle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
+
+    fun shareNode(nodeHandle: Long): LiveData<String> {
+        val result = MutableLiveData<String>()
+        exportNodeUseCase.export(nodeHandle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { link ->
+                    result.value = link
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+        return result
+    }
+
+    fun copyNode(nodeHandle: Long, newParentHandle: Long) {
+        getNodeUseCase.copyNode(nodeHandle, newParentHandle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
+
+    fun moveNode(nodeHandle: Long, newParentHandle: Long) {
+        getNodeUseCase.moveNode(nodeHandle, newParentHandle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
+
+    fun moveNodeToRubishBin(nodeHandle: Long) {
+        getNodeUseCase.moveToRubbishBin(nodeHandle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
     }
 
     fun setCurrentPosition(position: Int) {

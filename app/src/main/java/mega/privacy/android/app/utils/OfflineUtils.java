@@ -50,8 +50,7 @@ public class OfflineUtils {
     public static final String DB_FILE = "0";
     private static final String DB_FOLDER = "1";
 
-    public static void saveOffline (File destination, MegaNode node, Context context, Activity activity){
-
+    public static void saveOffline(File destination, MegaNode node, Activity activity){
         if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
             showOverDiskQuotaPaywallWarning();
             return;
@@ -97,7 +96,7 @@ public class OfflineUtils {
             service.putExtra(DownloadService.EXTRA_URL, url);
             service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
             service.putExtra(DownloadService.EXTRA_PATH, path);
-            context.startService(service);
+            activity.startService(service);
         }
     }
 

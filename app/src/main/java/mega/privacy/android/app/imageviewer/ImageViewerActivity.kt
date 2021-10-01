@@ -22,11 +22,13 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LinksUtil
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
+import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
@@ -156,18 +158,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_download -> {
-                nodeSaver.get()?.saveHandle(currentNodeHandle, fromMediaViewer = true)
+                saveNode(currentNodeHandle, false)
                 true
             }
             R.id.action_save_gallery -> {
-                nodeSaver.get()?.saveHandle(
-                    currentNodeHandle,
-                    highPriority = false,
-                    isFolderLink = false,
-                    fromMediaViewer = false,
-                    needSerialize = true,
-                    downloadToGallery = true
-                )
+                saveNode(currentNodeHandle, true)
                 true
             }
             R.id.action_get_link -> {
@@ -175,7 +170,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_chat -> {
-                nodeAttacher.get()?.attachNode(currentNodeHandle)
+                attachNode(currentNodeHandle)
                 true
             }
             R.id.action_more -> {
@@ -187,15 +182,33 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
     }
 
+    fun saveNode(nodeHandle: Long, downloadToGallery: Boolean) {
+        nodeSaver.get()?.saveHandle(
+            nodeHandle,
+            highPriority = false,
+            isFolderLink = false,
+            fromMediaViewer = true,
+            needSerialize = true,
+            downloadToGallery = downloadToGallery
+        )
+    }
+
+    fun attachNode(nodeHandle: Long) {
+        nodeAttacher.get()?.attachNode(nodeHandle)
+    }
+
+    fun showRenameDialog(node: MegaNode) {
+        showRenameNodeDialog(this, node, this, null)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         when {
-            nodeAttacher.get()?.handleActivityResult(requestCode, resultCode, intent, this) == true -> {
+            nodeAttacher.get()?.handleActivityResult(requestCode, resultCode, intent, this) == true ->
                 return
-            }
-            nodeSaver.get()?.handleActivityResult(requestCode, resultCode, intent) == true -> {
+            nodeSaver.get()?.handleActivityResult(requestCode, resultCode, intent) == true ->
                 return
-            }
-            else -> super.onActivityResult(requestCode, resultCode, intent)
+            else ->
+                super.onActivityResult(requestCode, resultCode, intent)
         }
     }
 
