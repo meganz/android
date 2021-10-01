@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.*
 import android.view.View.OnClickListener
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -40,8 +41,11 @@ import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldShowStartScreenDialog
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.*
@@ -72,6 +76,7 @@ class HomepageFragment : Fragment() {
         const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
         private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
         private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
+        private const val START_SCREEN_DIALOG_SHOWN = "START_SCREEN_DIALOG_SHOWN"
     }
 
     private val viewModel: HomePageViewModel by viewModels()
@@ -106,6 +111,8 @@ class HomepageFragment : Fragment() {
     private val tabsChildren = ArrayList<View>()
 
     private var windowContent: ViewGroup? = null
+
+    private var startScreenDialog: AlertDialog? = null
 
     private val homepageVisibilityChangeObserver = androidx.lifecycle.Observer<Boolean> {
         if (it) {
@@ -202,6 +209,10 @@ class HomepageFragment : Fragment() {
         requireContext().registerReceiver(
             networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
         )
+
+        if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
+            showChooseStartScreenDialog()
+        }
     }
 
     override fun onResume() {
@@ -214,6 +225,12 @@ class HomepageFragment : Fragment() {
         // Retrieve the banners from the server again, for the banners are possibly varied
         // while the app is on the background
         viewModel.getBanners()
+
+        callManager { manager ->
+            if (manager.isInMainHomePage && shouldShowStartScreenDialog(requireContext())) {
+                showChooseStartScreenDialog()
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -227,6 +244,8 @@ class HomepageFragment : Fragment() {
 
         LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
             .removeObserver(fabChangeObserver)
+
+        startScreenDialog?.dismiss()
     }
 
     /**
@@ -351,6 +370,7 @@ class HomepageFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
+        outState.putBoolean(START_SCREEN_DIALOG_SHOWN, isAlertDialogShown(startScreenDialog))
         outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
         if (this::bottomSheetBehavior.isInitialized) {
             outState.putBoolean(
@@ -821,12 +841,15 @@ class HomepageFragment : Fragment() {
      * Shows the dialog which informs the start screen can be changed.
      */
     private fun showChooseStartScreenDialog() {
-        MaterialAlertDialogBuilder(requireContext())
+        startScreenDialog = MaterialAlertDialogBuilder(requireContext())
             .setView(R.layout.dialog_choose_start_screen)
-            .setPositiveButton(
-                StringResourcesUtils.getString(R.string.change_setting_action)
-            ) { _, _ -> callManager { manager -> manager.moveToSettingsSectionStartScreen() } }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.change_setting_action)) { _, _ ->
+                callManager { manager -> manager.moveToSettingsSectionStartScreen() }
+                notAlertAnymoreAboutStartScreen(requireContext())
+            }
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
+                notAlertAnymoreAboutStartScreen(requireContext())
+            }
             .show()
     }
 }

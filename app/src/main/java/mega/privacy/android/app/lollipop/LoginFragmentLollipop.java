@@ -97,6 +97,7 @@ import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
 import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
@@ -1644,6 +1645,8 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         logDebug("First time");
                         intent = new Intent(context,ManagerActivityLollipop.class);
                         intent.putExtra(EXTRA_FIRST_LOGIN, true);
+                        setStartScreenTimeStamp(requireContext());
+
                         if (action != null){
                             logDebug("Action not NULL");
                             if (action.equals(ACTION_EXPORT_MASTER_KEY)){
@@ -1678,6 +1681,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             intent = new Intent(context,ManagerActivityLollipop.class);
                             intent.putExtra(EXTRA_FIRST_LOGIN, true);
                             initialCam = true;
+                            setStartScreenTimeStamp(requireContext());
                         }
 
                         if (!initialCam){

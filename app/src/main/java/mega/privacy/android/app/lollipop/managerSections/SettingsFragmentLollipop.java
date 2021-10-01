@@ -63,6 +63,10 @@ import mega.privacy.android.app.utils.ThemeHelper;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.PREFERRED_START_SCREEN;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
@@ -247,7 +251,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         SharedPreferences sharedPreferences = requireContext()
                 .getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE);
 
-        updateStartScreenSetting(sharedPreferences.getInt(PREFERRED_START_SCREEN, DEFAULT_PREFERRED_START_SCREEN));
+        updateStartScreenSetting(sharedPreferences.getInt(PREFERRED_START_SCREEN, HOME));
         hideRecentActivity.setChecked(sharedPreferences.getBoolean(HIDE_RECENT_ACTIVITY, false));
     }
 
@@ -589,6 +593,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     public void goToSectionStartScreen() {
         scrollToPreference(startScreen);
         startActivity(new Intent(context, StartScreenPreferencesActivity.class));
+        ((ManagerActivityLollipop) context).openSettingsStartScreen = false;
     }
 
     private void refreshAccountInfo() {

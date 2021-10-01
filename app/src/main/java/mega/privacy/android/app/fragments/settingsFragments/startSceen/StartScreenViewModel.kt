@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN
-import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_PREFERRED_START_SCREEN
-import mega.privacy.android.app.constants.SettingsConstants.PREFERRED_START_SCREEN
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.PREFERRED_START_SCREEN
 
 class StartScreenViewModel : BaseRxViewModel() {
 
@@ -19,8 +19,7 @@ class StartScreenViewModel : BaseRxViewModel() {
 
     fun initPreferences(preferences: SharedPreferences) {
         this.preferences = preferences
-        checkedScreen.value =
-            preferences.getInt(PREFERRED_START_SCREEN, DEFAULT_PREFERRED_START_SCREEN)
+        checkedScreen.value = preferences.getInt(PREFERRED_START_SCREEN, HOME)
     }
 
     fun newScreenClicked(newScreen: Int) {

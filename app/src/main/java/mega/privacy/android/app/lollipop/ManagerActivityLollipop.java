@@ -264,6 +264,7 @@ import nz.mega.sdk.MegaUserAlert;
 import static mega.privacy.android.app.constants.EventConstants.*;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartBottomNavigationItem;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartDrawerItem;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldCloseApp;
 import static mega.privacy.android.app.lollipop.PermissionsFragment.PERMISSIONS_FRAGMENT;
 import static mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.GENERAL_UPLOAD;
@@ -1599,6 +1600,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				isSmallGridCameraUploads = dbH.isSmallGridCamera();
 			}
 		}
+
+		if (firstTimeAfterInstallation) {
+			setStartScreenTimeStamp(this);
+		}
+
 		logDebug("Preferred View List: " + isList);
 
 		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
@@ -4816,7 +4822,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	private void updateHomepageFabPosition() {
 		HomepageFragment fragment = getFragmentByType(HomepageFragment.class);
-		if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE && fragment != null) {
+		if (isInMainHomePage() && fragment != null) {
 			fragment.updateFabPosition(psaViewHolder.visible() ? psaViewHolder.psaLayoutHeight() : 0,
 					miniAudioPlayerController.visible() ? miniAudioPlayerController.playerHeight() : 0);
 		}
@@ -6286,7 +6292,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			if (getSearchFragment() == null || sFLol.onBackPressed() == 0) {
     			closeSearchSection();
     		}
-        } else if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+        } else if (isInMainHomePage()) {
             HomepageFragment fragment = getFragmentByType(HomepageFragment.class);
             if(fragment != null && fragment.isFabExpanded()) {
                 fragment.collapseFab();
@@ -6330,7 +6336,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
     public void adjustTransferWidgetPositionInHomepage() {
-        if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+        if (isInMainHomePage()) {
             RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
             if (transfersWidgetLayout == null) return;
 
@@ -6345,8 +6351,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Update the PSA view visibility. It should only visible in root homepage tab.
 	 */
     private void updatePsaViewVisibility() {
-		psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE
-				&& mHomepageScreen == HomepageScreen.HOMEPAGE);
+		psaViewHolder.toggleVisible(isInMainHomePage());
 		if (psaViewHolder.visible()) {
 			handler.post(this::updateHomepageFabPosition);
 		} else {
@@ -11685,7 +11690,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
         params.gravity = Gravity.END;
 
-        if (!bNVHidden && drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+        if (!bNVHidden && isInMainHomePage()) {
             params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM, outMetrics);
         } else {
             params.bottomMargin = 0;
@@ -11833,5 +11838,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else {
 			showOpenLinkError(true, 0);
 		}
+	}
+
+	/**
+	 * Checks if the current screen is the main of Home.
+	 *
+	 * @return True if the current screen is the main of Home, false otherwise.
+	 */
+	public boolean isInMainHomePage() {
+		return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE;
 	}
 }

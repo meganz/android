@@ -8,13 +8,13 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import mega.privacy.android.app.constants.SettingsConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.app.databinding.FragmentStartScreenSettingsBinding
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CAMERA_UPLOADS
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.SHARED_ITEMS
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.USER_INTERFACE_PREFERENCES
 
 /**
  * Settings fragment to choose the preferred start screen.
