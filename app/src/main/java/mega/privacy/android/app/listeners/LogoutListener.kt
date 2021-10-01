@@ -6,6 +6,8 @@ import android.content.Intent
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.LoginActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.AccountController
+import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.showSnackbar
@@ -31,8 +33,11 @@ class LogoutListener(context: Context) : BaseListener(context) {
         AccountController.logoutConfirmed(context)
 
         context.startActivity(
-            Intent(context, LoginActivityLollipop::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            Intent(
+                context,
+                if (context is MeetingActivity) LeftMeetingActivity::class.java
+                else LoginActivityLollipop::class.java
+            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         )
 
         (context as Activity).finish()

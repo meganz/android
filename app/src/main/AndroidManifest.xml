@@ -427,13 +427,6 @@
             android:label="@string/app_name">
         </activity>
 
-        <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask"
-            android:label="@string/app_name">
-        </activity>
-
         <activity android:name="mega.privacy.android.app.smsVerification.SMSVerificationActivity" />
 
         <activity android:name="mega.privacy.android.app.smsVerification.SMSVerificationReceiveTxtActivity"/>
@@ -526,13 +519,23 @@
             android:name="mega.privacy.android.app.contacts.ContactsActivity"
             android:launchMode="singleTop" />
 
+        <activity android:name=".meeting.activity.MeetingActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize"/>
+
+        <activity android:name=".meeting.activity.LeftMeetingActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"/>
+
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
             android:exported="false" >
         </service>
 
         <service
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallService"
+            android:name="mega.privacy.android.app.meeting.CallService"
             android:exported="false" >
         </service>
 
@@ -542,7 +545,7 @@
         </service>
 
         <service
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService"
+            android:name="mega.privacy.android.app.meeting.CallNotificationIntentService"
             android:exported="false" >
         </service>
 

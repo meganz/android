@@ -7687,6 +7687,9 @@ public class MegaChatLollipopAdapter extends RecyclerView.Adapter<RecyclerView.V
      * @return True if some of the cases described below match, false otherwise.
      */
     private boolean checkIfIsGiphyOrGifMessage(int positionInMessages, ViewHolderMessageChat holder) {
+        if (messages == null || messages.isEmpty() || messages.size() <= positionInMessages)
+            return false;
+
         AndroidMegaChatMessage message = messages.get(positionInMessages);
 
         if (message != null && message.getMessage() != null) {

@@ -4417,4 +4417,138 @@
         <item quantity="one">Get Link</item>
         <item quantity="other">Get Links</item>
     </plurals>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">انت الوحيد هنا</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">اجتماع</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">ابدأ/ انضم إلى الاجتماع</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">اجتماع جديد</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">أنضم إلى الاجتماع</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">ابدأ الاجتماع</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">انضم كضيف</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">اجتماع %s</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">إنهاء</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">ميكروفون</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">تم كتم صوت الميكروفون خاصتك</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">تم إعادة صوت الميكروفون خاصتك</string>
+    <!-- General label for camera -->
+    <string name="general_camera">الكاميرا</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">تم تشغيل الكاميرا خاصتك.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">تم إيقاف تشغيل الكاميرا خاصتك.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">تعليق</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">مكبر الصوت</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">سماعات الأذن</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">سماعات الأذن مفعلة</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">مكبر الصوت قيد التشغيل</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">مكبر الصوت متوقف</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">إنهاء</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">قم بدعوة مشاركين</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">المشاركون (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">إظهار كعرض قائمة</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">التعيين كمشرف</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">هل تريد مغادرة الاجتماع الآن؟</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">لا يوجد مشرف</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">قبل المغادرة، يرجى تعيين مشرف جديد أو أكثر للاجتماع.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">التعيين كمشرف</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">غادر على أي حال</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">يرجى تعيين مشرف جديد أو أكثر.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">تغيير اسم الاجتماع</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">المشاركون: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">مشرف:%s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">رابط الاجتماع</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">مدة</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">انضم إلى الاجتماع كضيف</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">أنت مدعو إلى اجتماع.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">اضغط على رابط الاجتماع المرسل إليك أو الصقه هنا</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">جودة اتصال رديئة</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">تم إنهاء الاجتماع</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">رابط الاجتماع غير صالح</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">أذونات الوصول المطلوبة لميغا MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">تحتاج ميغا MEGA إلى الوصول إلى الميكروفون والكاميرا الخاصة بك للاجتماعات.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">فهمت ذلك</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">انتقل إلى الإعدادات للسماح لميغا MEGA بالوصول إلى الكاميرا والميكروفون.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">عرض محادثة الاجتماع</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">قم بدعوة المزيد من المشاركين إلى الاجتماع. اسحب لأعلى للدعوة.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">انقر لإنشاء اجتماع جديد</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">قم بإعداد اجتماع ميغا MEGA بسرعة باستخدام ميزة الاجتماع المشفرة الجديدة الخاصة بنا</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">أنت المشرف الجديد.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">رابط الاجتماع الذي تم نسخه.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">قام %s ببدء اجتماع. انقر للانضمام.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">اجتماع ميغا MEGA</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">اجتماع فيديو مشفر من طرف إلى طرف</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">الرجاء إدخال رابط صالح للاجتماع</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">أكثر من مجرد اجتماعات</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">خصوصيتك مهمة</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">انضم إلى أكبر منصة تخزين وتعاون سحابية آمنة في العالم.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">احصل على 20 جيجابايت مجاناً</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">اشترك الآن واستمتع بميزات التعاون المتقدمة مجانًا.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">مكالمة أخرى جارية. يرجى إنهاء مكالمتك الحالية قبل إجراء أخرى.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">اسم الاجتماع الجديد</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">فشل إنشاء اجتماع.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](أنا)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">عرض كقائمة</string>
 </resources>

@@ -1337,7 +1337,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void doOnTransferStart(MegaTransfer transfer) {
 		logDebug("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads());
 
-		if (isVoiceClipType(transfer.getAppData())) return;
+		if (transfer.isStreamingTransfer() || isVoiceClipType(transfer.getAppData())) return;
+
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
 			String appData = transfer.getAppData();
 
@@ -1367,6 +1368,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	private void doOnTransferFinish(MegaTransfer transfer, MegaError error) {
 		logDebug("Node handle: " + transfer.getNodeHandle() + ", Type = " + transfer.getType());
+
+		if (transfer.isStreamingTransfer()) {
+			return;
+		}
 
 		if (error.getErrorCode() == MegaError.API_EBUSINESSPASTDUE) {
 			sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED));
@@ -1595,7 +1600,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				DownloadService.this.cancel();
 				return;
 			}
-			if(isVoiceClipType(transfer.getAppData())) return;
+			if(transfer.isStreamingTransfer() || isVoiceClipType(transfer.getAppData())) return;
 
 			if(!transfer.isFolderTransfer()){
 				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
@@ -1619,6 +1624,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void doOnTransferTemporaryError(MegaTransfer transfer, MegaError e) {
 		logWarning("Download Temporary Error - Node Handle: " + transfer.getNodeHandle() +
 				"\nError: " + e.getErrorCode() + " " + e.getErrorString());
+
+		if (transfer.isStreamingTransfer()) {
+			return;
+		}
 
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 			if(e.getErrorCode() == MegaError.API_EOVERQUOTA) {

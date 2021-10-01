@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -215,7 +216,7 @@ public class ChatUtil {
         Button shareButton = v.findViewById(R.id.share_button);
         shareButton.setOnClickListener(v13 -> {
             Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-            sharingIntent.setType(PLAIN_TEXT_SHARE_TYPE);
+            sharingIntent.setType(TYPE_TEXT_PLAIN);
             sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink);
             context.startActivity(Intent.createChooser(sharingIntent, context.getString(R.string.context_share)));
             dismissShareChatLinkDialog(context, shareLinkDialog);
@@ -1785,5 +1786,47 @@ public class ChatUtil {
      */
     public static boolean checkForwardVisibilityInContactMsg(boolean isMultipleSelect, ChatController cC) {
         return !cC.isInAnonymousMode() && !isMultipleSelect;
+    }
+
+    /**
+     * Method to find out if I am participating in a chat room
+     *
+     * @param chatId The chat ID
+     * @return True, if I am joined to the chat. False, if not
+     */
+    public static boolean amIParticipatingInAChat(long chatId) {
+        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
+        if (chatRoom == null)
+            return false;
+
+        if (chatRoom.isPreview()) {
+            return false;
+        }
+
+        int myPrivileges = chatRoom.getOwnPrivilege();
+        return myPrivileges == MegaChatRoom.PRIV_RO || myPrivileges == MegaChatRoom.PRIV_STANDARD || myPrivileges == MegaChatRoom.PRIV_MODERATOR;
+    }
+
+    /**
+     * Method to get the position of a chatroom in the chat list from the chat Id
+     *
+     * @param chats          List of chats.
+     * @param chatIdToUpdate Chat ID.
+     * @return The position of the chat.
+     */
+    public static int getPositionFromChatId(List<MegaChatListItem> chats, long chatIdToUpdate) {
+        if(chats == null || chats.isEmpty())
+            return INVALID_POSITION;
+
+        ListIterator<MegaChatListItem> itrReplace = chats.listIterator();
+        while (itrReplace.hasNext()) {
+            MegaChatListItem chat = itrReplace.next();
+            if (chat != null && chat.getChatId() == chatIdToUpdate) {
+                return itrReplace.nextIndex() - 1;
+
+            }
+        }
+
+        return INVALID_POSITION;
     }
 }
