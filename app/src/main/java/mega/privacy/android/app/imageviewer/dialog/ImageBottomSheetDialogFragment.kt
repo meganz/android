@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
@@ -18,6 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetImageOptionsBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
@@ -86,7 +86,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     @SuppressLint("SetTextI18n")
     private fun showNodeData(item: MegaNodeItem?) {
         if (item?.node == null || item.node.isTakenDown) {
-            Toast.makeText(requireContext(), R.string.error_download_takendown_node, Toast.LENGTH_LONG).show()
+            (activity as? ImageViewerActivity?)?.showSnackbar(getString(R.string.error_download_takendown_node))
             dismiss()
             return
         }
@@ -101,8 +101,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // File Info
             optionInfo.setOnClickListener {
                 val intent = Intent(context, FileInfoActivityLollipop::class.java).apply {
-                    putExtra(Constants.HANDLE, item.node.handle)
-                    putExtra(Constants.NAME, item.node.name)
+                    putExtra(HANDLE, item.node.handle)
+                    putExtra(NAME, item.node.name)
                 }
 
                 startActivity(intent)
@@ -133,7 +133,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionLabelCurrent.isVisible = item.node.label != MegaNode.NODE_LBL_UNKNOWN
             optionLabelLayout.setOnClickListener {
                 NodeLabelBottomSheetDialogFragment.newInstance(item.node.handle).show(childFragmentManager, TAG)
-                dismiss()
             }
 
             // Open with

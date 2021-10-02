@@ -17,6 +17,7 @@ import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
+import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -32,7 +33,7 @@ import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
-class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower {
+class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower, ActionNodeCallback {
 
     companion object {
         private const val OFFSCREEN_PAGE_LIMIT = 3
@@ -126,27 +127,25 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private fun setupObservers() {
         viewModel.setCurrentPosition(nodePosition)
-        viewModel.getImagesHandle().observe(this) { handles ->
-            pagerAdapter.submitList(handles) {
-                if (!defaultPageSet) {
-                    defaultPageSet = true
-                    binding.viewPager.waitForLayout {
-                        binding.viewPager.setCurrentItem(nodePosition, false)
-                    }
+        viewModel.getImagesHandle().observe(this, ::showImages)
+        viewModel.getCurrentImage().observe(this, ::showCurrentImageInfo)
+    }
+
+    private fun showImages(handles: List<Long>?) {
+        pagerAdapter.submitList(handles) {
+            if (!defaultPageSet) {
+                defaultPageSet = true
+                binding.viewPager.waitForLayout {
+                    binding.viewPager.setCurrentItem(nodePosition, false)
                 }
             }
         }
-        viewModel.getCurrentImage().observe(this, ::showCurrentImage)
     }
 
-    private fun showCurrentImage(item: ImageItem?) {
-        if (item != null) {
+    private fun showCurrentImageInfo(item: ImageItem?) {
+        item?.let {
             binding.txtTitle.text = item.name
         }
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -198,7 +197,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     fun showRenameDialog(node: MegaNode) {
-        showRenameNodeDialog(this, node, this, null)
+        showRenameNodeDialog(this, node, this, this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -210,6 +209,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             else ->
                 super.onActivityResult(requestCode, resultCode, intent)
         }
+    }
+
+    override fun actionConfirmed() {
+        viewModel.updateCurrentImage()
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

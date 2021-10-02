@@ -12,7 +12,6 @@ import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
-import mega.privacy.android.app.utils.MegaNodeUtil.isImage
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
 import javax.inject.Inject
@@ -33,34 +32,27 @@ class GetImageUseCase @Inject constructor(
                 !node.isFile -> {
                     emitter.onError(IllegalArgumentException("Node is not a file"))
                 }
-                !node.isImage() -> {
-                    emitter.onError(IllegalArgumentException("Node is not an image"))
-                }
                 else -> {
-                    val thumbnailFile = buildThumbnailFile(context, node.base64Handle + JPG_EXTENSION)
-                    val previewFile = buildPreviewFile(context, node.base64Handle + JPG_EXTENSION)
-                    val fullFile = buildTempFile(context, node.base64Handle + JPG_EXTENSION)
-
-                    val thumbnailUri = if (node.hasThumbnail() && thumbnailFile.exists()) thumbnailFile.toUri() else null
-                    val previewUri = if (node.hasPreview() && previewFile.exists()) previewFile.toUri() else null
-                    val fullSizeUri = if (fullFile.exists()) fullFile.toUri() else null
+                    val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.base64Handle + JPG_EXTENSION) else null
+                    val previewFile = if (node.hasPreview()) buildPreviewFile(context, node.base64Handle + JPG_EXTENSION) else null
+                    val fullFile = if (fullSize) buildTempFile(context, node.base64Handle + JPG_EXTENSION) else null
 
                     val imageItem = ImageItem(
                         node.handle,
                         node.name,
-                        thumbnailUri = thumbnailUri,
-                        previewUri = previewUri,
-                        fullSizeUri = fullSizeUri
+                        thumbnailUri = if (thumbnailFile?.exists() == true) thumbnailFile.toUri() else null,
+                        previewUri = if (previewFile?.exists() == true) previewFile.toUri() else null,
+                        fullSizeUri = if (fullFile?.exists() == true) fullFile.toUri() else null
                     )
 
                     emitter.onNext(imageItem)
 
-                    if (fullSize && imageItem.fullSizeUri != null || imageItem.previewUri != null) {
+                    if ((fullSize && fullFile?.exists() == true) || (!fullSize && previewFile?.exists() == true)) {
                         emitter.onComplete()
                         return@create
                     }
 
-                    if (node.hasThumbnail() && !thumbnailFile.exists()) {
+                    if (thumbnailFile != null && !thumbnailFile.exists()) {
                         megaApi.getThumbnail(
                             node,
                             thumbnailFile.absolutePath,
@@ -74,7 +66,7 @@ class GetImageUseCase @Inject constructor(
                             ))
                     }
 
-                    if (node.hasPreview() && !previewFile.exists()) {
+                    if (previewFile != null && !previewFile.exists()) {
                         megaApi.getPreview(
                             node,
                             previewFile.absolutePath,
@@ -88,7 +80,7 @@ class GetImageUseCase @Inject constructor(
                             ))
                     }
 
-                    if (fullSize && !fullFile.exists()) {
+                    if (fullFile != null && !fullFile.exists()) {
                         megaApi.startDownload(
                             node,
                             fullFile.absolutePath,
@@ -96,7 +88,7 @@ class GetImageUseCase @Inject constructor(
                                 onTransferFinish = { _: MegaTransfer, error: MegaError ->
                                     when (error.errorCode) {
                                         API_OK -> {
-                                            imageItem.fullSizeUri = previewFile.toUri()
+                                            imageItem.fullSizeUri = fullFile.toUri()
                                             emitter.onNext(imageItem)
                                             emitter.onComplete()
                                         }
