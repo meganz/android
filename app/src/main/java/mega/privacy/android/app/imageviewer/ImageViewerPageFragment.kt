@@ -34,6 +34,7 @@ class ImageViewerPageFragment : Fragment() {
 
     private lateinit var binding: PageImageViewerBinding
 
+    private var fullSizeRequested = false
     private val nodeHandle: Long by extraNotNull(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val viewModel by activityViewModels<ImageViewerViewModel>()
     private val retainingSupplier by lazy { RetainingDataSourceSupplier<CloseableReference<CloseableImage>>() }
@@ -59,9 +60,19 @@ class ImageViewerPageFragment : Fragment() {
             setZoomingEnabled(true)
             setIsLongpressEnabled(true)
             setAllowTouchInterceptionWhileZoomed(false)
-            setTapListener(MultiTapGestureListener(this){
-                viewModel.switchToolbar()
-            })
+            setTapListener(
+                MultiTapGestureListener(this,
+                    onSingleTapCallback = {
+                        viewModel.switchToolbar()
+                    },
+                    onZoomCallback = {
+                        if (!fullSizeRequested) {
+                            fullSizeRequested = true
+                            viewModel.updateCurrentImage(true)
+                        }
+                    }
+                )
+            )
 
             controller = Fresco.newDraweeControllerBuilder()
                 .setOldController(controller)
@@ -73,7 +84,7 @@ class ImageViewerPageFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.getImage(nodeHandle).observe(viewLifecycleOwner, ::showImageItem)
-        viewModel.loadSingleImage(nodeHandle, isResumed)
+        viewModel.loadSingleImage(nodeHandle, false)
     }
 
     private fun showImageItem(item: ImageItem?) {

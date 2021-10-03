@@ -214,7 +214,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     }
 
     override fun actionConfirmed() {
-        viewModel.updateCurrentImage()
+        viewModel.updateCurrentImage(false)
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

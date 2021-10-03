@@ -113,10 +113,6 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun updateCurrentImage() {
-        loadSingleImage(currentHandle, true)
-    }
-
     fun getNode(context: Context, nodeHandle: Long): LiveData<MegaNodeItem?> {
         val result = MutableLiveData<MegaNodeItem?>()
         getNodeUseCase.get(context, nodeHandle)
@@ -226,6 +222,10 @@ class ImageViewerViewModel @ViewModelInject constructor(
                 }
             )
             .addTo(composite)
+    }
+
+    fun updateCurrentImage(fullSize: Boolean) {
+        loadSingleImage(currentHandle, fullSize)
     }
 
     fun setCurrentPosition(position: Int) {
