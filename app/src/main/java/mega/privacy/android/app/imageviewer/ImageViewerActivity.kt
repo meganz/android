@@ -51,17 +51,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                val itemCount = binding.viewPager.adapter?.itemCount ?: 0
-
-                binding.txtPageCount.apply {
-                    text = getString(
-                        R.string.wizard_steps_indicator,
-                        position + 1,
-                        itemCount
-                    )
-                    isVisible = itemCount > 1
-                }
-
                 viewModel.setCurrentPosition(position)
             }
         }
@@ -82,7 +71,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         super.onCreate(savedInstanceState)
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setupView()
 
         when {
@@ -129,6 +117,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         viewModel.setCurrentPosition(nodePosition)
         viewModel.getImagesHandle().observe(this, ::showImages)
         viewModel.getCurrentImage().observe(this, ::showCurrentImageInfo)
+        viewModel.onSwitchToolbar().observe(this) {
+            if (binding.motion.currentState == R.id.start) {
+                binding.motion.transitionToEnd()
+            } else {
+                binding.motion.transitionToStart()
+            }
+        }
     }
 
     private fun showImages(handles: List<Long>?) {
@@ -145,6 +140,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     private fun showCurrentImageInfo(item: ImageItem?) {
         item?.let {
             binding.txtTitle.text = item.name
+
+            val itemCount = binding.viewPager.adapter?.itemCount ?: 0
+            val currentItem = binding.viewPager.currentItem + 1
+            binding.txtPageCount.apply {
+                text = getString(R.string.wizard_steps_indicator, currentItem, itemCount)
+                isVisible = itemCount > 1
+            }
         }
     }
 

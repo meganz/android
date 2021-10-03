@@ -31,6 +31,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     private var currentHandle = INVALID_HANDLE
     private val currentPosition = MutableLiveData(0)
     private val images: MutableLiveData<List<ImageItem>> = MutableLiveData()
+    private val switchToolbar: MutableLiveData<Unit> = MutableLiveData()
 
     fun getCurrentHandle(): Long = currentHandle
 
@@ -45,6 +46,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun getImage(position: Int): LiveData<ImageItem?> =
         images.map { items -> items.getOrNull(position) }
+
+    fun onSwitchToolbar(): LiveData<Unit> = switchToolbar
 
     fun retrieveSingleImage(nodeHandle: Long) {
         getImageHandlesUseCase.get(listOf(nodeHandle))
@@ -230,5 +233,9 @@ class ImageViewerViewModel @ViewModelInject constructor(
         images.value?.get(position)?.handle?.let { handle ->
             currentHandle = handle
         }
+    }
+
+    fun switchToolbar() {
+        switchToolbar.value = Unit
     }
 }
