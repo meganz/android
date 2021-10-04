@@ -37,9 +37,17 @@ import javax.inject.Inject
  *      - On scroll, move to top of screen and scroll contents internally.
  *      - Always left the bottom option of the 50% . modal visibility partially visible.
  *
- * @property contentView        This view must be set in children and must be the root view.
- * @property itemsLayout        This view must be set in children and must be the view containing
- *                              all available actions.
+ * All classes which extends from here must implement onCreateView to set the mandatory views defined
+ * as properties below. If not visible actions are:
+ *  - Hidden here, then is not needed to implement onViewCreated.
+ *  - Not hidden here, then is mandatory to implement onViewCreated too, hide the not visible actions
+ *      and finally call super.onViewCreated at the end of the method to ensure the final view is
+ *      already set.
+ *
+ * @property contentView        This view must be set in children onCreateView.
+ *                              It must be the root view.
+ * @property itemsLayout        This view must be set in children onCreateView.
+ *                              It must be the view containing all available actions.
  * @property state              State of the sheet to restore it after screen's rotations.
  */
 @AndroidEntryPoint
