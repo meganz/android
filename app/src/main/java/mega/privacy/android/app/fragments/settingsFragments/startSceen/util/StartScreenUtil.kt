@@ -18,9 +18,9 @@ object StartScreenUtil {
 
     const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
     const val PREFERRED_START_SCREEN = "PREFERRED_START_SCREEN"
-    const val START_SCREEN_LOGIN_TIMESTAMP = "START_SCREEN_LOGIN_TIMESTAMP"
+    private const val START_SCREEN_LOGIN_TIMESTAMP = "START_SCREEN_LOGIN_TIMESTAMP"
     private const val TIME_TO_SHOW_START_SCREEN_DIALOG: Long = 604800 //1 week in seconds
-    const val ALERT_ABOUT_START_SCREEN = "ALERT_ABOUT_START_SCREEN"
+    private const val DO_NOT_ALERT_ABOUT_START_SCREEN = "DO_NOT_ALERT_ABOUT_START_SCREEN"
     const val HIDE_RECENT_ACTIVITY = "HIDE_RECENT_ACTIVITY"
 
     /**
@@ -84,10 +84,10 @@ object StartScreenUtil {
         val preferences =
             context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
 
-        val alert = preferences.getBoolean(ALERT_ABOUT_START_SCREEN, false)
+        val doNotAlert = preferences.getBoolean(DO_NOT_ALERT_ABOUT_START_SCREEN, false)
         val preferredScreen = preferences.getInt(PREFERRED_START_SCREEN, HOME)
 
-        if (alert || preferredScreen != HOME) {
+        if (doNotAlert || preferredScreen != HOME) {
             return false
         }
 
@@ -104,7 +104,7 @@ object StartScreenUtil {
      */
     fun notAlertAnymoreAboutStartScreen(context: Context) {
         context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
-            .edit().putBoolean(ALERT_ABOUT_START_SCREEN, true).apply()
+            .edit().putBoolean(DO_NOT_ALERT_ABOUT_START_SCREEN, true).apply()
     }
 
     /**
