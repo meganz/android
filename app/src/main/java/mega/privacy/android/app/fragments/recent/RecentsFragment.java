@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import kotlin.Pair;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
@@ -184,8 +183,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
 
         observeDragSupportEvents(getViewLifecycleOwner(), listView, VIEWER_FROM_RECETS);
-
-        LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair.class).post(new Pair<>(this, false));
     }
 
     @Override

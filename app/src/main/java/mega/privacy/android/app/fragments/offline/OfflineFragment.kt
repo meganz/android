@@ -723,13 +723,10 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     override fun checkScroll() {
         val rv = recyclerView ?: return
 
-        callManager {
-            it.changeAppBarElevation(!args.rootFolderOnly
+        callManager { manager ->
+            manager.changeAppBarElevation(!args.rootFolderOnly
                     && (rv.canScrollVertically(SCROLLING_UP_DIRECTION) || viewModel.selecting || binding.offlineWarningLayout.isVisible))
         }
-
-        LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair::class.java)
-            .post(Pair(this, rv.canScrollVertically(SCROLLING_UP_DIRECTION)))
     }
 
     fun setSearchQuery(query: String?) {
