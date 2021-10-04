@@ -27,17 +27,6 @@ class InMeetingRepository @Inject constructor(
 ) {
 
     /**
-     * Get the initial name of the meeting created
-     *
-     * @return String meeting's name
-     */
-    fun getInitialMeetingName(): String {
-        return StringResourcesUtils.getString(
-            R.string.type_meeting_name, megaChatApi.myFullname
-        )
-    }
-
-    /**
      * Set a title for a chat
      *
      * @param chatId chat ID
@@ -427,8 +416,9 @@ class InMeetingRepository @Inject constructor(
         lastName: String,
         listener: MegaRequestListenerInterface
     ) {
+        logDebug("INIT STATE: ${megaChatApi.initState}")
         val initResult = megaChatApi.init(null)
-
+        logDebug("result of init ---> $initResult")
         if (initResult == INIT_WAITING_NEW_SESSION) {
             megaApi.createEphemeralAccountPlusPlus(firstName, lastName, listener)
         } else {
