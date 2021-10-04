@@ -19,14 +19,34 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
-import java.util.HashMap
 import javax.inject.Inject
 
+/**
+ * Mandatory base class for all BottomSheetDialogFragment which should behave as follows:
+ *
+ *  1. If sheet height is under or equal to 50% of screen height:
+ *      - Show modal visibility at full height.
+ *
+ *  2. If sheet height is greater than 50 to 100% of screen height:
+ *      - Show modal visibility at 50% of screen height.
+ *      - On scroll, reveal full sheet.
+ *      - Always left the bottom option of the 50% modal visibility partially visible.
+ *
+ *  3. If sheet height is greater than or equal to 100% of screen height:
+ *      - Show modal partially visible at 50% of screen height.
+ *      - On scroll, move to top of screen and scroll contents internally.
+ *      - Always left the bottom option of the 50% . modal visibility partially visible.
+ *
+ * @property contentView        This view must be set in children and must be the root view.
+ * @property itemsLayout        This view must be set in children and must be the view containing
+ *                              all available actions.
+ * @property state              State of the sheet to restore it after screen's rotations.
+ */
 @AndroidEntryPoint
 open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), ActivityLauncher {
 
     companion object {
-        private const val HEIGHT_SEPARATOR = 1
+        private const val HEIGHT_SEPARATOR = 1F
         private const val STATE = "STATE"
     }
 
@@ -40,16 +60,13 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     @Inject
     lateinit var dbH: DatabaseHandler
 
-    lateinit var contentView: View
-    lateinit var itemsLayout: LinearLayout
+    protected lateinit var contentView: View
+    protected lateinit var itemsLayout: LinearLayout
 
-    private var halfHeightDisplay = 0
     private var state = INVALID_VALUE
-    private val heightSeparator by lazy { Util.dp2px(HEIGHT_SEPARATOR.toFloat()) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        halfHeightDisplay = resources.displayMetrics.heightPixels / 2
         state = savedInstanceState?.getInt(STATE, INVALID_VALUE) ?: INVALID_VALUE
         view.post { setBottomSheetBehavior() }
     }
@@ -63,10 +80,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         super.onResume()
 
         val dialog = dialog ?: return
-
         val window = dialog.window ?: return
-
-        // In landscape mode, we need limit the bottom sheet dialog width.
 
         // In landscape mode, we need limit the bottom sheet dialog width.
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -74,10 +88,6 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
             val maxSize = displayMetrics.heightPixels
             window.setLayout(maxSize, ViewGroup.LayoutParams.MATCH_PARENT)
         }
-
-        // But `setLayout` causes navigation buttons almost invisible in light mode,
-        // in this case we set navigation bar background with light grey to make
-        // navigation buttons visible.
 
         // But `setLayout` causes navigation buttons almost invisible in light mode,
         // in this case we set navigation bar background with light grey to make
@@ -138,8 +148,11 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
      * @return The initial height of a BottomSheet.
      */
     private fun getCustomPeekHeight(): Int {
-        if (contentView.height <= halfHeightDisplay) {
-            return contentView.height
+        val halfHeightDisplay = resources.displayMetrics.heightPixels / 2
+        val contentViewHeight = contentView.height
+
+        if (contentViewHeight <= halfHeightDisplay) {
+            return contentViewHeight
         }
 
         var peekHeight = when (contentView) {
@@ -154,6 +167,8 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
             }
             else -> 0
         }
+
+        val heightSeparator by lazy { Util.dp2px(HEIGHT_SEPARATOR) }
 
         for (i in 0 until itemsLayout.childCount) {
             val v: View = itemsLayout.getChildAt(i)
