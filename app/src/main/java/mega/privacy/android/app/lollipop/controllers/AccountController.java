@@ -45,7 +45,6 @@ import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.middlelayer.push.PushMessageHanlder.PUSH_TOKEN;
 import static mega.privacy.android.app.textEditor.TextEditorViewModel.SHOW_LINE_NUMBERS;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -55,6 +54,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.PermissionUtils.*;

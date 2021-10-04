@@ -3,6 +3,10 @@ package mega.privacy.android.app.fragments.settingsFragments.startSceen.util
 import android.content.Context
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.*
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.SharedPreferenceConstants.DO_NOT_ALERT_ABOUT_START_SCREEN
+import mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN
+import mega.privacy.android.app.utils.SharedPreferenceConstants.START_SCREEN_LOGIN_TIMESTAMP
+import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 
 /**
  * Class storing util methods for the start screen setting.
@@ -15,13 +19,7 @@ object StartScreenUtil {
     const val CHAT = 3
     const val SHARED_ITEMS = 4
 
-
-    const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
-    const val PREFERRED_START_SCREEN = "PREFERRED_START_SCREEN"
-    private const val START_SCREEN_LOGIN_TIMESTAMP = "START_SCREEN_LOGIN_TIMESTAMP"
-    private const val TIME_TO_SHOW_START_SCREEN_DIALOG: Long = 604800 //1 week in seconds
-    private const val DO_NOT_ALERT_ABOUT_START_SCREEN = "DO_NOT_ALERT_ABOUT_START_SCREEN"
-    const val HIDE_RECENT_ACTIVITY = "HIDE_RECENT_ACTIVITY"
+    private const val TIME_TO_SHOW_START_SCREEN_DIALOG = 604800000 //1 week in milliseconds
 
     /**
      * Gets the start DrawerItem depending on the preferred start screen chosen.
@@ -94,7 +92,7 @@ object StartScreenUtil {
         val timeStamp = preferences.getLong(START_SCREEN_LOGIN_TIMESTAMP, INVALID_VALUE.toLong())
 
         return timeStamp == INVALID_VALUE.toLong()
-                || System.currentTimeMillis() - timeStamp >= TIME_TO_SHOW_START_SCREEN_DIALOG
+                || System.currentTimeMillis().minus(timeStamp) >= TIME_TO_SHOW_START_SCREEN_DIALOG
     }
 
     /**

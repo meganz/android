@@ -63,15 +63,15 @@ import mega.privacy.android.app.utils.ThemeHelper;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HIDE_RECENT_ACTIVITY;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.PREFERRED_START_SCREEN;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
 import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 

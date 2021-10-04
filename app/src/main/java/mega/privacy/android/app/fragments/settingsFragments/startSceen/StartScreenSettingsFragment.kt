@@ -14,7 +14,7 @@ import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.Star
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.SHARED_ITEMS
-import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.USER_INTERFACE_PREFERENCES
+import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 
 /**
  * Settings fragment to choose the preferred start screen.

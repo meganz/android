@@ -7,7 +7,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME
-import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.PREFERRED_START_SCREEN
+import mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN
 
 class StartScreenViewModel : BaseRxViewModel() {
 
