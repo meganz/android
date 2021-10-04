@@ -5,8 +5,6 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
-import android.content.res.Configuration.ORIENTATION_LANDSCAPE
-import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -67,6 +65,7 @@ import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
+import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY
 import mega.privacy.android.app.meeting.OnDragTouchListener
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -823,30 +822,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        val display = meetingActivity.windowManager.defaultDisplay
         val outMetrics = DisplayMetrics()
+        val display = meetingActivity.windowManager.defaultDisplay
         display.getMetrics(outMetrics)
         bottomFloatingPanelViewHolder.updateWidth(newConfig.orientation, outMetrics.widthPixels)
-
-        floatingWindowContainer.let {
-            if (newConfig.orientation == ORIENTATION_LANDSCAPE) {
-                previousY = previousY * outMetrics.heightPixels / outMetrics.widthPixels
-                // When LANDSCAPE, save the y pos of floating window of PORTRAIT
-                yBias = it.y
-            } else {
-                previousY = previousY * outMetrics.widthPixels / outMetrics.heightPixels
-            }
-
-            val menuLayoutParams = it.layoutParams as ViewGroup.MarginLayoutParams
-            menuLayoutParams.setMargins(0, 0, 0, Util.dp2px(125f, outMetrics))
-            it.layoutParams = menuLayoutParams
-            onConfigurationChangedOfFloatingWindow(newConfig)
-        }
 
         floatingWindowFragment?.let {
             if (it.isAdded) {
                 it.updateOrientation()
             }
+        }
+
+        floatingWindowContainer.let {
+            val menuLayoutParams = it.layoutParams as ViewGroup.MarginLayoutParams
+            menuLayoutParams.setMargins(0, 0, 0, Util.dp2px(125f, outMetrics))
+            it.layoutParams = menuLayoutParams
+            onConfigurationChangedOfFloatingWindow(outMetrics)
         }
 
         gridViewCallFragment?.let {
@@ -1238,36 +1229,20 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     /**
      * Method to control the position of the floating window in relation to the configuration change
      *
-     * @param newConfig Device configuration information
+     * @param outMetrics display metrics
      */
-    private fun onConfigurationChangedOfFloatingWindow(newConfig: Configuration) {
+    private fun onConfigurationChangedOfFloatingWindow(outMetrics: DisplayMetrics ) {
         floatingWindowContainer.post {
-            // Control the position of the floating window in relation to the toolbar, including the banner
-            val maxTop =
-                if (bannerMuteLayout.isVisible) bannerMuteLayout.bottom else toolbar.bottom
-            var isIntersect: Boolean
+            previousY = -1f
+            var dx = outMetrics.widthPixels - floatingWindowContainer.width
+            var dy = outMetrics.heightPixels - floatingWindowContainer.height
 
-            if (newConfig.orientation == ORIENTATION_LANDSCAPE) {
-                isIntersect = (maxTop - floatingWindowContainer.y) > 0
-                if (isIntersect) {
-                    if (toolbar.isVisible) floatingWindowContainer.moveY(maxTop.toFloat())
-                    else floatingWindowContainer.moveY(0f)
-                }
+            if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder.getState() && floatingBottomSheet.isVisible) {
+                dy = floatingBottomSheet.top - floatingWindowContainer.height
             }
 
-            if (newConfig.orientation == ORIENTATION_PORTRAIT) {
-                // Move back to previous position
-                floatingWindowContainer.moveY(yBias)
-                isIntersect = (maxTop - yBias) > 0
-                if (toolbar.isVisible && isIntersect) {
-                    floatingWindowContainer.moveY(maxTop.toFloat())
-                }
-            }
-
-            val isIntersectPreviously = (maxTop - previousY) > 0
-            if (!toolbar.isVisible && isIntersectPreviously && previousY >= 0) {
-                floatingWindowContainer.moveY(previousY)
-            }
+            floatingWindowContainer.moveX(dx.toFloat())
+            floatingWindowContainer.moveY(dy.toFloat())
         }
     }
     /**

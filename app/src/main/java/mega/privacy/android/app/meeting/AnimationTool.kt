@@ -33,6 +33,11 @@ object AnimationTool {
         animate().y(dy).setDuration(duration).start()
     }
 
+    @ExperimentalCoroutinesApi
+    fun View.moveX(dx: Float, duration: Long = InMeetingFragment.ANIMATION_DURATION) {
+        animate().x(dx).setDuration(duration).start()
+    }
+
     fun View.clearAnimationAndGone() {
         clearAnimation().also { isVisible = false }
     }
