@@ -34,21 +34,18 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
     @Inject
     lateinit var megaChatApi: MegaChatApiAndroid
+
     @Inject
     lateinit var dbH: DatabaseHandler
 
-    private var halfHeightDisplay = 0
+    private val halfHeightDisplay by lazy { resources.displayMetrics.heightPixels / 2 }
     private var heightHeader = 0
     lateinit var contentView: View
     lateinit var mainLinearLayout: LinearLayout
     lateinit var itemsLayout: LinearLayout
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        halfHeightDisplay = resources.displayMetrics.heightPixels / 2
-    }
 
     override fun onResume() {
         super.onResume()
@@ -75,6 +72,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         // navigation buttons visible.
         if (!Util.isDarkMode(requireContext())) {
             // Only set navigation bar elements colour, View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR = 0x00000010
+            @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = 0x00000010
         }
     }
@@ -82,7 +80,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     /**
      * Sets the initial state of a BottomSheet and its state.
      *
-     * @param heightHeader           Height of the header.
+     * @param heightHeader  Height of the header.
      */
     protected fun setBottomSheetBehavior(heightHeader: Int) {
         this.heightHeader = heightHeader
@@ -106,7 +104,8 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
      * Hides the BottomSheet.
      */
     protected fun setStateBottomSheetBehaviorHidden() {
-        BottomSheetBehavior.from(contentView.parent as View).state = BottomSheetBehavior.STATE_HIDDEN
+        BottomSheetBehavior.from(contentView.parent as View).state =
+            BottomSheetBehavior.STATE_HIDDEN
     }
 
     /**
