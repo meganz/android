@@ -64,7 +64,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun retrieveImagesFromParent(parentNodeHandle: Long, childOrder: Int) {
+    fun retrieveImagesFromParent(parentNodeHandle: Long, childOrder: Int? = null) {
         getImageHandlesUseCase.getChildren(parentNodeHandle, childOrder)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

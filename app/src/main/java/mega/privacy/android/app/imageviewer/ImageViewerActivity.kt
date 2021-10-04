@@ -1,6 +1,7 @@
 package mega.privacy.android.app.imageviewer
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -37,13 +38,48 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
 
     companion object {
         private const val OFFSCREEN_PAGE_LIMIT = 3
+
+        @JvmStatic
+        fun getIntentForSingleNode(
+            context: Context,
+            nodeHandle: Long
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+            }
+
+        @JvmStatic
+        @JvmOverloads
+        fun getIntentForParentNode(
+            context: Context,
+            parentNodeHandle: Long,
+            childOrder: Int = ORDER_PHOTO_ASC,
+            currentNodePosition: Int = 0
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentNodeHandle)
+                putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, childOrder)
+                putExtra(INTENT_EXTRA_KEY_POSITION, currentNodePosition)
+            }
+
+        @JvmStatic
+        @JvmOverloads
+        fun getIntentForChildren(
+            context: Context,
+            childrenHandles: LongArray,
+            currentNodePosition: Int = 0
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, childrenHandles)
+                putExtra(INTENT_EXTRA_KEY_POSITION, currentNodePosition)
+            }
     }
 
     private val nodePosition: Int by extraNotNull(INTENT_EXTRA_KEY_POSITION, 0)
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
     private val childrenHandles: LongArray? by extra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
-    private val childOrder: Int by extraNotNull(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_PHOTO_ASC)
+    private val childOrder: Int? by extra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN)
 
     private var defaultPageSet = false
     private val viewModel by viewModels<ImageViewerViewModel>()

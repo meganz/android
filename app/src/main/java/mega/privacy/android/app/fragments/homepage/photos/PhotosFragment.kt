@@ -3,7 +3,6 @@ package mega.privacy.android.app.fragments.homepage.photos
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,9 +21,7 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.ListenScrollChangesHelper
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
-import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
-import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentPhotosBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
@@ -36,8 +33,6 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.util.*
 
@@ -365,36 +360,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         listView.findViewHolderForLayoutPosition(nodeItem.index)?.itemView?.findViewById<ImageView>(
             R.id.thumbnail
         )?.also {
-//            val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
-            val intent = Intent(context, ImageViewerActivity::class.java)
-//                .apply {
-//                putExtra(INTENT_EXTRA_KEY_HANDLE, nodeItem.node?.handle ?: INVALID_HANDLE)
-//                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, megaApi.getParentNode(nodeItem.node).handle)
-//                }
-
-            intent.putExtra(INTENT_EXTRA_KEY_POSITION, nodeItem.photoIndex)
-            intent.putExtra(
-                INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                MegaApiJava.ORDER_MODIFICATION_DESC
+            val intent = ImageViewerActivity.getIntentForChildren(
+                requireContext(),
+                childrenHandles = viewModel.getHandlesOfPhotos()!!,
+                currentNodePosition = nodeItem.photoIndex
             )
-
-            if (viewModel.searchMode) {
-                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_SEARCH_ADAPTER);
-            } else {
-                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_BROWSE_ADAPTER)
-            }
-            intent.putExtra(
-                INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
-                viewModel.getHandlesOfPhotos()
-            )
-
-            intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodeItem.node?.handle ?: INVALID_HANDLE)
-            (listView.adapter as? DragThumbnailGetter)?.let {
-                putThumbnailLocation(intent, listView, nodeItem.index, VIEWER_FROM_PHOTOS, it)
-            }
-
             startActivity(intent)
-            requireActivity().overridePendingTransition(0, 0)
         }
     }
 

@@ -1,5 +1,23 @@
 package mega.privacy.android.app.fragments.managerFragments.cu;
 
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA;
+import static mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark;
+import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
+import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_GRID;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF;
+import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
+import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CUMU;
+import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
+import static mega.privacy.android.app.utils.LogUtil.logDebug;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.PermissionUtils.requestPermission;
+import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
+import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
+import static mega.privacy.android.app.utils.Util.showSnackbar;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -17,7 +35,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.app.ActivityCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -38,36 +55,11 @@ import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
-
-import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA;
-import static mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION;
-import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
-import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR_GRID;
-import static mega.privacy.android.app.utils.Constants.PHOTO_SYNC_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_ON_OFF_FIRST_TIME;
-import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
-import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CUMU;
-import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
-import static mega.privacy.android.app.utils.LogUtil.logDebug;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
-import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
-import static mega.privacy.android.app.utils.Util.showSnackbar;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class CameraUploadsFragment extends BaseFragment implements CUGridViewAdapter.Listener,
@@ -563,19 +555,13 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         }
 
         MegaNode parentNode = megaApi.getParentNode(node);
-        Intent intent = new Intent(context, FullScreenImageViewerLollipop.class)
-                .putExtra(INTENT_EXTRA_KEY_POSITION, cuNode.getIndexForViewer())
-                .putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderManagement.getOrderCamera())
-                .putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle())
-                .putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                        parentNode == null || parentNode.getType() == MegaNode.TYPE_ROOT
-                                ? INVALID_HANDLE
-                                : parentNode.getHandle())
-                .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER);
-
-        putThumbnailLocation(intent, binding.cuList, position, VIEWER_FROM_CUMU, gridAdapter);
+        Intent intent = ImageViewerActivity.getIntentForParentNode(
+                requireContext(),
+                parentNode.getHandle(),
+                sortOrderManagement.getOrderCamera(),
+                cuNode.getIndexForViewer()
+        );
         startActivity(intent);
-        requireActivity().overridePendingTransition(0, 0);
     }
 
     @Override
