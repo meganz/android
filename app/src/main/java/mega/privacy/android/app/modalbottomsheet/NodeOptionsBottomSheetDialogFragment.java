@@ -1,16 +1,18 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -110,14 +112,16 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         nC = new NodeController(requireActivity());
     }
 
-    @SuppressLint("RestrictedApi")
+    @Nullable
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
         itemsLayout = contentView.findViewById(R.id.items_layout_bottom_sheet_node);
+        return contentView;
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         ImageView nodeThumb = contentView.findViewById(R.id.node_thumbnail);
         TextView nodeName = contentView.findViewById(R.id.node_name_text);
         nodeInfo = contentView.findViewById(R.id.node_info_text);
@@ -575,7 +579,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                         if (sl != null) {
                             if (sl.size() != 0) {
                                 nodeInfo.setText(getQuantityString(R.plurals.general_num_shared_with,
-                                                sl.size(), sl.size()));
+                                        sl.size(), sl.size()));
                             }
                         }
                     } else {
@@ -936,7 +940,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         separatorShares.setVisibility(counterShares <= 0 ? View.GONE : View.VISIBLE);
         separatorModify.setVisibility(counterModify <= 0 ? View.GONE : View.VISIBLE);
 
-        offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
+        offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
 
         optionFavourite.setText(node.isFavourite() ? R.string.file_properties_unfavourite : R.string.file_properties_favourite);
         optionFavourite.setCompoundDrawablesWithIntrinsicBounds(node.isFavourite()
@@ -955,7 +959,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             optionLabelCurrent.setVisibility(View.GONE);
         }
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     private void showOwnerSharedFolder() {

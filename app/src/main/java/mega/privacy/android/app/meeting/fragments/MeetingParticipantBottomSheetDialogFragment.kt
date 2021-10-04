@@ -75,6 +75,7 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         bottomViewModel.setShowingName(binding.name)
 
         contentView = binding.root
+        itemsLayout = binding.itemsLayout
         dialog.setContentView(contentView)
         initItemAction(binding)
         initAvatar(participantItem)

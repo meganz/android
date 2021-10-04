@@ -6,12 +6,16 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
@@ -23,8 +27,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
     companion object {
         private const val HEIGHT_SEPARATOR = 1
-        private const val TYPE_OPTION = "TYPE_OPTION"
-        private const val TYPE_SEPARATOR = "TYPE_SEPARATOR"
+        private const val STATE = "STATE"
     }
 
     @MegaApi
@@ -41,11 +44,19 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     lateinit var itemsLayout: LinearLayout
 
     private var halfHeightDisplay = 0
+    private var state = INVALID_VALUE
+    private val heightSeparator by lazy { Util.dp2px(HEIGHT_SEPARATOR.toFloat()) }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         halfHeightDisplay = resources.displayMetrics.heightPixels / 2
+        state = savedInstanceState?.getInt(STATE, INVALID_VALUE) ?: INVALID_VALUE
         view.post { setBottomSheetBehavior() }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(STATE, BottomSheetBehavior.from(contentView.parent as View).state)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onResume() {
@@ -83,8 +94,20 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
      */
     private fun setBottomSheetBehavior() {
         BottomSheetBehavior.from(contentView.parent as View).apply {
-            peekHeight = getNewPeekHeight()
-            state = BottomSheetBehavior.STATE_COLLAPSED
+            peekHeight = getCustomPeekHeight()
+
+            state = when {
+                this.state != INVALID_VALUE -> {
+                    this.state
+                }
+                peekHeight == contentView.height -> {
+                    BottomSheetBehavior.STATE_EXPANDED
+                }
+                else -> {
+                    BottomSheetBehavior.STATE_COLLAPSED
+                }
+            }
+
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     if (newState == BottomSheetBehavior.STATE_HIDDEN) {
@@ -114,49 +137,35 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
      *
      * @return The initial height of a BottomSheet.
      */
-    private fun getNewPeekHeight(): Int {
+    private fun getCustomPeekHeight(): Int {
         if (contentView.height <= halfHeightDisplay) {
             return contentView.height
         }
 
-        var numVisibleOptions = 0
-        var childHeight = 0
-        val visibleItems: MutableMap<Int, String> = HashMap()
-        var peekHeight = 0
-        val heightSeparator = Util.dp2px(HEIGHT_SEPARATOR.toFloat())
+        var peekHeight = when (contentView) {
+            is LinearLayout -> {
+                (contentView as LinearLayout).getChildAt(0).height
+            }
+            is RelativeLayout -> {
+                (contentView as RelativeLayout).getChildAt(0).height
+            }
+            is ConstraintLayout -> {
+                (contentView as ConstraintLayout).getChildAt(0).height
+            }
+            else -> 0
+        }
 
         for (i in 0 until itemsLayout.childCount) {
             val v: View = itemsLayout.getChildAt(i)
 
-            if (v.visibility == View.VISIBLE) {
-                val height = v.layoutParams.height
-                childHeight += height
-                if (height == heightSeparator) {
-                    //Is separator
-                    visibleItems[i] = TYPE_SEPARATOR
-                } else {
-                    //Is visible option
-                    numVisibleOptions++
-                    visibleItems[i] = TYPE_OPTION
+            if (v.isVisible) {
+                val height = v.height
+                peekHeight += height
+
+                if (peekHeight > halfHeightDisplay && height > heightSeparator) {
+                    peekHeight -= height / 2
+                    return peekHeight
                 }
-            }
-        }
-
-        var countVisibleOptions = 0
-        for ((visibleItemPosition, visibleItemType) in visibleItems) {
-            val heightVisiblePosition =
-                itemsLayout.getChildAt(visibleItemPosition).layoutParams.height
-
-            if (visibleItemType == TYPE_OPTION) {
-                countVisibleOptions++
-            }
-
-            peekHeight += if (peekHeight < halfHeightDisplay || visibleItemType == TYPE_SEPARATOR
-                || countVisibleOptions == numVisibleOptions
-            ) {
-                heightVisiblePosition
-            } else {
-                return peekHeight + heightVisiblePosition / 2
             }
         }
 
