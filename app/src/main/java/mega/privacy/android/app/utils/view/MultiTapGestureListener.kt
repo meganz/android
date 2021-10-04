@@ -1,6 +1,8 @@
-package mega.privacy.android.app.utils.view.zoomable
+package mega.privacy.android.app.utils.view
 
 import android.view.MotionEvent
+import com.facebook.samples.zoomable.DoubleTapGestureListener
+import com.facebook.samples.zoomable.ZoomableDraweeView
 
 class MultiTapGestureListener constructor(
     zoomableDraweeView: ZoomableDraweeView,

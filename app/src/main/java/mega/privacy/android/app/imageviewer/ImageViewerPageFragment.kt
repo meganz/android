@@ -16,7 +16,7 @@ import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.view.zoomable.MultiTapGestureListener
+import mega.privacy.android.app.utils.view.MultiTapGestureListener
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
