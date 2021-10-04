@@ -86,7 +86,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         }
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
-        mainLinearLayout = contentView.findViewById(R.id.contact_attachment_bottom_sheet);
         LinearLayout titleContact = contentView.findViewById(R.id.contact_attachment_chat_title_layout);
         View separatorTitleContact = contentView.findViewById(R.id.contact_title_separator);
         itemsLayout = contentView.findViewById(R.id.items_layout);
@@ -253,7 +252,6 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 optionInvite.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     @Override

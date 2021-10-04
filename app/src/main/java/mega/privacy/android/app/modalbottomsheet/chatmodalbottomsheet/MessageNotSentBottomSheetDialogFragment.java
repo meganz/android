@@ -55,7 +55,6 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.msg_not_sent_bottom_sheet, null);
-        mainLinearLayout = contentView.findViewById(R.id.msg_not_sent_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
         TextView titleSlidingPanel = contentView.findViewById(R.id.msg_not_sent_title_text);
@@ -91,7 +90,6 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW);
     }
 
     @Override

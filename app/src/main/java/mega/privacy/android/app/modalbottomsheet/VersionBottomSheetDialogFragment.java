@@ -49,7 +49,6 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         }
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_versions_file, null);
-        mainLinearLayout = contentView.findViewById(R.id.versions_file_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         ImageView nodeThumb = contentView.findViewById(R.id.versions_file_thumbnail);
@@ -108,7 +107,6 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     @Override

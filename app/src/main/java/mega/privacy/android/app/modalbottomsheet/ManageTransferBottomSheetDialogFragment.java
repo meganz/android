@@ -60,7 +60,6 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
     public void setupDialog(Dialog dialog, int style) {
         BottomSheetManageTransferBinding binding = BottomSheetManageTransferBinding.inflate(getLayoutInflater());
         contentView = binding.getRoot();
-        mainLinearLayout = contentView.findViewById(R.id.manage_transfer_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         if (transfer == null) return;
@@ -148,7 +147,6 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     @Override

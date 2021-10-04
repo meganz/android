@@ -49,13 +49,10 @@ public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDia
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_nickname, null);
-        mainLinearLayout = contentView.findViewById(R.id.nickname_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout);
         contentView.findViewById(R.id.edit_nickname_layout).setOnClickListener(this);
         contentView.findViewById(R.id.remove_nickname_layout).setOnClickListener(this);
         dialog.setContentView(contentView);
-
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW);
     }
 
     @Override

@@ -41,7 +41,6 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_folder_link, null);
-        mainLinearLayout = contentView.findViewById(R.id.folder_link_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
         ImageView nodeThumb = contentView.findViewById(R.id.folder_link_thumbnail);
@@ -78,7 +77,6 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
 

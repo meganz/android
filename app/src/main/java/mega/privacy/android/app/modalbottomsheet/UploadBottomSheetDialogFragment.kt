@@ -41,7 +41,6 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
 
         binding = BottomSheetUploadBinding.inflate(layoutInflater)
         contentView = binding.root.rootView
-        mainLinearLayout = binding.uploadBottomSheet
         itemsLayout = binding.itemsLayout
 
         when (arguments?.getInt(UPLOAD_TYPE)) {
@@ -62,7 +61,6 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
         binding.newTxtOption.setOnClickListener(this)
 
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW)
     }
 
     override fun onClick(v: View?) {

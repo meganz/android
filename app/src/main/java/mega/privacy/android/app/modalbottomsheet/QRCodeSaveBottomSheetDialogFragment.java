@@ -77,13 +77,11 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_qr_code, null);
-        mainLinearLayout = contentView.findViewById(R.id.qr_code_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
         contentView.findViewById(R.id.qr_code_saveTo_cloud_layout).setOnClickListener(this);
         contentView.findViewById(R.id.qr_code_saveTo_fileSystem_layout).setOnClickListener(this);
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW);
     }
 }

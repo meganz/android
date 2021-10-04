@@ -65,10 +65,8 @@ class PasscodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
         }
 
         contentView = binding.root
-        mainLinearLayout = binding.parentLayout
-        itemsLayout = mainLinearLayout
+        itemsLayout = binding.parentLayout
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW)
     }
 
     private fun setSelectedColor(text: TextView) =

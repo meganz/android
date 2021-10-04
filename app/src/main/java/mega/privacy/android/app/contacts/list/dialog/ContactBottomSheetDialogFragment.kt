@@ -83,7 +83,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     ): View {
         binding = BottomSheetContactDetailBinding.inflate(inflater, container, false)
         contentView = binding.root
-        mainLinearLayout = binding.layoutRoot
         itemsLayout = binding.layoutItems
 
         binding.header.btnMore.isVisible = false
@@ -93,7 +92,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.post { setBottomSheetBehavior(HEIGHT_HEADER_LARGE) }
 
         viewModel.getContact(userHandle).observe(viewLifecycleOwner, ::showContactInfo)
         viewModel.getMegaUser(userHandle).observe(viewLifecycleOwner) { megaUser ->

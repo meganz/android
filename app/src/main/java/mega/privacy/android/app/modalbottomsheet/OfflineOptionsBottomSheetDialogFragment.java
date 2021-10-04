@@ -53,7 +53,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_offline_item, null);
-        mainLinearLayout = contentView.findViewById(R.id.offline_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
         contentView.findViewById(R.id.option_download_layout).setOnClickListener(this);
@@ -125,7 +124,6 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
 

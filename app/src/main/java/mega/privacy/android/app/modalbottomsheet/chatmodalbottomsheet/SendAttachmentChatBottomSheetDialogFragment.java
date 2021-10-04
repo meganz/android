@@ -22,7 +22,6 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.send_attatchment_chat_bottom_sheet, null);
-        mainLinearLayout = contentView.findViewById(R.id.send_attachment_chat_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.send_attachment_chat_items_layout);
 
         contentView.findViewById(R.id.send_attachment_chat_from_cloud_layout).setOnClickListener(this);
@@ -31,7 +30,6 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
         contentView.findViewById(R.id.send_attachment_chat_location_layout).setOnClickListener(this);
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW);
     }
 
     @Override

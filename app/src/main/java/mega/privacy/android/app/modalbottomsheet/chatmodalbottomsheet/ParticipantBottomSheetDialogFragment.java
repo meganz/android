@@ -69,7 +69,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_group_participant, null);
-        mainLinearLayout = contentView.findViewById(R.id.participant_item_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
         titleNameContactChatPanel = contentView.findViewById(R.id.group_participants_chat_name_text);
@@ -217,7 +216,6 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 optionRemoveParticipantChat.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     @Override

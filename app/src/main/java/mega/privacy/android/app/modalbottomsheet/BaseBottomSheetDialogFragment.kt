@@ -22,13 +22,9 @@ import javax.inject.Inject
 open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), ActivityLauncher {
 
     companion object {
-        const val HEIGHT_HEADER_RADIO_GROUP = 56
-        const val HEIGHT_HEADER_LARGE = 81
-        const val HEIGHT_HEADER_LOW = 48
-        const val HEIGHT_SEPARATOR = 1
-
-        const val TYPE_OPTION = "TYPE_OPTION"
-        const val TYPE_SEPARATOR = "TYPE_SEPARATOR"
+        private const val HEIGHT_SEPARATOR = 1
+        private const val TYPE_OPTION = "TYPE_OPTION"
+        private const val TYPE_SEPARATOR = "TYPE_SEPARATOR"
     }
 
     @MegaApi
@@ -41,11 +37,16 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     @Inject
     lateinit var dbH: DatabaseHandler
 
-    private val halfHeightDisplay by lazy { resources.displayMetrics.heightPixels / 2 }
-    private var heightHeader = 0
     lateinit var contentView: View
-    lateinit var mainLinearLayout: LinearLayout
     lateinit var itemsLayout: LinearLayout
+
+    private var halfHeightDisplay = 0
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        halfHeightDisplay = resources.displayMetrics.heightPixels / 2
+        view.post { setBottomSheetBehavior() }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -79,11 +80,8 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
     /**
      * Sets the initial state of a BottomSheet and its state.
-     *
-     * @param heightHeader  Height of the header.
      */
-    protected fun setBottomSheetBehavior(heightHeader: Int) {
-        this.heightHeader = heightHeader
+    private fun setBottomSheetBehavior() {
         BottomSheetBehavior.from(contentView.parent as View).apply {
             peekHeight = getNewPeekHeight()
             state = BottomSheetBehavior.STATE_COLLAPSED
@@ -117,10 +115,14 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
      * @return The initial height of a BottomSheet.
      */
     private fun getNewPeekHeight(): Int {
+        if (contentView.height <= halfHeightDisplay) {
+            return contentView.height
+        }
+
         var numVisibleOptions = 0
         var childHeight = 0
         val visibleItems: MutableMap<Int, String> = HashMap()
-        var peekHeight = Util.dp2px(heightHeader.toFloat())
+        var peekHeight = 0
         val heightSeparator = Util.dp2px(HEIGHT_SEPARATOR.toFloat())
 
         for (i in 0 until itemsLayout.childCount) {
@@ -138,12 +140,6 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
                     visibleItems[i] = TYPE_OPTION
                 }
             }
-        }
-
-        if (numVisibleOptions <= 3 && heightHeader == HEIGHT_HEADER_LARGE
-            || numVisibleOptions <= 4 && heightHeader == HEIGHT_HEADER_LOW
-        ) {
-            return peekHeight + childHeight
         }
 
         var countVisibleOptions = 0

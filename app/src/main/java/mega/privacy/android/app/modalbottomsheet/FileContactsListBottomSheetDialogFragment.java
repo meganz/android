@@ -65,8 +65,6 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         }
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_file_contact_list, null);
-
-        mainLinearLayout = contentView.findViewById(R.id.file_contact_list_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
         EmojiTextView titleNameContactPanel = contentView.findViewById(R.id.file_contact_list_contact_name_text);
@@ -124,7 +122,6 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     @Override

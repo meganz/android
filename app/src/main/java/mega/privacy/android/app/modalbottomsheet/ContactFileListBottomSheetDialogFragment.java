@@ -71,7 +71,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         }
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_file_list, null);
-        mainLinearLayout = contentView.findViewById(R.id.contact_file_list_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         ImageView nodeThumb = contentView.findViewById(R.id.contact_file_list_thumbnail);
@@ -198,8 +197,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         }
 
         dialog.setContentView(contentView);
-
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     private boolean getFirstLevel() {

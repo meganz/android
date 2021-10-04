@@ -48,7 +48,6 @@ class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment(
 
         binding = BottomSheetManageChatLinkBinding.inflate(layoutInflater)
         contentView = binding.root.rootView
-        mainLinearLayout = binding.manageChatLinkBottomSheet
         itemsLayout = binding.itemsLayout
 
         binding.copyManageChatLinkOption.setOnClickListener {
@@ -82,7 +81,6 @@ class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment(
         }
 
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

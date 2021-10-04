@@ -71,7 +71,6 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.chat_item_bottom_sheet, null);
-        mainLinearLayout = contentView.findViewById(R.id.chat_item_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
         ImageView iconStateChatPanel = contentView.findViewById(R.id.chat_list_contact_state);
@@ -226,7 +225,6 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     private void addAvatarChatPanel(String contactMail, MegaChatListItem chat) {

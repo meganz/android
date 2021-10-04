@@ -20,12 +20,10 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
 
         val binding = BottomSheetMeetingBinding.inflate(LayoutInflater.from(context), null, false)
         contentView = binding.root
-        mainLinearLayout = binding.root.meeting_bottom_sheet
 
         binding.ivStartMeeting.setOnClickListener(this)
         binding.ivJoinMeeting.setOnClickListener(this)
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE)
     }
 
     override fun onClick(v: View) {

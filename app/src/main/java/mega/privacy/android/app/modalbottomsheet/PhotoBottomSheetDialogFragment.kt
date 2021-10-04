@@ -17,7 +17,6 @@ class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val binding = BottomSheetPhotoBinding.inflate(layoutInflater, null, false)
 
         contentView = binding.root
-        mainLinearLayout = binding.photoBottomSheet
         itemsLayout = binding.itemsLayout
 
         binding.capturePhotoAction.setOnClickListener {
@@ -46,7 +45,6 @@ class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW)
     }
 
     interface PhotoCallback {

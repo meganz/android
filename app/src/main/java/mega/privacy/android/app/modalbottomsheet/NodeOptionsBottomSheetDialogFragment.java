@@ -116,7 +116,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
-        mainLinearLayout = contentView.findViewById(R.id.node_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout_bottom_sheet_node);
 
         ImageView nodeThumb = contentView.findViewById(R.id.node_thumbnail);
@@ -957,7 +956,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     private void showOwnerSharedFolder() {

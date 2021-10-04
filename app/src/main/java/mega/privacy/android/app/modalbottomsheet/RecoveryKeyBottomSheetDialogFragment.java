@@ -41,7 +41,6 @@ public class RecoveryKeyBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.setupDialog(dialog, style);
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_recovery_key, null);
-        mainLinearLayout = contentView.findViewById(R.id.recovery_key_bottom_sheet);
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
         contentView.findViewById(R.id.recovery_key_print_layout).setOnClickListener(this);
@@ -50,6 +49,5 @@ public class RecoveryKeyBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW);
     }
 }

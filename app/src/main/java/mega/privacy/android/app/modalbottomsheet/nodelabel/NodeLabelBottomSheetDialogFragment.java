@@ -43,11 +43,9 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
 
         contentView = binding.getRoot().getRootView();
-        mainLinearLayout = binding.nodeBottomSheet;
         itemsLayout = binding.radioGroupLabel;
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_RADIO_GROUP);
     }
 
     private void showCurrentNodeLabel() {

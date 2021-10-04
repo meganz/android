@@ -100,7 +100,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_attachment_item, null);
-        mainLinearLayout = contentView.findViewById(R.id.node_attachment_bottom_sheet);
         titleLayout = contentView.findViewById(R.id.node_attachment_title_layout);
         titleSeparator = contentView.findViewById(R.id.title_separator);
         itemsLayout = contentView.findViewById(R.id.items_layout);
@@ -183,7 +182,6 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         offlineSwitch.setChecked(availableOffline(requireContext(), node));
         offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     private void showSingleNodeSelected() {

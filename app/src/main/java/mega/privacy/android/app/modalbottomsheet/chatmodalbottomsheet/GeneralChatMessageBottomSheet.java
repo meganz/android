@@ -348,7 +348,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
 
         dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE);
     }
 
     public MegaNode getNodeByHandle(long handle) {
