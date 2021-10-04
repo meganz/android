@@ -65,6 +65,7 @@ import mega.privacy.android.app.lollipop.megachat.ChatSettings;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.lollipop.megachat.PendingMessageSingle;
+import mega.privacy.android.app.lollipop.megachat.RemovedMessage;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1734,23 +1735,57 @@ public class ChatUtil {
     }
 
     /**
-     * Method to know if the bottom dialog with message options should be displayed
+     * Method for finding out if the selected message is deleted or
+     * has STATUS_SERVER_REJECTED, STATUS_SENDING_MANUAL or STATUS_SENDING status
      *
-     * @param currentMsg The message to be checked
-     * @return True, if it is to be displayed. False, if not
+     * @param removedMessages List of deleted messages
+     * @param message         The message selected.
+     * @return True if it's removed, rejected or in sending or manual sending status . False, otherwise.
      */
-    public static boolean shouldBottomDialogBeDisplayed(MegaChatMessage currentMsg) {
-        if (currentMsg.getStatus() == MegaChatMessage.STATUS_SENDING ||
-                currentMsg.getStatus() == MegaChatMessage.STATUS_SENDING_MANUAL ||
-                currentMsg.getStatus() == MegaChatMessage.STATUS_SERVER_REJECTED) {
+    public static boolean isMsgRemovedOrHasRejectedOrManualSendingStatus(ArrayList<RemovedMessage> removedMessages, MegaChatMessage message) {
+        int status = message.getStatus();
+        if (status == MegaChatMessage.STATUS_SERVER_REJECTED ||
+                status == MegaChatMessage.STATUS_SENDING_MANUAL ||
+                status == MegaChatMessage.STATUS_SENDING) {
+            return true;
+        }
 
-            if (!Util.isOnline(MegaApplication.getInstance().getApplicationContext())) {
-                logDebug("No network connection");
-                return false;
+        if (removedMessages == null || removedMessages.isEmpty()) {
+            return false;
+        }
+
+        for (RemovedMessage removeMsg : removedMessages) {
+            if ((message.getMsgId() != MEGACHAT_INVALID_HANDLE && message.getMsgId() == removeMsg.getMsgId()) ||
+                    (message.getTempId() != MEGACHAT_INVALID_HANDLE && message.getTempId() == removeMsg.getMsgTempId())) {
+                return true;
             }
         }
 
-        return true;
+        return false;
+    }
+
+    /**
+     * Method to know if the forward icon of a own message should be displayed.
+     *
+     * @param removedMessages  List of deleted messages
+     * @param message          The message to be checked
+     * @param isMultipleSelect True, if multi-select mode is activated. False, otherwise.
+     * @param cC               ChatController
+     * @return True, if it must be visible. False, if it must be hidden
+     */
+    public static boolean checkForwardVisibilityInOwnMsg(ArrayList<RemovedMessage> removedMessages, MegaChatMessage message, boolean isMultipleSelect, ChatController cC) {
+        return !isMsgRemovedOrHasRejectedOrManualSendingStatus(removedMessages, message) && !cC.isInAnonymousMode() && !isMultipleSelect;
+    }
+
+    /**
+     * Method to know if the forward icon a contact message should be displayed
+     *
+     * @param isMultipleSelect True, if multi-select mode is activated. False, otherwise
+     * @param cC               ChatController
+     * @return True, if it must be visible. False, if it must be hidden
+     */
+    public static boolean checkForwardVisibilityInContactMsg(boolean isMultipleSelect, ChatController cC) {
+        return !cC.isInAnonymousMode() && !isMultipleSelect;
     }
 
     /**
