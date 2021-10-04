@@ -1798,8 +1798,13 @@ class InMeetingViewModel @ViewModelInject constructor(
      *
      * @return True, if the link is visible. False, if not.
      */
-    fun isLinkVisible(): Boolean =
-        isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR
+    fun isLinkVisible(): Boolean {
+        getCall()?.let {
+            return isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR && it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS
+        }
+
+        return false
+    }
 
     /**
      * Determine if should hide or show the link button

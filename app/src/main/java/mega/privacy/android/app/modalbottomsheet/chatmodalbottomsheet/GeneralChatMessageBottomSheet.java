@@ -23,6 +23,7 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatReactionsView;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -136,10 +137,12 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         optionSaveOffline.setOnClickListener(this);
         optionDelete.setOnClickListener(this);
 
+        boolean isRemovedOrPendingMsg =  message != null && message.getMessage() != null
+                && ((ChatActivityLollipop) requireActivity()).hasMessagesRemovedOrPending(message.getMessage());
+
         boolean shouldReactionOptionBeVisible = chatRoom != null && message != null &&
                 requireActivity() instanceof ChatActivityLollipop && shouldReactionBeClicked(chatRoom) &&
-                !((ChatActivityLollipop) requireActivity()).hasMessagesRemoved(message.getMessage()) &&
-                !message.isUploading();
+                !isRemovedOrPendingMsg && !message.isUploading();
 
         if (shouldReactionOptionBeVisible) {
             reactionsFragment.init(requireActivity(), this, chatId, messageId, positionMessage);
@@ -149,7 +152,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
         }
         reactionSeparator.setVisibility(shouldReactionOptionBeVisible ? View.VISIBLE : View.GONE);
 
-        if (message == null || message.getMessage() == null || chatRoom == null || ((ChatActivityLollipop) requireActivity()).hasMessagesRemoved(message.getMessage()) || message.isUploading()) {
+        if (message == null || message.getMessage() == null || chatRoom == null || message.isUploading()) {
             optionOpenWith.setVisibility(View.GONE);
             forwardSeparator.setVisibility(View.GONE);
             optionForward.setVisibility(View.GONE);
@@ -175,7 +178,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
             deleteSeparator.setVisibility(View.GONE);
             optionDelete.setVisibility(View.GONE);
             return;
-
         } else {
             MegaChatMessage megaChatMessage = message.getMessage();
             int typeMessage = megaChatMessage.getType();
@@ -213,14 +215,15 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 optionShare.setVisibility(View.GONE);
 
             } else {
-                optionShare.setVisibility(typeMessage != MegaChatMessage.TYPE_NODE_ATTACHMENT ||
-                        !isOnline(requireContext()) || chatC.isInAnonymousMode() ?
-                        View.GONE : View.VISIBLE);
+                optionShare.setVisibility(isRemovedOrPendingMsg
+                        || typeMessage != MegaChatMessage.TYPE_NODE_ATTACHMENT
+                        || !isOnline(requireContext()) || chatC.isInAnonymousMode()
+                        ? View.GONE : View.VISIBLE);
 
-                optionForward.setVisibility(!isOnline(requireContext()) ||
-                        chatC.isInAnonymousMode() ? View.GONE : View.VISIBLE);
+                optionForward.setVisibility((isRemovedOrPendingMsg || !isOnline(requireContext())
+                        || chatC.isInAnonymousMode()) ? View.GONE : View.VISIBLE);
 
-                if (megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
+                if (isRemovedOrPendingMsg || megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
                         !megaChatMessage.isEditable() ||
                         typeMessage == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
                     optionEdit.setVisibility(View.GONE);
@@ -229,7 +232,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                             typeMessage == MegaChatMessage.TYPE_CONTAINS_META ? View.VISIBLE : View.GONE);
                 }
 
-                if (megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
+                if (isRemovedOrPendingMsg || megaChatMessage.getUserHandle() != megaChatApi.getMyUserHandle() ||
                         !megaChatMessage.isDeletable()) {
                     optionDelete.setVisibility(View.GONE);
                 } else {
@@ -245,11 +248,11 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 }
             }
 
-            optionOpenWith.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
+            optionOpenWith.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
 
-            optionDownload.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
+            optionDownload.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT ? View.VISIBLE : View.GONE);
 
-            if (node != null && node.isFile()) {
+            if (node != null && node.isFile() && !isRemovedOrPendingMsg) {
                 MimeTypeList nodeMime = MimeTypeList.typeForName(node.getName());
                 if (nodeMime.isImage() || nodeMime.isVideo()) {
                     optionGallery.setVisibility(View.VISIBLE);
@@ -260,9 +263,10 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 optionGallery.setVisibility(View.GONE);
             }
 
-            optionImport.setVisibility(typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
+            optionImport.setVisibility(!isRemovedOrPendingMsg && typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode() ? View.VISIBLE : View.GONE);
             boolean shouldShowOfflineOption = typeMessage == MegaChatMessage.TYPE_NODE_ATTACHMENT && !chatC.isInAnonymousMode();
-            if (shouldShowOfflineOption) {
+
+            if (shouldShowOfflineOption && !isRemovedOrPendingMsg) {
                 offlineSwitch.setChecked(availableOffline(requireContext(), node));
                 optionSaveOffline.setVisibility(View.VISIBLE);
             } else {
@@ -274,24 +278,24 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 long userHandle = megaChatMessage.getUserHandle(0);
                 String userEmail = megaChatMessage.getUserEmail(0);
 
-                optionInfoContacts.setVisibility((userCount == 1 &&
+                optionInfoContacts.setVisibility(!isRemovedOrPendingMsg && (userCount == 1 &&
                         userHandle != megaChatApi.getMyUserHandle() &&
                         megaApi.getContact(userEmail) != null &&
                         megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
 
-                optionViewContacts.setVisibility(userCount > 1 ? View.VISIBLE : View.GONE);
+                optionViewContacts.setVisibility(!isRemovedOrPendingMsg && userCount > 1 ? View.VISIBLE : View.GONE);
 
                 if(userCount == 1){
-                    optionInviteContact.setVisibility(userHandle != megaChatApi.getMyUserHandle() &&
+                    optionInviteContact.setVisibility(!isRemovedOrPendingMsg && userHandle != megaChatApi.getMyUserHandle() &&
                             (megaApi.getContact(userEmail) == null ||
                                     megaApi.getContact(userEmail).getVisibility() != MegaUser.VISIBILITY_VISIBLE) ? View.VISIBLE : View.GONE);
 
-                    optionStartConversation.setVisibility(userHandle != megaChatApi.getMyUserHandle() &&
+                    optionStartConversation.setVisibility(!isRemovedOrPendingMsg && userHandle != megaChatApi.getMyUserHandle() &&
                             megaApi.getContact(userEmail) != null &&
                             megaApi.getContact(userEmail).getVisibility() == MegaUser.VISIBILITY_VISIBLE &&
                             (chatRoom.isGroup() || userHandle != chatRoom.getPeerHandle(0)) ? View.VISIBLE : View.GONE);
                 } else {
-                    optionStartConversation.setVisibility(View.VISIBLE);
+                    optionStartConversation.setVisibility(!isRemovedOrPendingMsg? View.VISIBLE : View.GONE);
                     optionInviteContact.setVisibility(View.GONE);
 
                     for (int i = 0; i < userCount; i++) {
@@ -306,7 +310,6 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
                 }
             }
         }
-
 
         forwardSeparator.setVisibility(optionOpenWith.getVisibility() == View.VISIBLE &&
                 optionForward.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
