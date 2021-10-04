@@ -5,6 +5,8 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -152,6 +154,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var lastTouch: Long = 0
     private lateinit var dragTouchListener: OnDragTouchListener
     private var bannerShouldBeShown = false
+    private var yBias = 0f // Recode the y bias of floating window
 
     // For snack bar
     private var shiftY = -1f // Record the shift of floatingWindowFragment to Snackbar
@@ -826,9 +829,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         bottomFloatingPanelViewHolder.updateWidth(newConfig.orientation, outMetrics.widthPixels)
 
         floatingWindowContainer.let {
+            if (newConfig.orientation == ORIENTATION_LANDSCAPE) {
+                previousY = previousY * outMetrics.heightPixels / outMetrics.widthPixels
+                // When LANDSCAPE, save the y pos of floating window of PORTRAIT
+                yBias = it.y
+            } else {
+                previousY = previousY * outMetrics.widthPixels / outMetrics.heightPixels
+            }
+
             val menuLayoutParams = it.layoutParams as ViewGroup.MarginLayoutParams
             menuLayoutParams.setMargins(0, 0, 0, Util.dp2px(125f, outMetrics))
             it.layoutParams = menuLayoutParams
+            onConfigurationChangedOfFloatingWindow(newConfig)
         }
 
         floatingWindowFragment?.let {
@@ -1223,6 +1235,41 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         lastTouch = System.currentTimeMillis()
     }
 
+    /**
+     * Method to control the position of the floating window in relation to the configuration change
+     *
+     * @param newConfig Device configuration information
+     */
+    private fun onConfigurationChangedOfFloatingWindow(newConfig: Configuration) {
+        floatingWindowContainer.post {
+            // Control the position of the floating window in relation to the toolbar, including the banner
+            val maxTop =
+                if (bannerMuteLayout.isVisible) bannerMuteLayout.bottom else toolbar.bottom
+            var isIntersect: Boolean
+
+            if (newConfig.orientation == ORIENTATION_LANDSCAPE) {
+                isIntersect = (maxTop - floatingWindowContainer.y) > 0
+                if (isIntersect) {
+                    if (toolbar.isVisible) floatingWindowContainer.moveY(maxTop.toFloat())
+                    else floatingWindowContainer.moveY(0f)
+                }
+            }
+
+            if (newConfig.orientation == ORIENTATION_PORTRAIT) {
+                // Move back to previous position
+                floatingWindowContainer.moveY(yBias)
+                isIntersect = (maxTop - yBias) > 0
+                if (toolbar.isVisible && isIntersect) {
+                    floatingWindowContainer.moveY(maxTop.toFloat())
+                }
+            }
+
+            val isIntersectPreviously = (maxTop - previousY) > 0
+            if (!toolbar.isVisible && isIntersectPreviously && previousY >= 0) {
+                floatingWindowContainer.moveY(previousY)
+            }
+        }
+    }
     /**
      * Method to control the position of the floating window in relation to the toolbar, bottom sheet panel and Snackbar
      *
