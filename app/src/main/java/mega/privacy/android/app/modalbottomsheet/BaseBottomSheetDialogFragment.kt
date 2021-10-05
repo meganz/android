@@ -48,7 +48,7 @@ import javax.inject.Inject
  *                              It must be the root view.
  * @property itemsLayout        This view must be set in children onCreateView.
  *                              It must be the view containing all available actions.
- * @property state              State of the sheet to restore it after screen's rotations.
+ * @property savedState         State of the sheet to restore it after screen's rotations.
  */
 @AndroidEntryPoint
 open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), ActivityLauncher {
@@ -69,13 +69,13 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     lateinit var dbH: DatabaseHandler
 
     protected lateinit var contentView: View
-    protected lateinit var itemsLayout: LinearLayout
+    protected lateinit var itemsLayout: View
 
-    private var state = INVALID_VALUE
+    private var savedState = INVALID_VALUE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        state = savedInstanceState?.getInt(STATE, INVALID_VALUE) ?: INVALID_VALUE
+        savedState = savedInstanceState?.getInt(STATE, INVALID_VALUE) ?: INVALID_VALUE
         view.post { setBottomSheetBehavior() }
     }
 
@@ -115,8 +115,8 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
             peekHeight = getCustomPeekHeight()
 
             state = when {
-                this.state != INVALID_VALUE -> {
-                    this.state
+                savedState != INVALID_VALUE -> {
+                    savedState
                 }
                 peekHeight == contentView.height -> {
                     BottomSheetBehavior.STATE_EXPANDED
@@ -178,8 +178,20 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
         val heightSeparator by lazy { Util.dp2px(HEIGHT_SEPARATOR) }
 
-        for (i in 0 until itemsLayout.childCount) {
-            val v: View = itemsLayout.getChildAt(i)
+        val childCount = when (itemsLayout) {
+            is LinearLayout -> (itemsLayout as LinearLayout).childCount
+            is RelativeLayout -> (itemsLayout as RelativeLayout).childCount
+            is ConstraintLayout -> (itemsLayout as ConstraintLayout).childCount
+            else -> 0
+        }
+
+        for (i in 0 until childCount) {
+            val v: View = when (itemsLayout) {
+                is LinearLayout -> (itemsLayout as LinearLayout).getChildAt(i)
+                is RelativeLayout -> (itemsLayout as RelativeLayout).getChildAt(i)
+                is ConstraintLayout -> (itemsLayout as ConstraintLayout).getChildAt(i)
+                else -> continue
+            }
 
             if (v.isVisible) {
                 val height = v.height
