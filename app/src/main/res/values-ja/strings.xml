@@ -1114,7 +1114,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">あなたのクラウドを育てましょう。[A]ぜひProアカウントで、ストレージと転送容量を増やしてください。</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGAアカウントの回復キーは以下に保存されています。%1s.[A]「オフライン用に保存されました」のセクションで、回復キーを含むファイルを見つけることができます。[A]注意：回復キーの入ったファイルは、ログアウトすると削除されますので、MEGAアカウントの外の安全な場所に保管してください。</string>
+    <string name="toast_master_key">MEGAアカウントの回復キーは以下に保存されています。%1s.[A]回復キーの入ったファイルは、オフラインセクションで確認できます。[A]注意：回復キーの入ったファイルは、ログアウトすると削除されますので、MEGAアカウントの外の安全な場所に保管してください。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">このメールアドレスはすでに使用されています。別のメールアドレスをご使用ください。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1882,7 +1882,7 @@
     <string name="camera_uploads_empty">カメラアップロードにファイルはありません</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">残り%1$d日</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">期限切れ</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">HTTPを使用しない</string>
