@@ -1079,17 +1079,8 @@ public class ChatActivityLollipop extends PasscodeActivity
     public void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-        if (megaApi == null) {
-            megaApi = MegaApplication.getInstance().getMegaApi();
-        }
 
-        if (megaChatApi == null) {
-            megaChatApi = MegaApplication.getInstance().getMegaChatApi();
-        }
-
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR || megaChatApi.getInitState() == MegaChatApi.INIT_NOT_DONE) {
-            logDebug("Refresh session - karere");
-            refreshSession();
+        if (shouldRefreshSessionDueToKarere()) {
             return;
         }
 

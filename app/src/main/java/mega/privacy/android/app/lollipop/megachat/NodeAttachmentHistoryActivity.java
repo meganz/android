@@ -184,18 +184,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) getApplication()).getMegaApi();
-
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-        }
-
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR || megaChatApi.getInitState() == MegaChatApi.INIT_NOT_DONE) {
-            logDebug("Refresh session - karere");
-            refreshSession();
+        if (shouldRefreshSessionDueToKarere()) {
             return;
         }
 
