@@ -91,8 +91,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         viewModel.getContact(userHandle).observe(viewLifecycleOwner, ::showContactInfo)
         viewModel.getMegaUser(userHandle).observe(viewLifecycleOwner) { megaUser ->
             setupButtons(megaUser)
@@ -107,6 +105,8 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 showNodePermissionsDialog()
             }
         }
+
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

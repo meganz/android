@@ -21,6 +21,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
@@ -36,7 +38,7 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 /**
  * Fragment shows the basic information of meeting
  */
-class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
+class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment(){
     private lateinit var binding: FragmentMeetingInfoBinding
     @ExperimentalCoroutinesApi
     private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
@@ -51,6 +53,14 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
 
         binding = FragmentMeetingInfoBinding.inflate(LayoutInflater.from(context), null, false)
         dialog.setContentView(binding.root)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val dialog = dialog ?: return
+        BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
+            BottomSheetBehavior.STATE_EXPANDED
     }
 
     @ExperimentalCoroutinesApi

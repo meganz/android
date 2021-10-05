@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.R
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -82,6 +83,14 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(STATE, BottomSheetBehavior.from(contentView.parent as View).state)
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val dialog = dialog ?: return
+        BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
+            BottomSheetBehavior.STATE_EXPANDED
     }
 
     override fun onResume() {
