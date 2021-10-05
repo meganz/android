@@ -20,7 +20,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
 import mega.privacy.android.app.fragments.BaseFragment
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.adapters.MultipleBucketAdapter
@@ -177,7 +177,7 @@ class RecentsBucketFragment : BaseFragment() {
 
         when {
             mime.isImage -> {
-                openImage(index, node)
+                openImage(node)
             }
             FileUtil.isAudioOrVideo(node) -> {
                 openAudioVideo(index, node, isMedia, localPath)
@@ -280,22 +280,22 @@ class RecentsBucketFragment : BaseFragment() {
         }
     }
 
-    private fun openImage(
-        index: Int,
-        node: MegaNode
-    ) {
-        val intent = Intent(activity, FullScreenImageViewerLollipop::class.java)
-
-        intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
-
-        intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
-        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter!!)
-
-        intent.putExtra(HANDLE, node.handle)
-        intent.putExtra(NODE_HANDLES, getNodesHandles(true))
-
+    private fun openImage(node: MegaNode) {
+        val handles = getNodesHandles(true)
+        val intent = if (handles != null && handles.isNotEmpty()) {
+            val position = handles.indexOfFirst { it == node.handle }
+            ImageViewerActivity.getIntentForChildren(
+                requireContext(),
+                handles,
+                if (position != -1) position else 0
+            )
+        } else {
+            ImageViewerActivity.getIntentForSingleNode(
+                requireContext(),
+                node.handle
+            )
+        }
         startActivity(intent)
-        activity?.overridePendingTransition(0, 0)
     }
 
     private fun download(handle: Long) {

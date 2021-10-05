@@ -38,6 +38,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
 
     companion object {
         private const val OFFSCREEN_PAGE_LIMIT = 3
+        private const val KEY_DEFAULT_PAGE_SET = "KEY_DEFAULT_PAGE_SET"
 
         @JvmStatic
         fun getIntentForSingleNode(
@@ -70,7 +71,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
             currentNodePosition: Int = 0
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
-                putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, childrenHandles)
+                putExtra(NODE_HANDLES, childrenHandles)
                 putExtra(INTENT_EXTRA_KEY_POSITION, currentNodePosition)
             }
     }
@@ -78,7 +79,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     private val nodePosition: Int by extraNotNull(INTENT_EXTRA_KEY_POSITION, 0)
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
-    private val childrenHandles: LongArray? by extra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
+    private val childrenHandles: LongArray? by extra(NODE_HANDLES)
     private val childOrder: Int? by extra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN)
 
     private var defaultPageSet = false
@@ -109,6 +110,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         setContentView(binding.root)
         setupView()
 
+        if (savedInstanceState?.containsKey(KEY_DEFAULT_PAGE_SET) == true) {
+            defaultPageSet = savedInstanceState.getBoolean(KEY_DEFAULT_PAGE_SET)
+        }
+
         when {
             parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
                 viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder)
@@ -130,6 +135,11 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_image_viewer, menu)
         return true
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(KEY_DEFAULT_PAGE_SET, defaultPageSet)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {
@@ -178,10 +188,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
             binding.txtTitle.text = item.name
 
             val itemCount = binding.viewPager.adapter?.itemCount ?: 0
-            val currentItem = binding.viewPager.currentItem + 1
-            binding.txtPageCount.apply {
-                text = getString(R.string.wizard_steps_indicator, currentItem, itemCount)
-                isVisible = itemCount > 1
+            if (itemCount > 1) {
+                val currentItem = binding.viewPager.currentItem + 1
+                binding.txtPageCount.text = getString(R.string.wizard_steps_indicator, currentItem, itemCount)
+                binding.txtPageCount.isVisible = true
+            } else {
+                binding.txtPageCount.isVisible = false
             }
         }
     }
