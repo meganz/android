@@ -987,11 +987,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         //set cu enabled and start the service
         dbH.setCamSyncEnabled(true);
 
-        handler.postDelayed(() -> {
-            logDebug("Enable Camera Uploads, Now I start the service");
-            startCameraUploadService(context);
-        }, 1000);
-
         logDebug("Camera Uploads ON");
         cameraUploadOnOff.setChecked(true);
 
@@ -1006,6 +1001,24 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         megaCameraFolder.setEnabled(false);
 
         MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE));
+    }
+
+    /**
+     * Start the camera upload service
+     */
+    public void startCU() {
+        boolean cuEnabled;
+        prefs = dbH.getPreferences();
+
+        if (prefs != null) {
+            cuEnabled = Boolean.parseBoolean(prefs.getCamSyncEnabled());
+            if (cuEnabled) {
+                handler.post(() -> {
+                    logDebug("Enable Camera Uploads, Now I start the service");
+                    startCameraUploadService(context);
+                });
+            }
+        }
     }
 
     private void setupConnectionTypeForCameraUpload() {
