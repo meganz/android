@@ -1,13 +1,18 @@
 package mega.privacy.android.app.modalbottomsheet;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
+
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -36,8 +41,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
     private File file;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_offline_item, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
             String handle = savedInstanceState.getString(HANDLE);
@@ -45,16 +51,12 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
         } else if (requireActivity() instanceof ManagerActivityLollipop) {
             nodeOffline = ((ManagerActivityLollipop) requireActivity()).getSelectedOfflineNode();
         }
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_offline_item, null);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         contentView.findViewById(R.id.option_download_layout).setOnClickListener(this);
         contentView.findViewById(R.id.option_properties_layout).setOnClickListener(this);
         TextView optionInfoText = contentView.findViewById(R.id.option_properties_text);
@@ -123,9 +125,8 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             }
         }
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
-
 
     @SuppressLint("NonConstantResourceId")
     @Override

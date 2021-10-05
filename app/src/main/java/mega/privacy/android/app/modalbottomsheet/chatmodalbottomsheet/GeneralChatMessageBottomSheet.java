@@ -1,10 +1,10 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -23,7 +23,6 @@ import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatReactionsView;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -43,6 +42,7 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -59,8 +59,11 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     private ChatReactionsView reactionsFragment;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_general_chat_messages, null);
+        reactionsLayout = contentView.findViewById(R.id.reactions_layout);
+        reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
             logDebug("Bundle is NOT NULL");
@@ -81,18 +84,12 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
         chatRoom = megaChatApi.getChatRoom(chatId);
         chatC = new ChatController(requireActivity());
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(@NonNull final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_general_chat_messages, null);
-        reactionsLayout = contentView.findViewById(R.id.reactions_layout);
-        reactionsFragment = contentView.findViewById(R.id.fragment_container_reactions);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         View reactionSeparator = contentView.findViewById(R.id.separator);
         RelativeLayout optionOpenWith = contentView.findViewById(R.id.open_with_layout);
         LinearLayout forwardSeparator = contentView.findViewById(R.id.forward_separator);
@@ -345,9 +342,9 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
         deleteSeparator.setVisibility(optionDelete.getVisibility());
 
-        offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
+        offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     public MegaNode getNodeByHandle(long handle) {

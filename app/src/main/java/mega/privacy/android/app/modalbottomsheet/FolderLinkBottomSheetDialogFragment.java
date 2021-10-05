@@ -1,9 +1,9 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,13 +19,17 @@ import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaNode node = null;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_folder_link, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
@@ -33,16 +37,12 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         } else if (requireActivity() instanceof FolderLinkActivityLollipop) {
             node = ((FolderLinkActivityLollipop) requireActivity()).getSelectedNode();
         }
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_folder_link, null);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         ImageView nodeThumb = contentView.findViewById(R.id.folder_link_thumbnail);
         TextView nodeName = contentView.findViewById(R.id.folder_link_name_text);
         TextView nodeInfo = contentView.findViewById(R.id.folder_link_info_text);
@@ -76,9 +76,8 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
             }
         }
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
-
 
     @Override
     public void onClick(View v) {

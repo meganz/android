@@ -91,9 +91,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         mMode = MODE0;
     }
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout_bottom_sheet_node);
 
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
@@ -110,13 +112,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         nC = new NodeController(requireActivity());
-    }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_item, null);
-        itemsLayout = contentView.findViewById(R.id.items_layout_bottom_sheet_node);
         return contentView;
     }
 
@@ -1201,7 +1197,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         // Save the new file to offline
-        saveOffline(offlineParent, node, requireContext(), requireActivity());
+        saveOffline(offlineParent, node, requireActivity(), requireActivity());
     }
 
     @Override

@@ -1,14 +1,16 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -46,9 +48,11 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
     private RoundedImageView chatImageView;
     private TextView optionMuteChatText;
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.chat_item_bottom_sheet, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
@@ -63,16 +67,12 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
         }
 
         chatC = new ChatController(requireActivity());
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
-        contentView = View.inflate(getContext(), R.layout.chat_item_bottom_sheet, null);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         ImageView iconStateChatPanel = contentView.findViewById(R.id.chat_list_contact_state);
         iconStateChatPanel.setMaxWidth(scaleWidthPx(6, getResources().getDisplayMetrics()));
         iconStateChatPanel.setMaxHeight(scaleHeightPx(6, getResources().getDisplayMetrics()));
@@ -224,7 +224,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             }
         }
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     private void addAvatarChatPanel(String contactMail, MegaChatListItem chat) {

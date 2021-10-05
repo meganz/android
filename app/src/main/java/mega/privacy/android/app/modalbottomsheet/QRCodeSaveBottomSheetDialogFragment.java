@@ -1,9 +1,10 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.io.File;
 
@@ -22,7 +23,24 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_qr_code, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
+        return contentView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        contentView.findViewById(R.id.qr_code_saveTo_cloud_layout).setOnClickListener(this);
+        contentView.findViewById(R.id.qr_code_saveTo_fileSystem_layout).setOnClickListener(this);
+        super.onViewCreated(view, savedInstanceState);
+    }
 
     @Override
     public void onClick(View v) {
@@ -69,19 +87,5 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
         intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
         ((QRCodeActivity) getActivity()).startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
-    }
-
-    @SuppressLint("RestrictedApi")
-    @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_qr_code, null);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
-
-        contentView.findViewById(R.id.qr_code_saveTo_cloud_layout).setOnClickListener(this);
-        contentView.findViewById(R.id.qr_code_saveTo_fileSystem_layout).setOnClickListener(this);
-
-        dialog.setContentView(contentView);
     }
 }

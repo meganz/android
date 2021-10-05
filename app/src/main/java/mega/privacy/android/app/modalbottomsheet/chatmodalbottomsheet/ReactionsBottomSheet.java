@@ -9,11 +9,13 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.twemoji.EmojiKeyboard;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import nz.mega.sdk.MegaChatMessage;
 
 import static mega.privacy.android.app.utils.ChatUtil.*;
@@ -21,7 +23,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ReactionsBottomSheet extends BaseBottomSheetDialogFragment {
+public class ReactionsBottomSheet extends BottomSheetDialogFragment {
 
     private final static int HEIGHT_REACTIONS_KEYBOARD = 250;
 
@@ -46,7 +48,7 @@ public class ReactionsBottomSheet extends BaseBottomSheetDialogFragment {
             messageId = ((ChatActivityLollipop) requireActivity()).selectedMessageId;
         }
 
-        MegaChatMessage messageMega = megaChatApi.getMessage(chatId, messageId);
+        MegaChatMessage messageMega = MegaApplication.getInstance().getMegaChatApi().getMessage(chatId, messageId);
         if (messageMega != null) {
             message = new AndroidMegaChatMessage(messageMega);
         }
@@ -56,7 +58,7 @@ public class ReactionsBottomSheet extends BaseBottomSheetDialogFragment {
     @Override
     public void setupDialog(final Dialog dialog, int style) {
         super.setupDialog(dialog, style);
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_reaction, null);
+        View contentView = View.inflate(getContext(), R.layout.bottom_sheet_reaction, null);
         mainLayout = contentView.findViewById(R.id.bottom_sheet);
         reactionsKeyboard = contentView.findViewById(R.id.reaction_keyboard);
         reactionsKeyboard.initReaction(dp2px(HEIGHT_REACTIONS_KEYBOARD));

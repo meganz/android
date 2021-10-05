@@ -1,9 +1,9 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,6 +22,9 @@ import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.*;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaUser contact = null;
@@ -29,8 +32,9 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
     private String nonContactEmail;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_file_contact_list, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
             String email = savedInstanceState.getString(EMAIL);
@@ -47,15 +51,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
             if (contact == null) {
                 nonContactEmail = share.getUser();
             }
-        }
-    }
-
-    @SuppressLint("RestrictedApi")
-    @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
-        if (requireActivity() instanceof FileInfoActivityLollipop) {
+        } else if (requireActivity() instanceof FileInfoActivityLollipop) {
             share = ((FileInfoActivityLollipop) requireActivity()).getSelectedShare();
             contact = ((FileInfoActivityLollipop) requireActivity()).getSelectedContact();
 
@@ -64,9 +60,11 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
             }
         }
 
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_file_contact_list, null);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
+        return contentView;
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         EmojiTextView titleNameContactPanel = contentView.findViewById(R.id.file_contact_list_contact_name_text);
         TextView titleMailContactPanel = contentView.findViewById(R.id.file_contact_list_contact_mail_text);
         RoundedImageView contactImageView = contentView.findViewById(R.id.sliding_file_contact_list_thumbnail);
@@ -121,7 +119,7 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
             titleMailContactPanel.setText(contact != null ? contact.getEmail() : nonContactEmail);
         }
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override

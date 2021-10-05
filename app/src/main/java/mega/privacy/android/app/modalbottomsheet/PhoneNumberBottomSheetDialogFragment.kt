@@ -1,20 +1,25 @@
 package mega.privacy.android.app.modalbottomsheet
 
-import android.annotation.SuppressLint
-import android.app.Dialog
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import mega.privacy.android.app.R
 
 class PhoneNumberBottomSheetDialogFragment: BaseBottomSheetDialogFragment() {
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-
-        val phoneNumberCallback = context as PhoneNumberCallback
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         contentView = View.inflate(requireContext(), R.layout.bottom_sheet_phonenumber, null)
         itemsLayout = contentView.findViewById(R.id.items_layout)
+        return contentView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val phoneNumberCallback = requireActivity() as PhoneNumberCallback
 
         contentView.findViewById<View>(R.id.modify_phonenumber_layout).setOnClickListener {
             phoneNumberCallback.showRemovePhoneNumberConfirmation(true)
@@ -26,7 +31,7 @@ class PhoneNumberBottomSheetDialogFragment: BaseBottomSheetDialogFragment() {
             setStateBottomSheetBehaviorHidden()
         }
 
-        dialog.setContentView(contentView)
+        super.onViewCreated(view, savedInstanceState)
     }
 
     interface PhoneNumberCallback {

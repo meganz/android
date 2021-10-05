@@ -1,23 +1,30 @@
 package mega.privacy.android.app.modalbottomsheet
 
-import android.annotation.SuppressLint
-import android.app.Dialog
-import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import mega.privacy.android.app.databinding.BottomSheetPhotoBinding
 import mega.privacy.android.app.lollipop.controllers.AccountController
 
 class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
+    private lateinit var binding: BottomSheetPhotoBinding
 
-        val callback = requireActivity() as PhotoCallback
-        val binding = BottomSheetPhotoBinding.inflate(layoutInflater, null, false)
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = BottomSheetPhotoBinding.inflate(layoutInflater, null, false)
         contentView = binding.root
         itemsLayout = binding.itemsLayout
+        return contentView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val callback = requireActivity() as PhotoCallback
 
         binding.capturePhotoAction.setOnClickListener {
             callback.capturePhoto()
@@ -44,7 +51,7 @@ class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
         }
 
-        dialog.setContentView(contentView)
+        super.onViewCreated(view, savedInstanceState)
     }
 
     interface PhotoCallback {

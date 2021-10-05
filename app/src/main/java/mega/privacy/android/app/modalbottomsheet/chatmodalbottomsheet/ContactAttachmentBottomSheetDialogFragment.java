@@ -1,9 +1,9 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -32,8 +32,10 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private AndroidMegaChatMessage message;
     private long chatId;
@@ -48,8 +50,9 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
     public RoundedImageView contactImageView;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
@@ -73,22 +76,19 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
         logDebug("Chat ID: " + chatId + ", Message ID: " + messageId);
         chatC = new ChatController(requireActivity());
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (message == null) {
             logError("Message is null");
             return;
         }
 
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_contact_attachment_item, null);
         LinearLayout titleContact = contentView.findViewById(R.id.contact_attachment_chat_title_layout);
         View separatorTitleContact = contentView.findViewById(R.id.contact_title_separator);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         titleNameContactChatPanel = contentView.findViewById(R.id.contact_attachment_chat_name_text);
         stateIcon = contentView.findViewById(R.id.contact_attachment_state_circle);
@@ -251,7 +251,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
                 optionInfo.getVisibility() == View.VISIBLE) && (optionStartConversation.getVisibility() == View.VISIBLE ||
                 optionInvite.getVisibility() == View.VISIBLE) ? View.VISIBLE : View.GONE);
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override

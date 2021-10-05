@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,6 +33,9 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaChatRoom selectedChat;
@@ -42,8 +47,10 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private RoundedImageView contactImageView;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_group_participant, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
+        titleNameContactChatPanel = contentView.findViewById(R.id.group_participants_chat_name_text);
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
@@ -56,22 +63,17 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         selectedChat = megaChatApi.getChatRoom(chatId);
 
         chatC = new ChatController(requireActivity());
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (selectedChat == null || participantHandle == INVALID_HANDLE) {
             logWarning("Error. Selected chat is NULL or participant handle is -1");
             return;
         }
 
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_group_participant, null);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
-
-        titleNameContactChatPanel = contentView.findViewById(R.id.group_participants_chat_name_text);
         ImageView stateIcon = contentView.findViewById(R.id.group_participants_state_circle);
 
         stateIcon.setVisibility(View.VISIBLE);
@@ -215,7 +217,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         separatorLeave.setVisibility(optionLeaveChat.getVisibility() == View.VISIBLE &&
                 optionRemoveParticipantChat.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override

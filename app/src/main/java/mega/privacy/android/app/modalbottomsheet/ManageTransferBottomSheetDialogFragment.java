@@ -4,7 +4,9 @@ import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -42,8 +44,10 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
     private long transferId;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        BottomSheetManageTransferBinding binding = BottomSheetManageTransferBinding.inflate(getLayoutInflater());
+        contentView = binding.getRoot();
+        itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         managerActivity = (ManagerActivityLollipop) requireActivity();
 
@@ -54,14 +58,12 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
             transferId = savedInstanceState.getLong(TRANSFER_ID, INVALID_ID);
             transfer = dbH.getcompletedTransfer(transferId);
         }
+
+        return contentView;
     }
 
     @Override
-    public void setupDialog(Dialog dialog, int style) {
-        BottomSheetManageTransferBinding binding = BottomSheetManageTransferBinding.inflate(getLayoutInflater());
-        contentView = binding.getRoot();
-        itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (transfer == null) return;
 
         managerActivity = (ManagerActivityLollipop) getActivity();
@@ -146,7 +148,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
             type.setLayoutParams(typeParams);
         }
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override

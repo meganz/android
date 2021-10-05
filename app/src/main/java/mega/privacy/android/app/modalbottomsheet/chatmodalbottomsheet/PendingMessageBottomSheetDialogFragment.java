@@ -4,11 +4,15 @@ package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import mega.privacy.android.app.R;
@@ -31,8 +35,9 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
     private boolean isUploadingMessage;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.msg_not_sent_bottom_sheet, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
@@ -44,16 +49,12 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
 
         logDebug("Chat ID: " + chatId + "Message ID: " + messageId);
         selectedChat = megaChatApi.getChatRoom(chatId);
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
-        contentView = View.inflate(getContext(), R.layout.msg_not_sent_bottom_sheet, null);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         TextView titleSlidingPanel = contentView.findViewById(R.id.msg_not_sent_title_text);
         LinearLayout optionRetryLayout = contentView.findViewById(R.id.msg_not_sent_retry_layout);
         LinearLayout optionDeleteLayout = contentView.findViewById(R.id.msg_not_sent_delete_layout);
@@ -90,7 +91,7 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
             }
         }
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override

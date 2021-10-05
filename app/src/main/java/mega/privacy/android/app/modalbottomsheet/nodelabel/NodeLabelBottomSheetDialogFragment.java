@@ -1,21 +1,21 @@
 package mega.privacy.android.app.modalbottomsheet.nodelabel;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
 
@@ -30,22 +30,29 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
         return nodeLabelFragment;
     }
 
-    @SuppressLint("RestrictedApi")
+    @Nullable
     @Override
-    public void setupDialog(@NonNull Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = BottomSheetNodeLabelBinding.inflate(getLayoutInflater());
+        contentView = binding.getRoot().getRootView();
+        itemsLayout = binding.radioGroupLabel;
+        return contentView;
+    }
 
-        node = getMegaApi().getNodeByHandle(getArguments().getLong(HANDLE));
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if (arguments == null) {
+            logError("Arguments is null, cannot get node.");
+            return;
+        }
+
+        node = megaApi.getNodeByHandle(arguments.getLong(HANDLE));
         showCurrentNodeLabel();
 
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
 
-        contentView = binding.getRoot().getRootView();
-        itemsLayout = binding.radioGroupLabel;
-
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     private void showCurrentNodeLabel() {

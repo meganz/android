@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -40,6 +42,9 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaNode node;
@@ -60,8 +65,18 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     private LinearLayout optionView;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_attachment_item, null);
+        titleLayout = contentView.findViewById(R.id.node_attachment_title_layout);
+        titleSeparator = contentView.findViewById(R.id.title_separator);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
+
+        nodeThumb = contentView.findViewById(R.id.node_attachment_thumbnail);
+        nodeName = contentView.findViewById(R.id.node_attachment_name_text);
+        nodeInfo = contentView.findViewById(R.id.node_attachment_info_text);
+
+        optionView = contentView.findViewById(R.id.option_view_layout);
+
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
             messageId = savedInstanceState.getLong(MESSAGE_ID, MEGACHAT_INVALID_HANDLE);
@@ -80,13 +95,12 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         chatRoom = megaChatApi.getChatRoom(chatId);
         chatC = new ChatController(requireActivity());
         dbH = DatabaseHandler.getDbHandler(getActivity());
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (message == null || message.getMessage() == null) {
             logWarning("Message is null");
             return;
@@ -99,16 +113,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
             return;
         }
 
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_node_attachment_item, null);
-        titleLayout = contentView.findViewById(R.id.node_attachment_title_layout);
-        titleSeparator = contentView.findViewById(R.id.title_separator);
-        itemsLayout = contentView.findViewById(R.id.items_layout);
 
-        nodeThumb = contentView.findViewById(R.id.node_attachment_thumbnail);
-        nodeName = contentView.findViewById(R.id.node_attachment_name_text);
-        nodeInfo = contentView.findViewById(R.id.node_attachment_info_text);
-
-        optionView = contentView.findViewById(R.id.option_view_layout);
         TextView optionViewText = contentView.findViewById(R.id.option_view_text);
         LinearLayout optionDownload = contentView.findViewById(R.id.option_download_layout);
         LinearLayout optionImport = contentView.findViewById(R.id.option_import_layout);
@@ -180,8 +185,9 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         offlineSwitch.setChecked(availableOffline(requireContext(), node));
-        offlineSwitch.setOnCheckedChangeListener((view, isChecked) -> onClick(view));
-        dialog.setContentView(contentView);
+        offlineSwitch.setOnCheckedChangeListener((v, isChecked) -> onClick(v));
+
+        super.onViewCreated(view, savedInstanceState);
     }
 
     private void showSingleNodeSelected() {

@@ -1,9 +1,9 @@
 package mega.privacy.android.app.modalbottomsheet
 
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetUploadBinding
@@ -33,15 +33,19 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
 
     private lateinit var binding: BottomSheetUploadBinding
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-
-        listener = context as UploadBottomSheetDialogActionListener
-
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = BottomSheetUploadBinding.inflate(layoutInflater)
         contentView = binding.root.rootView
         itemsLayout = binding.itemsLayout
+        return contentView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        listener = requireActivity() as UploadBottomSheetDialogActionListener
 
         when (arguments?.getInt(UPLOAD_TYPE)) {
             DOCUMENTS_UPLOAD -> {
@@ -60,7 +64,7 @@ class UploadBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.On
         binding.newFolderOption.setOnClickListener(this)
         binding.newTxtOption.setOnClickListener(this)
 
-        dialog.setContentView(contentView)
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onClick(v: View?) {

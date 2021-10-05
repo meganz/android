@@ -1,9 +1,9 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,13 +22,17 @@ import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaShare.*;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaNode node = null;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_versions_file, null);
+        itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         if (savedInstanceState != null) {
             long handle = savedInstanceState.getLong(HANDLE, INVALID_HANDLE);
@@ -36,20 +40,16 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         } else if (requireActivity() instanceof VersionsFileActivity) {
             node = ((VersionsFileActivity) requireActivity()).getSelectedNode();
         }
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (node == null) {
             logWarning("Node NULL");
             return;
         }
-
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_versions_file, null);
-        itemsLayout = contentView.findViewById(R.id.item_list_bottom_sheet_contact_file);
 
         ImageView nodeThumb = contentView.findViewById(R.id.versions_file_thumbnail);
         TextView nodeName = contentView.findViewById(R.id.versions_file_name_text);
@@ -106,7 +106,7 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
             separatorRevert.setVisibility(View.VISIBLE);
         }
 
-        dialog.setContentView(contentView);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
