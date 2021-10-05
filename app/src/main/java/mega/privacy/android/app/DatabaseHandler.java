@@ -1781,13 +1781,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.insert(TABLE_CHAT_SETTINGS, null, values);
 	}
 
+	/**
+	 * Sets the chat video quality value.
+	 * There are four possible values for this setting: VIDEO_QUALITY_ORIGINAL, VIDEO_QUALITY_HIGH,
+	 * VIDEO_QUALITY_MEDIUM or VIDEO_QUALITY_LOW.
+	 *
+	 * @param chatVideoQuality The new chat video quality.
+	 */
 	public void setChatVideoQuality(int chatVideoQuality){
         logDebug("setChatVideoQuality");
         setIntValue(TABLE_CHAT_SETTINGS, KEY_CHAT_VIDEO_QUALITY, chatVideoQuality);
 	}
 
+	/**
+	 * Gets the chat video quality value.
+	 *
+	 * @return The chat video quality.
+	 */
 	public int getChatVideoQuality(){
-		logDebug("setChatVideoQuality");
+		logDebug("getChatVideoQuality");
 		return getIntValue(TABLE_CHAT_SETTINGS, KEY_CHAT_VIDEO_QUALITY, VIDEO_QUALITY_MEDIUM);
 	}
 

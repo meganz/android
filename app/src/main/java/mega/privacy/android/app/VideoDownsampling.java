@@ -11,7 +11,6 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
-import android.os.Build;
 import android.view.Surface;
 
 import java.io.File;
@@ -44,9 +43,7 @@ public class VideoDownsampling {
     private static final int OUTPUT_AUDIO_AAC_PROFILE = MediaCodecInfo.CodecProfileLevel.AACObjectHE;
     private static final int OUTPUT_AUDIO_SAMPLE_RATE_HZ = 44100;
 
-    private static final int BIT_RATE_MEDIUM = 3000000;
     private static final int SHORT_SIDE_SIZE_MEDIUM = 720;
-    private static final int BIT_RATE_LOW = 1500000;
     private static final int SHORT_SIDE_SIZE_LOW = 480;
 
     protected int quality;
@@ -170,13 +167,13 @@ public class VideoDownsampling {
             MediaMetadataRetriever m = new MediaMetadataRetriever();
             m.setDataSource(mInputFile);
 
-            getRealWidthAndHeight(m);
+            getOriginalWidthAndHeight(m);
 
             int resultWidth = mWidth;
             int resultHeight = mHeight;
-            int bitrate;
-            int shortSideByQuality = quality == VIDEO_QUALITY_MEDIUM ?
-                    SHORT_SIDE_SIZE_MEDIUM
+            int bitrate = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
+            int shortSideByQuality = quality == VIDEO_QUALITY_MEDIUM
+                    ? SHORT_SIDE_SIZE_MEDIUM
                     : SHORT_SIDE_SIZE_LOW;
 
             int shortSide = Math.min(mWidth, mHeight);
@@ -184,10 +181,11 @@ public class VideoDownsampling {
                     ? inputFormat.getInteger(MediaFormat.KEY_FRAME_RATE)
                     : OUTPUT_VIDEO_FRAME_RATE;
 
-            if (quality == VIDEO_QUALITY_HIGH) {
-                bitrate = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
-            } else {
-                bitrate = quality == VIDEO_QUALITY_MEDIUM ? BIT_RATE_MEDIUM : BIT_RATE_LOW;
+            if (quality != VIDEO_QUALITY_HIGH) {
+                bitrate = quality == VIDEO_QUALITY_MEDIUM
+                        ? bitrate / 2
+                        : bitrate / 3;
+
                 frameRate = Math.min(frameRate, OUTPUT_VIDEO_FRAME_RATE);
 
                 if (shortSide > shortSideByQuality) {
@@ -207,7 +205,7 @@ public class VideoDownsampling {
             boolean supported = capabilities.areSizeAndRateSupported(resultWidth, resultHeight, frameRate);
 
             if (!supported) {
-                logError("Sizes width: " + resultWidth + " height: " + resultHeight + " not supported.");
+                logWarning("Sizes width: " + resultWidth + " height: " + resultHeight + " not supported.");
 
                 for (int i = shortSideByQuality; i< shortSide; i++) {
                     if (mWidth > mHeight) {
@@ -350,7 +348,7 @@ public class VideoDownsampling {
         }
     }
 
-    private void getRealWidthAndHeight(MediaMetadataRetriever m) {
+    private void getOriginalWidthAndHeight(MediaMetadataRetriever m) {
         mWidth = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
         mHeight = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
         Bitmap thumbnail = m.getFrameAtTime();
