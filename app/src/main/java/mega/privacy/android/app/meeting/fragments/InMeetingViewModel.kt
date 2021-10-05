@@ -76,7 +76,7 @@ class InMeetingViewModel @ViewModelInject constructor(
 
     // Chat title
     private val _chatTitle: MutableLiveData<String> =
-        MutableLiveData<String>(inMeetingRepository.getInitialMeetingName())
+        MutableLiveData<String>(" ")
     val chatTitle: LiveData<String> = _chatTitle
 
     // List of participants in the meeting
