@@ -1080,11 +1080,9 @@ public class ChatActivityLollipop extends PasscodeActivity
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
 
-        if (shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
-
-        dbH = DatabaseHandler.getDbHandler(this);
 
         handler = new Handler();
 

@@ -184,7 +184,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
-        if (shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
 
@@ -195,8 +195,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         megaChatApi.addNodeHistoryListener(chatId, this);
 
         handler = new Handler();
-
-        dbH = DatabaseHandler.getDbHandler(this);
 
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
