@@ -471,8 +471,6 @@ public class ChatActivityLollipop extends PasscodeActivity
     MegaChatLollipopAdapter adapter;
     int stateHistory;
 
-    DatabaseHandler dbH = null;
-
     FrameLayout fileStorageLayout;
     private ChatFileStorageFragment fileStorageF;
 

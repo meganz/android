@@ -118,7 +118,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     MaterialToolbar tB;
     NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;
 
-    DatabaseHandler dbH = null;
     public boolean isList = true;
 
     private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
