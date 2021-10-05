@@ -86,6 +86,7 @@ import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class InviteContactActivity extends PasscodeActivity implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
 
@@ -370,7 +371,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, message);
-                sendIntent.setType("text/plain");
+                sendIntent.setType(TYPE_TEXT_PLAIN);
                 startActivity(Intent.createChooser(sendIntent, getString(R.string.invite_contact_chooser_title)));
                 break;
             }
@@ -689,7 +690,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         switch (v.getId()) {
             case R.id.layout_scan_qr: {
                 logDebug("Scan QR code pressed");
-                if (isNecessaryDisableLocalCamera() != -1) {
+                if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
                     showConfirmationOpenCamera(this, ACTION_OPEN_QR, true);
                     break;
                 }

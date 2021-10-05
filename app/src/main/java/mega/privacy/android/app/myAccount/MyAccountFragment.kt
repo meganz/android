@@ -386,7 +386,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         if (megaApi.isMasterBusinessAccount) {
             when (megaApi.businessStatus) {
                 MegaApiJava.BUSINESS_STATUS_EXPIRED, MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD -> {
-                    paymentAlertBinding.businessUpdate(megaApi, viewModel)
+                    paymentAlertBinding.businessUpdate(megaApi, viewModel, false)
                     expandPaymentInfoIfNeeded()
                 }
                 else -> setupPaymentDetails() //BUSINESS_STATUS_ACTIVE

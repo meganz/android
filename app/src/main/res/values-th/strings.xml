@@ -1440,7 +1440,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">คัดลอกไปที่คลิปบอร์ดแล้ว</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">ข้อผิดพลาดในการแชท!</string>
+    <string name="chat_error_open_title">พบข้อผิดพลาดในแชท</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">แชทไม่สามารถเปิดได้อย่างถูกต้อง</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -2430,7 +2430,7 @@
     <!-- Title of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="title_2fa_enabled">เปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัยแล้ว</string>
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
-    <string name="description_2fa_enabled">ครั้งต่อไปที่คุณลงชื่อเข้าใช้บัญชีของคุณ ระบบจะขอให้คุณกรอกรหัส 6 หลักที่ได้รับจากแอปตัวรับรองความถูกต้องของคุณ</string>
+    <string name="description_2fa_enabled">ครั้งต่อไปที่คุณลงชื่อเข้าใช้บัญชี ระบบจะขอให้คุณกรอกรหัส 6 หลักจากแอปตัวรับรองความถูกต้องที่ให้มา</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
     <string name="recommendation_2fa_enabled">กรุณาบันทึก<b>คีย์การกู้คืน</b>ของคุณไว้ในที่ปลอดภัย เพื่อหลีกเลี่ยงปัญหาในกรณีที่คุณไม่สามารถเข้าถึงแอปของคุณ หรือหากคุณต้องการปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัย</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2586,7 +2586,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">คุณกำลังจะลบประวัติเวอร์ชันของไฟล์ทั้งหมด ไฟล์ใด ๆ ที่แชร์ให้กับคุณจากผู้ติดต่อจะต้องถูกลบทิ้งด้วย\n\nโปรดทราบว่าไฟล์ปัจจุบันจะไม่ถูกลบ</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">เวอร์ชันไฟล์ถูกลบแล้ว</string>
+    <string name="success_delete_versions">เวอร์ชันไฟล์ถูกลบออกเรียบร้อยแล้ว</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">เกิดข้อผิดพลาดขณะพยายามลบไฟล์เวอร์ชันก่อนหน้าทั้งหมดของคุณ กรุณาลองอีกครั้งในภายหลัง</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -3949,4 +3949,138 @@
     <plurals name="get_links">
         <item quantity="other">รับลิงก์</item>
     </plurals>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">มีคุณคนเดียวที่อยู่ที่นี่</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">การประชุม</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">เริ่ม/เข้าร่วมการประชุม</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">ประชุมใหม่</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">เข้าร่วมการประชุม</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">เริ่มการประชุม</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">เข้าร่วมในฐานะแขกรับเชิญ</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">กำลังประชุมกับ %s</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">วางสาย</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">ไมค์</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">ไมโครโฟนของคุณปิดเสียงอยู่</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">ไมโครโฟนของคุณเปิดเสียงอยู่</string>
+    <!-- General label for camera -->
+    <string name="general_camera">กล้อง</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">กล้องของคุณเปิดอยู่</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">กล้องของคุณปิดอยู่</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">พักสาย</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">ลำโพง</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">หูฟัง</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">หูฟังเปิดใช้งานอยู่</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">เปิดลำโพงอยู่</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">ลำโพงปิดอยู่</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">จบการประชุม</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">เชิญผู้เข้าร่วม</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">ผู้เข้าร่วม (%d คน)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">แสดงในมุมมองหลัก</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">แต่งตั้งเป็นผู้ดูแล</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">ออกจากการประชุมตอนนี้หรือไม่</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">ไม่มีผู้ดูแล</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">ก่อนที่จะออกจากการเป็นผู้ดูแล กรุณาแต่งตั้งผู้ดูแลการประชุมคนใหม่อย่างน้อยหนึ่งคน</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">แต่งตั้งเป็นผู้ดูแล</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">ยืนยันที่จะออก</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">กรุณาแต่งตั้งผู้ดูแลคนใหม่อย่างน้อยหนึ่งคน</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">เปลี่ยนชื่อการประชุม</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">ผู้เข้าร่วม: %d คน</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">ผู้ดูแล: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">ลิงก์ประชุม</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">ระยะเวลา</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">เข้าร่วมประชุมในฐานะแขกรับเชิญ</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">คุณได้รับเชิญให้เข้าร่วมการประชุม</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">แตะลิงก์ประชุมที่ส่งถึงคุณหรือวางที่นี่</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">การเชื่อมต่อไม่ดี</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">สิ้นสุดการประชุมแล้ว</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">ลิงก์การประชุมไม่ถูกต้อง</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">MEGA จำเป็นต้องใช้สิทธิ์ในการเข้าถึง</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">MEGA ต้องการเข้าถึงไมโครโฟนและกล้องสำหรับการประชุม</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">รับทราบ</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">ไปที่การตั้งค่าเพื่ออนุญาตให้ MEGA เข้าถึงกล้องและไมโครโฟนของคุณ</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">ดูแชทการประชุม</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">เชิญผู้เข้าร่วมประชุมเพิ่มเติม ปัดขึ้นเพื่อเชิญ</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">แตะเพื่อสร้างการประชุมใหม่</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">ตั้งค่าการประชุม MEGA อย่างรวดเร็วด้วยฟีเจอร์การประชุมที่เข้ารหัสใหม่ของเรา</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">คุณเป็นผู้ดูแลคนใหม่</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">คัดลอกลิงก์การประชุมแล้ว</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%sเริ่มการประชุม แตะเพื่อเข้าร่วม</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA การประชุม</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">การประชุมทางวิดีโอที่เข้ารหัสตั้งแต่ต้นทางถึงปลายทาง</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">กรุณากรอกลิงก์การประชุมให้ถูกต้อง</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">เป็นมากกว่าการประชุม</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">ความเป็นส่วนตัวของคุณมีความสำคัญเป็นอันดับแรก</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">เข้าร่วมพื้นที่เก็บข้อมูลบนคลาวด์ที่ปลอดภัยและแพลตฟอร์มการทำงานร่วมกันที่ใหญ่ที่สุดในโลก</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">รับฟรี 20 GB</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">ลงทะเบียนตอนนี้และเพลิดเพลินไปกับฟีเจอร์การทำงานร่วมกันขั้นสูงได้ฟรี</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">อยู่ระหว่างดำเนินการโทรอีก กรุณาวางสายปัจจุบันของคุณก่อนที่จะโทรออกอีกครั้ง</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">ชื่อการประชุมใหม่</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">สร้างการประชุมไม่สำเร็จ</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](ฉัน)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">มุมมองหลัก</string>
 </resources>

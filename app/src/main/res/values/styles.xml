@@ -182,8 +182,8 @@
     <style name="Widget.Mega.SnackBar" parent="Widget.MaterialComponents.Snackbar">
         <item name="actionTextColorAlpha">1</item>
         <item name="backgroundTintMode">add</item>
-        <item name="backgroundTint">@color/grey_alpha_087_white</item>
-        <item name="textColor">@color/white_alpha_087_grey_alpha_087</item>
+        <item name="backgroundTint">@color/grey_087_white</item>
+        <item name="textColor">@color/white_087_grey_087</item>
     </style>
 
     <style name="Widget.Mega.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
@@ -273,7 +273,9 @@
     </style>
 
     <style name="Widget.Mega.DatePicker" parent="MaterialAlertDialog.MaterialComponents.Picker.Date.Calendar">
-        <item name="android:headerMonthTextAppearance">@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary</item>
+        <item name="android:headerMonthTextAppearance">
+            @style/ThemeOverlay.MaterialComponents.MaterialAlertDialog.Picker.Date.Header.Text.Secondary
+        </item>
         <item name="android:headerBackground">@color/white_grey_800</item>
     </style>
 
@@ -554,9 +556,65 @@
         <item name="drawableTint">?android:attr/textColorSecondary</item>
     </style>
 
+    <style name="BottomSheetItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/bottom_sheet_item_height</item>
+        <item name="android:drawablePadding">@dimen/bottom_sheet_item_drawable_padding</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
+        <item name="drawableTint">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="BottomSheetItemDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginStart">@dimen/bottom_sheet_item_divider_margin_start</item>
+        <item name="android:background">@color/grey_012_white_012</item>
+    </style>
+
+    <style name="BottomSheetIcon">
+        <item name="android:layout_width">@dimen/meeting_bottom_floating_panel_fab_size</item>
+        <item name="android:layout_height">@dimen/meeting_bottom_floating_panel_fab_size</item>
+        <item name="android:background">@null</item>
+        <item name="android:padding">1dp</item>
+        <item name="borderWidth">0dp</item>
+        <item name="elevation">0dp</item>
+        <item name="pressedTranslationZ">0dp</item>
+        <item name="fabCustomSize">@dimen/meeting_bottom_floating_panel_fab_size</item>
+        <item name="off_background_tint">@color/white</item>
+        <item name="off_icon_tint">@color/red_600</item>
+        <item name="on_background_tint">@color/grey_032_white_054</item>
+        <item name="on_icon_tint">@color/white</item>
+    </style>
+
+    <style name="BottomSheetInfoItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/bottom_sheet_item_height</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/bottom_sheet_item_padding_horizontal</item>
+        <item name="android:textAppearance">?attr/textAppearanceSubtitle1</item>
+    </style>
+
     <style name="BottomSheetOption.Red">
         <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Red</item>
         <item name="drawableTint">@color/red_600_red_300</item>
+    </style>
+
+    <style name="CallBanner">
+        <item name="android:minHeight">36dp</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:elevation">1dp</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
     <style name="Widget.Mega.TimeBar" parent="ExoStyledControls.TimeBar">
