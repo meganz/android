@@ -43,8 +43,8 @@ public class VideoDownsampling {
     private static final int OUTPUT_AUDIO_AAC_PROFILE = MediaCodecInfo.CodecProfileLevel.AACObjectHE;
     private static final int OUTPUT_AUDIO_SAMPLE_RATE_HZ = 44100;
 
-    private static final int SHORT_SIDE_SIZE_MEDIUM = 720;
-    private static final int SHORT_SIDE_SIZE_LOW = 480;
+    private static final int SHORT_SIDE_SIZE_MEDIUM = 1080;
+    private static final int SHORT_SIDE_SIZE_LOW = 720;
 
     protected int quality;
 
@@ -230,7 +230,6 @@ public class VideoDownsampling {
             }
 
             MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE, resultWidth, resultHeight);
-            outputVideoFormat.setInteger(MediaFormat.KEY_PROFILE, AVCProfileBaseline);
             outputVideoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, OUTPUT_VIDEO_COLOR_FORMAT);
             outputVideoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
             outputVideoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
