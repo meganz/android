@@ -1924,7 +1924,7 @@
     <string name="camera_uploads_empty">Noch keine Medienuploads</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d Tage</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Abgelaufen</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Kein HTTP nutzen</string>
@@ -4096,7 +4096,7 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">In Hauptansicht anzeigen</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Moderator bestimmen</string>
+    <string name="make_moderator">Zu Moderator ernennen</string>
     <!-- The title of dialog for end meeting confirmation-->
     <string name="title_end_meeting">Meeting jetzt verlassen?</string>
     <!-- no moderator when the moderator leave meeting-->

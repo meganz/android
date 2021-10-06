@@ -970,8 +970,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
 				updateVisibleCallElements(call.getChatid());
-				if ((call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION ||
-						call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) &&
+				if (call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION &&
 						call.getTermCode() == MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS) {
 					showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
 				}
@@ -2851,7 +2850,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void destroySMSVerificationFragment() {
         if (!isTablet(this)) {
             logDebug("mobile, all orientation");
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
         }
         onAskingSMSVerificationFragment = false;
         svF = null;
@@ -2871,7 +2870,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		//In mobile, allow all orientation after permission screen
 		if (!isTablet(this)) {
 			logDebug("Mobile, all orientation");
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
 		}
 
 		turnOnNotifications = false;
@@ -4575,6 +4574,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 
 				showGlobalAlertDialogsIfNeeded();
+
+				if (mHomepageScreen == HomepageScreen.HOMEPAGE) {
+					changeAppBarElevation(false);
+				}
 				break;
 			}
     		case CAMERA_UPLOADS: {
@@ -4759,8 +4762,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			// workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
 			// offline, and hide AppBarLayout when immediately on go back, we will see the flicker
 			// of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
-			if (bottomNavigationCurrentItem == HOMEPAGE_BNV
-                    && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+			if (isInMainHomePage()) {
 				abL.setVisibility(View.GONE);
 			}
 		}
@@ -11068,7 +11070,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			abL.setElevation(0);
 		}
 
-		ColorUtils.changeStatusBarColorForElevation(this, mElevationCause > 0);
+		ColorUtils.changeStatusBarColorForElevation(this,
+				mElevationCause > 0 && !isInMainHomePage());
 	}
 
 	public long getParentHandleInbox() {

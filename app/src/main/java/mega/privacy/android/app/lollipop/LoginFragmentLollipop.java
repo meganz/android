@@ -1318,18 +1318,23 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if (megaChatApi == null) {
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
-            int ret = megaChatApi.init(null);
-            logDebug("result of init ---> " + ret);
-            if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
-                logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
-                disableLoginButton();
-                megaApi.login(lastEmail, lastPassword, this);
-            } else {
-                logWarning("ERROR INIT CHAT: " + ret);
-                megaChatApi.logout(new ChatLogoutListener(getContext()));
 
-                disableLoginButton();
-                megaApi.login(lastEmail, lastPassword, this);
+            int ret = megaChatApi.getInitState();
+            logDebug("INIT STATE: " + ret);
+            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+                ret = megaChatApi.init(null);
+                logDebug("result of init ---> " + ret);
+                if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
+                    logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
+                    disableLoginButton();
+                    megaApi.login(lastEmail, lastPassword, this);
+                } else {
+                    logWarning("ERROR INIT CHAT: " + ret);
+                    megaChatApi.logout(new ChatLogoutListener(getContext()));
+
+                    disableLoginButton();
+                    megaApi.login(lastEmail, lastPassword, this);
+                }
             }
         }
     }
