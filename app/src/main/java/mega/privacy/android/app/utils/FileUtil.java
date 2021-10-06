@@ -734,16 +734,23 @@ public class FileUtil {
     @Nullable
     public static String getFullPathFromTreeUri(@Nullable final Uri treeUri, Context con) {
         if (treeUri == null) return null;
-        SDCardOperator operator;
-        try {
-            operator = new SDCardOperator(con);
-        } catch (SDCardOperator.SDCardException e) {
-            e.printStackTrace();
-            logError(e.getMessage(), e);
-            return null;
+
+        String volumePath;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            SDCardOperator operator;
+            try {
+                operator = new SDCardOperator(con);
+            } catch (SDCardOperator.SDCardException e) {
+                e.printStackTrace();
+                logError(e.getMessage(), e);
+                return null;
+            }
+
+            volumePath = operator.getSDCardRoot();
+        } else {
+            volumePath = getVolumePath(getVolumeIdFromTreeUri(treeUri), con);
         }
 
-        String volumePath = operator.getSDCardRoot();
         if (volumePath == null) return File.separator;
         if (volumePath.endsWith(File.separator))
             volumePath = volumePath.substring(0, volumePath.length() - 1);
@@ -758,6 +765,39 @@ public class FileUtil {
             else
                 return volumePath + File.separator + documentPath;
         } else return volumePath;
+    }
+
+    @SuppressLint("ObsoleteSdkInt")
+    private static String getVolumePath(final String volumeId, Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return null;
+        try {
+            StorageManager mStorageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
+            Class<?> storageVolumeClazz = Class.forName("android.os.storage.StorageVolume");
+            Method getVolumeList = mStorageManager.getClass().getMethod("getVolumeList");
+            Method getUuid = storageVolumeClazz.getMethod("getUuid");
+            Method getPath = storageVolumeClazz.getMethod("getPath");
+            Method isPrimary = storageVolumeClazz.getMethod("isPrimary");
+            Object result = getVolumeList.invoke(mStorageManager);
+
+            final int length = Array.getLength(result);
+            for (int i = 0; i < length; i++) {
+                Object storageVolumeElement = Array.get(result, i);
+                String uuid = (String) getUuid.invoke(storageVolumeElement);
+                Boolean primary = (Boolean) isPrimary.invoke(storageVolumeElement);
+
+                // primary volume?
+                if (primary && PRIMARY_VOLUME_NAME.equals(volumeId))
+                    return (String) getPath.invoke(storageVolumeElement);
+
+                // other volumes?
+                if (uuid != null && uuid.equals(volumeId))
+                    return (String) getPath.invoke(storageVolumeElement);
+            }
+            // not found.
+            return null;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
