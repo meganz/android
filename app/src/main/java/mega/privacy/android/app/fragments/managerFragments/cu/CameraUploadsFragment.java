@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,13 +34,14 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
+import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.repo.MegaNodeRepo;
@@ -65,6 +68,7 @@ import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_CUMU;
 import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.SDCardUtils.getSDCardDirName;
 import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
@@ -182,15 +186,15 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             return;
         }
 
+        new Handler().post(this::showCameraUploadTip);
+    }
+
+    private void startCU() {
         viewModel.enableCu(mFirstLoginBinding.cellularConnectionSwitch.isChecked(),
                 mFirstLoginBinding.uploadVideosSwitch.isChecked());
 
         mManagerActivity.setFirstLogin(false);
         viewModel.setEnableCUShown(false);
-        showCameraUploadTip();
-    }
-
-    private void startCU() {
         mManagerActivity.refreshCameraUpload();
 
         new Handler().postDelayed(() -> {
@@ -277,13 +281,36 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
 
         if (requestCode == CAMERA_SETTINGS_RESULT_CODE) {
             logDebug("resultCode = "+resultCode);
+            MegaPreferences prefs = dbH.getPreferences();
+            if(intent != null) {
+                String cameraPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+
+                if (!isNewSettingValid(cameraPath, prefs.getLocalPathSecondaryFolder(), prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())) {
+                    Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                boolean isExternalSDCardCU = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
+                String camSyncLocalPath = isExternalSDCardCU ? getSDCardDirName(Uri.parse(prefs.getUriExternalSDCard())) : cameraPath;
+                prefs.setCamSyncLocalPath(camSyncLocalPath);
+                dbH.setCamSyncLocalPath(camSyncLocalPath);
+                dbH.setCamSyncEnabled(true);
+            }
             startCU();
+
         }
+    }
+
+    private boolean isNewSettingValid(String primaryPath, String secondaryPath, String primaryHandle, String secondaryHandle) {
+        if (primaryPath == null || primaryHandle == null || secondaryPath == null || secondaryHandle == null)
+            return true;
+
+        return !primaryHandle.equals(secondaryHandle) || (!primaryPath.contains(secondaryPath) && !secondaryPath.contains(primaryPath));
     }
 
     public void setViewTypes(LinearLayout cuViewTypes, TextView cuYearsButton,
@@ -738,7 +765,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
      */
     private void enableCameraUpload(DialogInterface dialog, Boolean needSettings) {
         if (needSettings) {
-            startActivityForResult(new Intent(context, CameraUploadsPreferencesActivity.class),CAMERA_SETTINGS_RESULT_CODE);
+            Intent intent = new Intent(context, FileStorageActivityLollipop.class);
+            intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+            intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
+            intent.putExtra(FileStorageActivityLollipop.PICK_FOLDER_TYPE, FileStorageActivityLollipop.PickFolderType.CU_FOLDER.getFolderType());
+            startActivityForResult(intent,CAMERA_SETTINGS_RESULT_CODE);
         } else {
             startCU();
         }

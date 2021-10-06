@@ -341,11 +341,16 @@ class CuViewModel extends BaseRxViewModel {
     public void enableCu(boolean enableCellularSync, boolean syncVideo) {
         add(Completable.fromCallable(
                 () -> {
-                    File localFile =
-                            Environment.getExternalStoragePublicDirectory(
-                                    Environment.DIRECTORY_DCIM);
-                    mDbHandler.setCamSyncLocalPath(localFile.getAbsolutePath());
-                    mDbHandler.setCameraFolderExternalSDCard(false);
+                    String camSyncLocalPath = mDbHandler.getPreferences().getCamSyncLocalPath();
+
+                    if(camSyncLocalPath == null) {
+                        File localFile =
+                                Environment.getExternalStoragePublicDirectory(
+                                        Environment.DIRECTORY_DCIM);
+                        mDbHandler.setCamSyncLocalPath(localFile.getAbsolutePath());
+                        mDbHandler.setCameraFolderExternalSDCard(false);
+                    }
+
                     mDbHandler.setCamSyncWifi(!enableCellularSync);
                     mDbHandler.setCamSyncFileUpload(
                             syncVideo ? MegaPreferences.PHOTOS_AND_VIDEOS
