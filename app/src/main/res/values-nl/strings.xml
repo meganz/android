@@ -579,8 +579,6 @@
     <string name="number_contact_not_removed">%d contacten waren niet verwijderd</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Map met %d contacten succesvol gedeeld</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Bestand kan niet worden gedeeld met %d contacten</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d mappen succesvol gedeeld</string>
     <!-- error message when sharing multiple files -->
@@ -659,7 +657,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Bestandssysteem probleem</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Er is een fout opgetreden bij het bladeren door lokale bestanden.</string>
+    <string name="general_error">Er is een fout opgetreden bij het bladeren door lokale bestanden</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Afbeelding weergave</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1488,7 +1486,7 @@
     <string name="title_message_uploading_options">Bijlage Uploaden</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Geen gespreksgeschiedenis</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A] is aan het schrijven&#8230;.[/A]</item>
         <item quantity="other">%1$s [A]zijn aan het schrijven&#8230;..[/A]</item>
@@ -1918,8 +1916,6 @@
     <string name="title_regitration">Registratie bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Neem een MEGA Desktop App</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Account basis tegoed</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Geen bestanden in Camera Uploads</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -3573,7 +3569,7 @@
     <string name="label_verify_credentials">Verifieer aanmeldgegevens</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Niet geverifieerd</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Geverifieerd</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authenticiteit Inloggegevens</string>
@@ -4045,6 +4041,8 @@
         <item quantity="one">Link Ophalen</item>
         <item quantity="other">Links Ophalen</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Alle Offline bestanden wissen?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">U bent de enige hier</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4179,4 +4177,6 @@
     <string name="meeting_me_text_bracket">%1s[A](ik)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Hoofdweergave</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Als u zich afmeldt, wordt uw offline inhoud verwijderd.</string>
 </resources>

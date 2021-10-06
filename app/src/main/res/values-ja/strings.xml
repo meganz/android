@@ -570,8 +570,6 @@
     <string name="number_contact_not_removed">%d件の連絡先は削除されませんでした</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">%d件の連絡先とフォルダが正常に共有されました</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">%d件の連絡先とファイルは共有できません</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%dフォルダが正常に共有されました</string>
     <!-- error message when sharing multiple files -->
@@ -649,7 +647,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">ファイルシステムの問題</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">ローカルファイルの閲覧中にエラーが発生しました。</string>
+    <string name="general_error">ローカルファイルの閲覧中にエラーが発生しました</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">画像ビューア</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1114,7 +1112,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">あなたのクラウドを育てましょう。[A]ぜひProアカウントで、ストレージと転送容量を増やしてください。</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGAアカウントの回復キーは以下に保存されています。%1s.[A]回復キーの入ったファイルは、オフラインセクションで確認できます。[A]注意：回復キーの入ったファイルは、ログアウトすると削除されますので、MEGAアカウントの外の安全な場所に保管してください。</string>
+    <string name="toast_master_key">MEGAアカウントの回復キーは以下に保存されています。%1s。[A]「オフライン用に保存されました」のセクションで、回復キーを含むファイルを見つけることができます。[/A]注意：回復キーの入ったファイルは、ログアウトすると削除されますので、MEGAアカウントの外の安全な場所に保管してください。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">このメールアドレスはすでに使用されています。別のメールアドレスをご使用ください。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1467,7 +1465,7 @@
     <string name="title_message_uploading_options">添付ファイルのアップロード中</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">会話履歴なし</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]さんが入力しています&#8230;[/A]</item>
     </plurals>
@@ -1876,8 +1874,6 @@
     <string name="title_regitration">ご登録ボーナス</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">MEGAデスクトップアプリを取得</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">アカウント基本容量</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">カメラアップロードにファイルはありません</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -3493,7 +3489,7 @@
     <string name="label_verify_credentials">本人確認証明</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">検証されていません</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">照合済み</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">認証資格情報</string>
@@ -3949,6 +3945,8 @@
     <plurals name="get_links">
         <item quantity="other">リンクを取得</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">オフラインファイルをすべて消去しますか？</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">ここにいるのはあなただけです</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4083,4 +4081,6 @@
     <string name="meeting_me_text_bracket">%1s [A](私)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">メインビュー</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">ログアウトすると、オフラインのコンテンツが削除されます。</string>
 </resources>

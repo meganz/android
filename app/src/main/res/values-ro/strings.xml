@@ -588,8 +588,6 @@
     <string name="number_contact_not_removed">%d contacte nu au fost eliminate</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Folder partajat cu succes cu %d contacte</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">File cannot be shared with %d contacts</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d foldere partajate cu succes</string>
     <!-- error message when sharing multiple files -->
@@ -668,7 +666,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problemă cu sistemul de fișiere</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">A apărut o eroare la răsfoirea fișierelor locale.</string>
+    <string name="general_error">A apărut o eroare la răsfoirea fișierelor locale</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Vizualizator de imagini</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1508,7 +1506,7 @@
     <string name="title_message_uploading_options">Se încarcă atașamentul</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Niciun istoric al conversației</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]tastează&#8230;[/A]</item>
         <item quantity="few">%1$s [A]tastează&#8230;[/A]</item>
@@ -1959,8 +1957,6 @@
     <string name="title_regitration">Bonus de înregistrare</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Get a MEGA Desktop App</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Cotă de bază a contului</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Niciun fișier în Încărcări cameră</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -3652,7 +3648,7 @@
     <string name="label_verify_credentials">Verifică acreditările</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Neverificate</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Verificat</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Acreditări de autenticitate</string>
@@ -3733,7 +3729,7 @@
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Debugging info for chat messages enabled</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Debugging info for chat messages is disabled</string>
+    <string name="show_info_chat_msg_disabled">Debugging info for chat messages disabled</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Ai atins limita maximă de %d reacții.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
@@ -4140,6 +4136,8 @@
         <item quantity="few">Obține linkurile</item>
         <item quantity="other">Obține linkurile</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Clear all offline files?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Ești singura persoană de aici</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4274,4 +4272,6 @@
     <string name="meeting_me_text_bracket">%1s [A](eu)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Vizualizare principală</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Logging out deletes your offline content.</string>
 </resources>

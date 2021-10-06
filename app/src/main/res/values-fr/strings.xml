@@ -579,8 +579,6 @@
     <string name="number_contact_not_removed">%d contacts n’ont pas été supprimés</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Le dossier a été partagé avec %d contacts avec succès</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Le fichier ne peut pas être partagé avec %d contacts</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d dossiers ont été partagés avec succès</string>
     <!-- error message when sharing multiple files -->
@@ -1126,7 +1124,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Faites grandir votre nuage.[A]Obtenez de quotas augmentés d’espace de stockage et de transfert avec un compte&#160;Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">La Clé de récupération du compte&#160;MEGA a été enregistrée dans&#160;: %1s. [A]Vous trouverez le fichier de votre Clé de récupération dans la section Hors ligne.[A]Note&#160;: dans la mesure où le fichier de votre Clé de récupération sera supprimé si vous vous déconnectez, veuillez le conserver en lieu sûr en dehors de votre compte&#160;MEGA..</string>
+    <string name="toast_master_key">La Clé de récupération du compte&#160;MEGA a été enregistrée dans&#160;: %1s. [A]Vous trouverez le fichier de votre Clé de récupération dans la section Enregistré Hors ligne.[/A] Note&#160;: dans la mesure où le fichier de votre Clé de récupération sera supprimé si vous vous déconnectez, veuillez le conserver en lieu sûr en dehors de votre compte&#160;MEGA..</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">L’adresse courriel est déjà utilisée. Veuillez saisir une adresse courriel différente.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1488,7 +1486,7 @@
     <string name="title_message_uploading_options">Téléverser un fichier joint</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Aucun historique de conversation</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]écrit&#8230;[/A]</item>
         <item quantity="other">%1$s [A]écrivent&#8230;[/A]</item>
@@ -1918,8 +1916,6 @@
     <string name="title_regitration">Prime d’inscription</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Obtenir une appli&#160;MEGA pour ordinateur</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Quota de base du compte</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Aucun fichier dans Téléversements de l’appareil photo</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -3573,7 +3569,7 @@
     <string name="label_verify_credentials">Confirmer le numéro d’identification</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Non confirmé</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Confirmé</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Numéro d’identification</string>
@@ -4045,6 +4041,8 @@
         <item quantity="one">Obtenir le lien</item>
         <item quantity="other">Obtenir les liens</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Vider tous les fichiers Hors ligne ?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Vous êtes la seule personne ici</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4179,4 +4177,6 @@
     <string name="meeting_me_text_bracket">%1s [A](moi)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Vue principale</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">La déconnexion supprime le contenu hors ligne.</string>
 </resources>

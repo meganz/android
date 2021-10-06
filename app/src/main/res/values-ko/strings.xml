@@ -570,8 +570,6 @@
     <string name="number_contact_not_removed">%d개의 연락처가 제거되지 않았습니다</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">%d개의 연락처와 폴더를 공유하였습니다</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">%d개의 연락처와 파일을 공유할 수 없습니다.</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d개의 폴더가 잘 공유되었습니다</string>
     <!-- error message when sharing multiple files -->
@@ -1467,7 +1465,7 @@
     <string name="title_message_uploading_options">첨부물 업로드중</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">대화 기록 없음</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s님이 [A]입력중&#8230;[/A]</item>
     </plurals>
@@ -1876,8 +1874,6 @@
     <string name="title_regitration">가입 보너스</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">MEGA 데스크톱 앱 받기</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">계정 기본 할당량</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">카메라 업로드에 파일 없음</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -3493,7 +3489,7 @@
     <string name="label_verify_credentials">자격 증명 인증 중</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">인증되지 않음</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">확인됨</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">진위 증명</string>
@@ -3949,6 +3945,8 @@
     <plurals name="get_links">
         <item quantity="other">링크 얻기</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">모든 오프라인 파일을 삭제할까요?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">현재 혼자 뿐입니다.</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4083,4 +4081,6 @@
     <string name="meeting_me_text_bracket">%1s [A](나)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">메인 보기</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">로그아웃 하면 오프라인 항목이 삭제됩니다.</string>
 </resources>

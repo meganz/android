@@ -597,8 +597,6 @@
     <string name="number_contact_not_removed">Контакты не удалены (%d)</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Доступ к папке успешно открыт %d контактам.</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Доступ к файлу не может быть открыт контактам (%d)</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">Доступ к папкам успешно открыт (%d)</string>
     <!-- error message when sharing multiple files -->
@@ -679,7 +677,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Ошибка файловой системы</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Произошла ошибка при просмотре локальных файлов.</string>
+    <string name="general_error">Произошла ошибка при просмотре локальных файлов</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Просмотр изображений</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1150,7 +1148,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Увеличьте своё облако.[A]Получите больше пространства и квоты передач с Pro-аккаунтом.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Ключ восстановления аккаунта MEGA был сохранён в: %1s. [A]Вы можете найти файл с ним в разделе «Локальные». [A]Примечание: поскольку файл с вашим ключом восстановления будет удалён при выходе из системы, сохраните его в безопасном месте за пределами аккаунта MEGA.</string>
+    <string name="toast_master_key">Ключ восстановления аккаунта MEGA был сохранён в: %1s. [A]Вы можете найти файл с ним в разделе «Сохранено локально». [/A]Примечание: поскольку файл с вашим ключом восстановления будет удалён при выходе из системы, храните его в безопасном месте за пределами аккаунта MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Этот адрес электронной почты уже используется. Пожалуйста, используйте другой адрес.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1530,7 +1528,7 @@
     <string name="title_message_uploading_options">Загрузка вложения</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Нет истории разговора</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]печатает&#8230;[/A]</item>
         <item quantity="few">%1$s [A]печатают&#8230;[/A]</item>
@@ -2002,8 +2000,6 @@
     <string name="title_regitration">Бонусы за регистрацию</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Установить MEGA на ПК</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Базовая квота</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">В «Загрузках камеры» нет файлов</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -3733,7 +3729,7 @@
     <string name="label_verify_credentials">Подтвердить учётные данные</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Не подтверждено</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Проверен</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Подлинность учётных данных</string>
@@ -4237,6 +4233,8 @@
         <item quantity="many">Получить ссылки</item>
         <item quantity="other">Получить ссылки</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Очистить все локальные файлы?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Здесь только вы</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4371,4 +4369,6 @@
     <string name="meeting_me_text_bracket">%1s [A](я)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Общий вид</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Выход из системы удалит локальный контент.</string>
 </resources>

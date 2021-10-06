@@ -579,8 +579,6 @@
     <string name="number_contact_not_removed">No se han podido eliminar %d contactos</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Se ha compartido la carpeta con %d contactos</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">No se puede compartir el archivo con %d contactos</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">Se han compartido %d carpetas</string>
     <!-- error message when sharing multiple files -->
@@ -659,7 +657,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Error en el sistema de archivos</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">No se han podido explorar los archivos locales.</string>
+    <string name="general_error">No se han podido explorar los archivos locales</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Visor de imágenes</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1488,7 +1486,7 @@
     <string name="title_message_uploading_options">Subiendo adjunto</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">No hay historial</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]está escribiendo&#8230;[/A]</item>
         <item quantity="other">%1$s [A]están escribiendo&#8230;[/A]</item>
@@ -1918,8 +1916,6 @@
     <string name="title_regitration">Bono por registro de cuenta</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Instala la app de escritorio</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Cuota base de la cuenta</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">No hay archivos en Subidas de la cámara</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -3573,7 +3569,7 @@
     <string name="label_verify_credentials">Verificar credenciales</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">No verificadas</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Verificado</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Credenciales de autenticidad</string>
@@ -4045,6 +4041,8 @@
         <item quantity="one">Obtener enlace</item>
         <item quantity="other">Obtener enlaces</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">¿Eliminar todos los archivos sin conexión?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Solo estás tú aquí</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4179,4 +4177,6 @@
     <string name="meeting_me_text_bracket">%1s[A](yo)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Vista principal</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Si cierras sesión, el contenido sin conexión será eliminado.</string>
 </resources>
