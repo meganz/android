@@ -11,7 +11,7 @@ import mega.privacy.android.app.exportRK.ExportRecoveryKeyViewModel.Companion.GE
 import mega.privacy.android.app.databinding.ActivityExportRecoveryKeyBinding
 import mega.privacy.android.app.lollipop.controllers.AccountController
 import mega.privacy.android.app.utils.LogUtil.logWarning
-import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.showAlert

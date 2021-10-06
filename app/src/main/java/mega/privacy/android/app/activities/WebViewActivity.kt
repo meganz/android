@@ -29,10 +29,11 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.PermissionUtils
-import mega.privacy.android.app.utils.PermissionUtils.*
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat

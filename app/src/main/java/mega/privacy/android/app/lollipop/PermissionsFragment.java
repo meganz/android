@@ -27,7 +27,7 @@ import android.widget.TextView;
 import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
 
 public class PermissionsFragment extends Fragment implements View.OnClickListener {
 

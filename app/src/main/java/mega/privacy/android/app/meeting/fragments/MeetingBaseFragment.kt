@@ -3,25 +3,16 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.fragment.app.activityViewModels
 import android.os.Bundle
-import android.view.View
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.PermissionUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.permission.PermissionRequest
-import mega.privacy.android.app.utils.permission.PermissionType
-import mega.privacy.android.app.utils.permission.PermissionsRequester
-import mega.privacy.android.app.utils.permission.permissionsBuilder
-import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import mega.privacy.android.app.utils.permission.*
 
 /**
  * Base fragment for meeting fragment:

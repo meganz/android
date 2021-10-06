@@ -1,16 +1,35 @@
 package mega.privacy.android.app.utils.permission
 
+import android.Manifest
+import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
-import android.util.ArrayMap
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.Settings
+import android.view.View
+import androidx.annotation.NonNull
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
-import java.util.HashMap
+import mega.privacy.android.app.BaseActivity
+import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity
+import mega.privacy.android.app.lollipop.LoginActivityLollipop
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.providers.FileProviderActivity
+import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.Util
+import java.lang.Exception
 
 /**
  * Declare singleton PermissionUtils
  */
+@TargetApi(Build.VERSION_CODES.M)
 object PermissionUtils {
     /**
      * Checks all given permissions have been granted.
@@ -18,6 +37,7 @@ object PermissionUtils {
      * @param grantResults results
      * @return returns true if all permissions have been granted.
      */
+    @JvmStatic
     fun verifyPermissions(vararg grantResults: Int): Boolean {
         if (grantResults.isEmpty()) {
             return false
@@ -37,6 +57,7 @@ object PermissionUtils {
      * @param permissions permission list
      * @return returns true if the Activity or Fragment has access to all given permissions.
      */
+    @JvmStatic
     fun hasSelfPermissions(context: Context, permissions: ArrayList<String>): Boolean {
         for (permission in permissions) {
             if (!hasSelfPermission(context, permission)) {
@@ -71,6 +92,7 @@ object PermissionUtils {
      * @param permissions permission list
      * @return returns true if one of the permission is needed to show rationale.
      */
+    @JvmStatic
     fun shouldShowRequestPermissionRationale(
         activity: Activity?,
         permissions: List<String>
@@ -90,6 +112,7 @@ object PermissionUtils {
      * @param permissions permission list
      * @return returns true if one of the permission is needed to show rationale.
      */
+    @JvmStatic
     fun shouldShowRequestPermissionRationale(
         fragment: Fragment,
         permissions: List<String>
@@ -100,5 +123,146 @@ object PermissionUtils {
             }
         }
         return false
+    }
+
+    /**
+     * Check if the user ticket 'Don't ask again' and deny a permission request.
+     * In this case, the system request permission dialog can no longer show up.
+     *
+     * @param activity the Context.
+     * @param permission which permission to check.
+     * @return false if the user ticket 'Don't ask again' and deny, otherwise true.
+     */
+    @JvmStatic
+    fun shouldShowRequestPermissionRationale(@NonNull activity: Activity, @NonNull permission: String): Boolean {
+        return ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
+    }
+
+    /**
+     * Provide an OnClickListener for snackbar's action.
+     *
+     * @param context Context.
+     * @return an OnClickListener, which leads to the APP info page, in where, users can grant MEGA permissions.
+     */
+    @JvmStatic
+    fun toAppInfo(@NonNull context: Context): View.OnClickListener {
+        return View.OnClickListener {
+            val intent = Intent()
+            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            val uri = Uri.fromParts("package", context.packageName, null)
+            intent.data = uri
+            try {
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                if (context is ManagerActivityLollipop) {
+                    // in case few devices cannot handle 'ACTION_APPLICATION_DETAILS_SETTINGS' action.
+                    Util.showSnackbar(
+                        context,
+                        context.getString(R.string.on_permanently_denied)
+                    )
+                } else {
+                    LogUtil.logError("Exception opening device settings", e)
+                }
+            }
+        }
+    }
+
+    /**
+     * Check permissions whether are granted
+     * @param context Context
+     * @param permissions one or more permission strings
+     * @return whether permissions has ben granted
+     */
+    @JvmStatic
+    fun hasPermissions(context: Context?, vararg permissions: String): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true
+        }
+        if (context != null) {
+            for (permission in permissions) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                    (permission == Manifest.permission.WRITE_EXTERNAL_STORAGE || permission == Manifest.permission.READ_EXTERNAL_STORAGE)
+                ) {
+                    if (!Environment.isExternalStorageManager()) {
+                        return false
+                    }
+                } else if (permission?.let {
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            it
+                        )
+                    } != PackageManager.PERMISSION_GRANTED
+                ) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+
+    /**
+     * Ask permissions
+     * @param activity The activity
+     * @param requestCode request code of permission asking
+     * @param permissions requested permissions
+     */
+    @JvmStatic
+    fun requestPermission(@NonNull activity: Activity, @NonNull requestCode: Int, @NonNull vararg permissions: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            for (permission in permissions) {
+                if (permission == Manifest.permission.WRITE_EXTERNAL_STORAGE || permission == Manifest.permission.READ_EXTERNAL_STORAGE) {
+                    if (!Environment.isExternalStorageManager()) {
+                        requestManageExternalStoragePermission(activity, requestCode)
+                        return
+                    }
+                }
+            }
+        }
+        ActivityCompat.requestPermissions(
+            activity,
+            permissions,
+            requestCode
+        )
+    }
+
+    /**
+     * Ask for the MANAGE_EXTERNAL_STORAGE special permission required by the app since Android 11
+     *
+     * @param context Context
+     * @param requestCode request code of permission asking
+     */
+    @JvmStatic
+    @TargetApi(Build.VERSION_CODES.R)
+    fun requestManageExternalStoragePermission(@NonNull context: Context, requestCode: Int) {
+        var intent: Intent? = null
+        try {
+            intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+            intent.addCategory("android.intent.category.DEFAULT")
+            intent.data = Uri.parse(String.format("package:%s", context.packageName))
+        } catch (e: Exception) {
+            intent = Intent()
+            intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+        } finally {
+            var activity: Activity? = null
+            when (context) {
+                is ManagerActivityLollipop -> {
+                    activity = context
+                }
+                is LoginActivityLollipop -> {
+                    activity = context
+                }
+                is FileProviderActivity -> {
+                    activity = context
+                }
+                is CameraUploadsPreferencesActivity -> {
+                    activity = context
+                }
+                is BaseActivity -> {
+                    activity = context
+                }
+            }
+            activity?.startActivityForResult(intent, requestCode)
+        }
     }
 }

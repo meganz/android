@@ -34,7 +34,6 @@ import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFra
 import mega.privacy.android.app.modalbottomsheet.PhotoBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_2FA
-import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.PROCESSING_FILE
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
@@ -47,6 +46,7 @@ import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.Util.*
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.*
@@ -190,7 +190,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         // Take profile picture scenario
         if (requestCode == REQUEST_CAMERA && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (PermissionUtils.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 checkTakePicture(this, TAKE_PICTURE_PROFILE_CODE)
             } else {
                 showSnackbar(StringResourcesUtils.getString(R.string.denied_write_permissions))

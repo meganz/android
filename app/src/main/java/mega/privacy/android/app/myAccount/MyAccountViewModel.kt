@@ -37,8 +37,8 @@ import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.LogUtil.*
-import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
-import mega.privacy.android.app.utils.PermissionUtils.requestPermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.API_EARGS

@@ -17,8 +17,8 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName
 import mega.privacy.android.app.utils.FileUtil.saveTextOnFile
 import mega.privacy.android.app.utils.LogUtil.logWarning
-import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
-import mega.privacy.android.app.utils.PermissionUtils.requestPermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
