@@ -110,8 +110,12 @@
     <color name="red_900_alpha_080">#CCC70000</color>
     <color name="red_400_alpha_080">#CCFD3E38</color>
 
+    <color name="yellow_100">#FFF8BF</color>
     <color name="yellow_300">#FFEF67</color>
     <color name="yellow_600">#FFD300</color>
+    <color name="yellow_700">#FEBC00</color>
+    
+    <color name="yellow_700_alpha_015">#26FEBC00</color>
 
     <color name="orange_300">#FFB640</color>
     <color name="orange_400">#FFA500</color>
@@ -491,5 +495,8 @@
     <color name="grey_010_white_009">@color/grey_010</color>
     <color name="amber_800_amber_700">@color/amber_800</color>
     <color name="red_400_red_300">@color/red_400</color>
+
+    <color name="yellow_100_yellow_700_alpha_015">@color/yellow_100</color>
+    <color name="grey_alpha_087_yellow_700">@color/grey_alpha_087</color>
 
 </resources>

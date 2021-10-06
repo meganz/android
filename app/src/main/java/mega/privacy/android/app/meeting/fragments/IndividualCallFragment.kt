@@ -67,7 +67,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         val callId = it.first
         val session = it.second
 
-        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId)) {
+        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId) && isAdded) {
             logDebug("Check changes in remote AVFlags")
             when {
                 isFloatingWindow -> checkItIsOnlyAudio()
@@ -89,7 +89,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     private val sessionHiResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first) && !isFloatingWindow && inMeetingViewModel.isOneToOneCall()) {
+            if (inMeetingViewModel.isSameCall(callAndSession.first) && !isFloatingWindow && inMeetingViewModel.isOneToOneCall() && isAdded) {
                 if (callAndSession.second.canRecvVideoHiRes() && callAndSession.second.isHiResVideo) {
                     logDebug("Can receive high-resolution video")
 
@@ -114,19 +114,16 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
 
     private val localAVFlagsObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
+        if (inMeetingViewModel.isSameCall(it.callId) && isAdded) {
             logDebug("Check changes in local AVFlags")
             checkItIsOnlyAudio()
         }
     }
 
     private val callOnHoldObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
+        if (inMeetingViewModel.isSameCall(it.callId) && isAdded) {
             logDebug("Check changes in call on hold")
-
-            if (isAdded) {
-                checkChangesInOnHold(it.isOnHold)
-            }
+            checkChangesInOnHold(it.isOnHold)
         }
     }
 
@@ -134,7 +131,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         val callId = it.first
         val session = it.second
 
-        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId)) {
+        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId) && isAdded) {
             logDebug("Check changes in session on hold")
             checkChangesInOnHold(
                 session.isOnHold
@@ -179,18 +176,19 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private fun initLiveEventBus() {
         LiveEventBus.get(EVENT_LOCAL_AVFLAGS_CHANGE, MegaChatCall::class.java)
             .observeSticky(this, localAVFlagsObserver)
-
-        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .observeSticky(this, callOnHoldObserver)
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE)
             .observeSticky(this, remoteAVFlagsObserver as Observer<Any>)
+
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EventConstants.EVENT_SESSION_ON_HIRES_CHANGE)
             .observe(this, sessionHiResObserver as Observer<Any>)
+
+        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
+            .observe(this, callOnHoldObserver)
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
-            .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
+            .observe(this, sessionOnHoldObserver as Observer<Any>)
     }
 
     override fun onCreateView(
@@ -224,7 +222,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         inMeetingViewModel.getAvatarBitmap(peerId)?.let {
             avatarImageView.setImageBitmap(it)
         }
@@ -421,14 +418,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
     fun checkVideoOn(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
         val currentCall = inMeetingViewModel.getCall()
-
-        if (currentCall != null && currentCall.status != MegaChatCall.CALL_STATUS_JOINING && currentCall.status != CALL_STATUS_IN_PROGRESS &&
-            ((!inMeetingViewModel.isMe(peerId) && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
+        if ((currentCall != null && currentCall.status != MegaChatCall.CALL_STATUS_JOINING && currentCall.status != CALL_STATUS_IN_PROGRESS) ||
+            (!inMeetingViewModel.isMe(peerId) && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
             (inMeetingViewModel.isMe(peerId) &&
                     ((inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
-                            (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold()))))
+                            (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold())))
         ) {
-            logDebug("The video should not be turned on")
+            logDebug("The video should be turned off")
             videoOffUI(peerId, clientId)
             return
         }
