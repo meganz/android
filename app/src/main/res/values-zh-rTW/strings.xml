@@ -1114,7 +1114,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">加大您的雲端空間。[A]訂閱Pro方案帳戶以獲得更大儲存空間和傳輸配額。</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA帳戶還原金鑰已儲存到：%1s。[A]您可以在儲存為離線存取區中找到包含您的還原金鑰的檔案。[A]注意：當您登出時，包含您還原金鑰的檔案將被刪除，因此請將它保存至您帳戶之外的安全地方。</string>
+    <string name="toast_master_key">MEGA帳戶還原金鑰已儲存到：%1s。[A]您可以在離線存取中找到您還原金鑰的檔案。[A]注意：當您登出時，您還原金鑰的檔案將被刪除，因此請將它儲存在您MEGA帳戶以外的安全地方。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">這個電子郵件地址已被使用。請改用其它電子郵件地址。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1882,7 +1882,7 @@
     <string name="camera_uploads_empty">相機上傳中沒有檔案</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">還剩%1$d天</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">過期</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">不使用HTTP</string>
@@ -3972,7 +3972,7 @@
     <!-- General label for microphone muted -->
     <string name="general_mic_mute">您的麥克風已靜音</string>
     <!-- General label for microphone unmuted -->
-    <string name="general_mic_unmute">您的麥克風已靜音</string>
+    <string name="general_mic_unmute">您的麥克風已取消靜音</string>
     <!-- General label for camera -->
     <string name="general_camera">相機</string>
     <!-- General label for camera enable -->
@@ -3980,7 +3980,7 @@
     <!-- General label for camera disable -->
     <string name="general_camera_disable">您的相機己關閉。</string>
     <!-- Label for hold meeting -->
-    <string name="meeting_hold">等待</string>
+    <string name="meeting_hold">保留</string>
     <!-- General label for speaker -->
     <string name="general_speaker">喇叭</string>
     <!-- General label for headphone-->
@@ -4002,7 +4002,7 @@
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">設為主持人</string>
     <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">現在要離開會議嗎？</string>
+    <string name="title_end_meeting">現在離開會議嗎？</string>
     <!-- no moderator when the moderator leave meeting-->
     <string name="no_moderator">沒有主持人</string>
     <!-- assign moderator message when the moderator leave meeting-->
@@ -4012,7 +4012,7 @@
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">無論如何還是離開</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">請指定一個或多個為新的主持人。</string>
+    <string name="pick_new_moderator_message">請指定一位或多位新的主持人。</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">更改會議名稱</string>
     <!-- The number of participants in the meeting on meeting info page-->
@@ -4022,13 +4022,13 @@
     <!-- The literal meeting link text-->
     <string name="meeting_link">會議連結</string>
     <!-- Subtitle of the meeting screen-->
-    <string name="duration_meeting">持續時間</string>
+    <string name="duration_meeting">通話時間</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">以訪客身份加入</string>
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">您受邀參加會議。</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
-    <string name="paste_meeting_link_guest_instruction">點擊發送給您的會議連結或將它貼上在此</string>
+    <string name="paste_meeting_link_guest_instruction">點擊發送給您的會議連結或將它貼上此處</string>
     <!-- Banner text to indicate poor network quality-->
     <string name="slow_connection_meeting">連線品質不良</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
@@ -4042,13 +4042,13 @@
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">知道了</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
-    <string name="meeting_required_permissions_warning">請至設定並允許MEGA存取您的相機與麥克風權限。</string>
+    <string name="meeting_required_permissions_warning">請至設定來允許MEGA存取您的相機與麥克風權限。</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
     <string name="view_meeting_chat">檢視會議對話</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">邀請更多與會者加入會議。向上滑動可邀請。</string>
     <!-- the content of tips when the user enters recent chat page first time-->
-    <string name="tip_create_meeting">點擊發起新會議</string>
+    <string name="tip_create_meeting">點擊建立一場新會議</string>
     <!-- the content of tips when the user enters start conversation page first time-->
     <string name="tip_setup_meeting">使用我們新的加密會議功能快速發起MEGA會議</string>
     <!-- the content of snack bar when the user be the new moderator-->
@@ -4056,7 +4056,7 @@
     <!-- the content of snack bar when copied meeting link-->
     <string name="copied_meeting_link">複製會議連結。</string>
     <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
-    <string name="join_meeting_layout_in_group_call">%s發起新會議。點擊加入。</string>
+    <string name="join_meeting_layout_in_group_call">%s發起一場會議。點擊加入。</string>
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA會議</string>
     <!-- Content of fourth tour screen -->
@@ -4066,7 +4066,7 @@
     <!-- Guest leave call-->
     <string name="more_than_meeting">不僅僅是會議</string>
     <!-- the title of join without account on left meeting page-->
-    <string name="left_meeting_join_title">您的隱私很重要</string>
+    <string name="left_meeting_join_title">您的隱私非常重要</string>
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">加入世界上最大的安全雲端空間與協作平台。</string>
     <!-- the bonus title of join without account on left meeting page-->
@@ -4074,11 +4074,11 @@
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">立即註冊並免費享有進階的協作功能。</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
-    <string name="ongoing_call_content">另一個通話正在進行中。請先結束目前通話，才能撥打另一通。</string>
+    <string name="ongoing_call_content">另一個通話正在進行中。請先結束目前通話才能撥打另一通。</string>
     <!-- The hint text when changing meeting name-->
     <string name="new_meeting_name">沒有會議名稱</string>
     <!-- The content of dialog when failed for creating meeting-->
-    <string name="meeting_is_failed_content">發起會議失敗。</string>
+    <string name="meeting_is_failed_content">建立會議失敗。</string>
     <!-- Word next to own user’s name on participant list -->
     <string name="meeting_me_text_bracket">%1s[A]（我）[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->

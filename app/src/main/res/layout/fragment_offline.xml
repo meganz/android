@@ -19,7 +19,7 @@
             android:layout_width="144dp"
             android:layout_height="144dp"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/empty_offline_portrait"/>
+            android:src="@drawable/empty_offline_portrait" />
 
         <TextView
             android:id="@+id/empty_hint_text"
@@ -33,30 +33,54 @@
             android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps" />
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/offline_warning_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/yellow_100_yellow_700_alpha_015"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/offline_warning_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:layout_toStartOf="@+id/offline_warning_close"
+            android:text="@string/offline_warning"
+            android:textAppearance="@style/TextAppearance.Mega.Caption.13sp.Grey87Yellow700" />
+
+        <ImageButton
+            android:id="@+id/offline_warning_close"
+            style="@style/Widget.Mega.Button.Transparent"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_remove"
+            app:tint="@color/grey_alpha_087_yellow_700"
+            tools:ignore="ContentDescription" />
+
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/offline_browser_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/offline_warning_layout"
         tools:visibility="visible" />
 
     <mega.privacy.android.app.components.NewGridRecyclerView
         android:id="@+id/offline_browser_grid"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:choiceMode="multipleChoice"
         android:columnWidth="172dp"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/offline_warning_layout"
         tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Guideline

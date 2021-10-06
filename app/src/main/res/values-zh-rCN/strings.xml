@@ -1114,7 +1114,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">升级您的云盘。[A]购买Pro会员帐户获得更多存储空间和传输流量。</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA帐户的恢复密钥已保存到：%1s。[A]您可以在离线里找到您的恢复密钥文件。[A]请注意：当您登出帐户时，您的恢复密钥文件将被删除，因此请将其保存在您MEGA帐户以外的安全位置。</string>
+    <string name="toast_master_key">MEGA帐户恢复密钥已保存到：%1s。[A]您可以在离线部分找到恢复密钥文件。[A]请注意：登出帐户后，恢复密钥文件将会被删除，请将其保存在MEGA帐户之外的安全位置。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">该电子邮件地址已被占用。请使用另一个电子邮件地址。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1882,7 +1882,7 @@
     <string name="camera_uploads_empty">相机上传中无文件</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">剩余%1$d d</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">已过期</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">不使用HTTP</string>

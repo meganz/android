@@ -1126,7 +1126,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Aumenta la capacidad de tu nube. [A]Obtén más espacio y más cuota de transferencia con una cuenta Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Se ha realizado una copia de seguridad de la Clave de recuperación en: %1s.[A] Encontrarás el archivo con la Clave de recuperación en la sección Sin conexión.[A]Aviso: Si cierras la sesión, la Clave se eliminará, por lo tanto tienes que guardarla en un lugar seguro fuera de tu cuenta MEGA.</string>
+    <string name="toast_master_key">Se ha realizado una copia de seguridad de la Clave de recuperación en: %1s.[A] Encontrarás el archivo con la Clave de recuperación en la sección Sin conexión.[A]Aviso: Si cierras la sesión, la Clave de recuperación se eliminará, por lo tanto tienes que guardarla en un lugar seguro fuera de tu cuenta MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Este correo electrónico ya está asociado a una cuenta de MEGA. Por favor usa otra dirección de correo electrónico.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1924,7 +1924,7 @@
     <string name="camera_uploads_empty">No hay archivos en Subidas de la cámara</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">Quedan %1$d d</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Caducado</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">No usar HTTP</string>
@@ -4096,15 +4096,15 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">Mostrar en la vista principal</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Designar como moderador</string>
+    <string name="make_moderator">Establecer como moderador</string>
     <!-- The title of dialog for end meeting confirmation-->
-    <string name="title_end_meeting">¿ Quieres salir de la reunión?</string>
+    <string name="title_end_meeting">¿Quieres salir de la reunión?</string>
     <!-- no moderator when the moderator leave meeting-->
     <string name="no_moderator">No hay moderadores</string>
     <!-- assign moderator message when the moderator leave meeting-->
     <string name="assign_moderator_message">Antes de irte, designa uno o más moderadores para la reunión.</string>
     <!-- assign moderator option when the moderator leave meeting-->
-    <string name="assign_moderator">Designar como moderador</string>
+    <string name="assign_moderator">Establecer como moderador</string>
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">Abandonar de todos modos</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->

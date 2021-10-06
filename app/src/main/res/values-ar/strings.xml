@@ -152,11 +152,11 @@
     <string name="error_kill_all_sessions">خطأ عند إغلاق الجلسات المفتوحة</string>
     <!-- General label for files -->
     <plurals name="general_num_files">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">ملف</item>
         <item quantity="one">ملف</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="two">ملفات</item>
+        <item quantity="few">ملفات</item>
+        <item quantity="many">ملفات</item>
         <item quantity="other">ملفات</item>
     </plurals>
     <!-- Indicates how many contacts a folder is shared with. Plural. e.g. Shared with 7 contacts -->
@@ -272,11 +272,11 @@
     <string name="cancel_all_action">إلغاء الكل</string>
     <!-- Warning to confirm remove selected transfers. Plural more than 1 transfer -->
     <plurals name="cancel_selected_transfers">
-        <item quantity="zero">empty</item>
-        <item quantity="one">سيتم إلغاء عملية النقل المحددة.</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="zero">سيتم إلغاء عملية التراسل المحددة.</item>
+        <item quantity="one">سيتم إلغاء عملية التراسل المحددة.</item>
+        <item quantity="two">سيتم إلغاء عمليات التراسل المحددة.</item>
+        <item quantity="few">سيتم إلغاء عمليات التراسل المحددة.</item>
+        <item quantity="many">سيتم إلغاء عمليات التراسل المحددة.</item>
         <item quantity="other">سيتم إلغاء عمليات التراسل المحددة.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
@@ -386,12 +386,12 @@
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_finish">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">تم الانتهاء من %1$d عملية تنزيل</item>
         <item quantity="one">انتهى التنزيل</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">تم الانتهاء من تنزيل %1$d</item>
+        <item quantity="two">تم الانتهاء من %1$d عمليتي تنزيل</item>
+        <item quantity="few">تم الانتهاء من %1$d عمليات تنزيل</item>
+        <item quantity="many">تم الانتهاء من %1$d عملية تنزيل</item>
+        <item quantity="other">تم الانتهاء من %1$d عملية تنزيل</item>
     </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
@@ -413,11 +413,11 @@
     </plurals>
     <!-- Warning shown when it tries to download some empty folders. Plural -->
     <plurals name="empty_folders">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">المجلد فارغ.</item>
         <item quantity="one">المجلد فارغ.</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="two">المجلدات فارغة.</item>
+        <item quantity="few">المجلدات فارغة.</item>
+        <item quantity="many">المجلدات فارغة.</item>
         <item quantity="other">المجلدات فارغة.</item>
     </plurals>
     <!-- Hint how to cancel the download -->
@@ -450,11 +450,11 @@
     <string name="context_remove_link_warning_text">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
-        <item quantity="zero">empty</item>
-        <item quantity="one">لن يكون هذا الرابط متاحا للعامة بعد الآن</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="zero">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</item>
+        <item quantity="one">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</item>
+        <item quantity="two">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
+        <item quantity="few">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
+        <item quantity="many">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
         <item quantity="other">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
     </plurals>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -1548,12 +1548,12 @@
     <string name="error_sharing_folder">خطأ في مشاركة المجلد. حاول مرة اخرى.</string>
     <!-- confirmation message before removing a contact, Plural -->
     <plurals name="confirmation_remove_contact">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">سيتم فقدان جميع البيانات المرتبطة بجهة الاتصال المحددة بشكل دائم.</item>
         <item quantity="one">سيتم فقدان جميع البيانات المرتبطة بجهة الاتصال المحددة بشكل دائم.</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">سيتم فقدان جميع البيانات المرتبطة بجهات الاتصال المحددة بشكل دائم.</item>
+        <item quantity="two">سيتم فقدان جميع البيانات المرتبطة بجهتي الاتصال المحددة بشكل دائم.</item>
+        <item quantity="few">سيتم فقدان جميع البيانات المرتبطة بجهات الاتصال المحددة بشكل دائم.</item>
+        <item quantity="many">سيتم فقدان جميع البيانات المرتبطة بجهة الاتصال المحددة بشكل دائم.</item>
+        <item quantity="other">سيتم فقدان جميع البيانات المرتبطة بجهة الاتصال المحددة بشكل دائم.</item>
     </plurals>
     <!-- title of confirmation alert before removing a contact, Plural -->
     <plurals name="title_confirmation_remove_contact">
@@ -1907,29 +1907,29 @@
     <string name="download_show_info">شاهد المعلومات</string>
     <!-- Error message when removing public links of nodes. Plural. -->
     <plurals name="context_link_removal_error">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">فشل إزالة الرابط، يرجى إعادة المحاولة لاحقاً.</item>
         <item quantity="one">فشل إزالة الرابط، يرجى إعادة المحاولة لاحقاً.</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="two">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
+        <item quantity="few">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
+        <item quantity="many">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
         <item quantity="other">فشل في إزالة بعض الروابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
     </plurals>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
-        <item quantity="zero">empty</item>
-        <item quantity="one">فشل إنشاء الرابط. الرجاء معاودة المحاولة في وقت لاحق.</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="zero">فشل إنشاء الرابط. الرجاء المحاولة في وقت لاحق.</item>
+        <item quantity="one">فشل إنشاء الرابط. الرجاء المحاولة في وقت لاحق.</item>
+        <item quantity="two">فشل إنشاء بعض الروابط. الرجاء المحاولة في وقت لاحق.</item>
+        <item quantity="few">فشل إنشاء بعض الروابط. الرجاء المحاولة في وقت لاحق.</item>
+        <item quantity="many">فشل إنشاء بعض الروابط. الرجاء المحاولة في وقت لاحق.</item>
         <item quantity="other">فشل إنشاء بعض الروابط. الرجاء المحاولة في وقت لاحق.</item>
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">تمت إزالة الرابط بنجاح.</item>
         <item quantity="one">تمت إزالة الرابط بنجاح.</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="two">تمت إزالة الروابط بنجاح.</item>
+        <item quantity="few">تمت إزالة الروابط بنجاح.</item>
+        <item quantity="many">تمت إزالة الروابط بنجاح.</item>
         <item quantity="other">تمت إزالة الروابط بنجاح.</item>
     </plurals>
     <!-- error message -->
@@ -2092,7 +2092,7 @@
     <string name="camera_uploads_empty">لا توجد ملفات في قسم ترفيعات الكاميرا</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d يوم متبقي</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">منتهي الصلاحية</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">لا تستخدم بروتوكول HTTP</string>
@@ -2438,11 +2438,11 @@
     <string name="header_current_section_item">الاصدار الحالي</string>
     <!--  -->
     <plurals name="header_previous_section_item">
-        <item quantity="zero">empty</item>
-        <item quantity="one">الاصدار السابق</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="zero">النسخة السابقة</item>
+        <item quantity="one">النسخة السابقة</item>
+        <item quantity="two">النسخ السابقة</item>
+        <item quantity="few">النسخ السابقة</item>
+        <item quantity="many">النسخ السابقة</item>
         <item quantity="other">النسخ السابقة</item>
     </plurals>
     <!-- option menu to revert a file version -->
@@ -2764,12 +2764,12 @@
     <string name="file_already_exists">الملف موجود ضمن الملفات المخزنة دون الاتصال بالإنترنت</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
-        <item quantity="zero">empty</item>
-        <item quantity="one">فشل إعادة توجيه الرسالة</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">فشل إعادة توجيه الرسائل</item>
+        <item quantity="zero">لم تتم إعادة توجيه الرسالة</item>
+        <item quantity="one">لم تتم إعادة توجيه الرسالة</item>
+        <item quantity="two">لم تتم إعادة توجيه الرسائل</item>
+        <item quantity="few">لم تتم إعادة توجيه الرسائل</item>
+        <item quantity="many">لم تتم إعادة توجيه الرسائل</item>
+        <item quantity="other">لم تتم إعادة توجيه الرسائل</item>
     </plurals>
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="title_confirmation_disable_rich_links">عرض الروابط الإلكترونية المعززة URL</string>
@@ -2805,12 +2805,12 @@
     <string name="context_send_message">أرسل رسالة</string>
     <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
     <plurals name="plural_contact_sent_to_chats">
-        <item quantity="zero">empty</item>
-        <item quantity="one">تم ارسال جهة الاتصال الى المحادثة بنجاح</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">تم ارسال جهات الاتصال الى المحادثة بنجاح</item>
+        <item quantity="zero">تم إرسال جهة اتصال إلى المحادثات بنجاح</item>
+        <item quantity="one">تم إرسال جهة اتصال إلى المحادثات بنجاح</item>
+        <item quantity="two">تم إرسال جهتي اتصال إلى المحادثات بنجاح</item>
+        <item quantity="few">تم إرسال جهات اتصال إلى المحادثات بنجاح</item>
+        <item quantity="many">تم إرسال جهة اتصال إلى المحادثات بنجاح</item>
+        <item quantity="other">تم إرسال جهة اتصال إلى المحادثات بنجاح</item>
     </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">مجلدات MEGAdrop ليست مدعومة</string>
@@ -2871,7 +2871,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">انت بصدد حذف كل النسخ المعدلة لكل الملفات. أي نسخة معدلة لملف مشارك معك من جهة اتصال يجب ان يحذف من قبله. \n\nيرجى الملاحظة انه لن يتم حذف النسخ الحالية للملفات.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">تم حذف النسخ المعدلة للملفات بنجاح</string>
+    <string name="success_delete_versions">تم حذف نسخ الملف بنجاح</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">حدث خطأ خلال عملية حذف النسخ المعدلة القديمة للملفات. يرجى إعادة المحاولة.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2944,12 +2944,12 @@
     <string name="contact_info_button_more">المزيد</string>
     <!-- Section title to select a file to perform an action, more files -->
     <plurals name="plural_select_file">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">اختر ملف</item>
         <item quantity="one">اختر ملف</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">اختر الملفات</item>
+        <item quantity="two">اختر ملفات</item>
+        <item quantity="few">اختر ملفات</item>
+        <item quantity="many">اختر ملفات</item>
+        <item quantity="other">اختر ملفات</item>
     </plurals>
     <!-- Title of confirmation dialog of sending invitation to a contact -->
     <string name="title_confirm_send_invitation">دعوة %1$s؟</string>
@@ -4011,39 +4011,39 @@
     <string name="subtitle_properties_manage_chat_label_year">1 سنة</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
     <plurals name="retention_time_picker_hours">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">ساعة</item>
         <item quantity="one">ساعة</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
+        <item quantity="two">ساعات</item>
+        <item quantity="few">ساعات</item>
+        <item quantity="many">ساعات</item>
         <item quantity="other">ساعات</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <plurals name="retention_time_picker_days">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">يوم</item>
         <item quantity="one">يوم</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">أيام</item>
+        <item quantity="two">يومان</item>
+        <item quantity="few">أيام</item>
+        <item quantity="many">يوماً</item>
+        <item quantity="other">يوم</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several weeks -->
     <plurals name="retention_time_picker_weeks">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">أسبوع</item>
         <item quantity="one">أسبوع</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">أسابيع</item>
+        <item quantity="two">أسبوعين</item>
+        <item quantity="few">أسابيع</item>
+        <item quantity="many">أسبوعاً</item>
+        <item quantity="other">أسبوع</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates several months -->
     <plurals name="retention_time_picker_months">
-        <item quantity="zero">empty</item>
+        <item quantity="zero">شهر</item>
         <item quantity="one">شهر</item>
-        <item quantity="two">empty</item>
-        <item quantity="few">empty</item>
-        <item quantity="many">empty</item>
-        <item quantity="other">شهور</item>
+        <item quantity="two">شهرين</item>
+        <item quantity="few">أشهر</item>
+        <item quantity="many">شهراً</item>
+        <item quantity="other">شهر</item>
     </plurals>
     <!-- Picker text to choose custom retention time. This option indicates a year -->
     <string name="retention_time_picker_year">سنة</string>
@@ -4399,23 +4399,35 @@
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">مجموعات</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <string name="warning_get_links">خيارات مثل “إرسال مفتاح فك التشفير بشكل منفصل” أو “تعيين تاريخ انتهاء الصلاحية” أو “ تعيين حماية كلمة المرور” متوفرة فقط للعناصر الفردية.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
-    <string name="action_copy_all">Copy all</string>
+    <string name="action_copy_all">نسخ الكل</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link successfully sent.</item>
-        <item quantity="other">Links successfully sent.</item>
+        <item quantity="zero">تم إرسال رابط بنجاح.</item>
+        <item quantity="one">تم إرسال رابط بنجاح.</item>
+        <item quantity="two">تم إرسال رابطين بنجاح.</item>
+        <item quantity="few">تم إرسال روابط بنجاح.</item>
+        <item quantity="many">تم إرسال رابطاً بنجاح.</item>
+        <item quantity="other">تم إرسال رابط بنجاح.</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Link copied to the clipboard.</item>
-        <item quantity="other">Links copied to the clipboard.</item>
+        <item quantity="zero">تم نسخ رابط إلى الحافظة.</item>
+        <item quantity="one">تم نسخ رابط إلى الحافظة.</item>
+        <item quantity="two">تم نسخ رابطين إلى الحافظة.</item>
+        <item quantity="few">تم نسخ روابط إلى الحافظة.</item>
+        <item quantity="many">تم نسخ رابطاً إلى الحافظة.</item>
+        <item quantity="other">تم نسخ رابط إلى الحافظة.</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
-        <item quantity="one">Get Link</item>
-        <item quantity="other">Get Links</item>
+        <item quantity="zero">احصل على رابط</item>
+        <item quantity="one">احصل على رابط</item>
+        <item quantity="two">احصل على رابطين</item>
+        <item quantity="few">احصل على روابط</item>
+        <item quantity="many">احصل على رابطاً</item>
+        <item quantity="other">احصل على رابط</item>
     </plurals>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">انت الوحيد هنا</string>
