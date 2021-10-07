@@ -827,6 +827,9 @@ class HomepageFragment : Fragment() {
             .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
                 notAlertAnymoreAboutStartScreen(requireContext())
             }
-            .show()
+            .show().apply {
+                setCancelable(false)
+                setCanceledOnTouchOutside(false)
+            }
     }
 }
