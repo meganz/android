@@ -55,7 +55,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="@dimen/cu_view_type_button_vertical_margin"
-                app:layout_above="@id/mini_audio_player" />
+                android:layout_above="@id/mini_audio_player" />
 
             <com.google.android.exoplayer2.ui.PlayerView
                 android:id="@+id/mini_audio_player"

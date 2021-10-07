@@ -4445,6 +4445,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
 					abL.setVisibility(View.GONE);
 				}
+
+                if (transfersWidget != null) {
+                    transfersWidget.update();
+                }
+
 				setDrawerLockMode(false);
 				return;
 			} else if (destinationId == R.id.photosFragment) {
@@ -4467,6 +4472,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				mHomepageScreen = HomepageScreen.RECENT_BUCKET;
 			}
 
+			transfersWidget.update();
 			updatePsaViewVisibility();
 			abL.setVisibility(View.VISIBLE);
 			showHideBottomNavigationView(true);
@@ -11868,14 +11874,27 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	/**
-	 * Checks if the current screen is the main of Home.
-	 *
-	 * @return True if the current screen is the main of Home, false otherwise.
-	 */
-	public boolean isInMainHomePage() {
-		return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE;
-	}
+    /**
+     * Checks if the current screen is the main of Home.
+     *
+     * @return True if the current screen is the main of Home, false otherwise.
+     */
+    public boolean isInMainHomePage() {
+        return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE;
+    }
+
+    /**
+     * Checks if the current screen is photos section of Homepage.
+     *
+     * @return True if the current screen is the photos, false otherwise.
+     */
+    public boolean isInPhotosPage() {
+        return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS;
+    }
+
+    public void hideTransferWidget() {
+        transfersWidget.hide();
+    }
 
     public int getCurrentZoom() {
         return currentZoom;
