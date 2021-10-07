@@ -162,7 +162,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         emptyText = v.findViewById(R.id.empty_text_recents);
 
         showActivityButton = v.findViewById(R.id.show_activity_button);
-        showActivityButton.setOnClickListener(v1 -> showActivity());
+        showActivityButton.setOnClickListener(v1 -> showRecentsActivity());
 
         String emptyString = formatEmptyScreenText(requireContext(),
                 StringResourcesUtils.getString(R.string.context_empty_recents));
@@ -194,7 +194,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         super.onViewCreated(view, savedInstanceState);
         LiveEventBus.get(EVENT_NODES_CHANGE, Boolean.class).observeForever(nodeChangeObserver);
         LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean.class)
-                .observe(getViewLifecycleOwner(), hide -> setRecentsView());
+                .observe(getViewLifecycleOwner(), this::setRecentsView);
 
         selectedBucketModel = new ViewModelProvider(requireActivity()).get(SelectedBucketViewModel.class);
 
@@ -255,9 +255,30 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 .getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
                 .getBoolean(HIDE_RECENT_ACTIVITY, false);
 
+        setRecentsView(hideRecentActivity);
+        ((ManagerActivityLollipop) context).setToolbarTitle();
+    }
+
+    /**
+     * Sets the recent view. Hide it if the setting to hide it is enabled, and shows it if the
+     * setting is disabled.
+     *
+     * @param hideRecentActivity True if the setting to hide the recent activity is enabled,
+     *                           false otherwise.
+     */
+    private void setRecentsView(boolean hideRecentActivity) {
         if (hideRecentActivity) {
-            showRecentsActivity();
-        } else if (buckets == null || buckets.isEmpty()) {
+            hideRecentsActivity();
+        } else {
+            showActivity();
+        }
+    }
+
+    /**
+     * Shows the recent activity.
+     */
+    private void showActivity() {
+        if (buckets == null || buckets.isEmpty()) {
             emptyLayout.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
             fastScroller.setVisibility(View.GONE);
@@ -273,14 +294,12 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
                 fastScroller.setVisibility(View.VISIBLE);
             }
         }
-
-        ((ManagerActivityLollipop) context).setToolbarTitle();
     }
 
     /**
-     * Shows the recent activity.
+     * Hides the recent activity.
      */
-    private void showRecentsActivity() {
+    private void hideRecentsActivity() {
         emptyLayout.setVisibility(View.VISIBLE);
         listView.setVisibility(View.GONE);
         fastScroller.setVisibility(View.GONE);
@@ -289,10 +308,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
     }
 
     /**
-     * Disables the setting to hide recent activity and updates the UI.
+     * Disables the setting to hide recent activity and updates the UI by showing it.
      */
-    private void showActivity() {
-        showRecentsActivity();
+    private void showRecentsActivity() {
         LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean.class).post(false);
         requireContext().getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
                 .edit().putBoolean(HIDE_RECENT_ACTIVITY, false).apply();
