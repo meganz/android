@@ -697,7 +697,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">مشكلة نظام الملفات</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">حدث خطأ أثناء استعراض الملفات المحلية</string>
+    <string name="general_error">حدث خطأ أثناء تنفيذ الإجراء</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">عارض الصور</string>
     <!-- Headline for the amount of storage space is used -->
@@ -2799,15 +2799,6 @@
     <string name="context_no_restored">حدث خطأ. لم تتم استعادة العنصر.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">أرسل رسالة</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="zero">تم إرسال جهة اتصال إلى المحادثات بنجاح</item>
-        <item quantity="one">تم إرسال جهة اتصال إلى المحادثات بنجاح</item>
-        <item quantity="two">تم إرسال جهتي اتصال إلى المحادثات بنجاح</item>
-        <item quantity="few">تم إرسال جهات اتصال إلى المحادثات بنجاح</item>
-        <item quantity="many">تم إرسال جهة اتصال إلى المحادثات بنجاح</item>
-        <item quantity="other">تم إرسال جهة اتصال إلى المحادثات بنجاح</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">مجلدات MEGAdrop ليست مدعومة</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->

@@ -677,7 +677,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problem z systemem plików</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Wystąpił błąd podczas przeglądania plików lokalnych</string>
+    <string name="general_error">Wystąpił błąd podczas wykonywania operacji</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Podgląd zdjęcia</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1148,7 +1148,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Rozwiń swoją chmurę.[A]Uzyskaj zwiększone limity pamięci i transferu dzięki kontu Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA konto Recovery Key zostało zapisane do: %1s.[A]Plik z Twoim kluczem odzyskiwania znajdziesz w sekcji Offline.[A]Uwaga: ponieważ plik z Twoim kluczem odzyskiwania zostanie usunięty po wylogowaniu, przechowuj go w bezpiecznym miejscu poza swoim MEGAkontem.</string>
+    <string name="toast_master_key">Klucz odzyskiwania do MEGA został zapisany w: %1s. [A]Plik z Swój klucz odzyskiwania znajdziesz w sekcji Zapisane dla Offline.[/A] Uwaga: ponieważ plik z Twoim kluczem odzyskiwania zostanie usunięty po wylogowaniu, przechowuj go w bezpiecznym miejscu poza swoim MEGAkontem.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Ten adres e-mail jest już używany. Proszę użyć innego adresu e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -2687,13 +2687,6 @@
     <string name="context_no_restored">Wystąpił błąd. Element nie został przywrócony.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Wyślij wiadomość</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Kontakt wysłany na czaty z powodzeniem</item>
-        <item quantity="few">Kontakty wysłane z powodzeniem na czaty</item>
-        <item quantity="many">Kontakty wysłane z powodzeniem na czaty</item>
-        <item quantity="other">Kontakty wysłane z powodzeniem na czaty</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Foldery MEGAdrop nie są jeszcze obsługiwane</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3810,7 +3803,7 @@
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Włączone debugowanie informacji dla wiadomości czatu</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Informacje o debugowaniu wiadomości czatu są wyłączone</string>
+    <string name="show_info_chat_msg_disabled">Wyłączenie informacji o debugowaniu dla wiadomości czatu</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Osiągnąłeś maksymalny limit %d reakcji.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->

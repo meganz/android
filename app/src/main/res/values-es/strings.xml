@@ -657,7 +657,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Error en el sistema de archivos</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">No se han podido explorar los archivos locales</string>
+    <string name="general_error">Error en el sistema de archivos</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Visor de imágenes</string>
     <!-- Headline for the amount of storage space is used -->
@@ -2575,11 +2575,6 @@
     <string name="context_no_restored">El elemento no se ha podido restaurar.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Enviar mensaje</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Contacto enviado a los chats</item>
-        <item quantity="other">Contactos enviado a los chats</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Las carpetas de MEGAdrop aún no están soportadas</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->

@@ -657,7 +657,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problème de système de fichiers</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Une erreur est survenue en parcourant les fichiers locaux</string>
+    <string name="general_error">Une erreur s’est produite lors de l’exécution de l’action</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Visualiseur d’images</string>
     <!-- Headline for the amount of storage space is used -->
@@ -2575,11 +2575,6 @@
     <string name="context_no_restored">Une erreur est survenue. L’élément n’a pas été restauré.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Envoyer un message</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Le contact a été envoyé vers les conversations avec succès</item>
-        <item quantity="other">Les contacts ont été envoyés vers les conversations avec succès</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Les dossiers MEGAdrop ne sont pas encore pris en charge</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -4178,5 +4173,5 @@
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Vue principale</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
-    <string name="offline_warning">La déconnexion supprime le contenu hors ligne.</string>
+    <string name="offline_warning">La déconnexion supprime votre contenu hors ligne.</string>
 </resources>

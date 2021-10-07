@@ -647,7 +647,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">ファイルシステムの問題</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">ローカルファイルの閲覧中にエラーが発生しました</string>
+    <string name="general_error">その操作の実行中にエラーが発生しました</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">画像ビューア</string>
     <!-- Headline for the amount of storage space is used -->
@@ -2519,10 +2519,6 @@
     <string name="context_no_restored">エラーが発生しました。項目が復元できませんでした。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">メッセージを送信</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">連絡先が正常にチャットに送信されました</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdropフォルダはまだサポートされていません</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->

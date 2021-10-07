@@ -647,7 +647,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">파일 시스템 문제</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">로컬 파일을 탐색하던 중 오류 발생</string>
+    <string name="general_error">행동 실행 중 오류가 발생했습니다</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">이미지 뷰어</string>
     <!-- Headline for the amount of storage space is used -->
@@ -2519,10 +2519,6 @@
     <string name="context_no_restored">오류가 발생하였습니다. 항목이 복원되지 않았습니다.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">메시지 보내기</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">연락처들이 성공적으로 대화에 전송됨</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdrop 폴더는 아직 지원되지 않습니다</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->

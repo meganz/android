@@ -666,7 +666,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problemă cu sistemul de fișiere</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">A apărut o eroare la răsfoirea fișierelor locale</string>
+    <string name="general_error">Eroare petrecută la executarea acțiunii</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Vizualizator de imagini</string>
     <!-- Headline for the amount of storage space is used -->
@@ -2630,12 +2630,6 @@
     <string name="context_no_restored">An error occurred. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Trimite mesaj</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Contact trimis cu succes la chaturi</item>
-        <item quantity="few">Contacte trimise cu succes la chaturi</item>
-        <item quantity="other">Contacte trimise cu succes la chaturi</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Folderele MEGAdrop nu sunt încă suportate</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->

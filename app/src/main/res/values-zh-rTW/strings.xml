@@ -647,7 +647,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">檔案系統問題</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">瀏覽本機檔案時發生錯誤</string>
+    <string name="general_error">執行操作時發生錯誤</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">圖片檢視器</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1112,7 +1112,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">加大您的雲端空間。[A]訂閱Pro方案帳戶以獲得更大儲存空間和傳輸配額。</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA帳戶還原金鑰已儲存到：%1s。[A]您可以在離線存取中找到您還原金鑰的檔案。[A]注意：當您登出時，您還原金鑰的檔案將被刪除，因此請將它儲存在您MEGA帳戶以外的安全地方。</string>
+    <string name="toast_master_key">MEGA帳戶還原金鑰已儲存到：%1s。[A]您可以在儲存為離線存取區中找到您的還原金鑰檔案。[/A]注意：當您登出時，您的還原金鑰檔案將被刪除，因此請將它保存至您帳戶以外的安全地方。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">這個電子郵件地址已被使用。請改用其它電子郵件地址。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -2519,10 +2519,6 @@
     <string name="context_no_restored">發生錯誤。項目無法還原。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">發送訊息</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">聯絡人資料已成功發送到對話室中</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">尚不支援MEGAdrop資料夾</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
