@@ -7,6 +7,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN
 import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME
+import mega.privacy.android.app.utils.SharedPreferenceConstants.DO_NOT_ALERT_ABOUT_START_SCREEN
 import mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN
 
 class StartScreenViewModel : BaseRxViewModel() {
@@ -28,7 +29,10 @@ class StartScreenViewModel : BaseRxViewModel() {
         }
 
         LiveEventBus.get(EVENT_UPDATE_START_SCREEN, Int::class.java).post(newScreen)
-        preferences.edit().putInt(PREFERRED_START_SCREEN, newScreen).apply()
+        preferences.edit()
+            .putInt(PREFERRED_START_SCREEN, newScreen)
+            .putBoolean(DO_NOT_ALERT_ABOUT_START_SCREEN, true)
+            .apply()
         checkedScreen.value = newScreen
     }
 }
