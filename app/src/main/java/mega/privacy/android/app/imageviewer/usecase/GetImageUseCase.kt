@@ -35,7 +35,7 @@ class GetImageUseCase @Inject constructor(
                 else -> {
                     val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.base64Handle + JPG_EXTENSION) else null
                     val previewFile = if (node.hasPreview()) buildPreviewFile(context, node.base64Handle + JPG_EXTENSION) else null
-                    val fullFile = if (fullSize) buildTempFile(context, node.base64Handle + JPG_EXTENSION) else null
+                    val fullFile = buildTempFile(context, node.base64Handle + JPG_EXTENSION)
 
                     val imageItem = ImageItem(
                         node.handle,
@@ -47,7 +47,7 @@ class GetImageUseCase @Inject constructor(
 
                     emitter.onNext(imageItem)
 
-                    if ((fullSize && fullFile?.exists() == true) || (!fullSize && previewFile?.exists() == true)) {
+                    if (fullFile?.exists() == true || (!fullSize && previewFile?.exists() == true)) {
                         emitter.onComplete()
                         return@create
                     }
@@ -80,7 +80,7 @@ class GetImageUseCase @Inject constructor(
                             ))
                     }
 
-                    if (fullFile != null && !fullFile.exists()) {
+                    if (fullSize && !fullFile.exists()) {
                         megaApi.startDownload(
                             node,
                             fullFile.absolutePath,

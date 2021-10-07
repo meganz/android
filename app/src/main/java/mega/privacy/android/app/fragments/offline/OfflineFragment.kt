@@ -39,6 +39,7 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
+import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.lollipop.*
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
@@ -523,21 +524,13 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 startActivity(intentZip)
             }
             mime.isImage -> {
-                val intent = Intent(context, FullScreenImageViewerLollipop::class.java)
-                intent.putExtra(INTENT_EXTRA_KEY_POSITION, position)
-                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
-                intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY, file.parent)
-
-                intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.node.handle)
-                putThumbnailLocation(intent, recyclerView!!, position, VIEWER_FROM_OFFLINE, adapter!!)
-
-                intent.putExtra(
-                    INTENT_EXTRA_KEY_ARRAY_OFFLINE, ArrayList(adapter!!.getOfflineNodes())
+                val handles = adapter!!.getOfflineNodes().map { it.handle.toLong() }.toLongArray()
+                val intent = ImageViewerActivity.getIntentForOfflineChildren(
+                    requireContext(),
+                    handles,
+                    position
                 )
-
                 startActivity(intent)
-                requireActivity().overridePendingTransition(0, 0)
             }
             mime.isVideoReproducible || mime.isAudio -> {
                 logDebug("Video/Audio file")

@@ -74,12 +74,24 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
                 putExtra(NODE_HANDLES, childrenHandles)
                 putExtra(INTENT_EXTRA_KEY_POSITION, currentNodePosition)
             }
+
+        @JvmStatic
+        fun getIntentForOfflineChildren(
+            context: Context,
+            childrenHandles: LongArray,
+            currentNodePosition: Int = 0
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE, childrenHandles)
+                putExtra(INTENT_EXTRA_KEY_POSITION, currentNodePosition)
+            }
     }
 
     private val nodePosition: Int by extraNotNull(INTENT_EXTRA_KEY_POSITION, 0)
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
     private val childrenHandles: LongArray? by extra(NODE_HANDLES)
+    private val childrenOfflineHandles: LongArray? by extra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
     private val childOrder: Int? by extra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN)
 
     private var defaultPageSet = false
@@ -120,6 +132,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
             }
             childrenHandles != null && childrenHandles!!.isNotEmpty() -> {
                 viewModel.retrieveImages(childrenHandles!!.toList())
+            }
+            childrenOfflineHandles != null && childrenOfflineHandles!!.isNotEmpty() -> {
+                viewModel.retrieveOfflineImages(childrenOfflineHandles!!.toList())
             }
             nodeHandle != null && nodeHandle != INVALID_HANDLE -> {
                 viewModel.retrieveSingleImage(nodeHandle!!)
