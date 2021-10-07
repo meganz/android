@@ -20,7 +20,10 @@
 
         <include
             android:id="@+id/empty_hint"
-            layout="@layout/empty_result_files"
+            layout="@layout/empty_result_photos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             app:showHint="@{viewModel.items.empty}" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -39,33 +42,32 @@
             android:id="@+id/scroller"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:orientation="vertical"
             android:layout_gravity="end"
+            android:orientation="vertical"
             app:visibleGone="@{viewModel.items.size() > (viewModel.searchMode ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}" />
 
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/mini_audio_player"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/audio_player_mini_controller_height"
-            android:background="?attr/colorPrimary"
-            android:visibility="gone"
-            app:controller_layout_id="@layout/audio_player_control_in_mini_player"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:player_layout_id="@layout/audio_player_view_controller_only"
-            app:surface_type="none"
-            tools:visibility="visible" />
+            <include
+                android:id="@+id/photos_view_type"
+                layout="@layout/cu_view_type_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="@dimen/cu_view_type_button_vertical_margin"
+                app:layout_above="@id/mini_audio_player" />
 
-        <include
-            android:id="@+id/photos_view_type"
-            layout="@layout/cu_view_type_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="@dimen/cu_view_type_button_vertical_margin"/>
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/mini_audio_player"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/audio_player_mini_controller_height"
+                android:layout_gravity="bottom"
+                android:background="?attr/colorPrimary"
+                android:visibility="gone"
+                app:controller_layout_id="@layout/audio_player_control_in_mini_player"
+                app:player_layout_id="@layout/audio_player_view_controller_only"
+                app:surface_type="none"
+                tools:visibility="visible" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
