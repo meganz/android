@@ -6,7 +6,6 @@ import androidx.lifecycle.*
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.listeners.BaseListener
 import mega.privacy.android.app.utils.Constants.*
 import nz.mega.sdk.MegaApiJava
@@ -21,22 +20,16 @@ class HomePageViewModel @ViewModelInject constructor(
     private val _notificationCount = MutableLiveData<Int>()
     private val _avatar = MutableLiveData<Bitmap>()
     private val _chatStatus = MutableLiveData<Int>()
-    private val _isScrolling = MutableLiveData<Pair<Scrollable, Boolean>>()
     private val _bannerList: MutableLiveData<MutableList<MegaBanner>?> =
         repository.getBannerListLiveData()
 
     val notificationCount: LiveData<Int> = _notificationCount
     val avatar: LiveData<Bitmap> = _avatar
     val chatStatus: LiveData<Int> = _chatStatus
-    val isScrolling: LiveData<Pair<Scrollable, Boolean>> = _isScrolling
     val bannerList: LiveData<MutableList<MegaBanner>?> = _bannerList
 
     private val avatarChangeObserver = androidx.lifecycle.Observer<Boolean> {
         loadAvatar()
-    }
-
-    private val scrollingObserver = androidx.lifecycle.Observer<Pair<Scrollable, Boolean>> {
-        _isScrolling.value = it
     }
 
     private val notificationCountObserver = androidx.lifecycle.Observer<Int> {
@@ -50,8 +43,6 @@ class HomePageViewModel @ViewModelInject constructor(
     init {
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .observeForever(avatarChangeObserver)
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_SCROLLING_CHANGE).observeForever(scrollingObserver as Observer<Any>)
         LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java)
             .observeForever(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
@@ -68,8 +59,6 @@ class HomePageViewModel @ViewModelInject constructor(
 
         LiveEventBus.get(EVENT_AVATAR_CHANGE, Boolean::class.java)
             .removeObserver(avatarChangeObserver)
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_SCROLLING_CHANGE).removeObserver(scrollingObserver as Observer<Any>)
         LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java)
             .removeObserver(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)

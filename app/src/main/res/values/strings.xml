@@ -1126,7 +1126,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Grow your cloud.[A]Get increased storage and transfer quotas with a Pro account.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s.[A]You can find the file with your Recovery Key in the Saved for Offline section.[A]Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
+    <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s.[A]You can find the file with your Recovery Key in the Offline section.[A]Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">This email address is already in use. Please use another email address.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1922,7 +1922,7 @@
     <string name="camera_uploads_empty">No files in Camera Uploads</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d d left</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Expired</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Don’t use HTTP</string>
@@ -4181,4 +4181,6 @@
     <string name="meeting_me_text_bracket">%1s [A](me)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Main view</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Logging out deletes your offline content.</string>
 </resources>

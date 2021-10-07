@@ -593,6 +593,14 @@
         <item name="android:textSize">11sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Caption.13sp">
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Caption.13sp.Grey87Yellow700">
+        <item name="android:textColor">@color/grey_alpha_087_yellow_700</item>
+    </style>
+
     <style name="TextAppearance.Mega.Caption.Secondary.Variant4">
         <item name="android:textSize">11sp</item>
         <item name="android:textColor">@color/white</item>
