@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RadioGroup
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.getColor
@@ -19,8 +20,7 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.getStatusBarHeight
-import mega.privacy.android.app.utils.Util.isDarkMode
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Inject
@@ -209,6 +209,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
             is LinearLayout -> (itemsLayout as LinearLayout).childCount
             is RelativeLayout -> (itemsLayout as RelativeLayout).childCount
             is ConstraintLayout -> (itemsLayout as ConstraintLayout).childCount
+            is RadioGroup -> (itemsLayout as RadioGroup).childCount
             else -> 0
         }
 
@@ -217,12 +218,19 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
                 is LinearLayout -> (itemsLayout as LinearLayout).getChildAt(i)
                 is RelativeLayout -> (itemsLayout as RelativeLayout).getChildAt(i)
                 is ConstraintLayout -> (itemsLayout as ConstraintLayout).getChildAt(i)
+                is RadioGroup -> (itemsLayout as RadioGroup).getChildAt(i)
                 else -> continue
             }
 
             if (v.isVisible) {
                 val height = v.height
                 peekHeight += height
+
+                if (itemsLayout is RadioGroup
+                    && (itemsLayout as RadioGroup).showDividers == RadioGroup.SHOW_DIVIDER_MIDDLE
+                ) {
+                    peekHeight += dp2px(1F)
+                }
 
                 if (peekHeight > halfHeightDisplay && height > heightSeparator) {
                     peekHeight -= height / 2
