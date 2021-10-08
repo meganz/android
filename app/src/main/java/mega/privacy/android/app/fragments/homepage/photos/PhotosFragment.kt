@@ -41,7 +41,6 @@ import mega.privacy.android.app.fragments.managerFragments.cu.*
 import mega.privacy.android.app.fragments.managerFragments.cu.CameraUploadsFragment.*
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE5
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -152,7 +151,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         setupFastScroller()
         setupActionMode()
         setupNavigation()
-        setupMiniAudioPlayer()
 
         viewModel.items.observe(viewLifecycleOwner) {
             if (!viewModel.searchMode) {
@@ -299,13 +297,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 )
             }
         })
-    }
-
-    private fun setupMiniAudioPlayer() {
-        val audioPlayerController = MiniAudioPlayerController(binding.miniAudioPlayer).apply {
-            shouldVisible = true
-        }
-        lifecycle.addObserver(audioPlayerController)
     }
 
     /**
@@ -635,7 +626,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             )
 
             if (viewModel.searchMode) {
-                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_SEARCH_ADAPTER);
+                intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTOS_SEARCH_ADAPTER)
                 intent.putExtra(
                     INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH,
                     viewModel.getHandlesOfPhotos()
@@ -674,7 +665,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
     private fun RecyclerView.switchBackToGrid() {
         linearLayoutManager = null
-        listView.layoutManager = gridLayoutManager
+        layoutManager = gridLayoutManager
     }
 
     /**
