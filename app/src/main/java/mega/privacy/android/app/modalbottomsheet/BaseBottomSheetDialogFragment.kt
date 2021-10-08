@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -18,6 +19,8 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.getStatusBarHeight
+import mega.privacy.android.app.utils.Util.isDarkMode
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Inject
@@ -137,8 +140,23 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    if (newState == BottomSheetBehavior.STATE_HIDDEN) {
-                        dismissAllowingStateLoss()
+                    when (newState) {
+                        BottomSheetBehavior.STATE_HIDDEN -> dismissAllowingStateLoss()
+                        BottomSheetBehavior.STATE_EXPANDED -> {
+                            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                return
+                            }
+
+                            val screenHeight =
+                                resources.displayMetrics.heightPixels - getStatusBarHeight()
+
+                            if (isDarkMode(requireContext()) && bottomSheet.height >= screenHeight) {
+                                requireActivity().window.statusBarColor =
+                                    getColor(requireContext(), R.color.grey_010_alpha_049)
+                            }
+                        }
+                        else -> requireActivity().window.statusBarColor =
+                            getColor(requireContext(), android.R.color.transparent)
                     }
                 }
 
