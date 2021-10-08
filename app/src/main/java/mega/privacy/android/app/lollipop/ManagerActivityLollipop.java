@@ -262,6 +262,12 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.constants.EventConstants.*;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CAMERA_UPLOADS_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.NO_BNV;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.SHARED_ITEMS_BNV;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartBottomNavigationItem;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.getStartDrawerItem;
 import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
@@ -345,12 +351,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public static final int PENDING_TAB = 0;
 	public static final int COMPLETED_TAB = 1;
 
-	public static final int CLOUD_DRIVE_BNV = 0;
-	public static final int CAMERA_UPLOADS_BNV = 1;
-	public static final int HOMEPAGE_BNV = 2;
-	public static final int CHAT_BNV = 3;
-	public static final int SHARED_BNV = 4;
-	private static final int HIDDEN_BNV = 5;
 	// 8dp + 56dp(Fab's size) + 8dp
     public static final int TRANSFER_WIDGET_MARGIN_BOTTOM = 72;
 
@@ -1911,7 +1911,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			logDebug("No network -> SHOW OFFLINE MODE");
 
 			if (drawerItem == null) {
-				drawerItem = getStartDrawerItem(this);
+				drawerItem = DrawerItem.HOMEPAGE;
 			}
 
 			selectDrawerItemLollipop(drawerItem);
@@ -3342,7 +3342,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	    		}
 	    		case SHARED_ITEMS:{
 					logDebug("Case SHARED ITEMS");
-					setBottomNavigationMenuItemChecked(SHARED_BNV);
+					setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV);
 					try {
 						NotificationManager notificationManager =
 								(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -3357,11 +3357,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	    		}
 				case SETTINGS:{
 					setToolbarTitle();
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+					setBottomNavigationMenuItemChecked(NO_BNV);
 					break;
 				}
 				case SEARCH:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+					setBottomNavigationMenuItemChecked(NO_BNV);
 					setToolbarTitle();
 					break;
 				}
@@ -3387,7 +3387,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 				case HOMEPAGE:
 				default:
-					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+					setBottomNavigationMenuItemChecked(HOME_BNV);
 					break;
     		}
     	}
@@ -4092,7 +4092,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				}
 				case HOMEPAGE: {
-					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+					setBottomNavigationMenuItemChecked(HOME_BNV);
 					break;
 				}
 				case CAMERA_UPLOADS:{
@@ -4100,7 +4100,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				}
 				case SHARED_ITEMS:{
-					setBottomNavigationMenuItemChecked(SHARED_BNV);
+					setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV);
 					break;
 				}
 				case CHAT:{
@@ -4112,7 +4112,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case TRANSFERS:
 				case NOTIFICATIONS:
 				case INBOX:{
-					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+					setBottomNavigationMenuItemChecked(NO_BNV);
 					break;
 				}
 			}
@@ -4200,7 +4200,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		drawerItem = DrawerItem.NOTIFICATIONS;
 
-		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+		setBottomNavigationMenuItemChecked(NO_BNV);
 
 		notificFragment = (NotificationsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(FragmentTag.NOTIFICATIONS.getTag());
 		if (notificFragment == null){
@@ -4225,7 +4225,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		drawerItem = DrawerItem.TRANSFERS;
 
-		setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+		setBottomNavigationMenuItemChecked(NO_BNV);
 
 		if (mTabsAdapterTransfers == null) {
 			mTabsAdapterTransfers = new TransfersPageAdapter(getSupportFragmentManager(), this);
@@ -4286,7 +4286,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	public void setBottomNavigationMenuItemChecked(int item) {
 		if (bNV != null) {
-			if (item == HIDDEN_BNV) {
+			if (item == NO_BNV) {
 				showHideBottomNavigationView(true);
 			} else if (bNV.getMenu().getItem(item) != null) {
 				if (!bNV.getMenu().getItem(item).isChecked()) {
@@ -4434,7 +4434,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				// Showing the bottom navigation view immediately because the initial dimension
 				// of Homepage bottom sheet is calculated based on it
 				showBNVImmediate();
-				if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
+				if (bottomNavigationCurrentItem == HOME_BNV) {
 					abL.setVisibility(View.GONE);
 				}
 				setDrawerLockMode(false);
@@ -4540,7 +4540,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					rubbishBinFLol = RubbishBinFragmentLollipop.newInstance();
 				}
 
-				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+				setBottomNavigationMenuItemChecked(NO_BNV);
 
 				replaceFragment(rubbishBinFLol, FragmentTag.RUBBISH_BIN.getTag());
 
@@ -4567,10 +4567,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                     showHideBottomNavigationView(true);
 				}
 
-				setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+				setBottomNavigationMenuItemChecked(HOME_BNV);
 
 				if (!comesFromNotifications) {
-					bottomNavigationCurrentItem = HOMEPAGE_BNV;
+					bottomNavigationCurrentItem = HOME_BNV;
 				}
 
 				showGlobalAlertDialogsIfNeeded();
@@ -4632,9 +4632,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				showFabButton();
 				showHideBottomNavigationView(false);
 				if (!comesFromNotifications) {
-					bottomNavigationCurrentItem = SHARED_BNV;
+					bottomNavigationCurrentItem = SHARED_ITEMS_BNV;
 				}
-				setBottomNavigationMenuItemChecked(SHARED_BNV);
+				setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV);
     			break;
     		}
 			case NOTIFICATIONS:{
@@ -4682,7 +4682,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     		case SEARCH:{
 				showHideBottomNavigationView(true);
 
-				setBottomNavigationMenuItemChecked(HIDDEN_BNV);
+				setBottomNavigationMenuItemChecked(NO_BNV);
 
     			drawerItem = DrawerItem.SEARCH;
 				if (getSearchFragment() == null) {
@@ -4744,7 +4744,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     	fullscreenOfflineFragment = fragment;
 
 		showFabButton();
-		setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+		setBottomNavigationMenuItemChecked(HOME_BNV);
 		abL.setVisibility(View.VISIBLE);
 		setToolbarTitle();
 		supportInvalidateOptionsMenu();
@@ -6328,7 +6328,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			// workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
 			// offline, and hide AppBarLayout when immediately on go back, we will see the flicker
 			// of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
-			if (bottomNavigationCurrentItem != HOMEPAGE_BNV) {
+			if (bottomNavigationCurrentItem != HOME_BNV) {
 				backToDrawerItem(bottomNavigationCurrentItem);
 			} else {
 				drawerItem = DrawerItem.HOMEPAGE;
@@ -6374,10 +6374,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		else if (item == CHAT_BNV) {
 			drawerItem = DrawerItem.CHAT;
 		}
-		else if (item == SHARED_BNV) {
+		else if (item == SHARED_ITEMS_BNV) {
 			drawerItem = DrawerItem.SHARED_ITEMS;
 		}
-		else if (item == HOMEPAGE_BNV || item == -1) {
+		else if (item == HOME_BNV || item == -1) {
 			drawerItem = DrawerItem.HOMEPAGE;
 		}
 
@@ -6442,7 +6442,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					super.onBackPressed();
 					return true;
 				} else {
-					setBottomNavigationMenuItemChecked(HOMEPAGE_BNV);
+					setBottomNavigationMenuItemChecked(HOME_BNV);
 				}
 				break;
 			}
@@ -6470,7 +6470,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					refreshSharesPageAdapter();
 				} else {
 					drawerItem = DrawerItem.SHARED_ITEMS;
-					setBottomNavigationMenuItemChecked(SHARED_BNV);
+					setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV);
 				}
 				break;
 			}

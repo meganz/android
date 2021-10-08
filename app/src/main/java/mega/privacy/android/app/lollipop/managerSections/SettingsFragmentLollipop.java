@@ -63,7 +63,7 @@ import mega.privacy.android.app.utils.ThemeHelper;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
 import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
@@ -251,7 +251,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         SharedPreferences sharedPreferences = requireContext()
                 .getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE);
 
-        updateStartScreenSetting(sharedPreferences.getInt(PREFERRED_START_SCREEN, HOME));
+        updateStartScreenSetting(sharedPreferences.getInt(PREFERRED_START_SCREEN, HOME_BNV));
         hideRecentActivity.setChecked(sharedPreferences.getBoolean(HIDE_RECENT_ACTIVITY, false));
     }
 

@@ -13,11 +13,12 @@ import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_P
  */
 object StartScreenUtil {
 
-    const val CLOUD_DRIVE = 0
-    const val CAMERA_UPLOADS = 1
-    const val HOME = 2
-    const val CHAT = 3
-    const val SHARED_ITEMS = 4
+    const val CLOUD_DRIVE_BNV = 0
+    const val CAMERA_UPLOADS_BNV = 1
+    const val HOME_BNV = 2
+    const val CHAT_BNV = 3
+    const val SHARED_ITEMS_BNV = 4
+    const val NO_BNV = 5
 
     private const val TIME_TO_SHOW_START_SCREEN_DIALOG = 604800000 //1 week in milliseconds
 
@@ -30,11 +31,11 @@ object StartScreenUtil {
     @JvmStatic
     fun getStartDrawerItem(context: Context): DrawerItem =
         when (context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
-            .getInt(PREFERRED_START_SCREEN, HOME)) {
-            CLOUD_DRIVE -> DrawerItem.CLOUD_DRIVE
-            CAMERA_UPLOADS -> DrawerItem.CAMERA_UPLOADS
-            CHAT -> DrawerItem.CHAT
-            SHARED_ITEMS -> DrawerItem.SHARED_ITEMS
+            .getInt(PREFERRED_START_SCREEN, HOME_BNV)) {
+            CLOUD_DRIVE_BNV -> DrawerItem.CLOUD_DRIVE
+            CAMERA_UPLOADS_BNV -> DrawerItem.CAMERA_UPLOADS
+            CHAT_BNV -> DrawerItem.CHAT
+            SHARED_ITEMS_BNV -> DrawerItem.SHARED_ITEMS
             else -> DrawerItem.HOMEPAGE
         }
 
@@ -47,14 +48,8 @@ object StartScreenUtil {
      */
     @JvmStatic
     fun getStartBottomNavigationItem(context: Context): Int =
-        when (context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
-            .getInt(PREFERRED_START_SCREEN, HOME)) {
-            CLOUD_DRIVE -> CLOUD_DRIVE_BNV
-            CAMERA_UPLOADS -> CAMERA_UPLOADS_BNV
-            CHAT -> CHAT_BNV
-            SHARED_ITEMS -> SHARED_BNV
-            else -> HOMEPAGE_BNV
-        }
+        context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+            .getInt(PREFERRED_START_SCREEN, HOME_BNV)
 
     /**
      * Checks if should close the app because the current DrawerItem is the preferred start screen.
@@ -68,8 +63,8 @@ object StartScreenUtil {
         (drawerItem == DrawerItem.CLOUD_DRIVE && startItem == CLOUD_DRIVE_BNV)
                 || (drawerItem == DrawerItem.CAMERA_UPLOADS && startItem == CAMERA_UPLOADS_BNV)
                 || (drawerItem == DrawerItem.CHAT && startItem == CHAT_BNV)
-                || (drawerItem == DrawerItem.SHARED_ITEMS && startItem == SHARED_BNV)
-                || (drawerItem == DrawerItem.HOMEPAGE && startItem == HOMEPAGE_BNV)
+                || (drawerItem == DrawerItem.SHARED_ITEMS && startItem == SHARED_ITEMS_BNV)
+                || (drawerItem == DrawerItem.HOMEPAGE && startItem == HOME_BNV)
 
 
     /**
@@ -83,9 +78,9 @@ object StartScreenUtil {
             context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
 
         val doNotAlert = preferences.getBoolean(DO_NOT_ALERT_ABOUT_START_SCREEN, false)
-        val preferredScreen = preferences.getInt(PREFERRED_START_SCREEN, HOME)
+        val preferredScreen = preferences.getInt(PREFERRED_START_SCREEN, HOME_BNV)
 
-        if (doNotAlert || preferredScreen != HOME) {
+        if (doNotAlert || preferredScreen != HOME_BNV) {
             return false
         }
 

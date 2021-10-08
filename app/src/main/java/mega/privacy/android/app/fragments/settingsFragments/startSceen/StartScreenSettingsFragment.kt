@@ -9,11 +9,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.databinding.FragmentStartScreenSettingsBinding
-import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CAMERA_UPLOADS
-import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT
-import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE
-import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME
-import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.SHARED_ITEMS
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CAMERA_UPLOADS_BNV
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CHAT_BNV
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.CLOUD_DRIVE_BNV
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.SHARED_ITEMS_BNV
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 
 /**
@@ -47,11 +47,11 @@ class StartScreenSettingsFragment : Fragment() {
     private fun setupView() {
         hideChecks()
 
-        binding.cloudLayout.setOnClickListener { viewModel.newScreenClicked(CLOUD_DRIVE) }
-        binding.cuLayout.setOnClickListener { viewModel.newScreenClicked(CAMERA_UPLOADS) }
-        binding.homeLayout.setOnClickListener { viewModel.newScreenClicked(HOME) }
-        binding.chatLayout.setOnClickListener { viewModel.newScreenClicked(CHAT) }
-        binding.sharedLayout.setOnClickListener { viewModel.newScreenClicked(SHARED_ITEMS) }
+        binding.cloudLayout.setOnClickListener { viewModel.newScreenClicked(CLOUD_DRIVE_BNV) }
+        binding.cuLayout.setOnClickListener { viewModel.newScreenClicked(CAMERA_UPLOADS_BNV) }
+        binding.homeLayout.setOnClickListener { viewModel.newScreenClicked(HOME_BNV) }
+        binding.chatLayout.setOnClickListener { viewModel.newScreenClicked(CHAT_BNV) }
+        binding.sharedLayout.setOnClickListener { viewModel.newScreenClicked(SHARED_ITEMS_BNV) }
     }
 
     private fun setupObservers() {
@@ -75,11 +75,11 @@ class StartScreenSettingsFragment : Fragment() {
         hideChecks()
 
         when (screenChecked) {
-            CLOUD_DRIVE -> binding.cloudCheck.isVisible = true
-            CAMERA_UPLOADS -> binding.cuCheck.isVisible = true
-            HOME -> binding.homeCheck.isVisible = true
-            CHAT -> binding.chatCheck.isVisible = true
-            SHARED_ITEMS -> binding.sharedCheck.isVisible = true
+            CLOUD_DRIVE_BNV -> binding.cloudCheck.isVisible = true
+            CAMERA_UPLOADS_BNV -> binding.cuCheck.isVisible = true
+            HOME_BNV -> binding.homeCheck.isVisible = true
+            CHAT_BNV -> binding.chatCheck.isVisible = true
+            SHARED_ITEMS_BNV -> binding.sharedCheck.isVisible = true
         }
     }
 }
