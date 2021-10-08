@@ -35,7 +35,6 @@ import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
-import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
@@ -367,16 +366,8 @@ class HomepageFragment : Fragment() {
                     // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
                     currentSelectedTabFragment?.view
                 )
-
-                (currentSelectedTabFragment as? Scrollable)?.checkScroll()
             }
         })
-
-        viewModel.isScrolling.observe(viewLifecycleOwner) {
-            if (it.first == currentSelectedTabFragment) {
-                changeTabElevation(it.second)
-            }
-        }
 
         setupBottomSheetBackground()
     }
@@ -536,20 +527,6 @@ class HomepageFragment : Fragment() {
         if (layoutParams.height != maxHeight) {
             layoutParams.height = maxHeight
             bottomSheet.layoutParams = layoutParams
-        }
-    }
-
-    /**
-     * Elevate the tab or not based on the scrolling in Recents/Offline fragments.
-     *
-     *
-     * @param withElevation elevate the tab if true, false otherwise
-     */
-    private fun changeTabElevation(withElevation: Boolean) {
-        tabLayout.elevation = if (withElevation) {
-            Util.dp2px(4f).toFloat()
-        } else {
-            0f
         }
     }
 

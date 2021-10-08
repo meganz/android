@@ -965,8 +965,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			case MegaChatCall.CALL_STATUS_DESTROYED:
 			case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
 				updateVisibleCallElements(call.getChatid());
-				if ((call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION ||
-						call.getStatus() == MegaChatCall.CALL_STATUS_DESTROYED) &&
+				if (call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION &&
 						call.getTermCode() == MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS) {
 					showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
 				}
@@ -2840,7 +2839,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void destroySMSVerificationFragment() {
         if (!isTablet(this)) {
             logDebug("mobile, all orientation");
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
         }
         onAskingSMSVerificationFragment = false;
         svF = null;
@@ -2860,7 +2859,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		//In mobile, allow all orientation after permission screen
 		if (!isTablet(this)) {
 			logDebug("Mobile, all orientation");
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
 		}
 
 		turnOnNotifications = false;
@@ -4563,6 +4562,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				}
 
 				showGlobalAlertDialogsIfNeeded();
+
+				if (mHomepageScreen == HomepageScreen.HOMEPAGE) {
+					changeAppBarElevation(false);
+				}
 				break;
 			}
     		case CAMERA_UPLOADS: {
@@ -4747,8 +4750,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			// workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
 			// offline, and hide AppBarLayout when immediately on go back, we will see the flicker
 			// of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
-			if (bottomNavigationCurrentItem == HOMEPAGE_BNV
-                    && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+			if (isInMainHomePage()) {
 				abL.setVisibility(View.GONE);
 			}
 		}
@@ -4810,7 +4812,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 */
 	private void updateHomepageFabPosition() {
 		HomepageFragment fragment = getFragmentByType(HomepageFragment.class);
-		if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE && fragment != null) {
+		if (isInMainHomePage() && fragment != null) {
 			fragment.updateFabPosition(psaViewHolder.visible() ? psaViewHolder.psaLayoutHeight() : 0,
 					miniAudioPlayerController.visible() ? miniAudioPlayerController.playerHeight() : 0);
 		}
@@ -6266,7 +6268,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			if (getSearchFragment() == null || sFLol.onBackPressed() == 0) {
     			closeSearchSection();
     		}
-        } else if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+        } else if (isInMainHomePage()) {
             HomepageFragment fragment = getFragmentByType(HomepageFragment.class);
             if(fragment != null && fragment.isFabExpanded()) {
                 fragment.collapseFab();
@@ -6296,7 +6298,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
     public void adjustTransferWidgetPositionInHomepage() {
-        if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+        if (isInMainHomePage()) {
             RelativeLayout transfersWidgetLayout = findViewById(R.id.transfers_widget_layout);
             if (transfersWidgetLayout == null) return;
 
@@ -6311,8 +6313,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * Update the PSA view visibility. It should only visible in root homepage tab.
 	 */
     private void updatePsaViewVisibility() {
-		psaViewHolder.toggleVisible(drawerItem == DrawerItem.HOMEPAGE
-				&& mHomepageScreen == HomepageScreen.HOMEPAGE);
+		psaViewHolder.toggleVisible(isInMainHomePage());
 		if (psaViewHolder.visible()) {
 			handler.post(this::updateHomepageFabPosition);
 		} else {
@@ -11030,7 +11031,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			abL.setElevation(0);
 		}
 
-		ColorUtils.changeStatusBarColorForElevation(this, mElevationCause > 0);
+		ColorUtils.changeStatusBarColorForElevation(this,
+				mElevationCause > 0 && !isInMainHomePage());
 	}
 
 	public long getParentHandleInbox() {
@@ -11652,7 +11654,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) transfersWidgetLayout.getLayoutParams();
         params.gravity = Gravity.END;
 
-        if (!bNVHidden && drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE) {
+        if (!bNVHidden && isInMainHomePage()) {
             params.bottomMargin = Util.dp2px(TRANSFER_WIDGET_MARGIN_BOTTOM, outMetrics);
         } else {
             params.bottomMargin = 0;
@@ -11800,5 +11802,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		} else {
 			showOpenLinkError(true, 0);
 		}
+	}
+
+	/**
+	 * Checks if the current screen is the main of Home.
+	 *
+	 * @return True if the current screen is the main of Home, false otherwise.
+	 */
+	public boolean isInMainHomePage() {
+		return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE;
 	}
 }

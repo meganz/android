@@ -722,10 +722,35 @@ public class FileUtil {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q;
     }
 
+    /**
+     * The full path of a SD card URI has two parts:
+     * 1. SD card root path, can get it from SDCardOperator. For example: /storage/2BA3-12F1.
+     * 2. User selected specific folder path on the SD card, can get it from getDocumentPathFromTreeUri.
+     *
+     * @param treeUri The URI of the selected SD card location.
+     * @param con Context object.
+     * @return Path of the selected SD card location.
+     */
     @Nullable
     public static String getFullPathFromTreeUri(@Nullable final Uri treeUri, Context con) {
         if (treeUri == null) return null;
-        String volumePath = getVolumePath(getVolumeIdFromTreeUri(treeUri), con);
+
+        String volumePath;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            SDCardOperator operator;
+            try {
+                operator = new SDCardOperator(con);
+            } catch (SDCardOperator.SDCardException e) {
+                e.printStackTrace();
+                logError(e.getMessage(), e);
+                return null;
+            }
+
+            volumePath = operator.getSDCardRoot();
+        } else {
+            volumePath = getVolumePath(getVolumeIdFromTreeUri(treeUri), con);
+        }
+
         if (volumePath == null) return File.separator;
         if (volumePath.endsWith(File.separator))
             volumePath = volumePath.substring(0, volumePath.length() - 1);
@@ -742,10 +767,7 @@ public class FileUtil {
         } else return volumePath;
     }
 
-
-    @SuppressLint("ObsoleteSdkInt")
     private static String getVolumePath(final String volumeId, Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) return null;
         try {
             StorageManager mStorageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
             Class<?> storageVolumeClazz = Class.forName("android.os.storage.StorageVolume");

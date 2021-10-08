@@ -18,8 +18,7 @@ class LeftMeetingActivity : PasscodeActivity() {
     private lateinit var binding: ActivityGuestLeaveMeetingBinding
 
     private val callStatusObserver = Observer<MegaChatCall> {
-        if ((it.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION ||
-                    it.status == MegaChatCall.CALL_STATUS_DESTROYED) &&
+        if (it.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION&&
             it.termCode == MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS
         ) {
             Util.showSnackbar(
