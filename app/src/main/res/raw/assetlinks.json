@@ -6,4 +6,20 @@
     "sha256_cert_fingerprints":
     ["08:F4:21:22:33:5A:39:02:DD:96:03:CC:BF:F7:A8:DE:5C:CC:EF:DC:21:1E:03:DA:B1:8E:25:92:59:7D:AF:5B"]
   }
-}]
+},
+  {
+    "relation": ["delegate_permission/common.get_login_creds"],
+    "target": {
+      "namespace": "web",
+      "site": "http://89.44.169.135"
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.get_login_creds"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "mega.privacy.android.app",
+      "sha256_cert_fingerprints":
+      ["08:F4:21:22:33:5A:39:02:DD:96:03:CC:BF:F7:A8:DE:5C:CC:EF:DC:21:1E:03:DA:B1:8E:25:92:59:7D:AF:5B"]
+    }
+  }]
