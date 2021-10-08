@@ -90,7 +90,7 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
         val dialog = dialog ?: return
         BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
-            BottomSheetBehavior.STATE_EXPANDED
+            BottomSheetBehavior.STATE_HALF_EXPANDED
     }
 
     override fun onResume() {
