@@ -14,6 +14,7 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import mega.privacy.android.app.R
 import org.jetbrains.anko.contentView
+import org.jetbrains.anko.displayMetrics
 
 /**
  * A helper class for showing highlight hint on certain UI elements.
@@ -74,10 +75,8 @@ class HighLightHintHelper(private val activity: Activity) {
         textCoverHeight = Util.dp2px(TEXT_COVER_HEIGHT_DP)
         arrowSize = Util.dp2px(ARROW_SIZE_DP)
 
-        val metrics = DisplayMetrics()
-        activity.windowManager.defaultDisplay.getMetrics(metrics)
-        screenWidth = metrics.widthPixels
-        screenHeight = metrics.heightPixels
+        screenWidth = activity.displayMetrics.widthPixels
+        screenHeight = activity.displayMetrics.heightPixels
     }
 
     /**
@@ -222,7 +221,7 @@ class HighLightHintHelper(private val activity: Activity) {
         targetLocation.right - targetLocation.left,
         targetLocation.bottom - targetLocation.top
     ).apply {
-        leftMargin = targetLocation.left
+        leftMargin = targetLocation.left + navigationBarHeight
         topMargin = targetLocation.top + statusBarHeight
     }
 
@@ -255,7 +254,7 @@ class HighLightHintHelper(private val activity: Activity) {
     ).apply {
         // Point to the middle of the cover.
         leftMargin =
-            targetLocation.left + (targetLocation.right - targetLocation.left) / 2 - arrowSize / 2
+            targetLocation.left + (targetLocation.right - targetLocation.left) / 2 - arrowSize / 2 + navigationBarHeight
         topMargin = statusBarHeight + targetLocation.bottom
     }
 
@@ -303,10 +302,10 @@ class HighLightHintHelper(private val activity: Activity) {
 
         leftMargin = if (exceedsPart >= 0) {
             // Exceeds screen end. (screenWidth - arrowLeft - arrowSize) / 4 is a bit of offset.
-            arrowLeft - exceedsPart - (screenWidth - arrowLeft - arrowSize) / 4
+            arrowLeft - exceedsPart - (screenWidth - arrowLeft - arrowSize) / 4 + navigationBarHeight
         } else {
             // arrowLeft / 4 is a bit of offset.
-            arrowLeft / 4
+            arrowLeft / 4 + navigationBarHeight
         }
 
         topMargin = targetLocation.bottom + statusBarHeight + arrowSize
