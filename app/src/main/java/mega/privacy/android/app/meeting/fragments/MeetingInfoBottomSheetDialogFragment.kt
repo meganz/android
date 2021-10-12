@@ -144,6 +144,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
      * Show dialog for changing the meeting name, only for moderator
      */
     @ExperimentalCoroutinesApi
+    @Suppress("DEPRECATION")
     fun showRenameGroupDialog() {
         val activity = requireActivity()
         val layout = LinearLayout(requireActivity())

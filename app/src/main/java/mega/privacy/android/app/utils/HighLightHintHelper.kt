@@ -97,6 +97,7 @@ class HighLightHintHelper(private val activity: Activity) {
         if(MANUFACTURE_HUAWEI.equals(Build.MANUFACTURER, true)) return false
 
         // Rotate to right, navigation bar will stay at the left of the screen.
+        @Suppress("DEPRECATION")
         return windowManager.defaultDisplay.rotation == Surface.ROTATION_270
     }
 
@@ -105,6 +106,7 @@ class HighLightHintHelper(private val activity: Activity) {
      *
      * @return A pair, the first element is real metrics, the second is metrics.
      */
+    @Suppress("DEPRECATION")
     private fun getMetrics(): Pair<DisplayMetrics, DisplayMetrics> {
         val display = activity.windowManager.defaultDisplay
 

@@ -52,6 +52,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
     }
 
     @ExperimentalCoroutinesApi
+    @Suppress("DEPRECATION")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val display = meetingActivity.windowManager.defaultDisplay
