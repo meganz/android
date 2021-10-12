@@ -363,7 +363,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             val intent = ImageViewerActivity.getIntentForChildren(
                 requireContext(),
                 childrenHandles = viewModel.getHandlesOfPhotos()!!,
-                currentNodePosition = nodeItem.photoIndex
+                currentNodeHandle = nodeItem.node?.handle
             )
             startActivity(intent)
         }

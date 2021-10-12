@@ -538,7 +538,7 @@ public class InboxFragmentLollipop extends RotatableFragment{
 					requireContext(),
 					megaApi.getParentNode(node).getHandle(),
 					sortOrderManagement.getOrderCloud(),
-					position
+					node.getHandle()
 			);
 			startActivity(intent);
 		} else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {

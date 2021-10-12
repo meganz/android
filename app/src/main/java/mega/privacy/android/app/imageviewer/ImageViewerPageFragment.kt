@@ -68,7 +68,7 @@ class ImageViewerPageFragment : Fragment() {
                     onZoomCallback = {
                         if (!fullSizeRequested) {
                             fullSizeRequested = true
-                            viewModel.updateCurrentImage(true)
+                            viewModel.reloadCurrentImage(true)
                         }
                     }
                 )

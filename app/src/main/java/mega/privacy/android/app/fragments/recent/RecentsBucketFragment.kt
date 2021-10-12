@@ -283,11 +283,10 @@ class RecentsBucketFragment : BaseFragment() {
     private fun openImage(node: MegaNode) {
         val handles = getNodesHandles(true)
         val intent = if (handles != null && handles.isNotEmpty()) {
-            val position = handles.indexOfFirst { it == node.handle }
             ImageViewerActivity.getIntentForChildren(
                 requireContext(),
                 handles,
-                if (position != -1) position else 0
+                node.handle
             )
         } else {
             ImageViewerActivity.getIntentForSingleNode(

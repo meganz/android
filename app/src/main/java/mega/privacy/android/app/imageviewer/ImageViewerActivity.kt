@@ -27,7 +27,6 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
-import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
@@ -55,12 +54,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
             context: Context,
             parentNodeHandle: Long,
             childOrder: Int = ORDER_PHOTO_ASC,
-            currentNodePosition: Int = 0
+            currentNodeHandle: Long? = null
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentNodeHandle)
                 putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, childOrder)
-                putExtra(INTENT_EXTRA_KEY_POSITION, currentNodePosition)
+                putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
             }
 
         @JvmStatic
@@ -68,26 +67,25 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         fun getIntentForChildren(
             context: Context,
             childrenHandles: LongArray,
-            currentNodePosition: Int = 0
+            currentNodeHandle: Long? = null
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(NODE_HANDLES, childrenHandles)
-                putExtra(INTENT_EXTRA_KEY_POSITION, currentNodePosition)
+                putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
             }
 
         @JvmStatic
         fun getIntentForOfflineChildren(
             context: Context,
             childrenHandles: LongArray,
-            currentNodePosition: Int = 0
+            currentNodeHandle: Long? = null
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE, childrenHandles)
-                putExtra(INTENT_EXTRA_KEY_POSITION, currentNodePosition)
+                putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
             }
     }
 
-    private val nodePosition: Int by extraNotNull(INTENT_EXTRA_KEY_POSITION, 0)
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
     private val childrenHandles: LongArray? by extra(NODE_HANDLES)
@@ -100,7 +98,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                viewModel.setCurrentPosition(position)
+                viewModel.updateCurrentPosition(position)
             }
         }
     }
@@ -120,30 +118,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         super.onCreate(savedInstanceState)
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setupView()
 
         if (savedInstanceState?.containsKey(KEY_DEFAULT_PAGE_SET) == true) {
             defaultPageSet = savedInstanceState.getBoolean(KEY_DEFAULT_PAGE_SET)
         }
 
-        when {
-            parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
-                viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder)
-            }
-            childrenHandles != null && childrenHandles!!.isNotEmpty() -> {
-                viewModel.retrieveImages(childrenHandles!!.toList())
-            }
-            childrenOfflineHandles != null && childrenOfflineHandles!!.isNotEmpty() -> {
-                viewModel.retrieveOfflineImages(childrenOfflineHandles!!.toList())
-            }
-            nodeHandle != null && nodeHandle != INVALID_HANDLE -> {
-                viewModel.retrieveSingleImage(nodeHandle!!)
-            }
-            else -> {
-                error("Invalid params")
-            }
-        }
-
+        setupView()
         setupObservers()
     }
 
@@ -175,24 +155,32 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     }
 
     private fun setupObservers() {
-        viewModel.setCurrentPosition(nodePosition)
-        viewModel.getImagesHandle().observe(this, ::showImages)
-        viewModel.getCurrentImage().observe(this, ::showCurrentImageInfo)
-        viewModel.onSwitchToolbar().observe(this) {
-            if (binding.motion.currentState == R.id.start) {
-                binding.motion.transitionToEnd()
-            } else {
-                binding.motion.transitionToStart()
+        when {
+            parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
+                viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
+            }
+            childrenHandles != null && childrenHandles!!.isNotEmpty() -> {
+                viewModel.retrieveImages(childrenHandles!!.toList(), nodeHandle)
+            }
+            childrenOfflineHandles != null && childrenOfflineHandles!!.isNotEmpty() -> {
+                viewModel.retrieveOfflineImages(childrenOfflineHandles!!.toList(), nodeHandle)
+            }
+            nodeHandle != null && nodeHandle != INVALID_HANDLE -> {
+                viewModel.retrieveSingleImage(nodeHandle!!)
+            }
+            else -> {
+                error("Invalid params")
             }
         }
-    }
 
-    private fun showImages(handles: List<Long>?) {
-        pagerAdapter.submitList(handles) {
+        viewModel.getImagesHandle().observe(this, pagerAdapter::submitList)
+        viewModel.getCurrentImage().observe(this, ::showCurrentImageInfo)
+        viewModel.onSwitchToolbar().observe(this) { switchToolbarVisibility() }
+        viewModel.getInitialPosition().observe(this) { position ->
             if (!defaultPageSet) {
                 defaultPageSet = true
                 binding.viewPager.waitForLayout {
-                    binding.viewPager.setCurrentItem(nodePosition, false)
+                    binding.viewPager.setCurrentItem(position, false)
                 }
             }
         }
@@ -213,8 +201,16 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         }
     }
 
+    private fun switchToolbarVisibility() {
+        if (binding.motion.currentState == R.id.start) {
+            binding.motion.transitionToEnd()
+        } else {
+            binding.motion.transitionToStart()
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val currentNodeHandle = viewModel.getCurrentHandle()
+        val currentNodeHandle = viewModel.getCurrentHandle().value!!
 
         return when (item.itemId) {
             android.R.id.home -> {
@@ -277,7 +273,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     }
 
     override fun actionConfirmed() {
-        viewModel.updateCurrentImage(false)
+        viewModel.reloadCurrentImage(false)
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

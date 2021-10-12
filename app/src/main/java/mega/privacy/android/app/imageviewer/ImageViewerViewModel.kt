@@ -19,7 +19,6 @@ import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.MegaNodeItem
 import mega.privacy.android.app.utils.LogUtil.logError
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageUseCase: GetImageUseCase,
@@ -28,15 +27,15 @@ class ImageViewerViewModel @ViewModelInject constructor(
     private val exportNodeUseCase: ExportNodeUseCase
 ) : BaseRxViewModel() {
 
-    private var currentHandle = INVALID_HANDLE
-    private val currentPosition = MutableLiveData(0)
+    private val currentHandle = MutableLiveData<Long>()
+    private val initialPosition = MutableLiveData<Int>()
     private val images: MutableLiveData<List<ImageItem>> = MutableLiveData()
     private val switchToolbar: MutableLiveData<Unit> = MutableLiveData()
 
-    fun getCurrentHandle(): Long = currentHandle
+    fun getCurrentHandle(): LiveData<Long> = currentHandle
 
     fun getCurrentImage(): LiveData<ImageItem?> =
-        Transformations.switchMap(currentPosition) { position -> getImage(position) }
+        Transformations.switchMap(currentHandle) { currentHandle -> getImage(currentHandle) }
 
     fun getImagesHandle(): LiveData<List<Long>> =
         images.map { items -> items.map(ImageItem::handle) }
@@ -44,8 +43,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     fun getImage(nodeHandle: Long): LiveData<ImageItem?> =
         images.map { items -> items.firstOrNull { it.handle == nodeHandle } }
 
-    fun getImage(position: Int): LiveData<ImageItem?> =
-        images.map { items -> items.getOrNull(position) }
+    fun getInitialPosition(): LiveData<Int> = initialPosition
 
     fun onSwitchToolbar(): LiveData<Unit> = switchToolbar
 
@@ -64,13 +62,23 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun retrieveImagesFromParent(parentNodeHandle: Long, childOrder: Int? = null) {
+    fun retrieveImagesFromParent(
+        parentNodeHandle: Long,
+        childOrder: Int? = null,
+        currentNodeHandle: Long? = null
+    ) {
         getImageHandlesUseCase.getChildren(parentNodeHandle, childOrder)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { imageItems ->
                     images.value = imageItems.toList()
+
+                    val currentIndex = imageItems.indexOfFirst { it.handle == currentNodeHandle }
+                    if (currentIndex != -1) {
+                        currentHandle.value = currentNodeHandle!!
+                        initialPosition.value = currentIndex
+                    }
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
@@ -79,13 +87,22 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun retrieveImages(nodeHandles: List<Long>) {
+    fun retrieveImages(
+        nodeHandles: List<Long>,
+        currentNodeHandle: Long? = null
+    ) {
         getImageHandlesUseCase.get(nodeHandles)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { imageItems ->
                     images.value = imageItems.toList()
+
+                    val currentIndex = imageItems.indexOfFirst { it.handle == currentNodeHandle }
+                    if (currentIndex != -1) {
+                        currentHandle.value = currentNodeHandle!!
+                        initialPosition.value = currentIndex
+                    }
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
@@ -94,13 +111,22 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun retrieveOfflineImages(nodeHandles: List<Long>) {
+    fun retrieveOfflineImages(
+        nodeHandles: List<Long>,
+        currentNodeHandle: Long? = null
+    ) {
         getImageHandlesUseCase.getOffline(nodeHandles)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { imageItems ->
                     images.value = imageItems.toList()
+
+                    val currentIndex = imageItems.indexOfFirst { it.handle == currentNodeHandle }
+                    if (currentIndex != -1) {
+                        currentHandle.value = currentNodeHandle!!
+                        initialPosition.value = currentIndex
+                    }
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
@@ -239,14 +265,15 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun updateCurrentImage(fullSize: Boolean) {
-        loadSingleImage(currentHandle, fullSize)
+    fun reloadCurrentImage(fullSize: Boolean) {
+        currentHandle.value?.let { loadSingleImage(it, fullSize) }
     }
 
-    fun setCurrentPosition(position: Int) {
-        currentPosition.value = position
+    fun updateCurrentPosition(position: Int) {
         images.value?.get(position)?.handle?.let { handle ->
-            currentHandle = handle
+            if (handle != currentHandle.value) {
+                currentHandle.value = handle
+            }
         }
     }
 

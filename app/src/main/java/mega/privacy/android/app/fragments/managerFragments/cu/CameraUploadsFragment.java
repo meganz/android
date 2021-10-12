@@ -559,7 +559,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 requireContext(),
                 parentNode.getHandle(),
                 sortOrderManagement.getOrderCamera(),
-                cuNode.getIndexForViewer()
+                node.getHandle()
         );
         startActivity(intent);
     }

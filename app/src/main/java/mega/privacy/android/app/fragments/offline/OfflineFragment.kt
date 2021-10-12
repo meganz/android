@@ -528,7 +528,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 val intent = ImageViewerActivity.getIntentForOfflineChildren(
                     requireContext(),
                     handles,
-                    position
+                    node.node.handle.toLongOrNull()
                 )
                 startActivity(intent)
             }
