@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -14,20 +13,22 @@
             type="mega.privacy.android.app.fragments.homepage.photos.PhotosViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <include
             android:id="@+id/empty_hint"
-            layout="@layout/empty_result_files"
+            layout="@layout/empty_result_photos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             app:showHint="@{viewModel.items.empty}" />
 
-        <mega.privacy.android.app.components.NewGridRecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/photo_list"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:columnWidth="@dimen/photo_item_width"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:paddingBottom="@dimen/grid_node_list_padding_bottom"
             app:items="@{viewModel.items}"
             app:layout_constraintBottom_toTopOf="@id/mini_audio_player"
@@ -40,25 +41,19 @@
             android:id="@+id/scroller"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
+            android:layout_gravity="end"
             android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@id/mini_audio_player"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:visibleGone="@{viewModel.items.size() > (viewModel.searchMode ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}" />
 
-        <com.google.android.exoplayer2.ui.PlayerView
-            android:id="@+id/mini_audio_player"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/audio_player_mini_controller_height"
-            android:background="?attr/colorPrimary"
-            android:visibility="gone"
-            app:controller_layout_id="@layout/audio_player_control_in_mini_player"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:player_layout_id="@layout/audio_player_view_controller_only"
-            app:surface_type="none"
-            tools:visibility="visible" />
+        <include
+            android:id="@+id/photos_view_type"
+            layout="@layout/cu_view_type_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="@dimen/cu_view_type_button_vertical_margin" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

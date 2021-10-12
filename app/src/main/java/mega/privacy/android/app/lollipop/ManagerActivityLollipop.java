@@ -130,6 +130,7 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
+import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -228,7 +229,9 @@ import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.TimeUtils;
+import mega.privacy.android.app.utils.ZoomUtil;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
+import mega.privacy.android.app.viewmodel.ZoomViewModel;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -284,6 +287,9 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.ColorUtils.tintIcon;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT;
+import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X;
+import static mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_2X;
 import static mega.privacy.android.app.utils.billing.PaymentUtils.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.NODE_HANDLE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
@@ -331,8 +337,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     public static final String LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK";
     public static final String CONNECTED = "CONNECTED";
     private static final String PROCESS_FILE_DIALOG_SHOWN = "PROGRESS_DIALOG_SHOWN";
-
-    private static final String SMALL_GRID = "SMALL_GRID";
 
 	public static final int ERROR_TAB = -1;
 	public static final int INCOMING_TAB = 0;
@@ -510,7 +514,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			switch(this)
 			{
 				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
-				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
+				case CAMERA_UPLOADS: return context.getString(R.string.sortby_type_photo_first);
 				case INBOX: return context.getString(R.string.section_inbox);
 				case SHARED_ITEMS: return context.getString(R.string.title_shared_items);
 				case SETTINGS: return context.getString(R.string.action_settings);
@@ -595,8 +599,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
        	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO, RECENT_BUCKET
 	}
 
-	public boolean isSmallGridCameraUploads = false;
-
 	public boolean isList = true;
 
 	private long parentHandleBrowser;
@@ -655,7 +657,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private AlertDialog newTextFileDialog;
 
 	private MenuItem searchMenuItem;
-	private MenuItem gridSmallLargeMenuItem;
+	private MenuItem zoomOutMenuItem;
+	private MenuItem zoomInMenuItem;
 	private MenuItem addContactMenuItem;
 	private MenuItem addMenuItem;
 	private MenuItem createFolderMenuItem;
@@ -718,6 +721,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private boolean onAskingPermissionsFragment = false;
 	public boolean onAskingSMSVerificationFragment = false;
+
+	@Inject
+	ZoomViewModel zoomViewModel;
+    private int currentZoom = ZOOM_DEFAULT;
 
 	private View mNavHostView;
 	private NavController mNavController;
@@ -1304,7 +1311,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink);
 		outState.putBoolean(CONNECTED, connected);
 		outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded);
-		outState.putBoolean(SMALL_GRID, isSmallGridCameraUploads);
 
 		if (getCameraUploadFragment() != null) {
 			getSupportFragmentManager().putFragment(outState, FragmentTag.CAMERA_UPLOADS.getTag(), cuFragment);
@@ -1414,7 +1420,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK);
 			connected = savedInstanceState.getBoolean(CONNECTED, false);
 			isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false);
-			isSmallGridCameraUploads = savedInstanceState.getBoolean(SMALL_GRID, false);
 
 			nodeAttacher.restoreState(savedInstanceState);
 			nodeSaver.restoreState(savedInstanceState);
@@ -1499,6 +1504,29 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
         createCacheFolders(this);
 
+        zoomViewModel.getZoom().observe(this, zoom -> {
+            // Out 3X: organize by year, In 1X: oragnize by day, both need to reload nodes.
+            boolean needReload = ZoomUtil.INSTANCE.needReload(currentZoom, zoom);
+            currentZoom = zoom;
+
+            if (drawerItem == DrawerItem.CAMERA_UPLOADS) {
+                refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
+
+                if (needReload) {
+                    refreshCUNodes();
+                }
+            }
+
+            if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS ) {
+                PhotosFragment photosFragment = getFragmentByType(PhotosFragment.class);
+                photosFragment.refreshSelf();
+
+                if (needReload) {
+                    photosFragment.loadPhotos();
+                }
+            }
+        });
+
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		managerActivity = this;
@@ -1572,10 +1600,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		if (prefs == null){
 			firstTimeAfterInstallation = true;
 			isList=true;
-
-			if (savedInstanceState == null) {
-				isSmallGridCameraUploads = false;
-			}
 		}
 		else{
 			if (prefs.getFirstTime() == null){
@@ -1588,10 +1612,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 			else{
 				isList = Boolean.parseBoolean(prefs.getPreferredViewList());
-			}
-
-			if (savedInstanceState == null) {
-				isSmallGridCameraUploads = dbH.isSmallGridCamera();
 			}
 		}
 		logDebug("Preferred View List: " + isList);
@@ -3846,7 +3866,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					aB.setTitle(getString(R.string.settings_camera_upload_on).toUpperCase());
 				} else {
 					setFirstNavigationLevel(true);
-					aB.setTitle(getString(R.string.section_photo_sync).toUpperCase());
+					aB.setTitle(getString(R.string.sortby_type_photo_first).toUpperCase());
 				}
 				break;
 			}
@@ -3856,7 +3876,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 				switch (mHomepageScreen) {
 					case PHOTOS:
-						titleId = R.string.sortby_type_photo_first;
+						titleId = R.string.section_images;
 						break;
 					case DOCUMENTS:
 						titleId = R.string.section_documents;
@@ -4425,6 +4445,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (bottomNavigationCurrentItem == HOMEPAGE_BNV) {
 					abL.setVisibility(View.GONE);
 				}
+
+                if (transfersWidget != null) {
+                    transfersWidget.update();
+                }
+
 				setDrawerLockMode(false);
 				return;
 			} else if (destinationId == R.id.photosFragment) {
@@ -4447,6 +4472,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				mHomepageScreen = HomepageScreen.RECENT_BUCKET;
 			}
 
+			transfersWidget.update();
 			updatePsaViewVisibility();
 			abL.setVisibility(View.VISIBLE);
 			showHideBottomNavigationView(true);
@@ -4583,6 +4609,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				supportInvalidateOptionsMenu();
 				showFabButton();
 				showHideBottomNavigationView(false);
+                refreshCUNodes();
 				if (!comesFromNotifications) {
 					bottomNavigationCurrentItem = CAMERA_UPLOADS_BNV;
 				}
@@ -5206,7 +5233,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			}
 		});
 
-		gridSmallLargeMenuItem = menu.findItem(R.id.action_grid_view_large_small);
+		zoomOutMenuItem = menu.findItem(R.id.action_zoom_out);
+		zoomInMenuItem = menu.findItem(R.id.action_zoom_in);
 		addContactMenuItem = menu.findItem(R.id.action_add_contact);
 		addMenuItem = menu.findItem(R.id.action_add);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
@@ -5273,6 +5301,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					if (mHomepageScreen == HomepageScreen.FULLSCREEN_OFFLINE) {
 						updateFullscreenOfflineFragmentOptionMenu(true);
 					}
+
 					break;
 				case RUBBISH_BIN:
 					if (getRubbishBinFragment() != null && rubbishBinFLol.getItemCount() > 0) {
@@ -5284,7 +5313,16 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					}
 					break;
 				case CAMERA_UPLOADS:
-					gridSmallLargeMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                    zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                    zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                    if (currentZoom == ZOOM_OUT_2X) {
+                        ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
+                    }
+
+                    if (currentZoom == ZOOM_IN_1X) {
+                        ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
+                    }
 
 					updateCuFragmentOptionsMenu();
 					break;
@@ -5409,6 +5447,21 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			} else {
 				if (mHomepageSearchable != null) {
 					searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
+
+                    if (mHomepageScreen == HomepageScreen.PHOTOS) {
+                        zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                        zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+                        if (currentZoom == ZOOM_OUT_2X) {
+                            ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
+                        }
+
+                        if (currentZoom == ZOOM_IN_1X) {
+                            ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
+                        }
+
+                        updatePhotosFragmentOptionsMenu();
+                    }
 				}
 			}
 		}
@@ -5490,28 +5543,30 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         return null;
     }
 
-	public void updateCuFragmentOptionsMenu() {
-		if (selectMenuItem == null || sortByMenuItem == null || gridSmallLargeMenuItem == null) {
-			return;
-		}
+    public void updateCuFragmentOptionsMenu() {
+        if (selectMenuItem == null || sortByMenuItem == null || zoomOutMenuItem == null || zoomInMenuItem == null) {
+            return;
+        }
 
-		if (drawerItem == DrawerItem.CAMERA_UPLOADS
-				&& getCameraUploadFragment() != null
-				&& cuFragment.getItemCount() > 0) {
-			boolean visible = cuFragment.shouldShowFullInfoAndOptions();
-			sortByMenuItem.setVisible(visible);
-			setCuThumbnailTypeIcon();
-			gridSmallLargeMenuItem.setVisible(visible);
-		}
-	}
+        if (drawerItem == DrawerItem.CAMERA_UPLOADS && getCameraUploadFragment() != null && cuFragment.getItemCount() > 0) {
+            boolean visible = cuFragment.shouldShowFullInfoAndOptions();
+            sortByMenuItem.setVisible(visible);
+            zoomOutMenuItem.setVisible(visible);
+            zoomInMenuItem.setVisible(visible);
+        }
+    }
 
-	private void setCuThumbnailTypeIcon() {
-		if (isSmallGridCameraUploads) {
-			gridSmallLargeMenuItem.setIcon(R.drawable.ic_thumbnail_view);
-		} else {
-			gridSmallLargeMenuItem.setIcon(R.drawable.ic_menu_gridview_small);
-		}
-	}
+    public void updatePhotosFragmentOptionsMenu() {
+        if (zoomOutMenuItem == null || zoomInMenuItem == null) {
+            return;
+        }
+
+        PhotosFragment photosFragment = getFragmentByType(PhotosFragment.class);
+        boolean shouldShow = photosFragment.shouldShowZoomMenuItem();
+
+        zoomOutMenuItem.setVisible(shouldShow);
+        zoomInMenuItem.setVisible(shouldShow);
+    }
 
 	private void setGridListIcon() {
 		if (isList){
@@ -5832,35 +5887,26 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	        	return true;
 	        }
-	        case R.id.action_grid_view_large_small:{
-				if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-					isSmallGridCameraUploads = !isSmallGridCameraUploads;
-					dbH.setSmallGridCamera(isSmallGridCameraUploads);
+            case R.id.action_zoom_out: {
+                if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
+                    zoomOut();
+                }
+                return true;
+            }
+            case R.id.action_zoom_in: {
+                if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
+                    zoomIn();
+                }
 
-					setCuThumbnailTypeIcon();
+                return true;
+            }
+            case R.id.action_grid: {
+                logDebug("action_grid selected");
 
-					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
-	        	}
-	        	return true;
-	        }
-	        case R.id.action_grid:{
-				logDebug("action_grid selected");
-	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-					logDebug("action_grid_list in CameraUploads");
-					if(!firstLogin) {
-						gridSmallLargeMenuItem.setVisible(true);
-					}else{
-						gridSmallLargeMenuItem.setVisible(false);
-					}
-					searchMenuItem.setVisible(false);
-					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
-				} else {
-					updateView(!isList);
-				}
-	        	supportInvalidateOptionsMenu();
-
-	        	return true;
-	        }
+                updateView(!isList);
+                supportInvalidateOptionsMenu();
+                return true;
+            }
 	        case R.id.action_menu_clear_rubbish_bin:{
 	        	showClearRubbishBinDialog();
 	        	return true;
@@ -5934,7 +5980,37 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-    private void hideItemsWhenSearchSelected() {
+    public void zoomIn() {
+        if (currentZoom < ZOOM_IN_1X) {
+            // Don't use currentZoom++, shouldn't change the value of currentZoom here.
+            zoomViewModel.setZoom(currentZoom + 1);
+            ZoomUtil.INSTANCE.enableButton(this, zoomOutMenuItem);
+        }
+
+        if (currentZoom == ZOOM_IN_1X) {
+            ZoomUtil.INSTANCE.disableButton(this, zoomInMenuItem);
+        }
+    }
+
+    public void zoomOut() {
+        if (currentZoom > ZOOM_OUT_2X) {
+            // Don't use currentZoom--, shouldn't change the value of currentZoom here.
+            zoomViewModel.setZoom(currentZoom - 1);
+            ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
+        }
+
+        if (currentZoom == ZOOM_OUT_2X) {
+            ZoomUtil.INSTANCE.disableButton(this, zoomOutMenuItem);
+        }
+    }
+
+    public void restoreDefaultZoom() {
+        zoomViewModel.setZoom(ZOOM_DEFAULT);
+		ZoomUtil.INSTANCE.enableButton(this, zoomInMenuItem);
+		ZoomUtil.INSTANCE.enableButton(this, zoomOutMenuItem);
+    }
+
+	private void hideItemsWhenSearchSelected() {
         textSubmitted = false;
         if (createFolderMenuItem != null) {
 			doNotDisturbMenuItem.setVisible(false);
@@ -5952,7 +6028,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             importLinkMenuItem.setVisible(false);
             takePicture.setVisible(false);
             helpMenuItem.setVisible(false);
-            gridSmallLargeMenuItem.setVisible(false);
+            zoomOutMenuItem.setVisible(false);
+            zoomInMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
             selectMenuItem.setVisible(false);
             thumbViewMenuItem.setVisible(false);
@@ -10617,13 +10694,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		return false;
 	}
 
-	public boolean isSmallGridCameraUploads() {
-		return isSmallGridCameraUploads;
-	}
-	public void setSmallGridCameraUploads(boolean isSmallGridCameraUploads) {
-		this.isSmallGridCameraUploads = isSmallGridCameraUploads;
-	}
-
 	public boolean getFirstLogin() {
 		return firstLogin;
 	}
@@ -11804,12 +11874,29 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	/**
-	 * Checks if the current screen is the main of Home.
-	 *
-	 * @return True if the current screen is the main of Home, false otherwise.
-	 */
-	public boolean isInMainHomePage() {
-		return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE;
-	}
+    /**
+     * Checks if the current screen is the main of Home.
+     *
+     * @return True if the current screen is the main of Home, false otherwise.
+     */
+    public boolean isInMainHomePage() {
+        return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.HOMEPAGE;
+    }
+
+    /**
+     * Checks if the current screen is photos section of Homepage.
+     *
+     * @return True if the current screen is the photos, false otherwise.
+     */
+    public boolean isInPhotosPage() {
+        return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS;
+    }
+
+    public void hideTransferWidget() {
+        transfersWidget.hide();
+    }
+
+    public int getCurrentZoom() {
+        return currentZoom;
+    }
 }

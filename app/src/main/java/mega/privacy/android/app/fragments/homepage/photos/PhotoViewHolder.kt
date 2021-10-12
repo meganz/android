@@ -2,6 +2,7 @@ package mega.privacy.android.app.fragments.homepage.photos
 
 import androidx.core.view.isVisible
 import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemNodeListBinding
@@ -10,10 +11,12 @@ import mega.privacy.android.app.databinding.ItemPhotosTitleBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
 import mega.privacy.android.app.fragments.homepage.ItemOperationViewModel
+import mega.privacy.android.app.utils.ZoomUtil
+import mega.privacy.android.app.utils.ZoomUtil.getMargin
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
-class PhotoViewHolder(val binding: ViewDataBinding) :
+class PhotoViewHolder(val binding: ViewDataBinding, private val zoom: Int = 0) :
     RecyclerView.ViewHolder(binding.root) {
 
     @MegaApi
@@ -33,6 +36,17 @@ class PhotoViewHolder(val binding: ViewDataBinding) :
                     this.item = item
 
                     thumbnail.isVisible = true
+
+                    val layoutParams = root.layoutParams as GridLayoutManager.LayoutParams
+                    val imageMargin = getMargin(root.context, zoom)
+
+                    if (zoom == ZoomUtil.ZOOM_IN_1X) {
+                        layoutParams.setMargins(0, imageMargin, 0, imageMargin)
+                    } else {
+                        layoutParams.setMargins(imageMargin, imageMargin, imageMargin, imageMargin)
+                    }
+
+                    root.layoutParams = layoutParams
                 }
                 is ItemNodeListBinding -> {
                     this.itemOperationViewModel = itemOperationViewModel

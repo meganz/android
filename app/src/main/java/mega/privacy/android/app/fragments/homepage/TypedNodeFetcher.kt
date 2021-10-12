@@ -3,18 +3,21 @@ package mega.privacy.android.app.fragments.homepage
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.text.Spanned
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
+import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.photos.PhotoNodeItem
 import mega.privacy.android.app.listeners.BaseListener
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.ThumbnailUtilsLollipop
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.*
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import nz.mega.sdk.*
 import java.io.File
+import java.lang.Exception
 import java.time.LocalDate
+import java.time.Year
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ofPattern
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
@@ -26,7 +29,8 @@ class TypedNodesFetcher(
     private val megaApi: MegaApiAndroid,
     private val type: Int = MegaApiJava.FILE_TYPE_DEFAULT,
     private val order: Int = MegaApiJava.ORDER_DEFAULT_ASC,
-    private val selectedNodesMap: LinkedHashMap<Any, NodeItem>
+    private val selectedNodesMap: LinkedHashMap<Any, NodeItem>,
+    private val zoom: Int
 ) {
     val result = MutableLiveData<List<NodeItem>>()
 
@@ -41,6 +45,7 @@ class TypedNodesFetcher(
     private var waitingForRefresh = false
 
     private val getThumbnailNodes = mutableMapOf<MegaNode, String>()
+    private val getPreviewNodes = mutableMapOf<MegaNode, String>()
 
     /**
      * Throttle for updating the LiveData
@@ -59,6 +64,11 @@ class TypedNodesFetcher(
 
     private fun getThumbnailFile(node: MegaNode) = File(
         ThumbnailUtilsLollipop.getThumbFolder(context),
+        node.base64Handle.plus(FileUtil.JPG_EXTENSION)
+    )
+
+    private fun getPreviewFile(node: MegaNode) = File(
+        PreviewUtils.getPreviewFolder(context),
         node.base64Handle.plus(FileUtil.JPG_EXTENSION)
     )
 
@@ -83,33 +93,72 @@ class TypedNodesFetcher(
     }
 
     /**
+     * Get the preview of the file.
+     */
+    private fun getPreview(node: MegaNode): File? {
+        val previewFile = getPreviewFile(node)
+
+        return if (previewFile.exists()) {
+            previewFile
+        } else {
+            // Note down the nodes and going to get their previews from the server
+            // as soon as the getNodeItems finished. (Don't start the getting operation here
+            // for avoiding potential ConcurrentModification issue)
+            if (node.hasPreview()) {
+                getPreviewNodes[node] = previewFile.absolutePath
+            }
+
+            null
+        }
+    }
+
+    /**
      * Get all nodes items
      */
     suspend fun getNodeItems() {
-        var lastModifyDate: LocalDate? = null
+        var lastYearDate: LocalDate? = null
+        var lastMonthDate: LocalDate? = null
+        var lastDayDate: LocalDate? = null
 
         for (node in getMegaNodes()) {
-            val thumbnail = getThumbnail(node)
+            val thumbnail = if(zoom == ZoomUtil.ZOOM_IN_1X) {
+                getPreview(node)
+            } else {
+                getThumbnail(node)
+            }
+
             val modifyDate = Util.fromEpoch(node.modificationTime)
-            val dateString = DateTimeFormatter.ofPattern("MMM uuuu").format(modifyDate)
+            val dateString = ofPattern("MMMM uuuu").format(modifyDate)
+            val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
 
             // Photo "Month-Year" section headers
-            if (type == MegaApiJava.FILE_TYPE_PHOTO && (lastModifyDate == null
-                        || YearMonth.from(lastModifyDate) != YearMonth.from(
-                    modifyDate
-                ))
-            ) {
-                lastModifyDate = modifyDate
-                // RandomUUID() can ensure non-repetitive values in practical purpose
-                fileNodesMap[UUID.randomUUID()] = PhotoNodeItem(
-                    PhotoNodeItem.TYPE_TITLE,
-                    -1,
-                    null,
-                    -1,
-                    dateString,
-                    null,
-                    false
-                )
+            if (type == MegaApiJava.FILE_TYPE_PHOTO) {
+                when(zoom) {
+                    ZoomUtil.ZOOM_OUT_2X -> {
+                        if (lastYearDate == null || Year.from(lastYearDate) != Year.from(modifyDate)) {
+                            lastYearDate = modifyDate
+                            addPhotoDateTitle(dateString, Pair(ofPattern("uuuu").format(modifyDate), ""))
+                        }
+                    }
+                    ZoomUtil.ZOOM_IN_1X -> {
+                        if (lastDayDate == null || lastDayDate.dayOfYear != modifyDate.dayOfYear) {
+                            lastDayDate = modifyDate
+
+                            addPhotoDateTitle(dateString, Pair(
+                                ofPattern("dd MMMM").format(modifyDate),
+                                if (sameYear) "" else ofPattern("uuuu").format(modifyDate)
+                            ))
+                        }
+                    }
+                    else -> {
+                        if (lastMonthDate == null || YearMonth.from(lastMonthDate) != YearMonth.from(modifyDate)) {
+                            lastMonthDate = modifyDate
+                            addPhotoDateTitle(dateString, Pair(ofPattern("MMMM").format(modifyDate),
+                                if (sameYear) "" else ofPattern("uuuu").format(modifyDate)
+                            ))
+                        }
+                    }
+                }
             }
 
             val selected = selectedNodesMap[node.handle]?.selected ?: false
@@ -122,6 +171,7 @@ class TypedNodesFetcher(
                     node,
                     -1,
                     dateString,
+                    null,
                     thumbnail,
                     selected
                 )
@@ -142,6 +192,41 @@ class TypedNodesFetcher(
         result.postValue(ArrayList(fileNodesMap.values))
 
         getThumbnailsFromServer()
+
+        if(zoom == ZoomUtil.ZOOM_IN_1X) {
+            getPreviewsFromServer(getPreviewNodes, ::refreshLiveData)
+        }
+    }
+
+    private fun formatDateTitle(date: Pair<String, String>) : Spanned {
+        var dateText =
+            if (TextUtil.isTextEmpty(date.second)) "[B]" + date.first + "[/B]" else StringResourcesUtils.getString(
+                R.string.cu_month_year_date,
+                date.first,
+                date.second
+            )
+        try {
+            dateText = dateText.replace("[B]", "<font face=\"sans-serif-medium\">")
+                .replace("[/B]", "</font>")
+        } catch (e: Exception) {
+            LogUtil.logWarning("Exception formatting text.", e)
+        }
+
+        return dateText.toSpannedHtmlText()
+    }
+
+    private fun addPhotoDateTitle(dateString: String, date: Pair<String, String>) {
+        // RandomUUID() can ensure non-repetitive values in practical purpose
+        fileNodesMap[UUID.randomUUID()] = PhotoNodeItem(
+            PhotoNodeItem.TYPE_TITLE,
+            -1,
+            null,
+            -1,
+            dateString,
+            formatDateTitle(date),
+            null,
+            false
+        )
     }
 
     private suspend fun getThumbnailsFromServer() {
@@ -165,6 +250,35 @@ class TypedNodesFetcher(
                         }
 
                         refreshLiveData()
+                    }
+                })
+
+            // Throttle the getThumbnail call, or the UI would be non-responsive
+            delay(GET_THUMBNAIL_THROTTLE)
+        }
+    }
+
+    suspend fun getPreviewsFromServer(map: MutableMap<MegaNode, String>, refreshCallback: () -> Unit) {
+        for (item in map) {
+            megaApi.getPreview(
+                item.key,
+                item.value,
+                object : BaseListener(context) {
+                    override fun onRequestFinish(
+                        api: MegaApiJava,
+                        request: MegaRequest,
+                        e: MegaError
+                    ) {
+                        if (e.errorCode != MegaError.API_OK) return
+
+                        request.let {
+                            fileNodesMap[it.nodeHandle]?.apply {
+                                thumbnail = getPreviewFile(item.key).absoluteFile
+                                uiDirty = true
+                            }
+                        }
+
+                        refreshCallback.invoke()
                     }
                 })
 
