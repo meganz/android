@@ -128,14 +128,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
 
     @Inject
     GetImageHandlesUseCase getImageHandlesUseCase;
-
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
     ActionBar aB;
     MaterialToolbar tB;
     NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;
 
-    DatabaseHandler dbH = null;
     public boolean isList = true;
 
     private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
@@ -201,18 +197,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) getApplication()).getMegaApi();
-
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-        }
-
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR || megaChatApi.getInitState() == MegaChatApi.INIT_NOT_DONE) {
-            logDebug("Refresh session - karere");
-            refreshSession();
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
 
@@ -223,8 +208,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         megaChatApi.addNodeHistoryListener(chatId, this);
 
         handler = new Handler();
-
-        dbH = DatabaseHandler.getDbHandler(this);
 
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();

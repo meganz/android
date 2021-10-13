@@ -570,8 +570,6 @@
     <string name="number_contact_not_removed">%d联系人尚未删除</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">已成功与%d 联系人分享文件夹</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">无法与%d位联系人共享文件</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d文件夹共享成功</string>
     <!-- error message when sharing multiple files -->
@@ -649,7 +647,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">文件系统问题</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">浏览本地文件时发生错误。</string>
+    <string name="general_error">执行操作时出错</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">图像浏览器</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1114,7 +1112,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">升级您的云盘。[A]购买Pro会员帐户获得更多存储空间和传输流量。</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA帐户的恢复密钥已保存到：%1s。[A]您可以在离线里找到您的恢复密钥文件。[A]请注意：当您登出帐户时，您的恢复密钥文件将被删除，因此请将其保存在您MEGA帐户以外的安全位置。</string>
+    <string name="toast_master_key">MEGA帐户恢复密钥已保存到：%1s。[A]您可以在离线中找到您的恢复密钥文件。[/A]请注意：登出帐户后，您的恢复密钥文件将被删除，因此请将其保存在您MEGA帐户以外的安全位置。</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">该电子邮件地址已被占用。请使用另一个电子邮件地址。</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1467,7 +1465,7 @@
     <string name="title_message_uploading_options">正在上传附件</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">没有对话历史记录</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]正在输入&#8230;[/A]</item>
     </plurals>
@@ -1876,13 +1874,11 @@
     <string name="title_regitration">注册奖励</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">安装MEGA桌面App</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">帐户基础配额</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">相机上传中无文件</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">剩余%1$d d</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">已过期</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">不使用HTTP</string>
@@ -2523,10 +2519,6 @@
     <string name="context_no_restored">发生错误。项目未还原。</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">发送信息</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="other">联系人已成功发送至聊天</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">尚不支持MEGAdrop文件夹</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3493,7 +3485,7 @@
     <string name="label_verify_credentials">验证凭证</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">未验证</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">已验证</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">授权认证</string>
@@ -3949,6 +3941,8 @@
     <plurals name="get_links">
         <item quantity="other">获取链接</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">清除所有离线文件？</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">只有您一人</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4083,4 +4077,6 @@
     <string name="meeting_me_text_bracket">%1s[A](我)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">主视图</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">登出帐户后，您保存在离线的内容将被删除。</string>
 </resources>

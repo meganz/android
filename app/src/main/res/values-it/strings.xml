@@ -253,7 +253,7 @@
     <!-- when creating the account -->
     <string name="error_passwords_dont_match">Le password non combaciano</string>
     <!-- when creating the account -->
-    <string name="error_email_registered">Questo indirizzo e-Mail è già utilizzato in Mega.</string>
+    <string name="error_email_registered">Questo indirizzo e-mail è già utilizzato da un altro account MEGA</string>
     <!--  -->
     <string name="create_account_creating_account">Connessione al server: registrazione conto</string>
     <!--  -->
@@ -579,8 +579,6 @@
     <string name="number_contact_not_removed">%d contatti non sono stati rimossi</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Cartella condivisa con %d contatti con successo</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Il file non può essere condiviso con %d contatti</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d cartelle condivise con successo</string>
     <!-- error message when sharing multiple files -->
@@ -659,7 +657,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problema del file system</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">C’è stato un errore durante lo sfoglio dei file locali.</string>
+    <string name="general_error">Errore avvenuto mentre eseguivo l’azione</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Visualizzatore di immagini</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1076,7 +1074,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_text">Per favore, controlla la tua email per procedere.</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Un errore è capitato, per favore, riprova.</string>
+    <string name="general_text_error">È stato riscontrato un errore, per favore, riprova.</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="alert_not_logged_in">Devi effettuare l’accesso per portare a termine questa azione.</string>
     <!-- Error message when a user attempts to change their email without an active login session. -->
@@ -1126,7 +1124,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Fai crescere il tuo cloud.[A]Ottieni un aumento del tuo spazio di archiviazione e della tua banda di trasferimento con un account Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">La Chiave di Recupero dell’account MEGA è stata salvata in: %1s.[A]Puoi trovare il file contenente la tua Chiave di Recupero nella sezione Offline.[A]Ricorda: visto che il file contenente la tua Chiave di Recupero verrà eliminato quando effettuerai il logout, per favore archivialo in un posto sicuro fuori dal tuo account MEGA.</string>
+    <string name="toast_master_key">La Chiave di Recupero dell’account MEGA è stata salvata in: %1s. [A]Puoi trovare il file contenente la tua Chiave di Recupero nella sezione Offline.[/A] Ricorda: visto che il file contenente la tua Chiave di Recupero verrà eliminato quando effettui il logout, per favore archivialo in un luogo sicuro al di fuori del tuo account MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Questo indirizzo email è già utilizzato. Per favore, utilizza un altro indirizzo email.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1216,7 +1214,7 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Collegamento Cartella non disponibile</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Il collegamento della cartella è stato rimossa a causa di una violazione dei ToS/AUP.</string>
+    <string name="folder_link_unavaible_ToS_violation">Il collegamento della cartella è stato rimossa a causa di una violazione dei ToS/PUA.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">File link non disponibile</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
@@ -1269,7 +1267,7 @@
     <!-- success message when changing permissions of contacts for a shared folder, place holder: number of contacts effected -->
     <string name="number_permission_incorrectly_changed_from_shared">Aggiornamento fallito dei permessi per %d contatti</string>
     <!-- Message shown while the contact list from the device is being read and then shown to the user -->
-    <string name="contacts_list_empty_text_loading">Caricamento dei contatti&#8230;</string>
+    <string name="contacts_list_empty_text_loading">Caricamento dei contatti dal telefono&#8230;</string>
     <!-- Warning message when reinviting multiple contacts -->
     <string name="number_existing_invite_contact_request">%d richieste già inviate.</string>
     <!-- success message when reinviting multiple contacts -->
@@ -1488,7 +1486,7 @@
     <string name="title_message_uploading_options">Caricamento dell’allegato</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Nessuna conversazione</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]sta scrivendo&#8230;[/A]</item>
         <item quantity="other">%1$s [A]stanno scrivendo&#8230;[/A]</item>
@@ -1918,13 +1916,11 @@
     <string name="title_regitration">Bonus di registrazione</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Ottieni app desktop di MEGA</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Account base quota</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Nessun file nei Caricamenti da fotocamera</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d gg rimanenti</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Scaduto</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Non usare HTTP</string>
@@ -2128,7 +2124,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">È stato riscontrato un errore e l’invito non è stato spedito.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Generazione del codice QR in corso...</string>
+    <string name="generatin_qr">Generazione del codice QR in corso&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Scansiona il QRcode</string>
     <!-- get the contact link and copy it -->
@@ -2184,7 +2180,7 @@
     <!-- Error message shown when user tries to open a not valid MEGA link -->
     <string name="open_link_not_valid_link">Il link che stai provando ad aprire non è un link MEGA valido.</string>
     <!-- Message shown when a link is being processing -->
-    <string name="processing_link">Caricamento&#8230;</string>
+    <string name="processing_link">Processando il link&#8230;</string>
     <!-- Message shown when it is creating an acount and it is been introduced a very weak or weak password -->
     <string name="passwd_weak">La tua password è facilmente intuibile. Rendi la tua password più lunga. Combina lettere maiuscole e minuscole. Aggiungi caratteri speciali. Non utilizzare nomi o parole del dizionario</string>
     <!-- Message shown when it is creating an acount and it is been introduced a medium password -->
@@ -2527,7 +2523,7 @@
     <!-- Label Play Store -->
     <string name="play_store_label">Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
-    <string name="text_2fa_help">Hai bisogno di un’applicazione di autenticazione per attivare l’autenticazione a due fattori (2FA) su MEGA. Puoi scaricare ed installare le app di Google Authenticator, Duo Mobile, Authy o Microsoft Authenticator per il tuo telefono o tablet.</string>
+    <string name="text_2fa_help">Hai bisogno di un’applicazione di autenticazione per attivare l’Autenticazione a 2 fattori su MEGA. Puoi scaricare ed installare le app di Google Authenticator, Duo Mobile, Authy o Microsoft Authenticator per il tuo telefono o tablet.</string>
     <!-- success message when importing multiple files from -->
     <string name="number_correctly_imported_from_chat">%d file condivisi con successo</string>
     <!-- error message when importing multiple files from chat -->
@@ -2579,11 +2575,6 @@
     <string name="context_no_restored">È stato riscontrato un errore. Oggetto non ripristinato.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Invia messaggio</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Contatto inviato alle chat con successo</item>
-        <item quantity="other">Contatti inviati alle chat con successo</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Le cartelle MEGAdrop non sono ancora supportate</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3246,7 +3237,7 @@
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="context_make_private_chat_warning_text">La rotazione della chiave di criptazione è leggermente più sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non potranno vedere i messaggi inviati prima del loro ingresso.</string>
     <!-- Message shown when a user has joined to a public chat successfully -->
-    <string name="message_joined_successfully">Ti sei unito con successo alla chat.</string>
+    <string name="message_joined_successfully">Adesso fai parte con successo alla chat.</string>
     <!-- Label that indicates the steps of a wizard -->
     <string name="wizard_steps_indicator">%1$d di %2$d</string>
     <!-- Hint of the Search view -->
@@ -3492,7 +3483,7 @@
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
     <string name="reconnecting_message">Riconnessione in corso</string>
     <!-- Text shown when the Internet connection is retrieved and there is a call is in progress -->
-    <string name="connected_message">Sei tornato.</string>
+    <string name="connected_message">Hai fatto ritorno.</string>
     <!-- Text shown in a call when the own internet connection is of low quality -->
     <string name="poor_internet_connection_message">Connessione internet debole</string>
     <!-- Text is displayed while a voice clip is being recorded -->
@@ -3573,7 +3564,7 @@
     <string name="label_verify_credentials">Verifica credenziali</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Non verificato</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Verificato</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Credenziali di Autenticità</string>
@@ -3654,7 +3645,7 @@
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Informazioni di debug per i messaggi della chat attivate</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Informazioni di debug per i messaggi della chat disattivate</string>
+    <string name="show_info_chat_msg_disabled">Informazioni di debug per i messaggi delle chat disattivate</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Hai raggiunto il limite massimo di %d reazioni.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
@@ -3948,7 +3939,7 @@
     <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <string name="files_already_downloaded_and_file_pending_download">%d file già scaricati. 1 file in attesa.</string>
     <!-- Message displayed when multiple download starts and multiple files have already been downloaded before and multiple files are being downloaded. Placeholders: number of files -->
-    <string name="files_already_downloaded_and_files_pending_download">%1$d file già scaricati. %2$d in attesa.</string>
+    <string name="files_already_downloaded_and_files_pending_download">%1$d file già scaricati. %2$d file in attesa.</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 node has not been moved successfully -->
     <string name="node_correctly_and_node_incorrectly_moved_to_rubbish">1 oggetto spostato nel Cestino con successo e 1 oggetto non eliminato correttamente</string>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and multiple nodes have not been moved successfully. Placeholder: number of nodes -->
@@ -4045,6 +4036,8 @@
         <item quantity="one">Ottieni link</item>
         <item quantity="other">Ottieni link</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Eliminare tutti i file salvati offline?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Sei l’unico utente qui</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4094,7 +4087,7 @@
     <!-- The number of participants in the meeting-->
     <string name="participants_number">Partecipanti (%d)</string>
     <!-- Pin the participant to speaker view in the meeting-->
-    <string name="pin_to_speaker">Mostra come principale</string>
+    <string name="pin_to_speaker">Mostra nella vista principale</string>
     <!-- Make the participant as moderator in the meeting-->
     <string name="make_moderator">Rendi moderatore</string>
     <!-- The title of dialog for end meeting confirmation-->
@@ -4179,4 +4172,6 @@
     <string name="meeting_me_text_bracket">%1s [A](io)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Vista principale</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Effettuare il logout elimina il contenuto offline.</string>
 </resources>

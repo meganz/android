@@ -61,7 +61,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import kotlin.Pair;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
@@ -71,8 +70,8 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
-import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.RecentsAdapter;
@@ -85,7 +84,7 @@ import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
 
 
-public class RecentsFragment extends Fragment implements StickyHeaderHandler, Scrollable {
+public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
     private Context context;
     private DisplayMetrics outMetrics;
@@ -190,13 +189,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         listView.setLayoutManager(stickyLayoutManager);
         listView.setClipToPadding(false);
         listView.setItemAnimator(new DefaultItemAnimator());
-        listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                checkScroll();
-            }
-        });
+
         fillRecentItems(buckets);
         setRecentsView();
         return v;
@@ -276,15 +269,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             }
         }
         ((ManagerActivityLollipop) context).setToolbarTitle();
-        checkScroll();
-    }
-
-    @Override
-    public void checkScroll() {
-        if (listView == null) return;
-        LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair.class)
-                .post(new Pair<>(this, listView.canScrollVertically(-1)
-                        && listView.getVisibility() == View.VISIBLE));
     }
 
     public String findUserName(String mail) {

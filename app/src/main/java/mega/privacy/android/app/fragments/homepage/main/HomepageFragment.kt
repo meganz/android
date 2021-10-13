@@ -367,16 +367,8 @@ class HomepageFragment : Fragment() {
                     // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
                     currentSelectedTabFragment?.view
                 )
-
-                (currentSelectedTabFragment as? Scrollable)?.checkScroll()
             }
         })
-
-        viewModel.isScrolling.observe(viewLifecycleOwner) {
-            if (it.first == currentSelectedTabFragment) {
-                changeTabElevation(it.second)
-            }
-        }
 
         setupBottomSheetBackground()
     }
@@ -539,20 +531,6 @@ class HomepageFragment : Fragment() {
         if (layoutParams.height != maxHeight) {
             layoutParams.height = maxHeight
             bottomSheet.layoutParams = layoutParams
-        }
-    }
-
-    /**
-     * Elevate the tab or not based on the scrolling in Recents/Offline fragments.
-     *
-     *
-     * @param withElevation elevate the tab if true, false otherwise
-     */
-    private fun changeTabElevation(withElevation: Boolean) {
-        tabLayout.elevation = if (withElevation) {
-            Util.dp2px(4f).toFloat()
-        } else {
-            0f
         }
     }
 
