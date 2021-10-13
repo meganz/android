@@ -7,6 +7,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.utils.Constants.INVALID_DIMENSION
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -17,7 +18,7 @@ import kotlin.math.min
 /**
  * A listener for metadata corresponding to video being rendered.
  */
-class MeetingVideoListener(
+class IndividualCallVideoListener(
     private val surfaceView: SurfaceView,
     outMetrics: DisplayMetrics?,
     clientId: Long,
@@ -27,6 +28,7 @@ class MeetingVideoListener(
 
     var width = 0
     var height = 0
+    var isFloatingWindow = false
     private var isLocal = true
     val renderer: MegaSurfaceRenderer
     private val surfaceHolder: SurfaceHolder
@@ -53,9 +55,13 @@ class MeetingVideoListener(
 
         // viewWidth != surfaceView.width || viewHeight != surfaceView.height
         // Re-calculate the camera preview ratio when surface view size changed
-        if (this.width != width || this.height != height
-            || viewWidth != renderer.surfaceWidth || viewHeight != renderer.surfaceHeight
-        ) {
+        if((isFloatingWindow &&
+                    (this.width != width || this.height != height || viewWidth != renderer.surfaceWidth || viewHeight != renderer.surfaceHeight)) ||
+            (!isFloatingWindow && (this.width != width || this.height != height))){
+
+            logDebug("************* this.width:: "+this.width+", VS width "+width)
+            logDebug("************* this.height:: "+this.height+", VS height "+height)
+
             this.width = width
             this.height = height
 
@@ -76,11 +82,8 @@ class MeetingVideoListener(
                         holderWidth = holderHeight * viewWidth / viewHeight
                     }
 
+                    logDebug("*************** onChatVideoData:: createBitmap")
                     bitmap = renderer.createBitmap(width, height)
-
-                    if (!isLocal) {
-                        holder.setFixedSize(holderWidth, holderHeight)
-                    }
                 } else {
                     this.width = INVALID_DIMENSION
                     this.height = INVALID_DIMENSION
@@ -99,8 +102,11 @@ class MeetingVideoListener(
     }
 
     init {
-        isLocal = clientId == MEGACHAT_INVALID_HANDLE
 
+
+        logDebug("***************** INICIANDO individual call video listener")
+        isLocal = clientId == MEGACHAT_INVALID_HANDLE
+        this.isFloatingWindow = isFloatingWindow
 
         if ((isFloatingWindow && isLocal) || !isOneToOneCall) {
             this.surfaceView.setZOrderOnTop(true)
