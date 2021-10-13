@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmD
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
+import mega.privacy.android.app.utils.ViewUtils.setStatusBarTransparent
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -144,6 +145,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
 
     @SuppressLint("WrongConstant")
     private fun setupView() {
+        setStatusBarTransparent()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 

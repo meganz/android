@@ -12,6 +12,7 @@ import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
 import javax.inject.Inject
@@ -75,6 +76,11 @@ class GetImageUseCase @Inject constructor(
                                     if (error.errorCode == API_OK) {
                                         imageItem.previewUri = previewFile.toUri()
                                         emitter.onNext(imageItem)
+                                        if (!fullSize) {
+                                            emitter.onComplete()
+                                        }
+                                    } else if (!fullSize) {
+                                        emitter.onError(error.toThrowable())
                                     }
                                 }
                             ))
