@@ -7679,6 +7679,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         if (pMsgState == PendingMessageSingle.STATE_UPLOADING
                 && pMsg.getTransferTag() != INVALID_ID) {
             megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
+            return;
         }
 
         if (pMsgState == PendingMessageSingle.STATE_SENT) {
