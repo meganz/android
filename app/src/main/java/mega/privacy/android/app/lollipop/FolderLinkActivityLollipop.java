@@ -2,16 +2,13 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -40,8 +37,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -64,6 +59,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -76,8 +72,6 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -105,9 +99,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	private static final String TAG_DECRYPT = "decrypt";
 
 	FolderLinkActivityLollipop folderLinkActivity = this;
-	MegaApiAndroid megaApi;
-	MegaApiAndroid megaApiFolder;
-	MegaChatApiAndroid megaChatApi;
 
 	ActionBar aB;
 	Toolbar tB;
@@ -148,7 +139,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 	long toHandle = 0;
 	long fragmentHandle = -1;
 	int cont = 0;
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 	MultipleRequestListenerLink importLinkMultipleListener = null;
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
@@ -304,7 +295,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 		}
 		
 	}	
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -346,10 +337,6 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 
 		handler = new Handler();
 
-		MegaApplication app = (MegaApplication)getApplication();
-		megaApiFolder = app.getMegaApiFolder();
-		megaApi = app.getMegaApi();
-
 		registerTransfersReceiver();
 
 		dbH = DatabaseHandler.getDbHandler(FolderLinkActivityLollipop.this);
@@ -360,34 +347,16 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			url = intentReceived.getDataString();
 		}
 
-		if (dbH.getCredentials() != null) {
-			if (megaApi == null || megaApi.getRootNode() == null) {
-				logDebug("Refresh session - sdk");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-				intent.setData(Uri.parse(url));
-				intent.setAction(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
-
-			if (megaChatApi == null) {
-				megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-			}
-
-			if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-				logDebug("Refresh session - karere");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-				intent.setData(Uri.parse(url));
-				intent.setAction(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
-				return;
-			}
+		if (dbH.getCredentials() != null && (megaApi == null || megaApi.getRootNode() == null)) {
+			logDebug("Refresh session - sdk or karere");
+			Intent intent = new Intent(this, LoginActivityLollipop.class);
+			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
+			intent.setData(Uri.parse(url));
+			intent.setAction(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return;
 		}
 
 		if (savedInstanceState != null) {
@@ -694,8 +663,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				}
 			}
 
-			statusDialog = new ProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.general_importing));
+			statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
 			statusDialog.show();
 
 			if(adapterList != null && adapterList.isMultipleSelect()){

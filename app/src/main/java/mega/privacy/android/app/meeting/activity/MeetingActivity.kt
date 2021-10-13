@@ -61,6 +61,19 @@ class MeetingActivity : PasscodeActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+            if (intent != null) {
+                intent.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
+                    if (chatId != MEGACHAT_INVALID_HANDLE) {
+                        //Notification of this call should be displayed again
+                        MegaApplication.getChatManagement().removeNotificationShown(chatId)
+                    }
+                }
+            }
+            return
+        }
+
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)

@@ -268,7 +268,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN = "INTENT_FILTER_UPDATE_FULL_SCREEN";
 
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
-    public static final String BROADCAST_ACTION_INTENT_UPDATE_2FA_SETTINGS = "INTENT_UPDATE_2FA_SETTINGS";
     public static final String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE = "INTENT_CONNECTIVITY_CHANGE";
     public static final String BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE_DIALOG = "INTENT_CONNECTIVITY_CHANGE_DIALOG";
     public static final String BROADCAST_ACTION_INTENT_SETTINGS_UPDATED = "SETTINGS_UPDATED";
@@ -615,7 +614,6 @@ public class Constants {
     public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
     public static final String EXTRA_VOLUME_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE";
     public static final String COPIED_TEXT_LABEL = "Copied Text";
-    public static final String PLAIN_TEXT_SHARE_TYPE = "text/plain";
     public static final String IS_FROM_CONTACTS = "IS_FROM_CONTACTS";
     public static final String IS_FLOATING_WINDOW = "IS_FLOATING_WINDOW";
 
@@ -850,7 +848,6 @@ public class Constants {
     public static final String EVENT_ORDER_CHANGE = "order_change";
     public static final String EVENT_LIST_GRID_CHANGE = "list_grid_change";
     public static final String EVENT_AVATAR_CHANGE = "avatar_change";
-    public static final String EVENT_SCROLLING_CHANGE = "scrolling_change";
     public static final String EVENT_NOTIFICATION_COUNT_CHANGE = "notification_count_change";
     public static final String EVENT_CHAT_STATUS_CHANGE = "chat_status_change";
     public static final String EVENT_LOGOUT_CLEARED = "logout_cleared";

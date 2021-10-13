@@ -1188,25 +1188,37 @@ public class BaseActivity extends AppCompatActivity implements ActivityLauncher,
     }
 
     /**
-     * Checks if should refresh session due to karere.
+     * Checks if should refresh session due to karere or init megaChatAp if the init state is not
+     * the right one.
      *
-     * @return True if should refresh session, false otherwise.
+     * @return True if should refresh session or megaChatApi cannot be recovered, false otherwise.
      */
     protected boolean shouldRefreshSessionDueToKarere() {
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
+        if (megaChatApi == null) {
             logWarning("Refresh session - karere");
             refreshSession();
             return true;
         }
 
+        int state = megaChatApi.getInitState();
+        if (state == MegaChatApi.INIT_ERROR || state == MegaChatApi.INIT_NOT_DONE) {
+            logWarning("MegaChatApi state: " + state);
+            UserCredentials credentials = dbH.getCredentials();
+            state = megaChatApi.init(credentials == null ? null : credentials.getSession());
+            logDebug("result of init ---> " + state);
+
+            if (state == MegaChatApi.INIT_ERROR) {
+                // The megaChatApi cannot be recovered, then logout
+                megaChatApi.logout(new ChatLogoutListener(this));
+                return true;
+            }
+        }
+
         return false;
     }
 
-    private void refreshSession() {
-        Intent intent = new Intent(this, LoginActivityLollipop.class);
-        intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+    protected void refreshSession() {
+        navigateToLogin();
         finish();
     }
 

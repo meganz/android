@@ -371,7 +371,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.putExtra(Intent.EXTRA_TEXT, message);
-                sendIntent.setType("text/plain");
+                sendIntent.setType(TYPE_TEXT_PLAIN);
                 startActivity(Intent.createChooser(sendIntent, getString(R.string.invite_contact_chooser_title)));
                 break;
             }

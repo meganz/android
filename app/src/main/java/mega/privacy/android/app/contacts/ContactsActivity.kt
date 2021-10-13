@@ -85,6 +85,11 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+            return
+        }
+
         binding = ActivityContactsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)

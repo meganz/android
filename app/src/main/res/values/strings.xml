@@ -579,8 +579,6 @@
     <string name="number_contact_not_removed">%d contacts were not removed</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Folder shared with %d contacts successfully</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">File cannot be shared with %d contacts</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d folders shared successfully</string>
     <!-- error message when sharing multiple files -->
@@ -659,7 +657,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">File system problem</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">An error occurred when browsing local files.</string>
+    <string name="general_error">Error happened when executing the action</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Image viewer</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1126,7 +1124,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Grow your cloud.[A]Get increased storage and transfer quotas with a Pro account.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s.[A]You can find the file with your Recovery Key in the Offline section.[A]Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
+    <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s. [A]You can find the file with your Recovery Key in the Saved for Offline section.[/A] Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">This email address is already in use. Please use another email address.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1488,7 +1486,7 @@
     <string name="title_message_uploading_options">Uploading attachment</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">No conversation history</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
         <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
@@ -1918,8 +1916,6 @@
     <string name="title_regitration">Registration bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Get a MEGA Desktop App</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Account base quota</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">No files in Camera Uploads</string>
     <!-- indicates the number of days left related to a achievement -->
@@ -2579,11 +2575,6 @@
     <string name="context_no_restored">An error occurred. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Send Message</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Contact sent to chats successfully</item>
-        <item quantity="other">Contacts sent to chats successfully</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdrop folders are not supported yet</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3573,7 +3564,7 @@
     <string name="label_verify_credentials">Verify credentials</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Not verified</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Verified</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authenticity Credentials</string>
@@ -3654,7 +3645,7 @@
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Debugging info for chat messages enabled</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Debugging info for chat messages is disabled</string>
+    <string name="show_info_chat_msg_disabled">Debugging info for chat messages disabled</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">You have reached the maximum limit of %d reactions.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
@@ -4045,6 +4036,8 @@
         <item quantity="one">Get Link</item>
         <item quantity="other">Get Links</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Clear all offline files?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">You are the only one here</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4179,4 +4172,6 @@
     <string name="meeting_me_text_bracket">%1s [A](me)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Main view</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Logging out deletes your offline content.</string>
 </resources>

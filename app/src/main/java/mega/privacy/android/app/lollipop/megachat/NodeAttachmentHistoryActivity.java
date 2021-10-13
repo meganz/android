@@ -1,7 +1,6 @@
 package mega.privacy.android.app.lollipop.megachat;
 
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,6 +14,7 @@ import android.os.Environment;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
@@ -50,6 +50,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -111,13 +112,10 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
 
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
     ActionBar aB;
     MaterialToolbar tB;
     NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;
 
-    DatabaseHandler dbH = null;
     public boolean isList = true;
 
     private final NodeSaver nodeSaver = new NodeSaver(this, this, this,
@@ -148,7 +146,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     private ActionMode actionMode;
     DisplayMetrics outMetrics;
 
-    ProgressDialog statusDialog;
+    AlertDialog statusDialog;
 
     MenuItem selectMenuItem;
     MenuItem unSelectMenuItem;
@@ -183,22 +181,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         logDebug("onCreate");
         super.onCreate(savedInstanceState);
 
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) getApplication()).getMegaApi();
-
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-        }
-
-        if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR || megaChatApi.getInitState() == MegaChatApi.INIT_NOT_DONE) {
-            logDebug("Refresh session - karere");
-            Intent intent = new Intent(this, LoginActivityLollipop.class);
-            intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
 
@@ -209,8 +192,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         megaChatApi.addNodeHistoryListener(chatId, this);
 
         handler = new Handler();
-
-        dbH = DatabaseHandler.getDbHandler(this);
 
         Display display = getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
@@ -1158,8 +1139,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     public void showProgressForwarding() {
         logDebug("showProgressForwarding");
 
-        statusDialog = new ProgressDialog(this);
-        statusDialog.setMessage(getString(R.string.general_forwarding));
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_forwarding));
         statusDialog.show();
     }
 
@@ -1167,13 +1147,12 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
         try {
             statusDialog.dismiss();
         } catch (Exception ex) {
+            logError(ex.getMessage());
         }
-        ;
     }
 
     public void importNodes(final long toHandle, final long[] importMessagesHandles) {
-        statusDialog = new ProgressDialog(this);
-        statusDialog.setMessage(getString(R.string.general_importing));
+        statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
         statusDialog.show();
 
         MegaNode target = null;
