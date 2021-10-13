@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
@@ -49,7 +48,8 @@ import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
-import static mega.privacy.android.app.utils.JobUtil.*;
+import static mega.privacy.android.app.utils.JobUtil.rescheduleCameraUpload;
+import static mega.privacy.android.app.utils.JobUtil.startCameraUploadService;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
@@ -98,6 +98,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     private String megaPathSecMediaFolder = "";
     private boolean isExternalSDCardMU;
     private SetAttrUserListener setAttrUserListener;
+    private boolean bRescheduleCameraUpload = false;
 
     public SettingsCameraUploadsFragment() {
         super();
@@ -464,7 +465,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             case KEY_CAMERA_UPLOAD_INCLUDE_GPS:
                 includeGPS = cameraUploadIncludeGPS.isChecked();
                 dbH.setRemoveGPS(!includeGPS);
-                rescheduleCameraUpload(context);
+                markRescheduleCameraUpload();
                 break;
 
             case KEY_CAMERA_UPLOAD_CHARGING:
@@ -539,7 +540,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 }
 
                 checkIfSecondaryFolderExists();
-                rescheduleCameraUpload(context);
+                markRescheduleCameraUpload();
                 break;
 
             case KEY_LOCAL_SECONDARY_MEDIA_FOLDER:
@@ -623,7 +624,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 cameraUploadCharging.setSummary(chargingHelper);
                 dbH.setChargingOnSize(size);
                 prefs.setChargingOnSize(size + "");
-                rescheduleCameraUpload(context);
+                markRescheduleCameraUpload();
             } else {
                 resetSizeInput(input);
             }
@@ -729,12 +730,12 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
     private void disableVideoCompressionSizeSettingsAndRestartUpload() {
         disableVideoCompressionSizeSettings();
-        rescheduleCameraUpload(context);
+        markRescheduleCameraUpload();
     }
 
     private void enableVideoCompressionSizeSettingsAndRestartUpload() {
         enableVideoCompressionSizeSettings();
-        rescheduleCameraUpload(context);
+        markRescheduleCameraUpload();
     }
 
     private void enableVideoCompressionSizeSettings() {
@@ -821,7 +822,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 }
 
                 cameraUploadHow.setSummary(wifi);
-                rescheduleCameraUpload(context);
+                markRescheduleCameraUpload();
                 break;
 
             case KEY_CAMERA_UPLOAD_WHAT_TO:
@@ -857,7 +858,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
 
                 cameraUploadWhat.setSummary(fileUpload);
                 resetCUTimestampsAndCache();
-                rescheduleCameraUpload(context);
+                markRescheduleCameraUpload();
                 break;
 
             case KEY_CAMERA_UPLOAD_VIDEO_QUALITY:
@@ -884,7 +885,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 }
 
                 videoQuality.setSummary(videoQuality.getEntry());
-                rescheduleCameraUpload(context);
+                markRescheduleCameraUpload();
                 break;
         }
 
@@ -1013,10 +1014,17 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         if (prefs != null) {
             cuEnabled = Boolean.parseBoolean(prefs.getCamSyncEnabled());
             if (cuEnabled) {
-                handler.post(() -> {
-                    logDebug("Enable Camera Uploads, Now I start the service");
-                    startCameraUploadService(context);
-                });
+                if (bRescheduleCameraUpload) {
+                    handler.post(() -> {
+                        logDebug("Rescheduling CU");
+                        rescheduleCameraUpload(context);
+                    });
+                } else {
+                    handler.post(() -> {
+                        logDebug("Enable Camera Uploads, Now I start the service");
+                        startCameraUploadService(context);
+                    });
+                }
             }
         }
     }
@@ -1136,6 +1144,14 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         checkSecondaryMediaFolder();
     }
 
+    /**
+     * Set to true when some of the settings change.
+     * Start or reschedule the CU service according to this value
+     */
+    private void markRescheduleCameraUpload() {
+        bRescheduleCameraUpload = true;
+    }
+
     private boolean isNewSettingValid(String primaryPath, String secondaryPath, String primaryHandle, String secondaryHandle) {
         if (!secondaryUpload || primaryPath == null || primaryHandle == null || secondaryPath == null || secondaryHandle == null)
             return true;
@@ -1165,7 +1181,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 dbH.setCamSyncLocalPath(camSyncLocalPath);
                 localCameraUploadFolder.setSummary(camSyncLocalPath);
                 resetCUTimestampsAndCache();
-                rescheduleCameraUpload(context);
+                markRescheduleCameraUpload();
                 // Update sync when primary local folder changed.
                 CuSyncManager.INSTANCE.updatePrimaryLocalFolder(cameraPath);
                 break;
@@ -1202,7 +1218,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 localSecondaryFolder.setSummary(localSecondaryFolderPath);
                 dbH.setSecSyncTimeStamp(0);
                 dbH.setSecVideoSyncTimeStamp(0);
-                rescheduleCameraUpload(context);
+                markRescheduleCameraUpload();
                 // Update sync when secondary local folder changed.
                 CuSyncManager.INSTANCE.updateSecondaryLocalFolder(secondaryPath);
                 break;

@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
@@ -118,6 +119,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     private GridLayoutManager layoutManager;
 
     private int selectedView = ALL_VIEW;
+    private AlertDialog alertDialog = null;
 
     public int getItemCount() {
         return gridAdapter == null ? 0 : gridAdapter.getItemCount();
@@ -238,8 +240,16 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (alertDialog != null && alertDialog.isShowing()) {
+            alertDialog.dismiss();
+        }
+    }
+
     private View createCameraUploadsViewForFirstLogin(@NonNull LayoutInflater inflater,
-            @Nullable ViewGroup container) {
+                                                      @Nullable ViewGroup container) {
         viewModel.setInitialPreferences();
 
         mFirstLoginBinding =
@@ -285,15 +295,13 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         super.onActivityResult(requestCode, resultCode, intent);
 
         if (requestCode == CAMERA_SETTINGS_RESULT_CODE) {
-            logDebug("resultCode = "+resultCode);
+            logDebug("resultCode = " + resultCode);
             MegaPreferences prefs = dbH.getPreferences();
-            if(intent != null) {
+            if (intent != null) {
                 String cameraPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 
-                if (!isNewSettingValid(cameraPath, prefs.getLocalPathSecondaryFolder(), prefs.getCamSyncHandle(), prefs.getMegaHandleSecondaryFolder())) {
-                    Toast.makeText(context, getString(R.string.error_invalid_folder_selected), Toast.LENGTH_LONG).show();
+                if(cameraPath == null)
                     return;
-                }
 
                 boolean isExternalSDCardCU = Boolean.parseBoolean(prefs.getCameraFolderExternalSDCard());
                 String camSyncLocalPath = isExternalSDCardCU ? getSDCardDirName(Uri.parse(prefs.getUriExternalSDCard())) : cameraPath;
@@ -304,13 +312,6 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             startCU();
 
         }
-    }
-
-    private boolean isNewSettingValid(String primaryPath, String secondaryPath, String primaryHandle, String secondaryHandle) {
-        if (primaryPath == null || primaryHandle == null || secondaryPath == null || secondaryHandle == null)
-            return true;
-
-        return !primaryHandle.equals(secondaryHandle) || (!primaryPath.contains(secondaryPath) && !secondaryPath.contains(primaryPath));
     }
 
     public void setViewTypes(LinearLayout cuViewTypes, TextView cuYearsButton,
@@ -748,13 +749,14 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
      * Show the dialog that can direct to the Camera Upload settings.
      */
     public void showCameraUploadTip(){
-        new MaterialAlertDialogBuilder(requireContext())
+        alertDialog = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.title_dcim_folder_dialog)
                 .setMessage(R.string.content_dcim_folder_dialog)
                 .setPositiveButton(R.string.action_settings, (dialog, which) -> enableCameraUpload(dialog, true))
                 .setNegativeButton(R.string.general_cancel, (dialog, which) -> enableCameraUpload(dialog, false))
-                .show()
-                .setCanceledOnTouchOutside(false);
+                .create();
+        alertDialog.show();
+        alertDialog.setCanceledOnTouchOutside(false);
     }
 
     /**
