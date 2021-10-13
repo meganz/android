@@ -12,16 +12,16 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.fragments.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
-class MeetingActivity : PasscodeActivity() {
+class MeetingActivity : BaseActivity() {
 
     companion object {
         /** The name of actions denoting set
