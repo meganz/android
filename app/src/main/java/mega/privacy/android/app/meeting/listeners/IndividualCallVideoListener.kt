@@ -59,9 +59,6 @@ class IndividualCallVideoListener(
                     (this.width != width || this.height != height || viewWidth != renderer.surfaceWidth || viewHeight != renderer.surfaceHeight)) ||
             (!isFloatingWindow && (this.width != width || this.height != height))){
 
-            logDebug("************* this.width:: "+this.width+", VS width "+width)
-            logDebug("************* this.height:: "+this.height+", VS height "+height)
-
             this.width = width
             this.height = height
 
@@ -74,15 +71,6 @@ class IndividualCallVideoListener(
                 val viewHeight = surfaceView.height
 
                 if (viewWidth != 0 && viewHeight != 0) {
-                    var holderWidth = min(viewWidth, width)
-                    var holderHeight = holderWidth * viewHeight / viewWidth
-
-                    if (holderHeight > viewHeight) {
-                        holderHeight = viewHeight
-                        holderWidth = holderHeight * viewWidth / viewHeight
-                    }
-
-                    logDebug("*************** onChatVideoData:: createBitmap")
                     bitmap = renderer.createBitmap(width, height)
                 } else {
                     this.width = INVALID_DIMENSION
@@ -102,9 +90,6 @@ class IndividualCallVideoListener(
     }
 
     init {
-
-
-        logDebug("***************** INICIANDO individual call video listener")
         isLocal = clientId == MEGACHAT_INVALID_HANDLE
         this.isFloatingWindow = isFloatingWindow
 
