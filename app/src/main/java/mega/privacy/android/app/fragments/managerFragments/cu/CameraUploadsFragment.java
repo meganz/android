@@ -82,6 +82,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         CUCardViewAdapter.Listener {
 
     private static final String SELECTED_VIEW = "SELECTED_VIEW";
+    private static final String DIALOG_IS_SHOWING = "DIALOG_IS_SHOWING";
     public static final int ALL_VIEW = 0;
     public static final int DAYS_VIEW = 1;
     public static final int MONTHS_VIEW = 2;
@@ -120,6 +121,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private int selectedView = ALL_VIEW;
     private AlertDialog alertDialog = null;
+    private boolean dialogIsShowing = false;
 
     public int getItemCount() {
         return gridAdapter == null ? 0 : gridAdapter.getItemCount();
@@ -210,6 +212,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
         if (savedInstanceState != null) {
             selectedView = savedInstanceState.getInt(SELECTED_VIEW, ALL_VIEW);
+            dialogIsShowing = savedInstanceState.getBoolean(DIALOG_IS_SHOWING, false);
         }
 
         mManagerActivity = (ManagerActivityLollipop) context;
@@ -237,6 +240,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     @Override
     public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
         outState.putInt(SELECTED_VIEW, selectedView);
+        outState.putBoolean(DIALOG_IS_SHOWING, dialogIsShowing);
         super.onSaveInstanceState(outState);
     }
 
@@ -278,6 +282,13 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         if (viewModel.isEnableCUShown()) {
             mManagerActivity.updateCULayout(View.GONE);
             mManagerActivity.updateCUViewTypes(View.GONE);
+            if(dialogIsShowing){
+                if(alertDialog == null) {
+                    showCameraUploadTip();
+                } else{
+                    alertDialog.show();
+                }
+            }
             return;
         }
 
@@ -757,6 +768,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 .create();
         alertDialog.show();
         alertDialog.setCanceledOnTouchOutside(false);
+        dialogIsShowing = true;
     }
 
     /**
@@ -776,6 +788,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             startCU();
         }
         dialog.dismiss();
+        dialogIsShowing = false;
     }
 
 }
