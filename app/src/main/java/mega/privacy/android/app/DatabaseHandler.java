@@ -301,6 +301,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_BACKUP_DEL + " BOOLEAN,"
             + KEY_BACKUP_OUTDATED + " BOOLEAN)";
 
+    private static final int OLD_VIDEO_QUALITY_MEDIUM = 1;
+
     private static DatabaseHandler instance;
 
     private static SQLiteDatabase db;
@@ -926,10 +928,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if (oldVersion <= 62 && oldVersion > 52) {
-			ChatSettings chatSettings = getChatSettingsFromDBv62(db);
-			db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
+			if (oldVersion > 52) {
+				ChatSettings chatSettings = getChatSettingsFromDBv62(db);
+				db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
+				onCreate(db);
+				setChatSettings(db, chatSettings);
+			}
+
+			MegaPreferences preferences = getPreferencesFromDBv62();
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
 			onCreate(db);
-			setChatSettings(db, chatSettings);
+			setPreferences(preferences);
 		}
 	}
 
@@ -1609,14 +1618,33 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_ASK_FOR_DISPLAY_OVER + " = '" + encrypt("false") + "';");
     }
 
+	/**
+	 * Get preferences from the DB v62 (previous to add four available video qualities).
+	 *
+	 * @return Preferences.
+	 */
+    private MegaPreferences getPreferencesFromDBv62() {
+		logDebug("getPreferencesFromDBv62");
+		return getPreferences(true);
+	}
+
 	public MegaPreferences getPreferences(){
         logDebug("getPreferences");
+        return getPreferences(false);
+	}
+
+	/**
+	 * Get preferences.
+	 *
+	 * @param fromDBv62 True if should get them from DB v62, false otherwise.
+	 * @return Preferences.
+	 */
+	private MegaPreferences getPreferences(boolean fromDBv62) {
 		MegaPreferences prefs = null;
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
 			if (cursor != null && cursor.moveToFirst()) {
-				int id = Integer.parseInt(cursor.getString(0));
 				String firstTime = decrypt(cursor.getString(1));
 				String camSyncEnabled = decrypt(cursor.getString(2));
 				String camSyncHandle = decrypt(cursor.getString(3));
@@ -1649,6 +1677,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String smallGridCamera = decrypt(cursor.getString(30));
 				String isAutoPlayEnabled = decrypt(cursor.getString(31));
 				String uploadVideoQuality = decrypt(cursor.getString(32));
+
+				if(fromDBv62 && Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_MEDIUM) {
+					uploadVideoQuality = String.valueOf(VIDEO_QUALITY_MEDIUM);
+				}
+
 				String conversionOnCharging = decrypt(cursor.getString(33));
 				String chargingOnSize = decrypt(cursor.getString(34));
 				String shouldClearCameraSyncRecords = decrypt(cursor.getString(35));
@@ -1676,6 +1709,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	/**
 	 * Get chat settings from the DB v52 (previous to remove the setting to enable/disable the chat).
 	 * KEY_CHAT_ENABLED and KEY_CHAT_STATUS have been removed in DB v53.
+	 *
 	 * @return Chat settings.
 	 */
 	private ChatSettings getChatSettingsFromDBv52(SQLiteDatabase db){
@@ -1705,7 +1739,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	/**
 	 * Get chat settings from the DB v62 (previous to remove the setting to enable/disable
-	 * the send original attachments). KEY_CHAT_SEND_ORIGINALS has been removed in DB v63.
+	 * the send original attachments and to add four available video qualities).
+	 * KEY_CHAT_SEND_ORIGINALS has been removed in DB v63.
+	 *
 	 * @return Chat settings.
 	 */
 	private ChatSettings getChatSettingsFromDBv62(SQLiteDatabase db){
