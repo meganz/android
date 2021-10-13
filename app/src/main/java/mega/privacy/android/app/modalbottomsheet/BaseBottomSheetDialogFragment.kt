@@ -123,17 +123,19 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
      * Sets the initial state of a BottomSheet and its state.
      */
     private fun setBottomSheetBehavior() {
-        BottomSheetBehavior.from(contentView.parent as View).apply {
-            peekHeight = getCustomPeekHeight()
+        val customPeekHeight = getCustomPeekHeight()
 
+        BottomSheetBehavior.from(contentView.parent as View).apply {
             state = when {
                 savedState != INVALID_VALUE -> {
+                    peekHeight = customPeekHeight
                     savedState
                 }
-                peekHeight == contentView.height -> {
+                customPeekHeight == contentView.height -> {
                     BottomSheetBehavior.STATE_EXPANDED
                 }
                 else -> {
+                    peekHeight = customPeekHeight
                     BottomSheetBehavior.STATE_COLLAPSED
                 }
             }

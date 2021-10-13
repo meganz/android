@@ -1177,7 +1177,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 adapterType = FROM_OTHERS;
         }
 
-        File offlineParent = getOfflineParentFile(requireContext(), adapterType, node, megaApi);
+        File offlineParent = getOfflineParentFile(requireActivity(), adapterType, node, megaApi);
 
         if (isFileAvailable(offlineParent)) {
             File offlineFile = new File(offlineParent, node.getName());
@@ -1197,7 +1197,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         // Save the new file to offline
-        saveOffline(offlineParent, node, requireActivity(), requireActivity());
+        saveOffline(offlineParent, node, requireActivity());
     }
 
     @Override

@@ -11531,7 +11531,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			if (transfer.getIsOfflineFile()) {
 				File offlineFile = new File(transfer.getOriginalPath());
-				saveOffline(offlineFile.getParentFile(), node, this, ManagerActivityLollipop.this);
+				saveOffline(offlineFile.getParentFile(), node, ManagerActivityLollipop.this);
 			} else {
 				nodeSaver.saveNode(node, transfer.getPath());
 			}
