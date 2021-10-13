@@ -59,6 +59,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TransfersManagementActivity;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.saver.NodeSaver;
@@ -1256,25 +1257,14 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 				}
 			}
 			else{
-				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
-					intent.putExtra("position", position);
-					intent.putExtra("adapterType", FOLDER_LINK_ADAPTER);
-
-					MegaNode parent = megaApiFolder.getParentNode(nodes.get(position));
-					intent.putExtra("parentNodeHandle",
-							parent == null || parent.getType() == MegaNode.TYPE_ROOT
-									? INVALID_HANDLE
-									: parent.getHandle());
-
-					intent.putExtra("orderGetChildren", orderGetChildren);
-					intent.putExtra("isFolderLink", true);
-
-					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
-					putThumbnailLocation(intent, listView, position, VIEWER_FROM_FOLDER_LINK, adapterList);
-
+				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()) {
+					Intent intent = ImageViewerActivity.getIntentForParentNode(
+							this,
+							megaApiFolder.getParentNode(nodes.get(position)).getHandle(),
+							orderGetChildren,
+							nodes.get(position).getHandle()
+					);
 					startActivity(intent);
-					overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);

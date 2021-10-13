@@ -50,6 +50,15 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
             }
 
         @JvmStatic
+        fun getIntentForSingleOfflineNode(
+            context: Context,
+            nodeHandle: Long
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, nodeHandle)
+            }
+
+        @JvmStatic
         @JvmOverloads
         fun getIntentForParentNode(
             context: Context,
@@ -88,6 +97,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     }
 
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
+    private val nodeOfflineHandle: Long? by extra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE)
     private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
     private val childrenHandles: LongArray? by extra(NODE_HANDLES)
     private val childrenOfflineHandles: LongArray? by extra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
@@ -166,6 +176,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
             }
             childrenOfflineHandles != null && childrenOfflineHandles!!.isNotEmpty() -> {
                 viewModel.retrieveOfflineImages(childrenOfflineHandles!!.toList(), nodeHandle)
+            }
+            nodeOfflineHandle != null && nodeOfflineHandle != INVALID_HANDLE -> {
+                viewModel.retrieveSingleOfflineImage(nodeOfflineHandle!!)
             }
             nodeHandle != null && nodeHandle != INVALID_HANDLE -> {
                 viewModel.retrieveSingleImage(nodeHandle!!)

@@ -62,6 +62,21 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    fun retrieveSingleOfflineImage(nodeHandle: Long) {
+        getImageHandlesUseCase.getOffline(listOf(nodeHandle))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { imageItems ->
+                    images.value = imageItems.toList()
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
+
     fun retrieveImagesFromParent(
         parentNodeHandle: Long,
         childOrder: Int? = null,

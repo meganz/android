@@ -1,33 +1,5 @@
 package mega.privacy.android.app.fragments.recent;
 
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
-import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
-import static mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE;
-import static mega.privacy.android.app.utils.Constants.EVENT_SCROLLING_CHANGE;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST;
-import static mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR;
-import static mega.privacy.android.app.utils.Constants.NODE_HANDLES;
-import static mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS;
-import static mega.privacy.android.app.utils.ContactUtil.getContactDB;
-import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
-import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
-import static mega.privacy.android.app.utils.FileUtil.isAudioOrVideo;
-import static mega.privacy.android.app.utils.FileUtil.isInternalIntent;
-import static mega.privacy.android.app.utils.FileUtil.isLocalFile;
-import static mega.privacy.android.app.utils.FileUtil.isOpusFile;
-import static mega.privacy.android.app.utils.FileUtil.setLocalIntentParams;
-import static mega.privacy.android.app.utils.FileUtil.setStreamingIntentParams;
-import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
-import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
-import static mega.privacy.android.app.utils.Util.getMediaIntent;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -70,7 +42,6 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -82,6 +53,16 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRecentActionBucket;
 import nz.mega.sdk.MegaUser;
+
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.observeDragSupportEvents;
+import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
+import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ContactUtil.*;
+import static mega.privacy.android.app.utils.FileUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.Util.getMediaIntent;
 
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler {

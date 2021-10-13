@@ -60,10 +60,11 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
-import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.lollipop.adapters.ZipListAdapterLollipop;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiJava;
 
@@ -367,21 +368,12 @@ public class ZipBrowserActivityLollipop extends PasscodeActivity {
 		int index = currentNode.getName().lastIndexOf('/');
 		String name = currentNode.getName().substring(index + 1);
 
-		if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
-            logDebug("isImage");
-			Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
-			intent.putExtra("position", position);
-			intent.putExtra("adapterType", ZIP_ADAPTER);
-			intent.putExtra("isFolderLink", false);
-			intent.putExtra("parentNodeHandle", -1L);
-			intent.putExtra("offlinePathDirectory", absolutePath);
-			intent.putExtra("orderGetChildren", orderGetChildren);
-
-			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, (long) name.hashCode());
-			putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_ZIP_BROWSER, adapterList);
-
+		if (MimeTypeList.typeForName(currentFile.getName()).isImage()) {
+			Intent intent = ImageViewerActivity.getIntentForSingleOfflineNode(
+					this,
+					name.hashCode()
+			);
 			startActivity(intent);
-			overridePendingTransition(0,0);
 		}
 		else if (MimeTypeList.typeForName(currentFile.getName()).isVideoReproducible() || MimeTypeList.typeForName(currentFile.getName()).isAudio()) {
             logDebug("Video file");
