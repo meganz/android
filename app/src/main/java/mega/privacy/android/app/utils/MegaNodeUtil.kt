@@ -1704,4 +1704,15 @@ object MegaNodeUtil {
 
     fun MegaNode.isImage(): Boolean =
         this.isFile && MimeTypeList.typeForName(name).isImage
+
+    fun MegaNode.isGif(): Boolean =
+        this.isFile && MimeTypeList.typeForName(name).isGIF
+
+    fun MegaNode.isVideo(): Boolean =
+        this.isFile && (MimeTypeList.typeForName(name).isVideoReproducible ||
+                MimeTypeList.typeForName(name).isMp4Video)
+
+    @JvmStatic
+    fun MegaNode.isValidForImageViewer(): Boolean =
+        isImage() || isGif() || isVideo()
 }

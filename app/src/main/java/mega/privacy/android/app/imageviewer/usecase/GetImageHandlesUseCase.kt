@@ -7,26 +7,25 @@ import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.OfflineUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
-import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Inject
 
 class GetImageHandlesUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid,
     private val databaseHandler: DatabaseHandler
 ) {
 
-    fun get(nodeHandles: List<Long>): Single<List<ImageItem>> =
+    fun get(nodeHandles: LongArray): Single<List<ImageItem>> =
         Single.create { emitter ->
             val items = mutableListOf<ImageItem>()
 
             nodeHandles.forEach { nodeHandle ->
                 val node = megaApi.getNodeByHandle(nodeHandle)
-                if (node != null) {
+                if (node?.isValidForImageViewer() == true) {
                     items.add(ImageItem(node.handle, node.name))
                 }
             }
@@ -34,7 +33,7 @@ class GetImageHandlesUseCase @Inject constructor(
             emitter.onSuccess(items)
         }
 
-    fun getOffline(nodeHandles: List<Long>): Single<List<ImageItem>> =
+    fun getOffline(nodeHandles: LongArray): Single<List<ImageItem>> =
         Single.create { emitter ->
             val offlineNodes = databaseHandler.offlineFiles
             val items = mutableListOf<ImageItem>()
@@ -66,30 +65,13 @@ class GetImageHandlesUseCase @Inject constructor(
             if (parentNode != null && megaApi.hasChildren(parentNode)) {
                 val items = mutableListOf<ImageItem>()
                 megaApi.getChildren(parentNode, order ?: ORDER_PHOTO_ASC).forEach { node ->
-                    items.add(ImageItem(node.handle, node.name))
+                    if (node.isValidForImageViewer()) {
+                        items.add(ImageItem(node.handle, node.name))
+                    }
                 }
                 emitter.onSuccess(items)
             } else {
                 emitter.onError(IllegalStateException("Node is null or has no children"))
             }
-        }
-
-    fun getFromChatMessages(chatId: Long, messageIds: Array<Long>): Single<List<ImageItem>> =
-        Single.create { emitter ->
-            val items = mutableListOf<ImageItem>()
-
-            messageIds.forEach { messageId ->
-                val message = megaChatApi.getMessage(chatId, messageId)
-                val node = message.megaNodeList.get(0)
-                items.add(ImageItem(node.handle, node.name))
-//                for (i in 0 until message.megaNodeList.size()) {
-//                    val node = nodeList[i]
-//                    if (node.isImage()) {
-//                        items.add(ImageItem(node.handle, node.name))
-//                    }
-//                }
-            }
-
-            emitter.onSuccess(items)
         }
 }

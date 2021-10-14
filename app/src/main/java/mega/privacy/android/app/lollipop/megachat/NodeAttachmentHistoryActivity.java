@@ -40,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.common.primitives.Longs;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -113,6 +115,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 import javax.inject.Inject;
@@ -708,98 +711,28 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     }
 
     public void showFullScreenViewer(long msgId) {
-        Long[] messageIds = messages.stream()
-                .map(megaChatMessage ->
-                        megaChatMessage.getMsgId()
-                )
-                .toArray(Long[]::new);
+        long currentNodeHandle = INVALID_HANDLE;
+        List<Long> nodeHandles = new ArrayList<>();
 
-        getImageHandlesUseCase.getFromChatMessages(chatId, messageIds)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((handles, throwable) -> {
-                    if (throwable == null) {
-                        int position = 0;
-                        for (int i = 0; i < handles.size(); i++) {
-                            ImageItem item = handles.get(i);
-
-                        }
-
-                        Intent intent = new Intent(this, ImageViewerActivity.class);
-                        intent.putExtra(INTENT_EXTRA_KEY_POSITION, position);
-                        intent.putExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH, handles.toArray());
-                        startActivity(intent);
-                    }
-                });
-
-        logDebug("Message ID: " + msgId);
-        int position = 0;
-        boolean positionFound = false;
-        List<Long> ids = new ArrayList<>();
         for (int i = 0; i < messages.size(); i++) {
-            MegaChatMessage msg = messages.get(i);
-            ids.add(msg.getMsgId());
+            MegaChatMessage message = messages.get(i);
+            MegaNode node = message.getMegaNodeList().get(0);
 
-            if (msg.getMsgId() == msgId) {
-                positionFound = true;
-            }
-            if (!positionFound) {
-                MegaNodeList nodeList = msg.getMegaNodeList();
-                if (nodeList.size() == 1) {
-                    MegaNode node = nodeList.get(0);
-                    if (MimeTypeList.typeForName(node.getName()).isImage()) {
-                        position++;
-                    }
+            if (MegaNodeUtil.isValidForImageViewer(node)) {
+                nodeHandles.add(node.getHandle());
+                if (msgId == message.getMsgId()) {
+                    currentNodeHandle = node.getHandle();
                 }
             }
         }
 
-        Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
-        intent.putExtra("position", position);
-        intent.putExtra("chatId", chatId);
-
-        long[] array = new long[ids.size()];
-        for (int i = 0; i < ids.size(); i++) {
-            array[i] = ids.get(i);
-        }
-        intent.putExtra("messageIds", array);
+        Intent intent = ImageViewerActivity.getIntentForChildren(
+                this,
+                Longs.toArray(nodeHandles),
+                currentNodeHandle
+        );
         startActivity(intent);
     }
-/*
-    public void showFullScreenViewer(long msgId) {
-        logDebug("Message ID: " + msgId);
-        int position = 0;
-        boolean positionFound = false;
-        List<Long> ids = new ArrayList<>();
-        for (int i = 0; i < messages.size(); i++) {
-            MegaChatMessage msg = messages.get(i);
-            ids.add(msg.getMsgId());
-
-            if (msg.getMsgId() == msgId) {
-                positionFound = true;
-            }
-            if (!positionFound) {
-                MegaNodeList nodeList = msg.getMegaNodeList();
-                if (nodeList.size() == 1) {
-                    MegaNode node = nodeList.get(0);
-                    if (MimeTypeList.typeForName(node.getName()).isImage()) {
-                        position++;
-                    }
-                }
-            }
-        }
-
-        Intent intent = new Intent(this, ChatFullScreenImageViewer.class);
-        intent.putExtra("position", position);
-        intent.putExtra("chatId", chatId);
-
-        long[] array = new long[ids.size()];
-        for (int i = 0; i < ids.size(); i++) {
-            array[i] = ids.get(i);
-        }
-        intent.putExtra("messageIds", array);
-        startActivity(intent);
-    }*/
 
     private void updateActionModeTitle() {
         logDebug("updateActionModeTitle");

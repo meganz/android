@@ -12,7 +12,8 @@ import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
-import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.MegaNodeUtil.isGif
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaError.*
 import javax.inject.Inject
@@ -86,7 +87,8 @@ class GetImageUseCase @Inject constructor(
                             ))
                     }
 
-                    if (fullSize && !fullFile.exists()) {
+                    val isFullSizeRequired = !node.isVideo() && node.isGif()
+                    if ((fullSize || isFullSizeRequired) && !fullFile.exists()) {
                         megaApi.startDownload(
                             node,
                             fullFile.absolutePath,

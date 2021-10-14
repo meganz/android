@@ -48,7 +48,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     fun onSwitchToolbar(): LiveData<Unit> = switchToolbar
 
     fun retrieveSingleImage(nodeHandle: Long) {
-        getImageHandlesUseCase.get(listOf(nodeHandle))
+        getImageHandlesUseCase.get(longArrayOf(nodeHandle))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -63,7 +63,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun retrieveSingleOfflineImage(nodeHandle: Long) {
-        getImageHandlesUseCase.getOffline(listOf(nodeHandle))
+        getImageHandlesUseCase.getOffline(longArrayOf(nodeHandle))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -103,7 +103,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun retrieveImages(
-        nodeHandles: List<Long>,
+        nodeHandles: LongArray,
         currentNodeHandle: Long? = null
     ) {
         getImageHandlesUseCase.get(nodeHandles)
@@ -127,7 +127,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun retrieveOfflineImages(
-        nodeHandles: List<Long>,
+        nodeHandles: LongArray,
         currentNodeHandle: Long? = null
     ) {
         getImageHandlesUseCase.getOffline(nodeHandles)

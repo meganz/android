@@ -43,9 +43,6 @@ import android.widget.OverScroller;
 
 import androidx.appcompat.widget.AppCompatImageView;
 
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
-
 import static mega.privacy.android.app.components.TouchImageView.State.ANIMATE_ZOOM;
 import static mega.privacy.android.app.components.TouchImageView.State.DRAG;
 import static mega.privacy.android.app.components.TouchImageView.State.FLING;
@@ -128,11 +125,6 @@ public class TouchImageView extends AppCompatImageView {
         m = new float[9];
         normalizedScale = 1;
 
-        if (getContext() instanceof FullScreenImageViewerLollipop) {
-            ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
-        } else if (getContext() instanceof ChatFullScreenImageViewer) {
-            ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
-        }
         if (mScaleType == null) {
             mScaleType = ScaleType.FIT_CENTER;
         }
@@ -290,14 +282,6 @@ public class TouchImageView extends AppCompatImageView {
             Bundle bundle = (Bundle) state;
             normalizedScale = bundle.getFloat("saveScale");
 
-            if (getContext() instanceof FullScreenImageViewerLollipop) {
-                ((FullScreenImageViewerLollipop) getContext()).setDraggable(normalizedScale == 1);
-                ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
-            } else if (getContext() instanceof ChatFullScreenImageViewer) {
-                ((ChatFullScreenImageViewer) getContext()).setDraggable(normalizedScale == 1);
-                ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
-            }
-
             m = bundle.getFloatArray("matrix");
             prevMatrix.setValues(m);
             prevMatchViewHeight = bundle.getFloat("matchViewHeight");
@@ -370,12 +354,6 @@ public class TouchImageView extends AppCompatImageView {
      */
     public void resetZoom() {
         normalizedScale = 1;
-
-        if (getContext() instanceof FullScreenImageViewerLollipop) {
-            ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
-        } else if (getContext() instanceof ChatFullScreenImageViewer) {
-            ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
-        }
 
         fitImageToView();
     }
@@ -673,12 +651,6 @@ public class TouchImageView extends AppCompatImageView {
             matrix.postTranslate(redundantXSpace / 2, redundantYSpace / 2);
             normalizedScale = 1;
 
-            if (getContext() instanceof FullScreenImageViewerLollipop) {
-                ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
-            } else if (getContext() instanceof ChatFullScreenImageViewer) {
-                ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
-            }
-
         } else {
             // These values should never be 0 or they will set prevActualWidth and prevActualHeight to 0.
             // It will cause "divide by zero" in translateMatrixAfterRotate.
@@ -961,36 +933,12 @@ public class TouchImageView extends AppCompatImageView {
         float origScale = normalizedScale;
         normalizedScale *= deltaScale;
 
-        if (getContext() instanceof FullScreenImageViewerLollipop) {
-            ((FullScreenImageViewerLollipop) getContext()).setDraggable(normalizedScale == 1);
-            ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
-        } else if (getContext() instanceof ChatFullScreenImageViewer) {
-            ((ChatFullScreenImageViewer) getContext()).setDraggable(normalizedScale == 1);
-            ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
-        }
-
         if (normalizedScale > upperScale) {
             normalizedScale = upperScale;
-
-            if (getContext() instanceof FullScreenImageViewerLollipop) {
-                ((FullScreenImageViewerLollipop) getContext()).setDraggable(normalizedScale == 1);
-                ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
-            } else if (getContext() instanceof ChatFullScreenImageViewer) {
-                ((ChatFullScreenImageViewer) getContext()).setDraggable(normalizedScale == 1);
-                ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
-            }
 
             deltaScale = upperScale / origScale;
         } else if (normalizedScale < lowerScale) {
             normalizedScale = lowerScale;
-
-            if (getContext() instanceof FullScreenImageViewerLollipop) {
-                ((FullScreenImageViewerLollipop) getContext()).setDraggable(normalizedScale == 1);
-                ((FullScreenImageViewerLollipop) getContext()).setNormalizedScale(normalizedScale);
-            } else if (getContext() instanceof ChatFullScreenImageViewer) {
-                ((ChatFullScreenImageViewer) getContext()).setDraggable(normalizedScale == 1);
-                ((ChatFullScreenImageViewer) getContext()).setNormalizedScale(normalizedScale);
-            }
 
             deltaScale = lowerScale / origScale;
         }

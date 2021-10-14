@@ -172,10 +172,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
                 viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
             }
             childrenHandles != null && childrenHandles!!.isNotEmpty() -> {
-                viewModel.retrieveImages(childrenHandles!!.toList(), nodeHandle)
+                viewModel.retrieveImages(childrenHandles!!, nodeHandle)
             }
             childrenOfflineHandles != null && childrenOfflineHandles!!.isNotEmpty() -> {
-                viewModel.retrieveOfflineImages(childrenOfflineHandles!!.toList(), nodeHandle)
+                viewModel.retrieveOfflineImages(childrenOfflineHandles!!, nodeHandle)
             }
             nodeOfflineHandle != null && nodeOfflineHandle != INVALID_HANDLE -> {
                 viewModel.retrieveSingleOfflineImage(nodeOfflineHandle!!)

@@ -113,11 +113,9 @@ import mega.privacy.android.app.getLink.GetLinkActivity;
 import mega.privacy.android.app.lollipop.ContactFileListActivityLollipop;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.megachat.ChatActivityLollipop;
-import mega.privacy.android.app.lollipop.megachat.ChatFullScreenImageViewer;
 import mega.privacy.android.app.lollipop.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity;
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity;
@@ -1174,9 +1172,7 @@ public class Util {
      * @param idChat Chat ID. If this param has a valid value, different to -1, the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat
      */
 	public static void showSnackbar(Context context, int snackbarType, String message, long idChat) {
-		if (context instanceof FullScreenImageViewerLollipop) {
-			((FullScreenImageViewerLollipop) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof FileInfoActivityLollipop) {
+		if (context instanceof FileInfoActivityLollipop) {
 			((FileInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
 		} else if (context instanceof ContactFileListActivityLollipop) {
 			((ContactFileListActivityLollipop) context).showSnackbar(snackbarType, message);
@@ -1184,8 +1180,6 @@ public class Util {
 			((ContactInfoActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
 		} else if (context instanceof GetLinkActivity) {
 			((GetLinkActivity) context).showSnackbar(snackbarType, message, idChat);
-		} else if (context instanceof ChatFullScreenImageViewer) {
-			((ChatFullScreenImageViewer) context).showSnackbar(snackbarType, message);
 		} else if (context instanceof PdfViewerActivityLollipop) {
 			((PdfViewerActivityLollipop) context).showSnackbar(snackbarType, message, idChat);
 		} else if (context instanceof ChatActivityLollipop) {

@@ -62,10 +62,10 @@ import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.search.callback.SearchActionsCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
@@ -752,27 +752,14 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
-                    //Put flag to notify FullScreenImageViewerLollipop.
-                    intent.putExtra("placeholder", adapter.getPlaceholderCount());
-					intent.putExtra("position", position);
-					intent.putExtra("searchQuery", ((ManagerActivityLollipop)context).getSearchQuery());
-					intent.putExtra("adapterType", SEARCH_ADAPTER);
-					if (((ManagerActivityLollipop)context).getParentHandleSearch() == -1){
-						intent.putExtra("parentNodeHandle", -1L);
-					}
-					else{
-						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-					}
-
-					intent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
-
-					intent.putExtra(INTENT_EXTRA_KEY_HANDLE, nodes.get(position).getHandle());
-					putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_SEARCH, adapter);
-
-					manageNodes(intent);
+					MegaNode node = nodes.get(position);
+					Intent intent = ImageViewerActivity.getIntentForParentNode(
+							requireContext(),
+							megaApi.getParentNode(node).getHandle(),
+							sortOrderManagement.getOrderCloud(),
+							node.getHandle()
+					);
 					startActivity(intent);
-					getActivity().overridePendingTransition(0,0);
 				}
 				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideoReproducible() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);

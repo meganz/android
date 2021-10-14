@@ -65,7 +65,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
-import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
+import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter;
@@ -648,25 +648,13 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 
 	public void openFile(MegaNode node, int position) {
 		if (MimeTypeList.typeForName(node.getName()).isImage()) {
-			Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
-			//Put flag to notify FullScreenImageViewerLollipop.
-			intent.putExtra("placeholder", adapter.getPlaceholderCount());
-			intent.putExtra("position", position);
-			intent.putExtra("adapterType", FILE_BROWSER_ADAPTER);
-			intent.putExtra("isFolderLink", false);
-			if (megaApi.getParentNode(node).getType() == MegaNode.TYPE_ROOT) {
-				intent.putExtra("parentNodeHandle", -1L);
-			} else {
-				intent.putExtra("parentNodeHandle", megaApi.getParentNode(node).getHandle());
-			}
-
-			intent.putExtra("orderGetChildren", sortOrderManagement.getOrderCloud());
-
-			intent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.getHandle());
-			putThumbnailLocation(intent, recyclerView, position, VIEWER_FROM_FILE_BROWSER, adapter);
-
-			context.startActivity(intent);
-			((ManagerActivityLollipop) context).overridePendingTransition(0, 0);
+			Intent intent = ImageViewerActivity.getIntentForParentNode(
+					requireContext(),
+					megaApi.getParentNode(node).getHandle(),
+					sortOrderManagement.getOrderCloud(),
+					node.getHandle()
+			);
+			startActivity(intent);
 		} else if (MimeTypeList.typeForName(node.getName()).isVideoReproducible() || MimeTypeList.typeForName(node.getName()).isAudio()) {
 			MegaNode file = node;
 
