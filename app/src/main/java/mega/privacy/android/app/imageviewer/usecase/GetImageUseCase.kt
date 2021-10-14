@@ -42,6 +42,7 @@ class GetImageUseCase @Inject constructor(
                     val imageItem = ImageItem(
                         node.handle,
                         node.name,
+                        node.isVideo(),
                         thumbnailUri = if (thumbnailFile?.exists() == true) thumbnailFile.toUri() else null,
                         previewUri = if (previewFile?.exists() == true) previewFile.toUri() else null,
                         fullSizeUri = if (fullFile?.exists() == true) fullFile.toUri() else null

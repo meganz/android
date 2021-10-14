@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 data class ImageItem constructor(
     val handle: Long,
     val name: String,
+    val isVideo: Boolean = false,
     var thumbnailUri: Uri? = null,
     var previewUri: Uri? = null,
     var fullSizeUri: Uri? = null

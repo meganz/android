@@ -5,9 +5,11 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.DatabaseHandler
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
+import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.OfflineUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
@@ -26,7 +28,7 @@ class GetImageHandlesUseCase @Inject constructor(
             nodeHandles.forEach { nodeHandle ->
                 val node = megaApi.getNodeByHandle(nodeHandle)
                 if (node?.isValidForImageViewer() == true) {
-                    items.add(ImageItem(node.handle, node.name))
+                    items.add(ImageItem(node.handle, node.name, node.isVideo()))
                 }
             }
 
@@ -46,7 +48,12 @@ class GetImageHandlesUseCase @Inject constructor(
                     val file = OfflineUtils.getOfflineFile(context, node)
                     if (file.exists()) {
                         items.add(
-                            ImageItem(node.handle.toLong(), node.name, fullSizeUri = file.toUri())
+                            ImageItem(
+                                node.handle.toLong(),
+                                node.name,
+                                MimeTypeList.typeForName(node.name).isVideo,
+                                fullSizeUri = file.toUri()
+                            )
                         )
                     }
                 }
@@ -66,7 +73,7 @@ class GetImageHandlesUseCase @Inject constructor(
                 val items = mutableListOf<ImageItem>()
                 megaApi.getChildren(parentNode, order ?: ORDER_PHOTO_ASC).forEach { node ->
                     if (node.isValidForImageViewer()) {
-                        items.add(ImageItem(node.handle, node.name))
+                        items.add(ImageItem(node.handle, node.name, node.isVideo()))
                     }
                 }
                 emitter.onSuccess(items)

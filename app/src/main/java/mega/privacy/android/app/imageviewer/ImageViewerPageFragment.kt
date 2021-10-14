@@ -1,9 +1,12 @@
 package mega.privacy.android.app.imageviewer
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.facebook.common.references.CloseableReference
@@ -12,13 +15,17 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
+import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 
 @AndroidEntryPoint
 class ImageViewerPageFragment : Fragment() {
@@ -84,7 +91,9 @@ class ImageViewerPageFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.getImage(nodeHandle).observe(viewLifecycleOwner, ::showImageItem)
-        viewModel.loadSingleImage(nodeHandle, false)
+        viewModel.loadSingleImage(nodeHandle, false).observe(viewLifecycleOwner) {
+            binding.progress.hide()
+        }
     }
 
     private fun showImageItem(item: ImageItem?) {
@@ -97,9 +106,33 @@ class ImageViewerPageFragment : Fragment() {
                 )
             )
 
-            binding.progress.hide()
+            if (item.isVideo) {
+                binding.image.setOnClickListener { launchVideoScreen(item) }
+                binding.btnVideo.setOnClickListener { launchVideoScreen(item) }
+            }
+            binding.btnVideo.isVisible = item.isVideo
         } else {
-            logError("Image doesn't exist")
+            logError("ImageItem is null")
+            Toast.makeText(requireContext(), R.string.error_fail_to_open_file_general, Toast.LENGTH_LONG).show()
+            activity?.finish()
         }
+    }
+
+    private fun launchVideoScreen(item: ImageItem) {
+        val fileUri = item.getAvailableUri()
+        val intent = Intent(context, VideoPlayerActivity::class.java).apply {
+            putExtra(INTENT_EXTRA_KEY_HANDLE, item.handle)
+            putExtra(INTENT_EXTRA_KEY_FILE_NAME, item.name)
+            putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INBOX_ADAPTER)
+            putExtra(INTENT_EXTRA_KEY_POSITION, 0)
+            putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
+            putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
+            putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            setDataAndType(fileUri, MimeTypeList.typeForName(item.name).type)
+        }
+
+        startActivity(intent)
     }
 }
