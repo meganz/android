@@ -197,6 +197,11 @@ public class VideoDownsampling {
                         resultHeight = mHeight * shortSideByQuality / mWidth;
                     }
                 }
+            } else {
+                // Since the METADATA_KEY_BITRATE is not the right value of the final bitrate
+                // of a video but the average one, we can assume a 2% less to ensure the final size
+                // is a bit less than the original one.
+                bitrate *= 0.98;
             }
 
             MediaCodecInfo.VideoCapabilities capabilities = videoCodecInfo
