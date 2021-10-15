@@ -56,7 +56,7 @@ public class CameraUploadsPreferencesActivity extends PreferencesBaseActivity {
                     break;
 
                 case ACTION_REFRESH_CAMERA_UPLOADS_MEDIA_SETTING:
-                    sttCameraUploads.disableMediaUploadUIProcess();
+//                    sttCameraUploads.shouldDisableMediaUploadUIProcess();
                     break;
             }
         }

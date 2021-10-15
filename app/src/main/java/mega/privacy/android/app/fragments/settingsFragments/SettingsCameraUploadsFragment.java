@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.SwitchPreferenceCompat;
@@ -79,7 +80,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     private boolean charging = false;
     private boolean includeGPS;
     private boolean fileNames = false;
-    private Handler handler = new Handler();
 
     private String wifi = "";
     private String camSyncLocalPath = "";
@@ -1004,6 +1004,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         MegaApplication.getInstance().sendBroadcast(new Intent(ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE));
     }
 
+
     /**
      * Start the camera upload service
      */
@@ -1014,18 +1015,63 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         if (prefs != null) {
             cuEnabled = Boolean.parseBoolean(prefs.getCamSyncEnabled());
             if (cuEnabled) {
+                if(!checkSecondaryLocalFolder()){
+                    dbH.setSecondaryUploadEnabled(false);
+                    disableMediaUploadUIProcess();
+                }
+
+                logDebug("Enable Camera Uploads, Now I start the service");
+                startCameraUploadService(context);
+
                 if (bRescheduleCameraUpload) {
-                    handler.post(() -> {
-                        logDebug("Rescheduling CU");
-                        rescheduleCameraUpload(context);
-                    });
-                } else {
-                    handler.post(() -> {
-                        logDebug("Enable Camera Uploads, Now I start the service");
-                        startCameraUploadService(context);
-                    });
+                    logDebug("Rescheduling CU");
+                    rescheduleCameraUpload(context);
                 }
             }
+        }
+    }
+
+    /**
+     * Check the availability of secondary local folder.
+     * If it's a path in internal storage, just check its existence.
+     * If it's a path in SD card, check the corresponding DocumentFile's existence.
+     *
+     * @return true, if secondary local folder is available. false， when it's unavailable.
+     */
+    private boolean checkSecondaryLocalFolder() {
+        // check secondary local folder if media upload is enabled
+        boolean secondaryEnabled = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+        if (secondaryEnabled) {
+            String localPathSecondary;
+            boolean isExist;
+            if (dbH.getMediaFolderExternalSdCard()) {
+                Uri uri = Uri.parse(dbH.getUriMediaExternalSdCard());
+                DocumentFile file = DocumentFile.fromTreeUri(requireContext(), uri);
+                if (file == null) {
+                    logError("Local media folder on sd card is unavailable.");
+                    return false;
+                }
+
+                isExist = file.exists();
+            } else {
+                localPathSecondary = prefs.getLocalPathSecondaryFolder();
+
+                if (localPathSecondary == null) return false;
+
+                if (!localPathSecondary.endsWith(SEPARATOR)) {
+                    localPathSecondary += SEPARATOR;
+                }
+
+                isExist =  new File(localPathSecondary).exists();
+            }
+
+            if(isExist){
+                dbH.setSecondaryUploadEnabled(true);
+            }
+            return isExist;
+        } else {
+            logDebug("Not enabled Secondary");
+            return true;
         }
     }
 
