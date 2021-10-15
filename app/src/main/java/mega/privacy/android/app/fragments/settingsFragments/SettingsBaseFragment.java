@@ -1,9 +1,20 @@
 package mega.privacy.android.app.fragments.settingsFragments;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_SCROLL;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
+
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -21,7 +32,7 @@ public class SettingsBaseFragment extends PreferenceFragmentCompat implements Pr
 
     protected SimpleSnackbarCallBack snackbarCallBack;
 
-    public SettingsBaseFragment () {
+    public SettingsBaseFragment() {
         if (megaApi == null) {
             megaApi = MegaApplication.getInstance().getMegaApi();
         }
@@ -45,7 +56,22 @@ public class SettingsBaseFragment extends PreferenceFragmentCompat implements Pr
     }
 
     @Override
-    public void onCreatePreferences(Bundle bundle, String s) { }
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        getListView().addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LiveEventBus.get(EVENT_UPDATE_SCROLL, Boolean.class)
+                        .post(recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION));
+            }
+        });
+    }
+
+    @Override
+    public void onCreatePreferences(Bundle bundle, String s) {
+    }
 
     @Override
     public boolean onPreferenceClick(Preference preference) {

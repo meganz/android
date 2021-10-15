@@ -130,6 +130,7 @@ import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.objects.PasscodeManagement;
+import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
@@ -465,17 +466,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	// Determine if open this activity from meeting page, if true, will finish this activity when user click back icon
 	private boolean isFromMeeting = false;
 
-	private Boolean initFabButtonShow = false;
-	private Observer<Boolean> fabChangeObserver  = isShow -> {
-		if(initFabButtonShow) {
-			if (isShow) {
-				showFabButtonAfterScrolling();
-			} else {
-				hideFabButtonWhenScrolling();
-			}
-		}
-	};
-
 	public enum FragmentTag {
 		CLOUD_DRIVE, HOMEPAGE, CAMERA_UPLOADS, INBOX, INCOMING_SHARES, OUTGOING_SHARES, SETTINGS, SEARCH,TRANSFERS, COMPLETED_TRANSFERS,
 		RECENT_CHAT, RUBBISH_BIN, NOTIFICATIONS, TURN_ON_NOTIFICATIONS, PERMISSIONS, SMS_VERIFICATION,
@@ -725,6 +715,22 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private View mNavHostView;
 	private NavController mNavController;
 	private HomepageSearchable mHomepageSearchable;
+
+	private Boolean initFabButtonShow = false;
+
+	private Observer<Boolean> fabChangeObserver  = isShow -> {
+		if (drawerItem == DrawerItem.HOMEPAGE) {
+			controlFabInHomepage(isShow);
+		} else {
+			if (initFabButtonShow) {
+				if (isShow) {
+					showFabButtonAfterScrolling();
+				} else {
+					hideFabButtonWhenScrolling();
+				}
+			}
+		}
+	};
 
 	private final Observer<Boolean> refreshAddPhoneNumberButtonObserver = new Observer<Boolean>() {
 		@Override
@@ -11726,6 +11732,35 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 	private PermissionsFragment getPermissionsFragment() {
 		return pF = (PermissionsFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PERMISSIONS.getTag());
+	}
+
+	/**
+	 * Checks whether the current screen is the main of Homepage or Documents.
+	 * Video / Audio / Photos do not need Fab button
+	 * @param isShow  True if Fab button should be display, False if Fab button should be hidden
+	 */
+	private void controlFabInHomepage(Boolean isShow) {
+		if (mHomepageScreen == HomepageScreen.HOMEPAGE){
+			// Control the Fab in homepage
+			HomepageFragment fragment = getFragmentByType(HomepageFragment.class);
+			if(fragment != null) {
+				if (isShow) {
+					fragment.showFabButton();
+				} else {
+					fragment.hideFabButton();
+				}
+			}
+		} else if(mHomepageScreen == HomepageScreen.DOCUMENTS){
+			// Control the Fab in documents
+			DocumentsFragment docFragment = getFragmentByType(DocumentsFragment.class);
+			if(docFragment != null) {
+				if (isShow) {
+					docFragment.showFabButton();
+				} else {
+					docFragment.hideFabButton();
+				}
+			}
+		}
 	}
 
 	@Override

@@ -23,7 +23,7 @@ import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -40,7 +40,7 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
 
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
-    private var videoListener: MeetingVideoListener? = null
+    private var videoListener: IndividualCallVideoListener? = null
 
     protected var meetingName = ""
     protected var chatId: Long = MEGACHAT_INVALID_HANDLE
@@ -464,7 +464,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         }
 
         if (videoListener == null) {
-            videoListener = MeetingVideoListener(
+            videoListener = IndividualCallVideoListener(
                 localSurfaceView,
                 outMetrics,
                 MEGACHAT_INVALID_HANDLE,

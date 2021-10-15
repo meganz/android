@@ -22,7 +22,7 @@ import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.listeners.OpenVideoDeviceListener
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
@@ -412,9 +412,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * Method of obtaining the video
      *
      * @param chatId chatId
-     * @param listener MeetingVideoListener
+     * @param listener IndividualCallVideoListener
      */
-    fun addLocalVideo(chatId: Long, listener: MeetingVideoListener?) {
+    fun addLocalVideo(chatId: Long, listener: IndividualCallVideoListener?) {
         if (listener == null)
             return
 
@@ -426,9 +426,9 @@ class MeetingActivityViewModel @ViewModelInject constructor(
      * Method of remove the local video
      *
      * @param chatId chatId
-     * @param listener MeetingVideoListener
+     * @param listener IndividualCallVideoListener
      */
-    fun removeLocalVideo(chatId: Long, listener: MeetingVideoListener?) {
+    fun removeLocalVideo(chatId: Long, listener: IndividualCallVideoListener?) {
         if (listener == null) {
             logError("Listener is null")
             return
