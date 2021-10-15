@@ -927,7 +927,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			setAttributes(db, attr);
 		}
 
-		if (oldVersion <= 62 && oldVersion > 52) {
+		if (oldVersion <= 62) {
 			if (oldVersion > 52) {
 				ChatSettings chatSettings = getChatSettingsFromDBv62(db);
 				db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
@@ -935,10 +935,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				setChatSettings(db, chatSettings);
 			}
 
-			MegaPreferences preferences = getPreferencesFromDBv62();
+			MegaPreferences preferences = getPreferencesFromDBv62(db);
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
 			onCreate(db);
-			setPreferences(preferences);
+			setPreferences(db, preferences);
 		}
 	}
 
@@ -1566,7 +1566,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return ephemeralCredentials;
     }
 
-	public void setPreferences (MegaPreferences prefs){
+	/**
+	 * Sets preferences.
+	 *
+	 * @param db    Current DB.
+	 * @param prefs Preferences.
+	 */
+	private void setPreferences (SQLiteDatabase db, MegaPreferences prefs){
         ContentValues values = new ContentValues();
         values.put(KEY_FIRST_LOGIN, encrypt(prefs.getFirstTime()));
         values.put(KEY_CAM_SYNC_WIFI, encrypt(prefs.getCamSyncWifi()));
@@ -1619,27 +1625,34 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
 	/**
-	 * Get preferences from the DB v62 (previous to add four available video qualities).
+	 * Gets preferences from the DB v62 (previous to add four available video qualities).
 	 *
+	 * @param db Current DB.
 	 * @return Preferences.
 	 */
-    private MegaPreferences getPreferencesFromDBv62() {
+    private MegaPreferences getPreferencesFromDBv62(SQLiteDatabase db) {
 		logDebug("getPreferencesFromDBv62");
-		return getPreferences(true);
-	}
-
-	public MegaPreferences getPreferences(){
-        logDebug("getPreferences");
-        return getPreferences(false);
+		return getPreferences(db, true);
 	}
 
 	/**
-	 * Get preferences.
+	 * Gets preferences.
 	 *
+	 * @return Preferences.
+	 */
+	public MegaPreferences getPreferences(){
+        logDebug("getPreferences");
+        return getPreferences(db, false);
+	}
+
+	/**
+	 * Gets preferences.
+	 *
+	 * @param db        Current DB.
 	 * @param fromDBv62 True if should get them from DB v62, false otherwise.
 	 * @return Preferences.
 	 */
-	private MegaPreferences getPreferences(boolean fromDBv62) {
+	private MegaPreferences getPreferences(SQLiteDatabase db, boolean fromDBv62) {
 		MegaPreferences prefs = null;
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 
