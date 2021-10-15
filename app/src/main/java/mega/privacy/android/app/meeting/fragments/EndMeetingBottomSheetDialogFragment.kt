@@ -5,6 +5,9 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetEndMeetingBinding
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
@@ -14,7 +17,7 @@ import nz.mega.sdk.MegaChatApiJava
 /**
  * The fragment shows two options for moderator when the moderator leave the meeting
  */
-class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+class EndMeetingBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetEndMeetingBinding
     private val sharedViewModel:InMeetingViewModel by activityViewModels()
     private var chatId: Long? = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -51,6 +54,14 @@ class EndMeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.assignModerator.setOnClickListener { assignModerator() }
         binding.leaveAnyway.setOnClickListener { leaveAnyway() }
         dialog.setContentView(binding.root)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val dialog = dialog ?: return
+        BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
+            BottomSheetBehavior.STATE_EXPANDED
     }
 
     /**
