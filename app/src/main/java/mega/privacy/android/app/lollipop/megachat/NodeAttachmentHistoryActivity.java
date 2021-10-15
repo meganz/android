@@ -112,8 +112,6 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity
     public static int NUMBER_MESSAGES_TO_LOAD = 20;
     public static int NUMBER_MESSAGES_BEFORE_LOAD = 8;
 
-    MegaApiAndroid megaApi;
-    MegaChatApiAndroid megaChatApi;
     ActionBar aB;
     MaterialToolbar tB;
     NodeAttachmentHistoryActivity nodeAttachmentHistoryActivity = this;

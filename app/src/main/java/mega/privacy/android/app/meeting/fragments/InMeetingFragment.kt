@@ -829,6 +829,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
+        individualCallFragment?.let {
+            if(it.isAdded){
+                it.updateOrientation()
+            }
+        }
+
         floatingWindowContainer.let {
             val menuLayoutParams = it.layoutParams as ViewGroup.MarginLayoutParams
             menuLayoutParams.setMargins(0, 0, 0, Util.dp2px(125f, outMetrics))

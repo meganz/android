@@ -278,20 +278,19 @@ public class ChatManagement {
     /**
      * Method to control whether or not to display the incoming call notification when I am added to a group and a call is in progress.
      *
-     * @param item MegaChatListItem of the new group chat
+     * @param chatId Chat ID of the new group chat
      */
-    public void checkActiveGroupChat(MegaChatListItem item) {
-        if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(item.getChatId())) {
-            currentActiveGroupChat.add(item.getChatId());
-            
-            MegaChatCall call = app.getMegaChatApi().getChatCall(item.getChatId());
+    public void checkActiveGroupChat(Long chatId) {
+        if (currentActiveGroupChat.isEmpty() || !currentActiveGroupChat.contains(chatId)) {
+            MegaChatCall call = app.getMegaChatApi().getChatCall(chatId);
             if (call == null) {
                 logError("Call is null");
                 return;
             }
 
             if(call.getStatus() == CALL_STATUS_USER_NO_PRESENT){
-                checkToShowIncomingGroupCallNotification(call, item.getChatId());
+                addCurrentGroupChat(chatId);
+                checkToShowIncomingGroupCallNotification(call, chatId);
             }
         }
     }
