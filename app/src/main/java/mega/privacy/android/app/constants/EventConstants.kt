@@ -47,6 +47,7 @@ object EventConstants {
     const val EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change"
     const val EVENT_CHAT_CONNECTION_STATUS = "chat_connection_status_change"
 
+    const val EVENT_UPDATE_SCROLL = "EVENT_UPDATE_SCROLL"
     const val EVENT_PERFORM_SCROLL = "EVENT_PERFORM_SCROLL"
     const val EVENT_REFRESH_PHONE_NUMBER = "EVENT_REFRESH_PHONE_NUMBER"
     const val EVENT_PURCHASES_UPDATED = "EVENT_PURCHASES_UPDATED"
