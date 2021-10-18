@@ -18,7 +18,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENTER_IN_MEETING
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.fragments.*
+import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
+import mega.privacy.android.app.utils.PasscodeUtil
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MeetingActivity : BaseActivity() {
@@ -46,12 +49,16 @@ class MeetingActivity : BaseActivity() {
         const val MEETING_IS_GUEST = "is_guest"
     }
 
+    @Inject
+    lateinit var passcodeUtil: PasscodeUtil
+
     private lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
     private var meetingAction: String? = null
 
     private var isGuest = false
+    private var isLockingEnabled = false
 
     private fun View.setMarginTop(marginTop: Int) {
         val menuLayoutParams = this.layoutParams as ViewGroup.MarginLayoutParams
@@ -231,6 +238,17 @@ class MeetingActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
+
+        val timeRequired = passcodeUtil.timeRequiredForPasscode()
+        if (timeRequired != REQUIRE_PASSCODE_INVALID) {
+            if (isLockingEnabled) {
+                MegaApplication.getPasscodeManagement().lastPause =
+                    System.currentTimeMillis() - timeRequired
+            } else {
+                passcodeUtil.pauseUpdate()
+            }
+        }
+
         sendQuitCallEvent()
     }
 
@@ -238,6 +256,7 @@ class MeetingActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
+        isLockingEnabled = passcodeUtil.shouldLock()
         val currentFragment = getCurrentFragment()
         if (currentFragment is InMeetingFragment) {
             currentFragment.sendEnterCallEvent()
