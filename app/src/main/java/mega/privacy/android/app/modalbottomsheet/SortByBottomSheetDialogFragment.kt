@@ -1,12 +1,13 @@
 package mega.privacy.android.app.modalbottomsheet
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,16 +49,25 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     @Inject
     lateinit var sortOrderManagement: SortOrderManagement
 
+    private lateinit var binding: BottomSheetSortByBinding
+
     private var oldOrder: Int = ORDER_DEFAULT_ASC
     private var orderType: Int = ORDER_CLOUD
     private var isIncomingRootOrder: Boolean = false
 
-    @SuppressLint("SetTextI18n", "RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = BottomSheetSortByBinding.inflate(LayoutInflater.from(context), null, false)
+        contentView = binding.root
+        itemsLayout = binding.root.linear_layout
+        return contentView
+    }
 
-        val binding = BottomSheetSortByBinding.inflate(LayoutInflater.from(context), null, false)
-
+    @SuppressLint("SetTextI18n")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val sortByName = getString(R.string.sortby_name)
         val sortByAsc = getString(R.string.sortby_name_ascending).toLowerCase(Locale.ROOT)
         val sortByDesc = getString(R.string.sortby_name_descending).toLowerCase(Locale.ROOT)
@@ -119,37 +129,40 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.sortByNameAsc.setOnClickListener {
             setNewOrder(ORDER_DEFAULT_ASC)
         }
+
         binding.sortByNameDesc.setOnClickListener {
             setNewOrder(ORDER_DEFAULT_DESC)
         }
+
         binding.sortByNewestDate.setOnClickListener {
             setNewOrder(if (orderType == ORDER_CONTACTS) ORDER_CREATION_ASC else ORDER_MODIFICATION_DESC)
         }
+
         binding.sortByOldestDate.setOnClickListener {
             setNewOrder(if (orderType == ORDER_CONTACTS) ORDER_CREATION_DESC else ORDER_MODIFICATION_ASC)
         }
+
         binding.sortByLargestSize.setOnClickListener {
             setNewOrder(ORDER_SIZE_DESC)
         }
+
         binding.sortBySmallestSize.setOnClickListener {
             setNewOrder(ORDER_SIZE_ASC)
         }
+
         binding.sortByPhotosMediaType.setOnClickListener {
             setNewOrder(ORDER_PHOTO_DESC)
         }
+
         binding.sortByVideosMediaType.setOnClickListener {
             setNewOrder(ORDER_VIDEO_DESC)
         }
 
-        contentView = binding.root
-        mainLinearLayout = binding.root.linear_layout
-        items_layout = binding.root.linear_layout
-        dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+        super.onViewCreated(view, savedInstanceState)
     }
 
     private fun setSelectedColor(text: TextView) {
-        val colorSecondary = ColorUtils.getThemeColor(context, R.attr.colorSecondary)
+        val colorSecondary = ColorUtils.getThemeColor(requireContext(), R.attr.colorSecondary)
         text.setTextColor(colorSecondary)
 
         var icon = text.compoundDrawablesRelative[0] ?: return

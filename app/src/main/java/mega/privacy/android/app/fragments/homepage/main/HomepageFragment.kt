@@ -97,14 +97,6 @@ class HomepageFragment : Fragment() {
         }
     }
 
-    private val fabChangeObserver = androidx.lifecycle.Observer<Boolean> {
-        if (it) {
-            showFabButton()
-        } else {
-            hideFabButton()
-        }
-    }
-
     var isFabExpanded = false
 
     /** The broadcast receiver for network connectivity.
@@ -146,9 +138,6 @@ class HomepageFragment : Fragment() {
 
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .observeForever(homepageVisibilityChangeObserver)
-
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
-            .observeForever(fabChangeObserver)
 
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
@@ -208,9 +197,6 @@ class HomepageFragment : Fragment() {
 
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .removeObserver(homepageVisibilityChangeObserver)
-
-        LiveEventBus.get(EVENT_FAB_CHANGE, Boolean::class.java)
-            .removeObserver(fabChangeObserver)
     }
 
     /**
@@ -766,7 +752,7 @@ class HomepageFragment : Fragment() {
     /**
      * Hides the fabButton
      */
-    private fun hideFabButton() {
+    fun hideFabButton() {
         fabMain.hide()
         fabMaskMain.hide()
     }
@@ -774,7 +760,7 @@ class HomepageFragment : Fragment() {
     /**
      * Shows the fabButton
      */
-    private fun showFabButton() {
+    fun showFabButton() {
         fabMain.show()
         fabMaskMain.show()
     }
