@@ -5,11 +5,12 @@ import android.app.Dialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 
-class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.OnClickListener {
+class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClickListener {
 
     private var listener: MeetingBottomSheetDialogActionListener? = null
 
@@ -18,13 +19,10 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
         super.setupDialog(dialog, style)
 
         val binding = BottomSheetMeetingBinding.inflate(LayoutInflater.from(context), null, false)
-        contentView = binding.root
-        mainLinearLayout = binding.meetingBottomSheet
 
         binding.ivStartMeeting.setOnClickListener(this)
         binding.ivJoinMeeting.setOnClickListener(this)
-        dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true)
+        dialog.setContentView(binding.root)
     }
 
     override fun onClick(v: View) {
@@ -36,7 +34,6 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
                 listener?.onJoinMeeting()
             }
         }
-        setStateBottomSheetBehaviorHidden()
     }
 
     override fun onAttach(context: Context) {

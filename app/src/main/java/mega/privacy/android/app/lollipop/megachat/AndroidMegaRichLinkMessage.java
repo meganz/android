@@ -106,13 +106,11 @@ public class AndroidMegaRichLinkMessage {
     }
 
     public static String extractMegaLink(String urlIn) {
-
-        urlIn = decodeURL(urlIn);
-
         Matcher m = Patterns.WEB_URL.matcher(urlIn);
+
         while (m.find()) {
-            String url = m.group();
-            logDebug("URL extracted: " + url);
+            String url = decodeURL(m.group());
+
             if (isFileLink(url)) {
                 return url;
             }
