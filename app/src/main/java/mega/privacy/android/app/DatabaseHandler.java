@@ -301,7 +301,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + KEY_BACKUP_DEL + " BOOLEAN,"
             + KEY_BACKUP_OUTDATED + " BOOLEAN)";
 
-    private static final int OLD_VIDEO_QUALITY_MEDIUM = 1;
+    private static final int OLD_VIDEO_QUALITY_ORIGINAL = 0;
 
     private static DatabaseHandler instance;
 
@@ -1636,8 +1636,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String uploadVideoQuality = preferences.getUploadVideoQuality();
 
 		if(!isTextEmpty(uploadVideoQuality)
-				&& Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_MEDIUM) {
-			preferences.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_MEDIUM));
+				&& Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_ORIGINAL) {
+			preferences.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_ORIGINAL));
 		}
 
 		return preferences;
