@@ -1632,7 +1632,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 */
     private MegaPreferences getPreferencesFromDBv62(SQLiteDatabase db) {
 		logDebug("getPreferencesFromDBv62");
-		return getPreferences(db, true);
+		MegaPreferences preferences = getPreferences(db);
+		String uploadVideoQuality = preferences.getUploadVideoQuality();
+
+		if(!isTextEmpty(uploadVideoQuality)
+				&& Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_MEDIUM) {
+			preferences.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_MEDIUM));
+		}
+
+		return preferences;
 	}
 
 	/**
@@ -1642,17 +1650,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 */
 	public MegaPreferences getPreferences(){
         logDebug("getPreferences");
-        return getPreferences(db, false);
+        return getPreferences(db);
 	}
 
 	/**
 	 * Gets preferences.
 	 *
-	 * @param db        Current DB.
-	 * @param fromDBv62 True if should get them from DB v62, false otherwise.
+	 * @param db Current DB.
 	 * @return Preferences.
 	 */
-	private MegaPreferences getPreferences(SQLiteDatabase db, boolean fromDBv62) {
+	private MegaPreferences getPreferences(SQLiteDatabase db) {
 		MegaPreferences prefs = null;
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 
@@ -1690,11 +1697,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String smallGridCamera = decrypt(cursor.getString(30));
 				String isAutoPlayEnabled = decrypt(cursor.getString(31));
 				String uploadVideoQuality = decrypt(cursor.getString(32));
-
-				if(fromDBv62 && Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_MEDIUM) {
-					uploadVideoQuality = String.valueOf(VIDEO_QUALITY_MEDIUM);
-				}
-
 				String conversionOnCharging = decrypt(cursor.getString(33));
 				String chargingOnSize = decrypt(cursor.getString(34));
 				String shouldClearCameraSyncRecords = decrypt(cursor.getString(35));

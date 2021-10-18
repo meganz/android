@@ -137,6 +137,26 @@ public class VideoDownsampling {
         }
     }
 
+    /**
+     * Creates the decoders and encoders to compress a video given a quality.
+     *
+     * Depending on quality these are the params the video encoder receives to perform the compression:
+     *  - VIDEO_QUALITY_HIGH:
+     *      * Original resolution.
+     *      * Original frame rate.
+     *      * Average bitrate reduced by 2%.
+     *  - VIDEO_QUALITY_MEDIUM:
+     *      * 1080p resolution if supported, the closest one if not.
+     *      * OUTPUT_VIDEO_FRAME_RATE or the original one if smaller.
+     *      * Half of average bitrate.
+     *  - VIDEO_QUALITY_LOW:
+     *      * 720p resolution if supported, the closest one if not.
+     *      * OUTPUT_VIDEO_FRAME_RATE or the original one if smaller.
+     *      * A third of average bitrate.
+     *
+     * @param video VideoUpload object containing the required info to compress a video.
+     * @throws Exception If something wrong happens.
+     */
     protected void prepareAndChangeResolution(VideoUpload video) throws Exception {
         logDebug("prepareAndChangeResolution");
         Exception exception = null;
