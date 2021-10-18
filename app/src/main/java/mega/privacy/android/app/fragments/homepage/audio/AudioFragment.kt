@@ -245,11 +245,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         }
 
         if (paramsSetSuccessfully) {
-            if (internalIntent) {
-                startActivity(intent)
-            } else {
-                startActivity(intent)
-            }
+            startActivity(intent)
         } else {
             logWarning("itemClick:noAvailableIntent")
             showSnackbar(

@@ -416,11 +416,9 @@ class VideoFragment : Fragment(), HomepageSearchable {
         }
 
         if (paramsSetSuccessfully) {
+            startActivity(intent)
             if (internalIntent) {
-                startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)
-            } else {
-                startActivity(intent)
             }
         } else {
             LogUtil.logWarning("itemClick:noAvailableIntent")
