@@ -6,6 +6,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
@@ -14,6 +15,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 import java.io.File
 import javax.inject.Inject
 
@@ -29,9 +31,22 @@ class GetNodeUseCase @Inject constructor(
 
     fun get(context: Context, nodeHandle: Long): Single<MegaNodeItem> =
         Single.fromCallable {
+            val node = megaApi.getNodeByHandle(nodeHandle)
+            val nodeAccess = megaApi.getAccess(node)
+
+            val hasFullAccess = nodeAccess == MegaShare.ACCESS_OWNER || nodeAccess == MegaShare.ACCESS_FULL
+            val isFromRubbishBin = node.parentHandle == megaApi.rubbishNode.handle
+            val isFromInbox = node.parentHandle == megaApi.inboxNode.handle
+            val isFromRoot = node.parentHandle == megaApi.rootNode.handle
+            val isAvailableOffline = isNodeAvailableOffline(context, nodeHandle).blockingGet()
+
             MegaNodeItem(
-                megaApi.getNodeByHandle(nodeHandle),
-                isNodeAvailableOffline(context, nodeHandle).blockingGet()
+                node,
+                hasFullAccess,
+                isFromRubbishBin,
+                isFromInbox,
+                isFromRoot,
+                isAvailableOffline
             )
         }
 
@@ -90,15 +105,12 @@ class GetNodeUseCase @Inject constructor(
             megaApi.copyNode(currentNode, newParentNode, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
-                        MegaError.API_OK -> {
+                        MegaError.API_OK ->
                             emitter.onComplete()
-                        }
-                        MegaError.API_EBUSINESSPASTDUE -> {
-                            emitter.onError(IllegalStateException("Business account status is expired"))
-                        }
-                        else -> {
+                        MegaError.API_EBUSINESSPASTDUE ->
+                            emitter.onError(BusinessAccountOverdueMegaError())
+                        else ->
                             emitter.onError(error.toThrowable())
-                        }
                     }
                 }
             ))
@@ -111,15 +123,12 @@ class GetNodeUseCase @Inject constructor(
             megaApi.moveNode(currentNode, newParentNode, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
-                        MegaError.API_OK -> {
+                        MegaError.API_OK ->
                             emitter.onComplete()
-                        }
-                        MegaError.API_EBUSINESSPASTDUE -> {
-                            emitter.onError(IllegalStateException("Business account status is expired"))
-                        }
-                        else -> {
+                        MegaError.API_EBUSINESSPASTDUE ->
+                            emitter.onError(BusinessAccountOverdueMegaError())
+                        else ->
                             emitter.onError(error.toThrowable())
-                        }
                     }
                 }
             ))
@@ -127,4 +136,21 @@ class GetNodeUseCase @Inject constructor(
 
     fun moveToRubbishBin(nodeHandle: Long): Completable =
         moveNode(nodeHandle, megaApi.rubbishNode.handle)
+
+    fun removeNode(nodeHandle: Long): Completable =
+        Completable.create { emitter ->
+            val node = megaApi.getNodeByHandle(nodeHandle)
+            megaApi.remove(node, OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK ->
+                            emitter.onComplete()
+                        MegaError.API_EMASTERONLY ->
+                            emitter.onError(IllegalStateException("Sub-user business account"))
+                        else ->
+                            emitter.onError(error.toThrowable())
+                    }
+                }
+            ))
+        }
 }

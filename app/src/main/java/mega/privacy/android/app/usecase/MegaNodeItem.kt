@@ -2,7 +2,11 @@ package mega.privacy.android.app.usecase
 
 import nz.mega.sdk.MegaNode
 
-data class MegaNodeItem constructor(
+data class MegaNodeItem(
     val node: MegaNode,
+    val hasFullAccess: Boolean,
+    val isFromRubbishBin: Boolean,
+    val isFromInbox: Boolean,
+    val isFromRoot: Boolean,
     val isAvailableOffline: Boolean
 )

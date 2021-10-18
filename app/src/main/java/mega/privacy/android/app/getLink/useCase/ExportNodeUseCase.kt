@@ -3,6 +3,7 @@ package mega.privacy.android.app.getLink.useCase
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -103,7 +104,7 @@ class ExportNodeUseCase @Inject constructor(
                             emitter.onComplete()
                         }
                         MegaError.API_EBUSINESSPASTDUE -> {
-                            emitter.onError(IllegalStateException("Business account status is expired"))
+                            emitter.onError(BusinessAccountOverdueMegaError())
                         }
                         else -> {
                             emitter.onError(error.toThrowable())

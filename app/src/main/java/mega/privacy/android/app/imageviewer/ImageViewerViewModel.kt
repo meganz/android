@@ -34,8 +34,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun getCurrentHandle(): LiveData<Long> = currentHandle
 
-    fun getCurrentImage(): LiveData<ImageItem?> =
-        Transformations.switchMap(currentHandle) { currentHandle -> getImage(currentHandle) }
+    fun getCurrentImage(): LiveData<MegaNodeItem?> =
+        Transformations.switchMap(currentHandle) { currentHandle -> getNode(currentHandle) }
 
     fun getImagesHandle(): LiveData<List<Long>> =
         images.map { items -> items.map(ImageItem::handle) }
@@ -273,8 +273,20 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
-    fun moveNodeToRubishBin(nodeHandle: Long) {
+    fun moveNodeToRubbishBin(nodeHandle: Long) {
         getNodeUseCase.moveToRubbishBin(nodeHandle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
+
+    fun removeNode(nodeHandle: Long) {
+        getNodeUseCase.removeNode(nodeHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmD
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
+import mega.privacy.android.app.utils.NetworkUtil.isOnline
 import mega.privacy.android.app.utils.ViewUtils.setStatusBarTransparent
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
@@ -168,24 +169,18 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
 
     private fun setupObservers() {
         when {
-            parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
+            parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
                 viewModel.retrieveImagesFromParent(parentNodeHandle!!, childOrder, nodeHandle)
-            }
-            childrenHandles != null && childrenHandles!!.isNotEmpty() -> {
+            childrenHandles != null && childrenHandles!!.isNotEmpty() ->
                 viewModel.retrieveImages(childrenHandles!!, nodeHandle)
-            }
-            childrenOfflineHandles != null && childrenOfflineHandles!!.isNotEmpty() -> {
+            childrenOfflineHandles != null && childrenOfflineHandles!!.isNotEmpty() ->
                 viewModel.retrieveOfflineImages(childrenOfflineHandles!!, nodeHandle)
-            }
-            nodeOfflineHandle != null && nodeOfflineHandle != INVALID_HANDLE -> {
+            nodeOfflineHandle != null && nodeOfflineHandle != INVALID_HANDLE ->
                 viewModel.retrieveSingleOfflineImage(nodeOfflineHandle!!)
-            }
-            nodeHandle != null && nodeHandle != INVALID_HANDLE -> {
+            nodeHandle != null && nodeHandle != INVALID_HANDLE ->
                 viewModel.retrieveSingleImage(nodeHandle!!)
-            }
-            else -> {
+            else ->
                 error("Invalid params")
-            }
         }
 
         viewModel.getImagesHandle().observe(this, pagerAdapter::submitList)
@@ -222,6 +217,18 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         } else {
             binding.motion.transitionToStart()
         }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        when {
+            isOnline() -> {
+                menu.findItem(R.id.action_download)?.isVisible = true
+                menu.findItem(R.id.action_save_gallery)?.isVisible = true
+                menu.findItem(R.id.action_get_link)?.isVisible = true
+                menu.findItem(R.id.action_chat)?.isVisible = true
+            }
+        }
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

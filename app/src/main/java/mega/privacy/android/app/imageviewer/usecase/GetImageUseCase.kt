@@ -6,6 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import mega.privacy.android.app.di.MegaApi
+import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
@@ -38,6 +39,7 @@ class GetImageUseCase @Inject constructor(
                     val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.base64Handle + JPG_EXTENSION) else null
                     val previewFile = if (node.hasPreview()) buildPreviewFile(context, node.base64Handle + JPG_EXTENSION) else null
                     val fullFile = buildTempFile(context, node.base64Handle + JPG_EXTENSION)
+                    val isFullSizeRequired = fullSize || (!node.isVideo() && node.isGif())
 
                     val imageItem = ImageItem(
                         node.handle,
@@ -50,7 +52,7 @@ class GetImageUseCase @Inject constructor(
 
                     emitter.onNext(imageItem)
 
-                    if (fullFile?.exists() == true || (!fullSize && previewFile?.exists() == true)) {
+                    if (fullFile?.exists() == true || (!isFullSizeRequired && previewFile?.exists() == true)) {
                         emitter.onComplete()
                         return@create
                     }
@@ -78,18 +80,17 @@ class GetImageUseCase @Inject constructor(
                                     if (error.errorCode == API_OK) {
                                         imageItem.previewUri = previewFile.toUri()
                                         emitter.onNext(imageItem)
-                                        if (!fullSize) {
+                                        if (!isFullSizeRequired) {
                                             emitter.onComplete()
                                         }
-                                    } else if (!fullSize) {
+                                    } else if (!isFullSizeRequired) {
                                         emitter.onError(error.toThrowable())
                                     }
                                 }
                             ))
                     }
 
-                    val isFullSizeRequired = !node.isVideo() && node.isGif()
-                    if ((fullSize || isFullSizeRequired) && !fullFile.exists()) {
+                    if (isFullSizeRequired && !fullFile.exists()) {
                         megaApi.startDownload(
                             node,
                             fullFile.absolutePath,
@@ -102,7 +103,7 @@ class GetImageUseCase @Inject constructor(
                                             emitter.onComplete()
                                         }
                                         API_EBUSINESSPASTDUE ->
-                                            emitter.onError(IllegalStateException("Business account is overdue"))
+                                            emitter.onError(BusinessAccountOverdueMegaError())
                                         else ->
                                             emitter.onError(error.toThrowable())
                                     }
