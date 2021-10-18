@@ -2274,10 +2274,10 @@
     <string name="on_refuse_storage_permission">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Low quality</item>
-        <item>Medium quality</item>
-        <item>High quality</item>
-        <item>Original quality</item>
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Original</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Missed call</string>
