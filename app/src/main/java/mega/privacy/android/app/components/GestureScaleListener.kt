@@ -8,16 +8,22 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop
  * Used to grid view zoom in/out.
  */
 class GestureScaleListener(
-    private val managerActivity: ManagerActivityLollipop
+    private val callback: GestureScaleCallback?
 ) : ScaleGestureDetector.SimpleOnScaleGestureListener() {
 
     override fun onScaleEnd(detector: ScaleGestureDetector) {
         //Scale factor is larger than 1 means zoom in.
         if(detector.scaleFactor > 1) {
-            managerActivity.zoomIn()
+            callback?.zoomIn()
         } else {
-            managerActivity.zoomOut()
+            callback?.zoomOut()
         }
         super.onScaleEnd(detector)
     }
+
+    interface GestureScaleCallback {
+        fun zoomIn()
+        fun zoomOut()
+    }
+
 }

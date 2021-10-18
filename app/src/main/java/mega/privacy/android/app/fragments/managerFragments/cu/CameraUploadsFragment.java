@@ -398,6 +398,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.scroller.setRecyclerView(binding.cuList);
     }
 
+    /**
+     * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.
+     *
+     * @param isPortrait true, on portrait mode, false otherwise.
+     */
     private int getSpanCount(boolean isPortrait) {
         if (selectedView != ALL_VIEW) {
             return isPortrait ? SPAN_CARD_PORTRAIT : SPAN_CARD_LANDSCAPE;
@@ -414,6 +419,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 HtmlCompat.FROM_HTML_MODE_LEGACY));
     }
 
+    /**
+     * Show the selected card view after corresponding button is clicked.
+     *
+     * @param selectedView The selected view.
+     */
     private void newViewClicked(int selectedView) {
         if (this.selectedView == selectedView) {
             return;
@@ -617,6 +627,10 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         return !isEnableCUFragmentShown() && selectedView == ALL_VIEW;
     }
 
+    /**
+     * First make all the buttons unselected,
+     * then apply selected style for the selected button regarding to the selected view.
+     */
     private void updateViewSelected() {
         setViewTypeButtonStyle(allButton, false);
         setViewTypeButtonStyle(daysButton, false);
@@ -669,6 +683,12 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         binding.scroller.setVisibility(visibility);
     }
 
+    /**
+     * Apply selected/unselected style for the TextView button.
+     *
+     * @param textView The TextView button to be applied with the style.
+     * @param enabled true, apply selected style; false, apply unselected style.
+     */
     private void setViewTypeButtonStyle(TextView textView, boolean enabled) {
         if (textView == null) {
             return;

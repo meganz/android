@@ -129,6 +129,7 @@ import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.OpenPasswordLinkActivity;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
@@ -319,7 +320,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener,
 		BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
 		ChatManagementCallback, ActionNodeCallback, SnackbarShower,
-		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback {
+		MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback, GestureScaleListener.GestureScaleCallback {
 
 	private static final String TRANSFER_OVER_QUOTA_SHOWN = "TRANSFER_OVER_QUOTA_SHOWN";
 
@@ -4478,7 +4479,9 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				mHomepageScreen = HomepageScreen.RECENT_BUCKET;
 			}
 
-			transfersWidget.update();
+            if (transfersWidget != null) {
+                transfersWidget.update();
+            }
 			updatePsaViewVisibility();
 			abL.setVisibility(View.VISIBLE);
 			showHideBottomNavigationView(true);

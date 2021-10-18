@@ -52,6 +52,7 @@ import mega.privacy.android.app.utils.ZoomUtil.ZOOM_DEFAULT
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_IN_1X
 import mega.privacy.android.app.utils.ZoomUtil.ZOOM_OUT_1X
 import mega.privacy.android.app.utils.ZoomUtil.getSpanCount
+import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -65,8 +66,6 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
     private lateinit var binding: FragmentPhotosBinding
-
-    private lateinit var mManagerActivity: ManagerActivityLollipop
 
     private lateinit var listView: RecyclerView
 
@@ -97,7 +96,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         override fun onCardClicked(position: Int, @NonNull card: CUCard) {
             when (selectedView) {
                 DAYS_VIEW -> {
-                    mManagerActivity.restoreDefaultZoom()
+                    callManager { it.restoreDefaultZoom() }
                     newViewClicked(ALL_VIEW)
                     val photoPosition = browseAdapter.getNodePosition(card.node.handle)
                     gridLayoutManager.scrollToPosition(photoPosition)
@@ -128,8 +127,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mManagerActivity = activity as ManagerActivityLollipop
-        currentZoom = mManagerActivity.currentZoom
+        callManager {
+            currentZoom = it.currentZoom
+        }
 
         binding = FragmentPhotosBinding.inflate(inflater, container, false).apply {
             viewModel = this@PhotosFragment.viewModel
@@ -217,6 +217,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         updateViewSelected()
     }
 
+    /**
+     * First make all the buttons unselected,
+     * then apply selected style for the selected button regarding to the selected view.
+     */
     private fun updateViewSelected() {
         setViewTypeButtonStyle(allButton, false)
         setViewTypeButtonStyle(daysButton, false)
@@ -230,9 +234,17 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             else -> setViewTypeButtonStyle(allButton, true)
         }
 
-        mManagerActivity.updatePhotosFragmentOptionsMenu()
+        callManager {
+            it.updatePhotosFragmentOptionsMenu()
+        }
     }
 
+    /**
+     * Apply selected/unselected style for the TextView button.
+     *
+     * @param textView The TextView button to be applied with the style.
+     * @param enabled true, apply selected style; false, apply unselected style.
+     */
     private fun setViewTypeButtonStyle(textView: TextView, enabled: Boolean) {
         textView.setBackgroundResource(
             if (enabled)
@@ -250,6 +262,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         )
     }
 
+    /**
+     * Show the selected card view after corresponding button is clicked.
+     *
+     * @param selectedView The selected view.
+     */
     private fun newViewClicked(selectedView: Int) {
         if (this.selectedView == selectedView) return
 
@@ -263,6 +280,7 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         updateViewSelected()
 
+        // If selected view is not all view, add layout param behaviour, so that button panel will go off when scroll.
         val params = viewTypePanel.layoutParams as CoordinatorLayout.LayoutParams
         params.behavior =
             if (selectedView != ALL_VIEW) CustomHideBottomViewOnScrollBehaviour<LinearLayout>() else null
@@ -291,10 +309,12 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
 
         itemOperationViewModel.showNodeItemOptionsEvent.observe(viewLifecycleOwner, EventObserver {
             doIfOnline {
-                mManagerActivity.showNodeOptionsPanel(
-                    it.node,
-                    MODE5
-                )
+                callManager { manager ->
+                    manager.showNodeOptionsPanel(
+                        it.node,
+                        MODE5
+                    )
+                }
             }
         })
     }
@@ -315,7 +335,9 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun elevateToolbarWhenScrolling() = ListenScrollChangesHelper().addViewToListen(
         listView
     ) { v: View?, _, _, _, _ ->
-        mManagerActivity.changeAppBarElevation(v!!.canScrollVertically(-1))
+        callManager {
+            it.changeAppBarElevation(v!!.canScrollVertically(-1))
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -330,7 +352,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         listView.clipToPadding = false
         listView.setHasFixedSize(true)
 
-        val scaleDetector = ScaleGestureDetector(activity, GestureScaleListener(mManagerActivity))
+        val scaleDetector = ScaleGestureDetector(activity, GestureScaleListener(activity as? GestureScaleListener.GestureScaleCallback))
+        callManager {
+
+        }
+
         listView.setOnTouchListener { _, event ->
 
             when (event.pointerCount) {
@@ -368,7 +394,10 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
                 actionModeCallback.nodeCount = viewModel.getRealPhotoCount()
 
                 if (actionMode == null) {
-                    mManagerActivity.hideKeyboardSearch()
+                    callManager { manager ->
+                        manager.hideKeyboardSearch()
+                    }
+
                     actionMode = (activity as AppCompatActivity).startSupportActionMode(
                         actionModeCallback
                     )
@@ -456,12 +485,19 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     private fun observeActionModeDestroy() =
         actionModeViewModel.actionModeDestroy.observe(viewLifecycleOwner, EventObserver {
             actionMode = null
-            mManagerActivity.showKeyboardForSearch()
+            callManager { manager ->
+                manager.showKeyboardForSearch()
+            }
             animateBottomView()
         })
 
     private fun setupFastScroller() = binding.scroller.setRecyclerView(listView)
 
+    /**
+     * Get how many items will be shown per row, depends on screen direction and zoom level if all view is selected.
+     *
+     * @param isPortrait true, on portrait mode, false otherwise.
+     */
     private fun getSpanCount(isPortrait: Boolean): Int {
         return if (selectedView != ALL_VIEW) {
             if (isPortrait) SPAN_CARD_PORTRAIT else SPAN_CARD_LANDSCAPE
@@ -470,6 +506,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * Set recycle view and its inner layout depends on card view selected and zoom level.
+     *
+     * @param zoom Zoom level.
+     */
     fun setupListAdapter(zoom: Int) {
         currentZoom = zoom
         searchAdapter = PhotosSearchAdapter(actionModeViewModel, itemOperationViewModel)
@@ -546,7 +587,11 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
     override fun searchReady() {
         // Rotate screen in action mode, the keyboard would pop up again, hide it
         if (actionMode != null) {
-            RunOnUIThreadUtils.post { mManagerActivity.hideKeyboardSearch() }
+            RunOnUIThreadUtils.post {
+                callManager {
+                    it.hideKeyboardSearch()
+                }
+            }
         }
 
         if (viewModel.searchMode) return
@@ -591,8 +636,17 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * Whether should show zoom in/out menu items.
+     * Depends on if selected view is all view.
+     *
+     * @return true, current view is all view should show the menu items, false, otherwise.
+     */
     fun shouldShowZoomMenuItem() = selectedView == ALL_VIEW
 
+    /**
+     * Display the view type buttons panel with animation effect, after a card is clicked.
+     */
     private fun showViewTypePanel() {
         val params = viewTypePanel.layoutParams as CoordinatorLayout.LayoutParams
         params.setMargins(
@@ -645,6 +699,14 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * Show the view with the data of years, months or days depends on selected view.
+     *
+     * @param dateCards
+     *          The first element is the cards of days.
+     *          The second element is the cards of months.
+     *          The third element is the cards of years.
+     */
     private fun showCards(dateCards: List<List<CUCard>?>?) {
         val index = when(selectedView) {
             DAYS_VIEW -> 0
