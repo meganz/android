@@ -720,11 +720,17 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
+    /**
+     * Set LinearLayoutManager for the list view.
+     */
     private fun RecyclerView.switchToLinear() {
         linearLayoutManager = LinearLayoutManager(context)
         listView.layoutManager = linearLayoutManager
     }
 
+    /**
+     * Set GridLayoutManager for the list view.
+     */
     private fun RecyclerView.switchBackToGrid() {
         linearLayoutManager = null
         layoutManager = gridLayoutManager

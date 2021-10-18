@@ -84,7 +84,7 @@ class CuViewModel extends BaseRxViewModel {
     private final Subject<Object> mCreatePreviewForCardFinished = PublishSubject.create();
 
     private final MegaRequestListenerInterface mCreateThumbnailRequest;
-    private final MegaRequestListenerInterface mCreatePreviewRequest;
+    private final MegaRequestListenerInterface createPreviewRequest;
     private final MegaRequestListenerInterface mCreatePreviewForCardRequest;
     private final LongSparseArray<MegaNode> mSelectedNodes = new LongSparseArray<>(5);
     private boolean mSelecting;
@@ -121,7 +121,7 @@ class CuViewModel extends BaseRxViewModel {
             }
         };
 
-        mCreatePreviewRequest = new BaseListener(mAppContext) {
+        createPreviewRequest = new BaseListener(mAppContext) {
             @Override
             public void onRequestFinish(@NotNull MegaApiJava api, @NotNull MegaRequest request, @NotNull MegaError e) {
                 if (e.getErrorCode() == MegaError.API_OK) {
@@ -498,7 +498,7 @@ class CuViewModel extends BaseRxViewModel {
                         File preview =
                                 new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
                         if (!preview.exists()) {
-                            mMegaApi.getPreview(node, preview.getAbsolutePath(), mCreatePreviewRequest);
+                            mMegaApi.getPreview(node, preview.getAbsolutePath(), createPreviewRequest);
                         }
                     }
                 }, logErr("CuViewModel getPreview")));
