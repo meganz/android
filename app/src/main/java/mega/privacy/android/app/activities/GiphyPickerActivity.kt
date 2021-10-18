@@ -41,6 +41,8 @@ import mega.privacy.android.app.utils.Util.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
+import kotlin.collections.ArrayList
 
 class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
@@ -91,7 +93,9 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         setSupportActionBar(binding.giphyToolbar)
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.giphyToolbar.title = getString(R.string.search_giphy_title)
+        binding.giphyToolbar.title = StringResourcesUtils.getString(R.string.search_giphy_title)
+            .toUpperCase(Locale.getDefault())
+
         binding.giphyToolbar.setOnClickListener { searchMenuItem?.expandActionView() }
 
         screenOrientation = resources.configuration.orientation
