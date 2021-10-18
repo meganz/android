@@ -80,6 +80,7 @@
                 app:drawableStartCompat="@drawable/info_ic" />
 
             <View
+                android:id="@+id/separator_info"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
@@ -124,6 +125,7 @@
             </LinearLayout>
 
             <View
+                android:id="@+id/separator_label"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
@@ -136,6 +138,7 @@
                 app:drawableStartCompat="@drawable/ic_open_with" />
 
             <View
+                android:id="@+id/separator_open"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
@@ -176,6 +179,7 @@
             </LinearLayout>
 
             <View
+                android:id="@+id/separator_offline"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"
@@ -208,6 +212,7 @@
                 app:drawableStartCompat="@drawable/ic_social_share_white" />
 
             <View
+                android:id="@+id/separator_share"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginStart="72dp"

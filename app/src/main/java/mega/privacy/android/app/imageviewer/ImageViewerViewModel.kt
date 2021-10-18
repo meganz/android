@@ -1,7 +1,6 @@
 package mega.privacy.android.app.imageviewer
 
 import android.app.Activity
-import android.content.Context
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -174,9 +173,9 @@ class ImageViewerViewModel @ViewModelInject constructor(
         return result
     }
 
-    fun getNode(context: Context, nodeHandle: Long): LiveData<MegaNodeItem?> {
+    fun getNode(nodeHandle: Long): LiveData<MegaNodeItem?> {
         val result = MutableLiveData<MegaNodeItem?>()
-        getNodeUseCase.get(context, nodeHandle)
+        getNodeUseCase.getNodeItem(nodeHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

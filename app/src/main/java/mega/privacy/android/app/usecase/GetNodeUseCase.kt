@@ -2,6 +2,7 @@ package mega.privacy.android.app.usecase
 
 import android.app.Activity
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.DatabaseHandler
@@ -20,6 +21,7 @@ import java.io.File
 import javax.inject.Inject
 
 class GetNodeUseCase @Inject constructor(
+    @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val databaseHandler: DatabaseHandler
 ) {
@@ -29,7 +31,7 @@ class GetNodeUseCase @Inject constructor(
             megaApi.getNodeByHandle(nodeHandle)
         }
 
-    fun get(context: Context, nodeHandle: Long): Single<MegaNodeItem> =
+    fun getNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
         Single.fromCallable {
             val node = megaApi.getNodeByHandle(nodeHandle)
             val nodeAccess = megaApi.getAccess(node)
@@ -38,7 +40,7 @@ class GetNodeUseCase @Inject constructor(
             val isFromRubbishBin = node.parentHandle == megaApi.rubbishNode.handle
             val isFromInbox = node.parentHandle == megaApi.inboxNode.handle
             val isFromRoot = node.parentHandle == megaApi.rootNode.handle
-            val isAvailableOffline = isNodeAvailableOffline(context, nodeHandle).blockingGet()
+            val isAvailableOffline = isNodeAvailableOffline(nodeHandle).blockingGet()
 
             MegaNodeItem(
                 node,
@@ -56,7 +58,7 @@ class GetNodeUseCase @Inject constructor(
             megaApi.setNodeFavourite(node, isFavorite)
         }
 
-    fun isNodeAvailableOffline(context: Context, nodeHandle: Long): Single<Boolean> =
+    fun isNodeAvailableOffline(nodeHandle: Long): Single<Boolean> =
         Single.fromCallable {
             val node = megaApi.getNodeByHandle(nodeHandle)
 
@@ -78,7 +80,7 @@ class GetNodeUseCase @Inject constructor(
         setAvailableOffline: Boolean
     ): Completable =
         Completable.fromCallable {
-            val isCurrentlyAvailable = isNodeAvailableOffline(activity, nodeHandle).blockingGet()
+            val isCurrentlyAvailable = isNodeAvailableOffline(nodeHandle).blockingGet()
 
             if (setAvailableOffline) {
                 if (!isCurrentlyAvailable) {

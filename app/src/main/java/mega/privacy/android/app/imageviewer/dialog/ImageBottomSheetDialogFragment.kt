@@ -77,7 +77,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         view.post { setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true) }
 
-        viewModel.getNode(requireContext(), imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
+        viewModel.getNode(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
         viewModel.getImage(imageNodeHandle).observe(viewLifecycleOwner) { imageItem ->
             binding.imgThumbnail.setImageURI(imageItem?.thumbnailUri)
         }
@@ -113,7 +113,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val favoriteText = if (item.node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
             val favoriteDrawable = if (!item.node.isFavourite) R.drawable.ic_add_favourite else R.drawable.ic_remove_favourite
             optionFavorite.setText(favoriteText)
-            optionFavorite.isVisible = !item.isFromRubbishBin
+            optionFavorite.isVisible = !item.isFromRubbishBin && item.hasFullAccess
             optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
             optionFavorite.setOnClickListener {
                 viewModel.markNodeAsFavorite(item.node.handle, !item.node.isFavourite)
@@ -132,7 +132,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionLabelCurrent.setTextColor(labelColor)
             optionLabelCurrent.text = getNodeLabelText(item.node.label)
             optionLabelCurrent.isVisible = item.node.label != MegaNode.NODE_LBL_UNKNOWN
-            optionLabelLayout.isVisible = !item.isFromRubbishBin
+            optionLabelLayout.isVisible = !item.isFromRubbishBin && item.hasFullAccess
             optionLabelLayout.setOnClickListener {
                 NodeLabelBottomSheetDialogFragment.newInstance(item.node.handle).show(childFragmentManager, TAG)
             }
@@ -159,8 +159,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Offline
+            optionOfflineLayout.isVisible = !item.isFromRubbishBin
             switchOffline.isChecked = item.isAvailableOffline
-            switchOffline.isVisible = !item.isFromRubbishBin
             switchOffline.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.setNodeAvailableOffline(
                     requireActivity(),
@@ -169,7 +169,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 )
                 dismiss()
             }
-            optionOfflineLayout.setOnClickListener {
+            optionOffline.setOnClickListener {
                 viewModel.setNodeAvailableOffline(
                     requireActivity(),
                     item.node.handle,
@@ -252,9 +252,9 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             // Rubbish bin
             if (item.isFromRubbishBin) {
-                optionRubbishBin.setText(R.string.context_move_to_trash)
-            } else {
                 optionRubbishBin.setText(R.string.general_remove)
+            } else {
+                optionRubbishBin.setText(R.string.context_move_to_trash)
             }
             optionRubbishBin.setOnClickListener {
                 val buttonText =
@@ -276,6 +276,13 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     .setNegativeButton(R.string.general_cancel, null)
                     .show()
             }
+
+            // Separators
+            separatorInfo.isVisible = optionFavorite.isVisible
+            separatorLabel.isVisible = optionLabelLayout.isVisible
+            separatorOpen.isVisible = optionOpenWith.isVisible
+            separatorOffline.isVisible = optionOfflineLayout.isVisible
+            separatorShare.isVisible = optionShare.isVisible
         }
     }
 

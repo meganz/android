@@ -16,11 +16,11 @@ import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
-import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.usecase.MegaNodeItem
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LinksUtil
@@ -196,9 +196,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         }
     }
 
-    private fun showCurrentImageInfo(item: ImageItem?) {
+    private fun showCurrentImageInfo(item: MegaNodeItem?) {
         item?.let {
-            binding.txtTitle.text = item.name
+            binding.txtTitle.text = item.node.name
 
             val itemCount = binding.viewPager.adapter?.itemCount ?: 0
             if (itemCount > 1) {
@@ -207,6 +207,20 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
                 binding.txtPageCount.isVisible = true
             } else {
                 binding.txtPageCount.isVisible = false
+            }
+
+            binding.toolbar.menu?.apply {
+                if (isOnline() && !item.isFromRubbishBin) {
+                    findItem(R.id.action_download)?.isVisible = true
+                    findItem(R.id.action_save_gallery)?.isVisible = true
+                    findItem(R.id.action_get_link)?.isVisible = item.hasFullAccess
+                    findItem(R.id.action_chat)?.isVisible = true
+                } else {
+                    findItem(R.id.action_download)?.isVisible = false
+                    findItem(R.id.action_save_gallery)?.isVisible = false
+                    findItem(R.id.action_get_link)?.isVisible = false
+                    findItem(R.id.action_chat)?.isVisible = false
+                }
             }
         }
     }
@@ -217,18 +231,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         } else {
             binding.motion.transitionToStart()
         }
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        when {
-            isOnline() -> {
-                menu.findItem(R.id.action_download)?.isVisible = true
-                menu.findItem(R.id.action_save_gallery)?.isVisible = true
-                menu.findItem(R.id.action_get_link)?.isVisible = true
-                menu.findItem(R.id.action_chat)?.isVisible = true
-            }
-        }
-        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
