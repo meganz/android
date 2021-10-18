@@ -72,7 +72,6 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
@@ -348,8 +347,7 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 			url = intentReceived.getDataString();
 		}
 
-		if (dbH.getCredentials() != null && (megaApi == null || megaApi.getRootNode() == null
-				|| megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR)) {
+		if (dbH.getCredentials() != null && (megaApi == null || megaApi.getRootNode() == null)) {
 			logDebug("Refresh session - sdk or karere");
 			Intent intent = new Intent(this, LoginActivityLollipop.class);
 			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);

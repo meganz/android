@@ -579,8 +579,6 @@
     <string name="number_contact_not_removed">%d Kontakte wurden nicht entfernt.</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Ordner wurde an %d Kontakte freigegeben</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Die Datei kann nicht an %d Kontakte freigegeben werden</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d Ordnerfreigaben wurden erstellt.</string>
     <!-- error message when sharing multiple files -->
@@ -659,7 +657,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problem mit dem Dateisystem</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Beim Durchsuchen der lokalen Dateien ist ein Fehler aufgetreten.</string>
+    <string name="general_error">Ein Fehler ist aufgetreten</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Bildbetrachter</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1488,7 +1486,7 @@
     <string name="title_message_uploading_options">Anhang wird hochgeladen</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Keine Nachrichten vorhanden</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]tippt&#8230;[/A]</item>
         <item quantity="other">%1$s [A]tippen&#8230;[/A]</item>
@@ -1918,13 +1916,11 @@
     <string name="title_regitration">Anmeldebonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">MEGA Desktop-App herunterladen</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Account-Basiskontingent</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Noch keine Medienuploads</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d Tage</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Abgelaufen</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Kein HTTP nutzen</string>
@@ -2579,11 +2575,6 @@
     <string name="context_no_restored">Ein Fehler ist aufgetreten. Das Element wurde nicht wiederhergestellt.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Nachricht schicken</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Der Kontakt wurde verschickt</item>
-        <item quantity="other">Die Kontakte wurden verschickt</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdrop-Ordner werden noch nicht unterstützt</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3573,7 +3564,7 @@
     <string name="label_verify_credentials">Identität prüfen</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Nicht verifiziert</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Bestätigt</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authentizitätsinformationen</string>
@@ -4045,6 +4036,8 @@
         <item quantity="one">Link erstellen</item>
         <item quantity="other">Links erstellen</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Alle Offline-Dateien löschen?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Sie sind der einzige Teilnehmer</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4096,7 +4089,7 @@
     <!-- Pin the participant to speaker view in the meeting-->
     <string name="pin_to_speaker">In Hauptansicht anzeigen</string>
     <!-- Make the participant as moderator in the meeting-->
-    <string name="make_moderator">Moderator bestimmen</string>
+    <string name="make_moderator">Zu Moderator ernennen</string>
     <!-- The title of dialog for end meeting confirmation-->
     <string name="title_end_meeting">Meeting jetzt verlassen?</string>
     <!-- no moderator when the moderator leave meeting-->
@@ -4179,4 +4172,6 @@
     <string name="meeting_me_text_bracket">%1s [A](ich)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Hauptansicht</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Logging out deletes your offline content.</string>
 </resources>

@@ -26,7 +26,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CH
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -61,13 +61,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     private lateinit var inMeetingViewModel: InMeetingViewModel
 
-    private var videoListener: MeetingVideoListener? = null
+    private var videoListener: IndividualCallVideoListener? = null
 
     private val remoteAVFlagsObserver = Observer<Pair<Long, MegaChatSession>> {
         val callId = it.first
         val session = it.second
 
-        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId)) {
+        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId) && isAdded) {
             logDebug("Check changes in remote AVFlags")
             when {
                 isFloatingWindow -> checkItIsOnlyAudio()
@@ -89,7 +89,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
 
     private val sessionHiResObserver =
         Observer<Pair<Long, MegaChatSession>> { callAndSession ->
-            if (inMeetingViewModel.isSameCall(callAndSession.first) && !isFloatingWindow && inMeetingViewModel.isOneToOneCall()) {
+            if (inMeetingViewModel.isSameCall(callAndSession.first) && !isFloatingWindow && inMeetingViewModel.isOneToOneCall() && isAdded) {
                 if (callAndSession.second.canRecvVideoHiRes() && callAndSession.second.isHiResVideo) {
                     logDebug("Can receive high-resolution video")
 
@@ -114,19 +114,16 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
 
     private val localAVFlagsObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
+        if (inMeetingViewModel.isSameCall(it.callId) && isAdded) {
             logDebug("Check changes in local AVFlags")
             checkItIsOnlyAudio()
         }
     }
 
     private val callOnHoldObserver = Observer<MegaChatCall> {
-        if (inMeetingViewModel.isSameCall(it.callId)) {
+        if (inMeetingViewModel.isSameCall(it.callId) && isAdded) {
             logDebug("Check changes in call on hold")
-
-            if (isAdded) {
-                checkChangesInOnHold(it.isOnHold)
-            }
+            checkChangesInOnHold(it.isOnHold)
         }
     }
 
@@ -134,7 +131,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         val callId = it.first
         val session = it.second
 
-        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId)) {
+        if (inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isSameCall(callId) && isAdded) {
             logDebug("Check changes in session on hold")
             checkChangesInOnHold(
                 session.isOnHold
@@ -179,18 +176,19 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private fun initLiveEventBus() {
         LiveEventBus.get(EVENT_LOCAL_AVFLAGS_CHANGE, MegaChatCall::class.java)
             .observeSticky(this, localAVFlagsObserver)
-
-        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .observeSticky(this, callOnHoldObserver)
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE)
             .observeSticky(this, remoteAVFlagsObserver as Observer<Any>)
+
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EventConstants.EVENT_SESSION_ON_HIRES_CHANGE)
             .observe(this, sessionHiResObserver as Observer<Any>)
+
+        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
+            .observe(this, callOnHoldObserver)
         @Suppress("UNCHECKED_CAST")
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
-            .observeSticky(this, sessionOnHoldObserver as Observer<Any>)
+            .observe(this, sessionOnHoldObserver as Observer<Any>)
     }
 
     override fun onCreateView(
@@ -224,7 +222,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
     @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         inMeetingViewModel.getAvatarBitmap(peerId)?.let {
             avatarImageView.setImageBitmap(it)
         }
@@ -257,7 +254,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
      */
     private fun addListener(clientId: Long) {
         if (videoListener == null) {
-            videoListener = MeetingVideoListener(
+            videoListener = IndividualCallVideoListener(
                 videoSurfaceView,
                 outMetrics,
                 clientId,
@@ -421,14 +418,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
     fun checkVideoOn(peerId: Long, clientId: Long) {
         if (isInvalid(peerId, clientId)) return
         val currentCall = inMeetingViewModel.getCall()
-
-        if (currentCall != null && currentCall.status != MegaChatCall.CALL_STATUS_JOINING && currentCall.status != CALL_STATUS_IN_PROGRESS &&
-            ((!inMeetingViewModel.isMe(peerId) && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
+        if ((currentCall != null && currentCall.status != MegaChatCall.CALL_STATUS_JOINING && currentCall.status != CALL_STATUS_IN_PROGRESS) ||
+            (!inMeetingViewModel.isMe(peerId) && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
             (inMeetingViewModel.isMe(peerId) &&
                     ((inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOrSessionOnHoldOfOneToOneCall()) ||
-                            (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold()))))
+                            (!inMeetingViewModel.isOneToOneCall() && inMeetingViewModel.isCallOnHold())))
         ) {
-            logDebug("The video should not be turned on")
+            logDebug("The video should be turned off")
             videoOffUI(peerId, clientId)
             return
         }
@@ -473,7 +469,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
                     isOneToOneChat = false
                 }
 
-                videoListener = MeetingVideoListener(
+                videoListener = IndividualCallVideoListener(
                     videoSurfaceView,
                     outMetrics,
                     MEGACHAT_INVALID_HANDLE,
@@ -487,7 +483,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
             }
             else -> {
                 logDebug("Video listener is null")
-                videoListener = MeetingVideoListener(
+                videoListener = IndividualCallVideoListener(
                     videoSurfaceView,
                     outMetrics,
                     clientId,
@@ -552,9 +548,16 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * Change the layout when the orientation is changing
      */
     fun updateOrientation() {
-        if (!isFloatingWindow) return
+        logDebug("Orientation changed. Is floating window $isFloatingWindow")
 
-        logDebug("Orientation changed")
+        if (!isFloatingWindow){
+            videoListener?.let {
+                it.height = 0
+                it.width = 0
+            }
+            return
+        }
+
         val params = rootLayout.layoutParams
         if (getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
             params.width = Util.dp2px(88f, outMetrics)

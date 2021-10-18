@@ -579,8 +579,6 @@
     <string name="number_contact_not_removed">%d contatos não foram removidos</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Pasta compartilhada corretamente com %d contatos</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Não foi possível compartilhar o arquivo com %d contatos</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d pastas foram compartilhadas</string>
     <!-- error message when sharing multiple files -->
@@ -659,7 +657,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problema no sistema de arquivos</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Não foi possível navegar nos arquivos locais.</string>
+    <string name="general_error">Erro aconteceu quando executar a ação</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Visor de imagens</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1488,7 +1486,7 @@
     <string name="title_message_uploading_options">Fazendo upload do anexo</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Este chat não tem histórico</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]está escrevendo&#8230;[/A]</item>
         <item quantity="other">%1$s [A]estão escrevendo&#8230;[/A]</item>
@@ -1918,13 +1916,11 @@
     <string name="title_regitration">Bônus de registro</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Instalar o app para desktop</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Cota padrão da conta</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Não há arquivos nos Uploads da câmera</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">Vence em %1$d d</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Expirado</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Não usar HTTP</string>
@@ -2579,11 +2575,6 @@
     <string name="context_no_restored">Não foi possível restaurar este item.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Enviar mensagem</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Contato enviado aos chats</item>
-        <item quantity="other">Contatos enviados aos chats</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">As pastas MEGAdrop ainda não são suportadas</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -2764,7 +2755,7 @@
     <!-- Title of compression queue size option in settings -->
     <string name="settings_video_compression_queue_size_title">Se os vídeos a comprimir forem maiores que</string>
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
-    <string name="settings_rb_scheduler_alert_disabling">To disable the Rubbish Bin clearing scheduler or set a longer retention period, please subscribe to a Pro plan.</string>
+    <string name="settings_rb_scheduler_alert_disabling">Para desativar o Planejador de limpeza da lixeira ou definir um período de retenção mais longo, é necessário adquirir um plano Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
     <string name="hint_days">dias</string>
     <!-- Title of the option to generate a public chat link -->
@@ -3032,7 +3023,7 @@
     <!-- Title of the screen asking permissions for microphone and write in log calls -->
     <string name="allow_acces_calls_title">Ativar chamadas</string>
     <!-- Title of the screen asking permissions for contacts -->
-    <string name="allow_acces_contact_title">Grant access to your address book</string>
+    <string name="allow_acces_contact_title">Permitir o acesso ao seu catálogo de endereços</string>
     <!-- Subtitle of the screen asking permissions for contacts -->
     <string name="allow_acces_contact_subtitle">Descubra facilmente quais são os contatos do seu catálogo de endereços que já estão no MEGA.</string>
     <!-- Explanation under the subtitle of asking permissions for contacts to explain that MEGA will never use the address book data for any other purpose -->
@@ -3356,7 +3347,7 @@
     <!-- Label to reference a chats section -->
     <string name="chats_label">Chats</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[B]No files in [/B][A]Recents[/A]</string>
+    <string name="context_empty_recents">[B]Não há arquivos nas [/B][A]Atividades recentes[/A]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">%1$s e mais %2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -3573,7 +3564,7 @@
     <string name="label_verify_credentials">Verifique as credenciais</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Verificação pendente</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Verificado</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Credenciais de autenticidade</string>
@@ -3879,7 +3870,7 @@
     <!-- Label indicating a file was updated successfully -->
     <string name="file_updated">Arquivo atualizado</string>
     <!-- Warning indicating a file was not updated successfully -->
-    <string name="file_update_failed">File update failed. Please try again.</string>
+    <string name="file_update_failed">Não foi possível fazer o update do arquivo, tente novamente.</string>
     <!-- Warning which alerts the user a file cannot be opened -->
     <string name="error_opening_file">O arquivo é muito grande e não pode ser aberto ou visualizado.</string>
     <!-- Error shown when the user writes a file name without extension. The placeholder shows the file extension. e. g. File without extension (.jpg)-->
@@ -4000,11 +3991,11 @@
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Adicione o seu telefone</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
-    <string name="backup_recovery_key_subtitle">Do you remember your password?\nMEGA cannot reset your password if you forget it.</string>
+    <string name="backup_recovery_key_subtitle">Você se lembra da sua senha?\nO MEGA não pode resetara a sua senha se você tiver esquecido qual é.</string>
     <!-- Action to change name -->
-    <string name="change_name_action">Change name</string>
+    <string name="change_name_action">Alterar nome</string>
     <!-- Action to add photo -->
-    <string name="add_photo_action">Add photo</string>
+    <string name="add_photo_action">Adicionar foto</string>
     <!-- Action to add phone number -->
     <string name="add_phone_number_action">Adicionar número de telefone</string>
     <!-- Warning indicating the app needs write permissions to do any action -->
@@ -4015,36 +4006,38 @@
     <string name="title_user_purchased_subscription">Aguardando confirmação</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
-        <item quantity="one">1 connection</item>
-        <item quantity="other">%1$d connections</item>
+        <item quantity="one">1 conexão</item>
+        <item quantity="other">%1$d conexões</item>
     </plurals>
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
     <string name="section_recently_added">Adicionado recentemente</string>
     <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
+    <string name="context_empty_groups">[B]Não há [/B][A]Grupos[/A]</string>
     <!-- Section name for the “Contact Requests” section. Preferably one word. -->
     <string name="section_requests">Solicitações</string>
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">Grupos</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
+    <string name="warning_get_links">Opções como “Enviar a chave de decodificação separadamente”, “Definir uma data de validade” ou “Estabelecer uma senha de acesso” somente estão disponíveis ao selecionar um único item.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
-    <string name="action_copy_all">Copy all</string>
+    <string name="action_copy_all">Copiar todos</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link successfully sent.</item>
-        <item quantity="other">Links successfully sent.</item>
+        <item quantity="one">O link foi enviado corretamente.</item>
+        <item quantity="other">Os links foram enviados corretamente.</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Link copied to the clipboard.</item>
-        <item quantity="other">Links copied to the clipboard.</item>
+        <item quantity="one">O link foi copiado para a área de transferência.</item>
+        <item quantity="other">Os links foram copiados para a área de transferência</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
-        <item quantity="one">Get Link</item>
-        <item quantity="other">Get Links</item>
+        <item quantity="one">Obter link</item>
+        <item quantity="other">Obter links</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Você quer deletar todos os arquivos offline?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">Não tem mais ninguém aqui</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4179,4 +4172,6 @@
     <string name="meeting_me_text_bracket">%1s [A](eu)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Vista principal</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Ao fazer logout, os seus arquivos offline serão deletados.</string>
 </resources>

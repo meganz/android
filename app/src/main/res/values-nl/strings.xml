@@ -579,8 +579,6 @@
     <string name="number_contact_not_removed">%d contacten waren niet verwijderd</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Map met %d contacten succesvol gedeeld</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Bestand kan niet worden gedeeld met %d contacten</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d mappen succesvol gedeeld</string>
     <!-- error message when sharing multiple files -->
@@ -659,7 +657,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Bestandssysteem probleem</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Er is een fout opgetreden bij het bladeren door lokale bestanden.</string>
+    <string name="general_error">Fout opgetreden bij uitvoeren van actie</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Afbeelding weergave</string>
     <!-- Headline for the amount of storage space is used -->
@@ -1126,7 +1124,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Laat uw cloud groeien.[A]Krijg meer opslag- en overdrachttegoed met een Pro-account.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">De Herstelsleutel van de MEGA-account is opgeslagen in:%1s.[A]U kunt het bestand met uw Herstelsleutel vinden in het gedeelte Opgeslagen voor Offline.[A]Opmerking: aangezien het bestand met uw Herstelsleutel wordt verwijderd wanneer u uitlogt, bewaar het dan in een kluis buiten uw MEGA-account plaatsen.</string>
+    <string name="toast_master_key">De Herstelsleutel van de MEGA-account is opgeslagen in:%1s.[A]U kunt het bestand met uw Herstelsleutel vinden in het gedeelte Opgeslagen voor Offline.[/A]Opmerking: aangezien het bestand met uw Herstelsleutel wordt verwijderd wanneer u uitlogt, bewaar het dan in een kluis buiten uw MEGA-account.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Dit e-mailadres is al in gebruik. Gelieve een ander e-mailadres te gebruiken.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1488,7 +1486,7 @@
     <string name="title_message_uploading_options">Bijlage Uploaden</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Geen gespreksgeschiedenis</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A] is aan het schrijven&#8230;.[/A]</item>
         <item quantity="other">%1$s [A]zijn aan het schrijven&#8230;..[/A]</item>
@@ -1918,13 +1916,11 @@
     <string name="title_regitration">Registratie bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Neem een MEGA Desktop App</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Account basis tegoed</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Geen bestanden in Camera Uploads</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d d over</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Verlopen</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Gebruik geen HTTP</string>
@@ -2579,11 +2575,6 @@
     <string name="context_no_restored">Er is een fout opgetreden. Artikel niet hersteld.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Bericht Versturen</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Contact succesvol naar gesprekken verzonden</item>
-        <item quantity="other">Contacten succesvol verzonden naar gesprekken</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdrop mappen worden nog niet ondersteund</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3573,7 +3564,7 @@
     <string name="label_verify_credentials">Verifieer aanmeldgegevens</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Niet geverifieerd</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Geverifieerd</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authenticiteit Inloggegevens</string>
@@ -3654,7 +3645,7 @@
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Foutopsporingsinformatie voor chatberichten ingeschakeld</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Foutopsporingsinformatie voor chatberichten uitgeschakeld</string>
+    <string name="show_info_chat_msg_disabled">Foutopsporingsinformatie voor gespreksberichten uitgeschakeld</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">U heeft de maximale limiet van %d reacties bereikt.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
@@ -4045,6 +4036,8 @@
         <item quantity="one">Link Ophalen</item>
         <item quantity="other">Links Ophalen</item>
     </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Alle Offline bestanden wissen?</string>
     <!-- Banner text when the call is in progress and I'm the only participant. -->
     <string name="banner_alone_on_the_call">U bent de enige hier</string>
     <!-- Item menu option upon right click on meeting. -->
@@ -4060,7 +4053,7 @@
     <!-- Button that join a meeting as guest -->
     <string name="btn_join_meeting_as_guest">Aansluiten als gast</string>
     <!-- Hint shown to guide user on meeting name -->
-    <string name="type_meeting_name">%s”s vergadering</string>
+    <string name="type_meeting_name">%s’s vergadering</string>
     <!-- General label for reject the call. -->
     <string name="general_reject">Ophangen</string>
     <!-- General label for microphone -->
@@ -4072,7 +4065,7 @@
     <!-- General label for camera -->
     <string name="general_camera">Camera</string>
     <!-- General label for camera enable -->
-    <string name="general_camera_enable">Uw camera is ingeschakeld</string>
+    <string name="general_camera_enable">Uw camera is ingeschakeld.</string>
     <!-- General label for camera disable -->
     <string name="general_camera_disable">Uw camera is uitgeschakeld.</string>
     <!-- Label for hold meeting -->
@@ -4100,15 +4093,15 @@
     <!-- The title of dialog for end meeting confirmation-->
     <string name="title_end_meeting">Vergadering nu verlaten?</string>
     <!-- no moderator when the moderator leave meeting-->
-    <string name="no_moderator">Geen moderator</string>
+    <string name="no_moderator">Geen gespreksleider</string>
     <!-- assign moderator message when the moderator leave meeting-->
-    <string name="assign_moderator_message">Wijs voor vertrek een of meer nieuwe moderatoren aan voor de vergadering.</string>
+    <string name="assign_moderator_message">Wijs voor vertrek een of meer nieuwe gespreksleiders aan voor de vergadering.</string>
     <!-- assign moderator option when the moderator leave meeting-->
     <string name="assign_moderator">Gespreksleider maken</string>
     <!-- leave anyway option when the moderator leave meeting-->
     <string name="leave_anyway">Toch verlaten</string>
     <!-- The message alert user to pick new moderator on assign moderator page-->
-    <string name="pick_new_moderator_message">Wijs een of meer nieuwe moderators aan.</string>
+    <string name="pick_new_moderator_message">Wijs één of meer nieuwe gespreksleiders aan.</string>
     <!-- The title of dialog for changing meeting name-->
     <string name="change_meeting_name">Wijzig vergadernaam</string>
     <!-- The number of participants in the meeting on meeting info page-->
@@ -4124,7 +4117,7 @@
     <!-- The title of the paste meeting link dialog for guest-->
     <string name="paste_meeting_link_guest_dialog_title">U bent uitgenodigd tot een vergadering.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
-    <string name="paste_meeting_link_guest_instruction">Tik de Uitnodigingslink die verzonden is naar jou of plak het hier</string>
+    <string name="paste_meeting_link_guest_instruction">Tik de Uitnodigingslink die verzonden is naar u of plak het hier</string>
     <!-- Banner text to indicate poor network quality-->
     <string name="slow_connection_meeting">Slechte verbindingskwaliteit</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
@@ -4140,13 +4133,13 @@
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_required_permissions_warning">Ga naar Instellingen om MEGA toegang te geven tot uw camera en microfoon.</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
-    <string name="view_meeting_chat">Vergaderingschat weergeven</string>
+    <string name="view_meeting_chat">Vergaderingsgesprek weergeven</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">Nodig meer deelnemers uit voor de vergadering. Veeg omhoog om uit te nodigen.</string>
     <!-- the content of tips when the user enters recent chat page first time-->
     <string name="tip_create_meeting">Tik om een nieuwe vergadering te creëren</string>
     <!-- the content of tips when the user enters start conversation page first time-->
-    <string name="tip_setup_meeting">Zet snel een MEGA-vergadering op met onze nieuwe versleutelde vergaderfunctie</string>
+    <string name="tip_setup_meeting">Zet snel een MEGA-vergadering op met onze nieuwe gecodeerde vergaderfunctie</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">U bent de nieuwe gespreksleider.</string>
     <!-- the content of snack bar when copied meeting link-->
@@ -4172,11 +4165,13 @@
     <!-- Content of ongoing call for MaterialAlertDialog-->
     <string name="ongoing_call_content">Een andere oproep is in behandeling. Beëindig uw huidige oproep voordat u een andere maakt.</string>
     <!-- The hint text when changing meeting name-->
-    <string name="new_meeting_name">Nieuwe naam van de vergadering</string>
+    <string name="new_meeting_name">Nieuwe vergadernaam</string>
     <!-- The content of dialog when failed for creating meeting-->
-    <string name="meeting_is_failed_content">Mislukt om vergadering te creëren</string>
+    <string name="meeting_is_failed_content">Kan vergadering niet maken.</string>
     <!-- Word next to own user’s name on participant list -->
     <string name="meeting_me_text_bracket">%1s[A](ik)[/A]</string>
     <!-- Menu item to change from thumbnail view to main view in meeting-->
     <string name="main_view">Hoofdweergave</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Als u zich afmeldt, wordt uw offline inhoud verwijderd.</string>
 </resources>

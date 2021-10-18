@@ -83,6 +83,7 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.protobuf.TombstoneProtos;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
+import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ThemeHelper;
 
 import nz.mega.sdk.MegaAccountSession;
@@ -589,9 +590,17 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					return;
 				}
 
-				if (callStatus == CALL_STATUS_USER_NO_PRESENT && isRinging) {
-					logDebug("Is incoming call");
-					incomingCall(listAllCalls, chatId, callStatus);
+				if (callStatus == CALL_STATUS_USER_NO_PRESENT) {
+					if (isRinging) {
+						logDebug("Is incoming call");
+						incomingCall(listAllCalls, chatId, callStatus);
+					} else {
+						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+						if (chatRoom != null && chatRoom.isGroup()) {
+							logDebug("Check if the incoming group call notification should be displayed");
+							getChatManagement().checkActiveGroupChat(chatId);
+						}
+					}
 				}
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
@@ -602,16 +611,16 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				break;
 
 			case MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION:
-				logDebug("The user participation in the call has ended");
+				logDebug("The user participation in the call has ended. The termination code is "+CallUtil.terminationCodeForCallToString(call.getTermCode()));
 				getChatManagement().controlCallFinished(callId, chatId);
 				break;
 
 			case MegaChatCall.CALL_STATUS_DESTROYED:
-				int termCode = call.getTermCode();
-				logDebug("Call has ended:: termCode = "+termCode);
+				int endCallReason = call.getEndCallReason();
+				logDebug("Call has ended. End call reason is "+ CallUtil.endCallReasonToString(endCallReason));
 				getChatManagement().controlCallFinished(callId, chatId);
 				boolean isIgnored = call.isIgnored();
-				checkCallDestroyed(chatId, callId, termCode, isIgnored);
+				checkCallDestroyed(chatId, callId, endCallReason, isIgnored);
 				break;
 		}
 	};
@@ -1380,7 +1389,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		if ((item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV))) {
 			if (item.getOwnPrivilege() != MegaChatRoom.PRIV_RM) {
-				getChatManagement().checkActiveGroupChat(item);
+				getChatManagement().checkActiveGroupChat(item.getChatId());
 			} else {
 				getChatManagement().removeActiveChatAndNotificationShown(item.getChatId());
 			}
@@ -1560,10 +1569,19 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 
 			MegaChatRoom chatRoom = megaChatApi.getChatRoom(currentChatId);
-			if (callStatus == CALL_STATUS_USER_NO_PRESENT && chatRoom != null &&
-					(chatRoom.isGroup() || chatRoom.isMeeting()) && !getChatManagement().isOpeningMeetingLink(currentChatId)) {
-				showGroupCallNotification(currentChatId);
-				return;
+			if (callStatus == CALL_STATUS_USER_NO_PRESENT && chatRoom != null) {
+				if ((chatRoom.isGroup() || chatRoom.isMeeting()) && !getChatManagement().isOpeningMeetingLink(currentChatId)) {
+					logDebug("Show incoming group call notification");
+					showGroupCallNotification(currentChatId);
+					return;
+				}
+
+				if (!chatRoom.isGroup() && !chatRoom.isMeeting() && openCallChatId != chatRoom.getChatId()) {
+					logDebug("Show incoming one to one call screen");
+					MegaChatCall callToLaunch = megaChatApi.getChatCall(chatRoom.getChatId());
+					launchCallActivity(callToLaunch);
+					return;
+				}
 			}
 		}
 
@@ -1589,7 +1607,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 	}
 
-	private void checkCallDestroyed(long chatId, long callId, int termCode, boolean isIgnored) {
+	private void checkCallDestroyed(long chatId, long callId, int endCallReason, boolean isIgnored) {
 		getChatManagement().setOpeningMeetingLink(chatId, false);
 
 		if (shouldNotify(this)) {
@@ -1602,13 +1620,12 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 		getChatManagement().removeNotificationShown(chatId);
 
-		//Show missed call if time out ringing (for incoming calls)
 		try {
-			if(termCode == MegaChatCall.TERM_CODE_ERROR && !isIgnored){
+			if (endCallReason == MegaChatCall.END_CALL_REASON_NO_ANSWER && !isIgnored) {
 				MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
 				if (chatRoom != null && !chatRoom.isGroup() && !chatRoom.isMeeting() && megaApi.isChatNotifiable(chatId)) {
-					logDebug("localTermCodeNotLocal");
 					try {
+						logDebug("Show missed call notification");
 						ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
 						notificationBuilder.showMissedCallNotification(chatId, callId);
 					} catch (Exception e) {
@@ -1701,7 +1718,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			removeRTCAudioManagerRingIn();
 			MegaApplication.isSpeakerOn = isSpeakerOn;
 			rtcAudioManager = AppRTCAudioManager.create(this, isSpeakerOn, type);
-			if (type != AUDIO_MANAGER_CREATING_JOINING_MEETING && type != AUDIO_MANAGER_CALL_OUTGOING) {
+			if (type != AUDIO_MANAGER_CREATING_JOINING_MEETING) {
 				startProximitySensor();
 			}
 		}
