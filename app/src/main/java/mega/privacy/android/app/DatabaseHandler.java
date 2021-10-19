@@ -1606,7 +1606,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
 		values.put(KEY_SMALL_GRID_CAMERA, encrypt(prefs.getSmallGridCamera()));
 		values.put(KEY_REMOVE_GPS, encrypt(prefs.getRemoveGPS()));
-		values.put(KEY_PASSCODE_LOCK_REQUIRE_TIME, encrypt(prefs.getPasscodeLockRequireTime()));
 		values.put(KEY_KEEP_FILE_NAMES, encrypt(prefs.getKeepFileNames()));
 		values.put(KEY_AUTO_PLAY, encrypt(prefs.isAutoPlayEnabled() + ""));
 		values.put(KEY_UPLOAD_VIDEO_QUALITY, encrypt(prefs.getUploadVideoQuality()));
@@ -1615,6 +1614,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_SHOULD_CLEAR_CAMSYNC_RECORDS, encrypt(prefs.getShouldClearCameraSyncRecords()));
 		values.put(KEY_SHOW_INVITE_BANNER, encrypt(prefs.getShowInviteBanner()));
 		values.put(KEY_SD_CARD_URI, encrypt(prefs.getSdCardUri()));
+		values.put(KEY_ASK_FOR_DISPLAY_OVER, encrypt(prefs.getAskForDisplayOver()));
+		values.put(KEY_ASK_SET_DOWNLOAD_LOCATION, encrypt(prefs.getAskForSetDownloadLocation()));
+		values.put(KEY_URI_MEDIA_EXTERNAL_SD_CARD, encrypt(prefs.getMediaSDCardUri()));
+		values.put(KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD, encrypt(prefs.getIsMediaOnSDCard()));
+		values.put(KEY_PASSCODE_LOCK_REQUIRE_TIME, encrypt(prefs.getPasscodeLockRequireTime()));
 
         db.insert(TABLE_PREFERENCES, null, values);
 	}
@@ -1714,13 +1718,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String closeInviteBanner = decrypt(cursor.getString(39));
 				String preferredSortCameraUpload = decrypt(cursor.getString(40));
 				String sdCardUri = decrypt(cursor.getString(41));
+				String askForDisplayOver = decrypt(cursor.getString(42));
+				String askForSetDownloadLocation = decrypt(cursor.getString(43));
+				String mediaSDCardUri = decrypt(cursor.getString(44));
+				String isMediaOnSDCard = decrypt(cursor.getString(45));
 				String passcodeLockRequireTime = decrypt(cursor.getString(46));
 
-				prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
-						pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
-						secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-						pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers, firstTimeChat, smallGridCamera, uploadVideoQuality, conversionOnCharging, chargingOnSize, shouldClearCameraSyncRecords, camVideoSyncTimeStamp,
-						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner, preferredSortCameraUpload, sdCardUri, passcodeLockRequireTime);
+				prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle,
+						camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
+						pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload,
+						lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
+						secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList,
+						preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
+						pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers,
+						firstTimeChat, smallGridCamera, uploadVideoQuality, conversionOnCharging,
+						chargingOnSize, shouldClearCameraSyncRecords, camVideoSyncTimeStamp,
+						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner,
+						preferredSortCameraUpload, sdCardUri, askForDisplayOver,
+						askForSetDownloadLocation, mediaSDCardUri, isMediaOnSDCard,
+						passcodeLockRequireTime);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
