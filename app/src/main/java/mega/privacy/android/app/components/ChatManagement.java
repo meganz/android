@@ -55,6 +55,12 @@ public class ChatManagement {
     private final ArrayList<Long> currentActiveGroupChat = new ArrayList<>();
     // List of calls for which an incoming call notification has already been shown
     private final ArrayList<Long> notificationShown = new ArrayList<>();
+    // List of pending messages ids in which its transfer is to be cancelled
+    private final HashMap<Integer, Long> hashMapPendingMessage = new HashMap<>();
+    // List of messages id to delete
+    private final ArrayList<Long> msgsToDelete = new ArrayList<>();
+
+
     // If this has a valid value, means there is a pending chat link to join.
     private String pendingJoinLink;
 
@@ -151,6 +157,50 @@ public class ChatManagement {
 
     public void setVideoStatus(long chatId, boolean videoStatus) {
         hashMapVideo.put(chatId, videoStatus);
+    }
+
+    public void setPendingMessage(int tag, long chatId) {
+        boolean entryExists = hashMapPendingMessage.containsKey(tag);
+        if (!entryExists) {
+            hashMapPendingMessage.put(tag, chatId);
+        }
+    }
+
+    public void removePendingMsg(int tag){
+        boolean entryExists = hashMapPendingMessage.containsKey(tag);
+        if (entryExists) {
+            hashMapPendingMessage.remove(tag);
+        }
+    }
+
+    public long getPendingMsgId(int tag) {
+        boolean entryExists = hashMapPendingMessage.containsKey(tag);
+        if (entryExists) {
+            return hashMapPendingMessage.get(tag);
+        }
+
+        return MEGACHAT_INVALID_HANDLE;
+    }
+
+    public void addMsgToDelete(long pMsgId) {
+        if (isNotificationShown(pMsgId)) {
+            return;
+        }
+
+        msgsToDelete.add(pMsgId);
+    }
+
+    public boolean isMsgToDelete(long pMsgId) {
+        if (msgsToDelete.isEmpty())
+            return false;
+
+        return msgsToDelete.contains(pMsgId);
+    }
+
+    public void removeMsgToDelete(long pMsgId) {
+        if (isMsgToDelete(pMsgId)) {
+            msgsToDelete.remove(pMsgId);
+        }
     }
 
     public boolean isOpeningMeetingLink(long chatId) {
