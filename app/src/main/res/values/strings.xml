@@ -4174,4 +4174,8 @@
     <string name="main_view">Main view</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Logging out deletes your offline content.</string>
+    <!-- title for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_title">Use mobile data to preview high resolution images</string>
+    <!-- summary for the settings to enable high resolution images when on mobile data -->
+    <string name="settings_mobile_data_resoluton_summary">Use mobile data to load high resolution images when previewing. If disabled, the original image will only be loaded when you zoom in.</string>
 </resources>

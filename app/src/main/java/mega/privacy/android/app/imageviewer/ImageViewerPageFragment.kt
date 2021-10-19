@@ -1,6 +1,7 @@
 package mega.privacy.android.app.imageviewer
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,15 +18,18 @@ import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ImageViewerPageFragment : Fragment() {
@@ -39,11 +43,14 @@ class ImageViewerPageFragment : Fragment() {
             }
     }
 
+    @Inject
+    lateinit var preferences: SharedPreferences
+
     private lateinit var binding: PageImageViewerBinding
 
+    private val viewModel by activityViewModels<ImageViewerViewModel>()
     private var fullSizeRequested = false
     private val nodeHandle: Long by extraNotNull(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
-    private val viewModel by activityViewModels<ImageViewerViewModel>()
     private val retainingSupplier by lazy { RetainingDataSourceSupplier<CloseableReference<CloseableImage>>() }
 
     override fun onCreateView(
@@ -73,7 +80,7 @@ class ImageViewerPageFragment : Fragment() {
                         viewModel.switchToolbar()
                     },
                     onZoomCallback = {
-                        if (!fullSizeRequested) {
+                        if (!fullSizeRequested && !isHighResolutionRestricted()) {
                             fullSizeRequested = true
                             viewModel.reloadCurrentImage(true)
                         }
@@ -135,4 +142,8 @@ class ImageViewerPageFragment : Fragment() {
 
         startActivity(intent)
     }
+
+    private fun isHighResolutionRestricted(): Boolean =
+        !requireContext().isMeteredConnection()
+                || !preferences.getBoolean(SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION, true)
 }

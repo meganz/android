@@ -297,7 +297,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
     }
 
     fun reloadCurrentImage(fullSize: Boolean) {
-        currentHandle.value?.let { loadSingleImage(it, fullSize) }
+        currentHandle.value?.let { handle -> loadSingleImage(handle, fullSize) }
     }
 
     fun updateCurrentPosition(position: Int) {
