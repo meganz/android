@@ -56,9 +56,9 @@ public class ChatManagement {
     // List of calls for which an incoming call notification has already been shown
     private final ArrayList<Long> notificationShown = new ArrayList<>();
     // List of pending messages ids in which its transfer is to be cancelled
-    private final HashMap<Integer, Long> hashMapPendingMessage = new HashMap<>();
+    private final HashMap<Integer, Long> hashMapPendingMsgsToBeCancelled = new HashMap<>();
     // List of messages id to delete
-    private final ArrayList<Long> msgsToDelete = new ArrayList<>();
+    private final ArrayList<Long> msgsToBeDeleted = new ArrayList<>();
 
 
     // If this has a valid value, means there is a pending chat link to join.
@@ -159,47 +159,43 @@ public class ChatManagement {
         hashMapVideo.put(chatId, videoStatus);
     }
 
-    public void setPendingMessage(int tag, long chatId) {
-        boolean entryExists = hashMapPendingMessage.containsKey(tag);
-        if (!entryExists) {
-            hashMapPendingMessage.put(tag, chatId);
+    public void setPendingMessageToBeCancelled(int tag, long chatId) {
+        if (getPendingMsgIdToBeCancelled(tag) == MEGACHAT_INVALID_HANDLE) {
+            hashMapPendingMsgsToBeCancelled.put(tag, chatId);
         }
     }
 
-    public void removePendingMsg(int tag){
-        boolean entryExists = hashMapPendingMessage.containsKey(tag);
+    public long getPendingMsgIdToBeCancelled(int tag) {
+        boolean entryExists = hashMapPendingMsgsToBeCancelled.containsKey(tag);
         if (entryExists) {
-            hashMapPendingMessage.remove(tag);
-        }
-    }
-
-    public long getPendingMsgId(int tag) {
-        boolean entryExists = hashMapPendingMessage.containsKey(tag);
-        if (entryExists) {
-            return hashMapPendingMessage.get(tag);
+            return hashMapPendingMsgsToBeCancelled.get(tag);
         }
 
         return MEGACHAT_INVALID_HANDLE;
     }
 
-    public void addMsgToDelete(long pMsgId) {
-        if (isNotificationShown(pMsgId)) {
-            return;
+    public void removePendingMsgToBeCancelled(int tag) {
+        if (getPendingMsgIdToBeCancelled(tag) != MEGACHAT_INVALID_HANDLE) {
+            hashMapPendingMsgsToBeCancelled.remove(tag);
         }
-
-        msgsToDelete.add(pMsgId);
     }
 
-    public boolean isMsgToDelete(long pMsgId) {
-        if (msgsToDelete.isEmpty())
+    public void addMsgToBeDelete(long pMsgId) {
+        if (!isMsgToBeDelete(pMsgId)) {
+            msgsToBeDeleted.add(pMsgId);
+        }
+    }
+
+    public boolean isMsgToBeDelete(long pMsgId) {
+        if (msgsToBeDeleted.isEmpty())
             return false;
 
-        return msgsToDelete.contains(pMsgId);
+        return msgsToBeDeleted.contains(pMsgId);
     }
 
     public void removeMsgToDelete(long pMsgId) {
-        if (isMsgToDelete(pMsgId)) {
-            msgsToDelete.remove(pMsgId);
+        if (isMsgToBeDelete(pMsgId)) {
+            msgsToBeDeleted.remove(pMsgId);
         }
     }
 

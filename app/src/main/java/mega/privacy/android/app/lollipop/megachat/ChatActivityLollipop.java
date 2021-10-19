@@ -6403,7 +6403,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                         dbH.removePendingMessageById(idMsg);
                     }
 
-                    if (MegaApplication.getChatManagement().isMsgToDelete(idMsg)) {
+                    if (MegaApplication.getChatManagement().isMsgToBeDelete(idMsg)) {
                         logDebug("Message to be deleted");
                         MegaApplication.getChatManagement().removeMsgToDelete(idMsg);
                         new ChatController(chatActivity).deleteMessage(msg, idChat);
@@ -7680,7 +7680,7 @@ public class ChatActivityLollipop extends PasscodeActivity
 
         if (pMsg.getState() == PendingMessageSingle.STATE_UPLOADING
                 && pMsg.getTransferTag() != INVALID_ID) {
-            MegaApplication.getChatManagement().setPendingMessage(pMsg.getTransferTag(), pMsg.getId());
+            MegaApplication.getChatManagement().setPendingMessageToBeCancelled(pMsg.getTransferTag(), pMsg.getId());
             megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
             return;
         }
@@ -8283,11 +8283,11 @@ public class ChatActivityLollipop extends PasscodeActivity
         }
         else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
             int tag = request.getTransferTag();
-            long pMsgId = MegaApplication.getChatManagement().getPendingMsgId(tag);
-            MegaApplication.getChatManagement().removePendingMsg(tag);
+            long pMsgId = MegaApplication.getChatManagement().getPendingMsgIdToBeCancelled(tag);
+            MegaApplication.getChatManagement().removePendingMsgToBeCancelled(tag);
 
             if (e.getErrorCode() != MegaError.API_OK) {
-                MegaApplication.getChatManagement().addMsgToDelete(pMsgId);
+                MegaApplication.getChatManagement().addMsgToBeDelete(pMsgId);
             } else {
                 removePendingMessageFromDbHAndUI(pMsgId);
             }
