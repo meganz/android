@@ -45,7 +45,7 @@ class MeetingActivity : PasscodeActivity() {
         const val MEETING_IS_GUEST = "is_guest"
     }
 
-    public lateinit var binding: ActivityMeetingBinding
+    lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
     private var meetingAction: String? = null
