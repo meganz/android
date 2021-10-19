@@ -203,6 +203,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.providers.FileProviderActivity.FROM_MEGA_APP;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -3503,6 +3504,15 @@ public class ChatActivityLollipop extends PasscodeActivity
                 return;
             }
 
+            if (intent.getBooleanExtra(FROM_MEGA_APP, false)) {
+                long[] handles = intent.getLongArrayExtra(NODE_HANDLES);
+                if (handles != null) {
+
+                }
+
+                return;
+            }
+
             intent.setAction(Intent.ACTION_GET_CONTENT);
 
             try {
@@ -4179,9 +4189,9 @@ public class ChatActivityLollipop extends PasscodeActivity
         disablePinScreen();
 
         Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.putExtra(FROM_MEGA_APP, true);
         intent.setType("*/*");
 
         startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET);
