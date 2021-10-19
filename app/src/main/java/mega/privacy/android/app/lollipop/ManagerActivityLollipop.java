@@ -3356,6 +3356,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				}
 				case SEARCH:{
+					if (searchExpand) {
+						textsearchQuery = false;
+						break;
+					}
+
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 					setToolbarTitle();
 					break;
