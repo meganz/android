@@ -1615,7 +1615,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_SHOULD_CLEAR_CAMSYNC_RECORDS, encrypt(prefs.getShouldClearCameraSyncRecords()));
 		values.put(KEY_SHOW_INVITE_BANNER, encrypt(prefs.getShowInviteBanner()));
 		values.put(KEY_SD_CARD_URI, encrypt(prefs.getSdCardUri()));
-		values.put(KEY_URI_MEDIA_EXTERNAL_SD_CARD, encrypt(prefs.getUriExternalSDCard()));
 
         db.insert(TABLE_PREFERENCES, null, values);
 	}
