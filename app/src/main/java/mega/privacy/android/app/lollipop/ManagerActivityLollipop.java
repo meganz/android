@@ -7575,7 +7575,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			cuFragment.updateProgress(visibility, pending);
 		}
 
-		cuProgressBar.setVisibility(visibility);
+		if (cuProgressBar.getVisibility() != visibility) {
+			cuProgressBar.setVisibility(visibility);
+		}
+
 		cuProgressBar.setProgress(progress);
 	}
 
