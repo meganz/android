@@ -21,7 +21,6 @@ import nz.mega.sdk.MegaChatPresenceConfig;
 import nz.mega.sdk.MegaPushNotificationSettings;
 
 import static mega.privacy.android.app.constants.SettingsConstants.*;
-import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
@@ -98,7 +97,7 @@ public class SettingsChatFragment extends SettingsBaseFragment {
         }
 
         /*Chat video quality*/
-        chatAttachmentsChatListPreference.setValue(isSendOriginalAttachments() ? 1 + "" : 0 + "");
+        chatAttachmentsChatListPreference.setValueIndex(dbH.getChatVideoQuality());
         chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
 
         /*Rich URL Previews*/
@@ -175,13 +174,8 @@ public class SettingsChatFragment extends SettingsBaseFragment {
 
             case KEY_CHAT_SEND_ORIGINALS:
                 newStatus = Integer.parseInt((String) newValue);
-                if (newStatus == 0) {
-                    dbH.setSendOriginalAttachments(false + "");
-                    chatAttachmentsChatListPreference.setValue(newStatus + "");
-                } else if (newStatus == 1) {
-                    dbH.setSendOriginalAttachments(true + "");
-                    chatAttachmentsChatListPreference.setValue(newStatus + "");
-                }
+                dbH.setChatVideoQuality(newStatus);
+                chatAttachmentsChatListPreference.setValueIndex(newStatus);
                 chatAttachmentsChatListPreference.setSummary(chatAttachmentsChatListPreference.getEntry());
                 break;
         }

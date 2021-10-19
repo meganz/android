@@ -4,18 +4,18 @@ public class ChatSettings {
 
     private String notificationsSound;
     private String vibrationEnabled;
-    private String sendOriginalAttachments;
+    private String videoQuality;
 
-    public ChatSettings(String notificationsSound, String vibrationEnabled, String sendOriginalAttachments) {
+    public ChatSettings(String notificationsSound, String vibrationEnabled, String videoQuality) {
         this.notificationsSound = notificationsSound;
         this.vibrationEnabled = vibrationEnabled;
-        this.sendOriginalAttachments = sendOriginalAttachments;
+        this.videoQuality = videoQuality;
     }
 
     public ChatSettings() {
         this.notificationsSound = "";
         this.vibrationEnabled = true+"";
-        this.sendOriginalAttachments = false+"";
+        this.videoQuality = false+"";
     }
 
     public String getNotificationsSound() {
@@ -34,11 +34,11 @@ public class ChatSettings {
         this.vibrationEnabled = vibrationEnabled;
     }
 
-    public String getSendOriginalAttachments() {
-        return sendOriginalAttachments;
+    public String getVideoQuality() {
+        return videoQuality;
     }
 
-    public void setSendOriginalAttachments(String sendOriginalAttachments) {
-        this.sendOriginalAttachments = sendOriginalAttachments;
+    public void setVideoQuality(String videoQuality) {
+        this.videoQuality = videoQuality;
     }
 }
