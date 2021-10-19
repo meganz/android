@@ -1607,6 +1607,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_SMALL_GRID_CAMERA, encrypt(prefs.getSmallGridCamera()));
 		values.put(KEY_REMOVE_GPS, encrypt(prefs.getRemoveGPS()));
 		values.put(KEY_PASSCODE_LOCK_REQUIRE_TIME, encrypt(prefs.getPasscodeLockRequireTime()));
+		values.put(KEY_KEEP_FILE_NAMES, encrypt(prefs.getKeepFileNames()));
+		values.put(KEY_AUTO_PLAY, encrypt(prefs.isAutoPlayEnabled() + ""));
+		values.put(KEY_UPLOAD_VIDEO_QUALITY, encrypt(prefs.getUploadVideoQuality()));
+		values.put(KEY_CONVERSION_ON_CHARGING, encrypt(prefs.getConversionOnCharging()));
+		values.put(KEY_CHARGING_ON_SIZE, encrypt(prefs.getChargingOnSize()));
+		values.put(KEY_SHOULD_CLEAR_CAMSYNC_RECORDS, encrypt(prefs.getShouldClearCameraSyncRecords()));
+		values.put(KEY_SHOW_INVITE_BANNER, encrypt(prefs.getShowInviteBanner()));
+		values.put(KEY_SD_CARD_URI, encrypt(prefs.getSdCardUri()));
+		values.put(KEY_URI_MEDIA_EXTERNAL_SD_CARD, encrypt(prefs.getUriExternalSDCard()));
 
         db.insert(TABLE_PREFERENCES, null, values);
 	}
