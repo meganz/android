@@ -12,14 +12,12 @@ class SortOrderManagement @Inject constructor(
 ) {
 
     private var orderCloud: Int = ORDER_DEFAULT_ASC
-    private var orderContacts: Int = ORDER_DEFAULT_ASC
     private var orderOthers: Int = ORDER_DEFAULT_ASC
     private var orderCamera: Int = ORDER_MODIFICATION_DESC
 
     init {
         dbH.preferences?.apply {
             preferredSortCloud?.toInt()?.let { orderCloud = it }
-            preferredSortContacts?.toInt()?.let { orderContacts = it }
             preferredSortOthers?.toInt()?.let { orderOthers = it }
             preferredSortCameraUpload?.toInt()?.let { orderCamera = it }
         }
@@ -30,7 +28,6 @@ class SortOrderManagement @Inject constructor(
      */
     fun resetDefaults() {
         orderCloud = ORDER_DEFAULT_ASC
-        orderContacts = ORDER_DEFAULT_ASC
         orderOthers = ORDER_DEFAULT_ASC
         orderCamera = ORDER_MODIFICATION_DESC
     }
@@ -40,13 +37,6 @@ class SortOrderManagement @Inject constructor(
     fun setOrderCloud(newOrderCloud: Int) {
         orderCloud = newOrderCloud
         dbH.setPreferredSortCloud(orderCloud.toString())
-    }
-
-    fun getOrderContacts(): Int = orderContacts
-
-    fun setOrderContacts(newOrderContacts: Int) {
-        orderContacts = newOrderContacts
-        dbH.setPreferredSortContacts(orderContacts.toString())
     }
 
     fun getOrderOthers(): Int = orderOthers

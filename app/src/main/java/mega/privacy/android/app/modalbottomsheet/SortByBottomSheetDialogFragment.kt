@@ -79,18 +79,12 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         oldOrder = when (orderType) {
             ORDER_CLOUD -> sortOrderManagement.getOrderCloud()
-            ORDER_CONTACTS -> sortOrderManagement.getOrderContacts()
             ORDER_CAMERA -> sortOrderManagement.getOrderCamera()
             ORDER_OTHERS -> sortOrderManagement.getOrderOthers()
             else -> ORDER_DEFAULT_ASC
         }
 
         when (orderType) {
-            ORDER_CONTACTS -> {
-                binding.sortByLargestSize.isVisible = false
-                binding.sortBySmallestSize.isVisible = false
-                binding.sortBySizeSeparator.isVisible = false
-            }
             ORDER_CAMERA -> {
                 binding.sortByNameAsc.isVisible = false
                 binding.sortByNameDesc.isVisible = false
@@ -135,11 +129,11 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.sortByNewestDate.setOnClickListener {
-            setNewOrder(if (orderType == ORDER_CONTACTS) ORDER_CREATION_ASC else ORDER_MODIFICATION_DESC)
+            setNewOrder(ORDER_MODIFICATION_DESC)
         }
 
         binding.sortByOldestDate.setOnClickListener {
-            setNewOrder(if (orderType == ORDER_CONTACTS) ORDER_CREATION_DESC else ORDER_MODIFICATION_ASC)
+            setNewOrder(ORDER_MODIFICATION_ASC)
         }
 
         binding.sortByLargestSize.setOnClickListener {
@@ -185,9 +179,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 } else if (requireActivity() is FileExplorerActivityLollipop) {
                     updateFileExplorerOrder(order)
                 }
-            }
-            ORDER_CONTACTS -> {
-                sortOrderManagement.setOrderContacts(order)
             }
             ORDER_CAMERA -> {
                 sortOrderManagement.setOrderCamera(order)

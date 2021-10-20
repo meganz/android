@@ -32,7 +32,6 @@ public class MegaPreferences{
 	String cameraFolderExternalSDCard = "";	
 	String passcodeLockType = "";
 	String preferredSortCloud = "";
-	String preferredSortContacts = "";
 	private String preferredSortCameraUpload;
 	String preferredSortOthers = "";
 	String firstTimeChat = "";
@@ -68,14 +67,14 @@ public class MegaPreferences{
 					String keepFileNames, String storageAdvancedDevices, String preferredViewList,
 					String preferredViewListCameraUploads, String uriExternalSDCard,
 					String cameraFolderExternalSDCard, String passcodeLockType,
-					String preferredSortCloud, String preferredSortContacts,
-					String preferredSortOthers, String firstTimeChat, String smallGridCamera,
-					String uploadVideoQuality, String conversionOnCharging, String chargingOnSize,
-					String shouldClearCameraSyncRecords, String camVideoSyncTimeStamp,
-					String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,
-					String showInviteBanner, String preferredSortCameraUpload, String sdCardUri,
-					String askForDisplayOver, String askForSetDownloadLocation,
-					String mediaSDCardUri, String isMediaOnSDCard, String passcodeLockRequireTime) {
+					String preferredSortCloud, String preferredSortOthers, String firstTimeChat,
+					String smallGridCamera, String uploadVideoQuality, String conversionOnCharging,
+					String chargingOnSize, String shouldClearCameraSyncRecords,
+					String camVideoSyncTimeStamp, String secVideoSyncTimeStamp,
+					String isAutoPlayEnabled, String removeGPS, String showInviteBanner,
+					String preferredSortCameraUpload, String sdCardUri, String askForDisplayOver,
+					String askForSetDownloadLocation, String mediaSDCardUri, String isMediaOnSDCard,
+					String passcodeLockRequireTime) {
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -102,7 +101,6 @@ public class MegaPreferences{
 		this.cameraFolderExternalSDCard = cameraFolderExternalSDCard;
 		this.passcodeLockType = passcodeLockType;
 		this.preferredSortCloud = preferredSortCloud;
-		this.preferredSortContacts = preferredSortContacts;
 		this.preferredSortOthers = preferredSortOthers;
 		this.firstTimeChat = firstTimeChat;
 		this.smallGridCamera = smallGridCamera;
@@ -357,14 +355,6 @@ public class MegaPreferences{
 
 	public void setPreferredSortCloud(String preferredSortCloud) {
 		this.preferredSortCloud = preferredSortCloud;
-	}
-
-	public String getPreferredSortContacts() {
-		return preferredSortContacts;
-	}
-
-	public void setPreferredSortContacts(String preferredSortContacts) {
-		this.preferredSortContacts = preferredSortContacts;
 	}
 
 	public String getPreferredSortOthers() {

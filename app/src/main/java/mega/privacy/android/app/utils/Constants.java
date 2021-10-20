@@ -878,9 +878,8 @@ public class Constants {
     public static final String NEW_ORDER = "NEW_ORDER";
     public static final String IS_CLOUD_ORDER = "IS_CLOUD_ORDER";
     public static final int ORDER_CLOUD = 0;
-    public static final int ORDER_CONTACTS = 1;
-    public static final int ORDER_OTHERS = 2;
-    public static final int ORDER_CAMERA = 3;
+    public static final int ORDER_OTHERS = 1;
+    public static final int ORDER_CAMERA = 2;
 
     public final static float MAX_WIDTH_APPBAR_LAND = 400;
     public final static float MAX_WIDTH_APPBAR_PORT = 200;

@@ -43,7 +43,7 @@ import static nz.mega.sdk.MegaApiJava.*;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 63;
+	private static final int DATABASE_VERSION = 64;
     private static final String DATABASE_NAME = "megapreferences";
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -939,6 +939,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			onCreate(db);
 			setPreferences(db, preferences);
 		}
+
+		if (oldVersion == 63) {
+			MegaPreferences preferences =  getPreferences(db);
+			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
+			onCreate(db);
+			setPreferences(db, preferences);
+		}
 	}
 
 //	public MegaOffline encrypt(MegaOffline off){
@@ -1599,7 +1606,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD, encrypt(prefs.getCameraFolderExternalSDCard()));
         values.put(KEY_PASSCODE_LOCK_TYPE, encrypt(prefs.getPasscodeLockType()));
 		values.put(KEY_PREFERRED_SORT_CLOUD, encrypt(prefs.getPreferredSortCloud()));
-		values.put(KEY_PREFERRED_SORT_CONTACTS, encrypt(prefs.getPreferredSortContacts()));
 		values.put(KEY_PREFERRED_SORT_CAMERA_UPLOAD, encrypt(prefs.getPreferredSortCameraUpload()));
 		values.put(KEY_PREFERRED_SORT_OTHERS, encrypt(prefs.getPreferredSortOthers()));
 		values.put(KEY_FIRST_LOGIN_CHAT, encrypt(prefs.getFirstTimeChat()));
@@ -1702,7 +1708,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String cameraFolderExternalSDCard = decrypt(cursor.getString(24));
 				String pinLockType = decrypt(cursor.getString(25));
 				String preferredSortCloud = decrypt(cursor.getString(26));
-				String preferredSortContacts = decrypt(cursor.getString(27));
 				String preferredSortOthers = decrypt(cursor.getString(28));
 				String firstTimeChat = decrypt(cursor.getString(29));
 				String smallGridCamera = decrypt(cursor.getString(30));
@@ -1729,13 +1734,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
 						secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList,
 						preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-						pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers,
-						firstTimeChat, smallGridCamera, uploadVideoQuality, conversionOnCharging,
-						chargingOnSize, shouldClearCameraSyncRecords, camVideoSyncTimeStamp,
-						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner,
-						preferredSortCameraUpload, sdCardUri, askForDisplayOver,
-						askForSetDownloadLocation, mediaSDCardUri, isMediaOnSDCard,
-						passcodeLockRequireTime);
+						pinLockType, preferredSortCloud, preferredSortOthers, firstTimeChat,
+						smallGridCamera, uploadVideoQuality, conversionOnCharging, chargingOnSize,
+						shouldClearCameraSyncRecords, camVideoSyncTimeStamp, secVideoSyncTimeStamp,
+						isAutoPlayEnabled, removeGPS, closeInviteBanner, preferredSortCameraUpload,
+						sdCardUri, askForDisplayOver, askForSetDownloadLocation, mediaSDCardUri,
+						isMediaOnSDCard, passcodeLockRequireTime);
 			}
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
@@ -2997,25 +3001,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
 			} else {
 				values.put(KEY_PREFERRED_SORT_CLOUD, encrypt(order));
-				db.insert(TABLE_PREFERENCES, null, values);
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
-	}
-
-	public void setPreferredSortContacts (String order){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
-		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		ContentValues values = new ContentValues();
-		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
-			if (cursor != null && cursor.moveToFirst()) {
-				String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_SORT_CONTACTS + "= '" + encrypt(order) + "' WHERE " + KEY_ID + " = '1'";
-				db.execSQL(UPDATE_PREFERENCES_TABLE);
-//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
-			} else {
-				values.put(KEY_PREFERRED_SORT_CONTACTS, encrypt(order));
 				db.insert(TABLE_PREFERENCES, null, values);
 			}
 		} catch (Exception e) {
