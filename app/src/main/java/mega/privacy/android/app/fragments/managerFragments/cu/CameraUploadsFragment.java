@@ -17,7 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.core.app.ActivityCompat;
 import androidx.core.text.HtmlCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -49,6 +48,7 @@ import static mega.privacy.android.app.components.dragger.DragToExitSupport.obse
 import static mega.privacy.android.app.components.dragger.DragToExitSupport.putThumbnailLocation;
 import static mega.privacy.android.app.utils.ColorUtils.DARK_IMAGE_ALPHA;
 import static mega.privacy.android.app.utils.ColorUtils.setImageViewAlphaIfDark;
+import static mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN;
@@ -68,6 +68,7 @@ import static mega.privacy.android.app.utils.StyleUtils.setTextStyle;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 @AndroidEntryPoint
 public class CameraUploadsFragment extends BaseFragment implements CUGridViewAdapter.Listener,
@@ -260,6 +261,14 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         if (viewModel.isEnableCUShown()) {
             mManagerActivity.updateCULayout(View.GONE);
             mManagerActivity.updateCUViewTypes(View.GONE);
+
+            mFirstLoginBinding.uploadVideosSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    mManagerActivity.showSnackbar(DISMISS_ACTION_SNACKBAR,
+                            StringResourcesUtils.getString(R.string.video_quality_info),
+                            MEGACHAT_INVALID_HANDLE);
+                }
+            });
             return;
         }
 

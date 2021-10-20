@@ -4174,4 +4174,8 @@
     <string name="main_view">Main view</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
     <string name="offline_warning">Logging out deletes your offline content.</string>
+    <!-- Alert informing the user can choose the video quality for Camera Upload Videos -->
+    <string name="video_quality_info">You can save space by decreasing the video quality in Camera Upload settings.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Original quality</string>
 </resources>
