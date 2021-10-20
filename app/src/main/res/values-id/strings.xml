@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Penampil MEGA PDF</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">dari</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Ya</string>
     <!-- Answer for confirmation dialog. -->
@@ -2226,10 +2224,12 @@
     <string name="settings_video_upload_quality">Kualitas video</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Unggah Kamera perlu mengakses foto dan media lain di perangkat Anda.  Silakan buka halaman pengaturan dan berikan izin.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Kualitas asli</item>
-        <item>Kualitas menengah</item>
+        <item>Rendah</item>
+        <item>Menengah</item>
+        <item>Tinggi</item>
+        <item>Original</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Panggilan tidak terjawab</string>
@@ -3572,7 +3572,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Pesan ini telah mencapai batas maksimum %d reaksi.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] mengubah waktu pembersihan pesan menjadi [/B][A]  %2$s[/A][B]. [/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] mengubah waktu pembersihan pesan menjadi [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Hapus riwayat ngobrol</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->

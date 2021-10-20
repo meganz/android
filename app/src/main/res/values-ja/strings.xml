@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF ビューア</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">/</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">はい</string>
     <!-- Answer for confirmation dialog. -->
@@ -2226,10 +2224,12 @@
     <string name="settings_video_upload_quality">動画の品質</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">カメラアップロードは、あなたの端末上の写真や他のメディアにアクセスする必要があります。設定ページに行き、許可を与えてください。</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>元の品質</item>
-        <item>中程度の品質</item>
+        <item>低い</item>
+        <item>中</item>
+        <item>高い</item>
+        <item>オリジナル</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">不在着信</string>
@@ -3376,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">あなたのアカウントは一時的に安全を確保するためにロックされました。</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]メールアドレスを検証して[/A]、MEGAのメールの手順に従ってアカウントのロックを解除してください。</string>
+    <string name="verify_email_and_follow_steps">[A]検証メール[/A]に記載されている手順に従って、アカウントのロックを解除してください。</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">これが表示されている理由は？</string>
     <!-- Label of a button which action is resend an email -->
@@ -3572,7 +3572,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">このメッセージは、反応の上限（%d）に達しました。</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B]さんがメッセージクリア時間を[/B][A]%2$s[/A][B]に変更しました。[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] さんがメッセージクリア時間を [/B][A]%2$s[/A][B]に変更しました。[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">チャット履歴をクリア</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3634,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">転送を選択</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">転送「%1$s」の優先順位の変更に失敗しました。</string>
+    <string name="change_of_transfer_priority_failed">転送”%1$s” の優先度を変更できませんでした。</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">復号キーを個別に送信</string>
     <!-- Explanation option to send separated the link and decryption key -->
