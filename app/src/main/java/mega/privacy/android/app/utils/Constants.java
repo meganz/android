@@ -518,6 +518,7 @@ public class Constants {
     public static final String APP_DATA_SEPARATOR = "-";
     //Indicates the data after it, is a new AppData due to a repeated transfer
     public static final String APP_DATA_REPEATED_TRANSFER_SEPARATOR = "!";
+    public static final String APP_DATA_BACKGROUND_TRANSFER = "BACKGROUND_TRANSFER";
 
     public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
     public static final String AVATAR_GROUP_CHAT_COLOR = "AVATAR_GROUP_CHAT_COLOR";

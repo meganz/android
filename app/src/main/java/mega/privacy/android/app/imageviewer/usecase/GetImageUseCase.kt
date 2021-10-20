@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
@@ -11,6 +12,7 @@ import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager.*
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.MegaNodeUtil.isGif
@@ -91,14 +93,22 @@ class GetImageUseCase @Inject constructor(
                     }
 
                     if (isFullSizeRequired && !fullFile.exists()) {
-                        megaApi.startDownload(
+                        megaApi.startDownloadWithTopPriority(
                             node,
                             fullFile.absolutePath,
+                            Constants.APP_DATA_BACKGROUND_TRANSFER,
                             OptionalMegaTransferListenerInterface(
+                                onTransferStart = { transfer ->
+                                    imageItem.transferTag = transfer.tag
+                                    emitter.onNext(imageItem)
+                                },
                                 onTransferFinish = { _: MegaTransfer, error: MegaError ->
+                                    if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
+
                                     when (error.errorCode) {
                                         API_OK -> {
                                             imageItem.fullSizeUri = fullFile.toUri()
+                                            imageItem.transferTag = null
                                             emitter.onNext(imageItem)
                                             emitter.onComplete()
                                         }
@@ -114,4 +124,18 @@ class GetImageUseCase @Inject constructor(
                 }
             }
         }, BackpressureStrategy.LATEST)
+
+    fun cancelTransfer(transferTag: Int): Completable =
+        Completable.create { emitter ->
+            megaApi.cancelTransferByTag(transferTag, OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    when (error.errorCode) {
+                        API_OK ->
+                            emitter.onComplete()
+                        else ->
+                            emitter.onError(error.toThrowable())
+                    }
+                }
+            ))
+        }
 }

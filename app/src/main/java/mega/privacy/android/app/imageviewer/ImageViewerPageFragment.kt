@@ -69,6 +69,11 @@ class ImageViewerPageFragment : Fragment() {
         setupObservers()
     }
 
+    override fun onDestroyView() {
+        viewModel.stopImageLoading(nodeHandle)
+        super.onDestroyView()
+    }
+
     private fun setupView() {
         binding.image.apply {
             setZoomingEnabled(true)

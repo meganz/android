@@ -296,6 +296,12 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .addTo(composite)
     }
 
+    fun stopImageLoading(nodeHandle: Long) {
+        images.value?.find { nodeHandle == it.handle }?.transferTag?.let { transferTag ->
+            getImageUseCase.cancelTransfer(transferTag)
+        }
+    }
+
     fun reloadCurrentImage(fullSize: Boolean) {
         currentHandle.value?.let { handle -> loadSingleImage(handle, fullSize) }
     }

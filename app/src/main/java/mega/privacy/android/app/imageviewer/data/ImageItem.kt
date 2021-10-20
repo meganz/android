@@ -9,7 +9,8 @@ data class ImageItem constructor(
     val isVideo: Boolean = false,
     var thumbnailUri: Uri? = null,
     var previewUri: Uri? = null,
-    var fullSizeUri: Uri? = null
+    var fullSizeUri: Uri? = null,
+    var transferTag: Int? = null
 ) {
 
     fun getAvailableUri(): Uri? =
