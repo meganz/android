@@ -239,6 +239,16 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
         }
     }
 
+    private fun updateFastScrollerVisibility() {
+        val gridView = selectedView == ALL_VIEW
+
+        binding.scroller.visibility =
+            if (!gridView && cardAdapter.itemCount >= MIN_ITEMS_SCROLLBAR)
+                View.VISIBLE
+            else
+                View.GONE
+    }
+
     /**
      * Apply selected/unselected style for the TextView button.
      *
@@ -718,6 +728,8 @@ class ImagesFragment : BaseFragment(), HomepageSearchable {
         if(index != -1) {
             cardAdapter.submitList(dateCards?.get(index))
         }
+
+        updateFastScrollerVisibility()
     }
 
     /**
