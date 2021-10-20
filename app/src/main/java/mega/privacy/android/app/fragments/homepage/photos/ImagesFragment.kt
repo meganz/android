@@ -61,7 +61,7 @@ import java.util.*
 @AndroidEntryPoint
 class ImagesFragment : BaseFragment(), HomepageSearchable {
 
-    private val viewModel by viewModels<PhotosViewModel>()
+    private val viewModel by viewModels<ImagesViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
     private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 

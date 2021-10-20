@@ -21,7 +21,7 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter.ofPattern
 import java.util.*
 
-class PhotosViewModel @ViewModelInject constructor(
+class ImagesViewModel @ViewModelInject constructor(
     private val repository: TypedFilesRepository,
     private val zoomViewModel: ZoomViewModel
 ) : ViewModel() {

@@ -37,7 +37,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
 import mega.privacy.android.app.databinding.FragmentPhotosBinding;
-import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
+import mega.privacy.android.app.databinding.FragmentPhotosFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
@@ -91,7 +91,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
     SortOrderManagement sortOrderManagement;
 
     private ManagerActivityLollipop mManagerActivity;
-    private FragmentCameraUploadsFirstLoginBinding mFirstLoginBinding;
+    private FragmentPhotosFirstLoginBinding mFirstLoginBinding;
     private FragmentPhotosBinding binding;
     private CUGridViewAdapter gridAdapter;
     private CUCardViewAdapter cardAdapter;
@@ -236,7 +236,7 @@ public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Li
         viewModel.setInitialPreferences();
 
         mFirstLoginBinding =
-                FragmentCameraUploadsFirstLoginBinding.inflate(inflater, container, false);
+                FragmentPhotosFirstLoginBinding.inflate(inflater, container, false);
 
         new ListenScrollChangesHelper().addViewToListen(mFirstLoginBinding.camSyncScrollView,
                 (v, scrollX, scrollY, oldScrollX, oldScrollY) -> mManagerActivity

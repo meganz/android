@@ -10,7 +10,7 @@
 
         <variable
             name="viewModel"
-            type="mega.privacy.android.app.fragments.homepage.photos.PhotosViewModel" />
+            type="mega.privacy.android.app.fragments.homepage.photos.ImagesViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
