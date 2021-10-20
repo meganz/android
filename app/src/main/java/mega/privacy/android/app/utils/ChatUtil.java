@@ -81,11 +81,11 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaPushNotificationSettings;
 import nz.mega.sdk.MegaStringList;
 
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.CallUtil.isStatusConnected;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.DBUtil.isSendOriginalAttachments;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.FileUtil.shareFile;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -1489,7 +1489,7 @@ public class ChatUtil {
         pendingMsg.setName(fileName);
         pendingMsg.setFingerprint(MegaApplication.getInstance().getMegaApi().getFingerprint(filePath));
 
-        if (MimeTypeList.typeForName(fileName).isMp4Video() && !isSendOriginalAttachments()) {
+        if (MimeTypeList.typeForName(fileName).isMp4Video() && dbH.getChatVideoQuality() != VIDEO_QUALITY_ORIGINAL) {
             idPendingMessage = dbH.addPendingMessage(pendingMsg, PendingMessageSingle.STATE_COMPRESSING);
             pendingMsg.setState(PendingMessageSingle.STATE_COMPRESSING);
         } else if (fromExplorer) {
