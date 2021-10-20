@@ -83,7 +83,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CAM_SYNC_FILE_UPLOAD = "fileUpload";
     private static final String KEY_CAM_SYNC_TIMESTAMP = "camSyncTimeStamp";
     private static final String KEY_CAM_VIDEO_SYNC_TIMESTAMP = "camVideoSyncTimeStamp";
-    private static final String KEY_CAM_SYNC_CHARGING = "camSyncCharging";
     private static final String KEY_UPLOAD_VIDEO_QUALITY = "uploadVideoQuality";
     private static final String KEY_CONVERSION_ON_CHARGING = "conversionOnCharging";
     private static final String KEY_REMOVE_GPS = "removeGPS";
@@ -349,7 +348,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_STORAGE_ASK_ALWAYS + " TEXT, "                															//9
                 + KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, "         															//10
                 + KEY_CAM_SYNC_TIMESTAMP + " TEXT, "                															//11
-                + KEY_CAM_SYNC_CHARGING + " BOOLEAN, "              															//12
                 + KEY_LAST_UPLOAD_FOLDER + " TEXT, "                															//13
                 + KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, "          															//14
                 + KEY_SEC_FOLDER_ENABLED + " TEXT, "                															//15
@@ -549,8 +547,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 //        db.insert(TABLE_PREFERENCES, null, valuesPref);
 
 		if (oldVersion <= 7){
-			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CAM_SYNC_CHARGING + " BOOLEAN;");
-			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_CHARGING + " = '" + encrypt("false") + "';");
 			db.execSQL("ALTER TABLE " + TABLE_OFFLINE + " ADD COLUMN " + KEY_OFF_INCOMING + " INTEGER;");
 			db.execSQL("ALTER TABLE " + TABLE_OFFLINE + " ADD COLUMN " + KEY_OFF_HANDLE_INCOMING + " INTEGER;");
 			db.execSQL("UPDATE " + TABLE_OFFLINE + " SET " + KEY_OFF_INCOMING + " = '0';");
@@ -1685,7 +1681,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String askAlways = decrypt(cursor.getString(getColumnIndex(cursor, KEY_STORAGE_ASK_ALWAYS)));
                 String downloadLocation = decrypt(cursor.getString(getColumnIndex(cursor, KEY_STORAGE_DOWNLOAD_LOCATION)));
                 String camSyncTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor, KEY_CAM_SYNC_TIMESTAMP)));
-                String camSyncCharging = decrypt(cursor.getString(getColumnIndex(cursor, KEY_CAM_SYNC_CHARGING)));
                 String lastFolderUpload = decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_UPLOAD_FOLDER)));
                 String lastFolderCloud = decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_CLOUD_FOLDER_HANDLE)));
                 String secondaryFolderEnabled = decrypt(cursor.getString(getColumnIndex(cursor, KEY_SEC_FOLDER_ENABLED)));
@@ -1720,23 +1715,55 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 String isMediaOnSDCard = decrypt(cursor.getString(getColumnIndex(cursor, KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD)));
                 String passcodeLockRequireTime = decrypt(cursor.getString(getColumnIndex(cursor, KEY_PASSCODE_LOCK_REQUIRE_TIME)));
 
-				prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle,
-						camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled,
-						pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload,
-						lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle,
-						secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList,
-						preferredViewListCamera, uriExternalSDCard, cameraFolderExternalSDCard,
-						pinLockType, preferredSortCloud, preferredSortContacts, preferredSortOthers,
-						firstTimeChat, uploadVideoQuality, conversionOnCharging,
-						chargingOnSize, shouldClearCameraSyncRecords, camVideoSyncTimeStamp,
-						secVideoSyncTimeStamp, isAutoPlayEnabled, removeGPS, closeInviteBanner,
-						preferredSortCameraUpload, sdCardUri, askForDisplayOver,
-						askForSetDownloadLocation, mediaSDCardUri, isMediaOnSDCard,
-						passcodeLockRequireTime);
-			}
-		} catch (Exception e) {
-			logError("Exception opening or managing DB cursor", e);
-		}
+                prefs = new MegaPreferences(
+                        firstTime,
+                        wifi, //
+                        camSyncEnabled,
+                        camSyncHandle,
+                        camSyncLocalPath,
+                        fileUpload,
+                        camSyncTimeStamp,
+                        pinLockEnabled,
+                        pinLockCode,
+                        askAlways,
+                        downloadLocation,
+                        lastFolderUpload,
+                        lastFolderCloud,
+                        secondaryFolderEnabled,
+                        secondaryPath,
+                        secondaryHandle,
+                        secSyncTimeStamp,
+                        keepFileNames,
+                        storageAdvancedDevices,
+                        preferredViewList,
+                        preferredViewListCamera,
+                        uriExternalSDCard,
+                        cameraFolderExternalSDCard,
+                        pinLockType,
+                        preferredSortCloud,
+                        preferredSortContacts,
+                        preferredSortOthers,
+                        firstTimeChat,
+                        uploadVideoQuality,
+                        conversionOnCharging,
+                        chargingOnSize,
+                        shouldClearCameraSyncRecords,
+                        camVideoSyncTimeStamp,
+                        secVideoSyncTimeStamp,
+                        isAutoPlayEnabled,
+                        removeGPS,
+                        closeInviteBanner,
+                        preferredSortCameraUpload,
+                        sdCardUri,
+                        askForDisplayOver,
+                        askForSetDownloadLocation,
+                        mediaSDCardUri,
+                        isMediaOnSDCard,
+                        passcodeLockRequireTime);
+            }
+        } catch (Exception e) {
+            logError("Exception opening or managing DB cursor", e);
+        }
 
         return prefs;
     }

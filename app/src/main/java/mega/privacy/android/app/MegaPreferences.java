@@ -6,7 +6,6 @@ public class MegaPreferences{
 	
 	String firstTime = "";
 	String camSyncWifi = "";
-	String camSyncCharging = "";
 	String camSyncEnabled = "";
 	String camSyncHandle = "";
 	String camSyncLocalPath = "";
@@ -57,24 +56,50 @@ public class MegaPreferences{
 	public final static int PHOTOS_AND_VIDEOS = 1003;
 	public final static int CHARGING_ON_SIZE_DEFAULT = 200;
 
-	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled,
-					String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload,
-					String camSyncTimeStamp, String passcodeLockEnabled, String passcodeLockCode,
-					String storageAskAlways, String storageDownloadLocation, String camSyncCharging,
-					String lastFolderUpload, String lastFolderCloud,
-					String secondaryMediaFolderEnabled, String localPathSecondaryFolder,
-					String megaHandleSecondaryFolder, String secSyncTimeStamp,
-					String keepFileNames, String storageAdvancedDevices, String preferredViewList,
-					String preferredViewListCameraUploads, String uriExternalSDCard,
-					String cameraFolderExternalSDCard, String passcodeLockType,
-					String preferredSortCloud, String preferredSortContacts,
-					String preferredSortOthers, String firstTimeChat,
-					String uploadVideoQuality, String conversionOnCharging, String chargingOnSize,
-					String shouldClearCameraSyncRecords, String camVideoSyncTimeStamp,
-					String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,
-					String showInviteBanner, String preferredSortCameraUpload, String sdCardUri,
-					String askForDisplayOver, String askForSetDownloadLocation,
-					String mediaSDCardUri, String isMediaOnSDCard, String passcodeLockRequireTime) {
+	MegaPreferences(String firstTime,
+					String camSyncWifi,
+					String camSyncEnabled,
+					String camSyncHandle,
+					String camSyncLocalPath,
+					String camSyncFileUpload,
+					String camSyncTimeStamp,
+					String passcodeLockEnabled,
+					String passcodeLockCode,
+					String storageAskAlways,
+					String storageDownloadLocation,
+					String lastFolderUpload,
+					String lastFolderCloud,
+					String secondaryMediaFolderEnabled,
+					String localPathSecondaryFolder,
+					String megaHandleSecondaryFolder,
+					String secSyncTimeStamp,
+					String keepFileNames,
+					String storageAdvancedDevices,
+					String preferredViewList,
+					String preferredViewListCameraUploads,
+					String uriExternalSDCard,
+					String cameraFolderExternalSDCard,
+					String passcodeLockType,
+					String preferredSortCloud,
+					String preferredSortContacts,
+					String preferredSortOthers,
+					String firstTimeChat,
+					String uploadVideoQuality,
+					String conversionOnCharging,
+					String chargingOnSize,
+					String shouldClearCameraSyncRecords,
+					String camVideoSyncTimeStamp,
+					String secVideoSyncTimeStamp,
+					String isAutoPlayEnabled,
+					String removeGPS,
+					String showInviteBanner,
+					String preferredSortCameraUpload,
+					String sdCardUri,
+					String askForDisplayOver,
+					String askForSetDownloadLocation,
+					String mediaSDCardUri,
+					String isMediaOnSDCard,
+					String passcodeLockRequireTime) {
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -86,7 +111,6 @@ public class MegaPreferences{
 		this.passcodeLockCode = passcodeLockCode;
 		this.storageAskAlways = storageAskAlways;
 		this.storageDownloadLocation = storageDownloadLocation;
-		this.camSyncCharging = camSyncCharging;
 		this.lastFolderUpload = lastFolderUpload;
 		this.lastFolderCloud = lastFolderCloud;
 		this.secondaryMediaFolderEnabled = secondaryMediaFolderEnabled;
@@ -168,14 +192,6 @@ public class MegaPreferences{
 
     public void setShouldClearCameraSyncRecords(String shouldClearCameraSyncRecords) {
         this.shouldClearCameraSyncRecords = shouldClearCameraSyncRecords;
-    }
-
-    public String getCamSyncCharging() {
-        return camSyncCharging;
-    }
-
-    public void setCamSyncCharging(String camSyncCharging) {
-        this.camSyncCharging = camSyncCharging;
     }
 	
 	public String getCamSyncFileUpload(){
