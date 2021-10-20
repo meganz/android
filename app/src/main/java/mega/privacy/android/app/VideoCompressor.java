@@ -32,9 +32,10 @@ public class VideoCompressor extends VideoDownsampling{
         logDebug("Video compressor stopped");
     }
 
-    public VideoCompressor(Context context, VideoCompressionCallback callback) {
+    public VideoCompressor(Context context, VideoCompressionCallback callback, int quality) {
         super(context);
         this.updater = callback;
+        this.quality = quality;
     }
 
     public void setPendingList(List<SyncRecord> pendingList) {

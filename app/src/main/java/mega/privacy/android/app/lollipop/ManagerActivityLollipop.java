@@ -3367,6 +3367,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				}
 				case SEARCH:{
+					if (searchExpand) {
+						textsearchQuery = false;
+						break;
+					}
+
 					setBottomNavigationMenuItemChecked(NO_BNV);
 					setToolbarTitle();
 					break;
@@ -7609,7 +7614,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			cuFragment.updateProgress(visibility, pending);
 		}
 
-		cuProgressBar.setVisibility(visibility);
+		if (cuProgressBar.getVisibility() != visibility) {
+			cuProgressBar.setVisibility(visibility);
+		}
+
 		cuProgressBar.setProgress(progress);
 	}
 
@@ -11578,7 +11586,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 			if (transfer.getIsOfflineFile()) {
 				File offlineFile = new File(transfer.getOriginalPath());
-				saveOffline(offlineFile.getParentFile(), node, this, ManagerActivityLollipop.this);
+				saveOffline(offlineFile.getParentFile(), node, ManagerActivityLollipop.this);
 			} else {
 				nodeSaver.saveNode(node, transfer.getPath());
 			}

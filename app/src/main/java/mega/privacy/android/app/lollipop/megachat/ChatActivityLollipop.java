@@ -146,7 +146,6 @@ import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaChatLollipopA
 import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ReactionsBottomSheet;
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.AttachmentUploadBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.InfoReactionsBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.GeneralChatMessageBottomSheet;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.MessageNotSentBottomSheetDialogFragment;
@@ -4422,13 +4421,6 @@ public class ChatActivityLollipop extends PasscodeActivity
             logWarning("Message cannot be edited!");
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_editing_message), -1);
         }
-    }
-
-    public void showUploadPanel(){
-        if (isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
-
-        bottomSheetDialogFragment = new AttachmentUploadBottomSheetDialogFragment();
-        bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
     public void activateActionMode(){
