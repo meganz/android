@@ -3505,11 +3505,7 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
 
             if (intent.getBooleanExtra(FROM_MEGA_APP, false)) {
-                long[] handles = intent.getLongArrayExtra(NODE_HANDLES);
-                if (handles != null) {
-
-                }
-
+                nodeAttacher.handleSelectFileResult(intent, idChat, this, this);
                 return;
             }
 
