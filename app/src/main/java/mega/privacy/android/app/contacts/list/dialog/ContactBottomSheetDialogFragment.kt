@@ -88,8 +88,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     ): View {
         binding = BottomSheetContactDetailBinding.inflate(inflater, container, false)
         contentView = binding.root
-        mainLinearLayout = binding.layoutRoot
-        items_layout = binding.layoutItems
+        itemsLayout = binding.layoutItems
 
         binding.header.btnMore.isVisible = false
         binding.header.divider.isVisible = false
@@ -97,9 +96,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        view.post { setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true) }
-
         viewModel.getContact(userHandle).observe(viewLifecycleOwner, ::showContactInfo)
         viewModel.getMegaUser(userHandle).observe(viewLifecycleOwner) { megaUser ->
             setupButtons(megaUser)
@@ -114,6 +110,8 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 showNodePermissionsDialog()
             }
         }
+
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -204,7 +202,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun showRemoveContactDialog(megaUser: MegaUser) {
         if (removeContactDialog?.isShowing == true) removeContactDialog?.dismiss()
 
-        removeContactDialog = MaterialAlertDialogBuilder(context)
+        removeContactDialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(resources.getQuantityString(R.plurals.title_confirmation_remove_contact, 1))
             .setMessage(resources.getQuantityString(R.plurals.confirmation_remove_contact, 1))
             .setNegativeButton(R.string.general_cancel, null)

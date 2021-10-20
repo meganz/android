@@ -42,27 +42,40 @@ public class MegaPreferences{
 	private String removeGPS;
 	String chargingOnSize = "";
 	String shouldClearCameraSyncRecords;
-
 	String isAutoPlayEnabled = "";
 	private String showInviteBanner = "";
 	String sdCardUri = "";
-
+	private String askForDisplayOver;
+	private String askForSetDownloadLocation;
+	private String mediaSDCardUri;
+	private String isMediaOnSDCard;
 	private String passcodeLockRequireTime;
-
 	private String fingerprintLock;
 
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
-	public final static int ORIGINAL = 0;
-	public final static int MEDIUM = 1;
 	public final static int CHARGING_ON_SIZE_DEFAULT = 200;
 
-	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String passcodeLockEnabled, String passcodeLockCode, String storageAskAlways,
-			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
-			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String passcodeLockType, String preferredSortCloud, String preferredSortContacts,
-			String preferredSortOthers, String firstTimeChat, String smallGridCamera, String uploadVideoQuality,String conversionOnCharging,String chargingOnSize,String shouldClearCameraSyncRecords,String camVideoSyncTimeStamp,
-            String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,String showInviteBanner, String preferredSortCameraUpload, String sdCardUri, String passcodeLockRequireTime, String fingerprintLock){
+	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled,
+					String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload,
+					String camSyncTimeStamp, String passcodeLockEnabled, String passcodeLockCode,
+					String storageAskAlways, String storageDownloadLocation, String camSyncCharging,
+					String lastFolderUpload, String lastFolderCloud,
+					String secondaryMediaFolderEnabled, String localPathSecondaryFolder,
+					String megaHandleSecondaryFolder, String secSyncTimeStamp,
+					String keepFileNames, String storageAdvancedDevices, String preferredViewList,
+					String preferredViewListCameraUploads, String uriExternalSDCard,
+					String cameraFolderExternalSDCard, String passcodeLockType,
+					String preferredSortCloud, String preferredSortContacts,
+					String preferredSortOthers, String firstTimeChat, String smallGridCamera,
+					String uploadVideoQuality, String conversionOnCharging, String chargingOnSize,
+					String shouldClearCameraSyncRecords, String camVideoSyncTimeStamp,
+					String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,
+					String showInviteBanner, String preferredSortCameraUpload, String sdCardUri,
+					String askForDisplayOver, String askForSetDownloadLocation,
+					String mediaSDCardUri, String isMediaOnSDCard, String passcodeLockRequireTime,
+					String fingerprintLock) {
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -104,6 +117,10 @@ public class MegaPreferences{
 		this.showInviteBanner = showInviteBanner;
 		this.preferredSortCameraUpload = preferredSortCameraUpload;
 		this.sdCardUri = sdCardUri;
+		this.askForDisplayOver = askForDisplayOver;
+		this.askForSetDownloadLocation = askForSetDownloadLocation;
+		this.mediaSDCardUri = mediaSDCardUri;
+		this.isMediaOnSDCard = isMediaOnSDCard;
 		this.passcodeLockRequireTime = passcodeLockRequireTime;
 		this.fingerprintLock = fingerprintLock;
 	}
@@ -430,6 +447,50 @@ public class MegaPreferences{
     public void setRemoveGPS(String removeGPS) {
         this.removeGPS = removeGPS;
     }
+
+	public String getAskForDisplayOver() {
+		return askForDisplayOver;
+	}
+
+	public void setAskForDisplayOver(String askForDisplayOver) {
+		this.askForDisplayOver = askForDisplayOver;
+	}
+
+	public String getAskForSetDownloadLocation() {
+		return askForSetDownloadLocation;
+	}
+
+	public void setAskForSetDownloadLocation(String askForSetDownloadLocation) {
+		this.askForSetDownloadLocation = askForSetDownloadLocation;
+	}
+
+	public String getMediaSDCardUri() {
+		return mediaSDCardUri;
+	}
+
+	public void setMediaSDCardUri(String mediaSDCardUri) {
+		this.mediaSDCardUri = mediaSDCardUri;
+	}
+
+	public String getIsMediaOnSDCard() {
+		return isMediaOnSDCard;
+	}
+
+	public void setIsMediaOnSDCard(String isMediaOnSDCard) {
+		this.isMediaOnSDCard = isMediaOnSDCard;
+	}
+
+	public String getIsAutoPlayEnabled() {
+		return isAutoPlayEnabled;
+	}
+
+	public void setIsAutoPlayEnabled(String isAutoPlayEnabled) {
+		this.isAutoPlayEnabled = isAutoPlayEnabled;
+	}
+
+	public void setShowInviteBanner(String showInviteBanner) {
+		this.showInviteBanner = showInviteBanner;
+	}
 
 	public String getPasscodeLockRequireTime() {
 		return passcodeLockRequireTime;

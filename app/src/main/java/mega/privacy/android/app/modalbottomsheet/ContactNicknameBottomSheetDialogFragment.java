@@ -1,29 +1,43 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 
 import static mega.privacy.android.app.utils.Constants.*;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+
     private String nickname;
     private ContactInfoActivityLollipop contactInfoActivityLollipop = null;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_nickname, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
 
         if (savedInstanceState != null) {
             nickname = savedInstanceState.getString(EXTRA_USER_NICKNAME, null);
-        } else if (context instanceof ContactInfoActivityLollipop) {
-            contactInfoActivityLollipop = ((ContactInfoActivityLollipop) context);
+        } else if (requireActivity() instanceof ContactInfoActivityLollipop) {
+            contactInfoActivityLollipop = ((ContactInfoActivityLollipop) requireActivity());
             nickname = contactInfoActivityLollipop.getNickname();
         }
+
+        return contentView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        contentView.findViewById(R.id.edit_nickname_layout).setOnClickListener(this);
+        contentView.findViewById(R.id.remove_nickname_layout).setOnClickListener(this);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -42,24 +56,8 @@ public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDia
         setStateBottomSheetBehaviorHidden();
     }
 
-
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_nickname, null);
-        mainLinearLayout = contentView.findViewById(R.id.nickname_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.items_layout);
-        contentView.findViewById(R.id.edit_nickname_layout).setOnClickListener(this);
-        contentView.findViewById(R.id.remove_nickname_layout).setOnClickListener(this);
-        dialog.setContentView(contentView);
-
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(EXTRA_USER_NICKNAME, nickname);
     }
