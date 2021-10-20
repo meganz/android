@@ -34,7 +34,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
-import mega.privacy.android.app.databinding.FragmentPhotosBinding
+import mega.privacy.android.app.databinding.FragmentImagesBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.managerFragments.cu.*
@@ -59,13 +59,13 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.util.*
 
 @AndroidEntryPoint
-class PhotosFragment : BaseFragment(), HomepageSearchable {
+class ImagesFragment : BaseFragment(), HomepageSearchable {
 
     private val viewModel by viewModels<PhotosViewModel>()
     private val actionModeViewModel by viewModels<ActionModeViewModel>()
     private val itemOperationViewModel by viewModels<ItemOperationViewModel>()
 
-    private lateinit var binding: FragmentPhotosBinding
+    private lateinit var binding: FragmentImagesBinding
 
     private lateinit var listView: RecyclerView
 
@@ -131,8 +131,8 @@ class PhotosFragment : BaseFragment(), HomepageSearchable {
             currentZoom = it.currentZoom
         }
 
-        binding = FragmentPhotosBinding.inflate(inflater, container, false).apply {
-            viewModel = this@PhotosFragment.viewModel
+        binding = FragmentImagesBinding.inflate(inflater, container, false).apply {
+            viewModel = this@ImagesFragment.viewModel
         }
 
         viewTypePanel = binding.photosViewType.root

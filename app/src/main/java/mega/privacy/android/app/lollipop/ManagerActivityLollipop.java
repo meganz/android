@@ -132,7 +132,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
-import mega.privacy.android.app.fragments.homepage.photos.PhotosFragment;
+import mega.privacy.android.app.fragments.homepage.photos.ImagesFragment;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -586,7 +586,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private HomepageScreen mHomepageScreen = HomepageScreen.HOMEPAGE;
 
 	private enum HomepageScreen {
-       	HOMEPAGE, PHOTOS, DOCUMENTS, AUDIO, VIDEO,
+       	HOMEPAGE, IMAGES, DOCUMENTS, AUDIO, VIDEO,
        	FULLSCREEN_OFFLINE, OFFLINE_FILE_INFO, RECENT_BUCKET
 	}
 
@@ -1524,12 +1524,12 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 }
             }
 
-            if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS ) {
-                PhotosFragment photosFragment = getFragmentByType(PhotosFragment.class);
-                photosFragment.refreshSelf();
+            if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES) {
+                ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
+                imagesFragment.refreshSelf();
 
                 if (needReload) {
-                    photosFragment.loadPhotos();
+                    imagesFragment.loadPhotos();
                 }
             }
         });
@@ -3887,7 +3887,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				int titleId = -1;
 
 				switch (mHomepageScreen) {
-					case PHOTOS:
+					case IMAGES:
 						titleId = R.string.section_images;
 						break;
 					case DOCUMENTS:
@@ -4465,7 +4465,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				setDrawerLockMode(false);
 				return;
 			} else if (destinationId == R.id.photosFragment) {
-				mHomepageScreen = HomepageScreen.PHOTOS;
+				mHomepageScreen = HomepageScreen.IMAGES;
 			} else if (destinationId == R.id.documentsFragment) {
 				mHomepageScreen = HomepageScreen.DOCUMENTS;
 			} else if (destinationId == R.id.audioFragment) {
@@ -5462,7 +5462,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				if (mHomepageSearchable != null) {
 					searchMenuItem.setVisible(mHomepageSearchable.shouldShowSearchMenu());
 
-                    if (mHomepageScreen == HomepageScreen.PHOTOS) {
+                    if (mHomepageScreen == HomepageScreen.IMAGES) {
                         zoomOutMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
                         zoomInMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
@@ -5575,8 +5575,8 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             return;
         }
 
-        PhotosFragment photosFragment = getFragmentByType(PhotosFragment.class);
-        boolean shouldShow = photosFragment.shouldShowZoomMenuItem();
+        ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
+        boolean shouldShow = imagesFragment.shouldShowZoomMenuItem();
 
         zoomOutMenuItem.setVisible(shouldShow);
         zoomInMenuItem.setVisible(shouldShow);
@@ -5902,13 +5902,13 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	return true;
 	        }
             case R.id.action_zoom_out: {
-                if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
+                if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES)) {
                     zoomOut();
                 }
                 return true;
             }
             case R.id.action_zoom_in: {
-                if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS)) {
+                if (drawerItem == DrawerItem.CAMERA_UPLOADS || (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES)) {
                     zoomIn();
                 }
 
@@ -11935,7 +11935,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
      * @return True if the current screen is the photos, false otherwise.
      */
     public boolean isInPhotosPage() {
-        return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.PHOTOS;
+        return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES;
     }
 
     public void hideTransferWidget() {

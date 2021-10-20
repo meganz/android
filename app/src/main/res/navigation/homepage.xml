@@ -33,7 +33,7 @@
     </fragment>
     <fragment
         android:id="@+id/photosFragment"
-        android:name="mega.privacy.android.app.fragments.homepage.photos.PhotosFragment"
+        android:name="mega.privacy.android.app.fragments.homepage.photos.ImagesFragment"
         android:label="@string/section_images">
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
