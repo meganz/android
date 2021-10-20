@@ -113,7 +113,7 @@ public class TransferWidget {
                 && drawerItem != ManagerActivityLollipop.DrawerItem.NOTIFICATIONS
                 && drawerItem != ManagerActivityLollipop.DrawerItem.CHAT
                 && drawerItem != ManagerActivityLollipop.DrawerItem.RUBBISH_BIN
-                && drawerItem != ManagerActivityLollipop.DrawerItem.CAMERA_UPLOADS
+                && drawerItem != ManagerActivityLollipop.DrawerItem.PHOTOS
                 && !((ManagerActivityLollipop) context).isInPhotosPage();
     }
 

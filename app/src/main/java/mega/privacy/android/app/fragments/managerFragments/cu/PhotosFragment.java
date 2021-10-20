@@ -36,7 +36,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.components.ListenScrollChangesHelper;
-import mega.privacy.android.app.databinding.FragmentCameraUploadsBinding;
+import mega.privacy.android.app.databinding.FragmentPhotosBinding;
 import mega.privacy.android.app.databinding.FragmentCameraUploadsFirstLoginBinding;
 import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
@@ -74,7 +74,7 @@ import static mega.privacy.android.app.utils.ZoomUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 @AndroidEntryPoint
-public class CameraUploadsFragment extends BaseFragment implements CUGridViewAdapter.Listener,
+public class PhotosFragment extends BaseFragment implements CUGridViewAdapter.Listener,
         CUCardViewAdapter.Listener {
 
     private static final String SELECTED_VIEW = "SELECTED_VIEW";
@@ -92,7 +92,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
 
     private ManagerActivityLollipop mManagerActivity;
     private FragmentCameraUploadsFirstLoginBinding mFirstLoginBinding;
-    private FragmentCameraUploadsBinding binding;
+    private FragmentPhotosBinding binding;
     private CUGridViewAdapter gridAdapter;
     private CUCardViewAdapter cardAdapter;
     private ActionMode mActionMode;
@@ -220,7 +220,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
             mManagerActivity.updateCuFragmentOptionsMenu();
             return createCameraUploadsViewForFirstLogin(inflater, container);
         } else {
-            binding = FragmentCameraUploadsBinding.inflate(inflater, container, false);
+            binding = FragmentPhotosBinding.inflate(inflater, container, false);
             return binding.getRoot();
         }
     }
