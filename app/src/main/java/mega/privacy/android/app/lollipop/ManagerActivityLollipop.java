@@ -3377,6 +3377,11 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				}
 				case SEARCH:{
+					if (searchExpand) {
+						textsearchQuery = false;
+						break;
+					}
+
 					setBottomNavigationMenuItemChecked(HIDDEN_BNV);
 					setToolbarTitle();
 					break;
@@ -7650,7 +7655,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			cuFragment.updateProgress(visibility, pending);
 		}
 
-		cuProgressBar.setVisibility(visibility);
+		if (cuProgressBar.getVisibility() != visibility) {
+			cuProgressBar.setVisibility(visibility);
+		}
+
 		cuProgressBar.setProgress(progress);
 	}
 

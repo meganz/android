@@ -55,16 +55,26 @@ public class MegaPreferences{
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
-	public final static int ORIGINAL = 0;
-	public final static int MEDIUM = 1;
 	public final static int CHARGING_ON_SIZE_DEFAULT = 200;
 
-    MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String passcodeLockEnabled, String passcodeLockCode, String storageAskAlways,
-                    String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp,
-                    String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads, String uriExternalSDCard, String cameraFolderExternalSDCard, String passcodeLockType, String preferredSortCloud, String preferredSortContacts,
-                    String preferredSortOthers, String firstTimeChat, String uploadVideoQuality, String conversionOnCharging, String chargingOnSize, String shouldClearCameraSyncRecords, String camVideoSyncTimeStamp,
-                    String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS, String showInviteBanner, String preferredSortCameraUpload, String sdCardUri,
-                    String askForDisplayOver, String askForSetDownloadLocation, String mediaSDCardUri, String isMediaOnSDCard, String passcodeLockRequireTime) {
+	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled,
+					String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload,
+					String camSyncTimeStamp, String passcodeLockEnabled, String passcodeLockCode,
+					String storageAskAlways, String storageDownloadLocation, String camSyncCharging,
+					String lastFolderUpload, String lastFolderCloud,
+					String secondaryMediaFolderEnabled, String localPathSecondaryFolder,
+					String megaHandleSecondaryFolder, String secSyncTimeStamp,
+					String keepFileNames, String storageAdvancedDevices, String preferredViewList,
+					String preferredViewListCameraUploads, String uriExternalSDCard,
+					String cameraFolderExternalSDCard, String passcodeLockType,
+					String preferredSortCloud, String preferredSortContacts,
+					String preferredSortOthers, String firstTimeChat,
+					String uploadVideoQuality, String conversionOnCharging, String chargingOnSize,
+					String shouldClearCameraSyncRecords, String camVideoSyncTimeStamp,
+					String secVideoSyncTimeStamp, String isAutoPlayEnabled, String removeGPS,
+					String showInviteBanner, String preferredSortCameraUpload, String sdCardUri,
+					String askForDisplayOver, String askForSetDownloadLocation,
+					String mediaSDCardUri, String isMediaOnSDCard, String passcodeLockRequireTime) {
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
