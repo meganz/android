@@ -927,6 +927,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
 			onCreate(db);
 			setPreferences(db, preferences);
+            // After re-create the table, refresh it to make sure the columns have correct index.
+            getPreferences(db);
 		}
 
         if (oldVersion <= 63) {
@@ -934,6 +936,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
             onCreate(db);
             setPreferences(db, preferences);
+            // After re-create the table, refresh it to make sure the columns have correct index.
+            getPreferences(db);
         }
 	}
 
