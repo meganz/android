@@ -50,6 +50,8 @@ public class VideoDownsampling {
 
     private int mWidth;
     private int mHeight;
+    private int resultWidth;
+    private int resultHeight;
 
     static Context context;
 
@@ -189,8 +191,9 @@ public class VideoDownsampling {
 
             getOriginalWidthAndHeight(m);
 
-            int resultWidth = mWidth;
-            int resultHeight = mHeight;
+            resultWidth = mWidth;
+            resultHeight = mHeight;
+
             int bitrate = Integer.parseInt(m.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
             int shortSideByQuality = quality == VIDEO_QUALITY_MEDIUM
                     ? SHORT_SIDE_SIZE_MEDIUM
@@ -201,6 +204,9 @@ public class VideoDownsampling {
                     ? inputFormat.getInteger(MediaFormat.KEY_FRAME_RATE)
                     : OUTPUT_VIDEO_FRAME_RATE;
 
+            logDebug("Video original width: " + mWidth + ", original height: " + mHeight
+                    + ", average bitrate: " + bitrate + ", frame rate: " + frameRate);
+
             if (quality != VIDEO_QUALITY_HIGH) {
                 bitrate = quality == VIDEO_QUALITY_MEDIUM
                         ? bitrate / 2
@@ -209,13 +215,7 @@ public class VideoDownsampling {
                 frameRate = Math.min(frameRate, OUTPUT_VIDEO_FRAME_RATE);
 
                 if (shortSide > shortSideByQuality) {
-                    if (mWidth > mHeight) {
-                        resultWidth = mWidth * shortSideByQuality / mHeight;
-                        resultHeight = shortSideByQuality;
-                    } else {
-                        resultWidth = shortSideByQuality;
-                        resultHeight = mHeight * shortSideByQuality / mWidth;
-                    }
+                    getCodecResolution(shortSideByQuality);
                 }
             } else {
                 // Since the METADATA_KEY_BITRATE is not the right value of the final bitrate
@@ -223,6 +223,9 @@ public class VideoDownsampling {
                 // is a bit less than the original one.
                 bitrate *= 0.98;
             }
+
+            logDebug("Video result width: " + resultWidth + ", result height: " + resultHeight
+                    + ", encode bitrate: " + bitrate + ", encode frame rate: " + frameRate);
 
             MediaCodecInfo.VideoCapabilities capabilities = videoCodecInfo
                     .getCapabilitiesForType(OUTPUT_VIDEO_MIME_TYPE).getVideoCapabilities();
@@ -233,25 +236,33 @@ public class VideoDownsampling {
                 logWarning("Sizes width: " + resultWidth + " height: " + resultHeight + " not supported.");
 
                 for (int i = shortSideByQuality; i< shortSide; i++) {
-                    if (mWidth > mHeight) {
-                        resultWidth = mWidth * i / mHeight;
-                        resultHeight = i;
-                    } else {
-                        resultWidth = i;
-                        resultHeight = mHeight * i / mWidth;
-                    }
-
+                    getCodecResolution(i);
                     supported = capabilities.areSizeAndRateSupported(resultWidth, resultHeight, frameRate);
 
                     if (supported) {
                         break;
                     }
                 }
+            }
 
-                if (!supported) {
-                    logError("Latest sizes width: " + resultWidth + " height: " + resultHeight + " not supported.");
-                    return;
+            if (!supported && quality == VIDEO_QUALITY_MEDIUM) {
+                logWarning("Sizes still not supported. Second try.");
+                shortSideByQuality--;
+
+                for (int i = shortSideByQuality; i > SHORT_SIDE_SIZE_LOW; i--) {
+                    getCodecResolution(i);
+                    supported = capabilities.areSizeAndRateSupported(resultWidth, resultHeight, frameRate);
+
+                    if (supported) {
+                        break;
+                    }
                 }
+            }
+
+            if (!supported) {
+                String error = "Latest sizes width: " + resultWidth + " height: " + resultHeight + " not supported.";
+                logError(error);
+                throw exception = new Exception(error);
             }
 
             MediaFormat outputVideoFormat = MediaFormat.createVideoFormat(OUTPUT_VIDEO_MIME_TYPE, resultWidth, resultHeight);
@@ -291,7 +302,8 @@ public class VideoDownsampling {
                 if (videoExtractor != null)
                     videoExtractor.release();
             } catch(Exception e) {
-                exception = e;
+                if (exception == null)
+                    exception = e;
             }
             try {
                 if (audioExtractor != null)
@@ -751,5 +763,20 @@ public class VideoDownsampling {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the resolution to compress the video.
+     *
+     * @param resolution Short side size.
+     */
+    private void getCodecResolution(int resolution) {
+        if (mWidth > mHeight) {
+            resultWidth = mWidth * resolution / mHeight;
+            resultHeight = resolution;
+        } else {
+            resultWidth = resolution;
+            resultHeight = mHeight * resolution / mWidth;
+        }
     }
 }
