@@ -276,6 +276,7 @@ import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog;
+import static mega.privacy.android.app.utils.MegaTransferUtils.isBackgroundTransfer;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.*;
@@ -10476,7 +10477,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		logDebug("onTransferStart: " + transfer.getNotificationNumber()+ "-" + transfer.getNodeHandle() + " - " + transfer.getTag());
 
-		if(transfer.isStreamingTransfer()){
+		if (transfer.isStreamingTransfer() || isBackgroundTransfer(transfer)) {
 			return;
 		}
 
@@ -10498,7 +10499,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		logDebug("onTransferFinish: " + transfer.getNodeHandle() + " - " + transfer.getTag() + "- " +transfer.getNotificationNumber());
-		if(transfer.isStreamingTransfer()){
+		if(transfer.isStreamingTransfer() || isBackgroundTransfer(transfer)){
 			return;
 		}
 
@@ -10553,7 +10554,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 
-		if(transfer.isStreamingTransfer()){
+		if(transfer.isStreamingTransfer() || isBackgroundTransfer(transfer)){
 			return;
 		}
 

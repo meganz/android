@@ -27,6 +27,7 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.components.transferWidget.TransferWidget.NO_TYPE;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.MegaTransferUtils.getSilentNumPendingDownloads;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESTART_SERVICE;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
@@ -67,7 +68,7 @@ public class TransfersManagement {
      */
     public boolean areTransfersPaused() {
         MegaApiAndroid megaApi = MegaApplication.getInstance().getMegaApi();
-        int totalTransfers = megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+        int totalTransfers = getSilentNumPendingDownloads(megaApi.getTransfers()) + megaApi.getNumPendingUploads();
 
         return megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD) || totalTransfers == pausedTransfers.size();
     }
@@ -269,7 +270,7 @@ public class TransfersManagement {
 
         new Handler().postDelayed(() -> {
             try {
-                if (megaApi.getNumPendingDownloads() > 0) {
+                if (getSilentNumPendingDownloads(megaApi.getTransfers()) > 0) {
                     Intent downloadServiceIntent = new Intent(app, DownloadService.class)
                             .setAction(ACTION_RESTART_SERVICE);
 

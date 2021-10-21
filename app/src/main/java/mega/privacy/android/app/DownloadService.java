@@ -79,6 +79,8 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
+import static mega.privacy.android.app.utils.MegaTransferUtils.isBackgroundTransfer;
+import static mega.privacy.android.app.utils.MegaTransferUtils.isVoiceClipType;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetPath;
 import static mega.privacy.android.app.utils.SDCardUtils.getSDCardTargetUri;
@@ -291,14 +293,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		return START_NOT_STICKY;
 	}
 
-	private boolean isVoiceClipType(String value) {
-		return value != null && value.contains(APP_DATA_VOICE_CLIP);
-	}
-
-	private boolean isBackgroundTransferType(String value) {
-		return value != null && value.contains(APP_DATA_BACKGROUND_TRANSFER);
-	}
-
 	protected void onHandleIntent(final Intent intent) {
 		logDebug("onHandleIntent");
 		this.intent = intent;
@@ -318,7 +312,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					continue;
 				}
 
-				if (!isVoiceClipType(transfer.getAppData()) && !isBackgroundTransferType(transfer.getAppData())) {
+				if (!isVoiceClipType(transfer) && !isBackgroundTransfer(transfer)) {
 					MegaApplication.getTransfersManagement().checkIfTransferIsPaused(transfer);
 					transfersCount++;
 				}
@@ -384,7 +378,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 
 					pendingIntents.add(intent);
-					if (!isVoiceClipType(type) && !isBackgroundTransferType(type)) {
+					if (!type.contains(APP_DATA_VOICE_CLIP) && !type.contains(APP_DATA_BACKGROUND_TRANSFER)) {
 						updateProgressNotification();
 					}
 
@@ -512,7 +506,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
                 if (!isTextEmpty(appData)) {
                     megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", appData);
                 } else {
-                    String data = isVoiceClipType(type) ? APP_DATA_VOICE_CLIP : "";
+                    String data = type.contains(APP_DATA_VOICE_CLIP) ? APP_DATA_VOICE_CLIP : "";
                     megaApi.startDownloadWithTopPriority(currentDocument, currentDir.getAbsolutePath() + "/", data);
                 }
 			} else if (!isTextEmpty(appData)) {
@@ -1341,7 +1335,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void doOnTransferStart(MegaTransfer transfer) {
 		logDebug("Download start: " + transfer.getNodeHandle() + ", totalDownloads: " + megaApi.getTotalDownloads());
 
-		if (transfer.isStreamingTransfer() || isVoiceClipType(transfer.getAppData()) || isBackgroundTransferType(transfer.getAppData())) return;
+		if (transfer.isStreamingTransfer() || isVoiceClipType(transfer) || isBackgroundTransfer(transfer)) return;
 
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD) {
 			String appData = transfer.getAppData();
@@ -1383,8 +1377,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		if(transfer.getType()==MegaTransfer.TYPE_DOWNLOAD){
 
-			boolean isVoiceClip = isVoiceClipType(transfer.getAppData());
-			boolean isBackgroundTransfer = isBackgroundTransferType(transfer.getAppData());
+			boolean isVoiceClip = isVoiceClipType(transfer);
+			boolean isBackgroundTransfer = isBackgroundTransfer(transfer);
 
 			if(!isVoiceClip && !isBackgroundTransfer) transfersCount--;
 
@@ -1605,7 +1599,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				DownloadService.this.cancel();
 				return;
 			}
-			if(transfer.isStreamingTransfer() || isVoiceClipType(transfer.getAppData()) || isBackgroundTransferType(transfer.getAppData())) return;
+			if(transfer.isStreamingTransfer() || isVoiceClipType(transfer) || isBackgroundTransfer(transfer)) return;
 
 			if(!transfer.isFolderTransfer()){
 				sendBroadcast(new Intent(BROADCAST_ACTION_INTENT_TRANSFER_UPDATE));
@@ -1630,7 +1624,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		logWarning("Download Temporary Error - Node Handle: " + transfer.getNodeHandle() +
 				"\nError: " + e.getErrorCode() + " " + e.getErrorString());
 
-		if (transfer.isStreamingTransfer() || isBackgroundTransferType(transfer.getAppData())) {
+		if (transfer.isStreamingTransfer() || isBackgroundTransfer(transfer)) {
 			return;
 		}
 

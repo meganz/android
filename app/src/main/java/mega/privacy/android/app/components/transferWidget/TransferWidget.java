@@ -1,5 +1,12 @@
 package mega.privacy.android.app.components.transferWidget;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static mega.privacy.android.app.components.transferWidget.TransfersManagement.isOnTransferOverQuota;
+import static mega.privacy.android.app.utils.MegaTransferUtils.getSilentNumPendingDownloads;
+import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
+import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
+
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -16,11 +23,6 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-import static mega.privacy.android.app.components.transferWidget.TransfersManagement.*;
-import static nz.mega.sdk.MegaTransfer.*;
 
 public class TransferWidget {
     static final int NO_TYPE = -1;
@@ -205,7 +207,7 @@ public class TransferWidget {
     public void setProgress(int progress, int typeTransfer) {
         setProgress(progress);
 
-        int numPendingDownloads = megaApi.getNumPendingDownloads();
+        int numPendingDownloads = getSilentNumPendingDownloads(megaApi.getTransfers());
         int numPendingUploads = megaApi.getNumPendingUploads();
         boolean pendingDownloads = numPendingDownloads > 0;
         boolean pendingUploads = numPendingUploads > 0;
@@ -236,7 +238,7 @@ public class TransferWidget {
      * @return The number of pending transfers.
      */
     public int getPendingTransfers() {
-        return megaApi.getNumPendingDownloads() + megaApi.getNumPendingUploads();
+        return getSilentNumPendingDownloads(megaApi.getTransfers()) + megaApi.getNumPendingUploads();
     }
 
     /**
