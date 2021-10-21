@@ -15,15 +15,17 @@ import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
+import mega.privacy.android.app.usecase.CancelTransferUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.MegaNodeItem
+import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.LogUtil.logError
 
 class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageUseCase: GetImageUseCase,
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
-    private val exportNodeUseCase: ExportNodeUseCase
+    private val exportNodeUseCase: ExportNodeUseCase,
+    private val cancelTransferUseCase: CancelTransferUseCase
 ) : BaseRxViewModel() {
 
     private val currentHandle = MutableLiveData<Long>()
@@ -298,7 +300,14 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun stopImageLoading(nodeHandle: Long) {
         images.value?.find { nodeHandle == it.handle }?.transferTag?.let { transferTag ->
-            getImageUseCase.cancelTransfer(transferTag)
+            cancelTransferUseCase.cancel(transferTag)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onError = { error ->
+                        logError(error.stackTraceToString())
+                    }
+                )
         }
     }
 

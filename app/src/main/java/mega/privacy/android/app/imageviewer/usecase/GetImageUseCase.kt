@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
@@ -124,18 +123,4 @@ class GetImageUseCase @Inject constructor(
                 }
             }
         }, BackpressureStrategy.LATEST)
-
-    fun cancelTransfer(transferTag: Int): Completable =
-        Completable.create { emitter ->
-            megaApi.cancelTransferByTag(transferTag, OptionalMegaRequestListenerInterface(
-                onRequestFinish = { _, error ->
-                    when (error.errorCode) {
-                        API_OK ->
-                            emitter.onComplete()
-                        else ->
-                            emitter.onError(error.toThrowable())
-                    }
-                }
-            ))
-        }
 }

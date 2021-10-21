@@ -23,7 +23,7 @@ import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
-import mega.privacy.android.app.usecase.MegaNodeItem
+import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull

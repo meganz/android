@@ -3,7 +3,9 @@ package mega.privacy.android.app.imageviewer
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -22,7 +24,15 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.mediaplayer.VideoPlayerActivity
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.INBOX_ADAPTER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
@@ -119,8 +129,17 @@ class ImageViewerPageFragment : Fragment() {
             )
 
             if (item.isVideo) {
-                binding.image.setOnClickListener { launchVideoScreen(item) }
                 binding.btnVideo.setOnClickListener { launchVideoScreen(item) }
+                binding.image.apply {
+                    setZoomingEnabled(false)
+                    setIsLongpressEnabled(false)
+                    setTapListener(object : GestureDetector.SimpleOnGestureListener() {
+                        override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                            launchVideoScreen(item)
+                            return true
+                        }
+                    })
+                }
             }
             binding.btnVideo.isVisible = item.isVideo
         } else {
@@ -133,6 +152,7 @@ class ImageViewerPageFragment : Fragment() {
     private fun launchVideoScreen(item: ImageItem) {
         val fileUri = item.getAvailableUri()
         val intent = Intent(context, VideoPlayerActivity::class.java).apply {
+            setDataAndType(fileUri, MimeTypeList.typeForName(item.name).type)
             putExtra(INTENT_EXTRA_KEY_HANDLE, item.handle)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, item.name)
             putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false)
@@ -140,15 +160,15 @@ class ImageViewerPageFragment : Fragment() {
             putExtra(INTENT_EXTRA_KEY_POSITION, 0)
             putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, ORDER_DEFAULT_ASC)
-            putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+            putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false)
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            setDataAndType(fileUri, MimeTypeList.typeForName(item.name).type)
         }
 
         startActivity(intent)
     }
 
     private fun isHighResolutionRestricted(): Boolean =
-        !requireContext().isMeteredConnection()
-                || !preferences.getBoolean(SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION, true)
+        requireContext().isMeteredConnection()
+                && !preferences.getBoolean(SettingsConstants.KEY_MOBILE_DATA_HIGH_RESOLUTION, true)
 }
