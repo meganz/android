@@ -2,7 +2,7 @@ package mega.privacy.android.app.components.saver
 
 import android.content.Context
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.SDCardOperator
 import nz.mega.sdk.MegaApiAndroid

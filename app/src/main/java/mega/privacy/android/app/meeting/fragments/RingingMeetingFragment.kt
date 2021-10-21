@@ -13,8 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.android.synthetic.main.meeting_ringing_fragment.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -75,8 +73,8 @@ class RingingMeetingFragment : MeetingBaseFragment(),
         savedInstanceState: Bundle?
     ): View {
         (requireActivity() as MeetingActivity).let {
-            toolbarTitle = it.title_toolbar
-            toolbarSubtitle = it.subtitle_toolbar
+            toolbarTitle = it.binding.titleToolbar
+            toolbarSubtitle = it.binding.subtitleToolbar
         }
 
         binding = MeetingRingingFragmentBinding.inflate(inflater, container, false)
@@ -169,7 +167,7 @@ class RingingMeetingFragment : MeetingBaseFragment(),
                 )
             }
 
-            avatar.setImageBitmap(bitmap)
+            binding.avatar.setImageBitmap(bitmap)
         }
 
         LiveEventBus.get(EVENT_CALL_ANSWERED_IN_ANOTHER_CLIENT, Long::class.java)
