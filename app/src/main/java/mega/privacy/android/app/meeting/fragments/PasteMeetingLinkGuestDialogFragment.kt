@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.dialog_paste_meeting_link_guest.*
 import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage
@@ -108,7 +107,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        Util.showKeyboardDelayed(meeting_link)
+        Util.showKeyboardDelayed(linkEdit)
     }
 
     override fun onPause() {

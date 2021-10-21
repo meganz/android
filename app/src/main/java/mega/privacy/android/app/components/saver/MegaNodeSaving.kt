@@ -2,8 +2,8 @@ package mega.privacy.android.app.components.saver
 
 import android.content.Context
 import android.content.Intent
-import kotlinx.android.parcel.Parcelize
-import kotlinx.android.parcel.TypeParceler
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.TypeParceler
 import mega.privacy.android.app.*
 import mega.privacy.android.app.DownloadService.*
 import mega.privacy.android.app.interfaces.SnackbarShower

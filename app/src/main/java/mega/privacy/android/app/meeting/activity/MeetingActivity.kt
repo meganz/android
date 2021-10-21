@@ -10,7 +10,6 @@ import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -53,7 +52,7 @@ class MeetingActivity : BaseActivity() {
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
 
-    private lateinit var binding: ActivityMeetingBinding
+    lateinit var binding: ActivityMeetingBinding
     private val meetingViewModel: MeetingActivityViewModel by viewModels()
 
     private var meetingAction: String? = null
@@ -82,6 +81,7 @@ class MeetingActivity : BaseActivity() {
             return
         }
 
+        @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
@@ -99,15 +99,15 @@ class MeetingActivity : BaseActivity() {
         setStatusBarTranslucent()
     }
 
+    @Suppress("DEPRECATION")
     private fun setStatusBarTranslucent() {
         val decorView: View = window.decorView
 
         decorView.setOnApplyWindowInsetsListener { v: View, insets: WindowInsets? ->
             val defaultInsets = v.onApplyWindowInsets(insets)
 
-            toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
+            binding.toolbar.setMarginTop(defaultInsets.systemWindowInsetTop)
 
-            @Suppress("DEPRECATION")
             defaultInsets.replaceSystemWindowInsets(
                 defaultInsets.systemWindowInsetLeft,
                 0,
