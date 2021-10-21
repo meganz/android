@@ -32,7 +32,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = MaterialAlertDialogBuilder(requireContext())
-        val inflater = requireActivity().layoutInflater;
+        val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.dialog_paste_meeting_link_guest, null)
 
         linkEdit = view.findViewById(R.id.meeting_link)
@@ -66,8 +66,8 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
             meetingLink = linkEdit.text.toString()
 
             if (TextUtils.isEmpty(meetingLink)) {
-                showError(R.string.invalid_meeting_link_empty);
-                return@setOnClickListener;
+                showError(R.string.invalid_meeting_link_empty)
+                return@setOnClickListener
             }
 
             // Meeting Link and Chat Link are exactly the same format.

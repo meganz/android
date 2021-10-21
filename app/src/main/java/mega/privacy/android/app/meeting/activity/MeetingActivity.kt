@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.PasscodeUtil
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MeetingActivity : BaseActivity() {
 
@@ -208,7 +209,6 @@ class MeetingActivity : BaseActivity() {
         navController.setGraph(navGraph, bundle)
     }
 
-    @ExperimentalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -252,7 +252,6 @@ class MeetingActivity : BaseActivity() {
         sendQuitCallEvent()
     }
 
-    @ExperimentalCoroutinesApi
     override fun onResume() {
         super.onResume()
 
@@ -263,7 +262,6 @@ class MeetingActivity : BaseActivity() {
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onBackPressed() {
         val currentFragment = getCurrentFragment()
 

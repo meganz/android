@@ -14,7 +14,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 
@@ -25,7 +24,7 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
     private var lastName: String = ""
 
     override fun onMeetingButtonClick() {
-        if (chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+        if (chatId == MEGACHAT_INVALID_HANDLE) {
             LogUtil.logError("Chat Id is invalid when join meeting")
             return
         }
