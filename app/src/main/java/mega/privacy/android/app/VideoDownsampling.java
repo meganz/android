@@ -260,7 +260,8 @@ public class VideoDownsampling {
             }
 
             if (!supported) {
-                String error = "Latest sizes width: " + resultWidth + " height: " + resultHeight + " not supported.";
+                String error = "Latest sizes width: " + resultWidth + " height: " + resultHeight + " not supported. " +
+                        "Video not compressed, uploading original video.";
                 logError(error);
                 throw exception = new Exception(error);
             }
@@ -374,7 +375,7 @@ public class VideoDownsampling {
             }
         }
         if (exception != null){
-            logError("Exception", exception);
+            logError("Exception. Video not compressed, uploading original video.", exception);
             throw exception;
         }
         else{
