@@ -3,7 +3,7 @@ package mega.privacy.android.app.components.saver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower

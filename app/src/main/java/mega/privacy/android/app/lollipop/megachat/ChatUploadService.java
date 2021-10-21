@@ -66,9 +66,9 @@ import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_AC
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RETRY_PENDING_MESSAGE;
 import static mega.privacy.android.app.constants.BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD;
 import static mega.privacy.android.app.constants.BroadcastConstants.PENDING_MESSAGE_ID;
+import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_ORIGINAL;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.DBUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -392,7 +392,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			}
 
 			if (pendingMsg != null) {
-				sendOriginalAttachments = isSendOriginalAttachments();
+				sendOriginalAttachments = dbH.getChatVideoQuality() == VIDEO_QUALITY_ORIGINAL;
 				logDebug("sendOriginalAttachments is " + sendOriginalAttachments);
 
 				if (chatId != -1) {
@@ -500,7 +500,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 						videoDownsampling = new VideoDownsampling(this);
 					}
 
-					videoDownsampling.changeResolution(file, outFile.getAbsolutePath(), pendingMsg.getId());
+					videoDownsampling.changeResolution(file, outFile.getAbsolutePath(),
+							pendingMsg.getId(), dbH.getChatVideoQuality());
 				}
 
 			} catch (Throwable throwable) {
@@ -1451,6 +1452,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					long nodeHandle = pendMsg.getNodeHandle();
 					MegaNode node = nodeList.get(0);
 					if(node.getHandle()==nodeHandle){
+						MegaApplication.getChatManagement().removeMsgToDelete(pendMsg.getId());
 						logDebug("The message MATCH!!");
 						dbH.updatePendingMessageOnAttach(pendMsg.getId(), -1+"", PendingMessageSingle.STATE_ERROR_ATTACHING);
 

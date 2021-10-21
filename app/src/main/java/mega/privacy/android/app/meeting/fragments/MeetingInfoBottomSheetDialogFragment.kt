@@ -21,6 +21,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
@@ -36,7 +38,7 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 /**
  * Fragment shows the basic information of meeting
  */
-class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
+class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment(){
     private lateinit var binding: FragmentMeetingInfoBinding
     @ExperimentalCoroutinesApi
     private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
@@ -51,6 +53,14 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
 
         binding = FragmentMeetingInfoBinding.inflate(LayoutInflater.from(context), null, false)
         dialog.setContentView(binding.root)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val dialog = dialog ?: return
+        BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
+            BottomSheetBehavior.STATE_EXPANDED
     }
 
     @ExperimentalCoroutinesApi
@@ -78,7 +88,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
             binding.moderatorName.text =
                 StringResourcesUtils.getString(
                     R.string.info_moderator_name,
-                    inMeetingViewModel.getModeratorNames(context, participants)
+                    inMeetingViewModel.getModeratorNames(requireActivity(), participants)
                 )
         }
 
@@ -144,6 +154,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
      * Show dialog for changing the meeting name, only for moderator
      */
     @ExperimentalCoroutinesApi
+    @Suppress("DEPRECATION")
     fun showRenameGroupDialog() {
         val activity = requireActivity()
         val layout = LinearLayout(requireActivity())
@@ -153,14 +164,10 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
-        val display: Display = requireActivity().windowManager.defaultDisplay
-        outMetrics = DisplayMetrics()
-        display.getMetrics(outMetrics)
-
         params.setMargins(
-            Util.scaleWidthPx(20, outMetrics),
-            Util.scaleHeightPx(16, outMetrics),
-            Util.scaleWidthPx(17, outMetrics),
+            Util.scaleWidthPx(20, resources.displayMetrics),
+            Util.scaleHeightPx(16, resources.displayMetrics),
+            Util.scaleWidthPx(17, resources.displayMetrics),
             0
         )
 
@@ -172,7 +179,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
         input.setSelectAllOnFocus(true)
         input.setTextColor(getThemeColor(requireActivity(), android.R.attr.textColorSecondary))
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-        input.setEmojiSize(Util.dp2px(Constants.EMOJI_SIZE.toFloat(), outMetrics))
+        input.setEmojiSize(Util.dp2px(Constants.EMOJI_SIZE.toFloat()))
         input.imeOptions = EditorInfo.IME_ACTION_DONE
         input.inputType = InputType.TYPE_CLASS_TEXT
         val maxAllowed = ChatUtil.getMaxAllowed(chatTitle)

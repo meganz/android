@@ -581,6 +581,7 @@ public class Constants {
     public static final int BACK_PRESS_HANDLED = 1;
 
     public static final int SCROLLING_UP_DIRECTION = -1;
+    public static final int REQUIRE_PASSCODE_INVALID = -1;
 
     public static final String CONTACT_HANDLE = "contactHandle";
     public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";

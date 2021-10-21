@@ -1,9 +1,9 @@
 package mega.privacy.android.app.modalbottomsheet
 
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
@@ -31,13 +31,23 @@ class PasscodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
         }
     }
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
+    private lateinit var binding: BottomSheetPasscodeOptionsBinding
 
-        val binding =
-            BottomSheetPasscodeOptionsBinding.inflate(LayoutInflater.from(context), null, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = BottomSheetPasscodeOptionsBinding
+            .inflate(LayoutInflater.from(context), null, false)
 
+        contentView = binding.root
+        itemsLayout = binding.parentLayout
+
+        return contentView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setSelectedColor(
             when (arguments?.getString(PASSCODE_TYPE)) {
                 PIN_4 -> {
@@ -64,15 +74,11 @@ class PasscodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
             changePasscodeType(PIN_ALPHANUMERIC)
         }
 
-        contentView = binding.root
-        mainLinearLayout = binding.parentLayout
-        items_layout = mainLinearLayout
-        dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+        super.onViewCreated(view, savedInstanceState)
     }
 
     private fun setSelectedColor(text: TextView) =
-        text.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary))
+        text.setTextColor(ColorUtils.getThemeColor(requireContext(), R.attr.colorSecondary))
 
     private fun changePasscodeType(type: String) {
         (requireActivity() as PasscodeLockActivity).setPasscodeType(type)

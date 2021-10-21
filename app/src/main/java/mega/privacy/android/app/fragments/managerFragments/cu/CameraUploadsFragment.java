@@ -117,7 +117,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
         }
 
         boolean isScrolled = binding.cuList.canScrollVertically(SCROLLING_UP_DIRECTION);
-        mManagerActivity.changeAppBarElevation(viewModel.isSelecting() || isScrolled);
+        mManagerActivity.changeAppBarElevation(binding.uploadProgress.getVisibility() == View.VISIBLE
+                || viewModel.isSelecting() || isScrolled);
     }
 
     public void selectAll() {
@@ -522,7 +523,7 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 : View.GONE);
 
         if (!cuEnabled) {
-            mManagerActivity.hideCUProgress();
+            hideCUProgress();
         }
     }
 
@@ -619,9 +620,18 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                 : View.GONE);
 
         if (selectedView != ALL_VIEW) {
-            mManagerActivity.hideCUProgress();
+            hideCUProgress();
             binding.uploadProgress.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Hides CU progress bar and checks the scroll
+     * in order to hide elevation if the list is not scrolled.
+     */
+    private void hideCUProgress() {
+        mManagerActivity.hideCUProgress();
+        checkScroll();
     }
 
     private void updateFastScrollerVisibility() {
@@ -679,7 +689,11 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
     }
 
     public void updateProgress(int visibility, int pending) {
-        binding.uploadProgress.setVisibility(visibility);
+        if (binding.uploadProgress.getVisibility() != visibility) {
+            binding.uploadProgress.setVisibility(visibility);
+            checkScroll();
+        }
+
         binding.uploadProgress.setText(StringResourcesUtils
                 .getQuantityString(R.plurals.cu_upload_progress, pending, pending));
     }
