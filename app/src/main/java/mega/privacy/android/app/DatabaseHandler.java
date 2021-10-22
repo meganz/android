@@ -303,7 +303,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     private static DatabaseHandler instance;
 
-    private static SQLiteDatabase db;
+    private SQLiteDatabase db;
 
     public static synchronized DatabaseHandler getDbHandler(Context context){
 
@@ -944,7 +944,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			setPreferences(db, preferences);
 		}
 
-		DatabaseHandler.db = db;
+		this.db = db;
 	}
 
 	public static String encrypt(String original) {
