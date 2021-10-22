@@ -9,7 +9,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.android.synthetic.main.alert_dialog.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_PURCHASES_UPDATED
 import mega.privacy.android.app.constants.IntentConstants

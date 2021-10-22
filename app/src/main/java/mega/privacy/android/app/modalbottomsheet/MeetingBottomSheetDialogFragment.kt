@@ -5,12 +5,12 @@ import android.app.Dialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
-import kotlinx.android.synthetic.main.bottom_sheet_meeting.view.*
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 
-class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.OnClickListener {
+class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnClickListener {
 
     private var listener: MeetingBottomSheetDialogActionListener? = null
 
@@ -19,25 +19,23 @@ class MeetingBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), View.O
         super.setupDialog(dialog, style)
 
         val binding = BottomSheetMeetingBinding.inflate(LayoutInflater.from(context), null, false)
-        contentView = binding.root;
-        mainLinearLayout = binding.root.meeting_bottom_sheet
 
         binding.ivStartMeeting.setOnClickListener(this)
         binding.ivJoinMeeting.setOnClickListener(this)
-        dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true)
+        dialog.setContentView(binding.root)
     }
 
     override fun onClick(v: View) {
         when (v.id) {
             R.id.iv_start_meeting -> {
                 listener?.onCreateMeeting()
+                dismiss()
             }
             R.id.iv_join_meeting -> {
                 listener?.onJoinMeeting()
+                dismiss()
             }
         }
-        setStateBottomSheetBehaviorHidden()
     }
 
     override fun onAttach(context: Context) {
