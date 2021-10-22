@@ -795,40 +795,33 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (rootNode != null){
                         Intent intent = new Intent(context, ManagerActivityLollipop.class);
                         if (action != null){
-//							if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-//								intent = new Intent(this, FileExplorerActivityLollipop.class);
-//								if(extras != null)
-//								{
-//									intent.putExtras(extras);
-//								}
-//								intent.setData(uriData);
-//							}
-                            if (action.equals(ACTION_FILE_PROVIDER)){
-                                intent = new Intent(context, FileProviderActivity.class);
-                                if(extras != null)
-                                {
-                                    intent.putExtras(extras);
-                                }
-                                intent.setData(uriData);
-                            }
-                            else if (action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
-                                intent = new Intent(context, FileLinkActivityLollipop.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = ACTION_OPEN_MEGA_LINK;
-                                intent.setData(uriData);
-                            }
-                            else if (action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
-                                intent = new Intent(context, FolderLinkActivityLollipop.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = ACTION_OPEN_MEGA_FOLDER_LINK;
-                                intent.setData(uriData);
-                            }
-                            else  if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = ACTION_OPEN_CONTACTS_SECTION;
-                                if(intentReceived.getLongExtra(CONTACT_HANDLE, -1) != -1){
-                                    intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
-                                }
+                            switch (action) {
+                                case ACTION_FILE_PROVIDER:
+                                    intent = new Intent(context, FileProviderActivity.class);
+                                    if (extras != null) {
+                                        intent.putExtras(extras);
+                                    }
+                                    intent.setData(uriData);
+                                    break;
+                                case ACTION_OPEN_FILE_LINK_ROOTNODES_NULL:
+                                    intent = new Intent(context, FileLinkActivityLollipop.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = ACTION_OPEN_MEGA_LINK;
+                                    intent.setData(uriData);
+                                    break;
+                                case ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL:
+                                    intent = new Intent(context, FolderLinkActivityLollipop.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = ACTION_OPEN_MEGA_FOLDER_LINK;
+                                    intent.setData(uriData);
+                                    break;
+                                case ACTION_OPEN_CONTACTS_SECTION:
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = ACTION_OPEN_CONTACTS_SECTION;
+                                    if (intentReceived.getLongExtra(CONTACT_HANDLE, -1) != -1) {
+                                        intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
+                                    }
+                                    break;
                             }
 
                             intent.setAction(action);
@@ -1329,18 +1322,23 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if (megaChatApi == null) {
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
-            int ret = megaChatApi.init(null);
-            logDebug("result of init ---> " + ret);
-            if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
-                logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
-                disableLoginButton();
-                megaApi.login(lastEmail, lastPassword, this);
-            } else {
-                logWarning("ERROR INIT CHAT: " + ret);
-                megaChatApi.logout(new ChatLogoutListener(getContext()));
 
-                disableLoginButton();
-                megaApi.login(lastEmail, lastPassword, this);
+            int ret = megaChatApi.getInitState();
+            logDebug("INIT STATE: " + ret);
+            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+                ret = megaChatApi.init(null);
+                logDebug("result of init ---> " + ret);
+                if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
+                    logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
+                    disableLoginButton();
+                    megaApi.login(lastEmail, lastPassword, this);
+                } else {
+                    logWarning("ERROR INIT CHAT: " + ret);
+                    megaChatApi.logout(new ChatLogoutListener(getContext()));
+
+                    disableLoginButton();
+                    megaApi.login(lastEmail, lastPassword, this);
+                }
             }
         }
     }
@@ -1697,36 +1695,30 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             intent = new Intent(context,ManagerActivityLollipop.class);
                             if (action != null){
                                 logDebug("The action is: " + action);
-//										if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-//											intent = new Intent(this, FileExplorerActivityLollipop.class);
-//											if(extras != null)
-//											{
-//												intent.putExtras(extras);
-//											}
-//											intent.setData(uriData);
-//										}
-                                if (action.equals(ACTION_FILE_PROVIDER)){
-                                    intent = new Intent(context, FileProviderActivity.class);
-                                    if(extras != null){
-                                        intent.putExtras(extras);
-                                    }
-                                    if(uriData != null){
+                                switch (action) {
+                                    case ACTION_FILE_PROVIDER:
+                                        intent = new Intent(context, FileProviderActivity.class);
+                                        if (extras != null) {
+                                            intent.putExtras(extras);
+                                        }
+                                        if (uriData != null) {
+                                            intent.setData(uriData);
+                                        }
+                                        break;
+                                    case ACTION_OPEN_FILE_LINK_ROOTNODES_NULL:
+                                        intent = new Intent(context, FileLinkActivityLollipop.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                         intent.setData(uriData);
-                                    }
-                                }
-                                else if (action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
-                                    intent = new Intent(context, FileLinkActivityLollipop.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.setData(uriData);
-                                }
-                                else if (action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
-                                    intent = new Intent(context, FolderLinkActivityLollipop.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    action = ACTION_OPEN_MEGA_FOLDER_LINK;
-                                    intent.setData(uriData);
-                                }
-                                else if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
-                                    intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
+                                        break;
+                                    case ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL:
+                                        intent = new Intent(context, FolderLinkActivityLollipop.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        action = ACTION_OPEN_MEGA_FOLDER_LINK;
+                                        intent.setData(uriData);
+                                        break;
+                                    case ACTION_OPEN_CONTACTS_SECTION:
+                                        intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
+                                        break;
                                 }
 
                                 intent.setAction(action);
@@ -1975,17 +1967,27 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivityLollipop.EXTRA_SHARE_INFOS);
 
                     if (shareInfos != null && shareInfos.size() > 0) {
-                        boolean canRead = hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE);
-                        if (canRead) {
+                        if (hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                             toSharePage();
                         } else {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                PermissionUtils.requestPermission((LoginActivityLollipop) context,
-                                        READ_MEDIA_PERMISSION, Manifest.permission.READ_EXTERNAL_STORAGE);
-                            } else {
-                                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_MEDIA_PERMISSION);
-                            }
+                            PermissionUtils.requestPermission((LoginActivityLollipop) context,
+                                    READ_MEDIA_PERMISSION, Manifest.permission.READ_EXTERNAL_STORAGE);
                         }
+
+                        return;
+                    } else if (ACTION_FILE_EXPLORER_UPLOAD.equals(action)
+                            && TYPE_TEXT_PLAIN.equals(receivedIntent.getType())) {
+                        startActivity(new Intent(context, FileExplorerActivityLollipop.class)
+                                .putExtra(Intent.EXTRA_TEXT, receivedIntent.getStringExtra(Intent.EXTRA_TEXT))
+                                .putExtra(Intent.EXTRA_SUBJECT, receivedIntent.getStringExtra(Intent.EXTRA_SUBJECT))
+                                .putExtra(Intent.EXTRA_EMAIL, receivedIntent.getStringExtra(Intent.EXTRA_EMAIL))
+                                .setAction(Intent.ACTION_SEND)
+                                .setType(TYPE_TEXT_PLAIN));
+
+                        if (getActivity() != null) {
+                            getActivity().finish();
+                        }
+
                         return;
                     } else if (ACTION_REFRESH.equals(action) && getActivity() != null) {
                         getActivity().setResult(RESULT_OK);

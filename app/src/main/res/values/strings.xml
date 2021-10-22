@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF Viewer</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">of</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Yes</string>
     <!-- Answer for confirmation dialog. -->
@@ -291,8 +289,6 @@
     <string name="section_contacts">Contacts</string>
     <!-- Item of the navigation title for the contacts section when there is any pending incoming request -->
     <string name="section_contacts_with_notification">Contacts [A](%1$d)[/A]</string>
-    <!-- Section name for the “Recently Added Contacts” section.Preferably one word. -->
-    <string name="section_recently_added">Recently Added</string>
     <!-- Empty state when the user has not sent any contact request to other users -->
     <string name="sent_requests_empty">[B]No [/B][A]sent requests[/A]</string>
     <!-- Empty state when the user has not received any contact request from other users -->
@@ -581,8 +577,6 @@
     <string name="number_contact_not_removed">%d contacts were not removed</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Folder shared with %d contacts successfully</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">File cannot be shared with %d contacts</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d folders shared successfully</string>
     <!-- error message when sharing multiple files -->
@@ -661,7 +655,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">File system problem</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">An error occurred when browsing local files.</string>
+    <string name="general_error">Error happened when executing the action</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Image viewer</string>
     <!-- Headline for the amount of storage space is used -->
@@ -672,8 +666,6 @@
     <string name="overquota_alert_text">You have exceeded your storage limit. Would you like to upgrade your account?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Last session</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Connections</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Changing password</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -1130,7 +1122,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Grow your cloud.[A]Get increased storage and transfer quotas with a Pro account.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s.[A]You can find the file with your Recovery Key in the Saved for Offline section.[A]Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
+    <string name="toast_master_key">The MEGA account Recovery Key has been saved to: %1s. [A]You can find the file with your Recovery Key in the Saved for Offline section.[/A] Note: as the file with your Recovery Key will be deleted when you log out, please store it in a safe place outside your MEGA account.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">This email address is already in use. Please use another email address.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1492,7 +1484,7 @@
     <string name="title_message_uploading_options">Uploading attachment</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">No conversation history</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]is typing&#8230;[/A]</item>
         <item quantity="other">%1$s [A]are typing&#8230;[/A]</item>
@@ -1922,13 +1914,11 @@
     <string name="title_regitration">Registration bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Get a MEGA Desktop App</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Account base quota</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">No files in Camera Uploads</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d d left</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Expired</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Don’t use HTTP</string>
@@ -2165,8 +2155,6 @@
     <string name="context_empty_offline">[B]No files [/B][A]Saved for Offline[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]No [/B][A]Contacts[/A]</string>
-    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]No[/A] [B]Conversations[/B]</string>
     <!-- Message shown when the chat is section is loading the conversations -->
@@ -2284,10 +2272,12 @@
     <string name="settings_video_upload_quality">Video Quality</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Camera Uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Original quality</item>
-        <item>Medium quality</item>
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+        <item>Original</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Missed call</string>
@@ -2585,11 +2575,6 @@
     <string name="context_no_restored">An error occurred. Item not restored.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Send Message</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Contact sent to chats successfully</item>
-        <item quantity="other">Contacts sent to chats successfully</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">MEGAdrop folders are not supported yet</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3468,7 +3453,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Your account has been temporarily locked for your safety.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Please verify your email address[/A] and follow the steps in MEGA’s email to unlock your account.</string>
+    <string name="verify_email_and_follow_steps">Please follow the steps in the [A]verification email[/A] to unlock your account.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Why am I seeing this?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3579,7 +3564,7 @@
     <string name="label_verify_credentials">Verify credentials</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Not verified</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Verified</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Authenticity Credentials</string>
@@ -3660,13 +3645,13 @@
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Debugging info for chat messages enabled</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Debugging info for chat messages is disabled</string>
+    <string name="show_info_chat_msg_disabled">Debugging info for chat messages disabled</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">You have reached the maximum limit of %d reactions.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">This message has reached the maximum limit of %d reactions.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] changed the message clearing time to[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] changed the message clearing time to [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Clear chat history</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3735,7 +3720,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Select transfers</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">The priority change of the transfer ”%1$s” failed.</string>
+    <string name="change_of_transfer_priority_failed">Unable to change priority of the transfer “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Send decryption key separately</string>
     <!-- Explanation option to send separated the link and decryption key -->
@@ -4024,6 +4009,14 @@
         <item quantity="one">1 connection</item>
         <item quantity="other">%1$d connections</item>
     </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Recently Added</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]No [/B][A]Groups[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Requests</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Groups</string>
     <!-- Text informing links management is only available for single items. -->
     <string name="warning_get_links">Options such as “Send decryption key separately”, “Set expiry date” or “Set password protection” are only available for single items.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
@@ -4043,8 +4036,142 @@
         <item quantity="one">Get Link</item>
         <item quantity="other">Get Links</item>
     </plurals>
-    <!-- Section name for the “Contact Requests” section.Preferably one word. -->
-    <string name="section_requests">Requests</string>
-    <!-- Section name for the “Groups” section.Preferably one word. -->
-    <string name="section_groups">Groups</string>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Clear all offline files?</string>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">You are the only one here</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">Meeting</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">Start/Join meeting</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">New meeting</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">Join meeting</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">Start meeting</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">Join as a guest</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">%s’s meeting</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">Hang up</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">Mic</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">Your microphone is muted</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">Your microphone is unmuted</string>
+    <!-- General label for camera -->
+    <string name="general_camera">Camera</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">Your camera is turned on.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">Your camera is turned off.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">Hold</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">Speaker</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">Headphones</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">Headphones are active</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">Speaker is on</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">Speaker is off</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">End</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">Invite participants</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">Participants (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">Display in main view</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">Make moderator</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">Leave meeting now?</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">No moderator</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">Before leaving, please assign one or more new moderators for the meeting.</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">Make moderator</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">Leave anyway</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">Please assign one or more new moderators.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">Change the meeting name</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">Participants: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">Moderator: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">Meeting link</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">Duration</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">Join meeting as guest</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">You are invited to a meeting.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">Tap the Meeting link sent to you or paste it here</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">Poor connection quality</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">Meeting has ended</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">Invalid meeting link</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">Access permissions needed for MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">MEGA needs access to your microphone and camera for meetings.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Got it</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">Go to Settings to allow MEGA to access your camera and microphone.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">View meeting chat</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">Invite more participants to the meeting. Swipe up to invite.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">Tap to create a new meeting</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">Quickly set up a MEGA meeting with our new encrypted meeting feature</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">You are the new moderator.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">Copied meeting link.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%s started a meeting. Tap to join.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA Meeting</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">End-to-end encrypted video meeting</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">Please enter a valid meeting link</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">More than just meetings</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">Your privacy matters</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">Join the largest secure cloud storage and collaboration platform in the world.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">Get 20 GB for free</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">Sign up now and enjoy advanced collaboration features for free.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">Another call in progress. Please end your current call before making another.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">New meeting name</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">Failed to create meeting.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](me)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">Main view</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Logging out deletes your offline content.</string>
 </resources>

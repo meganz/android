@@ -288,7 +288,7 @@ class GetLinkViewModel @ViewModelInject constructor(
      */
     fun shareLink(link: String? = null, action: (Intent) -> Unit) {
         val intent = Intent(Intent.ACTION_SEND)
-        intent.type = Constants.PLAIN_TEXT_SHARE_TYPE
+        intent.type = Constants.TYPE_TEXT_PLAIN
         intent.putExtra(Intent.EXTRA_TEXT, link ?: node.publicLink)
         action.invoke(Intent.createChooser(intent, getString(R.string.context_get_link)))
     }

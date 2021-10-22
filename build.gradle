@@ -2,7 +2,7 @@
 buildscript {
     ext.gradleVersion = '4.1.1'
     ext.kotlinVersion = '1.4.10'
-    ext.navigationVersion = '2.3.0'
+    ext.navigationVersion = '2.3.5'
     ext.googleServicesVersion = '4.3.5'
     ext.hiltVersion = "2.29.1-alpha"
     ext.huaweiServicesVersion = "1.4.1.300"
@@ -49,8 +49,8 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "4.2.2"
-    versionCode = 401
+    appVersion = "5.1"
+    versionCode = 409
 
     // Sdk and tools
     compileSdkVersion = 30

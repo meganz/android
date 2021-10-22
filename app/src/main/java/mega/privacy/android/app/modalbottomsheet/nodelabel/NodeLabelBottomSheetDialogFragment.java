@@ -1,21 +1,21 @@
 package mega.privacy.android.app.modalbottomsheet.nodelabel;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetNodeLabelBinding;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.utils.Constants.HANDLE;
+import static mega.privacy.android.app.utils.LogUtil.logError;
 
 public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFragment {
 
@@ -30,24 +30,29 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
         return nodeLabelFragment;
     }
 
-    @SuppressLint("RestrictedApi")
+    @Nullable
     @Override
-    public void setupDialog(@NonNull Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = BottomSheetNodeLabelBinding.inflate(getLayoutInflater());
+        contentView = binding.getRoot().getRootView();
+        itemsLayout = binding.radioGroupLabel;
+        return contentView;
+    }
 
-        node = getMegaApi().getNodeByHandle(getArguments().getLong(HANDLE));
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if (arguments == null) {
+            logError("Arguments is null, cannot get node.");
+            return;
+        }
+
+        node = megaApi.getNodeByHandle(arguments.getLong(HANDLE));
         showCurrentNodeLabel();
 
         binding.radioGroupLabel.setOnCheckedChangeListener((group, checkedId) -> updateNodeLabel(checkedId));
 
-        contentView = binding.getRoot().getRootView();
-        mainLinearLayout = binding.nodeBottomSheet;
-        items_layout = binding.radioGroupLabel;
-
-        dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_RADIO_GROUP, false);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     private void showCurrentNodeLabel() {
@@ -86,35 +91,31 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
     private void updateNodeLabel(int checkedId) {
         switch (checkedId) {
             case R.id.radio_label_red:
-                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_RED);
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_RED);
                 break;
             case R.id.radio_label_orange:
-                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_ORANGE);
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_ORANGE);
                 break;
             case R.id.radio_label_yellow:
-                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_YELLOW);
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_YELLOW);
                 break;
             case R.id.radio_label_green:
-                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_GREEN);
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_GREEN);
                 break;
             case R.id.radio_label_blue:
-                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_BLUE);
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_BLUE);
                 break;
             case R.id.radio_label_purple:
-                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_PURPLE);
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_PURPLE);
                 break;
             case R.id.radio_label_grey:
-                getMegaApi().setNodeLabel(node, MegaNode.NODE_LBL_GREY);
+                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_GREY);
                 break;
             case R.id.radio_remove:
-                getMegaApi().resetNodeLabel(node);
+                megaApi.resetNodeLabel(node);
                 break;
         }
 
         dismiss();
-    }
-
-    private MegaApiAndroid getMegaApi() {
-        return MegaApplication.getInstance().getMegaApi();
     }
 }

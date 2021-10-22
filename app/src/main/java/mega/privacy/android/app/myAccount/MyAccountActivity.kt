@@ -16,8 +16,6 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.android.synthetic.main.activity_my_account.*
-import kotlinx.android.synthetic.main.dialog_general_confirmation.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.BroadcastConstants
@@ -29,7 +27,6 @@ import mega.privacy.android.app.databinding.DialogErrorInputEditTextBinding
 import mega.privacy.android.app.databinding.DialogErrorPasswordInputEditTextBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.lollipop.ChangePasswordActivityLollipop
-import mega.privacy.android.app.lollipop.megaachievements.AchievementsActivity
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -90,6 +87,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (shouldRefreshSessionDueToSDK()) {
+            return
+        }
+
         binding = ActivityMyAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -335,7 +337,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     private fun updateActionBar(background: Int) {
         if (!isDarkMode(this)) {
             window?.statusBarColor = background
-            toolbar.setBackgroundColor(background)
+            binding.toolbar.setBackgroundColor(background)
         }
     }
 
@@ -461,7 +463,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                     }
                 }
 
-                this.positive_button.setOnClickListener {
+                getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
                     if (cancelSubscriptionsFeedback?.isEmpty() == true) {
                         showSnackbar(StringResourcesUtils.getString(R.string.reason_cancel_subscriptions))
                     } else {

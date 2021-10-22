@@ -85,7 +85,6 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private SwitchPreferenceCompat twoFASwitch;
     private SwitchPreferenceCompat qrCodeAutoAcceptSwitch;
     private Preference advancedPreference;
-    private RecyclerView listView;
     private boolean passcodeLock = false;
     private boolean setAutoaccept = false;
     private boolean autoAccept = true;
@@ -227,28 +226,27 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         logDebug("onViewCreated");
 
         // Init QR code setting
         megaApi.getContactLinksOption((ManagerActivityLollipop) context);
 
-        listView = view.findViewById(android.R.id.list);
         if (((ManagerActivityLollipop) context).openSettingsStorage) {
             goToCategoryStorage();
         } else if (((ManagerActivityLollipop) context).openSettingsQR) {
             goToCategoryQR();
         }
-        if (listView != null) {
-            listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                @Override
-                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    super.onScrolled(recyclerView, dx, dy);
-                    checkScroll();
-                }
-            });
-        }
+
+        getListView().addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                checkScroll();
+            }
+        });
+
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         outMetrics = new DisplayMetrics();
         display.getMetrics(outMetrics);
@@ -272,9 +270,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
      * Method for controlling whether or not to display the action bar elevation.
      */
     public void checkScroll() {
-        if (listView != null) {
-            ((ManagerActivityLollipop) context).changeAppBarElevation(listView.canScrollVertically(-1));
+        if (getListView() == null) {
+            return;
         }
+
+        ((ManagerActivityLollipop) context)
+                .changeAppBarElevation(getListView().canScrollVertically(SCROLLING_UP_DIRECTION));
     }
 
     @Override
@@ -624,7 +625,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             String subject = getString(R.string.setting_feedback_subject) + " v" + versionApp;
 
             Intent emailIntent = new Intent(Intent.ACTION_SEND);
-            emailIntent.setType("text/plain");
+            emailIntent.setType(TYPE_TEXT_PLAIN);
             emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {MAIL_ANDROID});
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
             emailIntent.putExtra(Intent.EXTRA_TEXT, body.toString());

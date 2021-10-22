@@ -87,7 +87,7 @@
     <!-- Error getting the root node -->
     <string name="error_general_nodes">Błąd. Proszę spróbuj ponownie.</string>
     <!-- File name (without extension) of file exported with the recovery key -->
-    <string name="general_rk">MEGA-RECOVERYKEY</string>
+    <string name="general_rk">MEGA-KLUCZODZYSKIWANIA</string>
     <!-- Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn’t exist -->
     <string name="secondary_media_service_error_local_folder">Kopia zapasowa katalogu nie istnieje, wybierz nowy katalog</string>
     <!-- when no external card exists -->
@@ -423,8 +423,6 @@
     <!-- Delete a link label -->
     <string name="context_delete_link">Usuń link</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_get_link_menu">Pobierz link</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_leave_menu">Anuluj</string>
     <!-- Title alert before leaving a share. -->
     <string name="alert_leave_share">Pozostaw</string>
@@ -599,8 +597,6 @@
     <string name="number_contact_not_removed">%d kontaktów nie zostało usunięte</string>
     <!-- success message when sharing a file with multiple contacts -->
     <string name="number_contact_file_shared_correctly">Katalog został&#160;udostępniony z %d kontaktami</string>
-    <!-- error message when sharing a file with multiple contacts -->
-    <string name="number_contact_file_not_shared_">Plik nie może być udostępniony dla %d kontaktów</string>
     <!-- success message when sharing multiple files -->
     <string name="number_correctly_shared">%d katalogów zostało udostępnione</string>
     <!-- error message when sharing multiple files -->
@@ -627,8 +623,8 @@
     <string name="confirmation_cancel_subscriptions">Dziękujemy za Twoją opinię. Czy na pewno chcesz zrezygnować z subskrypcji MEGA?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Twoja subskrypcja nie została anulowane. Prosimy o podane powodu anulowania</string>
-    <!-- welcome message after user brought subscription. placeholder 1: subscription type (Lite/Pro1 etc), placeholder 2: renewal interval (monthly/yearly) -->
-    <string name="message_user_purchased_subscription">Dziękujemy za subskrypcję %1$s %2$s!</string>
+    <!-- Confirmation message of the dialog shown when a subscription has been processed successfully -->
+    <string name="message_user_purchased_subscription">Dziękuję. Twoja płatność jest w trakcie przetwarzania. Proszę napisz do nas na adres support&#64;mega.co.nz jeśli nie otrzymałeś aktualizacji w ciągu 24 godzin.</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
     <string name="message_user_purchased_subscription_down_grade">Twoja nowa subskrypcja wejdzie w życie po wygaśnięciu obecnej, nowa cena zostanie naliczona w tym czasie.</string>
     <!-- Pop up message shows when user purchased a subscription with a payment method that can not be processed in real time, e.g. voucher -->
@@ -681,7 +677,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problem z systemem plików</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Wystąpił błąd podczas przeglądania plików lokalnych.</string>
+    <string name="general_error">Wystąpił błąd podczas wykonywania operacji</string>
     <!-- title of the image gallery -->
     <string name="full_screen_image_viewer_label">Podgląd zdjęcia</string>
     <!-- Headline for the amount of storage space is used -->
@@ -692,8 +688,6 @@
     <string name="overquota_alert_text">Przekroczyłeś dostępny limit na pliki. Czy chcesz zmienić rodzaj swojego konta?</string>
     <!-- when did the last session happen -->
     <string name="my_account_last_session">Ostatnia sesja</string>
-    <!-- header for the social connections, showing the number of contacts the user has -->
-    <string name="my_account_connections">Połączenia</string>
     <!-- message displayed while the app is changing the password -->
     <string name="my_account_changing_password">Zmiana hasła</string>
     <!-- when changing the password, the first edittext is to enter the current password -->
@@ -1154,7 +1148,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Rozwiń swoją chmurę.[A]Uzyskaj zwiększone limity pamięci i transferu dzięki kontu Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Klucz odzyskiwania do MEGA został zapisany do: %1s.[A]Plik z Twoim kluczem odzyskiwania znajdziesz w sekcji Zapisane dla Offline.[A]Uwaga: ponieważ plik z Twoim kluczem odzyskiwania zostanie usunięty po wylogowaniu, przechowuj go w bezpiecznym miejscu poza swoim kontem MEGA.</string>
+    <string name="toast_master_key">Klucz odzyskiwania do MEGA został zapisany w: %1s. [A]Plik z Swój klucz odzyskiwania znajdziesz w sekcji Zapisane dla Offline.[/A] Uwaga: ponieważ plik z Twoim kluczem odzyskiwania zostanie usunięty po wylogowaniu, przechowuj go w bezpiecznym miejscu poza swoim MEGAkontem.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Ten adres e-mail jest już używany. Proszę użyć innego adresu e-mail.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -1498,7 +1492,7 @@
     <!-- success alert when the user copy some messages to the clipboard -->
     <string name="messages_copied_clipboard">Skopiowana do schowka</string>
     <!-- Title of the error dialog when opening a chat -->
-    <string name="chat_error_open_title">Błąd czatu!</string>
+    <string name="chat_error_open_title">Błąd</string>
     <!-- Message of the error dialog when opening a chat -->
     <string name="chat_error_open_message">Ten czat nie został otwarty prawidłowo</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -1534,7 +1528,7 @@
     <string name="title_message_uploading_options">Przesyłanie załącznika</string>
     <!-- message shown when a chat has no messages -->
     <string name="no_conversation_history">Brak historii rozmowy</string>
-    <!-- title of confirmation alert before removing a contact, Plural -->
+    <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="one">%1$s [A]pisze&#8230;[/A]</item>
         <item quantity="few">%1$s [A]piszą&#8230;[/A]</item>
@@ -2006,13 +2000,11 @@
     <string name="title_regitration">Zarejestruj bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
     <string name="title_install_desktop">Pobierz aplikację MEGA Desktop</string>
-    <!-- title of the section for base quota in achivements section -->
-    <string name="title_base_quota">Podstawowy limit</string>
     <!-- Text that indicates that no pictures have been uploaded to the Camera Uploads section -->
     <string name="camera_uploads_empty">Brak plików w Przesyłanych z aparatu</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d d pozostało</string>
-    <!-- State to indicate something has expired (achivements of business status account for instance) -->
+    <!-- State to indicate an achievement has expired -->
     <string name="expired_label">Wygasło</string>
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Nie używaj HTTP</string>
@@ -2695,13 +2687,6 @@
     <string name="context_no_restored">Wystąpił błąd. Element nie został przywrócony.</string>
     <!-- menu item from contact section to send a message to a contact -->
     <string name="context_send_message">Wyślij wiadomość</string>
-    <!-- Message shown when a contact is successfully sent to several chats, more contacts -->
-    <plurals name="plural_contact_sent_to_chats">
-        <item quantity="one">Kontakt wysłany na czaty z powodzeniem</item>
-        <item quantity="few">Kontakty wysłane z powodzeniem na czaty</item>
-        <item quantity="many">Kontakty wysłane z powodzeniem na czaty</item>
-        <item quantity="other">Kontakty wysłane z powodzeniem na czaty</item>
-    </plurals>
     <!-- Error message on opening a MEGAdrop folder link -->
     <string name="error_MEGAdrop_not_supported">Foldery MEGAdrop nie są jeszcze obsługiwane</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
@@ -3577,7 +3562,7 @@
     <string name="business_management_alert">Zarządzanie użytkownikami jest dostępne tylko z poziomu przeglądarki internetowej.</string>
     <!-- Title of the usage tab in My Account Section -->
     <string name="tab_my_account_usage">Zużycie</string>
-    <!-- Title of usage storage details section in Storage -->
+    <!-- Title of usage storage details section in My Account -->
     <string name="usage_storage_details_label">Podział wykorzystania pamięci</string>
     <!-- Title of overall usage section in Storage -->
     <string name="overall_usage_label">Ogólne wykorzystanie</string>
@@ -3737,7 +3722,7 @@
     <string name="label_verify_credentials">Weryfikacja uprawnień</string>
     <!-- Label to indicate that contact’s credentials are not verified. -->
     <string name="label_not_verified">Nie zweryfikowany</string>
-    <!-- Action indicating something was verified. -->
+    <!-- Label indicating the authenticity credentials of a contact have been verified -->
     <string name="label_verified">Zweryfikowany</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Poświadczenia autentyczności</string>
@@ -3818,7 +3803,7 @@
     <!-- Message showing when enable the mode for showing the special information in the chat messages. This action is performed from the settings section, clicking 5 times on the App version option -->
     <string name="show_info_chat_msg_enabled">Włączone debugowanie informacji dla wiadomości czatu</string>
     <!-- Message showing when disable the mode for showing the special information in the chat messages.. This action is performed from the settings section, clicking 5 times on the App version option -->
-    <string name="show_info_chat_msg_disabled">Informacje o debugowaniu wiadomości czatu są wyłączone</string>
+    <string name="show_info_chat_msg_disabled">Wyłączenie informacji o debugowaniu dla wiadomości czatu</string>
     <!-- Shows the error when the limit of reactions per user is reached and the user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_user">Osiągnąłeś maksymalny limit %d reakcji.</string>
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
@@ -3922,14 +3907,10 @@
     <string name="button_copy_key">Skopiuj klucz</string>
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Skopiuj hasło</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_copied_clipboard">Link skopiowany do schowka.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="key_copied_clipboard">Klucz skopiowany do schowka.</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Hasło skopiowane do schowka.</string>
-    <!-- Confirmation shown informing a link it’s copied to the clipboard -->
-    <string name="link_sent">Link wysłany.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
     <string name="link_and_key_sent">Link i klucz wysłane.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
@@ -4179,4 +4160,208 @@
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Dokonaj zmiany</string>
+    <!-- Snackbar text to display if the user doesn't grant the permission to access all files on a device with Android 11 or higher -->
+    <string name="snackbar_storage_permission_denied_android_11">Uprawnienia potrzebne do uzyskania dostępu do pamięci masowej.</string>
+    <!-- String to show the transfer quota and the used space in My Account section. E.g.: -->
+    <string name="used_storage_transfer">%1$s / %2$s</string>
+    <!-- String to show the transfer quota and the used space in My Account section -->
+    <string name="used_storage_transfer_percentage">%1$s%%</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <!-- Title of Add phone number option in My account section -->
+    <string name="add_phone_label">Dodaj swój numer telefonu</string>
+    <!-- Text of the option Backup Recovery Key in My account section -->
+    <string name="backup_recovery_key_subtitle">Czy pamiętasz swoje hasło?\nMEGA nie może zresetować Twojego hasła, jeśli je zapomnisz.</string>
+    <!-- Action to change name -->
+    <string name="change_name_action">Zmień nazwę</string>
+    <!-- Action to add photo -->
+    <string name="add_photo_action">Dodaj zdjęcie</string>
+    <!-- Action to add phone number -->
+    <string name="add_phone_number_action">Dodaj numer telefonu</string>
+    <!-- Warning indicating the app needs write permissions to do any action -->
+    <string name="denied_write_permissions">Aby kontynuować, MEGA potrzebuje uprawnień do zapisu w pamięci urządzenia.</string>
+    <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
+    <string name="tomorrow_date">Jutro, %1$s</string>
+    <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
+    <string name="title_user_purchased_subscription">Oczekiwanie na potwierdzenie</string>
+    <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
+    <plurals name="my_account_connections">
+        <item quantity="one">1 połączenie</item>
+        <item quantity="few">%1$d połączeń</item>
+        <item quantity="many">%1$d połączeń</item>
+        <item quantity="other">%1$dpołączeń</item>
+    </plurals>
+    <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
+    <string name="section_recently_added">Ostatnio dodane</string>
+    <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
+    <string name="context_empty_groups">[B]Brak[/B][A]grup[/A]</string>
+    <!-- Section name for the “Contact Requests” section. Preferably one word. -->
+    <string name="section_requests">Zgłoszenia</string>
+    <!-- Section name for the “Groups” section. Preferably one word. -->
+    <string name="section_groups">Grupy</string>
+    <!-- Text informing links management is only available for single items. -->
+    <string name="warning_get_links">Opcje takie jak “Wyślij klucz deszyfrujący osobno”, “Ustaw datę ważności” czy “Ustaw ochronę hasłem” są dostępne tylko dla pojedynczych elementów.</string>
+    <!-- Action which allows to copy all the links showed in the list. -->
+    <string name="action_copy_all">Skopiuj wszystko</string>
+    <!-- Confirmation shown informing links have been sent to the selected chats -->
+    <plurals name="links_sent">
+        <item quantity="one">Link został pomyślnie wysłany.</item>
+        <item quantity="few">Linki zostały pomyślnie wysłane.</item>
+        <item quantity="many">Linki zostały pomyślnie wysłane.</item>
+        <item quantity="other">Linki zostały pomyślnie wysłane.</item>
+    </plurals>
+    <!-- Confirmation shown informing links have been copied to the clipboard -->
+    <plurals name="links_copied_clipboard">
+        <item quantity="one">Link skopiowany do schowka.</item>
+        <item quantity="few">Linki skopiowane do schowka.</item>
+        <item quantity="many">Linki skopiowane do schowka.</item>
+        <item quantity="other">Linki skopiowane do schowka.</item>
+    </plurals>
+    <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
+    <plurals name="get_links">
+        <item quantity="one">Pobierz link</item>
+        <item quantity="few">Pobierz linki</item>
+        <item quantity="many">Pobierz linki</item>
+        <item quantity="other">Pobierz linki</item>
+    </plurals>
+    <!-- Ask for confirmation before clear offline files -->
+    <string name="clear_offline_confirmation">Wyczyścić wszystkie pliki offline?</string>
+    <!-- Banner text when the call is in progress and I'm the only participant. -->
+    <string name="banner_alone_on_the_call">Jesteś aktualnie sam</string>
+    <!-- Item menu option upon right click on meeting. -->
+    <string name="context_meeting">Spotkanie</string>
+    <!-- Menu option that allows the user to start/join meeting. -->
+    <string name="start_join_meeting">Rozpocznij/dołącz do spotkania</string>
+    <!-- Label that create a meeting -->
+    <string name="new_meeting">Nowe spotkanie</string>
+    <!-- Label that join a meeting -->
+    <string name="join_meeting">Dołącz do spotkania</string>
+    <!-- Button that create a meeting -->
+    <string name="btn_start_meeting">Rozpocznij spotkanie</string>
+    <!-- Button that join a meeting as guest -->
+    <string name="btn_join_meeting_as_guest">Dołącz jako gość</string>
+    <!-- Hint shown to guide user on meeting name -->
+    <string name="type_meeting_name">%sspotkanie</string>
+    <!-- General label for reject the call. -->
+    <string name="general_reject">Rozłącz się</string>
+    <!-- General label for microphone -->
+    <string name="general_mic">Mikrofon</string>
+    <!-- General label for microphone muted -->
+    <string name="general_mic_mute">Twój mikrofon jest wyciszony</string>
+    <!-- General label for microphone unmuted -->
+    <string name="general_mic_unmute">Twój mikrofon jest nie wyciszony</string>
+    <!-- General label for camera -->
+    <string name="general_camera">Aparat</string>
+    <!-- General label for camera enable -->
+    <string name="general_camera_enable">Aparat jest włączony.</string>
+    <!-- General label for camera disable -->
+    <string name="general_camera_disable">Kamera jest wyłączona.</string>
+    <!-- Label for hold meeting -->
+    <string name="meeting_hold">Zawieś</string>
+    <!-- General label for speaker -->
+    <string name="general_speaker">Głośnik</string>
+    <!-- General label for headphone-->
+    <string name="general_headphone">Słuchawki</string>
+    <!-- General label for headphone on-->
+    <string name="general_headphone_on">Słuchawki są aktywne</string>
+    <!-- General label for speaker on-->
+    <string name="general_speaker_on">Głośnik jest włączony</string>
+    <!-- General label for speaker off-->
+    <string name="general_speaker_off">Głośnik jest wyłączony</string>
+    <!-- Label for end meeting-->
+    <string name="meeting_end">Zakończ</string>
+    <!-- Invite contacts as participants of the meeting-->
+    <string name="invite_participants">Zaproś uczestników</string>
+    <!-- The number of participants in the meeting-->
+    <string name="participants_number">Uczestnicy (%d)</string>
+    <!-- Pin the participant to speaker view in the meeting-->
+    <string name="pin_to_speaker">Wyświetl w widoku głównym</string>
+    <!-- Make the participant as moderator in the meeting-->
+    <string name="make_moderator">Zrób moderatora</string>
+    <!-- The title of dialog for end meeting confirmation-->
+    <string name="title_end_meeting">Opuścić spotkanie teraz?</string>
+    <!-- no moderator when the moderator leave meeting-->
+    <string name="no_moderator">Brak moderatora</string>
+    <!-- assign moderator message when the moderator leave meeting-->
+    <string name="assign_moderator_message">Przed wyjazdem proszę wyznaczyć jednego lub więcej nowych moderatorów spotkania</string>
+    <!-- assign moderator option when the moderator leave meeting-->
+    <string name="assign_moderator">Zrób moderatora</string>
+    <!-- leave anyway option when the moderator leave meeting-->
+    <string name="leave_anyway">Opuść</string>
+    <!-- The message alert user to pick new moderator on assign moderator page-->
+    <string name="pick_new_moderator_message">Proszę o przydzielenie jednego lub więcej nowych moderatorów.</string>
+    <!-- The title of dialog for changing meeting name-->
+    <string name="change_meeting_name">Zmień nazwę spotkania</string>
+    <!-- The number of participants in the meeting on meeting info page-->
+    <string name="info_participants_number">Uczestnicy: %d</string>
+    <!-- The name of moderators in the meeting on meeting info page-->
+    <string name="info_moderator_name">Moderator: %s</string>
+    <!-- The literal meeting link text-->
+    <string name="meeting_link">Link do spotkania</string>
+    <!-- Subtitle of the meeting screen-->
+    <string name="duration_meeting">Czas trwania</string>
+    <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
+    <string name="join_meeting_as_guest">Dołącz do spotkania jako gość</string>
+    <!-- The title of the paste meeting link dialog for guest-->
+    <string name="paste_meeting_link_guest_dialog_title">Zostałeś zaproszony na spotkanie.</string>
+    <!-- Tell the guest to paste the meeting link in the edit box-->
+    <string name="paste_meeting_link_guest_instruction">Naciśnij na przesłany link do spotkania lub wklej go tutaj</string>
+    <!-- Banner text to indicate poor network quality-->
+    <string name="slow_connection_meeting">Niska jakość połączenia</string>
+    <!-- the message in the alert dialog for notifying the meeting has ended-->
+    <string name="meeting_has_ended">Spotkanie zakończone</string>
+    <!-- error message shown when a meeting link is not well formed-->
+    <string name="invalid_meeting_link_args">Nieprawidłowy link do spotkania</string>
+    <!-- Warning show to the user when the app needs permissions to start a meeting.-->
+    <string name="meeting_permission_info">Uprawnienia dostępu wymagane dla MEGA</string>
+    <!-- Message of a dialog to show user the permissions that needed-->
+    <string name="meeting_permission_info_message">MEGA potrzebuje dostępu do Twojego mikrofonu i kamery podczas spotkań.</string>
+    <!-- Button to confirm the action of restarting one transfer-->
+    <string name="button_permission_info">Rozumiem</string>
+    <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
+    <string name="meeting_required_permissions_warning">Przejdź do Ustawień, aby umożliwić MEGA dostęp do kamery i mikrofonu.</string>
+    <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
+    <string name="view_meeting_chat">Wyświetl czat spotkania</string>
+    <!-- the content of tips when the user uses the meeting first time-->
+    <string name="tip_invite_more_participants">Zaproś więcej uczestników na spotkanie. Przesuń palcem w górę, aby zaprosić.</string>
+    <!-- the content of tips when the user enters recent chat page first time-->
+    <string name="tip_create_meeting">Kliknij, aby utworzyć nowe spotkanie</string>
+    <!-- the content of tips when the user enters start conversation page first time-->
+    <string name="tip_setup_meeting">Szybko zorganizuj MEGA spotkanie dzięki naszej nowej funkcji szyfrowanych spotkań</string>
+    <!-- the content of snack bar when the user be the new moderator-->
+    <string name="be_new_moderator">Jesteś nowym moderatorem.</string>
+    <!-- the content of snack bar when copied meeting link-->
+    <string name="copied_meeting_link">Skopiowany link do spotkania.</string>
+    <!-- Title of the layout to join a meeting from the chat screen. The placeholder indicates the user who initiated the meeting -->
+    <string name="join_meeting_layout_in_group_call">%s rozpoczął spotkanie. Kliknij , aby dołączyć.</string>
+    <!-- Title of fifth tour screen -->
+    <string name="title_tour_five">MEGA Meeting</string>
+    <!-- Content of fourth tour screen -->
+    <string name="content_tour_five">Spotkanie wideo szyfrowane od końca do końca</string>
+    <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
+    <string name="invalid_meeting_link_empty">Proszę wpisać prawidłowy link spotkania</string>
+    <!-- Guest leave call-->
+    <string name="more_than_meeting">Więcej niż tylko spotkania</string>
+    <!-- the title of join without account on left meeting page-->
+    <string name="left_meeting_join_title">Twoja prywatność ma znaczenie</string>
+    <!-- the content of join without account on left meeting page-->
+    <string name="left_meeting_join_content">Dołącz do największej na świecie platformy bezpiecznego przechowywania danych i współpracy w chmurze.</string>
+    <!-- the bonus title of join without account on left meeting page-->
+    <string name="left_meeting_bonus_title">Uzyskaj 20 GB za darmo</string>
+    <!-- the bonus content of join without account on left meeting page-->
+    <string name="left_meeting_bonus_content">Zarejestruj się teraz i korzystaj z zaawansowanych funkcji współpracy za darmo.</string>
+    <!-- Content of ongoing call for MaterialAlertDialog-->
+    <string name="ongoing_call_content">Trwa inne połączenie. Proszę zakończyć bieżące połączenie przed nawiązaniem kolejnego.</string>
+    <!-- The hint text when changing meeting name-->
+    <string name="new_meeting_name">Nowa nazwa spotkania</string>
+    <!-- The content of dialog when failed for creating meeting-->
+    <string name="meeting_is_failed_content">Nie udało się utworzyć spotkania.</string>
+    <!-- Word next to own user’s name on participant list -->
+    <string name="meeting_me_text_bracket">%1s [A](ja)[/A]</string>
+    <!-- Menu item to change from thumbnail view to main view in meeting-->
+    <string name="main_view">Widok główny</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="offline_warning">Wylogowanie powoduje usunięcie zawartości offline.</string>
 </resources>
