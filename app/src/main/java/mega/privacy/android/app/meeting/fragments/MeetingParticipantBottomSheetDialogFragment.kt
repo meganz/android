@@ -23,11 +23,11 @@ import nz.mega.sdk.*
 /**
  * The fragment shows options for different roles when click the three dots
  */
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private val bottomViewModel: MeetingParticipantBottomSheetDialogViewModel by viewModels()
     private val sharedViewModel: MeetingActivityViewModel by activityViewModels()
-    @ExperimentalCoroutinesApi
     private val inMeetingViewModel: InMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
 
     // Get from activity
@@ -78,7 +78,6 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
         return contentView
     }
 
-    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         bottomViewModel.setShowingName(binding.name)
         initItemAction(binding)
@@ -89,7 +88,6 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
     /**
      * Init the action for different items
      */
-    @ExperimentalCoroutinesApi
     private fun initItemAction(binding: BottomSheetMeetingParticipantBinding) {
         listenAction(binding.addContact) {
             (parentFragment as InMeetingFragment).addContact(participantItem.peerId)

@@ -214,7 +214,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean isLoggingRunning = false;
 	private static boolean isWaitingForCall = false;
 	public static boolean isSpeakerOn = false;
-	private static boolean arePreferenceCookiesEnabled = false;
 	private static boolean areAdvertisingCookiesEnabled = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
@@ -1009,7 +1008,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe((cookies, throwable) -> {
 					if (throwable == null) {
-						setPreferenceCookiesEnabled(cookies.contains(CookieType.PREFERENCE));
 						setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
 					}
 				});
@@ -1933,14 +1931,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static void setUserWaitingForCall(long userWaitingForCall) {
 		MegaApplication.userWaitingForCall = userWaitingForCall;
-	}
-
-	public static boolean arePreferenceCookiesEnabled() {
-		return arePreferenceCookiesEnabled;
-	}
-
-	public static void setPreferenceCookiesEnabled(boolean enabled) {
-		arePreferenceCookiesEnabled = enabled;
 	}
 
 	public static boolean areAdvertisingCookiesEnabled() {

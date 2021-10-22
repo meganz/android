@@ -2178,8 +2178,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setSmallGridCamera (boolean smallGridCamera){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
         logDebug("setSmallGridCamera");
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
@@ -2958,8 +2956,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredViewList (boolean list){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -2977,8 +2973,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredViewListCamera (boolean list){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -2996,8 +2990,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredSortCloud (String order){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -3015,8 +3007,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredSortContacts (String order){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -3034,15 +3024,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
     public void setPreferredSortCameraUpload(String order) {
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
         logDebug("set sort camera upload order: " + order);
         setStringValue(TABLE_PREFERENCES, KEY_PREFERRED_SORT_CAMERA_UPLOAD, order);
     }
 
 	public void setPreferredSortOthers (String order){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {

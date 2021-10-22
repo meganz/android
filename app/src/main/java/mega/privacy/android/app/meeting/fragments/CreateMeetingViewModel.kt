@@ -15,7 +15,7 @@ class CreateMeetingViewModel @ViewModelInject constructor(
      * Sets the default value of meetingName
      */
     fun initMeetingName() {
-        meetingName.value = "";
+        meetingName.value = ""
     }
 
     /**
