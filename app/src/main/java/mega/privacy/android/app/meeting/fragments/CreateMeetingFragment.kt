@@ -12,10 +12,10 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.appbar.MaterialToolbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import mega.privacy.android.app.R
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.isAllowedTitle
@@ -33,19 +33,21 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
     private val viewModel: CreateMeetingViewModel by viewModels()
 
+    private var toolbar: MaterialToolbar? = null
+
     //Create first the chat
     var chats = ArrayList<MegaChatRoom>()
 
     override fun onMeetingButtonClick() {
         if (!isAllowedTitle(meetingName)) {
-            type_meeting_edit_text.error = getString(R.string.title_long)
-            type_meeting_edit_text.requestFocus()
+            binding.typeMeetingEditText.error = getString(R.string.title_long)
+            binding.typeMeetingEditText.requestFocus()
             return
         }
 
         // if the name is empty, get the default name for the meeting
         if (meetingName.isEmpty()) {
-            type_meeting_edit_text.setText(viewModel.initHintMeetingName())
+            binding.typeMeetingEditText.setText(viewModel.initHintMeetingName())
         }
 
         logDebug("Meeting Name: $meetingName")
@@ -59,7 +61,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
     }
 
     fun releaseVideoAndHideKeyboard() {
-        hideKeyboardView(type_meeting_edit_text.context, type_meeting_edit_text, 0)
+        hideKeyboardView(binding.typeMeetingEditText.context, binding.typeMeetingEditText, 0)
         releaseVideoDeviceAndRemoveChatVideoListener()
     }
 
@@ -69,14 +71,15 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
         savedInstanceState: Bundle?
     ): View {
         // Toolbar should be set to TRANSPARENT in "Create Meeting"
-        activity?.toolbar?.background = ColorDrawable(Color.TRANSPARENT)
+        toolbar = (activity as? MeetingActivity)?.binding?.toolbar
+        toolbar?.background = ColorDrawable(Color.TRANSPARENT)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         // Reset the toolbar background to the default value
-        activity?.toolbar?.background = ContextCompat.getDrawable(requireContext(), R.drawable.gradient_shape_callschat)
+        toolbar?.background = ContextCompat.getDrawable(requireContext(), R.drawable.gradient_shape_callschat)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -94,10 +97,10 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
             when (event.action) {
                 ACTION_DOWN -> {
                     if (v != null) {
-                        if (v != type_meeting_edit_text)
+                        if (v != binding.typeMeetingEditText)
                             hideKeyboardView(
-                                type_meeting_edit_text.context,
-                                type_meeting_edit_text,
+                                binding.typeMeetingEditText.context,
+                                binding.typeMeetingEditText,
                                 0
                             )
                     }
@@ -136,7 +139,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
      */
     override fun onRequiresPermission(permissions: ArrayList<String>) {
         super.onRequiresPermission(permissions)
-        showKeyboardDelayed(type_meeting_edit_text)
+        showKeyboardDelayed(binding.typeMeetingEditText)
     }
 
     /**
@@ -145,6 +148,6 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
      */
     override fun onPermissionDenied(permissions: ArrayList<String>) {
         super.onPermissionDenied(permissions)
-        showKeyboardDelayed(type_meeting_edit_text)
+        showKeyboardDelayed(binding.typeMeetingEditText)
     }
 }

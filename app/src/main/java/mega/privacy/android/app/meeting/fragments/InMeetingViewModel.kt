@@ -1800,7 +1800,7 @@ class InMeetingViewModel @ViewModelInject constructor(
      */
     fun isLinkVisible(): Boolean {
         getCall()?.let {
-            return isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR && it.status == MegaChatCall.CALL_STATUS_IN_PROGRESS
+            return isChatRoomPublic() && getOwnPrivileges() == MegaChatRoom.PRIV_MODERATOR && it.status == CALL_STATUS_IN_PROGRESS
         }
 
         return false

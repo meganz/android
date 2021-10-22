@@ -25,9 +25,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.android.synthetic.main.in_meeting_fragment.*
-import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
 import kotlinx.coroutines.*
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -153,7 +150,6 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private var lastTouch: Long = 0
     private lateinit var dragTouchListener: OnDragTouchListener
     private var bannerShouldBeShown = false
-    private var yBias = 0f // Recode the y bias of floating window
 
     // For snack bar
     private var shiftY = -1f // Record the shift of floatingWindowFragment to Snackbar
@@ -816,6 +812,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      *
      * @param newConfig Portrait or landscape
      */
+    @Suppress("DEPRECATION")
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         val outMetrics = DisplayMetrics()
@@ -918,22 +915,22 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     }
 
     private fun initToolbar() {
-        toolbar = meetingActivity.toolbar
-        toolbarTitle = meetingActivity.title_toolbar
-        toolbarSubtitle = meetingActivity.subtitle_toolbar
+        toolbar = meetingActivity.binding.toolbar
+        toolbarTitle = meetingActivity.binding.titleToolbar
+        toolbarSubtitle = meetingActivity.binding.subtitleToolbar
         toolbarSubtitle?.let {
             it.text = StringResourcesUtils.getString(R.string.chat_connecting)
         }
 
-        bannerAnotherCallLayout = meetingActivity.banner_another_call
-        bannerAnotherCallTitle = meetingActivity.banner_another_call_title
-        bannerAnotherCallSubtitle = meetingActivity.banner_another_call_subtitle
-        bannerParticipant = meetingActivity.banner_participant
-        bannerInfo = meetingActivity.banner_info
-        bannerMuteLayout = meetingActivity.banner_mute
-        bannerMuteIcon = meetingActivity.banner_mute_icon
-        bannerMuteText = meetingActivity.banner_mute_text
-        meetingChrono = meetingActivity.simple_chronometer
+        bannerAnotherCallLayout = meetingActivity.binding.bannerAnotherCall
+        bannerAnotherCallTitle = meetingActivity.binding.bannerAnotherCallTitle
+        bannerAnotherCallSubtitle = meetingActivity.binding.bannerAnotherCallSubtitle
+        bannerParticipant = meetingActivity.binding.bannerParticipant
+        bannerInfo = meetingActivity.binding.bannerInfo
+        bannerMuteLayout = meetingActivity.binding.bannerMute
+        bannerMuteIcon = meetingActivity.binding.bannerMuteIcon
+        bannerMuteText = meetingActivity.binding.bannerMuteText
+        meetingChrono = meetingActivity.binding.simpleChronometer
 
         meetingActivity.setSupportActionBar(toolbar)
         val actionBar = meetingActivity.supportActionBar ?: return
@@ -1216,6 +1213,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
         floatingBottomSheet.fadeInOut(dy = FLOATING_BOTTOM_SHEET_DY, toTop = false)
 
+        @Suppress("DEPRECATION")
         if (toolbar.isVisible) {
             meetingActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         } else {
@@ -1236,7 +1234,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
     private fun onConfigurationChangedOfFloatingWindow(outMetrics: DisplayMetrics ) {
         floatingWindowContainer.post {
             previousY = -1f
-            var dx = outMetrics.widthPixels - floatingWindowContainer.width
+            val dx = outMetrics.widthPixels - floatingWindowContainer.width
             var dy = outMetrics.heightPixels - floatingWindowContainer.height
 
             if (BottomSheetBehavior.STATE_COLLAPSED == bottomFloatingPanelViewHolder.getState() && floatingBottomSheet.isVisible) {
@@ -2585,10 +2583,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         if (inMeetingViewModel.isOneToOneCall() || inMeetingViewModel.isGroupCall()) {
             logDebug("End the one to one or group call")
             leaveMeeting()
-            checkIfAnotherCallShouldBeShown()
         } else if (inMeetingViewModel.shouldAssignModerator()) {
             EndMeetingBottomSheetDialogFragment.newInstance(inMeetingViewModel.getChatId())
                 .run {
+                    setLeaveMeetingCallBack(leaveMeetingModerator)
                     setAssignCallBack(showAssignModeratorFragment)
                     show(
                         this@InMeetingFragment.childFragmentManager,
@@ -2600,11 +2598,12 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
     }
 
+    private val leaveMeetingModerator = fun() {
+        leaveMeeting()
+    }
+
     private val showAssignModeratorFragment = fun() {
-        val callback = fun() {
-            leaveMeeting()
-        }
-        AssignModeratorBottomFragment.newInstance(callback).let {
+        AssignModeratorBottomFragment.newInstance(leaveMeetingModerator).let {
             it.show(childFragmentManager, it.tag)
         }
     }
@@ -2910,14 +2909,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      * Check if exists another call in progress or on hold
      */
     private fun checkIfAnotherCallShouldBeShown() {
-        val anotherCall = inMeetingViewModel.getAnotherCall()
-        if (anotherCall != null) {
+        inMeetingViewModel.getAnotherCall()?.let {
             logDebug("Show another call")
-            CallUtil.openMeetingInProgress(requireContext(), anotherCall.chatid, false)
+            CallUtil.openMeetingInProgress(requireContext(), it.chatid, false)
         }
-
-        logDebug("Finish current call")
-        finishActivity()
     }
 
     /**

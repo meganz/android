@@ -17,7 +17,7 @@ class ParticipantViewHolder(
 
     init {
         binding.threeDots.setOnClickListener {
-            onParticipantOption(adapterPosition)
+            onParticipantOption(bindingAdapterPosition)
         }
     }
 

@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.bottom_sheet_sort_by.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.globalmanagement.SortOrderManagement
@@ -62,7 +61,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     ): View {
         binding = BottomSheetSortByBinding.inflate(LayoutInflater.from(context), null, false)
         contentView = binding.root
-        itemsLayout = binding.root.linear_layout
+        itemsLayout = binding.linearLayout
         return contentView
     }
 
