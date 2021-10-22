@@ -28,7 +28,6 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.TextureView;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,23 +38,21 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTextureListener {
 
-    private final static String TAG = "WEBRTC";
     private Paint paint;
     private PorterDuffXfermode modesrcover;
     private PorterDuffXfermode modesrcin;
     private int surfaceWidth = 0;
     private int surfaceHeight = 0;
-    private static int CORNER_RADIUS = 20;
-    private static int VISIBLE = 255;
+    private static final int CORNER_RADIUS = 20;
+    private static final int VISIBLE = 255;
 
     // the bitmap used for drawing.
     private Bitmap bitmap = null;
-    private ByteBuffer byteBuffer = null;
     private SurfaceHolder surfaceHolder;
     // Rect of the source bitmap to draw
-    private Rect srcRect = new Rect();
+    private final Rect srcRect = new Rect();
     // Rect of the destination canvas to draw to
-    private Rect dstRect = new Rect();
+    private final Rect dstRect = new Rect();
     private RectF dstRectf = new RectF();
     private boolean isSmallCamera;
     private DisplayMetrics outMetrics;
@@ -172,7 +169,6 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     public void surfaceDestroyed(SurfaceHolder holder) {
         logDebug("Surface destroyed");
         bitmap = null;
-        byteBuffer = null;
         surfaceWidth = 0;
         surfaceHeight = 0;
     }
@@ -294,8 +290,7 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int in_width, int in_height) {
         Bitmap textureViewBitmap = myTexture.getBitmap();
-        Canvas canvas = new Canvas(textureViewBitmap);
-        if (canvas == null) return;
+        if (textureViewBitmap == null) return;
 
         logDebug("TextureView Available");
         notifyStateToAll();
@@ -311,7 +306,6 @@ public class MegaSurfaceRenderer implements Callback, TextureView.SurfaceTexture
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
         logDebug("TextureView destroyed");
         bitmap = null;
-        byteBuffer = null;
         surfaceWidth = 0;
         surfaceHeight = 0;
         return true;

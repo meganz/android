@@ -9,7 +9,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetEndMeetingBinding
-import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil
 import nz.mega.sdk.MegaChatApiJava
@@ -19,9 +18,10 @@ import nz.mega.sdk.MegaChatApiJava
  */
 class EndMeetingBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetEndMeetingBinding
-    private val sharedViewModel:InMeetingViewModel by activityViewModels()
+    private val sharedViewModel: InMeetingViewModel by activityViewModels()
     private var chatId: Long? = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
     private var callBack: (() -> Unit)? = null
+    private var callBackLeaveMeeting: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,8 +76,17 @@ class EndMeetingBottomSheetDialogFragment : BottomSheetDialogFragment() {
      * Leave anyway listener, will leave meeting directly
      */
     private fun leaveAnyway() {
-        sharedViewModel.leaveMeeting()
-        requireActivity().finish()
+        dismiss()
+        callBackLeaveMeeting?.invoke()
+    }
+
+    /**
+     * Set the call back for clicking leave meeting option
+     *
+     * @param leaveMeetingModerator call back
+     */
+    fun setLeaveMeetingCallBack(leaveMeetingModerator: () -> Unit) {
+        callBackLeaveMeeting = leaveMeetingModerator
     }
 
     /**

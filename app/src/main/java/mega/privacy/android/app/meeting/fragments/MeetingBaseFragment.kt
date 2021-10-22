@@ -41,7 +41,7 @@ open class MeetingBaseFragment : BaseFragment() {
     protected val sharedModel: MeetingActivityViewModel by activityViewModels()
 
     // Indicate if permission has been requested. After requested, we should check "shouldShowRequestPermissionRationaleSnackBar"
-    private var bRequested = false;
+    private var bRequested = false
     private var bRefreshPermission = false
     protected var requestCode = 0
 
