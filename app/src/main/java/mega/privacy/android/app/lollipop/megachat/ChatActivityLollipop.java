@@ -91,6 +91,7 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.activities.GiphyPickerActivity;
+import mega.privacy.android.app.components.ChatManagement;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -203,6 +204,7 @@ import static mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON
 import static mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage.*;
 import static mega.privacy.android.app.lollipop.megachat.MapsActivity.*;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
+import static mega.privacy.android.app.providers.FileProviderActivity.FROM_MEGA_APP;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
@@ -3503,6 +3505,11 @@ public class ChatActivityLollipop extends PasscodeActivity
                 return;
             }
 
+            if (intent.getBooleanExtra(FROM_MEGA_APP, false)) {
+                nodeAttacher.handleSelectFileResult(intent, idChat, this, this);
+                return;
+            }
+
             intent.setAction(Intent.ACTION_GET_CONTENT);
 
             try {
@@ -4179,9 +4186,9 @@ public class ChatActivityLollipop extends PasscodeActivity
         disablePinScreen();
 
         Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent.putExtra(FROM_MEGA_APP, true);
         intent.setType("*/*");
 
         startActivityForResult(Intent.createChooser(intent, null), REQUEST_CODE_GET);
@@ -4907,7 +4914,7 @@ public class ChatActivityLollipop extends PasscodeActivity
         nodeSaver.saveNodes(nodes, false, false, false, true, true);
     }
 
-    public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messages, final MegaChatRoom chat){
+    public void showConfirmationDeleteMessages(final ArrayList<AndroidMegaChatMessage> messagesToDelete, final MegaChatRoom chat){
         logDebug("showConfirmationDeleteMessages");
 
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -4916,8 +4923,7 @@ public class ChatActivityLollipop extends PasscodeActivity
                 switch (which){
                     case DialogInterface.BUTTON_POSITIVE:
                         stopReproductions();
-                        ChatController cC = new ChatController(chatActivity);
-                        cC.deleteAndroidMessages(messages, chat);
+                        chatC.deleteAndroidMessages(messagesToDelete, chat);
                         break;
                     case DialogInterface.BUTTON_NEGATIVE:
                         //No button clicked
@@ -6327,7 +6333,6 @@ public class ChatActivityLollipop extends PasscodeActivity
     @Override
     public void onMessageUpdate(MegaChatApiJava api, MegaChatMessage msg) {
         logDebug("msgID " + msg.getMsgId());
-
         if (msg.isDeleted()) {
             if (adapter != null) {
                 adapter.stopPlaying(msg.getMsgId());
@@ -6396,6 +6401,11 @@ public class ChatActivityLollipop extends PasscodeActivity
                         dbH.removePendingMessageById(idMsg);
                     }
 
+                    if (MegaApplication.getChatManagement().isMsgToBeDelete(idMsg)) {
+                        logDebug("Message to be deleted");
+                        MegaApplication.getChatManagement().removeMsgToDelete(idMsg);
+                        chatC.deleteMessage(msg, idChat);
+                    }
                     return;
                 }
             }
@@ -7661,34 +7671,19 @@ public class ChatActivityLollipop extends PasscodeActivity
      * @param pMsg The pending message.
      */
     public void removePendingMsg(PendingMessageSingle pMsg) {
-        if (pMsg == null) {
-            logWarning("pMsg is null, cannot remove it");
-            return;
-        }
-
-        int pMsgState = pMsg.getState();
-
-        if (pMsgState == PendingMessageSingle.STATE_UPLOADING
-                && pMsg.getTransferTag() != INVALID_ID) {
-            megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
-        }
-
-        if (pMsgState == PendingMessageSingle.STATE_SENT) {
+        if (pMsg == null || pMsg.getState() == PendingMessageSingle.STATE_SENT) {
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_message_already_sent), MEGACHAT_INVALID_HANDLE);
             return;
         }
 
-        try {
-            dbH.removePendingMessageById(pMsg.getId());
-            int positionToRemove = selectedPosition == INVALID_POSITION
-                    ? findPendingMessagePosition(pMsg.getId())
-                    : selectedPosition;
-
-            messages.remove(positionToRemove);
-            adapter.removeMessage(positionToRemove, messages);
-        } catch (IndexOutOfBoundsException e) {
-            logError("EXCEPTION", e);
+        if ((pMsg.getState() == PendingMessageSingle.STATE_UPLOADING || pMsg.getState() == PendingMessageSingle.STATE_ATTACHING)
+                && pMsg.getTransferTag() != INVALID_ID) {
+            MegaApplication.getChatManagement().setPendingMessageToBeCancelled(pMsg.getTransferTag(), pMsg.getId());
+            megaApi.cancelTransferByTag(pMsg.getTransferTag(), this);
+            return;
         }
+
+        removePendingMessageFromDbHAndUI(pMsg.getId());
     }
 
     /**
@@ -8285,11 +8280,15 @@ public class ChatActivityLollipop extends PasscodeActivity
             }
         }
         else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
+            int tag = request.getTransferTag();
+            ChatManagement chatManagement = MegaApplication.getChatManagement();
+            long pMsgId = chatManagement.getPendingMsgIdToBeCancelled(tag);
+            chatManagement.removePendingMsgToBeCancelled(tag);
+
             if (e.getErrorCode() != MegaError.API_OK) {
-                logError("Error TYPE_CANCEL_TRANSFER: " + e.getErrorCode());
-            }
-            else{
-                logDebug("Chat upload cancelled");
+                chatManagement.addMsgToBeDelete(pMsgId);
+            } else {
+                removePendingMessageFromDbHAndUI(pMsgId);
             }
         }
         else if (request.getType() == MegaRequest.TYPE_SET_ATTR_USER){
@@ -8304,6 +8303,25 @@ public class ChatActivityLollipop extends PasscodeActivity
                     MegaApplication.setEnabledGeoLocation(false);
                 }
             }
+        }
+    }
+
+    /**
+     * Method for removing a penging message from the database and UI
+     *
+     * @param pendingId Pending message ID
+     */
+    private void removePendingMessageFromDbHAndUI(long pendingId) {
+        try {
+            dbH.removePendingMessageById(pendingId);
+            int positionToRemove = selectedPosition == INVALID_POSITION
+                    ? findPendingMessagePosition(pendingId)
+                    : selectedPosition;
+
+            messages.remove(positionToRemove);
+            adapter.removeMessage(positionToRemove, messages);
+        } catch (IndexOutOfBoundsException exception) {
+            logError("EXCEPTION", exception);
         }
     }
 

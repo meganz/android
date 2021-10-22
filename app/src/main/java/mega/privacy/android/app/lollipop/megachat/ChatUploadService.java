@@ -1452,6 +1452,7 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 					long nodeHandle = pendMsg.getNodeHandle();
 					MegaNode node = nodeList.get(0);
 					if(node.getHandle()==nodeHandle){
+						MegaApplication.getChatManagement().removeMsgToDelete(pendMsg.getId());
 						logDebug("The message MATCH!!");
 						dbH.updatePendingMessageOnAttach(pendMsg.getId(), -1+"", PendingMessageSingle.STATE_ERROR_ATTACHING);
 
