@@ -490,6 +490,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         logInfo("Database upgraded from " + oldVersion + " to " + newVersion);
 
+        boolean chatSettingsAlreadyUpdated = false;
+        boolean attributesAlreadyUpdated = false;
+        boolean preferencesAlreadyUpdated = false;
+
 		if (oldVersion <= 7){
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CAM_SYNC_CHARGING + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_CHARGING + " = '" + encrypt("false") + "';");
@@ -799,6 +803,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
 			onCreate(db);
 			setChatSettings(db, chatSettings);
+			chatSettingsAlreadyUpdated = true;
 		}
 
 		if (oldVersion <= 53) {
@@ -862,10 +867,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
 			onCreate(db);
 			setAttributes(db, attr);
+			attributesAlreadyUpdated = true;
 		}
 
 		if (oldVersion <= 62) {
-			if (oldVersion > 52) {
+			if (!chatSettingsAlreadyUpdated) {
 				ChatSettings chatSettings = getChatSettingsFromDBv62(db);
 				db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
 				onCreate(db);
@@ -876,9 +882,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
 			onCreate(db);
 			setPreferences(db, preferences);
+			preferencesAlreadyUpdated = true;
 		}
 
-		if (oldVersion <= 63) {
+		if (oldVersion <= 63 && !preferencesAlreadyUpdated) {
 			//KEY_PREFERRED_SORT_CONTACTS has been removed in DB v64, old 27 index
 			MegaPreferences preferences =  getPreferences(db);
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
