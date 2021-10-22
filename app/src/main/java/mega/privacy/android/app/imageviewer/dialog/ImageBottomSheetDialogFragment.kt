@@ -68,15 +68,12 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     ): View {
         binding = BottomSheetImageOptionsBinding.inflate(inflater, container, false)
         contentView = binding.root
-        mainLinearLayout = binding.layoutRoot
-        items_layout = binding.layoutItems
+        itemsLayout = binding.layoutItems
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.post { setBottomSheetBehavior(HEIGHT_HEADER_LARGE, true) }
-
         viewModel.getNode(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
         viewModel.getImage(imageNodeHandle).observe(viewLifecycleOwner) { imageItem ->
             binding.imgThumbnail.setImageURI(imageItem?.thumbnailUri)
@@ -214,7 +211,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionShare.isVisible = item.hasFullAccess && !item.isFromRubbishBin
             optionShare.setOnClickListener {
                 viewModel.shareNode(item.node.handle).observe(viewLifecycleOwner) { link ->
-                    MegaNodeUtil.startShareIntent(context, Intent(Intent.ACTION_SEND), link)
+                    MegaNodeUtil.startShareIntent(requireContext(), Intent(Intent.ACTION_SEND), link)
                     dismiss()
                 }
             }
