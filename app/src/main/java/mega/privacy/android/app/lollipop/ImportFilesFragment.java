@@ -118,12 +118,14 @@ public class ImportFilesFragment extends BaseFragment {
         int wrongNames = 0;
 
         for (String name : nameFiles.values()) {
-            if (name.trim().isEmpty()) {
-                emptyNames++;
-            }
+            if (name != null) {
+                if (name.trim().isEmpty()) {
+                    emptyNames++;
+                }
 
-            if (NODE_NAME_REGEX.matcher(name).find()) {
-                wrongNames++;
+                if (NODE_NAME_REGEX.matcher(name).find()) {
+                    wrongNames++;
+                }
             }
         }
 
