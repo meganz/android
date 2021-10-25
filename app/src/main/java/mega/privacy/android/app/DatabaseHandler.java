@@ -937,7 +937,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			MegaPreferences preferences = getPreferencesFromDBv62(db);
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
 			onCreate(db);
-			setPreferences(db, preferences);
+
+			if (preferences != null) {
+				setPreferences(db, preferences);
+			}
 		}
 	}
 
@@ -1641,14 +1644,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param db Current DB.
 	 * @return Preferences.
 	 */
-    private MegaPreferences getPreferencesFromDBv62(SQLiteDatabase db) {
+	private MegaPreferences getPreferencesFromDBv62(SQLiteDatabase db) {
 		logDebug("getPreferencesFromDBv62");
 		MegaPreferences preferences = getPreferences(db);
-		String uploadVideoQuality = preferences.getUploadVideoQuality();
 
-		if(!isTextEmpty(uploadVideoQuality)
-				&& Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_ORIGINAL) {
-			preferences.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_ORIGINAL));
+		if (preferences != null) {
+			String uploadVideoQuality = preferences.getUploadVideoQuality();
+
+			if (!isTextEmpty(uploadVideoQuality)
+					&& Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_ORIGINAL) {
+				preferences.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_ORIGINAL));
+			}
 		}
 
 		return preferences;
