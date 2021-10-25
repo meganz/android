@@ -42,8 +42,6 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.sync.cusync.CuSyncManager;
 import nz.mega.sdk.MegaNode;
 
-import static mega.privacy.android.app.MegaPreferences.MEDIUM;
-import static mega.privacy.android.app.MegaPreferences.ORIGINAL;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING_SUBTITLE;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.utils.CameraUploadUtil.*;
@@ -205,18 +203,18 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 int quality;
 
                 if (uploadQuality == null || uploadQuality.isEmpty()) {
-                    dbH.setCameraUploadVideoQuality(MEDIUM);
+                    dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
                     quality = VIDEO_QUALITY_MEDIUM;
-                } else if (Integer.parseInt(uploadQuality) == ORIGINAL) {
-                    quality = VIDEO_QUALITY_ORIGINAL;
                 } else {
-                    quality = VIDEO_QUALITY_MEDIUM;
+                    quality = Integer.parseInt(uploadQuality);
                 }
 
                 videoQuality.setValueIndex(quality);
                 videoQuality.setSummary(videoQuality.getEntry());
 
-                if (quality == VIDEO_QUALITY_MEDIUM) {
+                if (quality == VIDEO_QUALITY_ORIGINAL) {
+                    disableChargingSettings();
+                } else {
                     enableChargingSettings();
                     //convention on charging
                     if (prefs.getConversionOnCharging() == null) {
@@ -234,14 +232,10 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                     } else {
                         disableVideoCompressionSizeSettings();
                     }
-
-                } else {
-                    disableChargingSettings();
                 }
 
             } else {
                 hideVideoQualitySettingsSection();
-                dbH.setCameraUploadVideoQuality(ORIGINAL);
                 dbH.setConversionOnCharging(false);
                 dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
             }
@@ -709,8 +703,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
     }
 
     private void disableVideoQualitySettings() {
-        prefs.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_MEDIUM));
-        dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
         getPreferenceScreen().removePreference(videoQuality);
         disableChargingSettings();
     }
@@ -752,15 +744,6 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
         cameraUploadVideoQueueSize.setSummary(getResources().getString(R.string.label_file_size_mega_byte, String.valueOf(size)));
     }
 
-    private void resetVideoQualitySettings() {
-        dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
-        dbH.setConversionOnCharging(true);
-        dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE);
-        String chargingHelper = getResources().getString(R.string.settings_camera_upload_charging_helper_label,
-                getResources().getString(R.string.label_file_size_mega_byte, String.valueOf(DEFAULT_CONVENTION_QUEUE_SIZE)));
-        cameraUploadCharging.setSummary(chargingHelper);
-    }
-
     private void enableChargingSettings() {
         prefs = dbH.getPreferences();
         if (prefs.getConversionOnCharging() == null) {
@@ -788,11 +771,13 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
             dbH.setCameraUploadVideoQuality(VIDEO_QUALITY_MEDIUM);
             videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
             enableChargingSettings();
-        } else if (Integer.parseInt(uploadQuality) == MEDIUM) {
-            enableChargingSettings();
-            videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
-        } else if (Integer.parseInt(uploadQuality) == ORIGINAL) {
-            videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
+        } else {
+            int quality = Integer.parseInt(uploadQuality);
+            videoQuality.setValueIndex(quality);
+
+            if (quality != VIDEO_QUALITY_ORIGINAL) {
+                enableChargingSettings();
+            }
         }
 
         videoQuality.setSummary(videoQuality.getEntry());
@@ -831,7 +816,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                         fileUpload = getString(R.string.settings_camera_upload_only_photos);
                         cameraUploadWhat.setValueIndex(0);
                         setupRemoveGPS();
-                        resetVideoQualitySettings();
+                        dbH.setConversionOnCharging(true);
                         disableVideoQualitySettings();
                         break;
                     }
@@ -839,7 +824,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                         dbH.setCamSyncFileUpload(MegaPreferences.ONLY_VIDEOS);
                         fileUpload = getString(R.string.settings_camera_upload_only_videos);
                         cameraUploadWhat.setValueIndex(1);
-                        resetVideoQualitySettings();
+                        dbH.setConversionOnCharging(true);
                         enableVideoQualitySettings();
                         removeRemoveGPS();
                         break;
@@ -849,7 +834,7 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                         fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
                         cameraUploadWhat.setValueIndex(2);
                         setupRemoveGPS();
-                        resetVideoQualitySettings();
+                        dbH.setConversionOnCharging(true);
                         enableVideoQualitySettings();
                         break;
                     }
@@ -861,26 +846,17 @@ public class SettingsCameraUploadsFragment extends SettingsBaseFragment {
                 break;
 
             case KEY_CAMERA_UPLOAD_VIDEO_QUALITY:
-                switch (value) {
-                    case VIDEO_QUALITY_ORIGINAL: {
-                        dbH.setCameraUploadVideoQuality(ORIGINAL);
-                        prefs.setUploadVideoQuality(ORIGINAL + "");
-                        videoQuality.setValueIndex(VIDEO_QUALITY_ORIGINAL);
-                        disableChargingSettings();
-                        dbH.updateVideoState(SyncRecord.STATUS_PENDING);
-                        break;
-                    }
-                    case VIDEO_QUALITY_MEDIUM: {
-                        dbH.setCameraUploadVideoQuality(MEDIUM);
-                        prefs.setUploadVideoQuality(MEDIUM + "");
-                        videoQuality.setValueIndex(VIDEO_QUALITY_MEDIUM);
-                        resetVideoQualitySettings();
-                        enableChargingSettings();
-                        dbH.updateVideoState(SyncRecord.STATUS_TO_COMPRESS);
-                        break;
-                    }
-                    default:
-                        break;
+                dbH.setCameraUploadVideoQuality(value);
+                prefs.setUploadVideoQuality(value + "");
+                videoQuality.setValueIndex(value);
+
+                if (value == VIDEO_QUALITY_ORIGINAL) {
+                    disableChargingSettings();
+                    dbH.updateVideoState(SyncRecord.STATUS_PENDING);
+                } else {
+                    dbH.setConversionOnCharging(true);
+                    enableChargingSettings();
+                    dbH.updateVideoState(SyncRecord.STATUS_TO_COMPRESS);
                 }
 
                 videoQuality.setSummary(videoQuality.getEntry());

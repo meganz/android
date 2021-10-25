@@ -63,6 +63,7 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
@@ -108,6 +109,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	public static final int INVALID_TAB = -1;
 	public static final int CLOUD_TAB = 0;
 	public static final int INCOMING_TAB = 1;
+
+	public static final String FROM_MEGA_APP = "FROM_MEGA_APP";
 
 	private String lastEmail;
 	private String lastPassword;
@@ -874,8 +877,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
 
-	public void downloadAndAttachAfterClick(long size, long[] hashes) {
-		AlertDialog temp = null;
+	public void downloadAndAttachAfterClick(long hash) {
+		AlertDialog temp;
 		try {
 			temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
 			temp.show();
@@ -887,10 +890,22 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		progressTransfersFinish = 0;
 		clipDataTransfers = null;
 
-		downloadAndAttach(size, hashes);
+		downloadAndAttach(new long[]{hash});
 	}
 
-	public void downloadAndAttach(long size, long[] hashes) {
+	public void downloadAndAttach(long[] hashes) {
+		if (getIntent() != null && getIntent().getBooleanExtra(FROM_MEGA_APP, false)) {
+			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+
+			setResult(Activity.RESULT_OK, new Intent()
+					.setAction(Intent.ACTION_GET_CONTENT)
+					.putExtra(FROM_MEGA_APP, true)
+					.putExtra(NODE_HANDLES, hashes));
+
+			finish();
+
+			return;
+		}
 
 		logDebug("downloadAndAttach");
 
@@ -1092,7 +1107,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				for (int i = 0; i < totalHashes.size(); i++) {
 					hashes[i] = totalHashes.get(i);
 				}
-				downloadAndAttach(selectedNodes.size(), hashes);
+				downloadAndAttach(hashes);
 				break;
 			}
             case R.id.lost_authentication_device: {

@@ -213,7 +213,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	private static boolean isLoggingRunning = false;
 	private static boolean isWaitingForCall = false;
 	public static boolean isSpeakerOn = false;
-	private static boolean arePreferenceCookiesEnabled = false;
 	private static boolean areAdvertisingCookiesEnabled = false;
 	private static long userWaitingForCall = MEGACHAT_INVALID_HANDLE;
 
@@ -582,9 +581,17 @@ public class MegaApplication extends MultiDexApplication implements Application.
 					return;
 				}
 
-				if (callStatus == CALL_STATUS_USER_NO_PRESENT && isRinging) {
-					logDebug("Is incoming call");
-					incomingCall(listAllCalls, chatId, callStatus);
+				if (callStatus == CALL_STATUS_USER_NO_PRESENT) {
+					if (isRinging) {
+						logDebug("Is incoming call");
+						incomingCall(listAllCalls, chatId, callStatus);
+					} else {
+						MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+						if (chatRoom != null && chatRoom.isGroup()) {
+							logDebug("Check if the incoming group call notification should be displayed");
+							getChatManagement().checkActiveGroupChat(chatId);
+						}
+					}
 				}
 
 				if ((callStatus == MegaChatCall.CALL_STATUS_IN_PROGRESS || callStatus == MegaChatCall.CALL_STATUS_JOINING)) {
@@ -1001,7 +1008,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				.observeOn(AndroidSchedulers.mainThread())
 				.subscribe((cookies, throwable) -> {
 					if (throwable == null) {
-						setPreferenceCookiesEnabled(cookies.contains(CookieType.PREFERENCE));
 						setAdvertisingCookiesEnabled(cookies.contains(CookieType.ADVERTISEMENT));
 					}
 				});
@@ -1371,7 +1377,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		if ((item.hasChanged(MegaChatListItem.CHANGE_TYPE_OWN_PRIV))) {
 			if (item.getOwnPrivilege() != MegaChatRoom.PRIV_RM) {
-				getChatManagement().checkActiveGroupChat(item);
+				getChatManagement().checkActiveGroupChat(item.getChatId());
 			} else {
 				getChatManagement().removeActiveChatAndNotificationShown(item.getChatId());
 			}
@@ -1920,14 +1926,6 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 	public static PasscodeManagement getPasscodeManagement() {
 		return passcodeManagement;
-	}
-
-	public static boolean arePreferenceCookiesEnabled() {
-		return arePreferenceCookiesEnabled;
-	}
-
-	public static void setPreferenceCookiesEnabled(boolean enabled) {
-		arePreferenceCookiesEnabled = enabled;
 	}
 
 	public static boolean areAdvertisingCookiesEnabled() {

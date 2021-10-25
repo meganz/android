@@ -16,7 +16,6 @@ import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.individual_call_fragment.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.RoundedImageView
@@ -29,7 +28,7 @@ import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
+import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
@@ -41,6 +40,7 @@ import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaChatSession.SESSION_STATUS_IN_PROGRESS
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class IndividualCallFragment : BaseFragment() {
 
@@ -61,12 +61,11 @@ class IndividualCallFragment : BaseFragment() {
     private lateinit var avatarImageView: RoundedImageView
     private lateinit var onHoldImageView: ImageView
 
-    @ExperimentalCoroutinesApi
     private lateinit var inMeetingFragment: InMeetingFragment
 
     private lateinit var inMeetingViewModel: InMeetingViewModel
 
-    private var videoListener: MeetingVideoListener? = null
+    private var videoListener: IndividualCallVideoListener? = null
 
     private val remoteAVFlagsObserver = Observer<Pair<Long, MegaChatSession>> {
         val callId = it.first
@@ -144,7 +143,6 @@ class IndividualCallFragment : BaseFragment() {
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -214,17 +212,24 @@ class IndividualCallFragment : BaseFragment() {
             )
         }
 
-        binding.root.let {
-            rootLayout = it as ConstraintLayout
-            videoSurfaceView = it.video
-            avatarImageView = it.avatar
-            onHoldImageView = it.on_hold_icon
+        // The cast is essential here not repeated code.
+        if(binding is SelfFeedFloatingWindowFragmentBinding) {
+            rootLayout = binding.root
+            videoSurfaceView = binding.video
+            avatarImageView = binding.avatar
+            onHoldImageView = binding.onHoldIcon
+        }
+
+        if(binding is IndividualCallFragmentBinding) {
+            rootLayout = binding.root
+            videoSurfaceView = binding.video
+            avatarImageView = binding.avatar
+            onHoldImageView = binding.onHoldIcon
         }
 
         return binding.root
     }
 
-    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         inMeetingViewModel.getAvatarBitmap(peerId)?.let {
@@ -259,7 +264,7 @@ class IndividualCallFragment : BaseFragment() {
      */
     private fun addListener(clientId: Long) {
         if (videoListener == null) {
-            videoListener = MeetingVideoListener(
+            videoListener = IndividualCallVideoListener(
                 videoSurfaceView,
                 outMetrics,
                 clientId,
@@ -474,7 +479,7 @@ class IndividualCallFragment : BaseFragment() {
                     isOneToOneChat = false
                 }
 
-                videoListener = MeetingVideoListener(
+                videoListener = IndividualCallVideoListener(
                     videoSurfaceView,
                     outMetrics,
                     MEGACHAT_INVALID_HANDLE,
@@ -488,7 +493,7 @@ class IndividualCallFragment : BaseFragment() {
             }
             else -> {
                 logDebug("Video listener is null")
-                videoListener = MeetingVideoListener(
+                videoListener = IndividualCallVideoListener(
                     videoSurfaceView,
                     outMetrics,
                     clientId,
@@ -553,9 +558,16 @@ class IndividualCallFragment : BaseFragment() {
      * Change the layout when the orientation is changing
      */
     fun updateOrientation() {
-        if (!isFloatingWindow) return
+        logDebug("Orientation changed. Is floating window $isFloatingWindow")
 
-        logDebug("Orientation changed")
+        if (!isFloatingWindow){
+            videoListener?.let {
+                it.height = 0
+                it.width = 0
+            }
+            return
+        }
+
         val params = rootLayout.layoutParams
         if (getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
             params.width = Util.dp2px(88f, outMetrics)

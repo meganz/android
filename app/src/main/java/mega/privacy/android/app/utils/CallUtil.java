@@ -85,8 +85,7 @@ public class CallUtil {
      * @param link        Meeting's link
      */
     public static void openMeetingToJoin(Context context, long chatId, String meetingName, String link, long publicChatHandle, boolean isRejoin) {
-        logDebug("Open join a meeting screen:: chatId = "+chatId);
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open join a meeting screen. Chat id is " + chatId);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         if (isRejoin) {
@@ -108,8 +107,7 @@ public class CallUtil {
      * @param chatId      chat ID
      */
     public static void openMeetingToStart(Context context, long chatId) {
-        logDebug("Open join a meeting screen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open a call in progress. Chat id is " + chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_START);
         meetingIntent.putExtra(MEETING_CHAT_ID, chatId);
@@ -123,8 +121,7 @@ public class CallUtil {
      * @param chatId  chat ID
      */
     public static void openMeetingRinging(Context context, long chatId) {
-        logDebug("Open incoming call screen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open incoming call screen. Chat id is " + chatId);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -140,8 +137,7 @@ public class CallUtil {
      * @param chatId  chat ID
      */
     public static void openMeetingInProgress(Context context, long chatId, boolean isNewTask) {
-        logDebug("Open in progress call screen");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open in progress call screen. Chat id is " + chatId);
         if (isNewTask) {
             MegaApplication.getInstance().openCallService(chatId);
         }
@@ -167,8 +163,7 @@ public class CallUtil {
      * @param isVideoEnable it the video is ON
      */
     public static void openMeetingWithAudioOrVideo(Context context, long chatId, boolean isAudioEnable, boolean isVideoEnable) {
-        logDebug("Open call with audio or video");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open call with audio or video. Chat id is " + chatId);
         MegaApplication.getInstance().openCallService(chatId);
         Intent meetingIntent = new Intent(context, MeetingActivity.class);
         meetingIntent.setAction(MEETING_ACTION_IN);
@@ -188,8 +183,7 @@ public class CallUtil {
      * @param link        Meeting's link
      */
     public static void openMeetingGuestMode(Context context, String meetingName, long chatId, String link) {
-        logDebug("Open meeting in guest mode");
-        MegaApplication.getPasscodeManagement().setShowPasscodeScreen(false);
+        logDebug("Open meeting in guest mode. Chat id is " + chatId);
         MegaApplication.getChatManagement().setOpeningMeetingLink(chatId, true);
         MegaApplication.getInstance().setIsLoggingRunning(true);
 

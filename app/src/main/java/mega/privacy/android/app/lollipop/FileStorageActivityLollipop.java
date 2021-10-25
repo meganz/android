@@ -817,8 +817,7 @@ public class FileStorageActivityLollipop extends PasscodeActivity implements OnC
 				if (mode == Mode.PICK_FOLDER) {
 					boolean isCUOrMUFolder = pickFolderType.equals(PickFolderType.CU_FOLDER) || pickFolderType.equals(PickFolderType.MU_FOLDER);
 
-					if (!isCUOrMUFolder && (prefs == null || prefs.getStorageAskAlways() == null || Boolean.parseBoolean(prefs.getStorageAskAlways()))
-							&& dbH.getAskSetDownloadLocation()) {
+					if (!isCUOrMUFolder && dbH.getCredentials() != null && dbH.getAskSetDownloadLocation()) {
 						showConfirmationSaveInSameLocation();
 					} else {
 						finishPickFolder();

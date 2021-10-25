@@ -9,9 +9,7 @@ import android.content.DialogInterface
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
 import android.text.InputType
-import android.util.DisplayMetrics
 import android.util.TypedValue
-import android.view.Display
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
@@ -21,6 +19,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
@@ -28,7 +28,6 @@ import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.FragmentMeetingInfoBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.listenAction
-import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util.showSnackbar
@@ -36,9 +35,9 @@ import mega.privacy.android.app.utils.Util.showSnackbar
 /**
  * Fragment shows the basic information of meeting
  */
-class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
+@ExperimentalCoroutinesApi
+class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment(){
     private lateinit var binding: FragmentMeetingInfoBinding
-    @ExperimentalCoroutinesApi
     private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
     private val shareViewModel: MeetingActivityViewModel by activityViewModels()
     private var changeTitleDialog: AlertDialog? = null
@@ -53,7 +52,14 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
         dialog.setContentView(binding.root)
     }
 
-    @ExperimentalCoroutinesApi
+    override fun onStart() {
+        super.onStart()
+
+        val dialog = dialog ?: return
+        BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
+            BottomSheetBehavior.STATE_EXPANDED
+    }
+
     override fun onResume() {
         super.onResume()
         initView()
@@ -78,7 +84,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
             binding.moderatorName.text =
                 StringResourcesUtils.getString(
                     R.string.info_moderator_name,
-                    inMeetingViewModel.getModeratorNames(context, participants)
+                    inMeetingViewModel.getModeratorNames(requireActivity(), participants)
                 )
         }
 
@@ -144,6 +150,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
      * Show dialog for changing the meeting name, only for moderator
      */
     @ExperimentalCoroutinesApi
+    @Suppress("DEPRECATION")
     fun showRenameGroupDialog() {
         val activity = requireActivity()
         val layout = LinearLayout(requireActivity())
@@ -153,14 +160,10 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
 
-        val display: Display = requireActivity().windowManager.defaultDisplay
-        outMetrics = DisplayMetrics()
-        display.getMetrics(outMetrics)
-
         params.setMargins(
-            Util.scaleWidthPx(20, outMetrics),
-            Util.scaleHeightPx(16, outMetrics),
-            Util.scaleWidthPx(17, outMetrics),
+            Util.scaleWidthPx(20, resources.displayMetrics),
+            Util.scaleHeightPx(16, resources.displayMetrics),
+            Util.scaleWidthPx(17, resources.displayMetrics),
             0
         )
 
@@ -172,7 +175,7 @@ class MeetingInfoBottomSheetDialogFragment : BaseBottomSheetDialogFragment(){
         input.setSelectAllOnFocus(true)
         input.setTextColor(getThemeColor(requireActivity(), android.R.attr.textColorSecondary))
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-        input.setEmojiSize(Util.dp2px(Constants.EMOJI_SIZE.toFloat(), outMetrics))
+        input.setEmojiSize(Util.dp2px(Constants.EMOJI_SIZE.toFloat()))
         input.imeOptions = EditorInfo.IME_ACTION_DONE
         input.inputType = InputType.TYPE_CLASS_TEXT
         val maxAllowed = ChatUtil.getMaxAllowed(chatTitle)

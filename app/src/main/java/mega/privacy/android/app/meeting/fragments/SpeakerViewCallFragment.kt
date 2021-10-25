@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatSession
 
+@ExperimentalCoroutinesApi
 class SpeakerViewCallFragment : BaseFragment(),
     MegaSurfaceRenderer.MegaSurfaceRendererListener {
 
@@ -94,7 +95,6 @@ class SpeakerViewCallFragment : BaseFragment(),
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         inMeetingViewModel = (parentFragment as InMeetingFragment).inMeetingViewModel

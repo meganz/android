@@ -13,13 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_meeting.*
-import kotlinx.android.synthetic.main.meeting_component_onofffab.*
-import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
@@ -27,13 +21,16 @@ import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
-import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.permission.*
+import mega.privacy.android.app.utils.permission.PermissionRequest
+import mega.privacy.android.app.utils.permission.PermissionType
+import mega.privacy.android.app.utils.permission.PermissionsRequester
+import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
@@ -42,13 +39,15 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
  * E.g. Turn on/off mic/camera/speaker buttons, self video preview,
  * click the big bottom button to move forward, etc.
  */
+@ExperimentalCoroutinesApi
 abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
 
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
     protected lateinit var permissionsRequester: PermissionsRequester
     protected val sharedModel: MeetingActivityViewModel by activityViewModels()
 
-    private var videoListener: MeetingVideoListener? = null
+    private var videoListener: IndividualCallVideoListener? = null
+
     lateinit var meetingActivity: MeetingActivity
 
     protected var meetingName = ""
@@ -78,10 +77,10 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
         val visibleHeight = r.height()
 
         val avatarRect = Rect()
-        meeting_thumbnail.getGlobalVisibleRect(avatarRect)
+        binding.meetingThumbnail.getGlobalVisibleRect(avatarRect)
 
         val fabRect = Rect()
-        fab_cam.getGlobalVisibleRect(fabRect)
+        binding.onOffFab.fabCam.getGlobalVisibleRect(fabRect)
 
         if (mRootViewHeight == 0) {
             // save height of root view
@@ -162,9 +161,9 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
             ) + Util.dp2px(MEETING_NAME_MARGIN_TOP)
         )
 
-        meetingActivity.toolbar?.apply {
-            meetingActivity.title_toolbar?.text = meetingName
-            meetingActivity.subtitle_toolbar?.text = meetingLink
+        meetingActivity.binding.toolbar.apply {
+            meetingActivity.binding.titleToolbar.text = meetingName
+            meetingActivity.binding.subtitleToolbar.text = meetingLink
         }
     }
 
@@ -191,15 +190,15 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
     }
 
     private fun setMarginTopOfMeetingName(marginTop: Int) {
-        val menuLayoutParams = meeting_info.layoutParams as ViewGroup.MarginLayoutParams
+        val menuLayoutParams = binding.meetingInfo.layoutParams as ViewGroup.MarginLayoutParams
         menuLayoutParams.setMargins(0, marginTop, 0, 0)
-        meeting_info.layoutParams = menuLayoutParams
+        binding.meetingInfo.layoutParams = menuLayoutParams
     }
 
     protected fun setMarginBottomOfMeetingButton(marginBottom: Float) {
-        val layoutParams = btn_start_join_meeting.layoutParams as ConstraintLayout.LayoutParams
+        val layoutParams = binding.btnStartJoinMeeting.layoutParams as ConstraintLayout.LayoutParams
         layoutParams.bottomMargin = Util.dp2px(marginBottom)
-        btn_start_join_meeting.layoutParams = layoutParams
+        binding.btnStartJoinMeeting.layoutParams = layoutParams
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -249,7 +248,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
         sharedModel.let { model->
             model.apply {
                 micLiveData.observe(viewLifecycleOwner) {
-                    fab_mic.isOn = it
+                    binding.onOffFab.fabMic.isOn = it
                 }
                 cameraLiveData.observe(viewLifecycleOwner) {
                     switchCamera(it)
@@ -257,38 +256,38 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
                 speakerLiveData.observe(viewLifecycleOwner) {
                     when (it) {
                         AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> {
-                            fab_speaker.enable = true
-                            fab_speaker.isOn = true
-                            fab_speaker.setOnIcon(R.drawable.ic_speaker_on)
-                            fab_speaker_label.text =
+                            binding.onOffFab.fabSpeaker.enable = true
+                            binding.onOffFab.fabSpeaker.isOn = true
+                            binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                            binding.onOffFab.fabSpeakerLabel.text =
                                 StringResourcesUtils.getString(R.string.general_speaker)
                         }
                         AppRTCAudioManager.AudioDevice.EARPIECE -> {
-                            fab_speaker.enable = true
-                            fab_speaker.isOn = false
-                            fab_speaker.setOnIcon(R.drawable.ic_speaker_off)
-                            fab_speaker_label.text =
+                            binding.onOffFab.fabSpeaker.enable = true
+                            binding.onOffFab.fabSpeaker.isOn = false
+                            binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_speaker_off)
+                            binding.onOffFab.fabSpeakerLabel.text =
                                 StringResourcesUtils.getString(R.string.general_speaker)
                         }
                         AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
                         AppRTCAudioManager.AudioDevice.BLUETOOTH -> {
-                            fab_speaker.enable = true
-                            fab_speaker.isOn = true
-                            fab_speaker.setOnIcon(R.drawable.ic_headphone)
-                            fab_speaker_label.text =
+                            binding.onOffFab.fabSpeaker.enable = true
+                            binding.onOffFab.fabSpeaker.isOn = true
+                            binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
+                            binding.onOffFab.fabSpeakerLabel.text =
                                 StringResourcesUtils.getString(R.string.general_headphone)
                         }
                         else -> {
-                            fab_speaker.enable = false
-                            fab_speaker.isOn = true
-                            fab_speaker.setOnIcon(R.drawable.ic_speaker_on)
-                            fab_speaker_label.text =
+                            binding.onOffFab.fabSpeaker.enable = false
+                            binding.onOffFab.fabSpeaker.isOn = true
+                            binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
+                            binding.onOffFab.fabSpeakerLabel.text =
                                 StringResourcesUtils.getString(R.string.general_speaker)
                         }
                     }
                 }
                 tips.observe(viewLifecycleOwner) {
-                    showToast(fab_tip_location, it, Toast.LENGTH_SHORT)
+                    showToast(binding.fabTipLocation, it, Toast.LENGTH_SHORT)
                 }
                 notificationNetworkState.observe(viewLifecycleOwner) {
                     logDebug("Network state changed, Online :$it")
@@ -364,7 +363,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
         val warningText =
             StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
         (activity as BaseActivity).showSnackbar(
-            Constants.PERMISSIONS_TYPE,
+            PERMISSIONS_TYPE,
             binding.root,
             warningText
         )
@@ -422,7 +421,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
     open fun setProfileAvatar() {
         logDebug("setProfileAvatar")
         sharedModel.avatarLiveData.observe(viewLifecycleOwner) {
-            meeting_thumbnail.setImageBitmap(it)
+            binding.meetingThumbnail.setImageBitmap(it)
         }
     }
 
@@ -433,12 +432,12 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
      * @param shouldVideoBeEnabled True, If the video is to be enabled. False, otherwise
      */
     fun switchCamera(shouldVideoBeEnabled: Boolean) {
-        fab_cam.isOn = shouldVideoBeEnabled
-        setViewEnable(fab_cam, false)
+        binding.onOffFab.fabCam.isOn = shouldVideoBeEnabled
+        setViewEnable(binding.onOffFab.fabCam, false)
 
         if(shouldVideoBeEnabled){
             // Always try to start the video using the front camera
-            mask.visibility = View.VISIBLE
+            binding.mask.visibility = View.VISIBLE
             bCameraOpen = true
             sharedModel.setChatVideoInDevice(null)
 
@@ -446,7 +445,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
             triggerAvatar(View.GONE)
             activateVideo()
         }else{
-            mask.visibility = View.GONE
+            binding.mask.visibility = View.GONE
             bCameraOpen = false
 
             // Show avatar when camera close
@@ -466,20 +465,20 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
     private fun triggerAvatar(visibility: Int) {
         logDebug("triggerAvatar bCameraOpen: $bCameraOpen & bKeyBoardExtend: $bKeyBoardExtend")
         if (bCameraOpen) {
-            if (meeting_thumbnail.visibility == View.GONE)
+            if (binding.meetingThumbnail.visibility == View.GONE)
                 return
 
-            meeting_thumbnail.visibility = View.GONE
+            binding.meetingThumbnail.visibility = View.GONE
         } else if (!bKeyBoardExtend) {
-            if (meeting_thumbnail.visibility == View.VISIBLE)
+            if (binding.meetingThumbnail.visibility == View.VISIBLE)
                 return
 
-            meeting_thumbnail.visibility = View.VISIBLE
+            binding.meetingThumbnail.visibility = View.VISIBLE
         } else {
-            if (meeting_thumbnail.visibility == visibility)
+            if (binding.meetingThumbnail.visibility == visibility)
                 return
 
-            meeting_thumbnail.visibility = visibility
+            binding.meetingThumbnail.visibility = visibility
         }
     }
 
@@ -487,15 +486,15 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
      * Method for activating the video.
      */
     private fun activateVideo() {
-        if (localSurfaceView == null || localSurfaceView.visibility == View.VISIBLE) {
+        if (binding.localSurfaceView.visibility == View.VISIBLE) {
             logError("Error activating video")
-            setViewEnable(fab_cam, true)
+            setViewEnable(binding.onOffFab.fabCam, true)
             return
         }
 
         if (videoListener == null) {
-            videoListener = MeetingVideoListener(
-                localSurfaceView,
+            videoListener = IndividualCallVideoListener(
+                binding.localSurfaceView,
                 outMetrics,
                 MEGACHAT_INVALID_HANDLE,
                 isFloatingWindow = false,
@@ -510,8 +509,8 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
             }
         }
 
-        localSurfaceView.visibility = View.VISIBLE
-        setViewEnable(fab_cam, true, bSync = false)
+        binding.localSurfaceView.visibility = View.VISIBLE
+        setViewEnable(binding.onOffFab.fabCam, true, bSync = false)
     }
 
     /**
@@ -547,16 +546,16 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
      * Method for deactivating the video.
      */
     private fun deactivateVideo() {
-        if (localSurfaceView == null || videoListener == null || localSurfaceView.visibility == View.GONE) {
+        if (videoListener == null || binding.localSurfaceView.visibility == View.GONE) {
             logError("Error deactivating video")
-            setViewEnable(fab_cam, true)
+            setViewEnable(binding.onOffFab.fabCam, true)
             return
         }
 
         logDebug("Removing surface view")
-        localSurfaceView.visibility = View.GONE
+        binding.localSurfaceView.visibility = View.GONE
         removeChatVideoListener()
-        setViewEnable(fab_cam, true)
+        setViewEnable(binding.onOffFab.fabCam, true)
     }
 
     /**
