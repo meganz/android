@@ -2469,7 +2469,7 @@
         <item>منخفضة</item>
         <item>متوسطة</item>
         <item>عالية</item>
-        <item>الأصلي</item>
+        <item>الأصلية</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">مكالمة فائتة</string>

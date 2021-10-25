@@ -2229,7 +2229,7 @@
         <item>低い</item>
         <item>中</item>
         <item>高い</item>
-        <item>オリジナル</item>
+        <item>元の</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">不在着信</string>

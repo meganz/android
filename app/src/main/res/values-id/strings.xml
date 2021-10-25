@@ -1110,7 +1110,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Kembangkan cloud Anda.[A]Dapatkan peningkatan penyimpanan dan kuota transfer dengan akun Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Kunci Pemulihan akun MEGA telah disimpan ke: %1s.[A] Anda dapat menemukan file dengan Kunci Pemulihan anda di bagian Offline.[A]Catatan: karena file dengan Kunci Pemulihan anda akan dihapus saat anda logout, harap simpan di tempat yang aman di luar akun MEGA anda.</string>
+    <string name="toast_master_key">Kunci Pemulihan akun MEGA telah disimpan ke: %1s. [A]Anda dapat menemukan file dengan Kunci Pemulihan anda di bagian Disimpan untuk Offline.[/A]Catatan: karena file dengan Kunci Pemulihan anda akan dihapus saat anda keluar, harap simpan di tempat yang aman di luar akun MEGA anda .</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Alamat e-mail ini telah digunakan. Silakan gunakan alamat email lain.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -3376,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Akun anda telah dikunci sementara untuk keselamatan anda.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Harap verifikasi alamat email anda[/A] dan ikuti langkah-langkah  dalam email MEGA untuk membuka kunci akun anda.</string>
+    <string name="verify_email_and_follow_steps">Silakan ikuti langkah-langkah di [A]email verifikasi[/A]untuk membuka kunci akun anda .</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Mengapa saya melihat ini?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3634,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Pilih transfer</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Perubahan prioritas transfer ”%1$s” gagal.</string>
+    <string name="change_of_transfer_priority_failed">Tidak dapat mengubah prioritas transfer “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Kirim kunci dekripsi secara terpisah</string>
     <!-- Explanation option to send separated the link and decryption key -->
