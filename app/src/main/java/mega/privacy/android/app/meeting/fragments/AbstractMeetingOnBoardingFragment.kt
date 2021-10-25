@@ -3,13 +3,16 @@ package mega.privacy.android.app.meeting.fragments
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_meeting.*
 import kotlinx.android.synthetic.main.meeting_component_onofffab.*
 import kotlinx.android.synthetic.main.meeting_on_boarding_fragment.*
@@ -21,14 +24,16 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
+import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.permission.permissionsBuilder
+import mega.privacy.android.app.utils.permission.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
@@ -37,10 +42,14 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
  * E.g. Turn on/off mic/camera/speaker buttons, self video preview,
  * click the big bottom button to move forward, etc.
  */
-abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
+abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
 
     protected lateinit var binding: MeetingOnBoardingFragmentBinding
+    protected lateinit var permissionsRequester: PermissionsRequester
+    protected val sharedModel: MeetingActivityViewModel by activityViewModels()
+
     private var videoListener: MeetingVideoListener? = null
+    lateinit var meetingActivity: MeetingActivity
 
     protected var meetingName = ""
     protected var chatId: Long = MEGACHAT_INVALID_HANDLE
@@ -51,9 +60,15 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     var mRootViewHeight: Int = 0
     protected var toast: Toast? = null
 
-    protected var bCameraOpen = false
-    protected var bKeyBoardExtend = false
+    private var bCameraOpen = false
+    private var bKeyBoardExtend = false
     private var preFabTop = 0
+
+    // Default permission array for meeting
+    protected val permissions = arrayOf(
+        Manifest.permission.CAMERA,
+        Manifest.permission.RECORD_AUDIO
+    )
 
     // Soft keyboard open and close listener
     private var keyboardLayoutListener: OnGlobalLayoutListener? = OnGlobalLayoutListener {
@@ -92,6 +107,11 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
             preFabTop = fabRect.top
             return@OnGlobalLayoutListener
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        meetingActivity = activity as MeetingActivity
     }
 
     override fun onAttach(context: Context) {
@@ -152,6 +172,16 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         super.onResume()
         logDebug("addOnGlobalLayoutListener: keyboardLayoutListener")
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(keyboardLayoutListener)
+
+        // Use A New Instance to Check Permissions
+        // Do not share the instance with other permission check process, because the callback functions are different.
+        permissionsBuilder(permissions.toCollection(ArrayList()))
+            .setPermissionRequestType(PermissionType.CheckPermission)
+            .setOnRequiresPermission { l ->
+                onCheckRequiresPermission(l)
+            }.setOnPermissionDenied { l ->
+                onCheckPermissionDenied(l)
+            }.build().launch(false)
     }
 
     override fun onPause() {
@@ -328,7 +358,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     }
 
     /**
-     * Notify the client to manually open the permission in system setting, This only needed when bRequested is true
+     * Notify the client to manually open the permission in system setting.
      */
     protected fun showSnackBar() {
         val warningText =
@@ -555,5 +585,197 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     fun initRTCAudioManager() {
         sharedModel.initRTCAudioManager()
+    }
+
+    /**
+     * Callback function for granting permissions
+     *
+     * @param permissions permission list
+     */
+    private fun onCheckRequiresPermission(permissions: ArrayList<String>) {
+        permissions.forEach {
+            logDebug("user check the permissions: $it")
+            when (it) {
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(true)
+                }
+                Manifest.permission.RECORD_AUDIO -> {
+                    sharedModel.setRecordAudioPermission(true)
+                }
+            }
+        }
+    }
+
+    /**
+     * Callback function for denying permissions
+     *
+     * @param permissions permission list
+     */
+    private fun onCheckPermissionDenied(permissions: ArrayList<String>) {
+        permissions.forEach {
+            logDebug("user denies the permissions: $it")
+            when (it) {
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(false)
+                }
+                Manifest.permission.RECORD_AUDIO -> {
+                    sharedModel.setRecordAudioPermission(false)
+                }
+            }
+        }
+    }
+
+    /**
+     * Callback function for granting permissions for sub class
+     *
+     * @param permissions permission list
+     */
+    protected open fun onRequiresPermission(permissions: ArrayList<String>) {
+        permissions.forEach {
+            logDebug("user requires the permissions: $it")
+            when (it) {
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(true)
+                }
+                Manifest.permission.RECORD_AUDIO -> {
+                    sharedModel.setRecordAudioPermission(true)
+                }
+            }
+        }
+    }
+
+    /**
+     * Check the condition of display of permission education dialog
+     * Then continue permission check without education dialog
+     */
+    private fun showPermissionsEducation() {
+        val sp = app.getSharedPreferences(MEETINGS_PREFERENCE, Context.MODE_PRIVATE)
+        val showEducation = sp.getBoolean(KEY_SHOW_EDUCATION, true)
+        if (showEducation) {
+            sp.edit()
+                .putBoolean(KEY_SHOW_EDUCATION, false).apply()
+            showPermissionsEducation(requireActivity()) { permissionsRequester.launch(false) }
+        } else {
+            permissionsRequester.launch(false)
+        }
+    }
+
+    /**
+     * Process when the user denies the permissions
+     *
+     * @param permissions permission list
+     */
+    protected open fun onPermissionDenied(permissions: ArrayList<String>) {
+        permissions.forEach {
+            logDebug("user denies the permissions: $it")
+            when (it) {
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(false)
+                }
+                Manifest.permission.RECORD_AUDIO -> {
+                    sharedModel.setRecordAudioPermission(false)
+                }
+            }
+        }
+    }
+
+    /**
+     * Callback function that allow for continuation or cancellation of a permission request..
+     *
+     * @param request allow for continuation or cancellation of a permission request.
+     */
+    private fun onShowRationale(request: PermissionRequest) {
+        request.proceed()
+    }
+
+    /**
+     * Callback function that will be called when the user denies the permissions and tickets "Never Ask Again" after calls requestPermissions()
+     *
+     * @param permissions permission list
+     */
+    private fun onNeverAskAgain(permissions: ArrayList<String>) {
+        permissions.forEach {
+            logDebug("user denies and never ask for the permissions: $it")
+            when (it) {
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(false)
+                }
+                Manifest.permission.RECORD_AUDIO -> {
+                    sharedModel.setRecordAudioPermission(false)
+                }
+            }
+        }
+    }
+
+    /**
+     * Callback function that user requires the Audio permissions
+     *
+     * @param permissions permission list
+     */
+    private fun onRequiresAudioPermission(permissions: ArrayList<String>) {
+        if (permissions.contains(Manifest.permission.RECORD_AUDIO)) {
+            logDebug("user requires the Audio permissions")
+            sharedModel.setRecordAudioPermission(true)
+        }
+    }
+
+    /**
+     * Callback function that user requires the Camera permissions
+     *
+     * @param permissions permission list
+     */
+    private fun onRequiresCameraPermission(permissions: ArrayList<String>) {
+        if (permissions.contains(Manifest.permission.CAMERA)) {
+            logDebug("user requires the Camera permissions")
+            sharedModel.setRecordAudioPermission(true)
+        }
+    }
+
+    /**
+     * Shows a permission education.
+     * It will be displayed at the beginning of meeting activity.
+     *
+     * @param context current Context.
+     * @param checkPermission a callback for check permissions
+     */
+    private fun showPermissionsEducation(context: Context, checkPermission: () -> Unit) {
+
+        val permissionsWarningDialogBuilder =
+            MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+
+        permissionsWarningDialogBuilder.setTitle(StringResourcesUtils.getString(R.string.meeting_permission_info))
+            .setMessage(StringResourcesUtils.getString(R.string.meeting_permission_info_message))
+            .setCancelable(false)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.button_permission_info)) { dialog, _ ->
+                run {
+                    dialog.dismiss()
+                    checkPermission()
+                }
+            }
+
+        permissionsWarningDialogBuilder.show()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        logDebug("onRequestPermissionsResult")
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        var i = 0
+        while (i < grantResults.size) {
+            val bPermission = grantResults[i] == PackageManager.PERMISSION_GRANTED
+            when (permissions[i]) {
+                Manifest.permission.CAMERA -> {
+                    sharedModel.setCameraPermission(bPermission)
+                }
+                Manifest.permission.RECORD_AUDIO -> {
+                    sharedModel.setRecordAudioPermission(bPermission)
+                }
+            }
+            i++
+        }
     }
 }

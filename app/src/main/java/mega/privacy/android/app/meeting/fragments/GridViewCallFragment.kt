@@ -9,13 +9,16 @@ import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
+import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.adapter.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatSession
 
-class GridViewCallFragment : MeetingBaseFragment() {
+class GridViewCallFragment : BaseFragment() {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
+    lateinit var meetingActivity: MeetingActivity
 
     private var maxWidth = 0
     private var maxHeight = 0
@@ -41,6 +44,11 @@ class GridViewCallFragment : MeetingBaseFragment() {
             viewPagerData = newData
             updateVisibleParticipantsGrid(newData)
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        meetingActivity = activity as MeetingActivity
     }
 
     override fun onCreateView(

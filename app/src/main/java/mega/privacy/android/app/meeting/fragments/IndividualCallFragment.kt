@@ -11,6 +11,7 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -26,6 +27,8 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AVFLAGS_CH
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.databinding.IndividualCallFragmentBinding
 import mega.privacy.android.app.databinding.SelfFeedFloatingWindowFragmentBinding
+import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.listeners.MeetingVideoListener
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LogUtil.logDebug
@@ -39,7 +42,9 @@ import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaChatSession.SESSION_STATUS_IN_PROGRESS
 
 @AndroidEntryPoint
-class IndividualCallFragment : MeetingBaseFragment() {
+class IndividualCallFragment : BaseFragment() {
+
+    private val sharedModel: MeetingActivityViewModel by activityViewModels()
 
     private var chatId: Long = MEGACHAT_INVALID_HANDLE
     private var peerId: Long = MEGACHAT_INVALID_HANDLE
