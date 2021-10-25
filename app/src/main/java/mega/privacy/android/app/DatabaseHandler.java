@@ -932,6 +932,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
 				onCreate(db);
 				setChatSettings(db, chatSettings);
+
+				// Temporary fix to avoid wrong values in chat settings after upgrade.
+				getChatSettings(db);
 			}
 
 			MegaPreferences preferences = getPreferencesFromDBv62(db);
@@ -1814,7 +1817,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * Get chat settings from the current DB.
 	 * @return Chat settings.
 	 */
-	public ChatSettings getChatSettings(){
+	public ChatSettings getChatSettings() {
+		return getChatSettings(db);
+	}
+
+	/**
+	 * Get chat settings from the current DB.
+	 *
+	 * @param db Current DB.
+	 * @return Chat settings.
+	 */
+	private ChatSettings getChatSettings(SQLiteDatabase db) {
 		logDebug("getChatSettings");
 		ChatSettings chatSettings = null;
 
