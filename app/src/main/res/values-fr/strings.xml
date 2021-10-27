@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro&#160;Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Visualiseur de PDF MEGA</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">de</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Oui</string>
     <!-- Answer for confirmation dialog. -->
@@ -1224,7 +1222,7 @@
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">En attente de la confirmation par courriel</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
-    <string name="confirm_email_explanation">Veuillez vérifier vos courriels et toucher sur le lien pour confirmer votre compte.</string>
+    <string name="confirm_email_explanation">Veuillez vérifier vos courriels et toucher le lien pour confirmer votre compte.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="one">1 élément</item>
@@ -1237,7 +1235,7 @@
     <!-- Title of the label in the my account section. It shows the credentials of the current user so it can be used to be verified by other contacts -->
     <string name="my_account_my_credentials">Mon numéro d’identification</string>
     <!-- Word to indicate the limited bandwidth of the free accounts -->
-    <string name="limited_bandwith">Limité</string>
+    <string name="limited_bandwith">Limitée</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Dialogue en ligne</string>
     <!-- Item of the navigation title for the chat section when there is any unread message -->
@@ -1773,7 +1771,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">L’utilisateur n’est pas un contact</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Utiliser les données cellulaires</string>
+    <string name="camera_uploads_cellular_connection">Utiliser les données mobiles</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Téléverser les vidéos</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -2274,10 +2272,12 @@
     <string name="settings_video_upload_quality">Qualité des vidéos</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Les téléversements de l’appareil photo doivent accéder à vos photos et autres médias sur votre appareil. Veuillez vous rendre dans les paramètres et accorder l’autorisation.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Qualité originale</item>
-        <item>Qualité moyenne</item>
+        <item>Basse</item>
+        <item>Moyenne</item>
+        <item>Haute</item>
+        <item>Originale</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Un appel a été manqué</string>
@@ -3453,7 +3453,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Votre compte a temporairement été verrouillé pour votre sécurité.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Veuillez confirmer votre adresse courriel[/A] et suivre les étapes du courriel de MEGA afin de déverrouiller votre compte.</string>
+    <string name="verify_email_and_follow_steps">Veuillez suivre les étapes du [A]courriel de confirmation[/A] afin de déverrouiller votre compte.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Pourquoi vois-je ceci ?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3651,7 +3651,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Ce message a atteint la limite maximale de %d réactions.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] a changé la durée avant effacement du message à[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] a changé la durée avant effacement du message à [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Effacer l’historique de la conversation</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3720,7 +3720,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Sélectionner des transferts</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Échec de changement de priorité du transfert «&#160;%1$s&#160;».</string>
+    <string name="change_of_transfer_priority_failed">Impossible de changer la priorité du transfert «&#160;%1$s&#160;»</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Envoyer la clé de déchiffrement séparément</string>
     <!-- Explanation option to send separated the link and decryption key -->
