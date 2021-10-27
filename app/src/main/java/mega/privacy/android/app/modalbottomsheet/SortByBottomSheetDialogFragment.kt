@@ -91,7 +91,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.sortByLargestSize.isVisible = false
                 binding.sortBySmallestSize.isVisible = false
                 binding.sortBySizeSeparator.isVisible = false
-                binding.sortByDateSeparator.isVisible = true
+                binding.sortByFavoritesType.isVisible = false
+                binding.sortByLabelType.isVisible = false
                 binding.sortByPhotosMediaType.isVisible = true
                 binding.sortByVideosMediaType.isVisible = true
             }
@@ -102,7 +103,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.sortBySizeSeparator.isVisible = false
                 binding.sortByNewestDate.isVisible = false
                 binding.sortByOldestDate.isVisible = false
-                binding.sortByDateSeparator.isVisible = false
             }
         }
 
@@ -115,6 +115,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             ORDER_MODIFICATION_ASC -> setSelectedColor(binding.sortByOldestDate)
             ORDER_SIZE_DESC -> setSelectedColor(binding.sortByLargestSize)
             ORDER_SIZE_ASC -> setSelectedColor(binding.sortBySmallestSize)
+            ORDER_FAV_ASC -> setSelectedColor(binding.sortByFavoritesType)
+            ORDER_LABEL_ASC -> setSelectedColor(binding.sortByLabelType)
             ORDER_PHOTO_DESC -> setSelectedColor(binding.sortByPhotosMediaType)
             ORDER_VIDEO_DESC -> setSelectedColor(binding.sortByVideosMediaType)
         }
@@ -141,6 +143,14 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         binding.sortBySmallestSize.setOnClickListener {
             setNewOrder(ORDER_SIZE_ASC)
+        }
+
+        binding.sortByFavoritesType.setOnClickListener {
+            setNewOrder(ORDER_FAV_ASC)
+        }
+
+        binding.sortByLabelType.setOnClickListener {
+            setNewOrder(ORDER_LABEL_ASC)
         }
 
         binding.sortByPhotosMediaType.setOnClickListener {
