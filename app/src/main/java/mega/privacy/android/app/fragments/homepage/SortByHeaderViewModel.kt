@@ -79,7 +79,9 @@ class SortByHeaderViewModel @ViewModelInject constructor(
             ORDER_MODIFICATION_ASC to R.string.sortby_date,
             ORDER_MODIFICATION_DESC to R.string.sortby_date,
             ORDER_SIZE_ASC to R.string.sortby_size,
-            ORDER_SIZE_DESC to R.string.sortby_size
+            ORDER_SIZE_DESC to R.string.sortby_size,
+            ORDER_FAV_ASC to R.string.file_properties_favourite,
+            ORDER_LABEL_ASC to R.string.title_label
         )
     }
 }
