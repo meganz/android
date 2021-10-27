@@ -799,10 +799,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if (oldVersion <= 52) {
-			ChatSettings chatSettings = getChatSettingsFromDBv52(db);
-			db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
-			onCreate(db);
-			setChatSettings(db, chatSettings);
+			recreateChatSettings(db, getChatSettingsFromDBv52(db));
 			chatSettingsAlreadyUpdated = true;
 		}
 
@@ -863,44 +860,84 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 
 		if (oldVersion <= 61) {
-			MegaAttributes attr = getAttributesFromDBv61(db);
-			db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
-			onCreate(db);
-			setAttributes(db, attr);
+			recreateAttributes(db, getAttributesFromDBv61(db));
 			attributesAlreadyUpdated = true;
 		}
 
 		if (oldVersion <= 62) {
 			if (!chatSettingsAlreadyUpdated) {
-				ChatSettings chatSettings = getChatSettingsFromDBv62(db);
-				db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
-				onCreate(db);
-				setChatSettings(db, chatSettings);
-
-				// Temporary fix to avoid wrong values in chat settings after upgrade.
-				getChatSettings(db);
+				recreateChatSettings(db, getChatSettingsFromDBv62(db));
+				chatSettingsAlreadyUpdated = true;
 			}
 
-			MegaPreferences preferences = getPreferencesFromDBv62(db);
-			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
-			onCreate(db);
-
-			if (preferences != null) {
-				setPreferences(db, preferences);
-			}
-			
+			recreatePreferences(db, getPreferencesFromDBv62(db));
 			preferencesAlreadyUpdated = true;
 		}
 
 		if (oldVersion <= 63 && !preferencesAlreadyUpdated) {
 			//KEY_PREFERRED_SORT_CONTACTS has been removed in DB v64, old 27 index
-			MegaPreferences preferences =  getPreferences(db);
-			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
-			onCreate(db);
-			setPreferences(db, preferences);
+			recreatePreferences(db, getPreferences(db));
+			preferencesAlreadyUpdated = true;
 		}
 
 		this.db = db;
+	}
+
+	/**
+	 * Drops the chat settings table if exists, creates the new one,
+	 * and then sets the updated chat settings.
+	 *
+	 * @param db			Current DB.
+	 * @param chatSettings	Chat Settings.
+	 */
+	private void recreateChatSettings(SQLiteDatabase db, ChatSettings chatSettings) {
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
+		onCreate(db);
+
+		if (chatSettings != null) {
+			setChatSettings(db, chatSettings);
+		}
+
+		// Temporary fix to avoid wrong values in chat settings after upgrade.
+		getChatSettings(db);
+	}
+
+	/**
+	 * Drops the attributes table if exists, creates the new one,
+	 * and then sets the updated attributes.
+	 *
+	 * @param db	Current DB.
+	 * @param attr	Attributes.
+	 */
+	private void recreateAttributes(SQLiteDatabase db, MegaAttributes attr) {
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
+		onCreate(db);
+
+		if (attr != null) {
+			setAttributes(db, attr);
+		}
+
+		// Temporary fix to avoid wrong values in attributes after upgrade.
+		getAttributes(db);
+	}
+
+	/**
+	 * Drops the preferences table if exists, creates the new one,
+	 * and then sets the updated preferences.
+	 *
+	 * @param db			Current DB.
+	 * @param preferences	Preferences.
+	 */
+	private void recreatePreferences(SQLiteDatabase db, MegaPreferences preferences) {
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
+		onCreate(db);
+
+		if (preferences != null) {
+			setPreferences(db, preferences);
+		}
+
+		// Temporary fix to avoid wrong values in preferences after upgrade.
+		getPreferences(db);
 	}
 
 	public static String encrypt(String original) {
@@ -2261,7 +2298,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return attr;
 	}
 
-	public MegaAttributes getAttributes(){
+	/**
+	 * Gets attributes.
+	 *
+	 * @param db	Current DB.
+	 * @return The attributes.
+	 */
+	private MegaAttributes getAttributes(SQLiteDatabase db) {
 		MegaAttributes attr = null;
 
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
@@ -2302,7 +2345,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		} catch (Exception e) {
 			logError("Exception opening or managing DB cursor", e);
 		}
+
 		return attr;
+	}
+
+	/**
+	 * Gets attributes.
+	 *
+	 * @return The attributes.
+	 */
+	public MegaAttributes getAttributes() {
+		return getAttributes(db);
 	}
 
 	public int setNonContactFirstName (String name, String handle){
