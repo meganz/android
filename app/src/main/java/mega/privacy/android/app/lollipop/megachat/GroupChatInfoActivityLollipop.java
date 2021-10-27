@@ -88,6 +88,7 @@ import static mega.privacy.android.app.utils.CallUtil.*;
 import static mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
 import static mega.privacy.android.app.utils.ChatUtil.*;
+import static mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -249,7 +250,11 @@ public class GroupChatInfoActivityLollipop extends PasscodeActivity
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
-                    changeViewElevation(aB, recyclerView.canScrollVertically(-1), getOutMetrics());
+                    boolean withElevation = recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION);
+
+                    changeViewElevation(aB, withElevation, getOutMetrics());
+                    changeStatusBarColorForElevation(groupChatInfoActivity, withElevation);
+
                     if (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) {
                         checkIfShouldAskForUsersAttributes(RecyclerView.SCROLL_STATE_IDLE);
                     }

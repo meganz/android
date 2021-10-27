@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF 뷰어</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">개째 진행중. 전체:</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">예</string>
     <!-- Answer for confirmation dialog. -->
@@ -1112,7 +1110,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">클라우드를 키우세요.[A]Pro 계정으로 증가된 저장소와 전송 할당량을 받으세요.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">MEGA 계정 복구 키는 다음에 저장되었습니다: %1s.[A]오프라인 섹션에서 복구 키 파일을 찾을 수 있습니다.[A]참고: 로그아웃 하면 복구 키가 담긴 파일이 삭제되니, MEGA 계정 밖의 안전한 곳에 보관하세요.</string>
+    <string name="toast_master_key">MEGA 계정 복구 키는 다음에 저장되었습니다: %1s.[A]오프라인용으로 저장됨 섹션에서 복구 키 파일을 찾을 수 있습니다.[/A] 참고: 로그아웃 하면 복구 키가 담긴 파일이 삭제되니, MEGA 계정 밖의 안전한 곳에 보관하세요.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">이 이메일 주소는 이미 사용 중입니다. 다른 이메일 주소를 사용하세요.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -2226,10 +2224,12 @@
     <string name="settings_video_upload_quality">동영상 품질</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">카메라 업로드는 당신의 기기의 사진과 다른 미디어에 대한 접근을 필요로 합니다. 설정 페이지에 가서 권한을 부여해주세요.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>원본 품질</item>
-        <item>중간 품질</item>
+        <item>낮음</item>
+        <item>중간</item>
+        <item>높음</item>
+        <item>원본</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">부재중 전화</string>
@@ -3376,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">당신의 안전을 위해 계정을 일시적으로 잠갔습니다.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">계정을 잠금 해제하려면 [A]이메일을 인증[/A]하고 절차를 수행하세요.</string>
+    <string name="verify_email_and_follow_steps">계정을 잠금 해제하려면 [A]인증 메일[/A]의 절차를 따라주세요.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">이게 왜 보여지나요?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3634,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">전송 선택</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">전송 ‘%1$s’의 우선 순위 변경을 실패하였습니다.</string>
+    <string name="change_of_transfer_priority_failed">전송 ”%1$s”의 우선순위를 바꿀 수 없습니다</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">복호화 키 따로 보내기</string>
     <!-- Explanation option to send separated the link and decryption key -->
