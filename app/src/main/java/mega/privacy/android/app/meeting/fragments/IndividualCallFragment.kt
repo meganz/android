@@ -37,6 +37,7 @@ import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaChatSession.SESSION_STATUS_IN_PROGRESS
 
+@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class IndividualCallFragment : MeetingBaseFragment() {
 
@@ -55,7 +56,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private lateinit var avatarImageView: RoundedImageView
     private lateinit var onHoldImageView: ImageView
 
-    @ExperimentalCoroutinesApi
     private lateinit var inMeetingFragment: InMeetingFragment
 
     private lateinit var inMeetingViewModel: InMeetingViewModel
@@ -138,7 +138,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -226,7 +225,6 @@ class IndividualCallFragment : MeetingBaseFragment() {
         return binding.root
     }
 
-    @ExperimentalCoroutinesApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         inMeetingViewModel.getAvatarBitmap(peerId)?.let {
