@@ -774,8 +774,8 @@ public class ChatUploadService extends Service implements MegaTransferListenerIn
 			int videosCompressed = getVideosCompressed();
 
 			if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-				message = StringResourcesUtils.getString(R.string.upload_service_notification,
-						inProgress, totalUploads) + " " + StringResourcesUtils.getString(R.string.operation_status_pause);
+				message = StringResourcesUtils.getString(R.string.upload_service_notification_paused,
+						inProgress, totalUploads);
 			} else if (thereAreChatUploads() || videosCompressed == mapVideoDownsampling.size()) {
 				message = StringResourcesUtils.getString(R.string.upload_service_notification, inProgress, totalUploads);
 			} else {

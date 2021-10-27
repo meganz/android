@@ -1918,8 +1918,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
                     .putExtra(PENDING_TRANSFERS, pendingTransfers));
 
             if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                message = StringResourcesUtils.getString(R.string.upload_service_notification, inProgress, totalTransfers) + " "
-                    + StringResourcesUtils.getString(R.string.operation_status_pause);
+                message = StringResourcesUtils.getString(R.string.upload_service_notification_paused, inProgress, totalTransfers);
             } else {
                 message = StringResourcesUtils.getString(R.string.upload_service_notification, inProgress, totalTransfers);
             }

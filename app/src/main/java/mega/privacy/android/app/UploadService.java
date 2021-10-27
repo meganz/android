@@ -727,16 +727,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
             if (isFolderUpload) {
                 filesProgress = totalFolderUploadsCompleted + 1 > totalFolderUploads ? totalFolderUploads : totalFolderUploadsCompleted + 1;
                 if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                    message = StringResourcesUtils.getString(R.string.folder_upload_service_notification, filesProgress, totalFolderUploads) + " "
-                            + StringResourcesUtils.getString(R.string.operation_status_pause);
+                    message = StringResourcesUtils.getString(R.string.folder_upload_service_notification_paused, filesProgress, totalFolderUploads);
                 } else {
                     message = StringResourcesUtils.getString(R.string.folder_upload_service_notification, filesProgress, totalFolderUploads);
                 }
             } else {
                 filesProgress = totalFileUploadsCompleted + 1 > totalFileUploads ? totalFileUploads : totalFileUploadsCompleted + 1;
                 if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                    message = StringResourcesUtils.getString(R.string.upload_service_notification, filesProgress, totalFileUploads) + " "
-                            + StringResourcesUtils.getString(R.string.operation_status_pause);
+                    message = StringResourcesUtils.getString(R.string.upload_service_notification_paused, filesProgress, totalFileUploads);
                 } else {
                     message = StringResourcesUtils.getString(R.string.upload_service_notification, filesProgress, totalFileUploads);
                 }
