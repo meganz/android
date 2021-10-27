@@ -13,21 +13,26 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.StrictMode;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Config;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.provider.FontRequest;
@@ -747,6 +752,9 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		checkAppUpgrade();
 		checkMegaStandbyBucket();
 		getTombstoneInfo();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			checkForUnsafeIntentLaunch();
+		}
 
 		setupMegaApi();
 		setupMegaApiFolder();
@@ -792,7 +800,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 
 		networkStateReceiver = new NetworkStateReceiver();
 		networkStateReceiver.addListener(this);
-		registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+		registerReceiver(networkStateReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
 		LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observeForever(callStatusObserver);
 		LiveEventBus.get(EVENT_RINGING_STATUS_CHANGE, MegaChatCall.class).observeForever(callRingingStatusObserver);
@@ -1691,6 +1699,22 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			}
 		}).start();
 	}
+
+	@RequiresApi(api = Build.VERSION_CODES.S)
+	private void checkForUnsafeIntentLaunch() {
+		boolean isDebug = ((this.getApplicationInfo().flags &
+				ApplicationInfo.FLAG_DEBUGGABLE) != 0);
+		if (isDebug) {
+			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+					// Other StrictMode checks that you've previously added.
+					.detectUnsafeIntentLaunch()
+					.penaltyLog()
+					// Consider also adding
+					.penaltyDeath()
+					.build());
+		}
+	}
+
 	public AppRTCAudioManager getAudioManager() {
 		return rtcAudioManager;
 	}
