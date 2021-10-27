@@ -13,6 +13,7 @@ import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
@@ -35,13 +36,20 @@ class GetNodeUseCase @Inject constructor(
     fun getNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
         Single.fromCallable {
             val node = megaApi.getNodeByHandle(nodeHandle)
-            val nodeAccess = megaApi.getAccess(node)
 
+            val nodeAccess = megaApi.getAccess(node)
             val hasFullAccess = nodeAccess == MegaShare.ACCESS_OWNER || nodeAccess == MegaShare.ACCESS_FULL
-            val isFromRubbishBin = node.parentHandle == megaApi.rubbishNode.handle
-            val isFromInbox = node.parentHandle == megaApi.inboxNode.handle
-            val isFromRoot = node.parentHandle == megaApi.rootNode.handle
             val isAvailableOffline = isNodeAvailableOffline(nodeHandle).blockingGet()
+            var isFromRubbishBin = false
+            var isFromInbox = false
+            var isFromRoot = false
+
+            val parentNode = megaApi.getRootParentNode(node)
+            when (parentNode.handle) {
+                megaApi.rootNode.handle -> isFromRoot = true
+                megaApi.inboxNode.handle -> isFromInbox = true
+                megaApi.rubbishNode.handle -> isFromRubbishBin = true
+            }
 
             MegaNodeItem(
                 node,

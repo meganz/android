@@ -94,21 +94,24 @@ class ExportNodeUseCase @Inject constructor(
             }
         }
 
+    /**
+     * Launches a request to stop sharing a file/folder
+     *
+     * @param nodeHandle    MegaNode to stop sharing
+     * @return              Completable subscription
+     */
     fun disableExport(nodeHandle: Long): Completable =
         Completable.create { emitter ->
             val node = megaApi.getNodeByHandle(nodeHandle)
             megaApi.disableExport(node, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {
-                        MegaError.API_OK -> {
+                        MegaError.API_OK ->
                             emitter.onComplete()
-                        }
-                        MegaError.API_EBUSINESSPASTDUE -> {
+                        MegaError.API_EBUSINESSPASTDUE ->
                             emitter.onError(BusinessAccountOverdueMegaError())
-                        }
-                        else -> {
+                        else ->
                             emitter.onError(error.toThrowable())
-                        }
                     }
                 }
             ))

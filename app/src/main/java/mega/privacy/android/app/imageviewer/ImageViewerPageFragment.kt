@@ -2,6 +2,7 @@ package mega.privacy.android.app.imageviewer
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -12,10 +13,9 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.facebook.common.references.CloseableReference
-import com.facebook.datasource.RetainingDataSourceSupplier
 import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.imagepipeline.image.CloseableImage
+import com.facebook.drawee.controller.BaseControllerListener
+import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
@@ -61,7 +61,6 @@ class ImageViewerPageFragment : Fragment() {
     private val viewModel by activityViewModels<ImageViewerViewModel>()
     private var fullSizeRequested = false
     private val nodeHandle: Long by extraNotNull(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
-    private val retainingSupplier by lazy { RetainingDataSourceSupplier<CloseableReference<CloseableImage>>() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -102,12 +101,6 @@ class ImageViewerPageFragment : Fragment() {
                     }
                 )
             )
-
-            controller = Fresco.newDraweeControllerBuilder()
-                .setOldController(controller)
-                .setAutoPlayAnimations(true)
-                .setDataSourceSupplier(retainingSupplier)
-                .build()
         }
     }
 
@@ -120,13 +113,14 @@ class ImageViewerPageFragment : Fragment() {
 
     private fun showImageItem(item: ImageItem?) {
         if (item != null) {
-            retainingSupplier.replaceSupplier(
-                Fresco.getImagePipeline().getDataSourceSupplier(
-                    ImageRequest.fromUri(item.getAvailableUri()),
-                    null,
-                    ImageRequest.RequestLevel.FULL_FETCH
-                )
-            )
+            when {
+                item.fullSizeUri != null ->
+                    showImageUris(item.fullSizeUri!!, item.previewUri ?: item.thumbnailUri)
+                item.previewUri != null ->
+                    showImageUris(item.previewUri!!, item.thumbnailUri)
+                item.thumbnailUri != null ->
+                    showImageUris(item.thumbnailUri!!)
+            }
 
             if (item.isVideo) {
                 binding.btnVideo.setOnClickListener { launchVideoScreen(item) }
@@ -147,6 +141,22 @@ class ImageViewerPageFragment : Fragment() {
             Toast.makeText(requireContext(), R.string.error_fail_to_open_file_general, Toast.LENGTH_LONG).show()
             activity?.finish()
         }
+    }
+
+    private fun showImageUris(mainImageUri: Uri, lowResImageUri: Uri? = null) {
+        binding.image.controller = Fresco.newDraweeControllerBuilder()
+            .setAutoPlayAnimations(true)
+            .setControllerListener(object : BaseControllerListener<ImageInfo>() {
+                override fun onFailure(id: String, throwable: Throwable) {
+                    logError(throwable.stackTraceToString())
+                    Toast.makeText(requireContext(), throwable.message, Toast.LENGTH_LONG).show()
+                    activity?.finish()
+                }
+            })
+            .setLowResImageRequest(ImageRequest.fromUri(lowResImageUri))
+            .setImageRequest(ImageRequest.fromUri(mainImageUri))
+            .setOldController(binding.image.controller)
+            .build()
     }
 
     private fun launchVideoScreen(item: ImageItem) {

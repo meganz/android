@@ -224,6 +224,7 @@ import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.LinksUtil;
+import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop;
@@ -11606,7 +11607,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	 * @param node	the node to open its location
 	 */
 	public void viewNodeInFolder(MegaNode node) {
-		MegaNode parentNode = getRootParentNode(node);
+		MegaNode parentNode = MegaNodeUtil.getRootParentNode(megaApi, node);
 		if (parentNode.getHandle() == megaApi.getRootNode().getHandle()) {
 			parentHandleBrowser = node.getParentHandle();
 			refreshFragment(FragmentTag.CLOUD_DRIVE.getTag());

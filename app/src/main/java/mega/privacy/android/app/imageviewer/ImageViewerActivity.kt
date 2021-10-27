@@ -196,6 +196,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
                 defaultPageSet = true
                 binding.viewPager.waitForLayout {
                     binding.viewPager.setCurrentItem(position, false)
+                    true
                 }
             }
         }

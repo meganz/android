@@ -139,11 +139,12 @@ class HomepageFragment : Fragment() {
         isFabExpanded = savedInstanceState?.getBoolean(KEY_IS_FAB_EXPANDED) ?: false
 
         // Fully expand the BottomSheet if it had been, e.g. rotate screen
-        rootView.waitForLayout {
-            if (rootView.height > 0) {
-                if (savedInstanceState?.getBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED) == true) {
+        if (savedInstanceState?.getBoolean(KEY_IS_BOTTOM_SHEET_EXPANDED) == true) {
+            rootView.waitForLayout {
+                if (rootView.height > 0) {
                     fullyExpandBottomSheet()
                 }
+                true
             }
         }
 
@@ -459,6 +460,7 @@ class HomepageFragment : Fragment() {
             }
 
             setBottomSheetMaxHeight()
+            false // TODO Refactor this behavior, is a bad practice to keep a GlobalLayoutObserver alive
         }
     }
 

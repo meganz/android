@@ -5,6 +5,7 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.errors.BusinessAccountOverdueMegaError
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -13,7 +14,6 @@ import mega.privacy.android.app.listeners.OptionalMegaTransferListenerInterface
 import mega.privacy.android.app.utils.CacheFolderManager.*
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
-import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.MegaNodeUtil.isGif
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import nz.mega.sdk.*
@@ -37,9 +37,10 @@ class GetImageUseCase @Inject constructor(
                     emitter.onError(IllegalArgumentException("Node is not a file"))
                 }
                 else -> {
-                    val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.base64Handle + JPG_EXTENSION) else null
-                    val previewFile = if (node.hasPreview()) buildPreviewFile(context, node.base64Handle + JPG_EXTENSION) else null
-                    val fullFile = buildTempFile(context, node.base64Handle + JPG_EXTENSION)
+                    val fileExtension = ".${MimeTypeList.typeForName(node.name).extension}"
+                    val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.base64Handle + fileExtension) else null
+                    val previewFile = if (node.hasPreview()) buildPreviewFile(context, node.base64Handle + fileExtension) else null
+                    val fullFile = buildTempFile(context, node.base64Handle + fileExtension)
                     val isFullSizeRequired = fullSize || (!node.isVideo() && node.isGif())
 
                     val imageItem = ImageItem(

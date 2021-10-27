@@ -73,11 +73,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         viewModel.getNode(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
         viewModel.getImage(imageNodeHandle).observe(viewLifecycleOwner) { imageItem ->
             binding.imgThumbnail.setImageURI(imageItem?.thumbnailUri)
         }
+        super.onViewCreated(view, savedInstanceState)
     }
 
     @SuppressLint("SetTextI18n")
@@ -93,7 +93,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
             val nodeSizeText = Util.getSizeString(item.node.size)
             val nodeDateText = TimeUtils.formatLongDateTime(item.node.creationTime)
-            txtInfo.text = "$nodeSizeText · $nodeDateText"
+            txtInfo.text = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
 
             // File Info
             optionInfo.setOnClickListener {

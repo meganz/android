@@ -12,12 +12,17 @@ import android.view.WindowManager
 @Suppress("DEPRECATION")
 object ViewUtils {
 
+    /**
+     * Global Layout Listener that runs an action when the View has been rendered.
+     *
+     * @param action    Action to be executed when the View has been rendered.
+     *                  Must return `true` to remove listener, `false` otherwise.
+     */
     @JvmStatic
-    fun View.waitForLayout(runnable: Runnable) {
+    fun View.waitForLayout(action: () -> Boolean) {
         viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                viewTreeObserver.removeOnGlobalLayoutListener(this)
-                runnable.run()
+                if (action.invoke()) viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
     }

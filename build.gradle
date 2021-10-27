@@ -78,7 +78,7 @@ ext {
     rxJavaVersion = '3.0.4'
     rxAndroidVersion = '3.0.0'
     ankoVersion = '0.10.8'
-    frescoVersion = '2.5.0'
+    frescoVersion = '2.6.0'
     bannerViewPagerVersion = '3.4.0'
     liveEventBus = '1.7.3'
     firebaseBom = '26.7.0'

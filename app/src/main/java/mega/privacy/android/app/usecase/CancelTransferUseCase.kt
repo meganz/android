@@ -1,6 +1,5 @@
 package mega.privacy.android.app.usecase
 
-import android.util.Log
 import io.reactivex.rxjava3.core.Completable
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -15,7 +14,6 @@ class CancelTransferUseCase @Inject constructor(
 
     fun cancel(transferTag: Int): Completable =
         Completable.create { emitter ->
-            Log.wtf("CACATAG", "cancelTransferByTag: $transferTag")
             megaApi.cancelTransferByTag(transferTag, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { _, error ->
                     when (error.errorCode) {

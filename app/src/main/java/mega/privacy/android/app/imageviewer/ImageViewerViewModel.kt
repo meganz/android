@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.map
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -18,6 +20,7 @@ import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.usecase.CancelTransferUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
 
 class ImageViewerViewModel @ViewModelInject constructor(
@@ -50,32 +53,12 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun retrieveSingleImage(nodeHandle: Long) {
         getImageHandlesUseCase.get(longArrayOf(nodeHandle))
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { imageItems ->
-                    images.value = imageItems.toList()
-                },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndUpdateImages()
     }
 
     fun retrieveSingleOfflineImage(nodeHandle: Long) {
         getImageHandlesUseCase.getOffline(longArrayOf(nodeHandle))
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { imageItems ->
-                    images.value = imageItems.toList()
-                },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndUpdateImages()
     }
 
     fun retrieveImagesFromParent(
@@ -84,23 +67,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         currentNodeHandle: Long? = null
     ) {
         getImageHandlesUseCase.getChildren(parentNodeHandle, childOrder)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { imageItems ->
-                    images.value = imageItems.toList()
-
-                    val currentIndex = imageItems.indexOfFirst { it.handle == currentNodeHandle }
-                    if (currentIndex != -1) {
-                        currentHandle.value = currentNodeHandle!!
-                        initialPosition.value = currentIndex
-                    }
-                },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndUpdateImages(currentNodeHandle)
     }
 
     fun retrieveImages(
@@ -108,23 +75,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         currentNodeHandle: Long? = null
     ) {
         getImageHandlesUseCase.get(nodeHandles)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { imageItems ->
-                    images.value = imageItems.toList()
-
-                    val currentIndex = imageItems.indexOfFirst { it.handle == currentNodeHandle }
-                    if (currentIndex != -1) {
-                        currentHandle.value = currentNodeHandle!!
-                        initialPosition.value = currentIndex
-                    }
-                },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndUpdateImages(currentNodeHandle)
     }
 
     fun retrieveOfflineImages(
@@ -132,23 +83,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         currentNodeHandle: Long? = null
     ) {
         getImageHandlesUseCase.getOffline(nodeHandles)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { imageItems ->
-                    images.value = imageItems.toList()
-
-                    val currentIndex = imageItems.indexOfFirst { it.handle == currentNodeHandle }
-                    if (currentIndex != -1) {
-                        currentHandle.value = currentNodeHandle!!
-                        initialPosition.value = currentIndex
-                    }
-                },
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndUpdateImages(currentNodeHandle)
     }
 
     fun loadSingleImage(nodeHandle: Long, fullSize: Boolean): LiveData<Unit> {
@@ -158,11 +93,11 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { imageItem ->
-                    val currentImages = images.value?.toMutableList()!!
-                    val index = currentImages.indexOfFirst { it.handle == nodeHandle }
-                    currentImages[index] = imageItem
-
-                    images.value = currentImages.toList()
+                    images.value?.toMutableList()?.let { items ->
+                        val index = items.indexOfFirst { it.handle == nodeHandle }
+                        items[index] = imageItem
+                        images.value = items.toList()
+                    }
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
@@ -195,14 +130,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun markNodeAsFavorite(nodeHandle: Long, isFavorite: Boolean) {
         getNodeUseCase.markAsFavorite(nodeHandle, isFavorite)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndComplete()
     }
 
     fun setNodeAvailableOffline(
@@ -211,26 +139,12 @@ class ImageViewerViewModel @ViewModelInject constructor(
         setAvailableOffline: Boolean
     ) {
         getNodeUseCase.setNodeAvailableOffline(activity, nodeHandle, setAvailableOffline)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndComplete()
     }
 
     fun removeLink(nodeHandle: Long) {
         exportNodeUseCase.disableExport(nodeHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndComplete()
     }
 
     fun shareNode(nodeHandle: Long): LiveData<String> {
@@ -252,50 +166,22 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
         getNodeUseCase.copyNode(nodeHandle, newParentHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndComplete()
     }
 
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
         getNodeUseCase.moveNode(nodeHandle, newParentHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndComplete()
     }
 
     fun moveNodeToRubbishBin(nodeHandle: Long) {
         getNodeUseCase.moveToRubbishBin(nodeHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndComplete()
     }
 
     fun removeNode(nodeHandle: Long) {
         getNodeUseCase.removeNode(nodeHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onError = { error ->
-                    logError(error.stackTraceToString())
-                }
-            )
-            .addTo(composite)
+            .subscribeAndComplete()
     }
 
     fun stopImageLoading(nodeHandle: Long) {
@@ -325,5 +211,38 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun switchToolbar() {
         switchToolbar.value = Unit
+    }
+
+    private fun Single<List<ImageItem>>.subscribeAndUpdateImages(currentNodeHandle: Long? = null) {
+        subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { imageItems ->
+                    images.value = imageItems.toList()
+
+                    currentNodeHandle?.let { nodeHandle ->
+                        val currentIndex = imageItems.indexOfFirst { nodeHandle == it.handle }
+                        if (currentIndex != INVALID_POSITION) {
+                            currentHandle.value = nodeHandle
+                            initialPosition.value = currentIndex
+                        }
+                    }
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
+    }
+
+    private fun Completable.subscribeAndComplete() {
+        subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                }
+            )
+            .addTo(composite)
     }
 }
