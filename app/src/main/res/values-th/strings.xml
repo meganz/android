@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">ดูไฟล์ PDF ด้วย MEGA</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">จาก</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">ใช่</string>
     <!-- Answer for confirmation dialog. -->
@@ -2226,10 +2224,12 @@
     <string name="settings_video_upload_quality">คุณภาพวีดีโอ</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">การอัปโหลดจากกล้องจำเป็นต้องเข้าถึงภาพถ่ายและสื่ออื่น ๆ บนอุปกรณ์ของคุณ กรุณาไปที่หน้าการตั้งค่าและการให้สิทธิ์</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>คุณภาพดั้งเดิม</item>
-        <item>คุณภาพปานกลาง</item>
+        <item>ต่ำ</item>
+        <item>ปานกลาง</item>
+        <item>สูง</item>
+        <item>ต้นฉบับ</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">สายที่ไม่ได้รับ</string>
@@ -3376,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">บัญชีถูกล็อกชั่วคราวเพื่อความปลอดภัยของคุณ</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]กรุณาตรวจสอบอีเมล[/A]และทำตามขั้นตอนในอีเมลของ MEGA เพื่อปลดล็อกบัญชีของคุณ</string>
+    <string name="verify_email_and_follow_steps">กรุณาทำตามขั้นตอนใน[A]อีเมลยืนยัน[/A]เพื่อปลดล็อกบัญชีของคุณ</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">ทำไมฉันเห็นสิ่งนี้</string>
     <!-- Label of a button which action is resend an email -->
@@ -3572,7 +3572,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">ข้อความนี้แสดงความรู้สึกถึงขีดจำกัดสูงสุด %d ครั้งแล้ว</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] เปลี่ยนเวลาล้างข้อความเป็น[/B][A] %2$s[/A][B][/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] เปลี่ยนเวลาล้างข้อความเป็น [/B][A]%2$s[/A][B][/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">ล้างประวัติการแชท</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3634,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">เลือกการถ่ายโอน</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">เปลี่ยนลำดับความสำคัญการถ่ายโอน “%1$s” ไม่สำเร็จ</string>
+    <string name="change_of_transfer_priority_failed">ไม่สามารถเปลี่ยนลำดับความสำคัญการถ่ายโอน “%1$s” ได้</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">ส่งคีย์ถอดรหัสลับแยกต่างหาก</string>
     <!-- Explanation option to send separated the link and decryption key -->

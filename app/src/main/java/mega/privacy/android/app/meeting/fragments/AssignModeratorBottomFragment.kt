@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
@@ -14,7 +15,6 @@ import mega.privacy.android.app.databinding.ActivityAssignModeratorBinding
 import mega.privacy.android.app.meeting.adapter.AssignParticipantsAdapter
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
-import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.StringResourcesUtils
 
 /**
@@ -22,7 +22,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
  */
 class AssignModeratorBottomFragment(
     private val leaveMeeting: () -> Unit
-) : BaseBottomSheetDialogFragment() {
+) : BottomSheetDialogFragment() {
     private lateinit var binding: ActivityAssignModeratorBinding
 
     private var selectedParticipants: MutableList<Participant> = mutableListOf()

@@ -45,7 +45,7 @@ class MeetingListener : MegaChatCallListenerInterface {
 
         // Call status has changed
         if (call.hasChanged(MegaChatCall.CHANGE_TYPE_STATUS)) {
-            logDebug("Call status changed, current status is ${callStatusToString(call.status)}, call id is ${call.callId}")
+            logDebug("Call status changed, current status is ${callStatusToString(call.status)}, call id is ${call.callId}. Call is Ringing ${call.isRinging}")
             sendCallEvent(EVENT_CALL_STATUS_CHANGE, call)
         }
 
