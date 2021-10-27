@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.dialog_paste_meeting_link_guest.*
 import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaRichLinkMessage
@@ -32,7 +31,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = MaterialAlertDialogBuilder(requireContext())
-        val inflater = requireActivity().layoutInflater;
+        val inflater = requireActivity().layoutInflater
         val view = inflater.inflate(R.layout.dialog_paste_meeting_link_guest, null)
 
         linkEdit = view.findViewById(R.id.meeting_link)
@@ -66,8 +65,8 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
             meetingLink = linkEdit.text.toString()
 
             if (TextUtils.isEmpty(meetingLink)) {
-                showError(R.string.invalid_meeting_link_empty);
-                return@setOnClickListener;
+                showError(R.string.invalid_meeting_link_empty)
+                return@setOnClickListener
             }
 
             // Meeting Link and Chat Link are exactly the same format.
@@ -108,7 +107,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        Util.showKeyboardDelayed(meeting_link)
+        Util.showKeyboardDelayed(linkEdit)
     }
 
     override fun onPause() {

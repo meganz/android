@@ -65,7 +65,6 @@ public class CallService extends Service{
     private NotificationCompat.Builder mBuilderCompatO;
 
     private final String notificationChannelId = NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID;
-    private final String notificationChannelName = NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME;
 
     private ChatController chatC;
 
@@ -133,10 +132,12 @@ public class CallService extends Service{
             stopSelf();
         }
 
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            currentChatId = extras.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-            logDebug("Chat handle to call: " + currentChatId);
+        if (intent != null) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                currentChatId = extras.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE);
+                logDebug("Chat handle to call: " + currentChatId);
+            }
         }
 
         if(currentChatId == MEGACHAT_INVALID_HANDLE)
@@ -233,7 +234,7 @@ public class CallService extends Service{
         if (notificationId == INVALID_CALL) return;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(notificationChannelId, notificationChannelName, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationChannel channel = new NotificationChannel(notificationChannelId, NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME, NotificationManager.IMPORTANCE_DEFAULT);
             channel.setShowBadge(true);
             channel.setSound(null, null);
             mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -360,7 +361,6 @@ public class CallService extends Service{
     }
 
     public Bitmap setProfileContactAvatar(long userHandle, String fullName, String email) {
-        Bitmap bitmap = null;
         File avatar = buildAvatarFile(getApplicationContext(), email + ".jpg");
 
         if (isFileAvailable(avatar)) {
@@ -368,7 +368,7 @@ public class CallService extends Service{
                 BitmapFactory.Options bOpts = new BitmapFactory.Options();
                 bOpts.inPurgeable = true;
                 bOpts.inInputShareable = true;
-                bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+                Bitmap bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                 bitmap = getCircleBitmap(bitmap);
                 if (bitmap != null) {
                     return bitmap;
