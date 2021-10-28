@@ -64,10 +64,7 @@ public class PositionDividerItemDecoration extends RecyclerView.ItemDecoration {
             return true;
         }
 
-        if (pos == 0 || (position != -1 && position-1 == pos)
-                || (position != -1 && position == pos)) {
-            return false;
-        }
-        return true;
+        return pos != 0 && (position == -1 || position - 1 != pos)
+                && (position == -1 || position != pos);
     }
 }
