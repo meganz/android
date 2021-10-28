@@ -73,9 +73,13 @@ class ImageViewerPageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         require(nodeHandle != INVALID_HANDLE) { "Invalid node handle" }
-
         setupView()
         setupObservers()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requestFullSizeImage()
     }
 
     override fun onDestroyView() {
@@ -89,16 +93,10 @@ class ImageViewerPageFragment : Fragment() {
             setIsLongpressEnabled(true)
             setAllowTouchInterceptionWhileZoomed(false)
             setTapListener(
-                MultiTapGestureListener(this,
-                    onSingleTapCallback = {
-                        viewModel.switchToolbar()
-                    },
-                    onZoomCallback = {
-                        if (!fullSizeRequested && !isHighResolutionRestricted()) {
-                            fullSizeRequested = true
-                            viewModel.reloadCurrentImage(true)
-                        }
-                    }
+                MultiTapGestureListener(
+                    this,
+                    onSingleTapCallback = viewModel::switchToolbar,
+                    onZoomCallback = ::requestFullSizeImage
                 )
             )
         }
@@ -106,9 +104,7 @@ class ImageViewerPageFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.getImage(nodeHandle).observe(viewLifecycleOwner, ::showImageItem)
-        viewModel.loadSingleImage(nodeHandle, false).observe(viewLifecycleOwner) {
-            binding.progress.hide()
-        }
+        viewModel.loadSingleImage(nodeHandle, false)
     }
 
     private fun showImageItem(item: ImageItem?) {
@@ -122,20 +118,23 @@ class ImageViewerPageFragment : Fragment() {
                     showImageUris(item.thumbnailUri!!)
             }
 
-            if (item.isVideo) {
-                binding.btnVideo.setOnClickListener { launchVideoScreen(item) }
-                binding.image.apply {
-                    setZoomingEnabled(false)
-                    setIsLongpressEnabled(false)
-                    setTapListener(object : GestureDetector.SimpleOnGestureListener() {
-                        override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                            launchVideoScreen(item)
-                            return true
-                        }
-                    })
+            if (item.isFullyLoaded) {
+                if (item.isVideo) {
+                    binding.btnVideo.setOnClickListener { launchVideoScreen(item) }
+                    binding.image.apply {
+                        setZoomingEnabled(false)
+                        setIsLongpressEnabled(false)
+                        setTapListener(object : GestureDetector.SimpleOnGestureListener() {
+                            override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                                launchVideoScreen(item)
+                                return true
+                            }
+                        })
+                    }
                 }
+                binding.progress.hide()
+                binding.btnVideo.isVisible = item.isVideo
             }
-            binding.btnVideo.isVisible = item.isVideo
         } else {
             logError("ImageItem is null")
             Toast.makeText(requireContext(), R.string.error_fail_to_open_file_general, Toast.LENGTH_LONG).show()
@@ -157,6 +156,13 @@ class ImageViewerPageFragment : Fragment() {
             .setImageRequest(ImageRequest.fromUri(mainImageUri))
             .setOldController(binding.image.controller)
             .build()
+    }
+
+    private fun requestFullSizeImage() {
+        if (!fullSizeRequested && !isHighResolutionRestricted()) {
+            fullSizeRequested = true
+            viewModel.reloadCurrentImage(true)
+        }
     }
 
     private fun launchVideoScreen(item: ImageItem) {

@@ -86,8 +86,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 
-    fun loadSingleImage(nodeHandle: Long, fullSize: Boolean): LiveData<Unit> {
-        val result = MutableLiveData<Unit>()
+    fun loadSingleImage(nodeHandle: Long, fullSize: Boolean) {
         getImageUseCase.get(nodeHandle, fullSize)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -101,13 +100,9 @@ class ImageViewerViewModel @ViewModelInject constructor(
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
-                },
-                onComplete = {
-                    result.value = Unit
                 }
             )
             .addTo(composite)
-        return result
     }
 
     fun getNode(nodeHandle: Long): LiveData<MegaNodeItem?> {

@@ -10,7 +10,8 @@ data class ImageItem constructor(
     var thumbnailUri: Uri? = null,
     var previewUri: Uri? = null,
     var fullSizeUri: Uri? = null,
-    var transferTag: Int? = null
+    var transferTag: Int? = null,
+    var isFullyLoaded: Boolean = false
 ) {
 
     fun getAvailableUri(): Uri? =

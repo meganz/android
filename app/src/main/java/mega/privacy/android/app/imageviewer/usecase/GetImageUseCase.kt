@@ -41,7 +41,7 @@ class GetImageUseCase @Inject constructor(
                     val thumbnailFile = if (node.hasThumbnail()) buildThumbnailFile(context, node.base64Handle + fileExtension) else null
                     val previewFile = if (node.hasPreview()) buildPreviewFile(context, node.base64Handle + fileExtension) else null
                     val fullFile = buildTempFile(context, node.base64Handle + fileExtension)
-                    val isFullSizeRequired = fullSize || (!node.isVideo() && node.isGif())
+                    val isFullSizeRequired = fullSize || node.isGif() || node.isVideo()
 
                     val imageItem = ImageItem(
                         node.handle,
@@ -52,11 +52,13 @@ class GetImageUseCase @Inject constructor(
                         fullSizeUri = if (fullFile?.exists() == true) fullFile.toUri() else null
                     )
 
-                    emitter.onNext(imageItem)
-
                     if (fullFile?.exists() == true || (!isFullSizeRequired && previewFile?.exists() == true)) {
+                        imageItem.isFullyLoaded = true
+                        emitter.onNext(imageItem)
                         emitter.onComplete()
                         return@create
+                    } else {
+                        emitter.onNext(imageItem)
                     }
 
                     if (thumbnailFile != null && !thumbnailFile.exists()) {
@@ -81,9 +83,12 @@ class GetImageUseCase @Inject constructor(
                                 onRequestFinish = { _: MegaRequest, error: MegaError ->
                                     if (error.errorCode == API_OK) {
                                         imageItem.previewUri = previewFile.toUri()
-                                        emitter.onNext(imageItem)
                                         if (!isFullSizeRequired) {
+                                            imageItem.isFullyLoaded = true
+                                            emitter.onNext(imageItem)
                                             emitter.onComplete()
+                                        } else {
+                                            emitter.onNext(imageItem)
                                         }
                                     } else if (!isFullSizeRequired) {
                                         emitter.onError(error.toThrowable())
@@ -109,6 +114,7 @@ class GetImageUseCase @Inject constructor(
                                         API_OK -> {
                                             imageItem.fullSizeUri = fullFile.toUri()
                                             imageItem.transferTag = null
+                                            imageItem.isFullyLoaded = true
                                             emitter.onNext(imageItem)
                                             emitter.onComplete()
                                         }
