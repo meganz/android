@@ -25,7 +25,11 @@ class GetImageUseCase @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
 
-    fun get(nodeHandle: Long, fullSize: Boolean = false): Flowable<ImageItem> =
+    fun get(
+        nodeHandle: Long,
+        fullSize: Boolean = false,
+        highPriority: Boolean = false
+    ): Flowable<ImageItem> =
         Flowable.create({ emitter ->
             val node = megaApi.getNodeByHandle(nodeHandle)
 
@@ -98,34 +102,45 @@ class GetImageUseCase @Inject constructor(
                     }
 
                     if (isFullSizeRequired && !fullFile.exists()) {
-                        megaApi.startDownloadWithTopPriority(
-                            node,
-                            fullFile.absolutePath,
-                            Constants.APP_DATA_BACKGROUND_TRANSFER,
-                            OptionalMegaTransferListenerInterface(
-                                onTransferStart = { transfer ->
-                                    imageItem.transferTag = transfer.tag
-                                    emitter.onNext(imageItem)
-                                },
-                                onTransferFinish = { _: MegaTransfer, error: MegaError ->
-                                    if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
+                        val listener = OptionalMegaTransferListenerInterface(
+                            onTransferStart = { transfer ->
+                                imageItem.transferTag = transfer.tag
+                                emitter.onNext(imageItem)
+                            },
+                            onTransferFinish = { _: MegaTransfer, error: MegaError ->
+                                if (emitter.isCancelled) return@OptionalMegaTransferListenerInterface
 
-                                    when (error.errorCode) {
-                                        API_OK -> {
-                                            imageItem.fullSizeUri = fullFile.toUri()
-                                            imageItem.transferTag = null
-                                            imageItem.isFullyLoaded = true
-                                            emitter.onNext(imageItem)
-                                            emitter.onComplete()
-                                        }
-                                        API_EBUSINESSPASTDUE ->
-                                            emitter.onError(BusinessAccountOverdueMegaError())
-                                        else ->
-                                            emitter.onError(error.toThrowable())
+                                when (error.errorCode) {
+                                    API_OK -> {
+                                        imageItem.fullSizeUri = fullFile.toUri()
+                                        imageItem.transferTag = null
+                                        imageItem.isFullyLoaded = true
+                                        emitter.onNext(imageItem)
+                                        emitter.onComplete()
                                     }
+                                    API_EBUSINESSPASTDUE ->
+                                        emitter.onError(BusinessAccountOverdueMegaError())
+                                    else ->
+                                        emitter.onError(error.toThrowable())
                                 }
-                            )
+                            }
                         )
+
+                        if (highPriority) {
+                            megaApi.startDownloadWithTopPriority(
+                                node,
+                                fullFile.absolutePath,
+                                Constants.APP_DATA_BACKGROUND_TRANSFER,
+                                listener
+                            )
+                        } else {
+                            megaApi.startDownloadWithData(
+                                node,
+                                fullFile.absolutePath,
+                                Constants.APP_DATA_BACKGROUND_TRANSFER,
+                                listener
+                            )
+                        }
                     }
                 }
             }

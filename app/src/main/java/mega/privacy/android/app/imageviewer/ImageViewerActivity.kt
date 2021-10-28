@@ -44,7 +44,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
 
     companion object {
         private const val OFFSCREEN_PAGE_LIMIT = 3
-        private const val KEY_DEFAULT_PAGE_SET = "KEY_DEFAULT_PAGE_SET"
+        private const val STATE_DEFAULT_PAGE_SET = "STATE_DEFAULT_PAGE_SET"
 
         @JvmStatic
         fun getIntentForSingleNode(
@@ -136,10 +136,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (savedInstanceState?.containsKey(KEY_DEFAULT_PAGE_SET) == true) {
-            defaultPageSet = savedInstanceState.getBoolean(KEY_DEFAULT_PAGE_SET)
-        }
-
+        defaultPageSet = savedInstanceState?.getBoolean(STATE_DEFAULT_PAGE_SET) ?: defaultPageSet
         setupView()
         setupObservers()
     }
@@ -150,7 +147,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean(KEY_DEFAULT_PAGE_SET, defaultPageSet)
+        outState.putBoolean(STATE_DEFAULT_PAGE_SET, defaultPageSet)
         super.onSaveInstanceState(outState)
     }
 
@@ -303,7 +300,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     }
 
     override fun actionConfirmed() {
-        viewModel.reloadCurrentImage(false)
+        viewModel.reloadCurrentImage()
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

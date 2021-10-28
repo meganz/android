@@ -86,8 +86,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 
-    fun loadSingleImage(nodeHandle: Long, fullSize: Boolean) {
-        getImageUseCase.get(nodeHandle, fullSize)
+    fun loadSingleImage(nodeHandle: Long, fullSize: Boolean, highPriority: Boolean) {
+        getImageUseCase.get(nodeHandle, fullSize, highPriority)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -192,8 +192,10 @@ class ImageViewerViewModel @ViewModelInject constructor(
         }
     }
 
-    fun reloadCurrentImage(fullSize: Boolean) {
-        currentHandle.value?.let { handle -> loadSingleImage(handle, fullSize) }
+    fun reloadCurrentImage() {
+        currentHandle.value?.let { handle ->
+            loadSingleImage(handle, fullSize = false, highPriority = false)
+        }
     }
 
     fun updateCurrentPosition(position: Int) {

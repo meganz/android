@@ -45,6 +45,8 @@ import javax.inject.Inject
 class ImageViewerPageFragment : Fragment() {
 
     companion object {
+        private const val STATE_FULL_IMAGE_REQUESTED = "STATE_FULL_IMAGE_REQUESTED"
+
         fun newInstance(nodeHandle: Long): ImageViewerPageFragment =
             ImageViewerPageFragment().apply {
                 arguments = Bundle().apply {
@@ -59,7 +61,7 @@ class ImageViewerPageFragment : Fragment() {
     private lateinit var binding: PageImageViewerBinding
 
     private val viewModel by activityViewModels<ImageViewerViewModel>()
-    private var fullSizeRequested = false
+    private var fullImageRequested = false
     private val nodeHandle: Long by extraNotNull(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
 
     override fun onCreateView(
@@ -68,6 +70,7 @@ class ImageViewerPageFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = PageImageViewerBinding.inflate(inflater, container, false)
+        fullImageRequested = savedInstanceState?.getBoolean(STATE_FULL_IMAGE_REQUESTED) ?: fullImageRequested
         return binding.root
     }
 
@@ -79,7 +82,14 @@ class ImageViewerPageFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        requestFullSizeImage()
+        if (!isHighResolutionRestricted()) {
+            requestFullSizeImage()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(STATE_FULL_IMAGE_REQUESTED, fullImageRequested)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroyView() {
@@ -103,18 +113,20 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        viewModel.getImage(nodeHandle).observe(viewLifecycleOwner, ::showImageItem)
-        viewModel.loadSingleImage(nodeHandle, false)
+        viewModel.getImage(nodeHandle).observe(viewLifecycleOwner, ::showItem)
+        viewModel.loadSingleImage(nodeHandle, fullSize = false, highPriority = false)
     }
 
-    private fun showImageItem(item: ImageItem?) {
+    private fun showItem(item: ImageItem?) {
         if (item != null) {
             when {
+                item.fullSizeUri != null && item.isVideo ->
+                    showImageUris(item.fullSizeUri!!, null)
                 item.fullSizeUri != null ->
                     showImageUris(item.fullSizeUri!!, item.previewUri ?: item.thumbnailUri)
-                item.previewUri != null ->
+                item.previewUri != null && !item.isVideo ->
                     showImageUris(item.previewUri!!, item.thumbnailUri)
-                item.thumbnailUri != null ->
+                item.thumbnailUri != null && !item.isVideo ->
                     showImageUris(item.thumbnailUri!!)
             }
 
@@ -143,7 +155,7 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun showImageUris(mainImageUri: Uri, lowResImageUri: Uri? = null) {
-        binding.image.controller = Fresco.newDraweeControllerBuilder()
+        val controller = Fresco.newDraweeControllerBuilder()
             .setAutoPlayAnimations(true)
             .setControllerListener(object : BaseControllerListener<ImageInfo>() {
                 override fun onFailure(id: String, throwable: Throwable) {
@@ -154,14 +166,17 @@ class ImageViewerPageFragment : Fragment() {
             })
             .setLowResImageRequest(ImageRequest.fromUri(lowResImageUri))
             .setImageRequest(ImageRequest.fromUri(mainImageUri))
-            .setOldController(binding.image.controller)
             .build()
+
+        if (binding.image.controller == null || !controller.isSameImageRequest(binding.image.controller)) {
+            binding.image.controller = controller
+        }
     }
 
     private fun requestFullSizeImage() {
-        if (!fullSizeRequested && !isHighResolutionRestricted()) {
-            fullSizeRequested = true
-            viewModel.reloadCurrentImage(true)
+        if (!fullImageRequested) {
+            fullImageRequested = true
+            viewModel.loadSingleImage(nodeHandle, fullSize = true, highPriority = true)
         }
     }
 
