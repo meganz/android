@@ -7,10 +7,10 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +32,8 @@ import mega.privacy.android.app.MimeTypeThumbnail;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
+import mega.privacy.android.app.databinding.SortByHeaderBinding;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
 import mega.privacy.android.app.lollipop.CloudDriveExplorerFragmentLollipop;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
 import mega.privacy.android.app.lollipop.IncomingSharesExplorerFragmentLollipop;
@@ -44,6 +46,9 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
+import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_GRID;
+import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_HEADER;
+import static mega.privacy.android.app.lollipop.adapters.MegaNodeAdapter.ITEM_VIEW_TYPE_LIST;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -52,6 +57,8 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.TimeUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
+
+import org.jetbrains.annotations.NotNull;
 
 public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop> implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, RotatableAdapter {
 	public static int MAX_WIDTH_FILENAME_LAND=500;
@@ -80,6 +87,8 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	private int placeholderCount;
 
 	private DisplayMetrics outMetrics;
+
+    private SortByHeaderViewModel sortByViewModel;
 
     /*public static view holder class*/
     public class ViewHolderExplorerLollipop extends RecyclerView.ViewHolder{
@@ -125,10 +134,28 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 			super(itemView);
 		}
 	}
+
+    public class ViewHolderSortBy extends ViewHolderExplorerLollipop {
+
+        private final SortByHeaderBinding binding;
+
+        private ViewHolderSortBy(SortByHeaderBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        private void bind(SortByHeaderViewModel sortByHeaderViewModel) {
+            binding.setSortByHeaderViewModel(sortByHeaderViewModel);
+            binding.setOrderNameStringId(sortByHeaderViewModel.getOrderMap()
+                    .get(sortByHeaderViewModel.getOrder()));
+        }
+    }
 	
 	ViewHolderExplorerLollipop holder = null;    
 
-	public MegaExplorerLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView listView, boolean selectFile){
+	public MegaExplorerLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes,
+                                       long _parentHandle, RecyclerView listView, boolean selectFile,
+                                       SortByHeaderViewModel sortByHeaderViewModel){
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
@@ -137,6 +164,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
 		this.fragment = fragment;
+		this.sortByViewModel = sortByHeaderViewModel;
 
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -159,6 +187,13 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 		return nodes.size();
 	}
 
+    @Override
+    public int getItemViewType(int position) {
+        return !nodes.isEmpty() && position == 0 ? ITEM_VIEW_TYPE_HEADER
+                : ((FileExplorerActivityLollipop) context).isList()
+                ? ITEM_VIEW_TYPE_LIST : ITEM_VIEW_TYPE_GRID;
+    }
+
 	public Object getItem(int position) {
 		return nodes.get(position);
 	}
@@ -172,7 +207,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	public ViewHolderExplorerLollipop onCreateViewHolder(ViewGroup parent, int viewType) {
 	    View v;
 
-	    if (((FileExplorerActivityLollipop) context).isList()) {
+	    if (viewType == ITEM_VIEW_TYPE_LIST) {
 	        logDebug("onCreateViewHolder list");
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer, parent, false);
 			ViewHolderListExplorerLollipop holder = new ViewHolderListExplorerLollipop(v);
@@ -186,7 +221,7 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
             holder.textViewFileName.setTag(holder);
 			v.setTag(holder);
 			return holder;
-		} else {
+		} else if (viewType == ITEM_VIEW_TYPE_GRID){
 		    logDebug("onCreateViewHolder grid");
 			v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file_explorer_grid, parent, false);
 			ViewHolderGridExplorerLollipop holder =  new ViewHolderGridExplorerLollipop(v);
@@ -208,18 +243,28 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
 			v.setTag(holder);
 			return holder;
-		}
+		} else {
+            SortByHeaderBinding binding = SortByHeaderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new ViewHolderSortBy(binding);
+        }
 	}
 
 	@Override
 	public void onBindViewHolder(ViewHolderExplorerLollipop holder, int position){
-        if (((FileExplorerActivityLollipop) context).isList()) {
-            ViewHolderListExplorerLollipop holderList = (ViewHolderListExplorerLollipop) holder;
-            onBindViewHolderList(holderList, position);
-        }
-        else  {
-            ViewHolderGridExplorerLollipop holderGrid = (ViewHolderGridExplorerLollipop) holder;
-            onBindViewHolderGrid(holderGrid, position);
+	    switch (getItemViewType(position)) {
+            case ITEM_VIEW_TYPE_HEADER:
+                ((ViewHolderSortBy) holder).bind(sortByViewModel);
+                break;
+
+            case ITEM_VIEW_TYPE_LIST:
+                ViewHolderListExplorerLollipop holderList = (ViewHolderListExplorerLollipop) holder;
+                onBindViewHolderList(holderList, position);
+                break;
+
+            case ITEM_VIEW_TYPE_GRID:
+                ViewHolderGridExplorerLollipop holderGrid = (ViewHolderGridExplorerLollipop) holder;
+                onBindViewHolderGrid(holderGrid, position);
+                break;
         }
 	}
 
@@ -720,7 +765,13 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
 	    if (((FileExplorerActivityLollipop) context).isList()) {
-	        placeholderCount = 0;
+            if (!nodes.isEmpty()) {
+                placeholderCount = 1;
+                nodes.add(0, null);
+            } else {
+                placeholderCount = 0;
+            }
+
 	        return nodes;
         }
 
@@ -742,6 +793,11 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
                     logError("Inserting placeholders [nodes.size]: " + nodes.size() + " [folderCount+i]: " + (folderCount + i), e);
                 }
             }
+        }
+
+        if (!nodes.isEmpty()) {
+            placeholderCount++;
+            nodes.add(0, null);
         }
 
         return nodes;
@@ -776,5 +832,14 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 
     public void setListFragment(RecyclerView listFragment) {
         this.listFragment = listFragment;
+    }
+
+    @NotNull
+    public final GridLayoutManager.SpanSizeLookup getSpanSizeLookup(final int spanCount) {
+        return (GridLayoutManager.SpanSizeLookup) (new GridLayoutManager.SpanSizeLookup() {
+            public int getSpanSize(int position) {
+                return getItemViewType(position) == ITEM_VIEW_TYPE_HEADER ? spanCount : 1;
+            }
+        });
     }
 }

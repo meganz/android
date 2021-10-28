@@ -879,7 +879,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         public void onReceive(Context context, Intent intent) {
             if (intent != null) {
                 updateView(intent.getBooleanExtra("isList", true));
-				supportInvalidateOptionsMenu();
             }
         }
     };

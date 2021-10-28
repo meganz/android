@@ -28,6 +28,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,13 +45,17 @@ import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.fragments.homepage.EventObserver;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModelFactory;
 import mega.privacy.android.app.search.callback.SearchActionsCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
@@ -268,9 +273,26 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 				FileExplorerActivityLollipop.INCOMING_FRAGMENT);
 	}
 
+	/**
+	 * Shows the Sort by panel.
+	 *
+	 * @param unit Unit event.
+	 * @return Null.
+	 */
+	private Unit showSortByPanel(Unit unit) {
+		((FileExplorerActivityLollipop) context).showSortByPanel();
+		return null;
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		logDebug("onCreateView");
+
+		SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this, new SortByHeaderViewModelFactory(context))
+				.get(SortByHeaderViewModel.class);
+
+		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
+				new EventObserver<>(this::showSortByPanel));
 
 		Display display = getActivity().getWindowManager().getDefaultDisplay();
 		
@@ -300,7 +322,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			v.findViewById(R.id.file_grid_view_browser).setVisibility(View.GONE);
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
+			recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
 		}
 		else {
 			recyclerView = (NewGridRecyclerView) v.findViewById(R.id.file_grid_view_browser);
@@ -342,12 +364,17 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		getNodes();
 
 		if (adapter == null){
-			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle, recyclerView, selectFile);
+			adapter = new MegaExplorerLollipopAdapter(context, this, nodes, parentHandle,
+					recyclerView, selectFile, sortByHeaderViewModel);
 		}
 		else{
 			adapter.setListFragment(recyclerView);
 			adapter.setParentHandle(parentHandle);
 			adapter.setSelectFile(selectFile);
+		}
+
+		if (gridLayoutManager != null) {
+			gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
 		}
 
         recyclerView.setAdapter(adapter);

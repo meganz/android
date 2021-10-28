@@ -457,6 +457,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             if (!nodes.isEmpty()) {
                 placeholderCount = 1;
                 nodes.add(0, null);
+            } else {
+                placeholderCount = 0;
             }
 
             return nodes;

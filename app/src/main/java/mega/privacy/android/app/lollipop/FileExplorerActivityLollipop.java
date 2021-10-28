@@ -1,7 +1,9 @@
 package mega.privacy.android.app.lollipop;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -199,8 +201,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	private MenuItem createFolderMenuItem;
 	private MenuItem newChatMenuItem;
 	private MenuItem searchMenuItem;
-	private MenuItem gridListMenuItem;
-	private MenuItem sortByMenuItem;
 	private boolean isList = true;
 
 	private FrameLayout cloudDriveFrameLayout;
@@ -281,6 +281,15 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	private String currentAction;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
+
+	private final BroadcastReceiver receiverUpdateView = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null) {
+				refreshViewNodes(intent.getBooleanExtra("isList", true));
+			}
+		}
+	};
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -609,6 +618,7 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
+		registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
 	}
 	
 	private void afterLoginAndFetch(){
@@ -925,17 +935,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	private void setGridListAction () {
-		if (isList) {
-			gridListMenuItem.setTitle(R.string.action_grid);
-			gridListMenuItem.setIcon(R.drawable.ic_thumbnail_view);
-		}
-		else {
-			gridListMenuItem.setTitle(R.string.action_list);
-			gridListMenuItem.setIcon(R.drawable.ic_list_view);
-		}
-	}
-
 	private boolean isSearchMultiselect() {
 		if (multiselect) {
 			cDriveExplorer = getCloudExplorerFragment();
@@ -958,16 +957,10 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	    searchMenuItem = menu.findItem(R.id.cab_menu_search);
 	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    newChatMenuItem = menu.findItem(R.id.cab_menu_new_chat);
-	    gridListMenuItem = menu.findItem(R.id.cab_menu_grid_list);
-	    sortByMenuItem = menu.findItem(R.id.cab_menu_sort);
-	   	setGridListAction();
-	   	sortByMenuItem.setIcon(ContextCompat.getDrawable(this, R.drawable.ic_sort));
 
 	    searchMenuItem.setVisible(false);
 		createFolderMenuItem.setVisible(false);
 		newChatMenuItem.setVisible(false);
-		gridListMenuItem.setVisible(true);
-		sortByMenuItem.setVisible(false);
 
 		searchView = (SearchView) searchMenuItem.getActionView();
 
@@ -987,8 +980,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 				if (isSearchMultiselect()) {
 					hideTabs(true, isCloudVisible() ? CLOUD_FRAGMENT : INCOMING_FRAGMENT);
-					gridListMenuItem.setVisible(false);
-					sortByMenuItem.setVisible(false);
 				} else {
 					hideTabs(true, CHAT_FRAGMENT);
 					chatExplorer = getChatExplorerFragment();
@@ -1102,7 +1093,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 			if(index==0){
 				if(isChatFirst){
-					gridListMenuItem.setVisible(false);
 					searchMenuItem.setVisible(true);
 					createFolderMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
@@ -1112,7 +1102,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					setCreateFolderVisibility();
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
-						sortByMenuItem.setVisible(true);
 						cDriveExplorer = getCloudExplorerFragment();
 						searchMenuItem.setVisible(cDriveExplorer != null && !cDriveExplorer.isFolderEmpty());
 					}
@@ -1154,7 +1143,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					}
 					newChatMenuItem.setVisible(false);
 					if (multiselect) {
-						sortByMenuItem.setVisible(true);
 						searchMenuItem.setVisible(iSharesExplorer != null && !iSharesExplorer.isFolderEmpty());
 					}
 				}
@@ -1190,7 +1178,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					newChatMenuItem.setVisible(false);
 				}
 				else{
-					gridListMenuItem.setVisible(false);
 					searchMenuItem.setVisible(true);
 					createFolderMenuItem.setVisible(false);
 					newChatMenuItem.setVisible(false);
@@ -1235,13 +1222,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 							break;
 						}
 						case CHAT_FRAGMENT:{
-							gridListMenuItem.setVisible(false);
 							newChatMenuItem.setVisible(false);
 							searchMenuItem.setVisible(true);
-							break;
-						}
-						case IMPORT_FRAGMENT: {
-							gridListMenuItem.setVisible(false);
 							break;
 						}
 					}
@@ -2280,6 +2262,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				logWarning("IOException deleting childThumbDir.", e);
 			}
 		}
+
+		unregisterReceiver(receiverUpdateView);
 		
 		super.onDestroy();
 	}
@@ -2358,14 +2342,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 					logWarning("Online but not megaApi");
 					showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				}
-				break;
-			}
-			case R.id.cab_menu_grid_list:{
-				refreshViewNodes();
-				break;
-			}
-			case R.id.cab_menu_sort:{
-				showSortByPanel();
 				break;
 			}
 		}
@@ -2731,12 +2707,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		}
 	}
 
-	private void refreshViewNodes () {
-		isList = !isList;
-		dbH.setPreferredViewList(isList);
-		updateManagerView();
+	private void refreshViewNodes (boolean isList) {
+		this.isList = isList;
 		refreshView();
-		supportInvalidateOptionsMenu();
 	}
 
 	private void refreshView () {
