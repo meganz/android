@@ -5827,29 +5827,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	return true;
 	        }
 	        case R.id.action_menu_sort_by:{
-	        	int orderType;
-
-	        	switch (drawerItem) {
-					case CAMERA_UPLOADS:
-						orderType = ORDER_CAMERA;
-						break;
-
-					default:
-						if (drawerItem == DrawerItem.SHARED_ITEMS
-								&& getTabItemShares() == INCOMING_TAB && deepBrowserTreeIncoming == 0) {
-							showNewSortByPanel(ORDER_OTHERS, true);
-							return true;
-						}
-
-						if (drawerItem == DrawerItem.SHARED_ITEMS
-								&& getTabItemShares() == OUTGOING_TAB && deepBrowserTreeOutgoing == 0) {
-							orderType = ORDER_OTHERS;
-						} else {
-							orderType = ORDER_CLOUD;
-						}
-				}
-
-				showNewSortByPanel(orderType);
+				showNewSortByPanel(ORDER_CAMERA);
 	        	return true;
 	        }
 	        case R.id.action_menu_help:{
@@ -7784,8 +7762,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	}
 
 	public void refreshCloudOrder(int order) {
-		LiveEventBus.get(EVENT_ORDER_CHANGE, Integer.class).post(order);
-
 		//Refresh Cloud Fragment
 		refreshCloudDrive();
 

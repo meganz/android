@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isVisible
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
@@ -182,6 +183,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         when (orderType) {
             ORDER_CLOUD -> {
                 sortOrderManagement.setOrderCloud(order)
+                LiveEventBus.get(EVENT_ORDER_CHANGE, Int::class.java).post(order)
 
                 if (requireActivity() is ManagerActivityLollipop) {
                     (requireActivity() as ManagerActivityLollipop).refreshCloudOrder(order)
@@ -198,6 +200,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
             ORDER_OTHERS -> {
                 sortOrderManagement.setOrderOthers(order)
+                LiveEventBus.get(EVENT_ORDER_CHANGE, Int::class.java).post(order)
 
                 if (requireActivity() is ManagerActivityLollipop) {
                     (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()
