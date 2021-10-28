@@ -87,12 +87,12 @@ class GetImageUseCase @Inject constructor(
                                 onRequestFinish = { _: MegaRequest, error: MegaError ->
                                     if (error.errorCode == API_OK) {
                                         imageItem.previewUri = previewFile.toUri()
-                                        if (!isFullSizeRequired) {
+                                        if (isFullSizeRequired) {
+                                            emitter.onNext(imageItem)
+                                        } else {
                                             imageItem.isFullyLoaded = true
                                             emitter.onNext(imageItem)
                                             emitter.onComplete()
-                                        } else {
-                                            emitter.onNext(imageItem)
                                         }
                                     } else if (!isFullSizeRequired) {
                                         emitter.onError(error.toThrowable())

@@ -52,12 +52,12 @@ class ImageViewerViewModel @ViewModelInject constructor(
     fun onSwitchToolbar(): LiveData<Unit> = switchToolbar
 
     fun retrieveSingleImage(nodeHandle: Long) {
-        getImageHandlesUseCase.get(longArrayOf(nodeHandle))
+        getImageHandlesUseCase.get(nodeHandles = longArrayOf(nodeHandle))
             .subscribeAndUpdateImages()
     }
 
     fun retrieveSingleOfflineImage(nodeHandle: Long) {
-        getImageHandlesUseCase.getOffline(longArrayOf(nodeHandle))
+        getImageHandlesUseCase.get(nodeHandles = longArrayOf(nodeHandle), isOffline = true)
             .subscribeAndUpdateImages()
     }
 
@@ -66,7 +66,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         childOrder: Int? = null,
         currentNodeHandle: Long? = null
     ) {
-        getImageHandlesUseCase.getChildren(parentNodeHandle, childOrder)
+        getImageHandlesUseCase.get(parentNodeHandle = parentNodeHandle, sortOrder = childOrder)
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 
@@ -74,7 +74,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         nodeHandles: LongArray,
         currentNodeHandle: Long? = null
     ) {
-        getImageHandlesUseCase.get(nodeHandles)
+        getImageHandlesUseCase.get(nodeHandles = nodeHandles)
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 
@@ -82,7 +82,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
         nodeHandles: LongArray,
         currentNodeHandle: Long? = null
     ) {
-        getImageHandlesUseCase.getOffline(nodeHandles)
+        getImageHandlesUseCase.get(nodeHandles = nodeHandles, isOffline = true)
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 

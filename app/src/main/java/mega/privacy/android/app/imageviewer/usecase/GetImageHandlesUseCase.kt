@@ -12,7 +12,9 @@ import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.OfflineUtils
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
+import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 class GetImageHandlesUseCase @Inject constructor(
@@ -21,64 +23,75 @@ class GetImageHandlesUseCase @Inject constructor(
     private val databaseHandler: DatabaseHandler
 ) {
 
-    fun get(nodeHandles: LongArray): Single<List<ImageItem>> =
+    fun get(
+        nodeHandles: LongArray? = null,
+        parentNodeHandle: Long? = null,
+        sortOrder: Int? = ORDER_PHOTO_ASC,
+        isOffline: Boolean = false
+    ): Single<List<ImageItem>> =
         Single.create { emitter ->
             val items = mutableListOf<ImageItem>()
-
-            nodeHandles.forEach { nodeHandle ->
-                val node = megaApi.getNodeByHandle(nodeHandle)
-                if (node?.isValidForImageViewer() == true) {
-                    items.add(ImageItem(node.handle, node.name, node.isVideo()))
+            when {
+                parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
+                    val parentNode = megaApi.getNodeByHandle(parentNodeHandle)
+                    if (parentNode != null && megaApi.hasChildren(parentNode)) {
+                        items.addChildrenNodes(parentNode, sortOrder ?: ORDER_PHOTO_ASC)
+                    } else {
+                        emitter.onError(IllegalStateException("Node is null or has no children"))
+                        return@create
+                    }
+                }
+                isOffline && nodeHandles != null && nodeHandles.isNotEmpty() -> {
+                    items.addOfflineNodeHandles(nodeHandles)
+                }
+                nodeHandles != null && nodeHandles.isNotEmpty() -> {
+                    items.addNodeHandles(nodeHandles)
+                }
+                else -> {
+                    emitter.onError(IllegalArgumentException("Invalid parameters"))
+                    return@create
                 }
             }
-
             emitter.onSuccess(items)
         }
 
-    fun getOffline(nodeHandles: LongArray): Single<List<ImageItem>> =
-        Single.create { emitter ->
-            val offlineNodes = databaseHandler.offlineFiles
-            val items = mutableListOf<ImageItem>()
+    private fun MutableList<ImageItem>.addNodeHandles(nodeHandles: LongArray) {
+        nodeHandles.forEach { nodeHandle ->
+            val node = megaApi.getNodeByHandle(nodeHandle)
+            if (node?.isValidForImageViewer() == true) {
+                this.add(ImageItem(node.handle, node.name, node.isVideo()))
+            }
+        }
+    }
 
-            nodeHandles.forEach { nodeHandle ->
-                offlineNodes.find {
-                    nodeHandle == it.handle.toLongOrNull() ||
-                            nodeHandle == it.handleIncoming.toLongOrNull()
-                }?.let { node ->
-                    val file = OfflineUtils.getOfflineFile(context, node)
+    private fun MutableList<ImageItem>.addChildrenNodes(megaNode: MegaNode, sortOrder: Int) {
+        megaApi.getChildren(megaNode, sortOrder).forEach { node ->
+            if (node.isValidForImageViewer()) {
+                this.add(ImageItem(node.handle, node.name, node.isVideo()))
+            }
+        }
+    }
+
+    private fun MutableList<ImageItem>.addOfflineNodeHandles(nodeHandles: LongArray) {
+        val offlineNodes = databaseHandler.offlineFiles
+        nodeHandles.forEach { nodeHandle ->
+            offlineNodes
+                .find { offlineNode ->
+                    nodeHandle == offlineNode.handle.toLongOrNull() ||
+                            nodeHandle == offlineNode.handleIncoming.toLongOrNull()
+                }?.let { offlineNode ->
+                    val file = OfflineUtils.getOfflineFile(context, offlineNode)
                     if (file.exists()) {
-                        items.add(
+                        this.add(
                             ImageItem(
-                                node.handle.toLong(),
-                                node.name,
-                                MimeTypeList.typeForName(node.name).isVideo,
+                                offlineNode.handle.toLong(),
+                                offlineNode.name,
+                                MimeTypeList.typeForName(offlineNode.name).isVideo,
                                 fullSizeUri = file.toUri()
                             )
                         )
                     }
                 }
-            }
-
-            emitter.onSuccess(items)
         }
-
-    fun getChildren(
-        parentNodeHandle: Long,
-        order: Int? = ORDER_PHOTO_ASC
-    ): Single<List<ImageItem>> =
-        Single.create { emitter ->
-            val parentNode = megaApi.getNodeByHandle(parentNodeHandle)
-
-            if (parentNode != null && megaApi.hasChildren(parentNode)) {
-                val items = mutableListOf<ImageItem>()
-                megaApi.getChildren(parentNode, order ?: ORDER_PHOTO_ASC).forEach { node ->
-                    if (node.isValidForImageViewer()) {
-                        items.add(ImageItem(node.handle, node.name, node.isVideo()))
-                    }
-                }
-                emitter.onSuccess(items)
-            } else {
-                emitter.onError(IllegalStateException("Node is null or has no children"))
-            }
-        }
+    }
 }
