@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.text.HtmlCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -72,7 +74,6 @@ import static mega.privacy.android.app.utils.Util.getMediaIntent;
 
 public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
-    private static final int LANDSCAPE_EMPTY_VIEW_PADDING = 50;
     private static final int LANDSCAPE_EMPTY_IMAGE_MARGIN = 60;
 
     private Context context;
@@ -143,21 +144,20 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler {
         emptyLayout = v.findViewById(R.id.empty_state_recents);
 
         ImageView emptyImage = v.findViewById(R.id.empty_image_recents);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) emptyImage.getLayoutParams();
 
-        RelativeLayout emptyView = v.findViewById(R.id.empty_layout);
+        ConstraintLayout emptyView = v.findViewById(R.id.empty_layout);
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(emptyView);
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             emptyImage.setImageResource(R.drawable.empty_recents_landscape);
-            params.topMargin = LANDSCAPE_EMPTY_IMAGE_MARGIN;
-            emptyView.setPadding(0, 0, 0, LANDSCAPE_EMPTY_VIEW_PADDING);
+            constraintSet.connect(R.id.empty_image_recents, ConstraintSet.TOP, R.id.parent, ConstraintSet.TOP, LANDSCAPE_EMPTY_IMAGE_MARGIN);
         } else {
             emptyImage.setImageResource(R.drawable.empty_recents_portrait);
-            params.topMargin = 0;
-            emptyView.setPadding(0, 0, 0, 0);
+            constraintSet.connect(R.id.empty_image_recents, ConstraintSet.TOP, R.id.guideline, ConstraintSet.BOTTOM, 0);
         }
 
-        emptyImage.setLayoutParams(params);
+        constraintSet.applyTo(emptyView);
 
         emptyText = v.findViewById(R.id.empty_text_recents);
 
