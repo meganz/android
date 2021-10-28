@@ -653,7 +653,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	private MenuItem enableSelectMenuItem;
 	private MenuItem selectMenuItem;
 	private MenuItem unSelectMenuItem;
-	private MenuItem thumbViewMenuItem;
 	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
 	private MenuItem doNotDisturbMenuItem;
@@ -5225,7 +5224,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		enableSelectMenuItem = menu.findItem(R.id.action_enable_select);
 		selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
-		thumbViewMenuItem = menu.findItem(R.id.action_grid);
 		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
 		doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb);
@@ -5274,10 +5272,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 					createFolderMenuItem.setVisible(true);
                     if (isCloudAdded() && fbFLol.getItemCount() > 0) {
-                        thumbViewMenuItem.setVisible(true);
-                        setGridListIcon();
                         searchMenuItem.setVisible(true);
-                        sortByMenuItem.setVisible(true);
                     }
 					break;
 				case HOMEPAGE:
@@ -5287,10 +5282,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					break;
 				case RUBBISH_BIN:
 					if (getRubbishBinFragment() != null && rubbishBinFLol.getItemCount() > 0) {
-						thumbViewMenuItem.setVisible(true);
-						setGridListIcon();
 						clearRubbishBinMenuitem.setVisible(true);
-						sortByMenuItem.setVisible(true);
 						searchMenuItem.setVisible(true);
 					}
 					break;
@@ -5303,10 +5295,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				case INBOX:
 					if (getInboxFragment() != null && iFLol.getItemCount() > 0) {
 						selectMenuItem.setVisible(true);
-						sortByMenuItem.setVisible(true);
 						searchMenuItem.setVisible(true);
-						thumbViewMenuItem.setVisible(true);
-						setGridListIcon();
 					}
 					break;
 
@@ -5315,9 +5304,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						addMenuItem.setEnabled(true);
 
 						if (isIncomingAdded() && inSFLol.getItemCount() > 0) {
-							thumbViewMenuItem.setVisible(true);
-							setGridListIcon();
-							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 
 							if (parentHandleIncoming != INVALID_HANDLE) {
@@ -5344,14 +5330,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 						}
 
 						if (isOutgoingAdded() && outSFLol.getItemCount() > 0) {
-							thumbViewMenuItem.setVisible(true);
-							setGridListIcon();
-							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
 					} else if (getTabItemShares() == LINKS_TAB && isLinksAdded()) {
 						if (isLinksAdded() && lF.getItemCount() > 0) {
-							sortByMenuItem.setVisible(true);
 							searchMenuItem.setVisible(true);
 						}
 					}
@@ -5364,9 +5346,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 					} else if (getSearchFragment() != null
 							&& getSearchFragment().getNodes() != null
 							&& getSearchFragment().getNodes().size() > 0) {
-						sortByMenuItem.setVisible(true);
-						thumbViewMenuItem.setVisible(true);
-						setGridListIcon();
 					}
 					break;
 
@@ -5521,16 +5500,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 			gridSmallLargeMenuItem.setIcon(R.drawable.ic_thumbnail_view);
 		} else {
 			gridSmallLargeMenuItem.setIcon(R.drawable.ic_menu_gridview_small);
-		}
-	}
-
-	private void setGridListIcon() {
-		if (isList){
-			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-			thumbViewMenuItem.setIcon(R.drawable.ic_thumbnail_view);
-		}
-		else{
-			thumbViewMenuItem.setIcon(R.drawable.ic_list_view);
 		}
 	}
 
@@ -5854,24 +5823,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 	        	}
 	        	return true;
 	        }
-	        case R.id.action_grid:{
-				logDebug("action_grid selected");
-	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-					logDebug("action_grid_list in CameraUploads");
-					if(!firstLogin) {
-						gridSmallLargeMenuItem.setVisible(true);
-					}else{
-						gridSmallLargeMenuItem.setVisible(false);
-					}
-					searchMenuItem.setVisible(false);
-					refreshFragment(FragmentTag.CAMERA_UPLOADS.getTag());
-				} else {
-					updateView(!isList);
-				}
-	        	supportInvalidateOptionsMenu();
-
-	        	return true;
-	        }
 	        case R.id.action_menu_clear_rubbish_bin:{
 	        	showClearRubbishBinDialog();
 	        	return true;
@@ -5966,7 +5917,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             gridSmallLargeMenuItem.setVisible(false);
             inviteMenuItem.setVisible(false);
             selectMenuItem.setVisible(false);
-            thumbViewMenuItem.setVisible(false);
             searchMenuItem.setVisible(false);
             openMeetingMenuItem.setVisible(false);
         }

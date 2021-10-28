@@ -454,8 +454,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      */
     private ArrayList<MegaNode> insertPlaceHolderNode(ArrayList<MegaNode> nodes) {
         if (adapterType == ITEM_VIEW_TYPE_LIST) {
-            placeholderCount = 1;
-            nodes.add(0, null);
+            if (!nodes.isEmpty()) {
+                placeholderCount = 1;
+                nodes.add(0, null);
+            }
+
             return nodes;
         }
 
@@ -479,8 +482,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
         }
 
-        placeholderCount++;
-        nodes.add(0, null);
+        if (!nodes.isEmpty()) {
+            placeholderCount++;
+            nodes.add(0, null);
+        }
 
         return nodes;
     }
@@ -1119,7 +1124,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0
+        return !nodes.isEmpty() && position == 0
                 && type != FOLDER_LINK_ADAPTER
                 && type != CONTACT_SHARED_FOLDER_ADAPTER
                 && type != CONTACT_FILE_ADAPTER
