@@ -2709,17 +2709,9 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 
 	private void refreshViewNodes (boolean isList) {
 		this.isList = isList;
-		refreshView();
-	}
 
-	private void refreshView () {
-		if (viewPagerExplorer != null && tabShown != NO_TABS) {
-			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
-			iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.explorer_tabs_pager, 0));
-		} else {
-			cDriveExplorer =  getCloudExplorerFragment();
-			iSharesExplorer = getIncomingExplorerFragment();
-		}
+		cDriveExplorer =  getCloudExplorerFragment();
+		iSharesExplorer = getIncomingExplorerFragment();
 
 		if (cDriveExplorer != null) {
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -2734,27 +2726,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 			ft.attach(iSharesExplorer);
 			ft.commitAllowingStateLoss();
 		}
-
-		if (viewPagerExplorer != null && tabShown != NO_TABS) {
-			if (currentAction.equals(ACTION_SELECT_FOLDER_TO_SHARE) ||
-					currentAction.equals(ACTION_UPLOAD_TO_CLOUD)) {
-				updateAdapterExplorer(false, DEFAULT_TAB_TO_REMOVE);
-			} else if (currentAction.equals(ACTION_MULTISELECT_FILE) ||
-					currentAction.equals(ACTION_PICK_MOVE_FOLDER) ||
-					currentAction.equals(ACTION_PICK_COPY_FOLDER) ||
-					currentAction.equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC) ||
-					currentAction.equals(ACTION_PICK_IMPORT_FOLDER)) {
-				updateAdapterExplorer(false, CHAT_TAB);
-			} else if (isChatFirst) {
-				updateAdapterExplorer(true, DEFAULT_TAB_TO_REMOVE);
-			}
-		}
-	}
-
-	private void updateManagerView () {
-		Intent intent = new Intent(BROADCAST_ACTION_INTENT_UPDATE_VIEW);
-		intent.putExtra("isList", isList);
-		sendBroadcast(intent);
 	}
 
 	public void collapseSearchView () {
