@@ -1621,7 +1621,6 @@
     <string name="paused_transfers_title">Paused transfers</string>
     <!-- message shown in the screen when there are not any active transfer -->
     <string name="completed_transfers_empty">No completed transfers</string>
-    <!-- The pause status of an operation, e.g. uploading or downloading files -->
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">Uploading files: %1$d of %2$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
