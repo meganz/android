@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.text.HtmlCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,28 +32,25 @@ import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import kotlin.Unit;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
+import mega.privacy.android.app.fragments.homepage.EventObserver;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModelFactory;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -113,6 +111,8 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     protected LinearLayout emptyLinearLayout;
     protected TextView emptyTextViewFirst;
 
+    protected SortByHeaderViewModel sortByHeaderViewModel;
+
     protected abstract void setNodes(ArrayList<MegaNode> nodes);
 
     protected abstract void setEmptyView();
@@ -126,6 +126,18 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     public MegaNodeBaseFragment() {
         prefs = dbH.getPreferences();
         downloadLocationDefaultPath = getDownloadLocation();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        sortByHeaderViewModel = new ViewModelProvider(this, new SortByHeaderViewModelFactory(context))
+                .get(SortByHeaderViewModel.class);
+
+        sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
+                new EventObserver<>(this::showSortByPanel));
+
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     protected abstract class BaseActionBarCallBack implements ActionMode.Callback {
@@ -351,6 +363,17 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             e.printStackTrace();
             logError("Invalidate error", e);
         }
+    }
+
+    /**
+     * Shows the Sort by panel.
+     *
+     * @param unit Unit event.
+     * @return Null.
+     */
+    protected Unit showSortByPanel(Unit unit) {
+        managerActivity.showNewSortByPanel(ORDER_CLOUD);
+        return null;
     }
 
     public ActionMode getActionMode() {
@@ -612,7 +635,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         recyclerView = v.findViewById(R.id.file_list_view_browser);
         mLayoutManager = new LinearLayoutManager(context);
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
+        recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
         fastScroller = v.findViewById(R.id.fastscroll);
         setRecyclerView();
         recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());

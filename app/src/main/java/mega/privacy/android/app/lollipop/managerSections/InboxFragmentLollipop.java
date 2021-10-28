@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,6 +54,7 @@ import java.util.Stack;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
@@ -60,7 +62,10 @@ import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.CustomizedGridLayoutManager;
 import mega.privacy.android.app.components.NewGridRecyclerView;
-import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.components.PositionDividerItemDecoration;
+import mega.privacy.android.app.fragments.homepage.EventObserver;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModelFactory;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
@@ -361,6 +366,17 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			new Handler(Looper.getMainLooper()).post(() -> updateActionModeTitle());
 		}
 	}
+
+	/**
+	 * Shows the Sort by panel.
+	 *
+	 * @param unit Unit event.
+	 * @return Null.
+	 */
+	private Unit showSortByPanel(Unit unit) {
+		((ManagerActivityLollipop) context).showNewSortByPanel(ORDER_CLOUD);
+		return null;
+	}
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -393,6 +409,12 @@ public class InboxFragmentLollipop extends RotatableFragment{
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
 
+		SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this, new SortByHeaderViewModelFactory(context))
+				.get(SortByHeaderViewModel.class);
+
+		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
+				new EventObserver<>(this::showSortByPanel));
+
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -424,14 +446,13 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
 
 			recyclerView = (RecyclerView) v.findViewById(R.id.inbox_list_view);
-//			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context, outMetrics));
 			mLayoutManager = new LinearLayoutManager(context);
 			//Add bottom padding for recyclerView like in other fragments.
 			recyclerView.setPadding(0, 0, 0, scaleHeightPx(85, outMetrics));
 			recyclerView.setClipToPadding(false);
 			recyclerView.setLayoutManager(mLayoutManager);
 			recyclerView.setItemAnimator(noChangeRecyclerViewItemAnimator());
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(requireContext()));
+			recyclerView.addItemDecoration(new PositionDividerItemDecoration(requireContext(), getOutMetrics()));
 			recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 				@Override
 				public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -445,13 +466,13 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_list_empty_text_first);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).getParentHandleInbox(), recyclerView, null, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+				adapter = new MegaNodeAdapter(context, this, nodes,
+						((ManagerActivityLollipop) context).getParentHandleInbox(),
+						recyclerView, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST, sortByHeaderViewModel);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
-//                addSectionTitle(nodes,MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
                 adapter.setListFragment(recyclerView);
-//				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 			}	
 
@@ -484,13 +505,17 @@ public class InboxFragmentLollipop extends RotatableFragment{
 			emptyTextViewFirst = (TextView) v.findViewById(R.id.inbox_grid_empty_text_first);
 
 			if (adapter == null){
-				adapter = new MegaNodeAdapter(context, this, nodes, ((ManagerActivityLollipop) context).getParentHandleInbox(), recyclerView, null, INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
+				adapter = new MegaNodeAdapter(context, this, nodes,
+						((ManagerActivityLollipop) context).getParentHandleInbox(), recyclerView,
+						INBOX_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_GRID, sortByHeaderViewModel);
 			}
 			else{
 				adapter.setParentHandle(((ManagerActivityLollipop) context).getParentHandleInbox());
 				adapter.setListFragment(recyclerView);
 				adapter.setAdapterType(MegaNodeAdapter.ITEM_VIEW_TYPE_GRID);
 			}
+
+			gridLayoutManager.setSpanSizeLookup(adapter.getSpanSizeLookup(gridLayoutManager.getSpanCount()));
 
 			recyclerView.setAdapter(adapter);
 

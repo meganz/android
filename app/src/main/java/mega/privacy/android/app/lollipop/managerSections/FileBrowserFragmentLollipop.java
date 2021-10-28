@@ -135,8 +135,6 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
     private RelativeLayout transferOverQuotaBanner;
     private TextView transferOverQuotaBannerText;
 
-    private SortByHeaderViewModel sortByHeaderViewModel;
-
 	@Override
 	protected MegaNodeAdapter getAdapter() {
 		return adapter;
@@ -474,7 +472,7 @@ public class FileBrowserFragmentLollipop extends RotatableFragment{
 			return null;
 		}
 
-		sortByHeaderViewModel = new ViewModelProvider(this, new SortByHeaderViewModelFactory(context))
+		SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this, new SortByHeaderViewModelFactory(context))
 				.get(SortByHeaderViewModel.class);
 
 		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),

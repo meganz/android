@@ -984,7 +984,9 @@ public class FolderLinkActivityLollipop extends TransfersManagementActivity impl
 						}
 
 						if (adapterList == null){
-							adapterList = new MegaNodeAdapter(this, null, nodes, parentHandle, listView, aB, FOLDER_LINK_ADAPTER, MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
+							adapterList = new MegaNodeAdapter(this, null, nodes,
+									parentHandle, listView, FOLDER_LINK_ADAPTER,
+									MegaNodeAdapter.ITEM_VIEW_TYPE_LIST);
 						}
 						else{
 							adapterList.setParentHandle(parentHandle);

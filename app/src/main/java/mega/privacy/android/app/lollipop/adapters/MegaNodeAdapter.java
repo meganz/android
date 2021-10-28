@@ -167,7 +167,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         public ImageView fileGridSelected;
     }
 
-    public static class ViewHolderSortBy extends ViewHolderBrowser {
+    public class ViewHolderSortBy extends ViewHolderBrowser {
 
         private final SortByHeaderBinding binding;
 
@@ -180,6 +180,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             binding.setSortByHeaderViewModel(sortByHeaderViewModel);
             binding.setOrderNameStringId(sortByHeaderViewModel.getOrderMap()
                     .get(sortByHeaderViewModel.getOrder()));
+
+            binding.listModeSwitch.setVisibility(type == LINKS_ADAPTER
+                    ? View.GONE
+                    : View.VISIBLE);
         }
     }
 
@@ -490,59 +494,38 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         });
     }
 
-    public MegaNodeAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView recyclerView, ActionBar aB, int type, int adapterType) {
-
-        this.context = _context;
-        this.nodes = _nodes;
-        this.parentHandle = _parentHandle;
-        this.type = type;
-        this.adapterType = adapterType;
-        this.fragment = fragment;
-
-        dbH = DatabaseHandler.getDbHandler(context);
-
-        switch (type) {
-            case CONTACT_FILE_ADAPTER: {
-                ((ContactFileListActivityLollipop)context).setParentHandle(parentHandle);
-                break;
-            }
-            case FOLDER_LINK_ADAPTER: {
-                megaApi = ((MegaApplication)((Activity)context).getApplication()).getMegaApiFolder();
-                break;
-            }
-            case SEARCH_ADAPTER: {
-                ((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
-                break;
-            }
-            case INBOX_ADAPTER: {
-                logDebug("onCreate INBOX_ADAPTER");
-                ((ManagerActivityLollipop)context).setParentHandleInbox(parentHandle);
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-
-        this.listFragment = recyclerView;
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication)((Activity)context).getApplication())
-                    .getMegaApi();
-        }
+    public MegaNodeAdapter(Context context, Object fragment, ArrayList<MegaNode> nodes,
+                           long parentHandle, RecyclerView recyclerView, int type, int adapterType) {
+        initAdapter(context, fragment, nodes, parentHandle, recyclerView, type, adapterType);
     }
 
-    public MegaNodeAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes,
-                           long _parentHandle, RecyclerView recyclerView, int type, int adapterType,
+    public MegaNodeAdapter(Context context, Object fragment, ArrayList<MegaNode> nodes,
+                           long parentHandle, RecyclerView recyclerView, int type, int adapterType,
                            SortByHeaderViewModel sortByHeaderViewModel) {
+        initAdapter(context, fragment, nodes, parentHandle, recyclerView, type, adapterType);
+        this.sortByViewModel = sortByHeaderViewModel;
+    }
 
-        this.context = _context;
-        this.nodes = _nodes;
-        this.parentHandle = _parentHandle;
+    /**
+     * Initializes the principal properties of the adapter.
+     *
+     * @param context      Current Context.
+     * @param fragment     Current Fragment.
+     * @param nodes        List of nodes.
+     * @param parentHandle Current parent handle.
+     * @param recyclerView View in which the adapter will be set.
+     * @param type         Fragment adapter type.
+     * @param adapterType  List or grid adapter type.
+     */
+    private void initAdapter(Context context, Object fragment, ArrayList<MegaNode> nodes,
+                             long parentHandle, RecyclerView recyclerView, int type, int adapterType) {
+
+        this.context = context;
+        this.nodes = nodes;
+        this.parentHandle = parentHandle;
         this.type = type;
         this.adapterType = adapterType;
         this.fragment = fragment;
-        this.sortByViewModel = sortByHeaderViewModel;
 
         dbH = DatabaseHandler.getDbHandler(context);
 
@@ -575,6 +558,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             megaApi = ((MegaApplication)((Activity)context).getApplication())
                     .getMegaApi();
         }
+
     }
 
     public void setNodes(ArrayList<MegaNode> nodes) {
@@ -1135,7 +1119,12 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 ? ITEM_VIEW_TYPE_HEADER : adapterType;
+        return position == 0
+                && type != FOLDER_LINK_ADAPTER
+                && type != CONTACT_SHARED_FOLDER_ADAPTER
+                && type != CONTACT_FILE_ADAPTER
+                ? ITEM_VIEW_TYPE_HEADER
+                : adapterType;
     }
 
     public Object getItem(int position) {
