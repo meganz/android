@@ -372,7 +372,10 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
      * @return Null.
      */
     protected Unit showSortByPanel(Unit unit) {
-        managerActivity.showNewSortByPanel(ORDER_CLOUD);
+        managerActivity.showNewSortByPanel(getCurrentSharesTab() == INCOMING_TAB
+                ? ORDER_OTHERS
+                : ORDER_CLOUD);
+
         return null;
     }
 
@@ -671,6 +674,25 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
         return v;
     }
 
+    /**
+     * Gets the current shares tab depending on the current Fragment instance.
+     *
+     * @return The current shares tab.
+     */
+    private int getCurrentSharesTab() {
+        int tab = ERROR_TAB;
+
+        if (MegaNodeBaseFragment.this instanceof IncomingSharesFragmentLollipop) {
+            tab = INCOMING_TAB;
+        } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragmentLollipop) {
+            tab = OUTGOING_TAB;
+        } else if (MegaNodeBaseFragment.this instanceof LinksFragment) {
+            tab = LINKS_TAB;
+        }
+
+        return tab;
+    }
+
     private void setRecyclerView() {
         recyclerView.setPadding(0, 0, 0, dp2px(MARGIN_BOTTOM_LIST, outMetrics));
         recyclerView.setHasFixedSize(true);
@@ -679,14 +701,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                int tab = ERROR_TAB;
-                if (MegaNodeBaseFragment.this instanceof IncomingSharesFragmentLollipop) {
-                    tab = INCOMING_TAB;
-                } else if (MegaNodeBaseFragment.this instanceof OutgoingSharesFragmentLollipop) {
-                    tab = OUTGOING_TAB;
-                } else if (MegaNodeBaseFragment.this instanceof LinksFragment) {
-                    tab = LINKS_TAB;
-                }
+                int tab = getCurrentSharesTab();
 
                 if (managerActivity.getTabItemShares() == tab) {
                     checkScroll();
