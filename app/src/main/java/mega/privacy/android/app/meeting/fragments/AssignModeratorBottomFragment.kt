@@ -20,6 +20,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 /**
  * AssignModerator page allow moderator assign other users moderator when they are leaving the meeting
  */
+@ExperimentalCoroutinesApi
 class AssignModeratorBottomFragment(
     private val leaveMeeting: () -> Unit
 ) : BottomSheetDialogFragment() {
@@ -30,10 +31,8 @@ class AssignModeratorBottomFragment(
 
     private lateinit var participantsAdapter: AssignParticipantsAdapter
     private lateinit var selectedParticipantsAdapter: SelectedParticipantsAdapter
-    @ExperimentalCoroutinesApi
     private val inMeetingViewModel by lazy { (parentFragment as InMeetingFragment).inMeetingViewModel }
 
-    @ExperimentalCoroutinesApi
     @SuppressLint("RestrictedApi")
     override fun setupDialog(dialog: Dialog, style: Int) {
         super.setupDialog(dialog, style)

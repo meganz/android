@@ -65,6 +65,7 @@ import nz.mega.sdk.MegaNode;
 
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.CLOUD_FRAGMENT;
 import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_CLOUD_EXPLORER;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
 import static mega.privacy.android.app.utils.Util.*;
@@ -180,6 +181,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
 			((FileExplorerActivityLollipop) context).hideTabs(true, CLOUD_FRAGMENT);
+			checkScroll();
 			return true;
 		}
 
@@ -193,6 +195,7 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			checkScroll();
 		}
 
 		@Override
@@ -281,7 +284,9 @@ public class CloudDriveExplorerFragmentLollipop extends RotatableFragment implem
 		}
 
 		((FileExplorerActivityLollipop) context).changeActionBarElevation(
-				recyclerView.canScrollVertically(-1), CLOUD_FRAGMENT);
+				recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION)
+						|| (adapter != null && adapter.isMultipleSelect()),
+				CLOUD_FRAGMENT);
 	}
 
 	@Override

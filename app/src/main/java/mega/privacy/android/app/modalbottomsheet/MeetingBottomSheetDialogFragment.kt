@@ -29,9 +29,11 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
         when (v.id) {
             R.id.iv_start_meeting -> {
                 listener?.onCreateMeeting()
+                dismiss()
             }
             R.id.iv_join_meeting -> {
                 listener?.onJoinMeeting()
+                dismiss()
             }
         }
     }

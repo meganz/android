@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF Viewer</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">von</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Ja</string>
     <!-- Answer for confirmation dialog. -->
@@ -2274,10 +2272,12 @@
     <string name="settings_video_upload_quality">Videoqualität</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Kamera-Uploads benötigt Zugriff auf Ihre Fotos und Mediendateien. Bitte gewähren Sie der App dieses Zugriffsrecht in den Einstellungen.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Höchste Qualitätsstufe</item>
-        <item>Mittlere Qualitätsstufe</item>
+        <item>Niedrig</item>
+        <item>Mittel</item>
+        <item>Hoch</item>
+        <item>Original</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Verpasster Anruf</string>
@@ -3651,7 +3651,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Maximale Anzahl von %d Reaktionen erreicht.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] hat die Lebensdauer von Chatnachrichten auf [/B][A] %2$s[/A][B] geändert.[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] hat die Lebensdauer von Chatnachrichten auf [/B][A]%2$s[/A][B] geändert.[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Chatverlauf löschen</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->

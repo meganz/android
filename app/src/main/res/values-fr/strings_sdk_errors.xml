@@ -74,6 +74,6 @@
     <string name="payment_egeneric_api_error_unknown">Erreur inconnue</string>
     <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
     <string name="api_error_http">Erreur HTTP</string>
-    <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
+    <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
     <string name="api_ecircular_ec_upload">Échec de transfert en raison d’une structure de répertoire récursive</string>
 </resources>

@@ -932,12 +932,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHAT_SETTINGS);
 				onCreate(db);
 				setChatSettings(db, chatSettings);
+
+				// Temporary fix to avoid wrong values in chat settings after upgrade.
+				getChatSettings(db);
 			}
 
 			MegaPreferences preferences = getPreferencesFromDBv62(db);
 			db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);
 			onCreate(db);
-			setPreferences(db, preferences);
+
+			if (preferences != null) {
+				setPreferences(db, preferences);
+			}
 		}
 	}
 
@@ -1641,14 +1647,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * @param db Current DB.
 	 * @return Preferences.
 	 */
-    private MegaPreferences getPreferencesFromDBv62(SQLiteDatabase db) {
+	private MegaPreferences getPreferencesFromDBv62(SQLiteDatabase db) {
 		logDebug("getPreferencesFromDBv62");
 		MegaPreferences preferences = getPreferences(db);
-		String uploadVideoQuality = preferences.getUploadVideoQuality();
 
-		if(!isTextEmpty(uploadVideoQuality)
-				&& Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_ORIGINAL) {
-			preferences.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_ORIGINAL));
+		if (preferences != null) {
+			String uploadVideoQuality = preferences.getUploadVideoQuality();
+
+			if (!isTextEmpty(uploadVideoQuality)
+					&& Integer.parseInt(uploadVideoQuality) == OLD_VIDEO_QUALITY_ORIGINAL) {
+				preferences.setUploadVideoQuality(String.valueOf(VIDEO_QUALITY_ORIGINAL));
+			}
 		}
 
 		return preferences;
@@ -1808,7 +1817,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 * Get chat settings from the current DB.
 	 * @return Chat settings.
 	 */
-	public ChatSettings getChatSettings(){
+	public ChatSettings getChatSettings() {
+		return getChatSettings(db);
+	}
+
+	/**
+	 * Get chat settings from the current DB.
+	 *
+	 * @param db Current DB.
+	 * @return Chat settings.
+	 */
+	private ChatSettings getChatSettings(SQLiteDatabase db) {
 		logDebug("getChatSettings");
 		ChatSettings chatSettings = null;
 
@@ -2168,8 +2187,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setSmallGridCamera (boolean smallGridCamera){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
         logDebug("setSmallGridCamera");
 
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
@@ -2948,8 +2965,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredViewList (boolean list){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -2967,8 +2982,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredViewListCamera (boolean list){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -2986,8 +2999,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredSortCloud (String order){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -3005,8 +3016,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	public void setPreferredSortContacts (String order){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {
@@ -3024,15 +3033,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
     public void setPreferredSortCameraUpload(String order) {
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
         logDebug("set sort camera upload order: " + order);
         setStringValue(TABLE_PREFERENCES, KEY_PREFERRED_SORT_CAMERA_UPLOAD, order);
     }
 
 	public void setPreferredSortOthers (String order){
-		if (!MegaApplication.arePreferenceCookiesEnabled()) return;
-
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		ContentValues values = new ContentValues();
 		try (Cursor cursor = db.rawQuery(selectQuery, null)) {

@@ -13,6 +13,7 @@ import mega.privacy.android.app.meeting.adapter.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatSession
 
+@ExperimentalCoroutinesApi
 class GridViewCallFragment : MeetingBaseFragment() {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
@@ -27,7 +28,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
     private lateinit var adapterPager: GridViewPagerAdapter
 
-    @ExperimentalCoroutinesApi
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
         val newData = sliceBy6(it)
@@ -51,7 +51,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
         return viewDataBinding.root
     }
 
-    @ExperimentalCoroutinesApi
     @Suppress("DEPRECATION")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -110,7 +109,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
      *
      * @param data The list of participants on each page
      */
-    @ExperimentalCoroutinesApi
     fun updateVisibleParticipantsGrid(data: List<List<Participant>>) {
         if (data.isNullOrEmpty())
             return
@@ -131,7 +129,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
     /**
      * Method that asks to receive videos from participants who are visible
      */
-    @ExperimentalCoroutinesApi
     private fun activateVideoWhenScroll() {
         val visibleParticipants =
             (parentFragment as InMeetingFragment).inMeetingViewModel.visibleParticipants
@@ -154,7 +151,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
     /**
      * Method to stop receiving videos from participants who are not visible
      */
-    @ExperimentalCoroutinesApi
     private fun closeVideoWhenScroll() {
         val visibleParticipants =
             (parentFragment as InMeetingFragment).inMeetingViewModel.visibleParticipants
@@ -196,7 +192,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * @param isAdded True, if the participant has been added. False, if the participant has left.
      * @param position The participant's position in the list
      */
-    @ExperimentalCoroutinesApi
     fun peerAddedOrRemoved(
         isAdded: Boolean,
         position: Int,
@@ -258,7 +253,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
      *
      * @param session MegaChatSession
      */
-    @ExperimentalCoroutinesApi
     fun updateSessionOnHold(session: MegaChatSession) {
         (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
             session.peerid,
@@ -280,7 +274,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * @param type type of change, Audio or Video
      * @param session MegaChatSession
      */
-    @ExperimentalCoroutinesApi
     fun updateRemoteAudioVideo(type: Int, session: MegaChatSession) {
         (parentFragment as InMeetingFragment).inMeetingViewModel.getParticipant(
             session.peerid,
@@ -302,7 +295,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
      * @param listPeers List of participants with changes
      * @param typeChange the type of change, name or avatar
      */
-    @ExperimentalCoroutinesApi
     fun updateNameOrAvatar(listPeers: MutableSet<Participant>, typeChange: Int) {
         val iterator = listPeers.iterator()
         iterator.forEach { peer ->
@@ -326,7 +318,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
      *
      * @param listPeers List of participants with changes
      */
-    @ExperimentalCoroutinesApi
     fun updatePrivileges(listPeers: MutableSet<Participant>) {
         val iterator = listPeers.iterator()
         iterator.forEach { peer ->
@@ -361,7 +352,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
     /**
      * Method to delete the videos and texture views of participants
      */
-    @ExperimentalCoroutinesApi
     fun removeTextureView() {
         val iterator = participants.iterator()
         iterator.forEach {
@@ -369,7 +359,6 @@ class GridViewCallFragment : MeetingBaseFragment() {
         }
     }
 
-    @ExperimentalCoroutinesApi
     override fun onDestroyView() {
         logDebug("View destroyed")
         removeTextureView()
