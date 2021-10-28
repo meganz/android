@@ -27,6 +27,7 @@ import android.widget.TextView;
 import java.io.File;
 
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -41,7 +42,7 @@ import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
 
-public class TestPasswordActivity extends PinActivityLollipop implements View.OnClickListener, MegaRequestListenerInterface {
+public class TestPasswordActivity extends PasscodeActivity implements View.OnClickListener, MegaRequestListenerInterface {
 
     private LinearLayout passwordReminderLayout;
     private ImageView passwordReminderCloseButton;
@@ -207,6 +208,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
 
     @Override
     public void onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return;
         dismissActivity(false);
         super.onBackPressed();
     }
@@ -260,7 +262,7 @@ public class TestPasswordActivity extends PinActivityLollipop implements View.On
             testPasswordbackupRecoveryKeyButton.setTextColor(ContextCompat.getColor(this, R.color.red_600_red_300));
             if (counter == 3) {
                 Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
-                intent.putExtra("logout", isLogout());
+                intent.putExtra(ChangePasswordActivityLollipop.KEY_IS_LOGOUT, isLogout());
                 startActivity(intent);
                 onBackPressed();
             }

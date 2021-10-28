@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -55,12 +56,14 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.FrescoUtils.loadGif;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer;
 import static mega.privacy.android.app.utils.PreviewUtils.*;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
 public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
-	
+
+	private FullScreenCallback callback;
 	private Activity activity;
 	private MegaFullScreenImageAdapterLollipop megaFullScreenImageAdapter;
 	private ArrayList<Long> imageHandles;
@@ -87,6 +90,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
     	public TouchImageView imgDisplay;
     	public SimpleDraweeView gifImgDisplay;
     	public ProgressBar progressBar;
+    	public ImageButton playButton;
     	public ProgressBar downloadProgressBar;
     	public long document;
     	public int position;
@@ -334,7 +338,8 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	}
 	
 	// constructor
-	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi) {
+	public MegaFullScreenImageAdapterLollipop(Context context ,Activity activity, ArrayList<Long> imageHandles,
+											  MegaApiAndroid megaApi, FullScreenCallback callback) {
 		this.activity = activity;
 		this.imageHandles = imageHandles;
 		this.megaApi = megaApi;
@@ -343,6 +348,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		this.isFileLink = ((FullScreenImageViewerLollipop) context).isFileLink();
 		this.fileLink = ((FullScreenImageViewerLollipop) context).getCurrentDocument();
 		this.isFolderLink = ((FullScreenImageViewerLollipop) context).isFolderLink();
+		this.callback = callback;
 
 		dbH = DatabaseHandler.getDbHandler(context);
 
@@ -377,14 +383,14 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			MegaApplication app = (MegaApplication) ((FullScreenImageViewerLollipop) context).getApplication();
 			megaApiFolder = app.getMegaApiFolder();
 			MegaNode nodeAuth = megaApiFolder.authorizeNode(node);
+
 			if (nodeAuth == null) {
 				nodeAuth = megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(imageHandles.get(position)));
-				node = nodeAuth;
 			}
-			else {
-				node = nodeAuth;
-			}
+
+			node = nodeAuth;
 		}
+
 		ViewHolderFullImage holder = new ViewHolderFullImage();
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
@@ -402,14 +408,15 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 		holder.downloadProgressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_download_progress_bar);
 		holder.downloadProgressBar.setVisibility(View.GONE);
 		holder.document = imageHandles.get(position);
+
+		holder.playButton = viewLayout.findViewById(R.id.play_button);
+		holder.playButton.setVisibility(View.GONE);
+		holder.playButton.setOnClickListener(v -> callback.onPlayVideo());
 		
 		holder.imgDisplay = viewLayout.findViewById(R.id.full_screen_image_viewer_image);
 		holder.imgDisplay.setOnClickListener(this);
 		holder.gifImgDisplay = viewLayout.findViewById(R.id.full_screen_image_viewer_gif);
 		holder.gifImgDisplay.setOnClickListener(this);
-
-		Bitmap thumb = null;
-		Bitmap preview = null;
 
 		final ProgressBar pb = holder.progressBar;
 
@@ -456,7 +463,9 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
                 setImageHolder(holder, fileLink);
             }
         } else if (node != null) {
-			if (MimeTypeList.typeForName(node.getName()).isGIF()) {
+			MimeTypeList mime = MimeTypeList.typeForName(node.getName());
+
+			if (mime.isGIF()) {
 				holder.isGIF = true;
 				holder.imgDisplay.setVisibility(View.GONE);
 				holder.gifImgDisplay.setVisibility(View.VISIBLE);
@@ -471,7 +480,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 					drawable = ContextCompat.getDrawable(context, MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 				}
 
-				String localPath = getLocalFile(context, node.getName(), node.getSize());
+				String localPath = getLocalFile(node);
                 if (localPath != null) {
                     loadGif(holder.gifImgDisplay, pb, drawable, UriUtil.getUriForFile(new File(localPath)));
                 } else {
@@ -479,45 +488,11 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
                     if (dbH == null) {
                         dbH = DatabaseHandler.getDbHandler(context.getApplicationContext());
                     }
-                    String url = null;
-                    if (dbH != null && dbH.getCredentials() != null) {
-                        if (megaApi.httpServerIsRunning() == 0) {
-                            megaApi.httpServerStart();
-                        }
 
-                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                        activityManager.getMemoryInfo(mi);
-
-                        if (mi.totalMem > BUFFER_COMP) {
-							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                        }
-                        else {
-							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-                            megaApi.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-                        }
-                        url = megaApi.httpServerGetLocalLink(node);
-                    }
-                    else if (isFolderLink){
-                        if (megaApiFolder.httpServerIsRunning() == 0) {
-                            megaApiFolder.httpServerStart();
-                        }
-
-                        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-                        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-                        activityManager.getMemoryInfo(mi);
-
-                        if (mi.totalMem > BUFFER_COMP) {
-							logDebug("Total mem: " + mi.totalMem + " allocate 32 MB");
-                            megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_32MB);
-                        }
-                        else {
-							logDebug("Total mem: " + mi.totalMem + " allocate 16 MB");
-                            megaApiFolder.httpServerSetMaxBufferSize(MAX_BUFFER_16MB);
-                        }
-                        url = megaApiFolder.httpServerGetLocalLink(node);
-                    }
+                    MegaApiAndroid api = isFolderLink ? megaApiFolder : megaApi;
+					setupStreamingServer(api, context);
+					callback.onStartHttpServer();
+					String url = api.httpServerGetLocalLink(node);
 
                     if (url != null) {
                         loadGif(holder.gifImgDisplay, pb, drawable, Uri.parse(url));
@@ -525,6 +500,10 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 				}
 			}
 			else {
+				if (mime.isVideoReproducible()) {
+					holder.playButton.setVisibility(View.VISIBLE);
+				}
+
 				setImageHolder(holder, node);
 			}
 		}
@@ -660,7 +639,7 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 			    float scaleW = getScaleW(outMetrics, density);
 			    float scaleH = getScaleH(outMetrics, density);
 
-				((FullScreenImageViewerLollipop) context).touchImage();
+				callback.onTouchImage();
 
 
 				RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
@@ -859,5 +838,11 @@ public class MegaFullScreenImageAdapterLollipop extends PagerAdapter implements 
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
 	{
 		return true;
+	}
+
+	public interface FullScreenCallback {
+		void onTouchImage();
+		void onPlayVideo();
+		void onStartHttpServer();
 	}
 }

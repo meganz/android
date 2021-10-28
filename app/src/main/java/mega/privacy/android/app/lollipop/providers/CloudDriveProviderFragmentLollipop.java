@@ -6,6 +6,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -35,8 +37,10 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.CheckScrollInterface;
 import mega.privacy.android.app.providers.FileProviderActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
@@ -47,7 +51,7 @@ import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimat
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 
-public class CloudDriveProviderFragmentLollipop extends Fragment{
+public class CloudDriveProviderFragmentLollipop extends Fragment implements CheckScrollInterface {
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -82,6 +86,17 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		}
 	}
 
+	@Override
+	public void checkScroll() {
+		if (listView == null) {
+			return;
+		}
+
+		((FileProviderActivity) context)
+				.changeActionBarElevation(listView.canScrollVertically(SCROLLING_UP_DIRECTION)
+						|| (adapter != null && adapter.isMultipleSelect()), CLOUD_TAB);
+	}
+
 
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -91,6 +106,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			((FileProviderActivity) context).hideTabs(true, CLOUD_TAB);
+			checkScroll();
 			return true;
 		}
 
@@ -98,6 +114,9 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			logDebug("onPrepareActionMode");
 			List<MegaNode> selected = adapter.getSelectedNodes();
+
+			menu.findItem(R.id.cab_menu_share_link)
+					.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
 
 			boolean showDownload = false;
 			boolean showRename = false;
@@ -183,6 +202,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			clearSelections();
 			adapter.setMultipleSelect(false);
 			((FileProviderActivity) context).hideTabs(false, CLOUD_TAB);
+			checkScroll();
 		}
 	}
 
@@ -228,6 +248,13 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
 		listView.setItemAnimator(noChangeRecyclerViewItemAnimator());
+		listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+			@Override
+			public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+				super.onScrolled(recyclerView, dx, dy);
+				checkScroll();
+			}
+		});
 
 		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
 		emptyTextViewFirst = (TextView) v.findViewById(R.id.provider_list_empty_text_first);
@@ -359,9 +386,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment{
 			else{
 				//File selected to download
 				MegaNode n = nodes.get(position);
-				hashes = new long[1];
-				hashes[0]=n.getHandle();
-				((FileProviderActivity) context).downloadAndAttachAfterClick(n.getSize(), hashes);
+				((FileProviderActivity) context).downloadAndAttachAfterClick(n.getHandle());
 			}
 		}
 

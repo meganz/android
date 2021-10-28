@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import nz.mega.sdk.MegaRecentActionBucket;
 
+import static mega.privacy.android.app.utils.LogUtil.logError;
+
 public class BucketSaved implements Serializable {
 
     private long timestamp;
@@ -14,6 +16,11 @@ public class BucketSaved implements Serializable {
 
 
     public BucketSaved(MegaRecentActionBucket bucket) {
+        if (bucket == null) {
+            logError("Error: recent bucket is null");
+            return;
+        }
+
         this.timestamp = bucket.getTimestamp();
         this.userMail = bucket.getUserEmail();
         this.parentHandle = bucket.getParentHandle();

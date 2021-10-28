@@ -1,14 +1,12 @@
 package mega.privacy.android.app.lollipop.adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -59,13 +57,11 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	int positionClicked;
 	ArrayList<MegaShare> shareList;
 	MegaNode node;
-//	RecyclerView listViewActivity;
 	
 	MegaApiAndroid megaApi;
 	MegaChatApiAndroid megaChatApi;
 	DatabaseHandler dbH = null;
-	
-//	boolean removeShare = false;
+
 	boolean multipleSelect = false;
 	
 	OnItemClickListener mItemClickListener;
@@ -75,9 +71,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	SparseBooleanArray selectedItems;
 	
 	final MegaSharedFolderLollipopAdapter megaSharedFolderAdapter;
-	
-	ProgressDialog statusDialog;
-	
+
 	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
 
 	@Override
@@ -259,7 +253,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	
 
 	@Override
-	public void onBindViewHolder(ViewHolderShareList holder, int position) {
+	public void onBindViewHolder(ViewHolderShareList holder, @SuppressLint("RecyclerView") int position) {
 		logDebug("Position: " + position);
 
 		holder.currentPosition = position;
@@ -283,7 +277,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			}
 
 			if(multipleSelect && this.isItemChecked(position)){
-				holder.imageView.setImageResource(R.drawable.ic_select_folder);
+				holder.imageView.setImageResource(R.drawable.ic_chat_avatar_select);
 			}else{
 				/*Default Avatar*/
 				int color = getColorAvatar(contact);

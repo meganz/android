@@ -3,6 +3,7 @@ package mega.privacy.android.app.listeners;
 import android.content.Context;
 
 import mega.privacy.android.app.R;
+
 import android.content.Intent;
 
 import org.jetbrains.annotations.NotNull;
@@ -11,13 +12,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.utils.Constants;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
-import mega.privacy.android.app.activities.GetLinkActivity;
 
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
@@ -34,7 +35,7 @@ public class ExportListener extends BaseListener {
     private int numberRemove;
     private int pendingRemove;
     private int numberError;
-    private String action;
+    private final String action;
     private int numberExport;
     private int pendingExport;
     private StringBuilder exportedLinks;
@@ -43,40 +44,33 @@ public class ExportListener extends BaseListener {
     private ArrayList<AndroidMegaChatMessage> messages;
     final private HashMap<Long, Long> msgIdNodeHandle = new HashMap<>();
 
-    /**
-     * Constructor used for the purpose get the link created.
-     *
-     * @param context     current Context
-     * @param typeAction   Action to manage.
-     */
-    public ExportListener(Context context, String typeAction) {
-        super(context);
-        this.action = typeAction;
-    }
+    private OnExportFinishedListener onExportFinishedListener;
 
     /**
-     * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
+     * Constructor used for launch a view intent to share content through the link created
+     * when the request finishes.
      *
-     * @param context     current Context
-     * @param typeAction   Action to manage.
-     * @param shareIntent Intent to share the content
+     * @param context                  Current Context
+     * @param shareIntent              Intent to share the content
+     * @param onExportFinishedListener Listener to manage the result of export request.
      */
-    public ExportListener(Context context, String typeAction, Intent shareIntent) {
+    public ExportListener(Context context, Intent shareIntent, OnExportFinishedListener onExportFinishedListener) {
         super(context);
-        this.action = typeAction;
+        this.action = ACTION_SHARE_NODE;
         this.shareIntent = shareIntent;
+        this.onExportFinishedListener = onExportFinishedListener;
     }
 
     /**
-     * Constructor used for the purpose of launch a view intent to share content through the link created when the request finishes
+     * Constructor used for launch a view intent to share content through the link created
+     * when the request finishes.
      *
      * @param context     current Context
-     * @param typeAction   Action to manage.
      * @param shareIntent Intent to share the content
      */
-    public ExportListener(Context context, String typeAction, Intent shareIntent, long messageId, long chatId){
+    public ExportListener(Context context, Intent shareIntent, long messageId, long chatId) {
         super(context);
-        this.action = typeAction;
+        this.action = ACTION_SHARE_MSG;
         this.shareIntent = shareIntent;
         this.messageId = messageId;
         this.chatId = chatId;
@@ -85,32 +79,43 @@ public class ExportListener extends BaseListener {
     }
 
     /**
-     * Constructor used for the purpose of remove links of one or more nodes
+     * Constructor used for remove links of one or more nodes
      *
-     * @param context      current Context
-     * @param typeAction   Action to manage.
-     * @param numberRemove number of nodes to remove the link
+     * @param context      Current Context
+     * @param numberRemove Number of nodes to remove the link
      */
-    public ExportListener(Context context, String typeAction, int numberRemove) {
+    public ExportListener(Context context, int numberRemove) {
         super(context);
-        this.action = typeAction;
+        this.action = ACTION_REMOVE_LINK;
         this.numberRemove = this.pendingRemove = numberRemove;
     }
 
     /**
-     * Constructor used for the purpose of export multiple nodes, then combine links with
-     * already exported nodes, then share those links.
+     * Constructor used for remove the link of a node.
+     *
+     * @param context                  Current Context
+     * @param onExportFinishedListener Listener to manage the result of export request.
+     */
+    public ExportListener(Context context, OnExportFinishedListener onExportFinishedListener) {
+        super(context);
+        this.action = ACTION_REMOVE_LINK;
+        this.numberRemove = this.pendingRemove = 1;
+        this.onExportFinishedListener = onExportFinishedListener;
+    }
+
+    /**
+     * Constructor used for export multiple nodes, then combine links with already exported nodes,
+     * then share those links.
      *
      * @param context       current Context
-     * @param typeAction   Action to manage.
      * @param numberExport  number of nodes to remove the link
      * @param exportedLinks links of already exported nodes
-     * @param shareIntent Intent to share the content
+     * @param shareIntent   Intent to share the content
      */
-    public ExportListener(Context context, String typeAction, int numberExport, StringBuilder exportedLinks,
+    public ExportListener(Context context, int numberExport, StringBuilder exportedLinks,
                           Intent shareIntent, ArrayList<AndroidMegaChatMessage> messages, long chatId) {
         super(context);
-        this.action = typeAction;
+        this.action = ACTION_SHARE_MSG;
         this.shareIntent = shareIntent;
         this.messages = messages;
         this.chatId = chatId;
@@ -118,7 +123,7 @@ public class ExportListener extends BaseListener {
         this.pendingExport = numberExport;
         this.exportedLinks = exportedLinks;
 
-        for(AndroidMegaChatMessage msg: messages){
+        for (AndroidMegaChatMessage msg : messages) {
             long msgId = msg.getMessage().getMsgId();
             long nodeHandle = msg.getMessage().getMegaNodeList().get(0).getHandle();
             msgIdNodeHandle.put(nodeHandle, msgId);
@@ -126,19 +131,17 @@ public class ExportListener extends BaseListener {
     }
 
     /**
-     * Constructor used for the purpose of export multiple nodes, then combine links with
-     * already exported nodes, then share those links.
+     * Constructor used for export multiple nodes, then combine links with already exported nodes,
+     * then share those links.
      *
      * @param context       current Context
-     * @param typeAction   Action to manage.
      * @param numberExport  number of nodes to remove the link
      * @param exportedLinks links of already exported nodes
-     * @param shareIntent Intent to share the content
+     * @param shareIntent   Intent to share the content
      */
-    public ExportListener(Context context, String typeAction, int numberExport, StringBuilder exportedLinks,
-        Intent shareIntent) {
+    public ExportListener(Context context, int numberExport, StringBuilder exportedLinks, Intent shareIntent) {
         super(context);
-        this.action = typeAction;
+        this.action = ACTION_SHARE_NODE;
         this.shareIntent = shareIntent;
         this.numberExport = numberExport;
         this.pendingExport = numberExport;
@@ -206,24 +209,14 @@ public class ExportListener extends BaseListener {
                         logError("Removing link error");
                         showSnackbar(context, getQuantityString(R.plurals.context_link_removal_error, numberRemove));
                     } else {
+                        if (onExportFinishedListener != null) {
+                            onExportFinishedListener.onExportFinished();
+                        }
+
                         showSnackbar(context, getQuantityString(R.plurals.context_link_removal_success, numberRemove));
                     }
                 }
 
-                break;
-
-            case ACTION_GET_LINK:
-                if (context instanceof GetLinkActivity) {
-                    if (e.getErrorCode() == MegaError.API_OK && request.getLink() != null) {
-                        ((GetLinkActivity) context).setLink();
-                    } else {
-                        logError("Error exporting node: " + e.getErrorString());
-                        if (e.getErrorCode() != MegaError.API_EBUSINESSPASTDUE) {
-                            ((GetLinkActivity) context).showSnackbar(SNACKBAR_TYPE,
-                                    context.getString(R.string.context_no_link), MEGACHAT_INVALID_HANDLE);
-                        }
-                    }
-                }
                 break;
 
             case ACTION_SHARE_NODE:
@@ -262,6 +255,10 @@ public class ExportListener extends BaseListener {
                         logDebug("Start share one item");
                         if (shareIntent != null) {
                             startShareIntent(context, shareIntent, request.getLink());
+
+                            if (onExportFinishedListener != null) {
+                                onExportFinishedListener.onExportFinished();
+                            }
                         }
                         return;
                     }
@@ -283,5 +280,16 @@ public class ExportListener extends BaseListener {
 
                 break;
         }
+    }
+
+    /**
+     * Interface to manage the export result.
+     */
+    public interface OnExportFinishedListener {
+
+        /**
+         * Called when export request finished.
+         */
+        void onExportFinished();
     }
 }

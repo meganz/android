@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="mega.privacy.android.app"
     android:installLocation="internalOnly">
 
@@ -17,7 +18,9 @@
         android:xlargeScreens="true"
         android:anyDensity="true"/>
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -38,9 +41,35 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
 
     <!--<uses-permission android:name="android.permission.READ_CALL_LOG"/>-->
     <!--<uses-permission android:name="android.permission.WRITE_CALL_LOG"/>-->
+
+    <queries>
+        <!-- Camera -->
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+
+        <!-- Content opened outside the app -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="application/*" />
+        </intent>
+
+        <!-- URLs opened outside the app -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data
+                android:host="*"
+                android:mimeType="application/*"
+                android:scheme="https" />
+        </intent>
+    </queries>
 
     <application
         android:name="mega.privacy.android.app.MegaApplication"
@@ -50,7 +79,8 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_mega_round"
         android:theme="@style/Theme.Mega"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:screenOrientation="fullUser">
 
         <meta-data
             android:name="fontProviderRequests"
@@ -158,7 +188,6 @@
 
         <activity
             android:name="mega.privacy.android.app.lollipop.FileExplorerActivityLollipop"
-            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustNothing">
@@ -194,7 +223,7 @@
             android:label="@string/app_name">
         </activity>
 
-        <activity android:name="mega.privacy.android.app.providers.PinFileProviderActivity"
+        <activity android:name="mega.privacy.android.app.providers.PasscodeFileProviderActivity"
             android:label="@string/app_name">
         </activity>
 
@@ -279,21 +308,15 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.activities.GetLinkActivity"
-            android:configChanges="screenSize|orientation"
-            android:label="@string/context_get_link_menu">
+            android:name="mega.privacy.android.app.getLink.GetLinkActivity"
+            android:configChanges="screenSize|orientation">
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.SearchByDateActivityLollipop"
-            android:label="@string/action_search_by_date">
-        </activity>
-
-        <activity
-            android:name="mega.privacy.android.app.lollipop.PinLockActivityLollipop"
-            android:label="@string/settings_pin_lock"
-            android:windowSoftInputMode="adjustResize|stateVisible">
-        </activity>
+            android:name="mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity"
+            android:label="@string/settings_passcode_lock"
+            android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustResize|stateVisible"/>
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop"
@@ -391,6 +414,7 @@
         <activity
             android:name=".mediaplayer.AudioPlayerActivity"
             android:windowSoftInputMode="adjustNothing"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
         <activity
@@ -404,20 +428,18 @@
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.BusinessExpiredAlertActivity"
+            android:name="mega.privacy.android.app.lollipop.VerifyTwoFactorActivity"
             android:label="@string/app_name">
         </activity>
 
         <activity
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.ChatCallActivity"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask"
+            android:name="mega.privacy.android.app.BusinessExpiredAlertActivity"
             android:label="@string/app_name">
         </activity>
 
-        <activity android:name="mega.privacy.android.app.SMSVerificationActivity" />
+        <activity android:name="mega.privacy.android.app.smsVerification.SMSVerificationActivity" />
 
-        <activity android:name="mega.privacy.android.app.SMSVerificationReceiveTxtActivity"/>
+        <activity android:name="mega.privacy.android.app.smsVerification.SMSVerificationReceiveTxtActivity"/>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity"
@@ -457,9 +479,8 @@
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.PasscodePreferencesActivity"
-            android:label="@string/settings_pin_lock_switch"
-            android:launchMode="singleTop">
-        </activity>
+            android:label="@string/settings_passcode_lock_switch"
+            android:launchMode="singleTop"/>
 
         <activity
             android:name="mega.privacy.android.app.activities.settingsActivities.CookiePreferencesActivity"
@@ -499,13 +520,32 @@
             android:launchMode="singleTop">
         </activity>
 
+        <activity
+            android:name="mega.privacy.android.app.textEditor.TextEditorActivity"
+            android:launchMode="singleTop">
+        </activity>
+
+        <activity
+            android:name="mega.privacy.android.app.contacts.ContactsActivity"
+            android:launchMode="singleTop" />
+
+        <activity android:name=".meeting.activity.MeetingActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize"/>
+
+        <activity android:name=".meeting.activity.LeftMeetingActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"/>
+
         <service
             android:name="mega.privacy.android.app.lollipop.megachat.ChatUploadService"
             android:exported="false" >
         </service>
 
         <service
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallService"
+            android:name="mega.privacy.android.app.meeting.CallService"
             android:exported="false" >
         </service>
 
@@ -515,7 +555,7 @@
         </service>
 
         <service
-            android:name="mega.privacy.android.app.lollipop.megachat.calls.CallNotificationIntentService"
+            android:name="mega.privacy.android.app.meeting.CallNotificationIntentService"
             android:exported="false" >
         </service>
 
@@ -607,8 +647,7 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="mega.privacy.android.app.lollipop.PinActivityLollipop" />
-
+                android:value="mega.privacy.android.app.activities.PasscodeActivity" />
         </activity>
 
         <activity
@@ -623,6 +662,39 @@
             android:screenOrientation="sensorPortrait"
             android:theme="@style/DocumentScannerTheme"
             android:windowSoftInputMode="stateHidden|adjustNothing"/>
+
+        <activity
+            android:name="mega.privacy.android.app.myAccount.editProfile.EditProfileActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.myAccount.MyAccountActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity"
+            android:label="@string/action_upgrade_account"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name="mega.privacy.android.app.upgradeAccount.ChooseAccountActivity"
+            android:label="@string/choose_account_fragment"
+            android:launchMode="singleTop" />
+
+        <receiver android:name=".psa.AlarmReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.checking.psa" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".activities.AskForDisplayOverActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:launchMode="singleTask"/>
 
     </application>
 

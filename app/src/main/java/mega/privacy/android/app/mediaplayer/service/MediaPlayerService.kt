@@ -19,6 +19,8 @@ import androidx.lifecycle.*
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import com.google.android.exoplayer2.util.EventLogger
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.R
@@ -31,6 +33,7 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -66,11 +69,17 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     private var needPlayWhenReceiveResumeCommand = false
 
     private val mainHandler = Handler(Looper.getMainLooper())
-    private val resumePlayRunnable = {
-        if (needPlayWhenReceiveResumeCommand) {
-            exoPlayer.playWhenReady = true
-            needPlayWhenReceiveResumeCommand = false
+
+    // We need keep it as Runnable here, because we need remove it from handler later,
+    // using lambda doesn't work when remove it from handler.
+    private val resumePlayRunnable = object : Runnable {
+        override fun run() {
+            if (needPlayWhenReceiveResumeCommand) {
+                setPlayWhenReady(true)
+                needPlayWhenReceiveResumeCommand = false
+            }
         }
+
     }
 
     private var audioManager: AudioManager? = null
@@ -81,7 +90,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             when (focusChange) {
                 AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
                     if (exoPlayer.playWhenReady) {
-                        exoPlayer.playWhenReady = false
+                        setPlayWhenReady(false)
                         needPlayWhenGoForeground = false
                         needPlayWhenReceiveResumeCommand = false
                     }
@@ -152,6 +161,14 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
                     playerNotificationManager?.setPlayer(exoPlayer)
                     notificationDismissed = false
                 }
+
+                if (playWhenReady) {
+                    if (viewModel.audioPlayer) {
+                        pauseVideoPlayer(this@MediaPlayerService)
+                    } else {
+                        pauseAudioPlayer(this@MediaPlayerService)
+                    }
+                }
             }
 
             override fun onPlaybackStateChanged(state: Int) {
@@ -167,6 +184,16 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
 
             override fun onPlayerError(error: ExoPlaybackException) {
                 viewModel.onPlayerError()
+            }
+        })
+
+        exoPlayer.addAnalyticsListener(object : EventLogger(trackSelector, "MediaPlayer") {
+            override fun logd(msg: String) {
+                logDebug(msg)
+            }
+
+            override fun loge(msg: String) {
+                logError(msg)
             }
         })
 
@@ -251,7 +278,9 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
             setUseNavigationActionsInCompactView(true)
 
             setPlayer(exoPlayer)
-            setControlDispatcher(CallAwareControlDispatcher(exoPlayer.repeatMode))
+            setControlDispatcher(
+                CallAwareControlDispatcher(exoPlayer.repeatMode)
+            )
         }
     }
 
@@ -260,14 +289,14 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         return binder
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         mainHandler.removeCallbacks(resumePlayRunnable)
 
-        when (intent.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)) {
+        when (intent?.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)) {
             COMMAND_PAUSE -> {
                 if (initialized) {
                     if (playing()) {
-                        exoPlayer.playWhenReady = false
+                        setPlayWhenReady(false)
                         needPlayWhenReceiveResumeCommand = true
                     }
                 } else {
@@ -326,7 +355,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         })
 
         viewModel.retry.observe(this, Observer {
-            if (it) {
+            if (it && exoPlayer.playbackState == Player.STATE_IDLE) {
                 exoPlayer.prepare()
             }
         })
@@ -374,7 +403,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         }
 
         if (!viewModel.paused) {
-            exoPlayer.playWhenReady = true
+            setPlayWhenReady(true)
         }
 
         exoPlayer.prepare()
@@ -413,10 +442,26 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         stopSelf()
     }
 
+    fun setPlayWhenReady(playWhenReady: Boolean) {
+        if (!playWhenReady) {
+            exoPlayer.playWhenReady = false
+        } else if (CallUtil.participatingInACall()) {
+            LiveEventBus.get(EVENT_NOT_ALLOW_PLAY, Boolean::class.java)
+                .post(true)
+        } else {
+            exoPlayer.playWhenReady = true
+        }
+    }
+
+    fun seekTo(index: Int) {
+        exoPlayer.seekTo(index, 0)
+        viewModel.resetRetryState()
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onMoveToForeground() {
         if (needPlayWhenGoForeground) {
-            exoPlayer.playWhenReady = true
+            setPlayWhenReady(true)
             needPlayWhenGoForeground = false
         }
     }
@@ -424,7 +469,7 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onMoveToBackground() {
         if ((!viewModel.backgroundPlayEnabled() || !viewModel.audioPlayer) && playing()) {
-            exoPlayer.playWhenReady = false
+            setPlayWhenReady(false)
             needPlayWhenGoForeground = true
         }
     }
@@ -443,6 +488,18 @@ open class MediaPlayerService : LifecycleService(), LifecycleObserver {
         private const val RESUME_DELAY_MS = 500L
 
         const val SINGLE_PLAYLIST_SIZE = 2
+
+        /**
+         * Pause the video player when play audio.
+         *
+         * @param context Android context
+         */
+        @JvmStatic
+        fun pauseVideoPlayer(context: Context) {
+            val videoPlayerIntent = Intent(context, VideoPlayerService::class.java)
+            videoPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_PAUSE)
+            context.startService(videoPlayerIntent)
+        }
 
         /**
          * Pause the audio player when play video, play/record audio clip, start/receive call.

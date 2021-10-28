@@ -1,13 +1,17 @@
 package mega.privacy.android.app.utils;
 
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.text.Spanned;
 import androidx.core.text.HtmlCompat;
 
-import mega.privacy.android.app.MegaApplication;
+import mega.privacy.android.app.BaseActivity;
 import mega.privacy.android.app.R;
 
 import static mega.privacy.android.app.utils.LogUtil.logError;
+import static mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL;
 import static mega.privacy.android.app.utils.Constants.STRING_SEPARATOR;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
@@ -15,6 +19,8 @@ import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityStr
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
 public class TextUtil {
+
+    private static final String COPIED = "Copied Text";
 
     public static boolean isTextEmpty(String string) {
         return string == null || string.isEmpty() || string.trim().isEmpty();
@@ -78,6 +84,32 @@ public class TextUtil {
 
     public static boolean isEmail(String str) {
         return !isTextEmpty(str) && EMAIL_ADDRESS.matcher(str).matches();
+    }
+
+    /**
+     * Formats a String of notification screen.
+     *
+     * @param context Current Context object, to get a resource(for example, color)
+     *                should not use application context, need to pass it from the caller.
+     * @param text    The text to format.
+     * @return The string formatted.
+     */
+    public static Spanned replaceFormatNotificationText(Context context, String text) {
+        try {
+            text = text.replace("[A]", "<font color='"
+                    + ColorUtils.getColorHexString(context, R.color.grey_900_grey_100)
+                    + "'>");
+            text = text.replace("[/A]", "</font>");
+            text = text.replace("[B]", "<font color='"
+                    + ColorUtils.getColorHexString(context, R.color.grey_500_grey_400)
+                    + "'>");
+
+            text = text.replace("[/B]", "</font>");
+        } catch (Exception e) {
+            logWarning("Error replacing text. ", e);
+        }
+
+        return HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY);
     }
 
     /**
@@ -162,6 +194,17 @@ public class TextUtil {
     }
 
     /**
+     * Gets the string to show as file info details with the next format: "size · date".
+     *
+     * @param size The file size.
+     * @param date The file modification date.
+     * @return The string so show as file info details.
+     */
+    public static String getFileInfo(String size, String date) {
+        return String.format("%s · %s", size, date);
+    }
+
+    /**
      * If the string received is not null, neither empty, adds a STRING_SEPARATOR at the end.
      *
      * @param text Initial text without separator.
@@ -169,5 +212,19 @@ public class TextUtil {
      */
     public static String addStringSeparator(String text) {
         return isTextEmpty(text) ? text : text + STRING_SEPARATOR;
+    }
+
+    /**
+     * Copies some content to the ClipBoard.
+     *
+     * @param activity   Activity from which the content has to be copied.
+     * @param textToCopy Content to copy.
+     */
+    public static void copyToClipboard(Activity activity, String textToCopy) {
+        ClipboardManager clipManager =
+                (ClipboardManager) activity.getSystemService(BaseActivity.CLIPBOARD_SERVICE);
+
+        ClipData clip = ClipData.newPlainText(COPIED_TEXT_LABEL, textToCopy);
+        clipManager.setPrimaryClip(clip);
     }
 }

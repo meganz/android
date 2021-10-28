@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.NewGridRecyclerView;
 import mega.privacy.android.app.fragments.MegaNodeBaseFragment;
@@ -170,8 +171,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleOutgoing());
 			logDebug("Parent Handle: " + managerActivity.getParentHandleOutgoing());
 
-			nodes = megaApi.getChildren(parentNode, managerActivity.orderCloud);
-			addSectionTitle(nodes, adapter.getAdapterType());
+			nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 			adapter.setNodes(nodes);
 		}
 
@@ -196,8 +196,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			MegaNode n = megaApi.getNodeByHandle(managerActivity.getParentHandleOutgoing());
 			managerActivity.setToolbarTitle();
 
-			nodes = megaApi.getChildren(n, managerActivity.orderCloud);
-			addSectionTitle(nodes, adapter.getAdapterType());
+			nodes = megaApi.getChildren(n, sortOrderManagement.getOrderCloud());
 			adapter.setNodes(nodes);
 		}
 
@@ -264,8 +263,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 			managerActivity.supportInvalidateOptionsMenu();
 			managerActivity.setToolbarTitle();
 
-			nodes = megaApi.getChildren(nodes.get(position), managerActivity.orderCloud);
-			addSectionTitle(nodes, adapter.getAdapterType());
+			nodes = megaApi.getChildren(nodes.get(position), sortOrderManagement.getOrderCloud());
 
 			adapter.setNodes(nodes);
 			recyclerView.scrollToPosition(0);
@@ -286,13 +284,12 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 	}
 
 	protected void orderNodes() {
-		if (managerActivity.orderOthers == MegaApiJava.ORDER_DEFAULT_DESC) {
+		if (sortOrderManagement.getOrderOthers() == MegaApiJava.ORDER_DEFAULT_DESC) {
 			sortByNameDescending(this.nodes);
 		} else {
 			sortByNameAscending(this.nodes);
 		}
 
-		addSectionTitle(nodes, adapter.getAdapterType());
 		adapter.setNodes(nodes);
 	}
 
@@ -314,7 +311,6 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 
 			managerActivity.setToolbarTitle();
 			findNodes();
-			addSectionTitle(nodes, adapter.getAdapterType());
 			adapter.setNodes(nodes);
 			visibilityFastScroller();
 
@@ -351,8 +347,7 @@ public class OutgoingSharesFragmentLollipop extends MegaNodeBaseFragment {
 				managerActivity.setToolbarTitle();
 				managerActivity.supportInvalidateOptionsMenu();
 
-				nodes = megaApi.getChildren(parentNode, managerActivity.orderCloud);
-				addSectionTitle(nodes, adapter.getAdapterType());
+				nodes = megaApi.getChildren(parentNode, sortOrderManagement.getOrderCloud());
 
 				adapter.setNodes(nodes);
 				visibilityFastScroller();

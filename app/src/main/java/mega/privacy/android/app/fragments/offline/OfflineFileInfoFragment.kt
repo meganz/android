@@ -17,17 +17,16 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentOfflineFileInfoBinding
-import mega.privacy.android.app.lollipop.controllers.NodeController
+import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
-import mega.privacy.android.app.utils.RunOnUIThreadUtils
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.Util.getStatusBarHeight
-import mega.privacy.android.app.utils.autoCleared
 import kotlin.math.abs
 
 @AndroidEntryPoint
@@ -61,6 +60,8 @@ class OfflineFileInfoFragment : Fragment() {
     private fun observeLiveData() {
         viewModel.node.observe(viewLifecycleOwner) {
             if (it == null) {
+                logError("OfflineFileInfoFragment observed null node")
+
                 requireActivity().finish()
             } else {
                 if (Util.isDarkMode(requireActivity())) {
@@ -178,7 +179,11 @@ class OfflineFileInfoFragment : Fragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setMessage(R.string.confirmation_delete_from_save_for_offline)
             .setPositiveButton(R.string.general_remove) { _, _ ->
-                NodeController(requireContext()).deleteOffline(node)
+                OfflineUtils.removeOffline(
+                    node,
+                    MegaApplication.getInstance().dbH,
+                    requireContext()
+                )
                 onConfirmed()
             }
             .setNegativeButton(R.string.general_cancel, null)

@@ -28,11 +28,15 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.TourImageAdapter;
 import mega.privacy.android.app.components.LoopViewPager;
+import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
+import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment;
 import mega.privacy.android.app.utils.TextUtil;
 
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK;
 import static mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT;
 import static mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT;
@@ -52,6 +56,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
     private ImageView secondItem;
     private ImageView thirdItem;
     private ImageView fourthItem;
+    private ImageView fifthItem;
     private Button bRegister;
     private Button bLogin;
     private ScrollView baseContainer;
@@ -116,6 +121,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         secondItem = (ImageView) v.findViewById(R.id.second_item);
         thirdItem = (ImageView) v.findViewById(R.id.third_item);
         fourthItem = (ImageView) v.findViewById(R.id.fourth_item);
+        fifthItem = (ImageView) v.findViewById(R.id.fifth_item);
 
         baseContainer = (ScrollView) v.findViewById(R.id.tour_fragment_base_container);
 
@@ -124,6 +130,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
 
         bLogin.setOnClickListener(this);
         bRegister.setOnClickListener(this);
+        v.findViewById(R.id.join_meeting_as_guest).setOnClickListener(this);
 
         adapter = new TourImageAdapter((LoginActivityLollipop)context);
         viewPager.setAdapter(adapter);
@@ -133,6 +140,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
 
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
 
@@ -144,6 +152,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
                     case 1:{
@@ -151,6 +160,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
                     case 2:{
@@ -158,6 +168,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
                         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         break;
                     }
                     case 3:{
@@ -165,6 +176,15 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
                         secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
                         fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
+                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        break;
+                    }
+                    case 4:{
+                        firstItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        secondItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        thirdItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fourthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.not_selection_circle_page_adapter));
+                        fifthItem.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.selection_circle_page_adapter));
                         break;
                     }
                 }
@@ -251,7 +271,7 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
         Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
         intent.setData(dataUri);
         if (key != null) {
-            intent.putExtra("MK", key);
+            intent.putExtra(EXTRA_MASTER_KEY, key);
             intent.setAction(ACTION_RESET_PASS_FROM_LINK);
         } else {
             intent.setAction(ACTION_RESET_PASS_FROM_PARK_ACCOUNT);
@@ -270,6 +290,12 @@ public class TourFragmentLollipop extends Fragment implements View.OnClickListen
             case R.id.button_login_tour:
                 logDebug("onLoginClick");
                 ((LoginActivityLollipop)context).showFragment(LOGIN_FRAGMENT);
+                break;
+            case R.id.join_meeting_as_guest:
+                logDebug("onJoinMeetingAsGuestClick");
+                MegaApplication.setLoggingOut(false);
+                new PasteMeetingLinkGuestDialogFragment().show(getChildFragmentManager(),
+                        PasteMeetingLinkGuestDialogFragment.TAG);
                 break;
         }
     }

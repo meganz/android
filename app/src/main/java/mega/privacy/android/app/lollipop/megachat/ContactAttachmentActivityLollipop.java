@@ -20,22 +20,16 @@ import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.controllers.ContactController;
 import mega.privacy.android.app.lollipop.megachat.chatAdapters.MegaContactsAttachedLollipopAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatMessage;
@@ -58,10 +52,8 @@ import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimat
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class ContactAttachmentActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnClickListener {
+public class ContactAttachmentActivityLollipop extends PasscodeActivity implements MegaRequestListenerInterface, MegaChatRequestListenerInterface, OnClickListener {
 
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 	ActionBar aB;
 	Toolbar tB;
 	public String selectedEmail;
@@ -108,31 +100,8 @@ public class ContactAttachmentActivityLollipop extends PinActivityLollipop imple
 	protected void onCreate(Bundle savedInstanceState) {
 		logDebug("onCreate");
 		super.onCreate(savedInstanceState);
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication) getApplication()).getMegaApi();
-		}
 
-		if (megaChatApi == null){
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-
-		if(megaApi==null||megaApi.getRootNode()==null){
-			logDebug("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
-		}
-		if(megaChatApi==null||megaChatApi.getInitState()== MegaChatApi.INIT_ERROR){
-			logDebug("Refresh session - karere");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
+		if(shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()){
 			return;
 		}
 

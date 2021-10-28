@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -74,9 +75,13 @@ import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
+import static android.content.ContentResolver.QUERY_ARG_OFFSET;
+import static android.content.ContentResolver.QUERY_ARG_SQL_LIMIT;
+import static android.content.ContentResolver.QUERY_ARG_SQL_SELECTION;
+import static android.content.ContentResolver.QUERY_ARG_SQL_SORT_ORDER;
+import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.jobservices.SyncRecord.*;
 import static mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction.INIT_CU;
-import static mega.privacy.android.app.constants.SettingsConstants.*;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.PENDING_TAB;
 import static mega.privacy.android.app.lollipop.ManagerActivityLollipop.TRANSFERS_TAB;
 import static mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.MOBILE;
@@ -152,6 +157,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private boolean isLoggingIn;
 
     private MegaApiAndroid megaApi;
+    private MegaApiAndroid megaApiFolder;
     private MegaChatApiAndroid megaChatApi;
     private MegaApplication app;
 
@@ -400,7 +406,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
     private boolean shouldCompressVideo() {
         String qualitySetting = prefs.getUploadVideoQuality();
-        return qualitySetting != null && Integer.parseInt(qualitySetting) == VIDEO_QUALITY_MEDIUM;
+        return qualitySetting != null && Integer.parseInt(qualitySetting) != VIDEO_QUALITY_ORIGINAL;
     }
 
     private void extractMedia(Cursor cursor, boolean isSecondary, boolean isVideo) {
@@ -543,20 +549,37 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
 
             //Primary Media Folder
             Cursor cursorPrimary;
-            String orderVideo = MediaStore.MediaColumns.DATE_MODIFIED;
-            String orderImage = MediaStore.MediaColumns.DATE_MODIFIED;
+            String orderVideo = MediaStore.MediaColumns.DATE_MODIFIED + " ASC ";
+            String orderImage = MediaStore.MediaColumns.DATE_MODIFIED  + " ASC ";
 
-            // Only paging for files in internal storage, because files on SD card usually have same timestamp.
-            if (!isLocalFolderOnSDCard(this, localPath)) {
-                orderVideo += " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
-                orderImage += " ASC LIMIT 0," + PAGE_SIZE;
-            }
+            // Only paging for files in internal storage, because files on SD card usually have same timestamp(the time when the SD is loaded).
+            boolean shouldPagingPrimary = !isLocalFolderOnSDCard(this, localPath);
 
-            if (isVideo) {
-                cursorPrimary = app.getContentResolver().query(uri, projection, selectionCameraVideo, null, orderVideo);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && shouldPagingPrimary) {
+                Bundle args = new Bundle();
+                args.putString(QUERY_ARG_SQL_SORT_ORDER, orderVideo);
+                args.putString(QUERY_ARG_OFFSET, "0");
+                if (isVideo) {
+                    args.putString(QUERY_ARG_SQL_SELECTION, selectionCameraVideo);
+                    args.putString(QUERY_ARG_SQL_LIMIT, Integer.toString(PAGE_SIZE_VIDEO));
+                } else {
+                    args.putString(QUERY_ARG_SQL_SELECTION, selectionCamera);
+                    args.putString(QUERY_ARG_SQL_LIMIT, Integer.toString(PAGE_SIZE));
+                }
+                cursorPrimary = app.getContentResolver().query(uri, projection, args, null);
             } else {
-                cursorPrimary = app.getContentResolver().query(uri, projection, selectionCamera, null, orderImage);
+                if (shouldPagingPrimary) {
+                    orderVideo += " LIMIT 0," + PAGE_SIZE_VIDEO;
+                    orderImage += " LIMIT 0," + PAGE_SIZE;
+                }
+
+                if (isVideo) {
+                    cursorPrimary = app.getContentResolver().query(uri, projection, selectionCameraVideo, null, orderVideo);
+                } else {
+                    cursorPrimary = app.getContentResolver().query(uri, projection, selectionCamera, null, orderImage);
+                }
             }
+
             if (cursorPrimary != null) {
                 extractMedia(cursorPrimary, false, isVideo);
             }
@@ -565,16 +588,35 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             if (secondaryEnabled) {
                 logDebug("Secondary is enabled.");
                 Cursor cursorSecondary;
-                String orderVideoSecondary = MediaStore.MediaColumns.DATE_MODIFIED;
-                String orderImageSecondary = MediaStore.MediaColumns.DATE_MODIFIED;
-                if (!isLocalFolderOnSDCard(this, localPathSecondary)) {
-                    orderVideoSecondary += " ASC LIMIT 0," + PAGE_SIZE_VIDEO;
-                    orderImageSecondary += " ASC LIMIT 0," + PAGE_SIZE;
-                }
-                if (isVideo) {
-                    cursorSecondary = app.getContentResolver().query(uri, projection, selectionSecondaryVideo, null, orderVideoSecondary);
+                String orderVideoSecondary = MediaStore.MediaColumns.DATE_MODIFIED + " ASC ";
+                String orderImageSecondary = MediaStore.MediaColumns.DATE_MODIFIED + " ASC ";
+
+                boolean shouldPagingSecondary = !isLocalFolderOnSDCard(this, localPathSecondary);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && shouldPagingSecondary) {
+                    Bundle args = new Bundle();
+                    args.putString(QUERY_ARG_SQL_SORT_ORDER, orderVideo);
+                    args.putString(QUERY_ARG_OFFSET, "0");
+
+                    if (isVideo) {
+                        args.putString(QUERY_ARG_SQL_SELECTION, selectionSecondaryVideo);
+                        args.putString(QUERY_ARG_SQL_LIMIT, Integer.toString(PAGE_SIZE_VIDEO));
+                    } else {
+                        args.putString(QUERY_ARG_SQL_SELECTION, selectionSecondary);
+                        args.putString(QUERY_ARG_SQL_LIMIT, Integer.toString(PAGE_SIZE));
+                    }
+                    cursorSecondary = app.getContentResolver().query(uri, projection, args, null);
                 } else {
-                    cursorSecondary = app.getContentResolver().query(uri, projection, selectionSecondary, null, orderImageSecondary);
+                    if (shouldPagingSecondary) {
+                        orderVideoSecondary += " LIMIT 0," + PAGE_SIZE_VIDEO;
+                        orderImageSecondary += " LIMIT 0," + PAGE_SIZE;
+                    }
+
+                    if (isVideo) {
+                        cursorSecondary = app.getContentResolver().query(uri, projection, selectionSecondaryVideo, null, orderVideoSecondary);
+                    } else {
+                        cursorSecondary = app.getContentResolver().query(uri, projection, selectionSecondary, null, orderImageSecondary);
+                    }
                 }
 
                 if (cursorSecondary != null) {
@@ -1233,6 +1275,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         }
 
         megaApi = app.getMegaApi();
+        megaApiFolder = app.getMegaApiFolder();
         megaChatApi = app.getMegaChatApi();
 
         if (megaApi == null) {
@@ -1378,6 +1421,8 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     private synchronized void requestFinished(MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_LOGIN) {
             if (e.getErrorCode() == MegaError.API_OK) {
+                logDebug("Logged in. Setting account auth token for folder links.");
+                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
                 logDebug("Fast login OK, Calling fetchNodes from CameraSyncService");
                 megaApi.fetchNodes(this);
             } else {
@@ -1631,6 +1676,9 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             } else {
                 logDebug("No pending videos, finish");
                 onQueueComplete();
+                sendBroadcast(new Intent(ACTION_UPDATE_CU)
+                        .putExtra(PROGRESS, 100)
+                        .putExtra(PENDING_TRANSFERS, 0));
             }
         }
     }
@@ -1711,7 +1759,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
     }
 
     private boolean isCompressedVideoPending() {
-        return dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS).size() > 0 && String.valueOf(VIDEO_QUALITY_MEDIUM).equals(prefs.getUploadVideoQuality());
+        return dbH.findVideoSyncRecordsByState(STATUS_TO_COMPRESS).size() > 0 && !String.valueOf(VIDEO_QUALITY_ORIGINAL).equals(prefs.getUploadVideoQuality());
     }
 
     private boolean isCompressorAvailable() {
@@ -1730,7 +1778,7 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
         totalUploaded = 0;
         totalToUpload = 0;
 
-        mVideoCompressor = new VideoCompressor(this, this);
+        mVideoCompressor = new VideoCompressor(this, this, Integer.parseInt(prefs.getUploadVideoQuality()));
         mVideoCompressor.setPendingList(fullList);
         mVideoCompressor.setOutputRoot(tempRoot);
         long totalPendingSizeInMB = mVideoCompressor.getTotalInputSize() / (1024 * 1024);
@@ -1863,6 +1911,10 @@ public class CameraUploadsService extends Service implements NetworkTypeChangeRe
             } else {
                 inProgress = totalTransfers - pendingTransfers + 1;
             }
+
+            sendBroadcast(new Intent(ACTION_UPDATE_CU)
+                    .putExtra(PROGRESS, progressPercent)
+                    .putExtra(PENDING_TRANSFERS, pendingTransfers));
 
             if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
                 message = getResources().getQuantityString(R.plurals.upload_service_paused_notification, totalTransfers, inProgress, totalTransfers);

@@ -1,18 +1,18 @@
 package mega.privacy.android.app.mediaplayer
 
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
+import android.graphics.PixelFormat
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.view.Menu
-import android.view.MenuItem
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import androidx.activity.viewModels
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -20,11 +20,12 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util.startForegroundService
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
+import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -34,8 +35,12 @@ import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.BaseListener
+import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop
 import mega.privacy.android.app.lollipop.FileInfoActivityLollipop
+import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.lollipop.controllers.NodeController
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
@@ -43,11 +48,15 @@ import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.utils.*
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showSaveToDeviceConfirmDialog
+import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
+import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.shareUri
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.moveToRubbishOrRemove
-import mega.privacy.android.app.utils.MegaNodeDialogUtil.Companion.showRenameNodeDialog
+import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove
+import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
+import mega.privacy.android.app.utils.MegaNodeUtil.handleSelectFolderToImportResult
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
@@ -55,17 +64,22 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownAlert
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
+import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import nz.mega.sdk.*
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
 
 @AndroidEntryPoint
-abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLauncher {
+abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, ActivityLauncher {
 
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var megaChatApi: MegaChatApiAndroid
 
     private lateinit var rootLayout: ViewGroup
     private lateinit var toolbar: Toolbar
@@ -81,7 +95,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
     private var serviceBound = false
     private var playerService: MediaPlayerService? = null
-    private var savingInstanceState = false
 
     private val nodeAttacher by lazy { MegaAttacher(this) }
 
@@ -107,17 +120,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
             if (service is MediaPlayerServiceBinder) {
                 playerService = service.service
 
-                service.service.viewModel.playlist.observe(this@MediaPlayerActivity) {
-                    if (service.service.viewModel.playlistSearchQuery != null) {
-                        return@observe
-                    }
-
-                    if (it.first.isEmpty()) {
-                        stopPlayer()
-                    } else {
-                        refreshMenuOptionsVisibility()
-                    }
-                }
+                refreshMenuOptionsVisibility()
 
                 service.service.metadata.observe(this@MediaPlayerActivity) {
                     dragToExit.nodeChanged(service.service.viewModel.playingHandle)
@@ -130,7 +133,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         }
     }
 
-    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -167,7 +169,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
             rootLayout = binding.rootLayout
             toolbar = binding.toolbar
 
-            toolbar.setBackgroundColor(Color.TRANSPARENT)
             toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.white_alpha_087))
 
             MediaPlayerService.pauseAudioPlayer(this)
@@ -175,6 +176,8 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
             dragToExit.viewerFrom = intent.getIntExtra(INTENT_EXTRA_KEY_VIEWER_FROM, INVALID_VALUE)
             dragToExit.observeThumbnailLocation(this)
         }
+
+        toolbar.setBackgroundColor(Color.TRANSPARENT)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -214,19 +217,50 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
             }
         }
 
+        @Suppress("DEPRECATION")
         if (!isAudioPlayer) {
             window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window?.setDecorFitsSystemWindows(false)
+            } else {
+                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            }
+        } else if (!Util.isDarkMode(this)) {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            }
         }
+
+        if (CallUtil.participatingInACall()) {
+            showNotAllowPlayAlert()
+        }
+
+        LiveEventBus.get(EVENT_NOT_ALLOW_PLAY, Boolean::class.java)
+            .observe(this) {
+                showNotAllowPlayAlert()
+            }
+    }
+
+    private fun showNotAllowPlayAlert() {
+        showSnackbar(StringResourcesUtils.getString(R.string.not_allow_play_alert))
     }
 
     override fun onResume() {
         super.onResume()
 
         refreshMenuOptionsVisibility()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        if (isAudioPlayer()) {
+            window.setFormat(PixelFormat.RGBA_8888) // Needed to fix bg gradient banding
+        }
     }
 
     abstract fun isAudioPlayer(): Boolean
@@ -236,8 +270,6 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
         nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
-
-        savingInstanceState = true
     }
 
     private fun stopPlayer() {
@@ -258,6 +290,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
     }
 
     override fun onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return
         if (!navController.navigateUp()) {
             finish()
         }
@@ -265,20 +298,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
     private fun setupNavDestListener() {
         navController.addOnDestinationChangedListener { _, dest, args ->
-            if (isAudioPlayer()) {
-                toolbar.elevation = 0F
-
-                val color = ContextCompat.getColor(
-                    this,
-                    if (dest.id == R.id.main_player) R.color.grey_020_grey_800 else R.color.white_dark_grey
-                )
-
-                window.statusBarColor = color
-                toolbar.setBackgroundColor(color)
-            } else {
-                window.statusBarColor = Color.BLACK
-                toolbar.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setupToolbarColors()
 
             when (dest.id) {
                 R.id.main_player -> {
@@ -304,7 +324,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
     override fun onDestroy() {
         super.onDestroy()
 
-        if (!savingInstanceState) {
+        if (isFinishing) {
             playerService?.mainPlayerUIClosed()
             dragToExit.showPreviousHiddenThumbnail()
         }
@@ -316,7 +336,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
         nodeSaver.destroy()
 
-        if (!savingInstanceState && !isAudioPlayer(intent)) {
+        if (isFinishing && !isAudioPlayer(intent)) {
             MediaPlayerService.resumeAudioPlayer(this)
         }
     }
@@ -325,6 +345,9 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         optionsMenu = menu
 
         menuInflater.inflate(R.menu.media_player, menu)
+
+        menu.findItem(R.id.get_link).title =
+            StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
 
         searchMenuItem = menu.findItem(R.id.action_search)
 
@@ -359,33 +382,45 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         return true
     }
 
-    private fun toggleAllMenuItemsVisibility(menu: Menu, visible: Boolean) {
-        for (i in 0 until menu.size()) {
-            menu.getItem(i).isVisible = visible
-        }
-    }
-
     private fun refreshMenuOptionsVisibility() {
-        val menu = optionsMenu ?: return
-        val currentFragment = navController.currentDestination?.id ?: return
+        val menu = optionsMenu
+        if (menu == null) {
+            logDebug("refreshMenuOptionsVisibility menu is null")
+            return
+        }
 
-        val adapterType = playerService?.viewModel?.currentIntent
+        val currentFragment = navController.currentDestination?.id
+        if (currentFragment == null) {
+            logDebug("refreshMenuOptionsVisibility currentFragment is null")
+            return
+        }
+
+        val service = playerService
+        if (service == null) {
+            logDebug("refreshMenuOptionsVisibility null service")
+
+            menu.toggleAllMenuItemsVisibility(false)
+            return
+        }
+
+        val adapterType = service.viewModel.currentIntent
             ?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
-        val playingHandle = playerService?.viewModel?.playingHandle
-        if (adapterType == null || playingHandle == null) {
-            toggleAllMenuItemsVisibility(menu, false)
+        if (adapterType == null) {
+            logDebug("refreshMenuOptionsVisibility null adapterType")
+
+            menu.toggleAllMenuItemsVisibility(false)
             return
         }
 
         when (currentFragment) {
             R.id.playlist -> {
-                toggleAllMenuItemsVisibility(menu, false)
+                menu.toggleAllMenuItemsVisibility(false)
                 searchMenuItem?.isVisible = true
             }
             R.id.main_player, R.id.track_info -> {
                 if (adapterType == OFFLINE_ADAPTER) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
 
                     menu.findItem(R.id.properties).isVisible =
                         currentFragment == R.id.main_player
@@ -397,9 +432,9 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                 }
 
                 if (adapterType == RUBBISH_BIN_ADAPTER
-                    || megaApi.isInRubbish(megaApi.getNodeByHandle(playingHandle))
+                    || megaApi.isInRubbish(megaApi.getNodeByHandle(service.viewModel.playingHandle))
                 ) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    menu.toggleAllMenuItemsVisibility(false)
 
                     menu.findItem(R.id.properties).isVisible =
                         currentFragment == R.id.main_player
@@ -411,36 +446,73 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     return
                 }
 
-                if (adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                if (adapterType == FROM_CHAT) {
+                    menu.toggleAllMenuItemsVisibility(false)
+
+                    menu.findItem(R.id.save_to_device).isVisible = true
+                    menu.findItem(R.id.chat_import).isVisible = true
+                    menu.findItem(R.id.chat_save_for_offline).isVisible = true
+
+                    // TODO: share option will be added in AND-12831
+                    menu.findItem(R.id.share).isVisible = false
+
+                    val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
+
+                    val pair = getChatMessage()
+                    val message = pair.second
+
+                    val canRemove = message != null &&
+                            message.userHandle == megaChatApi.myUserHandle && message.isDeletable
+
+                    if (!canRemove) {
+                        moveToTrash.isVisible = false
+                        return
+                    }
+
+                    moveToTrash.isVisible = true
+                    moveToTrash.title = StringResourcesUtils.getString(R.string.context_remove)
+
+                    return
                 }
 
-                val service = playerService
-                if (service == null) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                if (adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER) {
+                    menu.toggleAllMenuItemsVisibility(false)
+
+                    menu.findItem(R.id.save_to_device).isVisible = true
+                    menu.findItem(R.id.share).isVisible = true
+
+                    return
+                }
+
+                if (adapterType == FOLDER_LINK_ADAPTER) {
+                    menu.toggleAllMenuItemsVisibility(false)
+
+                    menu.findItem(R.id.save_to_device).isVisible = true
+
                     return
                 }
 
                 val node = megaApi.getNodeByHandle(service.viewModel.playingHandle)
                 if (node == null) {
-                    toggleAllMenuItemsVisibility(menu, false)
+                    logDebug("refreshMenuOptionsVisibility node is null")
+
+                    menu.toggleAllMenuItemsVisibility(false)
                     return
                 }
 
-                toggleAllMenuItemsVisibility(menu, true)
+                menu.toggleAllMenuItemsVisibility(true)
                 searchMenuItem?.isVisible = false
 
                 menu.findItem(R.id.save_to_device).isVisible = true
 
-                menu.findItem(R.id.properties).isVisible =
-                    currentFragment == R.id.main_player
+                menu.findItem(R.id.properties).isVisible = currentFragment == R.id.main_player
 
                 menu.findItem(R.id.share).isVisible =
                     currentFragment == R.id.main_player && showShareOption(
                         adapterType, adapterType == FOLDER_LINK_ADAPTER, node.handle
                     )
 
-                menu.findItem(R.id.send_to_chat).isVisible = adapterType != FROM_CHAT
+                menu.findItem(R.id.send_to_chat).isVisible = true
 
                 if (megaApi.getAccess(node) == MegaShare.ACCESS_OWNER) {
                     if (node.isExported) {
@@ -454,6 +526,9 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     menu.findItem(R.id.get_link).isVisible = false
                     menu.findItem(R.id.remove_link).isVisible = false
                 }
+
+                menu.findItem(R.id.chat_import).isVisible = false
+                menu.findItem(R.id.chat_save_for_offline).isVisible = false
 
                 val access = megaApi.getAccess(node)
                 when (access) {
@@ -471,8 +546,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                     node.parentHandle != megaApi.rubbishNode.handle
                             && (access == MegaShare.ACCESS_FULL || access == MegaShare.ACCESS_OWNER)
 
-                menu.findItem(R.id.copy).isVisible =
-                    adapterType != FOLDER_LINK_ADAPTER && adapterType != FROM_CHAT
+                menu.findItem(R.id.copy).isVisible = adapterType != FOLDER_LINK_ADAPTER
             }
         }
     }
@@ -486,15 +560,49 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
 
         when (item.itemId) {
             R.id.save_to_device -> {
-                if (adapterType == OFFLINE_ADAPTER) {
-                    nodeSaver.saveOfflineNode(playingHandle, true)
-                } else {
-                    nodeSaver.saveHandle(
-                        playingHandle,
-                        isFolderLink = isFolderLink,
-                        fromMediaViewer = true
-                    )
+                when (adapterType) {
+                    OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(playingHandle, true)
+                    ZIP_ADAPTER -> {
+                        val uri = service.exoPlayer.currentMediaItem?.playbackProperties?.uri
+                            ?: return false
+                        val playlistItem =
+                            service.viewModel.getPlaylistItem(service.exoPlayer.currentMediaItem?.mediaId)
+                                ?: return false
+
+                        nodeSaver.saveUri(uri, playlistItem.nodeName, playlistItem.size, true)
+                    }
+                    FROM_CHAT -> {
+                        val node = getChatMessageNode() ?: return true
+
+                        nodeSaver.saveNode(
+                            node, highPriority = true, fromMediaViewer = true, needSerialize = true
+                        )
+                    }
+                    FILE_LINK_ADAPTER -> {
+                        launchIntent.getStringExtra(EXTRA_SERIALIZE_STRING)?.let { serialize ->
+                            val currentDocument = MegaNode.unserialize(serialize)
+                            if (currentDocument != null) {
+                                logDebug("currentDocument NOT NULL")
+                                nodeSaver.saveNode(
+                                    currentDocument,
+                                    isFolderLink = isFolderLink,
+                                    fromMediaViewer = true,
+                                    needSerialize = true
+                                )
+                            } else {
+                                LogUtil.logWarning("currentDocument is NULL")
+                            }
+                        }
+                    }
+                    else -> {
+                        nodeSaver.saveHandle(
+                            playingHandle,
+                            isFolderLink = isFolderLink,
+                            fromMediaViewer = true
+                        )
+                    }
                 }
+
                 return true
             }
             R.id.properties -> {
@@ -507,22 +615,52 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                         )
                     )
                 } else {
-                    val nodeName =
-                        service.viewModel.getPlaylistItem(service.exoPlayer.currentMediaItem?.mediaId)?.nodeName
-                            ?: return false
-
                     val intent: Intent
 
                     if (adapterType == OFFLINE_ADAPTER) {
                         intent = Intent(this, OfflineFileInfoActivity::class.java)
+                        intent.putExtra(HANDLE, playingHandle.toString())
+
+                        logDebug("onOptionsItemSelected properties offline handle $playingHandle")
                     } else {
                         intent = Intent(this, FileInfoActivityLollipop::class.java)
-                        intent.putExtra(NAME, nodeName)
+                        intent.putExtra(HANDLE, playingHandle)
+
+                        val node = megaApi.getNodeByHandle(playingHandle)
+                        if (node == null) {
+                            logError("onOptionsItemSelected properties non-offline null node")
+
+                            return false
+                        }
+
+                        intent.putExtra(NAME, node.name)
+
+                        val fromIncoming =
+                            if (adapterType == SEARCH_ADAPTER || adapterType == RECENTS_ADAPTER) {
+                                NodeController(this).nodeComesFromIncoming(node)
+                            } else {
+                                false
+                            }
+
+                        when {
+                            adapterType == INCOMING_SHARES_ADAPTER || fromIncoming -> {
+                                intent.putExtra(INTENT_EXTRA_KEY_FROM, FROM_INCOMING_SHARES)
+                                intent.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false)
+                            }
+                            adapterType == INBOX_ADAPTER -> {
+                                intent.putExtra(INTENT_EXTRA_KEY_FROM, FROM_INBOX)
+                            }
+                        }
                     }
 
-                    intent.putExtra(HANDLE, playingHandle)
                     startActivity(intent)
                 }
+                return true
+            }
+            R.id.chat_import -> {
+                val intent = Intent(this, FileExplorerActivityLollipop::class.java)
+                intent.action = FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER
+                startActivityForResult(intent, REQUEST_CODE_SELECT_IMPORT_FOLDER)
                 return true
             }
             R.id.share -> {
@@ -582,6 +720,18 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                 }
                 return true
             }
+            R.id.chat_save_for_offline -> {
+                val pair = getChatMessage()
+                val message = pair.second
+
+                if (message != null) {
+                    ChatController(this).saveForOffline(
+                        message.megaNodeList, megaChatApi.getChatRoom(pair.first), true, this
+                    )
+                }
+
+                return true
+            }
             R.id.rename -> {
                 val node = megaApi.getNodeByHandle(playingHandle) ?: return true
                 showRenameNodeDialog(this, node, this, object : ActionNodeCallback {
@@ -601,11 +751,56 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
                 return true
             }
             R.id.move_to_trash -> {
-                moveToRubbishOrRemove(playingHandle, this, this)
+                if (adapterType == FROM_CHAT) {
+                    val pair = getChatMessage()
+                    val message = pair.second
+
+                    if (message != null) {
+                        removeAttachmentMessage(this, pair.first, message)
+                    }
+                } else {
+                    moveToRubbishOrRemove(playingHandle, this, this)
+                }
                 return true
             }
         }
         return false
+    }
+
+    /**
+     * Get chat id and chat message from the launch intent.
+     *
+     * @return first is chat id, second is chat message
+     */
+    private fun getChatMessage(): Pair<Long, MegaChatMessage?> {
+        val chatId = intent.getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, INVALID_HANDLE)
+        val msgId = intent.getLongExtra(INTENT_EXTRA_KEY_MSG_ID, INVALID_HANDLE)
+
+        if (chatId == INVALID_HANDLE || msgId == INVALID_HANDLE) {
+            return Pair(chatId, null)
+        }
+
+        var message = megaChatApi.getMessage(chatId, msgId)
+
+        if (message == null) {
+            message = megaChatApi.getMessageFromNodeHistory(chatId, msgId)
+        }
+
+        return Pair(chatId, message)
+    }
+
+    /**
+     * Get chat message node from the launch intent.
+     *
+     * @return chat message node
+     */
+    private fun getChatMessageNode(): MegaNode? {
+        val pair = getChatMessage()
+        val message = pair.second ?: return null
+
+        return ChatController(this).authorizeNodeIfPreview(
+            message.megaNodeList.get(0), megaChatApi.getChatRoom(pair.first)
+        )
     }
 
     /**
@@ -644,7 +839,18 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
             return
         }
 
-        viewModel.handleActivityResult(requestCode, resultCode, data, this, this)
+        if (requestCode == REQUEST_CODE_SELECT_IMPORT_FOLDER) {
+            val node = getChatMessageNode() ?: return
+
+            val toHandle = data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
+            if (toHandle == null || toHandle == INVALID_HANDLE) {
+                return
+            }
+
+            handleSelectFolderToImportResult(resultCode, toHandle, node, this, this)
+        } else {
+            viewModel.handleActivityResult(this, requestCode, resultCode, data, this, this)
+        }
     }
 
     fun setToolbarTitle(title: String) {
@@ -666,10 +872,19 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
             toolbar.translationY = -toolbar.measuredHeight.toFloat()
         }
 
-        if (!isAudioPlayer() && hideStatusBar) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!isAudioPlayer() && hideStatusBar) {
+                window?.setDecorFitsSystemWindows(false)
+            } else {
+                window?.setDecorFitsSystemWindows(true)
+            }
         } else {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            @Suppress("DEPRECATION")
+            if (!isAudioPlayer() && hideStatusBar) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            }
         }
     }
 
@@ -685,32 +900,64 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         }
 
         if (!isAudioPlayer()) {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window?.setDecorFitsSystemWindows(false)
+            } else {
+                @Suppress("DEPRECATION")
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+            }
         }
     }
 
-    fun showToolbarElevation(withElevation: Boolean) {
-        // This is the actual color when using Util.changeToolBarElevation, but video player
-        // use different toolbar theme (to force dark theme), which breaks
-        // Util.changeToolBarElevation, so we just use the actual color here.
-        val darkElevationColor = Color.parseColor("#282828")
+    fun setupToolbarColors(showElevation: Boolean = false) {
+        val isDarkMode = Util.isDarkMode(this)
+        val isMainPlayer = navController.currentDestination?.id == R.id.main_player
+        @ColorRes val toolbarBackgroundColor: Int
+        @ColorInt val statusBarColor: Int
+        val toolbarElevation: Float
 
-        if (!isAudioPlayer() || Util.isDarkMode(this)) {
-            toolbar.setBackgroundColor(
-                when {
-                    withElevation -> darkElevationColor
-                    isAudioPlayer() -> Color.TRANSPARENT
-                    else -> ContextCompat.getColor(this, R.color.dark_grey)
-                }
-            )
-
-            post {
-                window.statusBarColor = if (withElevation) darkElevationColor else Color.BLACK
+        when {
+            isAudioPlayer() && isMainPlayer -> {
+                toolbarElevation = 0F
+                toolbarBackgroundColor = android.R.color.transparent
+                statusBarColor = ContextCompat.getColor(this, R.color.grey_020_grey_800)
             }
-        } else {
-            toolbar.elevation =
-                if (withElevation) resources.getDimension(R.dimen.toolbar_elevation) else 0F
+            isDarkMode -> {
+                toolbarElevation = 0F
+                toolbarBackgroundColor = if (showElevation) {
+                    R.color.action_mode_background
+                } else {
+                    R.color.dark_grey
+                }
+                statusBarColor = if (showElevation) {
+                    val elevation = resources.getDimension(R.dimen.toolbar_elevation)
+                    ColorUtils.getColorForElevation(this, elevation)
+                } else {
+                    ContextCompat.getColor(this, android.R.color.transparent)
+                }
+            }
+            else -> {
+                toolbarElevation = if (showElevation) {
+                    resources.getDimension(R.dimen.toolbar_elevation)
+                } else {
+                    0F
+                }
+                toolbarBackgroundColor = if (showElevation) {
+                    R.color.white
+                } else {
+                    android.R.color.transparent
+                }
+                statusBarColor = if (isAudioPlayer()) {
+                    ContextCompat.getColor(this, R.color.white_dark_grey)
+                } else {
+                    ContextCompat.getColor(this, R.color.black)
+                }
+            }
         }
+
+        window.statusBarColor = statusBarColor
+        toolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarBackgroundColor))
+        toolbar.elevation = toolbarElevation
     }
 
     fun setDraggable(draggable: Boolean) {
@@ -726,6 +973,7 @@ abstract class MediaPlayerActivity : BaseActivity(), SnackbarShower, ActivityLau
         when (code) {
             MegaError.API_EOVERQUOTA -> showGeneralTransferOverQuotaWarning()
             MegaError.API_EBLOCKED -> showTakenDownAlert(this)
+            MegaError.API_ENOENT -> stopPlayer()
         }
     }
 

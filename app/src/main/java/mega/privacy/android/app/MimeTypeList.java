@@ -8,12 +8,26 @@ import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+
+import static mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX;
+import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
 
 /*
  * Mime type for files
  */
 public class MimeTypeList {
+	//20MB
+	private static final long MAX_SIZE_OPENABLE_TEXT_FILE = 20971520;
+	private static final List<String> TEXT_EXTENSIONS = Arrays.asList(
+			//Text
+			"txt", "ans", "ascii", "log", "wpd", "json", "md",
+			//Web data
+			"html", "xml", "shtml", "dhtml", "js", "css", "jar", "java", "class",
+			//Web lang
+			"php", "php3", "php4", "php5", "phtml", "inc", "asp", "pl", "cgi", "py", "sql", "accdb", "db", "dbf", "mdb", "pdb", "c", "cpp", "h", "cs", "sh", "vb", "swift");
 	
 	// Icon resource mapping for different file type extensions
 	private static HashMap<String, Integer> resourcesCache;
@@ -67,9 +81,7 @@ public class MimeTypeList {
 		resources.put(R.drawable.ic_numbers_list, new String[] {"numbers", });
 		resources.put(R.drawable.ic_openoffice_list, new String[] {"odp", "odt", "ods"});
 		resources.put(R.drawable.ic_sketch_list, new String[] {"sketch", });
-
-
-
+		resources.put(R.drawable.ic_url_list, new String[]{"url"});
 	}
 
 	private String type;
@@ -91,43 +103,49 @@ public class MimeTypeList {
 			name = "";
 		}
 		String fixedName = name.trim().toLowerCase();
-		String extension = null;
+		String extension = "";
 		int index = fixedName.lastIndexOf(".");
-		if((index != -1) && ((index+1)<fixedName.length())) {
+
+		if (index != INVALID_INDEX && index + 1 < fixedName.length()) {
 			extension = fixedName.substring(index + 1);
-		} else {
-			extension = fixedName;
 		}
+
 		String detectedType = MimeTypeMap.getSingleton()
 				.getMimeTypeFromExtension(extension);
+
 		if (detectedType == null) {
-			if(extension.equals("mkv")) {
-				detectedType = "video/x-matroska";
-			}
-			else if (extension.equals("heic")) {
-				detectedType = "image/heic";
-			}
-			else if (extension.equals("url")) {
-				detectedType = "web/url";
-			}else if(extension.equals("webp")) {
-				detectedType = "image/webp";
-			}
-			else {
-				detectedType = "application/octet-stream";
+			switch (extension) {
+				case "mkv":
+					detectedType = "video/x-matroska";
+					break;
+				case "heic":
+					detectedType = "image/heic";
+					break;
+				case "url":
+					detectedType = "web/url";
+					break;
+				case "webp":
+					detectedType = "image/webp";
+					break;
+				default:
+					detectedType = "application/octet-stream";
+					break;
 			}
 		}
-		if (extension == null) {
-			extension = "";
-		}
+
 		return new MimeTypeList(detectedType, extension);
 	}
 
 	public String getType() {
 		return type;
 	}
+
+	public String getExtension() {
+		return extension;
+	}
 	
 	public boolean isDocument(){
-		boolean r = type.startsWith("application/pdf") || type.startsWith("application/msword") || type.startsWith("application/vnd.ms-excel") || type.startsWith("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || type.startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document") || type.startsWith("application/rtf") || type.startsWith("text/plain");
+		boolean r = type.startsWith("application/pdf") || type.startsWith("application/msword") || type.startsWith("application/vnd.ms-excel") || type.startsWith("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || type.startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document") || type.startsWith("application/rtf") || type.startsWith(TYPE_TEXT_PLAIN);
 		
 		return r;
 	}
@@ -197,7 +215,7 @@ public class MimeTypeList {
 	}
 
 	public boolean isVideoNotSupported() {
-		return extension.equals("flv") || extension.equals("avi") || extension.equals("wmv");
+		return extension.equals("mpg") || extension.equals("avi") || extension.equals("wmv");
 	}
 
 	public boolean isMp4Video() {
@@ -218,7 +236,7 @@ public class MimeTypeList {
 	}
 
 	public boolean isAudioNotSupported() {
-		return extension.equals("flac") || extension.equals("wma") || extension.equals("aif")
+		return extension.equals("wma") || extension.equals("aif")
 				|| extension.equals("aiff") || extension.equals("iff") || extension.equals("oga")|| extension.equals("opus")
 				|| extension.equals("3ga");
 	}
@@ -254,5 +272,34 @@ public class MimeTypeList {
 
 	public boolean isGIF () {
 		return extension.equals("gif") || extension.equals("webp");
+	}
+
+	/**
+	 * Checks if a file is openable in Text editor.
+	 *
+	 * All the contemplated extension are supported by Web client, so mobile clients should try
+	 * to support them too.
+	 *
+	 * @return True if the file is openable, false otherwise.
+	 */
+	public boolean isValidTextFileType() {
+				//Text
+		return type.startsWith(TYPE_TEXT_PLAIN)
+
+				//File extensions considered as plain text
+				|| TEXT_EXTENSIONS.contains(extension)
+
+				//Files without extension
+				|| type.startsWith("application/octet-stream");
+	}
+
+	/**
+	 * Checks if a file is openable in Text editor.
+	 * It's openable if its size is not bigger than MAX_SIZE_OPENABLE_TEXT_FILE.
+	 *
+	 * @return True if the file is openable, false otherwise.
+	 */
+	public boolean isOpenableTextFile(long fileSize) {
+		return  isValidTextFileType() && fileSize <= MAX_SIZE_OPENABLE_TEXT_FILE;
 	}
 }

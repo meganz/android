@@ -64,6 +64,8 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP;
+import static mega.privacy.android.app.utils.Constants.THUMB_MARGIN_DP;
+import static mega.privacy.android.app.utils.Constants.THUMB_SIZE_DP;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.dp2px;
@@ -1138,8 +1140,8 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
-		if(localPath != null) //Si la tengo en el sistema de ficheros
+		String localPath = getLocalFile(document); //if file already exists returns != null
+		if(localPath != null)
 		{
 			ResizerParams params = new ResizerParams();
 			params.document = document;
@@ -1156,8 +1158,8 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
-		if(localPath != null) //Si la tengo en el sistema de ficheros
+		String localPath = getLocalFile(document); //if file already exists returns != null
+		if(localPath != null)
 		{
 			logDebug("localPath is not null: " + localPath);
 			ResizerParams params = new ResizerParams();
@@ -1176,8 +1178,8 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 
-		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
-		if(localPath != null) //Si la tengo en el sistema de ficheros
+		String localPath = getLocalFile(document); //if file already exists returns != null
+		if(localPath != null)
 		{
 			logDebug("localPath is not null: " + localPath);
 			ResizerParams params = new ResizerParams();
@@ -1204,22 +1206,23 @@ public class ThumbnailUtilsLollipop {
 
 		// if the thumbnail bitmap is cached in memory cache
 		Bitmap bitmap = getThumbnailFromCache(key);
+		if (bitmap == null) {
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+			File directoryCachedFile = new File(getThumbFolder(context), key + ".jpg");
+			if (directoryCachedFile.exists()) {
+				bitmap = BitmapFactory.decodeFile(directoryCachedFile.getAbsolutePath(), options);
+			}
+		}
+
 		if (bitmap != null) {
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
+			params.height = params.width = dp2px(Constants.THUMBNAIL_SIZE_DP);
+			int margin = dp2px(Constants.THUMBNAIL_MARGIN_DP);
+			params.setMargins(margin, 0, margin, 0);
 			holder.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
 			return;
 		}
-
-//		 if the thumbnail bitmap is cached in device file directory
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-		File directoryCachedFile = new File(getThumbFolder(context), key + ".jpg" );
-		if (directoryCachedFile.exists()) {
-            bitmap = BitmapFactory.decodeFile(directoryCachedFile.getAbsolutePath(), options);
-            if (bitmap != null) {
-                holder.imageView.setImageBitmap(getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
-                return;
-            }
-        }
 
 		// There is no cache before, we have to start an async task to have the thumbnail bitmap
 		new AttachThumbnailToFileStorageExplorerTask(context, megaApi, adapter, position).execute(document);
@@ -1233,8 +1236,8 @@ public class ThumbnailUtilsLollipop {
 			return;
 		}
 		
-		String localPath = getLocalFile(context, document.getName(), document.getSize()); //if file already exists returns != null
-		if(localPath != null) //Si la tengo en el sistema de ficheros
+		String localPath = getLocalFile(document); //if file already exists returns != null
+		if(localPath != null)
 		{
 			logDebug("localPath is not null: " + localPath);
 			ResizerParams params = new ResizerParams();

@@ -29,8 +29,7 @@ open class SetBackupCallback : SyncEventCallback {
                 localFolder = file,
                 backupName = name,
                 state = access,
-                subState = numDetails,
-                extraData = text
+                subState = numDetails
             )
             logDebug("Save back $backup to local cache.")
             getDatabase().saveBackup(backup)

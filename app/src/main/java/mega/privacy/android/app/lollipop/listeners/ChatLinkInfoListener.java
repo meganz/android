@@ -20,7 +20,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
-import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 
 public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaChatRequestListenerInterface {
@@ -94,55 +94,21 @@ public class ChatLinkInfoListener implements MegaRequestListenerInterface, MegaC
 
                 richLinkMessage = new AndroidMegaRichLinkMessage(link, null);
 
+                logDebug("Logged in. Setting account auth token for folder links.");
+                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
+
                 megaApiFolder.fetchNodes(this);
-            }
-            else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+            } else if (request.getType() == MegaRequest.TYPE_FETCH_NODES) {
                 MegaNode rootNode = megaApiFolder.getRootNode();
-                if (rootNode != null) {
 
-                    if (!request.getFlag()) {
+                if (rootNode != null && !request.getFlag()) {
+                    richLinkMessage.setNode(rootNode);
+                    String content = getFolderInfo(megaApiFolder.getNumChildFolders(rootNode),
+                            megaApiFolder.getNumChildFiles(rootNode));
 
-                        String folderSubHandle = null;
+                    richLinkMessage.setFolderContent(content);
 
-                        String url = richLinkMessage.getUrl();
-                        String [] s = url.split("!");
-                        logDebug("URL parts: "  + s.length);
-                        for (int i=0;i<s.length;i++){
-                            switch (i){
-                                case 1:{
-//                                    folderHandle = s[1];
-//                                    log("URL_handle: " + folderHandle);
-                                    break;
-                                }
-                                case 2:{
-//                                    folderKey = s[2];
-//                                    log("URL_key: " + folderKey);
-                                    break;
-                                }
-                                case 3:{
-                                    folderSubHandle = s[3];
-                                    logDebug("URL_subhandle: " + folderSubHandle);
-                                    break;
-                                }
-                            }
-                        }
-
-                        if(folderSubHandle==null){
-                            richLinkMessage.setNode(rootNode);
-                            String content = getMegaNodeFolderInfo(rootNode);
-                            richLinkMessage.setFolderContent(content);
-                        }
-                        else{
-                            MegaNode pN = megaApiFolder.getNodeByHandle(MegaApiAndroid.base64ToHandle(folderSubHandle));
-                            richLinkMessage.setNode(pN);
-                            if(pN.isFolder()){
-                                String content = getMegaNodeFolderInfo(pN);
-                                richLinkMessage.setFolderContent(content);
-                            }
-                        }
-
-                        ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
-                    }
+                    ((ChatActivityLollipop) context).setRichLinkInfo(msgId, richLinkMessage);
                 }
 
                 megaApiFolder.logout();

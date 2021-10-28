@@ -19,6 +19,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,11 +35,13 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentOfflineBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
-import mega.privacy.android.app.fragments.homepage.Scrollable
+import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.*
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
@@ -46,20 +49,26 @@ import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.Util.getMediaIntent
-import mega.privacy.android.app.utils.Util.scaleHeightPx
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.io.File
+import javax.inject.Inject
 import java.util.*
 import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
+
+    companion object {
+        const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"
+        const val SHOW_OFFLINE_WARNING = "SHOW_OFFLINE_WARNING"
+    }
+
+    @Inject
+    lateinit var sortOrderManagement: SortOrderManagement
+
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
     private val viewModel: OfflineViewModel by viewModels()
@@ -156,7 +165,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         viewModel.setDisplayParam(
             args.rootFolderOnly, isList(),
             if (isList()) 0 else binding.offlineBrowserGrid.spanCount, path,
-            callManager { it.orderCloud } ?: ORDER_DEFAULT_ASC
+            sortOrderManagement.getOrderCloud()
         )
     }
 
@@ -167,6 +176,8 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     private fun setupView() {
+        setupOfflineWarning()
+
         adapter =
             OfflineAdapter(isList(), sortByHeaderViewModel, object : OfflineAdapterListener {
                 override fun onNodeClicked(position: Int, node: OfflineNode) {
@@ -256,19 +267,39 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         }
 
         binding.emptyHintText.text = textToShow.toSpannedHtmlText()
+
+        checkScroll()
+    }
+
+    private fun setupOfflineWarning() {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        binding.offlineWarningLayout.isVisible =
+            preferences.getBoolean(SHOW_OFFLINE_WARNING, true)
+
+        binding.offlineWarningClose.setOnClickListener {
+            preferences.edit().putBoolean(SHOW_OFFLINE_WARNING, false).apply()
+            binding.offlineWarningLayout.isVisible = false
+            checkScroll()
+        }
     }
 
     private fun setupRecyclerView(rv: RecyclerView) {
-        rv.setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
-        rv.clipToPadding = false
-        rv.setHasFixedSize(true)
-        rv.itemAnimator = noChangeRecyclerViewItemAnimator()
-        rv.addOnScrollListener(object : OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                checkScroll()
+        rv.apply {
+            setPadding(0, 0, 0, scaleHeightPx(85, resources.displayMetrics))
+            clipToPadding = false
+            setHasFixedSize(true)
+            itemAnimator = noChangeRecyclerViewItemAnimator()
+
+            if (!args.rootFolderOnly) {
+                addOnScrollListener(object : OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        checkScroll()
+                    }
+                })
             }
-        })
+        }
     }
 
     private fun observeLiveData() {
@@ -378,7 +409,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         viewModel.showSortedBy.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel()
+                manager.showNewSortByPanel(ORDER_CLOUD)
             }
         })
 
@@ -386,7 +417,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
             callManager { manager ->
-                manager.showNewSortByPanel()
+                manager.showNewSortByPanel(ORDER_CLOUD)
             }
         })
 
@@ -636,6 +667,14 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 logDebug("Is URL file")
                 viewModel.processUrlFile(file)
             }
+            mime.isOpenableTextFile(file.length()) -> {
+                startActivity(
+                    Intent(requireContext(), TextEditorActivity::class.java)
+                        .putExtra(INTENT_EXTRA_KEY_FILE_NAME, file.name)
+                        .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
+                        .putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
+                )
+            }
             else -> {
                 openFile(file)
             }
@@ -682,14 +721,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     }
 
     override fun checkScroll() {
-        val rv = recyclerView
+        val rv = recyclerView ?: return
 
-        if (rv != null) {
-            callManager {
-                it.changeAppBarElevation(rv.canScrollVertically(-1) || viewModel.selecting)
-            }
-            LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair::class.java)
-                .post(Pair(this, rv.canScrollVertically(-1)))
+        callManager { manager ->
+            manager.changeAppBarElevation(!args.rootFolderOnly
+                    && (rv.canScrollVertically(SCROLLING_UP_DIRECTION) || viewModel.selecting || binding.offlineWarningLayout.isVisible))
         }
     }
 
@@ -807,10 +843,5 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
 
         viewModel.clearSelection()
         checkScroll()
-    }
-
-
-    companion object {
-        const val REFRESH_OFFLINE_FILE_LIST = "refresh_offline_file_list"
     }
 }

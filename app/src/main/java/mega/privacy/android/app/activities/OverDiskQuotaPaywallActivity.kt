@@ -11,13 +11,17 @@ import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
+import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ACCOUNT_TYPE
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_ASK_PERMISSIONS
 import mega.privacy.android.app.constants.IntentConstants.Companion.EXTRA_UPGRADE_ACCOUNT
-import mega.privacy.android.app.listeners.GetUserDataListener
+import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
-import mega.privacy.android.app.lollipop.PinActivityLollipop
+import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
+
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.DBUtil.callToAccountDetails
@@ -26,8 +30,15 @@ import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.TimeUtils.*
 import mega.privacy.android.app.utils.Util.setDrawUnderStatusBar
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener{
+@AndroidEntryPoint
+class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener{
+
+    @Inject
+    lateinit var myAccountInfo: MyAccountInfo
+    @Inject
+    lateinit var getUserDataUseCase: GetUserDataUseCase
 
     private var timer: CountDownTimer? = null
 
@@ -55,7 +66,10 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
             megaApi.getSpecificAccountDetails(true, false, false)
         }
 
-        megaApi.getUserData(GetUserDataListener(this))
+        getUserDataUseCase.get()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe()
 
         setContentView(R.layout.activity_over_disk_quota_paywall)
 
@@ -129,7 +143,7 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
         val email = megaApi.myEmail
         val warningsTs = megaApi.overquotaWarningsTs
         val files = megaApi.numNodes
-        val size = app.myAccountInfo.usedFormatted
+        val size = myAccountInfo.usedFormatted
         deadlineTs = megaApi.overquotaDeadlineTs
 
         if (warningsTs == null || warningsTs.size() == 0) {
@@ -206,12 +220,12 @@ class OverDiskQuotaPaywallActivity : PinActivityLollipop(), View.OnClickListener
      * space used by the user.
      */
     private fun getProPlanNeeded(): String {
-        val plans = app.myAccountInfo.pricing ?: return getString(R.string.pro_account)
+        val plans = myAccountInfo.pricing ?: return getString(R.string.pro_account)
 
         val gb = 1073741824 // 1024(KB) * 1024(MB) * 1024(GB)
 
         for (i in 0 until plans.numProducts) {
-            if (plans.getGBStorage(i) > app.myAccountInfo.usedStorage / gb) {
+            if (plans.getGBStorage(i) > myAccountInfo.usedStorage / gb) {
                 proPlanNeeded = plans.getProLevel(i)
                 return when(plans.getProLevel(i)) {
                     1 -> getString(R.string.pro1_account)

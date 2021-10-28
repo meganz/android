@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.Player
@@ -67,12 +68,14 @@ class MediaPlayerFragment : Fragment() {
 
     private var toolbarVisible = true
 
+    private var retryFailedDialog: AlertDialog? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return if (MediaPlayerActivity.isAudioPlayer(activity?.intent)) {
+    ): View =
+        if (MediaPlayerActivity.isAudioPlayer(activity?.intent)) {
             val binding = FragmentAudioPlayerBinding.inflate(inflater, container, false)
             audioPlayerVH = AudioPlayerViewHolder(binding)
             binding.root
@@ -81,7 +84,6 @@ class MediaPlayerFragment : Fragment() {
             videoPlayerVH = VideoPlayerViewHolder(binding)
             binding.root
         }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -132,7 +134,7 @@ class MediaPlayerFragment : Fragment() {
         super.onPause()
 
         if (isVideoPlayer() && playerService?.playing() == true) {
-            playerService?.exoPlayer?.playWhenReady = false
+            playerService?.setPlayWhenReady(false)
             videoPlayerPausedForPlaylist = true
         }
     }
@@ -141,6 +143,12 @@ class MediaPlayerFragment : Fragment() {
         super.onSaveInstanceState(outState)
 
         outState.putBoolean(KEY_VIDEO_PAUSED_FOR_PLAYLIST, videoPlayerPausedForPlaylist)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        playlistObserved = false
     }
 
     override fun onDestroy() {
@@ -162,32 +170,34 @@ class MediaPlayerFragment : Fragment() {
             service.viewModel.playlist.observe(viewLifecycleOwner) {
                 logDebug("MediaPlayerService observed playlist ${it.first.size} items")
 
-                if (service.viewModel.playlistSearchQuery != null) {
-                    return@observe
-                }
-
                 audioPlayerVH?.togglePlaylistEnabled(it.first)
                 videoPlayerVH?.togglePlaylistEnabled(it.first)
             }
 
             service.viewModel.retry.observe(viewLifecycleOwner) {
-                if (!it) {
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setCancelable(false)
-                        .setMessage(
-                            StringResourcesUtils.getString(
-                                if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
-                                else R.string.error_fail_to_open_file_no_network
+                when {
+                    !it && retryFailedDialog == null -> {
+                        retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
+                            .setCancelable(false)
+                            .setMessage(
+                                StringResourcesUtils.getString(
+                                    if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
+                                    else R.string.error_fail_to_open_file_no_network
+                                )
                             )
-                        )
-                        .setPositiveButton(
-                            StringResourcesUtils.getString(R.string.general_ok)
-                                .toUpperCase(Locale.ROOT)
-                        ) { _, _ ->
-                            playerService?.stopAudioPlayer()
-                            requireActivity().finish()
-                        }
-                        .show()
+                            .setPositiveButton(
+                                StringResourcesUtils.getString(R.string.general_ok)
+                                    .toUpperCase(Locale.ROOT)
+                            ) { _, _ ->
+                                playerService?.stopAudioPlayer()
+                                requireActivity().finish()
+                            }
+                            .show()
+                    }
+                    it -> {
+                        retryFailedDialog?.dismiss()
+                        retryFailedDialog = null
+                    }
                 }
             }
         }
@@ -200,12 +210,6 @@ class MediaPlayerFragment : Fragment() {
             setupPlayerView(service.exoPlayer, viewHolder.binding.playerView, false)
             viewHolder.layoutArtwork()
             service.metadata.observe(viewLifecycleOwner, viewHolder::displayMetadata)
-
-            // we need setup control buttons again, because reset player would reset
-            // PlayerControlView
-            viewHolder.setupBgPlaySetting(service.viewModel.backgroundPlayEnabled()) {
-                playerService?.viewModel?.toggleBackgroundPlay() ?: false
-            }
 
             viewHolder.setupPlaylistButton(service.viewModel.playlist.value?.first) {
                 findNavController().navigate(R.id.action_player_to_playlist)
@@ -225,7 +229,7 @@ class MediaPlayerFragment : Fragment() {
             }
 
             if (videoPlayerPausedForPlaylist) {
-                service.exoPlayer.playWhenReady = true
+                service.setPlayWhenReady(true)
                 videoPlayerPausedForPlaylist = false
             }
         }
@@ -241,19 +245,15 @@ class MediaPlayerFragment : Fragment() {
         playerView.useController = true
         playerView.controllerShowTimeoutMs = 0
 
-        if (videoPlayer) {
-            playerView.controllerHideOnTouch = true
-
-            playerView.setShowShuffleButton(false)
-            playerView.setRepeatToggleModes(RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE)
-        } else {
-            playerView.controllerHideOnTouch = false
-
-            playerView.setShowShuffleButton(true)
-            playerView.setRepeatToggleModes(
+        playerView.setRepeatToggleModes(
+            if (videoPlayer)
+                RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
+            else
                 RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE or RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
-            )
-        }
+        )
+
+        playerView.controllerHideOnTouch = videoPlayer
+        playerView.setShowShuffleButton(!videoPlayer)
 
         playerView.showController()
 
@@ -308,7 +308,7 @@ class MediaPlayerFragment : Fragment() {
         dragToExit.runEnterAnimation(requireActivity().intent, binding.playerView) {
             if (it) {
                 updateViewForAnimation()
-            } else {
+            } else if (isResumed) {
                 showToolbar()
                 videoPlayerVH?.showController()
 

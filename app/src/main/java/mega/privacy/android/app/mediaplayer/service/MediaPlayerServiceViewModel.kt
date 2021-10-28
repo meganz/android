@@ -18,6 +18,7 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.SettingsConstants.*
 import mega.privacy.android.app.listeners.MegaRequestFinishListener
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.utils.Constants.*
@@ -30,11 +31,13 @@ import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.IGNORE
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtilsLollipop.getThumbFolder
 import mega.privacy.android.app.utils.Util.isOnline
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.*
+import org.jetbrains.anko.defaultSharedPreferences
 import java.io.File
 import java.util.*
 import java.util.concurrent.Callable
@@ -54,11 +57,10 @@ class MediaPlayerServiceViewModel(
 ) : ExposedShuffleOrder.ShuffleChangeListener, MegaTransferListenerInterface {
     private val compositeDisposable = CompositeDisposable()
 
-    private val preferences = context.getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE)
-
-    private var backgroundPlayEnabled = preferences.getBoolean(KEY_BACKGROUND_PLAY_ENABLED, true)
-    private var shuffleEnabled = preferences.getBoolean(KEY_SHUFFLE_ENABLED, false)
-    private var repeatMode = preferences.getInt(KEY_REPEAT_MODE, Player.REPEAT_MODE_OFF)
+    private val preferences = context.defaultSharedPreferences
+    private var backgroundPlayEnabled = preferences.getBoolean(KEY_AUDIO_BACKGROUND_PLAY_ENABLED, true)
+    private var shuffleEnabled = preferences.getBoolean(KEY_AUDIO_SHUFFLE_ENABLED, false)
+    private var repeatMode = preferences.getInt(KEY_AUDIO_REPEAT_MODE, Player.REPEAT_MODE_OFF)
 
     private val createThumbnailFinished = PublishSubject.create<Boolean>()
     private val createThumbnailRequest = MegaRequestFinishListener({
@@ -81,8 +83,11 @@ class MediaPlayerServiceViewModel(
     private val _playingThumbnail = MutableLiveData<File>()
     val playingThumbnail: LiveData<File> = _playingThumbnail
 
-    private val _playlist = MutableLiveData<Triple<List<PlaylistItem>, Int, String>>()
-    val playlist: LiveData<Triple<List<PlaylistItem>, Int, String>> = _playlist
+    private val _playlist = MutableLiveData<Pair<List<PlaylistItem>, Int>>()
+    val playlist: LiveData<Pair<List<PlaylistItem>, Int>> = _playlist
+
+    private val _playlistTitle = MutableLiveData<String>()
+    val playlistTitle: LiveData<String> = _playlistTitle
 
     private val _retry = MutableLiveData<Boolean>()
     val retry: LiveData<Boolean> = _retry
@@ -92,7 +97,6 @@ class MediaPlayerServiceViewModel(
 
     var currentIntent: Intent? = null
         private set
-    var playlistTitle = ""
 
     private val playlistItems = ArrayList<PlaylistItem>()
     private val playlistItemsMap = HashMap<String, PlaylistItem>()
@@ -235,17 +239,19 @@ class MediaPlayerServiceViewModel(
                     .fromCallable(Callable {
                         when (type) {
                             OFFLINE_ADAPTER -> {
-                                playlistTitle = getOfflineFolderName(context, firstPlayHandle)
+                                _playlistTitle.postValue(
+                                    getOfflineFolderName(context, firstPlayHandle)
+                                )
 
                                 buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
                             }
                             AUDIO_BROWSE_ADAPTER -> {
-                                playlistTitle = getString(R.string.upload_to_audio)
+                                _playlistTitle.postValue(getString(R.string.upload_to_audio))
 
                                 buildPlaylistForAudio(intent, firstPlayHandle)
                             }
                             VIDEO_BROWSE_ADAPTER -> {
-                                playlistTitle = getString(R.string.sortby_type_video_first)
+                                _playlistTitle.postValue(getString(R.string.sortby_type_video_first))
 
                                 buildPlaylistForVideos(intent, firstPlayHandle)
                             }
@@ -255,8 +261,7 @@ class MediaPlayerServiceViewModel(
                             LINKS_ADAPTER,
                             INCOMING_SHARES_ADAPTER,
                             OUTGOING_SHARES_ADAPTER,
-                            CONTACT_FILE_ADAPTER,
-                            PHOTO_SYNC_ADAPTER -> {
+                            CONTACT_FILE_ADAPTER -> {
                                 val parentHandle = intent.getLongExtra(
                                     INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                                     INVALID_HANDLE
@@ -267,7 +272,7 @@ class MediaPlayerServiceViewModel(
                                 )
 
                                 if (isInRootLinksLevel(type, parentHandle)) {
-                                    playlistTitle = getString(R.string.tab_links_shares)
+                                    _playlistTitle.postValue(getString(R.string.tab_links_shares))
 
                                     buildPlaylistFromNodes(
                                         megaApi, megaApi.getPublicLinks(order), firstPlayHandle
@@ -276,7 +281,7 @@ class MediaPlayerServiceViewModel(
                                 }
 
                                 if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                                    playlistTitle = getString(R.string.tab_incoming_shares)
+                                    _playlistTitle.postValue(getString(R.string.tab_incoming_shares))
 
                                     buildPlaylistFromNodes(
                                         megaApi, megaApi.getInShares(order), firstPlayHandle
@@ -285,7 +290,7 @@ class MediaPlayerServiceViewModel(
                                 }
 
                                 if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                                    playlistTitle = getString(R.string.tab_outgoing_shares)
+                                    _playlistTitle.postValue(getString(R.string.tab_outgoing_shares))
 
                                     val nodes = ArrayList<MegaNode>()
                                     var lastHandle = INVALID_HANDLE
@@ -307,9 +312,10 @@ class MediaPlayerServiceViewModel(
                                     val contact = megaApi.getContact(email) ?: return@Callable
                                     val nodes = megaApi.getInShares(contact)
 
-                                    playlistTitle =
-                                        getString(R.string.title_incoming_shares_with_explorer) +
+                                    val title =
+                                        getString(R.string.title_incoming_shares_with_explorer) + " " +
                                                 getMegaUserNameDB(contact)
+                                    _playlistTitle.postValue(title)
 
                                     buildPlaylistFromNodes(megaApi, nodes, firstPlayHandle)
                                     return@Callable
@@ -325,7 +331,7 @@ class MediaPlayerServiceViewModel(
                                     megaApi.getNodeByHandle(parentHandle)
                                 }) ?: return@Callable
 
-                                playlistTitle = if (parentHandle == INVALID_HANDLE) {
+                                val title = if (parentHandle == INVALID_HANDLE) {
                                     getString(
                                         when (type) {
                                             RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
@@ -337,10 +343,12 @@ class MediaPlayerServiceViewModel(
                                     parent.name
                                 }
 
+                                _playlistTitle.postValue(title)
+
                                 buildPlaylistFromParent(parent, intent, firstPlayHandle)
                             }
                             RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
-                                playlistTitle = getString(R.string.section_recents)
+                                _playlistTitle.postValue(getString(R.string.section_recents))
 
                                 val handles =
                                     intent.getLongArrayExtra(NODE_HANDLES) ?: return@Callable
@@ -362,7 +370,7 @@ class MediaPlayerServiceViewModel(
                                     megaApiFolder.getNodeByHandle(parentHandle)
                                 }) ?: return@Callable
 
-                                playlistTitle = parent.name
+                                _playlistTitle.postValue(parent.name)
 
                                 buildPlaylistFromNodes(
                                     getApi(type), megaApiFolder.getChildren(parent, order),
@@ -374,7 +382,7 @@ class MediaPlayerServiceViewModel(
                                     intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
                                         ?: return@Callable
 
-                                playlistTitle = File(zipPath).parentFile?.name ?: ""
+                                _playlistTitle.postValue(File(zipPath).parentFile?.name ?: "")
 
                                 val files = File(zipPath).parentFile?.listFiles() ?: return@Callable
                                 buildPlaylistFromFiles(files.asList(), firstPlayHandle)
@@ -410,7 +418,8 @@ class MediaPlayerServiceViewModel(
             }
 
             val playlistItem = PlaylistItem(
-                firstPlayHandle, firstPlayNodeName, thumbnail, 0, PlaylistItem.TYPE_PLAYING
+                firstPlayHandle, firstPlayNodeName, thumbnail, 0, PlaylistItem.TYPE_PLAYING,
+                node?.size ?: INVALID_SIZE
             )
             playlistItems.add(playlistItem)
             playlistItemsMap[firstPlayHandle.toString()] = playlistItem
@@ -433,6 +442,8 @@ class MediaPlayerServiceViewModel(
         playerRetry++
         _retry.value = playerRetry <= MAX_RETRY
     }
+
+    fun isInSearchMode() = playlistSearchQuery?.isTextEmpty() == false
 
     /**
      * Check if the new intent would create the same playlist as current one.
@@ -463,7 +474,8 @@ class MediaPlayerServiceViewModel(
             AUDIO_BROWSE_ADAPTER,
             VIDEO_BROWSE_ADAPTER,
             FROM_CHAT,
-            FILE_LINK_ADAPTER -> {
+            FILE_LINK_ADAPTER,
+            PHOTO_SYNC_ADAPTER -> {
                 return oldType == type
             }
             FILE_BROWSER_ADAPTER,
@@ -473,8 +485,7 @@ class MediaPlayerServiceViewModel(
             INCOMING_SHARES_ADAPTER,
             OUTGOING_SHARES_ADAPTER,
             CONTACT_FILE_ADAPTER,
-            FOLDER_LINK_ADAPTER,
-            PHOTO_SYNC_ADAPTER -> {
+            FOLDER_LINK_ADAPTER -> {
                 val oldParentHandle = oldIntent.getLongExtra(
                     INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                     INVALID_HANDLE
@@ -527,7 +538,8 @@ class MediaPlayerServiceViewModel(
         doBuildPlaylist(
             megaApi, nodes, firstPlayHandle,
             {
-                isFileAvailable(getOfflineFile(context, it)) && filterByNodeName(it.name)
+                val file = getOfflineFile(context, it)
+                isFileAvailable(file) && file.isFile && filterByNodeName(it.name)
             },
             {
                 mediaItemFromFile(getOfflineFile(context, it), it.handle)
@@ -540,6 +552,9 @@ class MediaPlayerServiceViewModel(
             },
             {
                 getThumbnailFile(context, it)
+            },
+            {
+                it.getSize(context)
             }
         )
     }
@@ -596,6 +611,9 @@ class MediaPlayerServiceViewModel(
             },
             {
                 null
+            },
+            {
+                it.length()
             }
         )
     }
@@ -609,10 +627,10 @@ class MediaPlayerServiceViewModel(
         doBuildPlaylist(
             api, nodes, firstPlayHandle,
             {
-                filterByNodeName(it.name)
+                it.isFile && filterByNodeName(it.name)
             },
             {
-                val localPath = getLocalFile(context, it.name, it.size)
+                val localPath = getLocalFile(it)
                 if (isLocalFile(it, api, localPath)) {
                     mediaItemFromFile(File(localPath), it.handle.toString())
                 } else {
@@ -641,6 +659,9 @@ class MediaPlayerServiceViewModel(
             },
             {
                 File(getThumbFolder(context), it.base64Handle.plus(JPG_EXTENSION))
+            },
+            {
+                it.size
             }
         )
     }
@@ -654,6 +675,7 @@ class MediaPlayerServiceViewModel(
         handleGetter: (T) -> Long,
         nameGetter: (T) -> String,
         thumbnailGetter: (T) -> File?,
+        sizeGetter: (T) -> Long,
     ) {
         playlistItems.clear()
         playlistItemsMap.clear()
@@ -680,7 +702,10 @@ class MediaPlayerServiceViewModel(
             }
 
             val playlistItem =
-                PlaylistItem(handle, nameGetter(node), thumbnail, index, PlaylistItem.TYPE_NEXT)
+                PlaylistItem(
+                    handle, nameGetter(node), thumbnail, index, PlaylistItem.TYPE_NEXT,
+                    sizeGetter(node)
+                )
             playlistItems.add(playlistItem)
             playlistItemsMap[handle.toString()] = playlistItem
 
@@ -787,7 +812,7 @@ class MediaPlayerServiceViewModel(
                 playingIndex == index -> PlaylistItem.TYPE_PLAYING
                 else -> PlaylistItem.TYPE_NEXT
             }
-            items[index] = item.finalizeThumbnailAndType(type)
+            items[index] = item.finalizeItem(index, type)
         }
 
         val hasPrevious = playingIndex > 0
@@ -816,19 +841,21 @@ class MediaPlayerServiceViewModel(
         }
 
         logDebug("doPostPlaylistItems post ${items.size} items")
-        _playlist.postValue(Triple(items, scrollPosition, playlistTitle))
+        _playlist.postValue(Pair(items, scrollPosition))
     }
 
     private fun filterPlaylistItems(items: List<PlaylistItem>, filter: String) {
         val filteredItems = ArrayList<PlaylistItem>()
 
-        for (item in items) {
+        for ((index, item) in items.withIndex()) {
             if (item.nodeName.toLowerCase(Locale.ROOT).contains(filter)) {
-                filteredItems.add(item.finalizeThumbnailAndType(PlaylistItem.TYPE_PREVIOUS))
+                // Filter only affects displayed playlist, it doesn't affect what
+                // ExoPlayer is playing, so we still need use the index before filter.
+                filteredItems.add(item.finalizeItem(index, PlaylistItem.TYPE_PREVIOUS))
             }
         }
 
-        _playlist.postValue(Triple(filteredItems, 0, playlistTitle))
+        _playlist.postValue(Pair(filteredItems, 0))
     }
 
     fun getPlaylistItem(handle: String?): PlaylistItem? {
@@ -844,13 +871,21 @@ class MediaPlayerServiceViewModel(
                 playlistItems.removeAt(index)
                 _mediaItemToRemove.value = index
                 if (playlistItems.isEmpty()) {
-                    _playlist.value = Triple(emptyList(), 0, playlistTitle)
+                    _playlist.value = Pair(emptyList(), 0)
+                    _error.value = MegaError.API_ENOENT
                 } else {
+                    resetRetryState()
+
                     postPlaylistItems()
                 }
                 return
             }
         }
+    }
+
+    fun resetRetryState() {
+        playerRetry = 0
+        _retry.value = true
     }
 
     fun updateItemName(handle: Long, newName: String) {
@@ -875,7 +910,7 @@ class MediaPlayerServiceViewModel(
     fun toggleBackgroundPlay(): Boolean {
         backgroundPlayEnabled = !backgroundPlayEnabled
         preferences.edit()
-            .putBoolean(KEY_BACKGROUND_PLAY_ENABLED, backgroundPlayEnabled)
+            .putBoolean(KEY_AUDIO_BACKGROUND_PLAY_ENABLED, backgroundPlayEnabled)
             .apply()
 
         return backgroundPlayEnabled
@@ -888,7 +923,7 @@ class MediaPlayerServiceViewModel(
     fun setShuffleEnabled(enabled: Boolean) {
         shuffleEnabled = enabled
         preferences.edit()
-            .putBoolean(KEY_SHUFFLE_ENABLED, shuffleEnabled)
+            .putBoolean(KEY_AUDIO_SHUFFLE_ENABLED, shuffleEnabled)
             .apply()
 
         postPlaylistItems()
@@ -906,7 +941,7 @@ class MediaPlayerServiceViewModel(
     fun setRepeatMode(repeatMode: Int) {
         this.repeatMode = repeatMode
         preferences.edit()
-            .putInt(KEY_REPEAT_MODE, repeatMode)
+            .putInt(KEY_AUDIO_REPEAT_MODE, repeatMode)
             .apply()
     }
 
@@ -947,7 +982,9 @@ class MediaPlayerServiceViewModel(
             return
         }
 
-        if ((e.errorCode == MegaError.API_EOVERQUOTA && e.value != 0L) || e.errorCode == MegaError.API_EBLOCKED) {
+        if ((e.errorCode == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota && e.value != 0L)
+            || e.errorCode == MegaError.API_EBLOCKED
+        ) {
             _error.value = e.errorCode
         }
     }
@@ -955,11 +992,6 @@ class MediaPlayerServiceViewModel(
     override fun onTransferData(api: MegaApiJava, transfer: MegaTransfer, buffer: ByteArray) = false
 
     companion object {
-        private const val SETTINGS_FILE = "audio_player_settings"
-        private const val KEY_BACKGROUND_PLAY_ENABLED = "background_play_enabled"
-        private const val KEY_SHUFFLE_ENABLED = "shuffle_enabled"
-        private const val KEY_REPEAT_MODE = "repeat_mode"
-
         private const val MAX_RETRY = 6
 
         /**
@@ -969,9 +1001,10 @@ class MediaPlayerServiceViewModel(
          */
         @JvmStatic
         fun clearSettings(context: Context) {
-            context.getSharedPreferences(SETTINGS_FILE, Context.MODE_PRIVATE)
-                .edit()
-                .clear()
+            context.defaultSharedPreferences.edit()
+                .remove(KEY_AUDIO_BACKGROUND_PLAY_ENABLED)
+                .remove(KEY_AUDIO_SHUFFLE_ENABLED)
+                .remove(KEY_AUDIO_REPEAT_MODE)
                 .apply()
         }
     }

@@ -48,21 +48,10 @@ public class FabButtonListener implements FloatingActionButton.OnClickListener{
                             ((ManagerActivityLollipop)context).showUploadPanel();
                             break;
                         }
-                        case CONTACTS:{
-                            logDebug("Add contacts");
-                            if(!isOnline(context)){
-                                if(context instanceof ManagerActivityLollipop){
-                                    ((ManagerActivityLollipop) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-                                }
-                                return;
-                            }
-                            ((ManagerActivityLollipop)context).chooseAddContactDialog(false);
-                            break;
-                        }
                         case CHAT:{
                             logDebug("Create new chat");
                             if (!Util.isFastDoubleClick()) {
-                                ((ManagerActivityLollipop) context).chooseAddContactDialog(true);
+                                ((ManagerActivityLollipop) context).fabMainClickCallback();
                             }
                             break;
                         }

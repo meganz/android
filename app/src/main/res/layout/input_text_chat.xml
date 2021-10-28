@@ -75,7 +75,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="sans-serif-medium"
-                                android:text="@string/edit_message"
+                                android:text="@string/edited_message_text"
                                 android:textColor="@color/teal_200"
                                 android:textSize="12sp" />
 
@@ -85,7 +85,6 @@
                                 android:layout_height="wrap_content"
                                 android:layout_below="@id/edit_msg_title"
                                 android:fontFamily="sans-serif"
-                                android:text="Hi, I have an appointment with adfgdfgd fgdfg dfgdfgd fgdfgd fgdfg"
                                 android:ellipsize="end"
                                 android:singleLine="true"
                                 android:textAppearance="@style/TextAppearance.Mega.Caption.Secondary.Variant"

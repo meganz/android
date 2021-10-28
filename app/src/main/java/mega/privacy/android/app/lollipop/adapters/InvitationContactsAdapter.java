@@ -121,7 +121,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     }
 
     public InvitationContactInfo getItem(int position) {
-        if (position < contactData.size()) {
+        if (position >= 0 && position < contactData.size()) {
             return contactData.get(position);
         }
         return null;
@@ -244,7 +244,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     private void setItemHighlighted(View view) {
         logDebug("setItemHighlighted");
         ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
-        Bitmap image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_select_folder);
+        Bitmap image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_chat_avatar_select);
         if (image != null) {
             imageView.setImageBitmap(image);
         }

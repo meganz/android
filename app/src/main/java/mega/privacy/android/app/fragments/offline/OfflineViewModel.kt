@@ -18,20 +18,13 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.repo.MegaNodeRepo
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.getFileFolderInfo
-import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
-import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.OfflineUtils.getThumbnailFile
+import mega.privacy.android.app.utils.OfflineUtils.*
 import mega.privacy.android.app.utils.RxUtil.logErr
-import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
-import mega.privacy.android.app.utils.Util.getSizeString
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaUtilsAndroid.createThumbnail
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -406,21 +399,7 @@ class OfflineViewModel @ViewModelInject constructor(
     }
 
     fun processUrlFile(file: File) {
-        add(Single
-            .fromCallable {
-                var reader: BufferedReader? = null
-                try {
-                    reader = BufferedReader(InputStreamReader(FileInputStream(file)))
-                    if (reader.readLine() != null) {
-                        val line2 = reader.readLine()
-                        return@fromCallable line2.replace("URL=", "")
-                    }
-                } finally {
-                    reader?.close()
-                }
-
-                return@fromCallable null
-            }
+        add(Single.fromCallable { return@fromCallable getURLOfflineFileContent(file) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -504,11 +483,7 @@ class OfflineViewModel @ViewModelInject constructor(
         return if (file.isDirectory) {
             getFileFolderInfo(file)
         } else {
-            String.format(
-                "%s . %s",
-                getSizeString(file.length()),
-                formatLongDateTime(file.lastModified() / 1000)
-            )
+            getFileInfo(file)
         }
     }
 

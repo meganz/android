@@ -4,6 +4,7 @@ import android.Manifest.permission
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.StatFs
 import android.text.TextUtils
@@ -23,7 +24,7 @@ import mega.privacy.android.app.interfaces.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.*
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode.PICK_FOLDER
-import mega.privacy.android.app.utils.AlertsAndWarnings.Companion.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
@@ -31,6 +32,7 @@ import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
+import mega.privacy.android.app.utils.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
@@ -69,7 +71,7 @@ class NodeSaver(
     private val megaApiFolder = app.megaApiFolder
     private val dbHandler = DatabaseHandler.getDbHandler(app)
 
-    private var saving = Saving.NOTHING
+    private var saving : Saving = Saving.Companion.NOTHING
 
     /**
      * Save an offline node into device.
@@ -77,6 +79,7 @@ class NodeSaver(
      * @param handle handle of the offline node to save
      * @param fromMediaViewer whether this download is from media viewer
      */
+    @JvmOverloads
     fun saveOfflineNode(
         handle: Long,
         fromMediaViewer: Boolean = false
@@ -91,6 +94,7 @@ class NodeSaver(
      * @param node the offline node to save
      * @param fromMediaViewer whether this download is from media viewer
      */
+    @JvmOverloads
     fun saveOfflineNode(
         node: MegaOffline,
         fromMediaViewer: Boolean = false
@@ -104,6 +108,7 @@ class NodeSaver(
      * @param nodes the offline nodes to save
      * @param fromMediaViewer whether this download is from media viewer
      */
+    @JvmOverloads
     fun saveOfflineNodes(
         nodes: List<MegaOffline>,
         fromMediaViewer: Boolean = false
@@ -126,6 +131,7 @@ class NodeSaver(
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
      */
+    @JvmOverloads
     fun saveHandle(
         handle: Long,
         highPriority: Boolean = false,
@@ -138,6 +144,7 @@ class NodeSaver(
 
     /**
      * Save a list of MegaNode into device.
+     * No matter if the list contains only files, or files and folders.
      *
      * @param handles the handle list of nodes to save
      * @param highPriority whether this download is high priority or not
@@ -145,6 +152,7 @@ class NodeSaver(
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
      */
+    @JvmOverloads
     fun saveHandles(
         handles: List<Long>,
         highPriority: Boolean = false,
@@ -154,20 +162,17 @@ class NodeSaver(
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
-            var totalSize = 0L
-
             val api = if (isFolderLink) megaApiFolder else megaApi
 
             for (handle in handles) {
                 val node = api.getNodeByHandle(handle)
                 if (node != null) {
                     nodes.add(node)
-                    totalSize += node.size
                 }
             }
 
             MegaNodeSaving(
-                totalSize, highPriority, isFolderLink, nodes, fromMediaViewer, needSerialize
+                nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer, needSerialize
             )
         }
     }
@@ -181,6 +186,7 @@ class NodeSaver(
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
      */
+    @JvmOverloads
     fun saveNode(
         node: MegaNode,
         highPriority: Boolean = false,
@@ -201,13 +207,14 @@ class NodeSaver(
      * @param needSerialize whether this download need serialize
      * @param downloadToGallery whether nodes should be downloaded into gallery
      */
+    @JvmOverloads
     fun saveNodeLists(
         nodeLists: List<MegaNodeList>,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
         needSerialize: Boolean = false,
-        downloadToGallery: Boolean = false,
+        downloadToGallery: Boolean = false
     ) {
         save {
             val nodes = ArrayList<MegaNode>()
@@ -234,17 +241,19 @@ class NodeSaver(
      * @param fromMediaViewer whether this download is from media viewer
      * @param needSerialize whether this download need serialize
      */
+    @JvmOverloads
     fun saveNodes(
         nodes: List<MegaNode>,
         highPriority: Boolean = false,
         isFolderLink: Boolean = false,
         fromMediaViewer: Boolean = false,
-        needSerialize: Boolean = false
+        needSerialize: Boolean = false,
+        downloadToGallery: Boolean = false
     ) {
         save {
             MegaNodeSaving(
                 nodesTotalSize(nodes), highPriority, isFolderLink, nodes, fromMediaViewer,
-                needSerialize
+                needSerialize, downloadToGallery = downloadToGallery
             )
         }
     }
@@ -311,12 +320,32 @@ class NodeSaver(
                 )
 
                 voiceClipSaving.doDownload(
-                    megaApi, megaApiFolder, parentPath, false, null, snackbarShower
+                    megaApi, megaApiFolder, parentPath, false, null, null
                 )
             })
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { logErr("NodeSaver downloadVoiceClip") })
             .addTo(compositeDisposable)
+    }
+
+    /**
+     * Save an Uri into device.
+     *
+     * @param uri uri to save
+     * @param name name of this uri
+     * @param size size of this uri content
+     * @param fromMediaViewer whether this download is from media viewer
+     */
+    @JvmOverloads
+    fun saveUri(
+        uri: Uri,
+        name: String,
+        size: Long,
+        fromMediaViewer: Boolean = false,
+    ) {
+        save {
+            UriSaving(uri, name, size, fromMediaViewer)
+        }
     }
 
     /**
@@ -332,7 +361,7 @@ class NodeSaver(
      * fragment/app should handle the result by other code.
      */
     fun handleActivityResult(requestCode: Int, resultCode: Int, intent: Intent?): Boolean {
-        if (saving == Saving.NOTHING) {
+        if (saving == Saving.Companion.NOTHING) {
             return false
         }
 
@@ -418,7 +447,7 @@ class NodeSaver(
      */
     fun handleRequestPermissionsResult(requestCode: Int): Boolean {
         if (requestCode != REQUEST_WRITE_STORAGE) {
-            return false;
+            return false
         }
 
         if (hasWriteExternalStoragePermission()) {
@@ -508,7 +537,7 @@ class NodeSaver(
         var totalSize = 0L
 
         for (node in nodes) {
-            totalSize += node.size
+            totalSize += if (node.isFolder) nodesTotalSize(megaApi.getChildren(node)) else node.size
         }
 
         return totalSize
@@ -630,8 +659,7 @@ class NodeSaver(
     }
 
     private fun hasWriteExternalStoragePermission(): Boolean =
-        ContextCompat.checkSelfPermission(app, permission.WRITE_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED
+        hasPermissions(app, permission.WRITE_EXTERNAL_STORAGE)
 
     private fun lackPermission(): Boolean {
         if (!hasWriteExternalStoragePermission()) {

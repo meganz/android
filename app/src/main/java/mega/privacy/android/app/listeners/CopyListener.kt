@@ -9,8 +9,10 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.lollipop.controllers.ChatController
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
+import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.LogUtil.*
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
@@ -52,7 +54,7 @@ class CopyListener(
         snackbarShower: SnackbarShower,
         chatController: ChatController,
         chatId: Long,
-        exportListener: ExportListener
+        exportListener: ExportListener?
     ) : this(action, snackbarShower, null, context) {
         initFields(messagesSelected, counter, chatController, chatId, exportListener)
     }
@@ -90,6 +92,11 @@ class CopyListener(
                         snackbarShower.showSnackbar(getString(R.string.context_correctly_copied))
                     }
                     MegaError.API_EOVERQUOTA -> {
+                        if (api.isForeignNode(request.parentHandle)) {
+                            showForeignStorageOverQuotaWarningDialog(context)
+                            return
+                        }
+
                         val intent = Intent(context, ManagerActivityLollipop::class.java)
                         intent.action = ACTION_OVERQUOTA_STORAGE
                         activityLauncher?.launchActivity(intent)

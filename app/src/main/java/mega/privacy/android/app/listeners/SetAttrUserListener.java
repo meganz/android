@@ -9,7 +9,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.jobservices.CameraUploadsService;
 import mega.privacy.android.app.utils.JobUtil;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -50,13 +49,13 @@ public class SetAttrUserListener extends BaseListener {
 
             case USER_ATTR_FIRSTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateFirstName(context, request.getText(), request.getEmail());
+                    updateFirstName(request.getText(), request.getEmail());
                 }
                 break;
 
             case USER_ATTR_LASTNAME:
                 if (e.getErrorCode() == MegaError.API_OK) {
-                    updateLastName(context, request.getText(), request.getEmail());
+                    updateLastName(request.getText(), request.getEmail());
                 }
                 break;
 

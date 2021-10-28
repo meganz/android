@@ -29,7 +29,7 @@ public class ChatDividerItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
 
-        int left = (int) context.getResources().getDimension(R.dimen.divider_width);
+        int left = (int) context.getResources().getDimension(R.dimen.bottom_sheet_item_divider_margin_start);
         int right = parent.getWidth() - parent.getPaddingRight();
 
         int childCount = parent.getChildCount();

@@ -1,6 +1,13 @@
 #!/bin/bash -i
 set -e
 
+if [ ${BASH_VERSINFO:-0} -lt 4 ] ; then
+    echo
+    echo "Bash 4.0 or higher is required to run this script."
+    echo
+    exit 1
+fi
+
 ##############################################################
 # SET THE PATH TO YOUR ANDROID NDK, SDK and JAVA DIRECTORIES #
 ##############################################################
@@ -35,11 +42,13 @@ if [ ! -d "${JAVA_HOME}" ]; then
 fi
 
 NDK_BUILD=${NDK_ROOT}/ndk-build
-JNI_PATH=`pwd`
-LIBDIR=${JNI_PATH}/../obj/local/armeabi
-JAVA_OUTPUT_PATH=${JNI_PATH}/../java
+BASE_PATH=`pwd`
+LIBDIR=${BASE_PATH}/../obj/local/armeabi
+JAVA_OUTPUT_PATH=${BASE_PATH}/../java
 APP_PLATFORM=`grep APP_PLATFORM Application.mk | cut -d '=' -f 2`
-LOG_FILE=/dev/null
+API_LEVEL=`echo ${APP_PLATFORM} | cut -d'-' -f2`
+JOBS=8
+LOG_FILE=/dev/null # Ensure you use a full path
 
 CRYPTOPP=cryptopp
 CRYPTOPP_VERSION=820
@@ -60,7 +69,7 @@ SQLITE_SHA1="ff9b4e140fe0764bc7bc802facf5ac164443f517"
 CURL=curl
 CURL_VERSION=7.67.0
 C_ARES_VERSION=1.15.0
-CURL_EXTRA="--disable-smb --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smtp --disable-gopher --disable-sspi"
+CURL_EXTRA="--disable-dict --disable-file --disable-ftp --disable-gopher --disable-imap --disable-ldap --disable-ldaps --disable-mime --disable-netrc --disable-pop3 --disable-proxy --disable-rtsp --disable-smb --disable-smtp --disable-telnet --disable-tftp --disable-manual"
 CURL_SOURCE_FILE=curl-${CURL_VERSION}.tar.gz
 CURL_SOURCE_FOLDER=curl-${CURL_VERSION}
 CURL_DOWNLOAD_URL=http://curl.haxx.se/download/${CURL_SOURCE_FILE}
@@ -87,11 +96,11 @@ SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/${SODIUM_S
 SODIUM_SHA1="795b73e3f92a362fabee238a71735579bf46bb97"
 
 LIBUV=libuv
-LIBUV_VERSION=1.8.0
+LIBUV_VERSION=1.42.0
 LIBUV_SOURCE_FILE=libuv-v${LIBUV_VERSION}.tar.gz
 LIBUV_SOURCE_FOLDER=libuv-v${LIBUV_VERSION}
 LIBUV_DOWNLOAD_URL=http://dist.libuv.org/dist/v${LIBUV_VERSION}/${LIBUV_SOURCE_FILE}
-LIBUV_SHA1="91ea51844ec0fac1c6358a7ad3e8bba128e9d0cc"
+LIBUV_SHA1="c78715261a1371381c8e2423995829e054daf906"
 
 MEDIAINFO=mediainfo
 MEDIAINFO_VERSION=4ee7f77c087b29055f48d539cd679de8de6f9c48
@@ -108,11 +117,10 @@ ZENLIB_DOWNLOAD_URL=https://github.com/MediaArea/ZenLib/archive/${ZENLIB_SOURCE_
 ZENLIB_SHA1="1af04654c9618f54ece624a0bad881a3cfef3692"
 
 LIBWEBSOCKETS=libwebsockets
-LIBWEBSOCKETS_VERSION=33a1e905113f05c3c1eec3b75e0727ca81a551b1
-LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-${LIBWEBSOCKETS_VERSION}.zip
+LIBWEBSOCKETS_VERSION=4.2-stable
+LIBWEBSOCKETS_SOURCE_FILE=libwebsockets-v${LIBWEBSOCKETS_VERSION}.zip
 LIBWEBSOCKETS_SOURCE_FOLDER=libwebsockets-${LIBWEBSOCKETS_VERSION}
-LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/${LIBWEBSOCKETS_VERSION}.zip
-LIBWEBSOCKETS_SHA1="cb99f397f586ce7333a1dc8b3e4a831cfb854dbc"
+LIBWEBSOCKETS_DOWNLOAD_URL=https://github.com/warmcat/libwebsockets/archive/refs/heads/v${LIBWEBSOCKETS_VERSION}.zip
 
 PDFVIEWER=pdfviewer
 PDFVIEWER_VERSION=1.9.0
@@ -127,6 +135,54 @@ EXOPLAYER_SOURCE_FILE=ExoPlayer-r${EXOPLAYER_VERSION}.zip
 EXOPLAYER_SOURCE_FOLDER=ExoPlayer-r${EXOPLAYER_VERSION}
 EXOPLAYER_DOWNLOAD_URL=https://github.com/google/ExoPlayer/archive/r${EXOPLAYER_VERSION}.zip
 EXOPLAYER_SHA1="a6476469ada55d089ea2523e3e78528dc4032e00"
+FFMPEG_VERSION=4.2
+FFMPEG_EXT_LIBRARY=exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
+FLAC_VERSION=1.3.2
+FLAC_SOURCE_FILE=flac-${FLAC_VERSION}.tar.xz
+FLAC_DOWNLOAD_URL=https://ftp.osuosl.org/pub/xiph/releases/flac/${FLAC_SOURCE_FILE}
+FLAC_SHA1="2bdbb56b128a780a5d998e230f2f4f6eb98f33ee"
+FLAC_EXT_LIBRARY=exoplayer-extension-flac-${EXOPLAYER_VERSION}.aar
+
+function setupEnv()
+{
+    local ABI="${1}"
+
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        local TOOLCHAIN="${NDK_ROOT}/toolchains/llvm/prebuilt/darwin-x86_64"
+    else
+        local TOOLCHAIN="${NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64"
+    fi
+    export AR=$TOOLCHAIN/bin/llvm-ar
+    export LD=$TOOLCHAIN/bin/ld
+    export RANLIB=$TOOLCHAIN/bin/llvm-ranlib
+    export STRIP=$TOOLCHAIN/bin/llvm-strip
+
+    if [ "${ABI}" == "armeabi-v7a" ]; then
+        export TARGET_HOST="armv7a-linux-androideabi"
+    elif [ "${ABI}" == "arm64-v8a" ]; then
+        export TARGET_HOST="aarch64-linux-android"
+    elif [ "${ABI}" == "x86" ]; then
+        export TARGET_HOST="i686-linux-android"
+    elif [ "${ABI}" == "x86_64" ]; then
+        export TARGET_HOST="x86_64-linux-android"
+    fi
+
+    export CC=$TOOLCHAIN/bin/${TARGET_HOST}${API_LEVEL}-clang
+    export AS=$CC
+    export CXX=$TOOLCHAIN/bin/${TARGET_HOST}${API_LEVEL}-clang++
+}
+
+function cleanEnv()
+{
+    unset AR
+    unset LD
+    unset RANLIB
+    unset STRIP
+    unset TARGET_HOST
+    unset CC
+    unset AS
+    unset CXX
+}
 
 function downloadCheckAndUnpack()
 {
@@ -159,6 +215,33 @@ function downloadCheckAndUnpack()
     elif [[ "${FILENAME}" =~ \.zip$ ]]; then
         echo "* Extracting ZIP file..."
     	unzip -o ${FILENAME} -d ${TARGETPATH} &>> ${LOG_FILE}
+    else
+        echo "* Dont know how to extract '${FILENAME}'"
+        exit 1
+    fi
+
+    echo "* Extraction finished"
+}
+
+function downloadAndUnpack()
+{
+    local URL=$1
+    local FILENAME=$2
+    local TARGETPATH=$3
+
+    if [[ -f ${FILENAME} ]]; then
+        echo "* Already downloaded: '${FILENAME}'"
+    else
+        echo "* Downloading '${FILENAME}' ..."
+        wget --no-check-certificate -O ${FILENAME} ${URL} &>> ${LOG_FILE}
+    fi
+
+    if [[ "${FILENAME}" =~ \.tar\.[^\.]+$ ]]; then
+        echo "* Extracting TAR file..."
+        tar --overwrite -xf ${FILENAME} -C ${TARGETPATH} &>> ${LOG_FILE}
+    elif [[ "${FILENAME}" =~ \.zip$ ]]; then
+        echo "* Extracting ZIP file..."
+        unzip -o ${FILENAME} -d ${TARGETPATH} &>> ${LOG_FILE}
     else
         echo "* Dont know how to extract '${FILENAME}'"
         exit 1
@@ -203,6 +286,7 @@ fi
 if [ "$1" == "clean_mega" ]; then
     echo "* Deleting Java bindings"
     make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &>> ${LOG_FILE}
+    rm -rf ${JAVA_OUTPUT_PATH}/nz/mega/sdk/*.java
     rm -rf megachat/megachat.cpp megachat/megachat.h
     echo "* Deleting tarballs"
     rm -rf ../obj/local/armeabi
@@ -216,6 +300,7 @@ fi
 if [ "$1" == "clean" ]; then
     echo "* Deleting Java bindings"
     make -C mega -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=${JAVA_OUTPUT_PATH} &>> ${LOG_FILE}
+    rm -rf ${JAVA_OUTPUT_PATH}/nz/mega/sdk/*.java
     rm -rf megachat/megachat.cpp megachat/megachat.h
     
     echo "* Deleting source folders"    
@@ -262,6 +347,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}
     rm -rf ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready
     rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}
+    rm -rf ${EXOPLAYER}/${FLAC_SOURCE_FILE}
     rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
 
     echo "* Deleting object files"
@@ -275,6 +361,8 @@ if [ "$1" == "clean" ]; then
     rm -rf ../libs/arm64-v8a
     rm -rf ../libs/x86
     rm -rf ../libs/x86_64
+    rm -rf ${EXOPLAYER}/${FFMPEG_EXT_LIBRARY}
+    rm -rf ${EXOPLAYER}/${FLAC_EXT_LIBRARY}
 
     echo "* Task finished OK"
     exit 0
@@ -355,6 +443,25 @@ echo "* Setting up libuv"
 if [ ! -f ${LIBUV}/${LIBUV_SOURCE_FILE}.ready ]; then
     downloadCheckAndUnpack ${LIBUV_DOWNLOAD_URL} ${LIBUV}/${LIBUV_SOURCE_FILE} ${LIBUV_SHA1} ${LIBUV}
     ln -sf ${LIBUV_SOURCE_FOLDER} ${LIBUV}/${LIBUV}
+
+    for ABI in ${BUILD_ARCHS}; do
+        echo "* Prebuilding libuv for ${ABI}"
+
+        setupEnv "${ABI}"
+
+        pushd ${LIBUV}/${LIBUV} &>> ${LOG_FILE}
+        ./autogen.sh &>> ${LOG_FILE}
+        ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${LIBUV}/${LIBUV}"/libuv-android-${ABI} &>> ${LOG_FILE}
+        make clean &>> ${LOG_FILE}
+        make -j${JOBS} &>> ${LOG_FILE}
+        make install &>> ${LOG_FILE}
+
+        popd &>> ${LOG_FILE}
+
+    done
+
+    cleanEnv
+
     touch ${LIBUV}/${LIBUV_SOURCE_FILE}.ready
 fi
 echo "* libuv is ready"
@@ -376,48 +483,10 @@ if [ ! -f ${MEDIAINFO}/${MEDIAINFO_SOURCE_FILE}.ready ]; then
 fi
 echo "* MediaInfo is ready"
 
-echo "* Setting up cURL with c-ares"
-if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
-    echo "* Setting up cURL"
-    downloadCheckAndUnpack ${CURL_DOWNLOAD_URL} ${CURL}/${CURL_SOURCE_FILE} ${CURL_SHA1} ${CURL}
-    ln -sf ${CURL_SOURCE_FOLDER} ${CURL}/${CURL}
-    echo "* cURL is ready"
-
-    echo "* Setting up c-ares"
-    downloadCheckAndUnpack ${ARES_DOWNLOAD_URL} ${CURL}/${ARES_SOURCE_FILE} ${ARES_SHA1} ${CURL}
-    ln -sf ${ARES_SOURCE_FOLDER} ${CURL}/ares
-    ln -sf ../${ARES_SOURCE_FOLDER} ${CURL}/${CURL_SOURCE_FOLDER}/ares
-    echo "* c-ares is ready"
-    touch ${CURL}/${CURL_SOURCE_FILE}.ready
-fi
-echo "* cURL with c-ares is ready"
-
-echo "* Setting up crashlytics"
-if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
-    wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE}
-    wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O  ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C}
-
-    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/ares_android.c < curl/ares_android_c.patch; then
-        patch -p0 ${CURL}/ares/ares_android.c < curl/ares_android_c.patch
-    fi
-
-    touch ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready
-fi
-echo "* crashlytics is ready"
-
-echo "* Setting up libwebsockets"
-if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
-    downloadCheckAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS_SHA1} ${LIBWEBSOCKETS}
-    ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
-    touch ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
-fi
-echo "* libwebsockets is ready"
-
-
 echo "* Checking WebRTC"
 if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
     WEBRTCSHA1=`sha1sum megachat/webrtc/libwebrtc_arm64.a | cut -d " " -f 1`
-    pwd
+
     if [ ! -d megachat/webrtc/include ] || [ $WEBRTCSHA1  != "0755036bf7afd622e96289468fd753e20213cf01" ]; then
         echo "ERROR: WebRTC not ready. Please download it from this link: https://mega.nz/file/RsMEgZqA#s0P754Ua7AqvWwamCeyrvNcyhmPjHTQQIxtqziSU4HI"
         echo "and uncompress it in megachat/webrtc"
@@ -428,6 +497,112 @@ if grep ^DISABLE_WEBRTC Application.mk | grep --quiet false; then
 else
     echo "* WebRTC is not needed"
 fi
+
+echo "* Setting up crashlytics"
+if [ ! -f ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready ]; then
+    wget ${CRASHLYTICS_DOWNLOAD_URL} -O ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE} &>> ${LOG_FILE}
+    wget ${CRASHLYTICS_DOWNLOAD_URL_C} -O  ${CRASHLYTICS_DEST_PATH}/${CRASHLYTICS_SOURCE_FILE_C} &>> ${LOG_FILE}
+
+    touch ${CURL}/${CRASHLYTICS_SOURCE_FILE}.ready
+fi
+echo "* crashlytics is ready"
+
+echo "* Setting up cURL with c-ares"
+if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
+    echo "* Setting up cURL"
+    downloadCheckAndUnpack ${CURL_DOWNLOAD_URL} ${CURL}/${CURL_SOURCE_FILE} ${CURL_SHA1} ${CURL}
+    ln -sf ${CURL_SOURCE_FOLDER} ${CURL}/${CURL}
+
+    echo "* Setting up c-ares"
+    downloadCheckAndUnpack ${ARES_DOWNLOAD_URL} ${CURL}/${ARES_SOURCE_FILE} ${ARES_SHA1} ${CURL}
+    ln -sf ${ARES_SOURCE_FOLDER} ${CURL}/ares
+
+    echo "* Patching c-ares to include crashlytics"
+    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}; then
+        patch -p0 ${CURL}/ares/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}
+    fi
+
+    for ABI in ${BUILD_ARCHS}; do
+        echo "* Prebuilding cURL with c-ares for ${ABI}"
+
+        setupEnv "${ABI}"
+
+        if [ "${ABI}" == "armeabi-v7a" ]; then
+            WEBRTC_SUFFIX="arm"
+        elif [ "${ABI}" == "arm64-v8a" ]; then
+            WEBRTC_SUFFIX="arm64"
+        else
+            WEBRTC_SUFFIX=${ABI}
+        fi
+
+        pushd ${CURL}/ares &>> ${LOG_FILE}
+        ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} &>> ${LOG_FILE}
+        make clean &>> ${LOG_FILE}
+        make -j${JOBS} &>> ${LOG_FILE}
+        make install &>> ${LOG_FILE}
+        popd &>> ${LOG_FILE}
+
+        pushd ${CURL}/${CURL} &>> ${LOG_FILE}
+        rm -r boringssl &>> ${LOG_FILE} || :
+        mkdir -p boringssl/lib
+        ln -s ${BASE_PATH}/megachat/webrtc/include/third_party/boringssl/src/include/ boringssl/include
+        ln -s ${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a boringssl/lib/libcrypto.a
+        ln -s ${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a boringssl/lib/libssl.a
+
+        LIBS=-lc++ ./configure --host "${TARGET_HOST}" --with-pic --disable-shared --prefix="${BASE_PATH}/${CURL}/${CURL}"/curl-android-${ABI} --with-ssl="${PWD}"/boringssl/ \
+        --enable-ares="${BASE_PATH}/${CURL}"/ares/ares-android-${ABI} ${CURL_EXTRA} &>> ${LOG_FILE}
+        make clean &>> ${LOG_FILE}
+        make -j${JOBS} &>> ${LOG_FILE}
+        make install &>> ${LOG_FILE}
+        popd &>> ${LOG_FILE}
+    done
+
+    cleanEnv
+
+    touch ${CURL}/${CURL_SOURCE_FILE}.ready
+fi
+echo "* cURL with c-ares is ready"
+
+echo "* Setting up libwebsockets"
+if [ ! -f ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready ]; then
+    downloadAndUnpack ${LIBWEBSOCKETS_DOWNLOAD_URL} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE} ${LIBWEBSOCKETS}
+    ln -sf ${LIBWEBSOCKETS_SOURCE_FOLDER} ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
+
+    for ABI in ${BUILD_ARCHS}; do
+        echo "* Prebuilding libwebsockets for ${ABI}"
+        if [ "${ABI}" == "armeabi-v7a" ]; then
+            WEBRTC_SUFFIX="arm"
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-implicit-int-conversion"
+        elif [ "${ABI}" == "arm64-v8a" ]; then
+            WEBRTC_SUFFIX="arm64"
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-shorten-64-to-32"
+        elif [ "${ABI}" == "x86" ]; then
+            WEBRTC_SUFFIX=${ABI}
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-implicit-int-conversion"
+        elif [ "${ABI}" == "x86_64" ]; then
+            WEBRTC_SUFFIX=${ABI}
+            EXTRA_FLAGS="-DCMAKE_C_FLAGS=-Wno-sign-conversion -Wno-shorten-64-to-32"
+        fi
+
+        rm -r ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE} ||:
+        mkdir -p ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
+        pushd ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/build &>> ${LOG_FILE}
+        cmake -DCMAKE_INSTALL_PREFIX="${BASE_PATH}/${LIBWEBSOCKETS}/${LIBWEBSOCKETS}/libwebsockets-android-${ABI}" -DANDROID_ABI=${ABI} -DANDROID_PLATFORM=${APP_PLATFORM} \
+        -DCMAKE_TOOLCHAIN_FILE=${NDK_ROOT}/build/cmake/android.toolchain.cmake -DLWS_WITH_SHARED=OFF -DLWS_WITH_STATIC=ON -DLWS_WITHOUT_TESTAPPS=ON \
+        -DLWS_WITHOUT_SERVER=ON -DLWS_IPV6=ON -DLWS_STATIC_PIC=ON -DLWS_WITH_HTTP2=0 -DLWS_WITH_BORINGSSL=ON -DLWS_SSL_CLIENT_USE_OS_CA_CERTS=0 \
+        -DLWS_OPENSSL_INCLUDE_DIRS="${BASE_PATH}/megachat/webrtc/include/third_party/boringssl/src/include" -DLWS_OPENSSL_LIBRARIES="${BASE_PATH}/megachat/webrtc/libwebrtc_${WEBRTC_SUFFIX}.a" \
+        -DLWS_WITH_LIBUV=1 -DLWS_LIBUV_INCLUDE_DIRS="${BASE_PATH}/${LIBUV}/${LIBUV}/libuv-android-${ABI}/include" \
+        -DLWS_LIBUV_LIBRARIES="${BASE_PATH}/${LIBUV}/${LIBUV}/libuv-android-${ABI}/lib/libuv.a" "${EXTRA_FLAGS}" \
+        ../ &>> ${LOG_FILE}
+
+        cmake --build . -- -j${JOBS} &>> ${LOG_FILE}
+        cmake --build . --target install &>> ${LOG_FILE}
+        popd &>> ${LOG_FILE}
+    done
+
+    touch ${LIBWEBSOCKETS}/${LIBWEBSOCKETS_SOURCE_FILE}.ready
+fi
+echo "* libwebsockets is ready"
 
 echo "* Setting up PdfViewer"
 if [ ! -f ${PDFVIEWER}/${PDFVIEWER_SOURCE_FILE}.ready ]; then
@@ -461,9 +636,9 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     fi
     ENABLED_DECODERS=(ac3)
     pushd "${FFMPEG_EXT_PATH}/jni" &>> ${LOG_FILE}
-    (git -C ffmpeg pull || git clone git://source.ffmpeg.org/ffmpeg ffmpeg)
+    (git -C ffmpeg pull || git clone git://source.ffmpeg.org/ffmpeg ffmpeg) &>> ${LOG_FILE}
     pushd ffmpeg &>> ${LOG_FILE}
-    git checkout release/4.2
+    git checkout release/${FFMPEG_VERSION} &>> ${LOG_FILE}
     popd &>> ${LOG_FILE}
     echo "* Building FFMPEG"
     ./build_ffmpeg.sh "${FFMPEG_EXT_PATH}" "${NDK_ROOT}" "${HOST_PLATFORM}" "${ENABLED_DECODERS[@]}" &>> ${LOG_FILE}
@@ -472,8 +647,23 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     NDK_REVISION=$(cat ${NDK_ROOT}/source.properties | grep Revision | cut -d " " -f 3)
     sed -i "s/android {/android {\n    ndkVersion '${NDK_REVISION}'/" common_library_config.gradle
     ./gradlew :extension-ffmpeg:assembleRelease &>> ${LOG_FILE}
-    cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../exoplayer-extension-ffmpeg-${EXOPLAYER_VERSION}.aar
+    cp extensions/ffmpeg/buildout/outputs/aar/extension-ffmpeg-release.aar ../${FFMPEG_EXT_LIBRARY}
     popd &>> ${LOG_FILE}
+
+    FLAC_EXT_PATH=${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER}/extensions/flac/src/main/jni
+    downloadCheckAndUnpack ${FLAC_DOWNLOAD_URL} ${EXOPLAYER}/${FLAC_SOURCE_FILE} ${FLAC_SHA1} ${EXOPLAYER}
+    rm -rf ${FLAC_EXT_PATH}/flac
+    mv ${EXOPLAYER}/flac-${FLAC_VERSION} ${FLAC_EXT_PATH}/flac
+    echo "* Building FLAC"
+    pushd ${FLAC_EXT_PATH} &>> ${LOG_FILE}
+    ${NDK_BUILD} APP_ABI=all -j4 &>> ${LOG_FILE}
+    popd &>> ${LOG_FILE}
+    echo "* Building ExoPlayer FLAC extension"
+    pushd ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER} &>> ${LOG_FILE}
+    ./gradlew :extension-flac:assembleRelease &>> ${LOG_FILE}
+    cp extensions/flac/buildout/outputs/aar/extension-flac-release.aar ../${FLAC_EXT_LIBRARY}
+    popd &>> ${LOG_FILE}
+
     touch ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
 fi
 echo "* ExoPlayer is ready"
@@ -484,28 +674,28 @@ rm -rf ../tmpLibs
 mkdir ../tmpLibs
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86`" ]; then
     echo "* Running ndk-build x86"
-    ${NDK_BUILD} -j8 APP_ABI=x86
+    ${NDK_BUILD} -j${JOBS} APP_ABI=x86 &>> ${LOG_FILE}
     mv ../libs/x86 ../tmpLibs/
     echo "* ndk-build finished for x86"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w armeabi-v7a`" ]; then
     echo "* Running ndk-build arm 32bits"
-    ${NDK_BUILD} -j8 APP_ABI=armeabi-v7a
+    ${NDK_BUILD} -j${JOBS} APP_ABI=armeabi-v7a &>> ${LOG_FILE}
     mv ../libs/armeabi-v7a ../tmpLibs/
     echo "* ndk-build finished for arm 32bits"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w x86_64`" ]; then
     echo "* Running ndk-build x86_64"
-    ${NDK_BUILD} -j8 APP_ABI=x86_64
+    ${NDK_BUILD} -j${JOBS} APP_ABI=x86_64 &>> ${LOG_FILE}
     mv ../libs/x86_64 ../tmpLibs/
     echo "* ndk-build finished for x86_64"
 fi
 
 if [ -n "`echo ${BUILD_ARCHS} | grep -w arm64-v8a`" ]; then
     echo "* Running ndk-build arm 64bits"
-    ${NDK_BUILD} -j8 APP_ABI=arm64-v8a
+    ${NDK_BUILD} -j${JOBS} APP_ABI=arm64-v8a &>> ${LOG_FILE}
     echo "* ndk-build finished for arm 64bits"
     mv ../libs/arm64-v8a ../tmpLibs/
 fi

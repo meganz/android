@@ -2,7 +2,7 @@ package mega.privacy.android.app.components.saver
 
 import android.content.Context
 import android.content.Intent
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
@@ -60,7 +60,7 @@ class OfflineSaving(
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
-        snackbarShower: SnackbarShower,
+        snackbarShower: SnackbarShower?,
     ): AutoPlayInfo {
         val context = MegaApplication.getInstance()
 
@@ -88,7 +88,7 @@ class OfflineSaving(
             } else {
                 getQuantityString(R.plurals.download_finish, totalFiles, totalFiles)
             }
-            snackbarShower.showSnackbar(message)
+            snackbarShower?.showSnackbar(message)
         }
 
         if (nodes.size != 1 || nodes[0].isFolder) {

@@ -222,7 +222,7 @@ class TrackInfoViewModel @ViewModelInject constructor(
                             )
                         }
 
-                        saveOffline(offlineParent, node, context, context as Activity)
+                        saveOffline(offlineParent, node, context as Activity)
                     }
                 })
                 .subscribeOn(Schedulers.io())

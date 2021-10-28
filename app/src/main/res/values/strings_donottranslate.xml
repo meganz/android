@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" context="Name of the app" translatable="false">MEGA</string>
-    <string name="lite_account" context="PRO Lite account" translatable="false">Lite</string>
     <string name="pro_account" context="PRO account" translatable="false">Pro</string>
     <string name="pro1_account" context="PRO I account" translatable="false">Pro I</string>
     <string name="pro2_account" context="PRO II account" translatable="false">Pro II</string>
@@ -9,4 +8,8 @@
     <string name="url_qr_2fa" context="URL that is used to generate Two-Factor Authentication QR code" translatable="false">otpauth://totp/MEGA:%s?secret=%s&amp;issuer=MEGA</string>
 
     <string name="audio_player_notification_channel_name" context="Name of audio player notification channel" translatable="false">MEGA Audio Player</string>
+
+    <string name="staging_api_server" context="Text to show as staging api server option" translatable="false">Staging</string>
+    <string name="staging444_api_server" context="Text to show as staging, port 444, api server option" translatable="false">Staging:444</string>
+    <string name="sandbox3_api_server" context="Text to show as sandbox3 api server option" translatable="false">Sandbox3</string>
 </resources>

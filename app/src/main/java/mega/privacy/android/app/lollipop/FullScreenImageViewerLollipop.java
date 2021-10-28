@@ -2,13 +2,10 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -19,7 +16,6 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
@@ -43,17 +39,17 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.List;
 
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ExtendedViewPager;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.components.TouchImageView;
 import mega.privacy.android.app.components.attacher.MegaAttacher;
 import mega.privacy.android.app.components.dragger.DragToExitSupport;
@@ -62,12 +58,11 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.adapters.MegaFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.adapters.MegaOfflineFullScreenImageAdapterLollipop;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
+import mega.privacy.android.app.repo.MegaNodeRepo;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -80,33 +75,34 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
-import static mega.privacy.android.app.SearchNodesTask.*;
 import static mega.privacy.android.app.lollipop.FileInfoActivityLollipop.*;
 import static mega.privacy.android.app.lollipop.managerSections.SearchFragmentLollipop.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.moveToRubbishOrRemove;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog;
 import static mega.privacy.android.app.utils.MegaNodeUtil.*;
 import static mega.privacy.android.app.utils.OfflineUtils.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static nz.mega.sdk.MegaApiJava.*;
 import static mega.privacy.android.app.utils.Util.*;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
-public class FullScreenImageViewerLollipop extends PinActivityLollipop
+public class FullScreenImageViewerLollipop extends PasscodeActivity
 		implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface,
-		SnackbarShower {
+		SnackbarShower, MegaFullScreenImageAdapterLollipop.FullScreenCallback {
 
 	int placeholderCount;
 
 	private DisplayMetrics outMetrics;
 
-	private boolean aBshown = true;
-
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 
 	AppBarLayout appBarLayout;
 	Toolbar tB;
@@ -158,8 +154,6 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 	private ExtendedViewPager viewPager;
 
 	private FullScreenImageViewerLollipop fullScreenImageViewer;
-    private MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 
     private ArrayList<String> paths;
 	private String offlinePathDirectory;
@@ -193,6 +187,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 	private long parentNodeHandle = INVALID_HANDLE;
 
+	private boolean needStopHttpServer;
+
 	@Override
 	public void onDestroy(){
 		if(megaApi != null){
@@ -205,6 +201,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		nodeSaver.destroy();
 
 		dragToExit.showPreviousHiddenThumbnail();
+
+		if (needStopHttpServer) {
+			MegaApiAndroid api = isFolderLink() ? megaApiFolder : megaApi;
+			api.httpServerStop();
+		}
 
 		super.onDestroy();
 	}
@@ -223,7 +224,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 	boolean isDownloaded(MegaNode node) {
 		logDebug("Node Handle: " + node.getHandle());
 
-		return getLocalFile(this, node.getName(), node.getSize()) != null;
+		return getLocalFile(node) != null;
 	}
 
 	@Override
@@ -234,6 +235,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		inflater.inflate(R.menu.activity_full_screen_image_viewer, menu);
 
 		getlinkIcon = menu.findItem(R.id.full_image_viewer_get_link);
+		getlinkIcon.setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, 1));
 		getlinkIcon.setVisible(false);
 		removelinkIcon = menu.findItem(R.id.full_image_viewer_remove_link);
 		removelinkIcon.setVisible(false);
@@ -555,6 +557,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		return super.onPrepareOptionsMenu(menu);
 	}
 
+	@SuppressLint("NonConstantResourceId")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		logDebug("onOptionsItemSelected");
@@ -602,10 +605,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 				LayoutInflater inflater = getLayoutInflater();
 				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
-				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
-				TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
-				TextView symbol = (TextView) dialoglayout.findViewById(R.id.dialog_link_symbol);
-				TextView removeText = (TextView) dialoglayout.findViewById(R.id.dialog_link_text_remove);
+				TextView url = dialoglayout.findViewById(R.id.dialog_link_link_url);
+				TextView key = dialoglayout.findViewById(R.id.dialog_link_link_key);
+				TextView symbol = dialoglayout.findViewById(R.id.dialog_link_symbol);
+				TextView removeText = dialoglayout.findViewById(R.id.dialog_link_text_remove);
 
 				((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(scaleWidthPx(25, outMetrics), scaleHeightPx(20, outMetrics), scaleWidthPx(10, outMetrics), 0);
 
@@ -632,21 +635,13 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 				builder.setView(dialoglayout);
 
-				builder.setPositiveButton(getString(R.string.context_remove), new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						typeExport=TYPE_EXPORT_REMOVE;
-						megaApi.disableExport(node, fullScreenImageViewer);
-					}
+				builder.setPositiveButton(getString(R.string.context_remove), (dialog, which) -> {
+					typeExport=TYPE_EXPORT_REMOVE;
+					megaApi.disableExport(node, fullScreenImageViewer);
 				});
 
-				builder.setNegativeButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+				builder.setNegativeButton(getString(R.string.general_cancel), (dialog, which) -> {
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-
-					}
 				});
 
 				removeLinkDialog = builder.create();
@@ -773,12 +768,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 		float scaleW = getScaleW(outMetrics, density);
 		float scaleH = getScaleH(outMetrics, density);
-		if (scaleH < scaleW){
-			scaleText = scaleH;
-		}
-		else{
-			scaleText = scaleW;
-		}
+		scaleText = Math.min(scaleH, scaleW);
 
 		viewPager = findViewById(R.id.image_viewer_pager);
 		viewPager.setPageMargin(40);
@@ -809,34 +799,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
                 positionG -= placeholderCount;
             }
         }
-        MegaApplication app = (MegaApplication)getApplication();
-		if (isFolderLink ){
-			megaApi = app.getMegaApiFolder();
-		}else{
-			megaApi = app.getMegaApi();
+
+		if (isFolderLink) {
+			megaApi = megaApiFolder;
 		}
 
 		if(isOnline(this) && !isFileLink) {
-			if (megaApi == null || megaApi.getRootNode() == null) {
-				logDebug("Refresh session - sdk");
-				Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-				intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-				intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intentLogin);
-				finish();
+			if (shouldRefreshSessionDueToSDK()) {
 				return;
 			}
 		}
 
-		if (megaChatApi == null) {
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-			Intent intentLogin = new Intent(this, LoginActivityLollipop.class);
-			intentLogin.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-			intentLogin.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intentLogin);
-			finish();
+		if (shouldRefreshSessionDueToKarere()) {
 			return;
 		}
 
@@ -852,9 +826,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
-		aB.setHomeButtonEnabled(true);
-		aB.setDisplayHomeAsUpEnabled(true);
-		aB.setTitle(" ");
+		if (aB != null) {
+			aB.setHomeButtonEnabled(true);
+			aB.setDisplayHomeAsUpEnabled(true);
+			aB.setTitle(" ");
+		}
 
 		imageHandles = new ArrayList<>();
 		paths = new ArrayList<>();
@@ -912,7 +888,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 					logDebug("Handle: " + hash);
 					imageHandles.add(hash);
 
-					adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
+					adapterMega = new MegaFullScreenImageAdapterLollipop(this,
+							fullScreenImageViewer, imageHandles, megaApi, this);
 					viewPager.setAdapter(adapterMega);
 					viewPager.setCurrentItem(positionG);
 					viewPager.addOnPageChangeListener(this);
@@ -951,17 +928,14 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			for (int i=0; i<fList.length; i++) {
 				zipFiles.add(fList[i]);
 			}
-			Collections.sort(zipFiles, new Comparator<File>(){
-
-				public int compare(File z1, File z2) {
-					String name1 = z1.getName();
-					String name2 = z2.getName();
-					int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
-					if (res == 0) {
-						res = name1.compareTo(name2);
-					}
-					return res;
+			Collections.sort(zipFiles, (z1, z2) -> {
+				String name1 = z1.getName();
+				String name2 = z2.getName();
+				int res = String.CASE_INSENSITIVE_ORDER.compare(name1, name2);
+				if (res == 0) {
+					res = name1.compareTo(name2);
 				}
+				return res;
 			});
 
 			logDebug("SIZE: " + zipFiles.size());
@@ -1019,19 +993,18 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			}
 
 			fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
-			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
+			adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,
+					imageHandles, megaApi, this);
 		} else if (isInRootLinksLevel(adapterType, parentNodeHandle)) {
 			getImageHandles(megaApi.getPublicLinks(orderGetChildren), savedInstanceState);
 		} else if (adapterType == PHOTOS_BROWSE_ADAPTER) {
 			// TODO: use constants
 			getImageHandles(megaApi.searchByType(orderGetChildren, FILE_TYPE_PHOTO, SEARCH_TARGET_ROOTNODE), savedInstanceState);
+		} else if (adapterType == PHOTO_SYNC_ADAPTER) {
+			getImageHandles(new MegaNodeRepo(megaApi, dbH).getCuChildren(orderGetChildren), savedInstanceState, true);
 		} else {
 			if (parentNodeHandle == INVALID_HANDLE){
 				switch(adapterType){
-					case FILE_BROWSER_ADAPTER:{
-						parentNode = megaApi.getRootNode();
-						break;
-					}
 					case RUBBISH_BIN_ADAPTER:{
 						parentNode = megaApi.getRubbishNode();
 						break;
@@ -1069,7 +1042,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			dragToExit.runEnterAnimation(intent, viewPager, animationStart -> {
 				if (animationStart) {
 					updateViewForAnimation();
-				} else {
+				} else if (!isFinishing()) {
 					showActionBar();
 
 					fragmentContainer.setBackgroundColor(BLACK);
@@ -1091,11 +1064,52 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		}
 	}
 
-	private void getImageHandles(ArrayList<MegaNode> nodes, Bundle savedInstanceState) {
+	/**
+	 * Gets a list of the searched MegaNode from the handles list received as param.
+	 *
+	 * @param handles List of searched node handles.
+	 * @return The list of the searched MegaNodes.
+	 */
+	private ArrayList<MegaNode> getSearchedNodes(ArrayList<String> handles) {
+		ArrayList<MegaNode> nodes = new ArrayList<>();
+
+		for (String handle : handles) {
+			MegaNode node = megaApi.getNodeByHandle(Long.parseLong(handle));
+			if (node != null) {
+				nodes.add(node);
+			}
+		}
+
+		return nodes;
+	}
+
+	/**
+	 * Gets all the image handles to preview.
+	 *
+	 * @param nodes				 List of all nodes where search.
+	 * @param savedInstanceState Saved instance state if exists, null otherwise.
+	 */
+	private void getImageHandles(List<MegaNode> nodes, Bundle savedInstanceState) {
+		getImageHandles(nodes, savedInstanceState, false);
+	}
+
+	/**
+	 * Gets all the handles to preview.
+	 *
+	 * @param nodes				 List of all nodes where search.
+	 * @param savedInstanceState Saved instance state if exists, null otherwise.
+	 * @param includeVideos		 True if should get video and image handles, false otherwise.
+	 */
+	private void getImageHandles(List<MegaNode> nodes, Bundle savedInstanceState, boolean includeVideos) {
 		int imageNumber = 0;
 		for (int i = 0; i < nodes.size(); i++) {
 			MegaNode n = nodes.get(i);
-			if (MimeTypeList.typeForName(n.getName()).isImage()) {
+			MimeTypeList mime = MimeTypeList.typeForName(n.getName());
+			boolean isImageHandle = includeVideos
+					? mime.isImage() || mime.isVideoReproducible()
+					: mime.isImage();
+
+			if (isImageHandle) {
 				imageHandles.add(n.getHandle());
 				if (i == positionG && savedInstanceState == null) {
 					positionG = imageNumber;
@@ -1110,10 +1124,11 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 		fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 
-		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer, imageHandles, megaApi);
+		adapterMega = new MegaFullScreenImageAdapterLollipop(this, fullScreenImageViewer,
+				imageHandles, megaApi, this);
 	}
 
-	private BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
+	private final BroadcastReceiver receiverToFinish = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if (intent != null) {
@@ -1197,7 +1212,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 							tIV.setZoom(1);
 						}
 					}
-					catch (Exception e) {}
+					catch (Exception e) {
+						logError(e.getMessage());
+					}
 					fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 				}
 //				title.setText(names.get(positionG));
@@ -1241,14 +1258,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 		adapterType = savedInstanceState.getInt("adapterType");
 
-		if ((adapterType == OFFLINE_ADAPTER) || (adapterType == ZIP_ADAPTER)){
-
-		}
-		else{
-			aBshown = savedInstanceState.getBoolean("aBshown");
+		if (adapterType != OFFLINE_ADAPTER && adapterType != ZIP_ADAPTER){
+			boolean aBshown = savedInstanceState.getBoolean("aBshown");
 			adapterMega.setaBshown(aBshown);
 		}
-
 	}
 
 	public void showMove(){
@@ -1306,19 +1319,28 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
             if (e.getErrorCode() == MegaError.API_OK) {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_correctly_moved), -1);
                 finish();
-            } else {
+            } else if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+				showForeignStorageOverQuotaWarningDialog(this);
+			} else {
                 showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.context_no_moved), -1);
             }
         } else if (request.getType() == MegaRequest.TYPE_COPY) {
 			try {
 				statusDialog.dismiss();
 			}
-			catch (Exception ex) {}
+			catch (Exception ex) {
+				logError(ex.getMessage());
+			}
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_copied), -1);
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+				if (api.isForeignNode(request.getParentHandle())) {
+					showForeignStorageOverQuotaWarningDialog(this);
+					return;
+				}
+
 				logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
 				Intent intent = new Intent(this, ManagerActivityLollipop.class);
 				intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -1405,18 +1427,17 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			return;
 		}
 
-		if (intent == null) {
-			return;
-		}
-
 		if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-				boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-				if (!hasStoragePermission) {
-					ActivityCompat.requestPermissions(this,
-							new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-							REQUEST_WRITE_STORAGE);
-				}
+			if (intent == null) {
+				logWarning("Intent is null");
+				return;
+			}
+
+			boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+			if (!hasStoragePermission) {
+				requestPermission(this,
+						REQUEST_WRITE_STORAGE,
+						Manifest.permission.WRITE_EXTERNAL_STORAGE);
 			}
 
 			if (app.getStorageState() == STORAGE_STATE_PAYWALL) {
@@ -1443,6 +1464,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+			if (intent == null) {
+				logWarning("Intent is null");
+				return;
+			}
 
 			if(!isOnline(this)){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
@@ -1455,10 +1480,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
-			ProgressDialog temp = null;
+			AlertDialog temp;
 			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_moving));
+				temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_moving));
 				temp.show();
 			}
 			catch(Exception e){
@@ -1466,11 +1490,16 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			}
 			statusDialog = temp;
 
-			for(int i=0; i<moveHandles.length;i++){
-				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
+			for (long moveHandle : moveHandles) {
+				megaApi.moveNode(megaApi.getNodeByHandle(moveHandle), parent, this);
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+			if (intent == null) {
+				logWarning("Intent is null");
+				return;
+			}
+
 			if(!isOnline(this)){
 				showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
 				return;
@@ -1480,10 +1509,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 			final int totalCopy = copyHandles.length;
 
-			ProgressDialog temp = null;
+			AlertDialog temp;
 			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_copying));
+				temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_copying));
 				temp.show();
 			}
 			catch(Exception e){
@@ -1504,8 +1532,20 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 						statusDialog.dismiss();
 						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_copied), -1);
 					}
-					catch (Exception ex) {}
+					catch (Exception ex) {
+						logError(ex.getMessage());
+					}
 				}
+			}
+		} else if (requestCode == REQUEST_WRITE_STORAGE) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				if (Environment.isExternalStorageManager()) {
+					nodeSaver.handleRequestPermissionsResult(requestCode);
+				} else {
+					super.onActivityResult(requestCode, resultCode, intent);
+				}
+			} else {
+				super.onActivityResult(requestCode, resultCode, intent);
 			}
 		}
 	}
@@ -1513,13 +1553,65 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
 
-	public void touchImage() {
-		logDebug("touchImage");
-		if(aB.isShowing()){
+	@Override
+	public void onTouchImage() {
+		if (aB.isShowing()) {
 			hideActionBar();
-		}else{
+		} else {
 			showActionBar();
 		}
+	}
+
+	@Override
+	public void onPlayVideo() {
+		MegaNode video = megaApi.getNodeByHandle(imageHandles.get(positionG));
+
+		Intent mediaIntent;
+		if (MimeTypeList.typeForName(video.getName()).isVideoNotSupported()) {
+			mediaIntent = new Intent(Intent.ACTION_VIEW);
+		} else {
+			mediaIntent = getMediaIntent(this, node.getName());
+		}
+
+		mediaIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, video.getHandle())
+				.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, PHOTO_SYNC_ADAPTER)
+				.putExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, false);
+
+		mediaIntent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.getName());
+
+		boolean paramsSetSuccessfully;
+		String localPath = null;
+
+		try {
+			localPath = findVideoLocalPath(this, node);
+		} catch (Exception e) {
+			logWarning(e.getMessage());
+		}
+
+		if (localPath != null && checkFingerprint(megaApi, node, localPath)) {
+			paramsSetSuccessfully = setLocalIntentParams(this, node, mediaIntent, localPath,
+					false, this);
+		} else {
+			paramsSetSuccessfully = setStreamingIntentParams(this, node, megaApi,
+					mediaIntent, this);
+		}
+
+		if (!isIntentAvailable(this, mediaIntent)) {
+			showSnackbar(SNACKBAR_TYPE,
+					StringResourcesUtils.getString(R.string.intent_not_available), MEGACHAT_INVALID_HANDLE);
+
+			paramsSetSuccessfully = false;
+		}
+
+		if (paramsSetSuccessfully) {
+			startActivity(mediaIntent);
+			overridePendingTransition(0, 0);
+		}
+	}
+
+	@Override
+	public void onStartHttpServer() {
+		needStopHttpServer = true;
 	}
 
 	protected void hideActionBar(){
@@ -1527,14 +1619,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 
 		if (aB != null && aB.isShowing()) {
 			if(tB != null) {
-				tB.animate().translationY(-220).setDuration(400L)
-						.withEndAction(new Runnable() {
-							@Override
-							public void run() {
-								aB.hide();
-							}
-						}).start();
-				bottomLayout.animate().translationY(220).setDuration(400L).start();
+				tB.animate().translationY(-220).setDuration(ANIMATION_DURATION)
+						.withEndAction(() -> aB.hide()).start();
+				bottomLayout.animate().translationY(220).setDuration(ANIMATION_DURATION).start();
 			} else {
 				aB.hide();
 			}
@@ -1546,8 +1633,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 		if (aB != null && !aB.isShowing()) {
 			aB.show();
 			if(tB != null) {
-				tB.animate().translationY(0).setDuration(400L).start();
-				bottomLayout.animate().translationY(0).setDuration(400L).start();
+				tB.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
+				bottomLayout.animate().translationY(0).setDuration(ANIMATION_DURATION).start();
 			}
 		}
 	}
@@ -1595,11 +1682,9 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop
 			}
 
 
-			Iterator<MegaNode> it = nodes.iterator();
-			while (it.hasNext()){
-				MegaNode n = it.next();
-				if (n != null && positionG < imageHandles.size() && n.getHandle() == imageHandles.get(positionG)){
-						thisNode = true;
+			for (MegaNode n : nodes) {
+				if (n != null && positionG < imageHandles.size() && n.getHandle() == imageHandles.get(positionG)) {
+					thisNode = true;
 				}
 			}
 

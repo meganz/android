@@ -2,8 +2,10 @@ package mega.privacy.android.app.utils;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Base64;
+
+import com.jeremyliao.liveeventbus.LiveEventBus;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
@@ -11,8 +13,6 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
-import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.managerSections.ContactsFragmentLollipop;
 import mega.privacy.android.app.lollipop.megachat.ContactAttachmentActivityLollipop;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaStringList;
@@ -21,6 +21,7 @@ import nz.mega.sdk.MegaUser;
 import mega.privacy.android.app.MegaApplication;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_CONTACT_NAME_CHANGE;
 import static mega.privacy.android.app.utils.Constants.ACTION_CHAT_OPEN;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
@@ -185,14 +186,17 @@ public class ContactUtil {
 
     public static void notifyNicknameUpdate(Context context, long userHandle) {
         notifyUserNameUpdate(context, ACTION_UPDATE_NICKNAME, userHandle);
+        LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long.class).post(userHandle);
     }
 
     public static void notifyFirstNameUpdate(Context context, long userHandle) {
         notifyUserNameUpdate(context, ACTION_UPDATE_FIRST_NAME, userHandle);
+        LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long.class).post(userHandle);
     }
 
     public static void notifyLastNameUpdate(Context context, long userHandle) {
         notifyUserNameUpdate(context, ACTION_UPDATE_LAST_NAME, userHandle);
+        LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long.class).post(userHandle);
     }
 
     public static void notifyUserNameUpdate(Context context, String action, long userHandle) {
@@ -230,23 +234,12 @@ public class ContactUtil {
         return visibleContacts;
     }
 
-    private static void updateView(Context context) {
-        if (context != null && context instanceof ManagerActivityLollipop) {
-            ContactsFragmentLollipop cFLol = ((ManagerActivityLollipop) context).getContactsFragment();
-            if (cFLol != null) {
-                cFLol.updateView();
-            }
-        }
-    }
-
-    public static void updateFirstName(Context context, String name, String email) {
+    public static void updateFirstName(String name, String email) {
         MegaApplication.getInstance().getDbH().setContactName(name, email);
-        updateView(context);
     }
 
-    public static void updateLastName(Context context, String lastName, String email) {
+    public static void updateLastName(String lastName, String email) {
         MegaApplication.getInstance().getDbH().setContactLastName(lastName, email);
-        updateView(context);
     }
 
     /**

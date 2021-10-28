@@ -1,7 +1,7 @@
 package mega.privacy.android.app.utils
 
 import android.os.Parcel
-import kotlinx.android.parcel.Parceler
+import kotlinx.parcelize.Parceler
 import nz.mega.sdk.MegaNode
 
 object MegaNodeParceler : Parceler<MegaNode> {

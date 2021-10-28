@@ -1,6 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -8,7 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,13 +18,14 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -47,6 +49,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -59,11 +63,15 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.fcm.IncomingCallService;
 import mega.privacy.android.app.listeners.ChatLogoutListener;
 import mega.privacy.android.app.lollipop.controllers.AccountController;
 import mega.privacy.android.app.lollipop.megachat.ChatSettings;
+import mega.privacy.android.app.middlelayer.push.PushMessageHanlder;
 import mega.privacy.android.app.providers.FileProviderActivity;
+import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.PermissionUtils;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -83,20 +91,34 @@ import nz.mega.sdk.MegaUser;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static android.view.MotionEvent.ACTION_CANCEL;
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MOVE;
+import static android.view.MotionEvent.ACTION_UP;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.constants.IntentConstants.EXTRA_MASTER_KEY;
+import static mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists;
+import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.hasPermissions;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
 public class LoginFragmentLollipop extends Fragment implements View.OnClickListener, MegaRequestListenerInterface, MegaChatListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
+    private static final long LONG_CLICK_DELAY = 5000;
     private static final int READ_MEDIA_PERMISSION = 109;
     private Context context;
     private AlertDialog insertMKDialog;
+    private AlertDialog changeApiServerDialog;
 
+    private Rect loginTitleBoundaries;
     private TextView loginTitle;
     private TextView newToMega;
     private TextInputLayout et_userLayout;
@@ -143,6 +165,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     private boolean resumeSesion = false;
 
     private MegaApiAndroid megaApi;
+    private MegaApiAndroid megaApiFolder;
     private MegaChatApiAndroid megaChatApi;
     private String confirmLink;
 
@@ -207,6 +230,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         logDebug("onCreateView");
@@ -249,6 +273,41 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         loginTitle.setText(R.string.login_to_mega);
         loginTitle.setOnClickListener(this);
+
+        Runnable onLongPress = () -> {
+            if (!isAlertDialogShown(changeApiServerDialog)) {
+                changeApiServerDialog = showChangeApiServerDialog((LoginActivityLollipop) context, megaApi);
+            }
+        };
+
+        Runnable onTap = () ->
+                handler.postDelayed(onLongPress, LONG_CLICK_DELAY - ViewConfiguration.getTapTimeout());
+
+        loginTitle.setOnTouchListener((view, event) -> {
+            switch (event.getAction()) {
+                case ACTION_DOWN:
+                    loginTitleBoundaries = new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
+                    handler.postDelayed(onTap, ViewConfiguration.getTapTimeout());
+                    break;
+
+                case ACTION_UP:
+                case ACTION_CANCEL:
+                    handler.removeCallbacks(onLongPress);
+                    handler.removeCallbacks(onTap);
+                    break;
+
+                case ACTION_MOVE:
+                    if (loginTitleBoundaries != null && !loginTitleBoundaries.contains(
+                            view.getLeft() + (int) event.getX(),
+                            view.getTop() + (int) event.getY())) {
+                        handler.removeCallbacks(onLongPress);
+                        handler.removeCallbacks(onTap);
+                    }
+                    break;
+            }
+
+            return false;
+        });
 
         et_userLayout = v.findViewById(R.id.login_email_text_layout);
         et_user = v.findViewById(R.id.login_email_text);
@@ -495,7 +554,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
         });
 
-        fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fouth_login);
+        fourthPin = (EditTextPIN) v.findViewById(R.id.pin_fourth_login);
         fourthPin.setOnLongClickListener(this);
         fourthPin.setOnFocusChangeListener(this);
         imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
@@ -611,87 +670,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         });
         ((LoginActivityLollipop) context).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb1.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb1.width = scaleWidthPx(25, outMetrics);
-        }
-        firstPin.setLayoutParams(paramsb1);
-        LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)firstPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        firstPin.setLayoutParams(textParams);
-
-        secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb2.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb2.width = scaleWidthPx(25, outMetrics);
-        }
-        secondPin.setLayoutParams(paramsb2);
-        textParams = (LinearLayout.LayoutParams)secondPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        secondPin.setLayoutParams(textParams);
         secondPin.setEt(firstPin);
 
-        thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb3.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb3.width = scaleWidthPx(25, outMetrics);
-        }
-        thirdPin.setLayoutParams(paramsb3);
-        textParams = (LinearLayout.LayoutParams)thirdPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(25, outMetrics), 0);
-        thirdPin.setLayoutParams(textParams);
         thirdPin.setEt(secondPin);
 
-        fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb4.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb4.width = scaleWidthPx(25, outMetrics);
-        }
-        fourthPin.setLayoutParams(paramsb4);
-        textParams = (LinearLayout.LayoutParams)fourthPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        fourthPin.setLayoutParams(textParams);
         fourthPin.setEt(thirdPin);
 
-        fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb5.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb5.width = scaleWidthPx(25, outMetrics);
-        }
-        fifthPin.setLayoutParams(paramsb5);
-        textParams = (LinearLayout.LayoutParams)fifthPin.getLayoutParams();
-        textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-        fifthPin.setLayoutParams(textParams);
         fifthPin.setEt(fourthPin);
 
-        sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-        android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            paramsb6.width = scaleWidthPx(42, outMetrics);
-        }
-        else {
-            paramsb6.width = scaleWidthPx(25, outMetrics);
-        }
-        sixthPin.setLayoutParams(paramsb6);
-        textParams = (LinearLayout.LayoutParams)sixthPin.getLayoutParams();
-        textParams.setMargins(0, 0, 0, 0);
-        sixthPin.setLayoutParams(textParams);
         sixthPin.setEt(fifthPin);
 
         intentReceived = ((LoginActivityLollipop) context).getIntent();
@@ -753,11 +739,10 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if ((intentReceived != null) && (action != null)){
                 if (action.equals(ACTION_REFRESH)){
                     MegaApplication.setLoggingIn(true);
-                    parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startLoginInProcess();
                     return v;
                 }
-                else if (action.equals(ACTION_REFRESH_STAGING)){
+                else if (action.equals(ACTION_REFRESH_API_SERVER)){
                     twoFA = true;
                     parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
                     startFastLogin();
@@ -805,40 +790,33 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     if (rootNode != null){
                         Intent intent = new Intent(context, ManagerActivityLollipop.class);
                         if (action != null){
-//							if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-//								intent = new Intent(this, FileExplorerActivityLollipop.class);
-//								if(extras != null)
-//								{
-//									intent.putExtras(extras);
-//								}
-//								intent.setData(uriData);
-//							}
-                            if (action.equals(ACTION_FILE_PROVIDER)){
-                                intent = new Intent(context, FileProviderActivity.class);
-                                if(extras != null)
-                                {
-                                    intent.putExtras(extras);
-                                }
-                                intent.setData(uriData);
-                            }
-                            else if (action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
-                                intent = new Intent(context, FileLinkActivityLollipop.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = ACTION_OPEN_MEGA_LINK;
-                                intent.setData(uriData);
-                            }
-                            else if (action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
-                                intent = new Intent(context, FolderLinkActivityLollipop.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = ACTION_OPEN_MEGA_FOLDER_LINK;
-                                intent.setData(uriData);
-                            }
-                            else  if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                action = ACTION_OPEN_CONTACTS_SECTION;
-                                if(intentReceived.getLongExtra(CONTACT_HANDLE, -1) != -1){
-                                    intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
-                                }
+                            switch (action) {
+                                case ACTION_FILE_PROVIDER:
+                                    intent = new Intent(context, FileProviderActivity.class);
+                                    if (extras != null) {
+                                        intent.putExtras(extras);
+                                    }
+                                    intent.setData(uriData);
+                                    break;
+                                case ACTION_OPEN_FILE_LINK_ROOTNODES_NULL:
+                                    intent = new Intent(context, FileLinkActivityLollipop.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = ACTION_OPEN_MEGA_LINK;
+                                    intent.setData(uriData);
+                                    break;
+                                case ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL:
+                                    intent = new Intent(context, FolderLinkActivityLollipop.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = ACTION_OPEN_MEGA_FOLDER_LINK;
+                                    intent.setData(uriData);
+                                    break;
+                                case ACTION_OPEN_CONTACTS_SECTION:
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    action = ACTION_OPEN_CONTACTS_SECTION;
+                                    if (intentReceived.getLongExtra(CONTACT_HANDLE, -1) != -1) {
+                                        intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
+                                    }
+                                    break;
                             }
 
                             intent.setAction(action);
@@ -996,7 +974,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 break;
             }
-            case R.id.pin_fouth_login:{
+            case R.id.pin_fourth_login:{
                 if (hasFocus) {
                     fourthPin.setText("");
                 }
@@ -1137,8 +1115,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             }
 
             disableLoginButton();
+
+            // Primitive type directly set value, atomic operation. Don't allow background login.
+            PushMessageHanlder.allowBackgroundLogin = false;
+            IncomingCallService.allowBackgroundLogin = false;
+
             megaApi.fastLogin(gSession, this);
-            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_REFRESH_STAGING))  {
+
+            if (intentReceived != null && intentReceived.getAction() != null && intentReceived.getAction().equals(ACTION_REFRESH_API_SERVER))  {
                 logDebug("megaChatApi.refreshUrl()");
                 megaChatApi.refreshUrl();
             }
@@ -1333,18 +1317,23 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             if (megaChatApi == null) {
                 megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
             }
-            int ret = megaChatApi.init(null);
-            logDebug("result of init ---> " + ret);
-            if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
-                logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
-                disableLoginButton();
-                megaApi.login(lastEmail, lastPassword, this);
-            } else {
-                logWarning("ERROR INIT CHAT: " + ret);
-                megaChatApi.logout(new ChatLogoutListener(getContext()));
 
-                disableLoginButton();
-                megaApi.login(lastEmail, lastPassword, this);
+            int ret = megaChatApi.getInitState();
+            logDebug("INIT STATE: " + ret);
+            if (ret == MegaChatApi.INIT_NOT_DONE || ret == MegaChatApi.INIT_ERROR) {
+                ret = megaChatApi.init(null);
+                logDebug("result of init ---> " + ret);
+                if (ret == MegaChatApi.INIT_WAITING_NEW_SESSION) {
+                    logDebug("condition ret == MegaChatApi.INIT_WAITING_NEW_SESSION");
+                    disableLoginButton();
+                    megaApi.login(lastEmail, lastPassword, this);
+                } else {
+                    logWarning("ERROR INIT CHAT: " + ret);
+                    megaChatApi.logout(new ChatLogoutListener(getContext()));
+
+                    disableLoginButton();
+                    megaApi.login(lastEmail, lastPassword, this);
+                }
             }
         }
     }
@@ -1443,15 +1432,23 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.button_forgot_pass:{
                 logDebug("Click on button_forgot_pass");
                 try {
-                    String url = "https://mega.nz/recovery";
                     Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(url));
+
+                    if (et_user != null && et_user.getText() != null && !isTextEmpty(et_user.getText().toString())) {
+                        String typedEmail = et_user.getText().toString();
+                        String encodedEmail = Base64.encodeToString(typedEmail.getBytes(), Base64.DEFAULT);
+                        encodedEmail = encodedEmail.replace("\n", "");
+                        openTermsIntent.setData(Uri.parse(RECOVERY_URL_EMAIL + encodedEmail));
+                    } else {
+                        openTermsIntent.setData(Uri.parse(RECOVERY_URL));
+                    }
+
                     startActivity(openTermsIntent);
                 }
                 catch (Exception e){
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+                    viewIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(viewIntent);
                 }
                 break;
@@ -1492,15 +1489,14 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
             case R.id.lost_authentication_device: {
                 try {
-                    String url = "https://mega.nz/recovery";
                     Intent openTermsIntent = new Intent(context, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(url));
+                    openTermsIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(openTermsIntent);
                 }
                 catch (Exception e){
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+                    viewIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(viewIntent);
                 }
                 break;
@@ -1542,7 +1538,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NotNull Context context) {
         logDebug("onAttach");
         super.onAttach(context);
         this.context = context;
@@ -1553,25 +1549,12 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
         }
 
+        if (megaApiFolder == null){
+            megaApiFolder = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
+        }
+
         if (megaChatApi == null) {
             megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
-        }
-    }
-
-    @Override
-    public void onAttach(Activity context) {
-        logDebug("onAttach Activity");
-        super.onAttach(context);
-        this.context = context;
-
-        dbH = DatabaseHandler.getDbHandler(context);
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) context.getApplication()).getMegaApi();
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) context.getApplication()).getMegaChatApi();
         }
     }
 
@@ -1707,36 +1690,30 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                             intent = new Intent(context,ManagerActivityLollipop.class);
                             if (action != null){
                                 logDebug("The action is: " + action);
-//										if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-//											intent = new Intent(this, FileExplorerActivityLollipop.class);
-//											if(extras != null)
-//											{
-//												intent.putExtras(extras);
-//											}
-//											intent.setData(uriData);
-//										}
-                                if (action.equals(ACTION_FILE_PROVIDER)){
-                                    intent = new Intent(context, FileProviderActivity.class);
-                                    if(extras != null){
-                                        intent.putExtras(extras);
-                                    }
-                                    if(uriData != null){
+                                switch (action) {
+                                    case ACTION_FILE_PROVIDER:
+                                        intent = new Intent(context, FileProviderActivity.class);
+                                        if (extras != null) {
+                                            intent.putExtras(extras);
+                                        }
+                                        if (uriData != null) {
+                                            intent.setData(uriData);
+                                        }
+                                        break;
+                                    case ACTION_OPEN_FILE_LINK_ROOTNODES_NULL:
+                                        intent = new Intent(context, FileLinkActivityLollipop.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                         intent.setData(uriData);
-                                    }
-                                }
-                                else if (action.equals(ACTION_OPEN_FILE_LINK_ROOTNODES_NULL)){
-                                    intent = new Intent(context, FileLinkActivityLollipop.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.setData(uriData);
-                                }
-                                else if (action.equals(ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL)){
-                                    intent = new Intent(context, FolderLinkActivityLollipop.class);
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    action = ACTION_OPEN_MEGA_FOLDER_LINK;
-                                    intent.setData(uriData);
-                                }
-                                else if (action.equals(ACTION_OPEN_CONTACTS_SECTION)){
-                                    intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
+                                        break;
+                                    case ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL:
+                                        intent = new Intent(context, FolderLinkActivityLollipop.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        action = ACTION_OPEN_MEGA_FOLDER_LINK;
+                                        intent.setData(uriData);
+                                        break;
+                                    case ACTION_OPEN_CONTACTS_SECTION:
+                                        intent.putExtra(CONTACT_HANDLE, intentReceived.getLongExtra(CONTACT_HANDLE, -1));
+                                        break;
                                 }
 
                                 intent.setAction(action);
@@ -1763,7 +1740,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     }
 
                     if (twoFA){
-                        intent.setAction(ACTION_REFRESH_STAGING);
+                        intent.setAction(ACTION_REFRESH_API_SERVER);
                         twoFA = false;
                     }
                     
@@ -1794,8 +1771,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 MegaApplication.getChatManagement().setPendingJoinLink(null);
                 loginActivityLollipop.finish();
-            } else {
-                loginActivityLollipop.showFragment(CHOOSE_ACCOUNT_FRAGMENT);
+            } else if (dbH.getCredentials() != null) {
+                startActivity(new Intent(loginActivityLollipop, ChooseAccountActivity.class));
+                loginActivityLollipop.finish();
             }
         }
     }
@@ -1833,6 +1811,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
         logDebug("onRequestFinish: " + request.getRequestString() + ",error code: " + error.getErrorCode());
         if (request.getType() == MegaRequest.TYPE_LOGIN){
+            PushMessageHanlder.allowBackgroundLogin = true;
+            IncomingCallService.allowBackgroundLogin = true;
+
             //cancel login process by press back.
             if(!MegaApplication.isLoggingIn()) {
                 logWarning("Terminate login process when login");
@@ -1918,6 +1899,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
 
                 returnToLogin();
             } else {
+                logDebug("Logged in. Setting account auth token for folder links.");
+                megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
+
                 if (is2FAEnabled){
                     loginVerificationLayout.setVisibility(View.GONE);
                     ((LoginActivityLollipop) context).hideAB();
@@ -1975,13 +1959,33 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 receivedIntent = ((LoginActivityLollipop) context).getIntentReceived();
                 if (receivedIntent != null) {
                     shareInfos = (ArrayList<ShareInfo>) receivedIntent.getSerializableExtra(FileExplorerActivityLollipop.EXTRA_SHARE_INFOS);
+
                     if (shareInfos != null && shareInfos.size() > 0) {
-                        boolean canRead = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-                        if (canRead) {
+                        if (hasPermissions(context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                             toSharePage();
                         } else {
-                            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_MEDIA_PERMISSION);
+                            PermissionUtils.requestPermission((LoginActivityLollipop) context,
+                                    READ_MEDIA_PERMISSION, Manifest.permission.READ_EXTERNAL_STORAGE);
                         }
+
+                        return;
+                    } else if (ACTION_FILE_EXPLORER_UPLOAD.equals(action)
+                            && TYPE_TEXT_PLAIN.equals(receivedIntent.getType())) {
+                        startActivity(new Intent(context, FileExplorerActivityLollipop.class)
+                                .putExtra(Intent.EXTRA_TEXT, receivedIntent.getStringExtra(Intent.EXTRA_TEXT))
+                                .putExtra(Intent.EXTRA_SUBJECT, receivedIntent.getStringExtra(Intent.EXTRA_SUBJECT))
+                                .putExtra(Intent.EXTRA_EMAIL, receivedIntent.getStringExtra(Intent.EXTRA_EMAIL))
+                                .setAction(Intent.ACTION_SEND)
+                                .setType(TYPE_TEXT_PLAIN));
+
+                        if (getActivity() != null) {
+                            getActivity().finish();
+                        }
+
+                        return;
+                    } else if (ACTION_REFRESH.equals(action) && getActivity() != null) {
+                        getActivity().setResult(RESULT_OK);
+                        getActivity().finish();
                         return;
                     }
                 }
@@ -2032,7 +2036,9 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                 }
                 else{
                     if(error.getErrorCode() != MegaError.API_EBLOCKED) {
-                        ((LoginActivityLollipop)context).showSnackbar(errorMessage);
+                        //It will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
+                        logWarning("Suspended account - Reason: " + request.getNumber());
+                        return;
                     }
                 }
 
@@ -2278,7 +2284,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                         Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
                         intent.setAction(ACTION_RESET_PASS_FROM_LINK);
                         intent.setData(Uri.parse(linkUrl));
-                        intent.putExtra("MK", value);
+                        intent.putExtra(EXTRA_MASTER_KEY, value);
                         startActivity(intent);
                         insertMKDialog.dismiss();
                     }
@@ -2326,7 +2332,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
                     Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
                     intent.setAction(ACTION_RESET_PASS_FROM_LINK);
                     intent.setData(Uri.parse(linkUrl));
-                    intent.putExtra("MK", value);
+                    intent.putExtra(EXTRA_MASTER_KEY, value);
                     startActivity(intent);
                     insertMKDialog.dismiss();
                 }
@@ -2345,6 +2351,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
         }
 
         closeCancelDialog();
+        dismissAlertDialogIfExists(changeApiServerDialog);
         super.onDestroy();
     }
 
@@ -2382,7 +2389,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
     public int onBackPressed() {
         logDebug("onBackPressed");
         //refresh, point to staging server, enable chat. block the back button
-        if (ACTION_REFRESH.equals(action) || ACTION_REFRESH_STAGING.equals(action)){
+        if (ACTION_REFRESH.equals(action) || ACTION_REFRESH_API_SERVER.equals(action)){
             return -1;
         }
         //login is in process
@@ -2539,7 +2546,7 @@ public class LoginFragmentLollipop extends Fragment implements View.OnClickListe
             case R.id.pin_first_login:
             case R.id.pin_second_login:
             case R.id.pin_third_login:
-            case R.id.pin_fouth_login:
+            case R.id.pin_fourth_login:
             case R.id.pin_fifth_login:
             case R.id.pin_sixth_login: {
                 pinLongClick = true;

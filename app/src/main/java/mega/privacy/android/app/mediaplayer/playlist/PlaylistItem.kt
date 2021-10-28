@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer.playlist
 
 import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.Constants.INVALID_SIZE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import java.io.File
@@ -14,6 +15,7 @@ import java.util.*
  * @property thumbnail thumbnail file path, null if not available
  * @property index the index used for seek to this item
  * @property type item type
+ * @property size size of the node
  */
 data class PlaylistItem(
     val nodeHandle: Long,
@@ -21,18 +23,21 @@ data class PlaylistItem(
     val thumbnail: File?,
     val index: Int,
     val type: Int,
+    val size: Long,
 ) {
     /**
-     * Create a new instance with the specified item type, and nullify thumbnail if it's not exist.
+     * Create a new instance with the specified index and item type,
+     * and nullify thumbnail if it's not exist.
      *
+     * @param index new index
      * @param type item type
      * @return the new instance
      */
-    fun finalizeThumbnailAndType(type: Int): PlaylistItem {
+    fun finalizeItem(index: Int, type: Int): PlaylistItem {
         return PlaylistItem(
             nodeHandle, nodeName,
             if (thumbnail?.exists() == true) thumbnail else null,
-            index, type
+            index, type, size
         )
     }
 
@@ -42,7 +47,8 @@ data class PlaylistItem(
      * @param newName new node name
      * @return the new instance
      */
-    fun updateNodeName(newName: String) = PlaylistItem(nodeHandle, newName, thumbnail, index, type)
+    fun updateNodeName(newName: String) =
+        PlaylistItem(nodeHandle, newName, thumbnail, index, type, size)
 
     companion object {
         const val TYPE_PREVIOUS = 1
@@ -87,7 +93,7 @@ data class PlaylistItem(
                 else -> playingHeaderHandle
             }
 
-            return PlaylistItem(handle, name, null, INVALID_VALUE, type)
+            return PlaylistItem(handle, name, null, INVALID_VALUE, type, INVALID_SIZE)
         }
     }
 }

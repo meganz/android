@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -13,7 +15,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.interfaces.SnackbarShower;
-import mega.privacy.android.app.lollipop.ContactInfoActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop;
@@ -32,6 +33,9 @@ import static mega.privacy.android.app.utils.AvatarUtil.*;
 import static mega.privacy.android.app.utils.TextUtil.*;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaChatRoom selectedChat;
@@ -43,43 +47,39 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private RoundedImageView contactImageView;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        contentView = View.inflate(getContext(), R.layout.bottom_sheet_group_participant, null);
+        itemsLayout = contentView.findViewById(R.id.items_layout);
+        titleNameContactChatPanel = contentView.findViewById(R.id.group_participants_chat_name_text);
 
         if (savedInstanceState != null) {
             chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
             participantHandle = savedInstanceState.getLong(CONTACT_HANDLE, INVALID_HANDLE);
         } else {
-            chatId = ((GroupChatInfoActivityLollipop) context).getChatHandle();
-            participantHandle = ((GroupChatInfoActivityLollipop) context).getSelectedHandleParticipant();
+            chatId = ((GroupChatInfoActivityLollipop) requireActivity()).getChatHandle();
+            participantHandle = ((GroupChatInfoActivityLollipop) requireActivity()).getSelectedHandleParticipant();
         }
 
         selectedChat = megaChatApi.getChatRoom(chatId);
 
-        chatC = new ChatController(context);
+        chatC = new ChatController(requireActivity());
+
+        return contentView;
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
-    public void setupDialog(final Dialog dialog, int style) {
-        super.setupDialog(dialog, style);
-
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         if (selectedChat == null || participantHandle == INVALID_HANDLE) {
             logWarning("Error. Selected chat is NULL or participant handle is -1");
             return;
         }
 
-        contentView = View.inflate(getContext(), R.layout.bottom_sheet_group_participant, null);
-        mainLinearLayout = contentView.findViewById(R.id.participant_item_bottom_sheet);
-        items_layout = contentView.findViewById(R.id.items_layout);
-
-        titleNameContactChatPanel = contentView.findViewById(R.id.group_participants_chat_name_text);
         ImageView stateIcon = contentView.findViewById(R.id.group_participants_state_circle);
 
         stateIcon.setVisibility(View.VISIBLE);
 
-        stateIcon.setMaxWidth(scaleWidthPx(6, outMetrics));
-        stateIcon.setMaxHeight(scaleHeightPx(6, outMetrics));
+        stateIcon.setMaxWidth(scaleWidthPx(6, getResources().getDisplayMetrics()));
+        stateIcon.setMaxHeight(scaleHeightPx(6, getResources().getDisplayMetrics()));
 
         ImageView permissionsIcon = contentView.findViewById(R.id.group_participant_list_permissions);
 
@@ -109,12 +109,12 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         View separatorOptions = contentView.findViewById(R.id.separator_options);
         View separatorLeave = contentView.findViewById(R.id.separator_leave);
 
-        if (isScreenInPortrait(context)) {
-            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT, outMetrics));
+        if (isScreenInPortrait(requireContext())) {
+            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT));
+            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT));
         } else {
-            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
-            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND, outMetrics));
+            titleNameContactChatPanel.setMaxWidthEmojis(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND));
+            titleMailContactChatPanel.setMaxWidth(dp2px(MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND));
         }
 
         setContactStatus(getUserStatus(participantHandle), stateIcon, StatusIconLocation.DRAWER);
@@ -182,8 +182,7 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
             } else {
                 optionContactInfoChat.setVisibility(View.GONE);
                 optionStartConversationChat.setVisibility(View.GONE);
-                optionInvite.setVisibility(View.VISIBLE);
-
+                optionInvite.setVisibility(chatC.getParticipantEmail(participantHandle) == null ? View.GONE : View.VISIBLE);
                 titleMailContactChatPanel.setVisibility(View.GONE);
             }
 
@@ -218,49 +217,48 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         separatorLeave.setVisibility(optionLeaveChat.getVisibility() == View.VISIBLE &&
                 optionRemoveParticipantChat.getVisibility() == View.VISIBLE ? View.VISIBLE : View.GONE);
 
-        dialog.setContentView(contentView);
-        setBottomSheetBehavior(HEIGHT_HEADER_LARGE, false);
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.contact_info_group_participants_chat_layout:
-                ContactUtil.openContactInfoActivity(context, chatC.getParticipantEmail(participantHandle));
+                ContactUtil.openContactInfoActivity(requireActivity(), chatC.getParticipantEmail(participantHandle));
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.start_chat_group_participants_chat_layout:
-                ((GroupChatInfoActivityLollipop) context).startConversation(participantHandle);
+                ((GroupChatInfoActivityLollipop) requireActivity()).startConversation(participantHandle);
                 break;
 
             case R.id.contact_list_option_call_layout:
-                startNewCall((GroupChatInfoActivityLollipop) context,
-                        (SnackbarShower) context,
+                startNewCall((GroupChatInfoActivityLollipop) requireActivity(),
+                        (SnackbarShower) requireActivity(),
                         megaApi.getContact(chatC.getParticipantEmail(participantHandle)));
                 break;
 
             case R.id.change_permissions_group_participants_chat_layout:
-                ((GroupChatInfoActivityLollipop) context).showChangePermissionsDialog(participantHandle, selectedChat);
+                ((GroupChatInfoActivityLollipop) requireActivity()).showChangePermissionsDialog(participantHandle, selectedChat);
                 break;
 
             case R.id.remove_group_participants_chat_layout:
-                ((GroupChatInfoActivityLollipop) context).showRemoveParticipantConfirmation(participantHandle);
+                ((GroupChatInfoActivityLollipop) requireActivity()).showRemoveParticipantConfirmation(participantHandle);
                 break;
 
             case R.id.edit_profile_group_participants_chat_layout:
-                Intent editProfile = new Intent(context, ManagerActivityLollipop.class);
+                Intent editProfile = new Intent(requireActivity(), ManagerActivityLollipop.class);
                 editProfile.setAction(ACTION_SHOW_MY_ACCOUNT);
                 startActivity(editProfile);
                 dismissAllowingStateLoss();
                 break;
 
             case R.id.leave_group_participants_chat_layout:
-                ((GroupChatInfoActivityLollipop) context).showConfirmationLeaveChat();
+                ((GroupChatInfoActivityLollipop) requireActivity()).showConfirmationLeaveChat();
                 break;
 
             case R.id.invite_group_participants_chat_layout:
-                ((GroupChatInfoActivityLollipop) context).inviteContact(chatC.getParticipantEmail(participantHandle));
+                ((GroupChatInfoActivityLollipop) requireActivity()).inviteContact(chatC.getParticipantEmail(participantHandle));
                 break;
         }
 

@@ -94,7 +94,7 @@
 
     <dimen name="audio_player_track_name_margin_bottom_small">10dp</dimen>
     <dimen name="audio_player_track_name_margin_bottom_large">28dp</dimen>
-    <dimen name="audio_player_main_controller_height">212dp</dimen>
+    <dimen name="audio_player_main_controller_height">248dp</dimen>
     <dimen name="audio_player_playlist_controller_height">106dp</dimen>
     <dimen name="audio_player_mini_controller_height">64dp</dimen>
 
@@ -104,6 +104,9 @@
     <dimen name="playlist_default_thumbnail_margin_start">12dp</dimen>
 
     <dimen name="bottom_navigation_view_height">56dp</dimen>
+
+    <dimen name="cu_view_type_button_height">36dp</dimen>
+    <dimen name="cu_view_type_button_vertical_margin">8dp</dimen>
 
     <!-- Dark mode refactor start -->
 
@@ -116,10 +119,35 @@
     <dimen name="drawer_item_height">48dp</dimen>
 
     <dimen name="bottom_sheet_drawable_padding">32dp</dimen>
-    <dimen name="divider_width">72dp</dimen>
-
     <!-- My account page button padding -->
-    <dimen name="btn_padding_horizontal_my_account">21dp</dimen>
+    <dimen name="btn_21_padding_horizontal">21dp</dimen>
 
     <dimen name="btn_transparent_padding_vertical">8dp</dimen>
+
+    <dimen name="meeting_bottom_floating_panel_fab_size">48dp</dimen>
+    <dimen name="meeting_bottom_floating_panel_peek_height">115dp</dimen>
+
+    <dimen name="bottom_sheet_item_height">56dp</dimen>
+    <dimen name="bottom_sheet_item_padding_horizontal">18dp</dimen>
+    <dimen name="bottom_sheet_item_drawable_padding">32dp</dimen>
+    <dimen name="bottom_sheet_item_divider_margin_start">72dp</dimen>
+    <dimen name="bottom_sheet_landscape_width">360dp</dimen>
+
+    <dimen name="card_margin_portrait">8dp</dimen>
+    <dimen name="card_margin_landscape">3dp</dimen>
+    <dimen name="cu_margin_bottom">50dp</dimen>
+
+    <dimen name="line_number_padding">6dp</dimen>
+    <dimen name="text_editor_padding_top">8dp</dimen>
+    <dimen name="text_editor_padding_bottom">120dp</dimen>
+    <dimen name="text_editor_padding_without_nLines">24dp</dimen>
+    <dimen name="text_editor_padding_start_with_nLines">36dp</dimen>
+    <dimen name="text_editor_padding_end_with_nLines">12dp</dimen>
+    <dimen name="line_number_size">10sp</dimen>
+
+    <dimen name="image_contact_size">40dp</dimen>
+    <dimen name="image_contact_text_size">20sp</dimen>
+    <dimen name="image_group_size">26dp</dimen>
+    <dimen name="image_group_text_size">15sp</dimen>
+    <dimen name="image_group_border_size">1dp</dimen>
 </resources>

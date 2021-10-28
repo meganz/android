@@ -1,22 +1,23 @@
 package mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet
 
-import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetManageChatLinkBinding
-import mega.privacy.android.app.lollipop.megachat.GroupChatInfoActivityLollipop
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ChatUtil.showConfirmationRemoveChatLink
 import mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL
-import mega.privacy.android.app.utils.Constants.PLAIN_TEXT_SHARE_TYPE
+import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.Util.showSnackbar
 
-class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment() {
+class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     companion object {
         private const val CHAT_LINK = "CHAT_LINK"
@@ -33,39 +34,41 @@ class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment(
         this.isModerator = isModerator
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = BottomSheetManageChatLinkBinding.inflate(layoutInflater)
+        contentView = binding.root.rootView
+        itemsLayout = binding.itemsLayout
 
         if (savedInstanceState != null) {
             chatLink = savedInstanceState.getString(CHAT_LINK, "")
             isModerator = savedInstanceState.getBoolean(IS_MODERATOR, false)
         }
+
+        return contentView
     }
 
-    @SuppressLint("RestrictedApi")
-    override fun setupDialog(dialog: Dialog, style: Int) {
-        super.setupDialog(dialog, style)
-
-        binding = BottomSheetManageChatLinkBinding.inflate(layoutInflater)
-        contentView = binding.root.rootView
-        mainLinearLayout = binding.manageChatLinkBottomSheet
-        items_layout = binding.itemsLayout
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.copyManageChatLinkOption.setOnClickListener {
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipboard =
+                requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText(COPIED_TEXT_LABEL, chatLink)
             clipboard.setPrimaryClip(clip)
 
-            if (activity is GroupChatInfoActivityLollipop) {
-                (activity as GroupChatInfoActivityLollipop).showSnackbar(getString(R.string.chat_link_copied_clipboard))
-            }
+            showSnackbar(
+                requireActivity(),
+                StringResourcesUtils.getString(R.string.chat_link_copied_clipboard)
+            )
 
             setStateBottomSheetBehaviorHidden()
         }
 
         binding.shareManageChatLinkOption.setOnClickListener {
             val sharingIntent = Intent(Intent.ACTION_SEND)
-            sharingIntent.type = PLAIN_TEXT_SHARE_TYPE
+            sharingIntent.type = TYPE_TEXT_PLAIN
             sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink)
             startActivity(Intent.createChooser(sharingIntent, getString(R.string.context_share)))
 
@@ -74,15 +77,11 @@ class ManageChatLinkBottomSheetDialogFragment() : BaseBottomSheetDialogFragment(
 
         if (!isModerator) binding.deleteManageChatLinkOption.visibility = View.GONE
         else binding.deleteManageChatLinkOption.setOnClickListener {
-            showConfirmationRemoveChatLink(
-                activity
-            )
-
+            showConfirmationRemoveChatLink(requireActivity())
             setStateBottomSheetBehaviorHidden()
         }
 
-        dialog.setContentView(contentView)
-        setBottomSheetBehavior(HEIGHT_HEADER_LOW, false)
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

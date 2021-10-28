@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,8 +132,9 @@ public class LinksFragment extends MegaNodeBaseFragment {
             MegaNode parentNode = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
             logDebug("ParentHandle to find children: " + managerActivity.getParentHandleLinks());
 
-            nodes = megaApi.getChildren(parentNode, getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel()));
-            addSectionTitle(nodes, adapter.getAdapterType());
+            nodes = megaApi.getChildren(parentNode, getLinksOrderCloud(
+                    sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel()));
+
             adapter.setNodes(nodes);
         }
 
@@ -145,13 +145,13 @@ public class LinksFragment extends MegaNodeBaseFragment {
     }
 
     private void findNodes() {
-        setNodes(megaApi.getPublicLinks(getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel())));
+        setNodes(megaApi.getPublicLinks(getLinksOrderCloud(
+                sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel())));
     }
 
     @Override
     public void setNodes(ArrayList<MegaNode> nodes) {
         this.nodes = nodes;
-        addSectionTitle(nodes, ITEM_VIEW_TYPE_LIST);
         adapter.setNodes(nodes);
         setEmptyView();
         visibilityFastScroller();
@@ -191,7 +191,8 @@ public class LinksFragment extends MegaNodeBaseFragment {
                 parentNodeLinks = megaApi.getParentNode(parentNodeLinks);
                 if (parentNodeLinks != null) {
                     managerActivity.setParentHandleLinks(parentNodeLinks.getHandle());
-                    setNodes(megaApi.getChildren(parentNodeLinks, getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel())));
+                    setNodes(megaApi.getChildren(parentNodeLinks, getLinksOrderCloud(
+                            sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel())));
                 }
             }
         } else {
@@ -231,7 +232,8 @@ public class LinksFragment extends MegaNodeBaseFragment {
             managerActivity.supportInvalidateOptionsMenu();
             managerActivity.setToolbarTitle();
 
-            setNodes(megaApi.getChildren(nodes.get(position), getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel())));
+            setNodes(megaApi.getChildren(nodes.get(position), getLinksOrderCloud(
+                    sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel())));
             recyclerView.scrollToPosition(0);
             checkScroll();
             managerActivity.showFabButton();
@@ -249,7 +251,8 @@ public class LinksFragment extends MegaNodeBaseFragment {
             findNodes();
         } else {
             MegaNode parentNodeLinks = megaApi.getNodeByHandle(managerActivity.getParentHandleLinks());
-            setNodes(megaApi.getChildren(parentNodeLinks, getLinksOrderCloud(managerActivity.orderCloud, managerActivity.isFirstNavigationLevel())));
+            setNodes(megaApi.getChildren(parentNodeLinks, getLinksOrderCloud(
+                    sortOrderManagement.getOrderCloud(), managerActivity.isFirstNavigationLevel())));
         }
     }
 

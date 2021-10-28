@@ -19,11 +19,16 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -39,17 +44,25 @@ import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop
 import mega.privacy.android.app.lollipop.ZipBrowserActivityLollipop
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
+import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
+import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
-import mega.privacy.android.app.utils.Util.getMediaIntent
+import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
+import mega.privacy.android.app.utils.Util.*
 import nz.mega.sdk.*
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import java.io.File
+import java.io.*
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -104,7 +117,9 @@ object MegaNodeUtil {
     @JvmStatic
     fun showTakenDownNodeActionNotAvailableDialog(node: MegaNode?, context: Context): Boolean {
         return if (isNodeTakenDown(node)) {
-            Util.showSnackbar(context, getString(R.string.error_download_takendown_node))
+            RunOnUIThreadUtils.post {
+                showSnackbar(context, getString(R.string.error_download_takendown_node))
+            }
             true
         } else {
             false
@@ -112,39 +127,53 @@ object MegaNodeUtil {
     }
 
     /**
-     * Gets the root parent folder of a node.
+     * Gets the path of a folder.
      *
-     * @param node  MegaNode to get its root parent path
-     * @return The path of the root parent of the node.
+     * @param nodeFolder  MegaNode to get its path
+     * @return The path of the of the folder.
      */
     @JvmStatic
-    fun getParentFolderPath(node: MegaNode?): String {
-        if (node != null) {
-            val megaApi = MegaApplication.getInstance().megaApi
-            var rootParent = node
-
-            while (megaApi.getParentNode(rootParent) != null) {
-                rootParent = megaApi.getParentNode(rootParent)
-            }
-
-            val path = megaApi.getNodePath(rootParent)
-
-            when {
-                rootParent!!.handle == megaApi.rootNode.handle -> {
-                    return getString(R.string.section_cloud_drive) + path
-                }
-                rootParent.handle == megaApi.rubbishNode.handle -> {
-                    return getString(R.string.section_rubbish_bin) +
-                            path.replace("bin" + Constants.SEPARATOR, "")
-                }
-                rootParent.isInShare -> {
-                    return getString(R.string.title_incoming_shares_explorer) +
-                            Constants.SEPARATOR + path.substring(path.indexOf(":") + 1)
-                }
-            }
+    fun getNodeFolderPath(nodeFolder: MegaNode?): String {
+        if (nodeFolder == null) {
+            logWarning("Node is null, cannot get its path.")
+            return ""
         }
 
-        return ""
+        val megaApi = MegaApplication.getInstance().megaApi
+        val path = megaApi.getNodePath(nodeFolder)
+
+        var rootParent = nodeFolder
+
+        while (megaApi.getParentNode(rootParent) != null) {
+            rootParent = megaApi.getParentNode(rootParent)
+        }
+
+        return when {
+            rootParent!!.handle == megaApi.rootNode.handle -> {
+                return getString(R.string.section_cloud_drive) + path
+            }
+            rootParent.handle == megaApi.rubbishNode.handle -> {
+                return getString(R.string.section_rubbish_bin) +
+                        path.replace("bin$SEPARATOR", "")
+            }
+            nodeFolder.isInShare -> {
+                return getString(R.string.title_incoming_shares_explorer) +
+                        SEPARATOR + path.substring(path.indexOf(":") + 1)
+            }
+            else -> ""
+        }
+    }
+
+    /**
+     *
+     * Shares a node.
+     *
+     * @param context Current Context.
+     * @param node    Node to share.
+     */
+    @JvmStatic
+    fun shareNode(context: Context, node: MegaNode) {
+        shareNode(context, node, null)
     }
 
     /**
@@ -153,13 +182,18 @@ object MegaNodeUtil {
      * If the node is a folder creates and/or shares the folder link.
      * If the node is a file and exists in local storage, shares the file. If not, creates and/or shares the file link.
      *
-     * @param context   current Context.
-     * @param node      node to share.
+     * @param context                  Current Context.
+     * @param node                     Node to share.
+     * @param onExportFinishedListener Listener to manage the result of export request.
      */
     @JvmStatic
-    fun shareNode(context: Context, node: MegaNode) {
+    fun shareNode(
+        context: Context,
+        node: MegaNode,
+        onExportFinishedListener: ExportListener.OnExportFinishedListener?
+    ) {
         if (shouldContinueWithoutError(context, "sharing node", node)) {
-            val path = getLocalFile(context, node.name, node.size)
+            val path = getLocalFile(node)
 
             if (!isTextEmpty(path) && !node.isFolder) {
                 shareFile(context, File(path))
@@ -167,7 +201,8 @@ object MegaNodeUtil {
                 startShareIntent(context, Intent(Intent.ACTION_SEND), node.publicLink)
             } else {
                 MegaApplication.getInstance().megaApi.exportNode(
-                    node, ExportListener(context, ACTION_SHARE_NODE, Intent(Intent.ACTION_SEND))
+                    node,
+                    ExportListener(context, Intent(Intent.ACTION_SEND), onExportFinishedListener)
                 )
             }
         }
@@ -185,7 +220,7 @@ object MegaNodeUtil {
         val downloadedFiles = ArrayList<File>()
 
         for (node in listNodes) {
-            val path = if (node.isFolder) null else getLocalFile(context, node.name, node.size)
+            val path = if (node.isFolder) null else getLocalFile(node)
 
             if (isTextEmpty(path)) {
                 return false
@@ -255,9 +290,8 @@ object MegaNodeUtil {
         }
 
         val megaApi = MegaApplication.getInstance().megaApi
-        val exportListener = ExportListener(
-            context, ACTION_SHARE_NODE, notExportedNodes, links, Intent(Intent.ACTION_SEND)
-        )
+        val exportListener =
+            ExportListener(context, notExportedNodes, links, Intent(Intent.ACTION_SEND))
 
         for (node in nodes) {
             if (!node.isExported) {
@@ -310,9 +344,9 @@ object MegaNodeUtil {
         if (node == null) {
             LogUtil.logError(error + "Node == NULL")
             return false
-        } else if (!Util.isOnline(context)) {
+        } else if (!isOnline(context)) {
             LogUtil.logError(error + "No network connection")
-            Util.showSnackbar(context, getString(R.string.error_server_connection_problem))
+            showSnackbar(context, getString(R.string.error_server_connection_problem))
             return false
         }
 
@@ -337,9 +371,9 @@ object MegaNodeUtil {
         if (nodes == null || nodes.isEmpty()) {
             LogUtil.logError(error + "no nodes")
             return false
-        } else if (!Util.isOnline(context)) {
+        } else if (!isOnline(context)) {
             LogUtil.logError(error + "No network connection")
-            Util.showSnackbar(context, getString(R.string.error_server_connection_problem))
+            showSnackbar(context, getString(R.string.error_server_connection_problem))
             return false
         }
 
@@ -385,7 +419,7 @@ object MegaNodeUtil {
     /**
      * Gets the node of the user attribute "My chat files" from the DB.
      *
-     * Before call this method is neccessary to call existsMyChatFilesFolder() method
+     * Before call this method is necessary to call existsMyChatFilesFolder() method
      *
      * @return "My chat files" folder node
      * @see MegaNodeUtil.existsMyChatFilesFolder
@@ -642,6 +676,25 @@ object MegaNodeUtil {
     }
 
     /**
+     * Check if all nodes have owner access.
+     *
+     * @param nodes List of nodes to check.
+     * @return True if all nodes have owner access, false otherwise.
+     */
+    @JvmStatic
+    fun allHaveOwnerAccess(nodes: List<MegaNode?>): Boolean {
+        val megaApi = MegaApplication.getInstance().megaApi
+
+        for (node in nodes) {
+            if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).errorCode != MegaError.API_OK) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    /**
      * Shows a confirmation warning before leave an incoming share.
      *
      * @param activity current Activity
@@ -735,7 +788,7 @@ object MegaNodeUtil {
         snackbarShower: SnackbarShower,
         handles: List<Long>
     ) {
-        logDebug("Leaving ${handles.size} incoming shares");
+        logDebug("Leaving ${handles.size} incoming shares")
 
         val megaApi = MegaApplication.getInstance().megaApi
 
@@ -895,6 +948,7 @@ object MegaNodeUtil {
      * @param context Android context
      * @return whether this function call really starts SDK HTTP streaming server
      */
+    @JvmStatic
     fun setupStreamingServer(api: MegaApiAndroid, context: Context): Boolean {
         if (api.httpServerIsRunning() == 0) {
             api.httpServerStart()
@@ -913,6 +967,19 @@ object MegaNodeUtil {
         }
 
         return false
+    }
+
+    /**
+     * Stop SDK HTTP streaming server.
+     *
+     * @param shouldStopServer True if should stop the server, false otherwise.
+     * @param megaApi          MegaApiAndroid instance to use.
+     */
+    @JvmStatic
+    fun stopStreamingServerIfNeeded(shouldStopServer: Boolean, megaApi: MegaApiAndroid) {
+        if (shouldStopServer) {
+            megaApi.httpServerStop()
+        }
     }
 
     /**
@@ -993,7 +1060,7 @@ object MegaNodeUtil {
             listener.onDisputeClicked()
             val openTermsIntent = Intent(context, WebViewActivity::class.java)
             openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            openTermsIntent.data = Uri.parse(Constants.DISPUTE_URL)
+            openTermsIntent.data = Uri.parse(DISPUTE_URL)
             context.startActivity(openTermsIntent)
             dialog.dismiss()
         }
@@ -1025,14 +1092,19 @@ object MegaNodeUtil {
     /**
      * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_MOVE.
      *
-     * @param requestCode requestCode parameter of onActivityResult
-     * @param resultCode resultCode parameter of onActivityResult
-     * @param data data parameter of onActivityResult
-     * @param snackbarShower interface to show snackbar
+     * @param context        Current Context.
+     * @param requestCode    RequestCode parameter of onActivityResult
+     * @param resultCode     ResultCode parameter of onActivityResult
+     * @param data           Data parameter of onActivityResult
+     * @param snackbarShower Interface to show snackbar
      */
     @JvmStatic
     fun handleSelectFolderToMoveResult(
-        requestCode: Int, resultCode: Int, data: Intent?, snackbarShower: SnackbarShower
+        context: Context,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower
     ): List<Long> {
         if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_MOVE
             || resultCode != RESULT_OK || data == null
@@ -1052,7 +1124,12 @@ object MegaNodeUtil {
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return emptyList()
 
-        val listener = MoveListener(snackbarShower)
+        val listener = MoveListener(snackbarShower) { _, isForeignOverQuota ->
+            if (isForeignOverQuota) {
+                showForeignStorageOverQuotaWarningDialog(context)
+            }
+        }
+
         val result = ArrayList<Long>()
 
         for (handle in moveHandles) {
@@ -1089,15 +1166,20 @@ object MegaNodeUtil {
     /**
      * Handle activity result of REQUEST_CODE_SELECT_FOLDER_TO_COPY.
      *
-     * @param requestCode requestCode parameter of onActivityResult
-     * @param resultCode resultCode parameter of onActivityResult
-     * @param data data parameter of onActivityResult
-     * @param snackbarShower interface to show snackbar
-     * @param activityLauncher interface to start activity
+     * @param context          Current Context.
+     * @param requestCode      RequestCode parameter of onActivityResult
+     * @param resultCode       ResultCode parameter of onActivityResult
+     * @param data             Data parameter of onActivityResult
+     * @param snackbarShower   Interface to show snackbar
+     * @param activityLauncher Interface to start activity
      */
     @JvmStatic
     fun handleSelectFolderToCopyResult(
-        requestCode: Int, resultCode: Int, data: Intent?, snackbarShower: SnackbarShower,
+        context: Context,
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+        snackbarShower: SnackbarShower,
         activityLauncher: ActivityLauncher
     ): Boolean {
         if (requestCode != REQUEST_CODE_SELECT_FOLDER_TO_COPY
@@ -1118,7 +1200,7 @@ object MegaNodeUtil {
         val toHandle = data.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
         val parent = megaApi.getNodeByHandle(toHandle) ?: return false
 
-        val listener = CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, megaApp)
+        val listener = CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, context)
 
         for (handle in copyHandles) {
             val node = megaApi.getNodeByHandle(handle)
@@ -1127,6 +1209,36 @@ object MegaNodeUtil {
                 megaApi.copyNode(node, parent, listener)
             }
         }
+
+        return true
+    }
+
+    /**
+     * Handle activity result of REQUEST_CODE_SELECT_IMPORT_FOLDER.
+     *
+     * @param resultCode resultCode parameter of onActivityResult
+     * @param toHandle the copy target node handle
+     * @param node the node to copy
+     * @param snackbarShower interface to show snackbar
+     * @param activityLauncher interface to start activity
+     */
+    @JvmStatic
+    fun handleSelectFolderToImportResult(
+        resultCode: Int, toHandle: Long, node: MegaNode,
+        snackbarShower: SnackbarShower, activityLauncher: ActivityLauncher
+    ): Boolean {
+        if (resultCode != RESULT_OK) {
+            return false
+        }
+
+        val megaApp = MegaApplication.getInstance()
+        val megaApi = megaApp.megaApi
+
+        val parent = megaApi.getNodeByHandle(toHandle) ?: return false
+
+        megaApi.copyNode(
+            node, parent, CopyListener(CopyListener.COPY, snackbarShower, activityLauncher, megaApp)
+        )
 
         return true
     }
@@ -1425,5 +1537,168 @@ object MegaNodeUtil {
         } else {
             snackbarShower.showSnackbar(getString(R.string.intent_not_available))
         }
+    }
+
+    /**
+     * Gets the string to show as file info details with the next format: "size · modification date".
+     *
+     * @param node The file node from which to get the details.
+     * @return The string so show as file info details.
+     */
+    @JvmStatic
+    fun getFileInfo(node: MegaNode): String? {
+        return TextUtil.getFileInfo(
+            getSizeString(node.size),
+            formatLongDateTime(node.modificationTime)
+        )
+    }
+
+    /**
+     * Launches an Intent to open TextFileEditorActivity.
+     *
+     * @param context     Current context.
+     * @param node        Node to preview on Text Editor.
+     * @param adapterType Current adapter view.
+     */
+    @JvmStatic
+    fun manageTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
+        manageTextFileIntent(context, node, adapterType, null, VIEW_MODE)
+    }
+
+    /**
+     * Launches an Intent to open TextFileEditorActivity on edit mode.
+     *
+     * @param context     Current context.
+     * @param node        Node to preview on Text Editor.
+     * @param adapterType Current adapter view.
+     */
+    @JvmStatic
+    fun manageEditTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
+        manageTextFileIntent(context, node, adapterType, null, EDIT_MODE)
+    }
+
+    /**
+     * Launches an Intent to open TextFileEditorActivity.
+     *
+     * @param context     Current context.
+     * @param node        Node to preview on Text Editor.
+     * @param adapterType Current adapter view.
+     * @param urlFileLink Link of the file if the adapter is FILE_LINK_ADAPTER.
+     */
+    @JvmStatic
+    fun manageTextFileIntent(
+        context: Context,
+        node: MegaNode,
+        adapterType: Int,
+        urlFileLink: String?
+    ) {
+        manageTextFileIntent(context, node, adapterType, urlFileLink, VIEW_MODE)
+    }
+
+    /**
+     * Launches an Intent to open TextFileEditorActivity.
+     *
+     * @param context     Current context.
+     * @param node        Node to preview on Text Editor.
+     * @param adapterType Current adapter view.
+     * @param urlFileLink Link of the file if the adapter is FILE_LINK_ADAPTER.
+     * @param mode        Text file editor mode.
+     */
+    @JvmStatic
+    fun manageTextFileIntent(
+        context: Context,
+        node: MegaNode,
+        adapterType: Int,
+        urlFileLink: String?,
+        mode: String
+    ) {
+        val textFileIntent = Intent(context, TextEditorActivity::class.java)
+
+        if (adapterType == FILE_LINK_ADAPTER) {
+            textFileIntent.putExtra(EXTRA_SERIALIZE_STRING, node.serialize())
+                .putExtra(URL_FILE_LINK, urlFileLink)
+        } else {
+            textFileIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+        }
+
+        textFileIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
+            .putExtra(MODE, mode)
+        context.startActivity(textFileIntent)
+    }
+
+    /**
+     * Opens an URL node.
+     *
+     * @param context Current context.
+     * @param megaApi MegaApiAndroid instance to use.
+     * @param node    MegaNode which contains an URL to open.
+     */
+    @JvmStatic
+    @Suppress("DEPRECATION")
+    fun manageURLNode(context: Context, megaApi: MegaApiAndroid, node: MegaNode) {
+        val progressDialog = android.app.ProgressDialog(context)
+        progressDialog.apply {
+            setMessage(getString(R.string.link_request_status))
+            setCancelable(false)
+            setCanceledOnTouchOutside(false)
+            show()
+        }
+
+        Completable.create { emitter ->
+            val localPath = getLocalFile(node)
+            var br: BufferedReader? = null
+            var shouldStopServer = false
+
+            if (localPath != null) {
+                //Read local file
+                val localFile = File(localPath)
+                br = BufferedReader(FileReader(localFile))
+            } else {
+                //Read streaming file
+                shouldStopServer = setupStreamingServer(megaApi, context)
+                val uri = megaApi.httpServerGetLocalLink(node)
+
+                if (!uri.isNullOrEmpty()) {
+                    val nodeURL = URL(uri)
+                    val connection = nodeURL.openConnection() as HttpURLConnection
+                    br = BufferedReader(InputStreamReader(connection.inputStream))
+                }
+            }
+
+            if (br != null) {
+                var line = br.readLine()
+
+                if (line != null) {
+                    line = br.readLine()
+                    val url = line.replace(URL_INDICATOR, "")
+                    val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(url))
+
+                    if (isIntentAvailable(context, intent)) {
+                        context.startActivity(intent)
+                    } else {
+                        showSnackbar(context, getString(R.string.intent_not_available_file))
+                    }
+
+                    stopStreamingServerIfNeeded(shouldStopServer, megaApi)
+                    emitter.onComplete()
+                    return@create
+                } else {
+                    logDebug("Not expected format: Exception on processing url file")
+                }
+            }
+
+            emitter.onError(Throwable("Error getting URL"))
+            stopStreamingServerIfNeeded(shouldStopServer, megaApi)
+            showSnackbar(context, getString(R.string.error_open_file_with))
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = { progressDialog.dismiss() },
+                onError = { error ->
+                    progressDialog.dismiss()
+                    LogUtil.logError(error.message)
+                }
+            )
     }
 }

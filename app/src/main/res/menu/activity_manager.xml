@@ -48,38 +48,6 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_menu_kill_all_sessions"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/action_kill_all_sessions"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_menu_change_pass"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/my_account_change_password"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_menu_forgot_pass"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="90"
-        android:title="@string/forgot_pass_menu"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_menu_export_MK"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="95"
-        android:title="@string/action_export_master_key"
-        android:visible="false"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_add"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="100"
@@ -176,15 +144,6 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_search_by_date"
-        android:icon="@drawable/ic_menu_search"
-        android:orderInCategory="115"
-        android:title="@string/action_search_by_date"
-        android:visible="false"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/action_grid"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="120"
@@ -192,14 +151,6 @@
         android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_menu_refresh"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="130"
-        android:title="@string/action_refresh"
-        android:visible="false"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_menu_help"
@@ -231,13 +182,6 @@
         android:title="@string/context_clear_rubbish"
         android:visible="false"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_menu_cancel_subscriptions"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="155"
-        android:title="@string/action_cancel_subscriptions"
-        android:visible="false"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_menu_retry_transfers"
@@ -264,10 +208,12 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_menu_logout"
-        android:icon="@drawable/ic_action_bar_null"
-        android:orderInCategory="175"
-        android:title="@string/action_logout"
+        android:id="@+id/action_menu_open_meeting"
+        android:icon="@drawable/ic_videocam_white"
+        android:orderInCategory="180"
+        android:title="@string/start_join_meeting"
         android:visible="false"
-        app:showAsAction="never" />
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="ifRoom"
+        />
 </menu>

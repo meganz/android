@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import kotlin.Pair;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.MegaContactDB;
@@ -43,7 +42,6 @@ import mega.privacy.android.app.RecentsItem;
 import mega.privacy.android.app.components.HeaderItemDecoration;
 import mega.privacy.android.app.components.TopSnappedStickyLayoutManager;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
-import mega.privacy.android.app.fragments.homepage.Scrollable;
 import mega.privacy.android.app.lollipop.FullScreenImageViewerLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.lollipop.PdfViewerActivityLollipop;
@@ -62,10 +60,12 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent;
+import static mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode;
 import static mega.privacy.android.app.utils.Util.getMediaIntent;
 
 
-public class RecentsFragment extends Fragment implements StickyHeaderHandler, Scrollable {
+public class RecentsFragment extends Fragment implements StickyHeaderHandler {
 
     private Context context;
     private DisplayMetrics outMetrics;
@@ -170,13 +170,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
         listView.setLayoutManager(stickyLayoutManager);
         listView.setClipToPadding(false);
         listView.setItemAnimator(new DefaultItemAnimator());
-        listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                checkScroll();
-            }
-        });
+
         fillRecentItems(buckets);
         setRecentsView();
         return v;
@@ -256,15 +250,6 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             }
         }
         ((ManagerActivityLollipop) context).setToolbarTitle();
-        checkScroll();
-    }
-
-    @Override
-    public void checkScroll() {
-        if (listView == null) return;
-        LiveEventBus.get(EVENT_SCROLLING_CHANGE, Pair.class)
-                .post(new Pair<>(this, listView.canScrollVertically(-1)
-                        && listView.getVisibility() == View.VISIBLE));
     }
 
     public String findUserName(String mail) {
@@ -349,7 +334,7 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
             return;
         }
 
-        String localPath = getLocalFile(context, node.getName(), node.getSize());
+        String localPath = getLocalFile(node);
         boolean paramsSetSuccessfully = false;
 
         if (isAudioOrVideo(node)) {
@@ -380,12 +365,8 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 intent.setDataAndType(intent.getData(), "audio/*");
             }
         } else if (MimeTypeList.typeForName(node.getName()).isURL()) {
-            intent = new Intent(Intent.ACTION_VIEW);
-
-            if (isLocalFile(node, megaApi, localPath)) {
-                paramsSetSuccessfully = setURLIntentParams(context, node, intent, localPath,
-                        (ManagerActivityLollipop) requireActivity());
-            }
+            manageURLNode(context, megaApi, node);
+            return;
         } else if (MimeTypeList.typeForName(node.getName()).isPdf()) {
             intent = new Intent(context, PdfViewerActivityLollipop.class);
             intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true);
@@ -398,6 +379,9 @@ public class RecentsFragment extends Fragment implements StickyHeaderHandler, Sc
                 paramsSetSuccessfully = setStreamingIntentParams(context, node, megaApi, intent,
                         (ManagerActivityLollipop) requireActivity());
             }
+        } else if (MimeTypeList.typeForName(node.getName()).isOpenableTextFile(node.getSize())) {
+            manageTextFileIntent(requireContext(), node, RECENTS_ADAPTER);
+            return;
         }
 
         if (intent != null && !isIntentAvailable(context, intent)) {

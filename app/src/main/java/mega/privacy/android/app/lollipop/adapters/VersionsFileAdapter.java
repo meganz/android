@@ -37,6 +37,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeUtil.getFileInfo;
 import static mega.privacy.android.app.utils.ThumbnailUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 
@@ -332,8 +333,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		holder.textViewFileName.setText(node.getName());
 		holder.textViewFileSize.setText("");
 
-		long nodeSize = node.getSize();
-		String fileInfo = getSizeString(nodeSize) + " . " + getNodeDate(node);
+		String fileInfo = getFileInfo(node);
 		holder.textViewFileSize.setText(fileInfo);
 
 		RelativeLayout.LayoutParams paramsLarge = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();
@@ -639,13 +639,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 		} catch (IndexOutOfBoundsException e) {
 		}
 		return null;
-	}
-
-	public String getNodeDate(MegaNode node){
-
-		Calendar calendar = calculateDateFromTimestamp(node.getModificationTime());
-		String format3 = new SimpleDateFormat("d MMM yyyy HH:mm", Locale.getDefault()).format(calendar.getTime());
-		return format3;
 	}
 
 	public long getParentHandle() {

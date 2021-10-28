@@ -3,24 +3,22 @@ package mega.privacy.android.app.providers;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputLayout;
-import androidx.core.app.ActivityCompat;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.MenuItemCompat;
@@ -32,7 +30,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -67,6 +64,8 @@ import mega.privacy.android.app.UserCredentials;
 import mega.privacy.android.app.activities.WebViewActivity;
 import mega.privacy.android.app.components.CustomViewPager;
 import mega.privacy.android.app.components.EditTextPIN;
+import mega.privacy.android.app.utils.AlertDialogUtil;
+import mega.privacy.android.app.utils.MegaProgressDialogUtil;
 import mega.privacy.android.app.lollipop.providers.CloudDriveProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import mega.privacy.android.app.lollipop.providers.ProviderPageAdapter;
@@ -93,10 +92,12 @@ import nz.mega.sdk.MegaUserAlert;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
+import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getCloudRootHandle;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.*;
 
@@ -104,11 +105,13 @@ import static nz.mega.sdk.MegaApiJava.*;
  * This activity is launched by 3rd apps, for example, when compose email pick attachments from MEGA.
  */
 @SuppressLint("NewApi") 
-public class FileProviderActivity extends PinFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
+public class FileProviderActivity extends PasscodeFileProviderActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaChatRequestListenerInterface, View.OnFocusChangeListener, View.OnLongClickListener {
 
 	public static final int INVALID_TAB = -1;
 	public static final int CLOUD_TAB = 0;
 	public static final int INCOMING_TAB = 1;
+
+	public static final String FROM_MEGA_APP = "FROM_MEGA_APP";
 
 	private String lastEmail;
 	private String lastPassword;
@@ -119,6 +122,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 	private MaterialToolbar tB;
 	private ActionBar aB;
+	private AppBarLayout aBL;
 
 	private ScrollView scrollView;
 	private LinearLayout loginLogin;
@@ -142,6 +146,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	private Button bLoginLol;
 
 	private MegaApiAndroid megaApi;
+	private MegaApiAndroid megaApiFolder;
 	private MegaChatApiAndroid megaChatApi;
 
 	private boolean folderSelected = false;
@@ -151,13 +156,12 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	private CloudDriveProviderFragmentLollipop cDriveProviderLol;
 	private IncomingSharesProviderFragmentLollipop iSharesProviderLol;
 
-	private ProgressDialog statusDialog;
+	private AlertDialog statusDialog;
 
 	private Button cancelButton;
 	private Button attachButton;
 
 	private TabLayout tabLayoutProvider;
-	private LinearLayout providerSectionLayout;
 	private ProviderPageAdapter mTabsAdapterProvider;
 	private CustomViewPager viewPagerProvider;
 
@@ -232,6 +236,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		}
 
 		megaApi = MegaApplication.getInstance().getMegaApi();
+		megaApiFolder = MegaApplication.getInstance().getMegaApiFolder();
 		megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 
 		megaApi.addGlobalListener(this);
@@ -303,6 +308,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 				logDebug("megaApi.getRootNode() NOT null");
 
+				aBL = findViewById(R.id.app_bar_layout_provider);
+
 				//Set toolbar
 				tB = findViewById(R.id.toolbar_provider);
 				setSupportActionBar(tB);
@@ -324,12 +331,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				activateButton(false);
 
 				//TABS section
-				providerSectionLayout = findViewById(R.id.tabhost_provider);
 				tabLayoutProvider = findViewById(R.id.sliding_tabs_provider);
 				viewPagerProvider = findViewById(R.id.provider_tabs_pager);
-
-				//Create tabs
-				providerSectionLayout.setVisibility(View.VISIBLE);
 
 				if (mTabsAdapterProvider == null) {
 
@@ -596,7 +599,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			}
 		});
 
-		fourthPin = findViewById(R.id.pin_fouth_login);
+		fourthPin = findViewById(R.id.pin_fourth_login);
 		fourthPin.setOnLongClickListener(this);
 		fourthPin.setOnFocusChangeListener(this);
 		imm.showSoftInput(fourthPin, InputMethodManager.SHOW_FORCED);
@@ -704,81 +707,14 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		});
 		getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-		firstPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb1 = firstPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb1.width = scaleWidthPx(42, outMetrics);
-		} else {
-			paramsb1.width = scaleWidthPx(25, outMetrics);
-		}
-		firstPin.setLayoutParams(paramsb1);
-		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams) firstPin.getLayoutParams();
-		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-		firstPin.setLayoutParams(textParams);
-
-		secondPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb2 = secondPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb2.width = scaleWidthPx(42, outMetrics);
-		} else {
-			paramsb2.width = scaleWidthPx(25, outMetrics);
-		}
-		secondPin.setLayoutParams(paramsb2);
-		textParams = (LinearLayout.LayoutParams) secondPin.getLayoutParams();
-		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-		secondPin.setLayoutParams(textParams);
 		secondPin.setEt(firstPin);
 
-		thirdPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb3 = thirdPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb3.width = scaleWidthPx(42, outMetrics);
-		} else {
-			paramsb3.width = scaleWidthPx(25, outMetrics);
-		}
-		thirdPin.setLayoutParams(paramsb3);
-		textParams = (LinearLayout.LayoutParams) thirdPin.getLayoutParams();
-		textParams.setMargins(0, 0, scaleWidthPx(25, outMetrics), 0);
-		thirdPin.setLayoutParams(textParams);
 		thirdPin.setEt(secondPin);
 
-		fourthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb4 = fourthPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb4.width = scaleWidthPx(42, outMetrics);
-		} else {
-			paramsb4.width = scaleWidthPx(25, outMetrics);
-		}
-		fourthPin.setLayoutParams(paramsb4);
-		textParams = (LinearLayout.LayoutParams) fourthPin.getLayoutParams();
-		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-		fourthPin.setLayoutParams(textParams);
 		fourthPin.setEt(thirdPin);
 
-		fifthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb5 = fifthPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb5.width = scaleWidthPx(42, outMetrics);
-		} else {
-			paramsb5.width = scaleWidthPx(25, outMetrics);
-		}
-		fifthPin.setLayoutParams(paramsb5);
-		textParams = (LinearLayout.LayoutParams) fifthPin.getLayoutParams();
-		textParams.setMargins(0, 0, scaleWidthPx(8, outMetrics), 0);
-		fifthPin.setLayoutParams(textParams);
 		fifthPin.setEt(fourthPin);
 
-		sixthPin.setGravity(Gravity.CENTER_HORIZONTAL);
-		android.view.ViewGroup.LayoutParams paramsb6 = sixthPin.getLayoutParams();
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-			paramsb6.width = scaleWidthPx(42, outMetrics);
-		} else {
-			paramsb6.width = scaleWidthPx(25, outMetrics);
-		}
-		sixthPin.setLayoutParams(paramsb6);
-		textParams = (LinearLayout.LayoutParams) sixthPin.getLayoutParams();
-		textParams.setMargins(0, 0, 0, 0);
-		sixthPin.setLayoutParams(textParams);
 		sixthPin.setEt(fifthPin);
 	}
 
@@ -826,7 +762,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				}
 				break;
 			}
-			case R.id.pin_fouth_login: {
+			case R.id.pin_fourth_login: {
 				if (hasFocus) {
 					fourthPin.setText("");
 				}
@@ -899,7 +835,7 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 			case R.id.pin_first_login:
 			case R.id.pin_second_login:
 			case R.id.pin_third_login:
-			case R.id.pin_fouth_login:
+			case R.id.pin_fourth_login:
 			case R.id.pin_fifth_login:
 			case R.id.pin_sixth_login: {
 				pinLongClick = true;
@@ -940,11 +876,10 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
 	}
 
-	public void downloadAndAttachAfterClick(long size, long[] hashes) {
-		ProgressDialog temp = null;
+	public void downloadAndAttachAfterClick(long hash) {
+		AlertDialog temp;
 		try {
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.context_preparing_provider));
+			temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
 			temp.show();
 		} catch (Exception e) {
 			return;
@@ -954,20 +889,30 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		progressTransfersFinish = 0;
 		clipDataTransfers = null;
 
-		downloadAndAttach(size, hashes);
+		downloadAndAttach(new long[]{hash});
 	}
 
-	public void downloadAndAttach(long size, long[] hashes) {
+	public void downloadAndAttach(long[] hashes) {
+		if (getIntent() != null && getIntent().getBooleanExtra(FROM_MEGA_APP, false)) {
+			AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
+
+			setResult(Activity.RESULT_OK, new Intent()
+					.setAction(Intent.ACTION_GET_CONTENT)
+					.putExtra(FROM_MEGA_APP, true)
+					.putExtra(NODE_HANDLES, hashes));
+
+			finish();
+
+			return;
+		}
 
 		logDebug("downloadAndAttach");
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-						new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
+		boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		if (!hasStoragePermission) {
+			requestPermission(this,
+					REQUEST_WRITE_STORAGE,
+					Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		}
 
 		if (MegaApplication.getInstance().getStorageState() == STORAGE_STATE_PAYWALL) {
@@ -990,7 +935,13 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		if (hashes != null && hashes.length > 0) {
 			for (long hash : hashes) {
 				MegaNode tempNode = megaApi.getNodeByHandle(hash);
-				String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
+				// If node doesn't exist continue to the next one
+				if (tempNode == null) {
+					logWarning("Temp node is null");
+					continue;
+				}
+
+				String localPath = getLocalFile(tempNode);
 				if(localPath != null){
 					try {
 						logDebug("COPY_FILE");
@@ -1096,7 +1047,6 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 	@Override
 	public void onBackPressed() {
 		logDebug("tabShown: " + tabShown);
-
 		if (tabShown == CLOUD_TAB) {
 			cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(getFragmentTag(R.id.provider_tabs_pager, CLOUD_TAB));
 
@@ -1133,10 +1083,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				break;
 			}
 			case R.id.attach_button: {
-				ProgressDialog temp = null;
+				AlertDialog temp;
 				try {
-					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.context_preparing_provider));
+					temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
 					temp.show();
 				} catch (Exception e) {
 					return;
@@ -1157,20 +1106,19 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 				for (int i = 0; i < totalHashes.size(); i++) {
 					hashes[i] = totalHashes.get(i);
 				}
-				downloadAndAttach(selectedNodes.size(), hashes);
+				downloadAndAttach(hashes);
 				break;
 			}
             case R.id.lost_authentication_device: {
                 try {
-                    String url = "https://mega.nz/recovery";
                     Intent openTermsIntent = new Intent(this, WebViewActivity.class);
                     openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(url));
+                    openTermsIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(openTermsIntent);
                 }
                 catch (Exception e){
                     Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setData(Uri.parse("https://mega.nz/recovery"));
+                    viewIntent.setData(Uri.parse(RECOVERY_URL));
                     startActivity(viewIntent);
                 }
                 break;
@@ -1486,6 +1434,9 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 					stopRunningCameraUploadService(this);
 				}
 			} else {
+				logDebug("Logged in. Setting account auth token for folder links.");
+				megaApiFolder.setAccountAuth(megaApi.getAccountAuth());
+
 				if (is2FAEnabled) {
 					is2FAEnabled = false;
 					loginVerificationLayout.setVisibility(View.GONE);
@@ -1588,12 +1539,8 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 		activateButton(false);
 
 		//TABS section
-		providerSectionLayout = findViewById(R.id.tabhost_provider);
 		tabLayoutProvider = findViewById(R.id.sliding_tabs_provider);
 		viewPagerProvider = findViewById(R.id.provider_tabs_pager);
-
-		//Create tabs
-		providerSectionLayout.setVisibility(View.VISIBLE);
 
 		if (mTabsAdapterProvider == null) {
 			mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(), this);
@@ -1917,5 +1864,21 @@ public class FileProviderActivity extends PinFileProviderActivity implements OnC
 
 		viewPagerProvider.disableSwipe(hide);
 		tabLayoutProvider.setVisibility(hide ? View.GONE : View.VISIBLE);
+	}
+
+	/**
+	 * Changes the elevation.
+	 *
+	 * @param withElevation True if should show elevation, false otherwise.
+	 * @param fragmentIndex Fragment index wich wants to modify the elevation.
+	 */
+	public void changeActionBarElevation(boolean withElevation, int fragmentIndex) {
+		if (viewPagerProvider == null || viewPagerProvider.getCurrentItem() != fragmentIndex) {
+			return;
+		}
+
+		ColorUtils.changeStatusBarColorForElevation(this, withElevation);
+		float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+		aBL.setElevation(withElevation ? elevation : 0);
 	}
 }

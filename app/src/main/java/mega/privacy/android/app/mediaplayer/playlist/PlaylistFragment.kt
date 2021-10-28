@@ -84,7 +84,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                (requireActivity() as MediaPlayerActivity).showToolbarElevation(
+                (requireActivity() as MediaPlayerActivity).setupToolbarColors(
                     recyclerView.canScrollVertically(-1)
                 )
             }
@@ -105,6 +105,12 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
         requireContext().bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        playlistObserved = false
+    }
+
     override fun onDestroy() {
         super.onDestroy()
 
@@ -121,11 +127,21 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
             playlistObserved = true
 
             service.viewModel.playlist.observe(viewLifecycleOwner) {
+                adapter.paused = service.viewModel.paused
+
                 adapter.submitList(it.first) {
                     listLayoutManager.scrollToPositionWithOffset(it.second, 0)
-                }
 
-                (requireActivity() as MediaPlayerActivity).setToolbarTitle(it.third)
+                    if (!isVideoPlayer() && it.first.isNotEmpty()) {
+                        // Trigger the visibility update of the pause icon of the
+                        // playing (paused) audio.
+                        adapter.notifyItemChanged(it.second + 1)
+                    }
+                }
+            }
+
+            service.viewModel.playlistTitle.observe(viewLifecycleOwner) {
+                (requireActivity() as MediaPlayerActivity).setToolbarTitle(it)
             }
         }
     }
@@ -148,7 +164,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation {
 
     override fun onItemClick(item: PlaylistItem) {
         if (!CallUtil.participatingInACall()) {
-            playerService?.exoPlayer?.seekTo(item.index, 0)
+            playerService?.seekTo(item.index)
         }
         (requireActivity() as MediaPlayerActivity).closeSearch()
 

@@ -18,7 +18,6 @@ import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import kotlinx.android.synthetic.main.bottom_sheet_upload.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.adapters.GiphyAdapter
 import mega.privacy.android.app.databinding.ActivityGiphyBinding
@@ -27,7 +26,6 @@ import mega.privacy.android.app.interfaces.GiphyInterface
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_DOWN_SERVER
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.EMPTY_SEARCH
 import mega.privacy.android.app.interfaces.GiphyInterface.Companion.NON_EMPTY
-import mega.privacy.android.app.lollipop.PinActivityLollipop
 import mega.privacy.android.app.objects.Data
 import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.GiphyResponse
@@ -43,7 +41,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
+class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
     companion object {
         private const val NUM_COLUMNS_PORTRAIT = 2
@@ -165,6 +163,7 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
     }
 
     override fun onBackPressed() {
+        if (psaWebBrowser.consumeBack()) return
         setResult(RESULT_CANCELED)
         super.onBackPressed()
     }
@@ -439,7 +438,7 @@ class GiphyPickerActivity : PinActivityLollipop(), GiphyInterface {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_PICK_GIF) {
-            val gifData = data?.getParcelableExtra(GIF_DATA) as GifData
+            val gifData = data?.getParcelableExtra(GIF_DATA) as GifData?
             setResult(RESULT_OK, Intent().putExtra(GIF_DATA, gifData))
             finish()
         }

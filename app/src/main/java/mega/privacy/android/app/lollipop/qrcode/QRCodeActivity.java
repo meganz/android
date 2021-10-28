@@ -30,11 +30,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.globalmanagement.MyAccountInfo;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -48,10 +52,15 @@ import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.utils.CacheFolderManager.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 
-public class QRCodeActivity extends PinActivityLollipop implements MegaRequestListenerInterface{
+@AndroidEntryPoint
+public class QRCodeActivity extends PasscodeActivity implements MegaRequestListenerInterface{
 
     private final int MY_PERMISSIONS_REQUEST_CAMERA = 1010;
+
+    @Inject
+    MyAccountInfo myAccountInfo;
 
     private Toolbar tB;
     private ActionBar aB;
@@ -127,8 +136,8 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
         tabLayoutQRCode =  (TabLayout) findViewById(R.id.sliding_tabs_qr_code);
         viewPagerQRCode = (ViewPager) findViewById(R.id.qr_code_tabs_pager);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+        if (!hasPermissions(this, Manifest.permission.CAMERA)) {
+            requestPermission(this, MY_PERMISSIONS_REQUEST_CAMERA, Manifest.permission.CAMERA);
         }else {
             initActivity();
         }
@@ -280,7 +289,7 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
     }
 
     public String getName(){
-       return  ((MegaApplication) getApplication()).getMyAccountInfo().getFullName();
+       return  myAccountInfo.getFullName();
 
     }
 
@@ -301,11 +310,9 @@ public class QRCodeActivity extends PinActivityLollipop implements MegaRequestLi
                 }
                 else {
                     if (qrFile.exists()) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-                            if (!hasStoragePermission) {
-                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_STORAGE);
-                            }
+                        boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                        if (!hasStoragePermission) {
+                            requestPermission(this, REQUEST_WRITE_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                         }
 
                         double availableFreeSpace = Double.MAX_VALUE;

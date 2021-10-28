@@ -13,23 +13,23 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintGuide_end="@dimen/audio_player_playlist_controller_height" />
 
-    <mega.privacy.android.app.components.DefaultTimeBar
+    <com.google.android.exoplayer2.ui.DefaultTimeBar
         android:id="@id/exo_progress"
+        style="@style/Widget.Mega.TimeBar"
         android:layout_width="0dp"
         android:layout_height="26dp"
-        app:buffered_color="@color/grey_300"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         app:layout_constraintBottom_toTopOf="@id/progress_center"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/progress_center"
-        app:played_color="@color/teal_300_teal_200"
-        app:unplayed_color="@color/grey_200_grey_600" />
+        app:layout_constraintTop_toTopOf="@id/progress_center" />
 
     <TextView
         android:id="@id/exo_position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="24dp"
         android:textAppearance="@style/TextAppearance.Mega.Caption.Variant4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
@@ -39,7 +39,7 @@
         android:id="@id/exo_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="24dp"
         android:textAppearance="@style/TextAppearance.Mega.Caption.Variant4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/exo_progress"
@@ -116,12 +116,11 @@
         android:id="@id/exo_repeat_toggle"
         style="@style/AudioPlayerButton"
         android:layout_marginEnd="10dp"
-        android:src="@drawable/audio_player_play_bg_on"
+        android:src="@drawable/exo_controls_repeat_all"
         app:layout_constraintBottom_toBottomOf="@id/control_button_center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toEndOf="@id/exo_next"
-        app:layout_constraintTop_toTopOf="@id/control_button_center"
-        tools:src="@drawable/exo_controls_repeat_all" />
+        app:layout_constraintTop_toTopOf="@id/control_button_center" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

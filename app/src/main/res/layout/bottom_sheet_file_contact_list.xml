@@ -11,7 +11,6 @@
         android:id="@+id/file_contact_list_title_layout"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_marginTop="8dp"
         android:orientation="horizontal" >
 
         <RelativeLayout
@@ -99,7 +98,7 @@
                 android:paddingBottom="2dp"
                 android:paddingTop="2dp"
                 android:layout_marginStart="18dp"
-                android:text="@string/contact_properties_activity"
+                android:text="@string/general_info"
                 android:textAppearance="?attr/textAppearanceSubtitle1" />
         </LinearLayout>
 

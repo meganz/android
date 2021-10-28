@@ -2,7 +2,6 @@ package mega.privacy.android.app.lollipop;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,29 +37,29 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.UploadService;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.saver.NodeSaver;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.lollipop.controllers.NodeController;
 import mega.privacy.android.app.lollipop.listeners.MultipleRequestListener;
-import mega.privacy.android.app.lollipop.tasks.FilePrepareTask;
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment;
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.documentscanner.DocumentScannerActivity;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaEvent;
@@ -72,21 +71,32 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
+import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.*;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.IS_NEW_TEXT_FILE_SHOWN;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TEXT;
+import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
-import static mega.privacy.android.app.utils.ProgressDialogUtil.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.UploadUtil.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class ContactFileListActivityLollipop extends PinActivityLollipop
+import javax.inject.Inject;
+
+@AndroidEntryPoint
+public class ContactFileListActivityLollipop extends PasscodeActivity
 		implements MegaGlobalListenerInterface, MegaRequestListenerInterface,
 		UploadBottomSheetDialogActionListener, ActionNodeCallback, SnackbarShower {
+
+	@Inject
+	FilePrepareUseCase filePrepareUseCase;
 
 	FrameLayout fragmentContainer;
 
@@ -94,8 +104,6 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 	MegaUser contact;
 	String fullName = "";
 
-	MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 	AlertDialog permissionsDialog;
 
 	ContactFileListFragmentLollipop cflF;
@@ -124,7 +132,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 	DisplayMetrics outMetrics;
 
 	private androidx.appcompat.app.AlertDialog renameDialog;
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 
 	MegaNode selectedNode = null;
 
@@ -132,6 +140,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 	ActionBar aB;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
+
+	private AlertDialog newTextFileDialog;
 
 	private BroadcastReceiver manageShareReceiver = new BroadcastReceiver() {
 		@Override
@@ -165,11 +175,10 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		logDebug("onSaveInstanceState");
-		super.onSaveInstanceState(outState);
 		outState.putLong(PARENT_HANDLE, parentHandle);
-
+		checkNewTextFileDialogState(newTextFileDialog, outState);
 		nodeSaver.saveState(outState);
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -248,6 +257,12 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 	}
 
 	@Override
+	public void showNewTextFileDialog(String typedName) {
+		newTextFileDialog = MegaNodeDialogUtil.showNewTxtFileDialog(this,
+				megaApi.getNodeByHandle(parentHandle), typedName, false);
+	}
+
+	@Override
 	public void createFolder(@NotNull String title) {
 
 		logDebug("createFolder");
@@ -277,8 +292,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 			if (!exists) {
 				statusDialog = null;
 				try {
-					statusDialog = new ProgressDialog(this);
-					statusDialog.setMessage(getString(R.string.context_creating_folder));
+					statusDialog = createProgressDialog(this, getString(R.string.context_creating_folder));
 					statusDialog.show();
 				} catch (Exception e) {
 					return;
@@ -304,8 +318,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 				if (!exists) {
 					statusDialog = null;
 					try {
-						statusDialog = new ProgressDialog(this);
-						statusDialog.setMessage(getString(R.string.context_creating_folder));
+						statusDialog = createProgressDialog(this, getString(R.string.context_creating_folder));
 						statusDialog.show();
 					} catch (Exception e) {
 						return;
@@ -336,40 +349,17 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		logDebug("onCreate first");
 		super.onCreate(savedInstanceState);
+
+		if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+			return;
+		}
+
 		if (savedInstanceState == null) {
 			this.setParentHandle(-1);
 		} else {
 			this.setParentHandle(savedInstanceState.getLong(PARENT_HANDLE, -1));
 
 			nodeSaver.restoreState(savedInstanceState);
-		}
-
-		if (megaApi == null) {
-			megaApi = ((MegaApplication) getApplication()).getMegaApi();
-		}
-
-		if (megaApi == null || megaApi.getRootNode() == null) {
-			logDebug("Refresh session - sdk");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
-		}
-
-		if (megaChatApi == null) {
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-
-		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-			logDebug("Refresh session - karere");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
-			return;
 		}
 
 		megaApi.addGlobalListener(this);
@@ -440,6 +430,10 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 
 			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commitNow();
 			coordinatorLayout.invalidate();
+
+			if (savedInstanceState != null && savedInstanceState.getBoolean(IS_NEW_TEXT_FILE_SHOWN, false)) {
+				showNewTextFileDialog(savedInstanceState.getString(NEW_TEXT_FILE_TEXT));
+			}
 		}
 	}
 
@@ -620,10 +614,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 				return;
 			}
 
-			ProgressDialog temp = null;
+			AlertDialog temp;
 			try {
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_copying));
+				temp = createProgressDialog(this, getString(R.string.context_copying));
 				temp.show();
 			} catch (Exception e) {
 				return;
@@ -670,10 +663,9 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 			moveToRubbish = false;
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 
-			ProgressDialog temp = null;
+			AlertDialog temp;
 			try {
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_moving));
+				temp = createProgressDialog(this, getString(R.string.context_moving));
 				temp.show();
 			} catch (Exception e) {
 				return;
@@ -688,17 +680,22 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 				return;
 			}
 			intent.setAction(Intent.ACTION_GET_CONTENT);
-			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-			filePrepareTask.execute(intent);
-			ProgressDialog temp = null;
+
 			try {
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.upload_prepare));
-				temp.show();
+				statusDialog = createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
+				statusDialog.show();
 			} catch (Exception e) {
 				return;
 			}
-			statusDialog = temp;
+
+			filePrepareUseCase.prepareFiles(intent)
+					.subscribeOn(Schedulers.io())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe((shareInfo, throwable) -> {
+						if (throwable == null) {
+							onIntentProcessed(shareInfo);
+						}
+					});
 		} else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			if (intent == null) {
 				return;
@@ -718,7 +715,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
-					statusDialog = getProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
+					statusDialog = createProgressDialog(contactPropertiesMainActivity, getString(R.string.context_sharing_folder));
 					permissionsDialog.dismiss();
 					new NodeController(this).shareFolder(parent, selectedContacts, item);
 				});
@@ -788,7 +785,8 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
                 if (StringResourcesUtils.getString(R.string.section_chat).equals(savedDestination)) {
                     fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CHAT);
                 } else {
-                    fileIntent.setAction(FileExplorerActivityLollipop.ACTION_UPLOAD_TO_CLOUD);
+                    fileIntent.setAction(FileExplorerActivityLollipop.ACTION_SAVE_TO_CLOUD);
+					fileIntent.putExtra(FileExplorerActivityLollipop.EXTRA_PARENT_HANDLE, getParentHandle());
                 }
                 fileIntent.putExtra(Intent.EXTRA_STREAM, intent.getData());
                 fileIntent.setType(intent.getType());
@@ -797,7 +795,12 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
         }
 	}
 
-	public void onIntentProcessed(List<ShareInfo> infos) {
+	/**
+	 * Handle processed upload intent.
+	 *
+	 * @param infos List<ShareInfo> containing all the upload info.
+	 */
+	private void onIntentProcessed(List<ShareInfo> infos) {
 		if (statusDialog != null) {
 			try {
 				statusDialog.dismiss();
@@ -834,6 +837,7 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 
 	@Override
 	public void onBackPressed() {
+		if (psaWebBrowser.consumeBack()) return;
 		retryConnectionsAndSignalPresence();
 
 		if (cflF != null && cflF.isVisible() && cflF.onBackPressed() == 0) {
@@ -959,6 +963,11 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 				}
 			} else {
 				if (e.getErrorCode() == MegaError.API_EOVERQUOTA) {
+					if (api.isForeignNode(request.getParentHandle())) {
+						showForeignStorageOverQuotaWarningDialog(this);
+						return;
+					}
+
 					logWarning("OVERQUOTA ERROR: " + e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -986,35 +995,26 @@ public class ContactFileListActivityLollipop extends PinActivityLollipop
 			} catch (Exception ex) {
 			}
 
-			if (moveToRubbish) {
+			if (cflF != null && cflF.isVisible()) {
+				cflF.clearSelections();
+				cflF.hideMultipleSelect();
+			}
+
+			if (e.getErrorCode() == MegaError.API_EOVERQUOTA && api.isForeignNode(request.getParentHandle())) {
+				showForeignStorageOverQuotaWarningDialog(this);
+			} else if (moveToRubbish) {
 				logDebug("Finish move to Rubbish!");
 				if (e.getErrorCode() == MegaError.API_OK) {
-					if (cflF != null && cflF.isVisible()) {
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish));
-					}
-				} else {
-					if (cflF != null && cflF.isVisible()) {
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-					}
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved_to_rubbish));
 				}
 			} else {
 				if (e.getErrorCode() == MegaError.API_OK) {
-					if (cflF != null && cflF.isVisible()) {
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved));
-					}
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_correctly_moved));
 				} else {
-					if (cflF != null && cflF.isVisible()) {
-						cflF.clearSelections();
-						cflF.hideMultipleSelect();
-						showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved));
-					}
+					showSnackbar(SNACKBAR_TYPE, getString(R.string.context_no_moved));
 				}
 			}
+
 			moveToRubbish = false;
 			logDebug("Move request finished");
 		}

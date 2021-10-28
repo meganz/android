@@ -24,7 +24,7 @@
         android:orderInCategory="105"
         android:icon="@drawable/ic_import_to_cloud_white"
         app:iconTint="?attr/colorSecondary"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/chat_cab_menu_download"
@@ -36,7 +36,7 @@
 
     <item
         android:id="@+id/chat_cab_menu_download_gallery"
-        android:title="@string/context_download"
+        android:title="@string/general_save_to_gallery"
         android:orderInCategory="105"
         android:icon="@drawable/ic_save_gallery"
         app:iconTint="?attr/colorSecondary"

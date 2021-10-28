@@ -3,10 +3,9 @@ package mega.privacy.android.app.lollipop.megachat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
@@ -16,7 +15,6 @@ import android.os.StatFs;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.ViewPager;
@@ -44,7 +42,6 @@ import java.util.Map;
 import kotlin.Unit;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
-import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ExtendedViewPager;
@@ -53,16 +50,12 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport;
 import mega.privacy.android.app.components.saver.NodeSaver;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.lollipop.FileExplorerActivityLollipop;
-import mega.privacy.android.app.lollipop.LoginActivityLollipop;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
-import mega.privacy.android.app.lollipop.PinActivityLollipop;
+import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.lollipop.adapters.MegaChatFullScreenImageAdapter;
 import mega.privacy.android.app.lollipop.controllers.ChatController;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
-import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaChatApi;
-import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
@@ -76,17 +69,19 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.graphics.Color.*;
+import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.FileUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.MegaApiUtils.*;
+import static mega.privacy.android.app.utils.PermissionUtils.*;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaApiJava.STORAGE_STATE_PAYWALL;
 
-public class ChatFullScreenImageViewer extends PinActivityLollipop implements OnPageChangeListener, MegaRequestListenerInterface, MegaGlobalListenerInterface,
-		SnackbarShower {
-	private static final long ANIMATION_DURATION = 400L;
+public class ChatFullScreenImageViewer extends PasscodeActivity implements OnPageChangeListener,
+		MegaRequestListenerInterface, MegaGlobalListenerInterface,SnackbarShower {
+
 	boolean fromChatSavedInstance = false;
 	RelativeLayout relativeImageViewerLayout;
 	private Handler handler;
@@ -95,7 +90,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 	private boolean aBshown = true;
 
-	ProgressDialog statusDialog;
+	AlertDialog statusDialog;
 
 	float scaleText;
 	AppBarLayout appBarLayout;
@@ -116,8 +111,6 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 	private ExtendedViewPager viewPager;
 
 	static ChatFullScreenImageViewer fullScreenImageViewer;
-    private MegaApiAndroid megaApi;
-	MegaChatApiAndroid megaChatApi;
 
 	MegaNode nodeToImport;
 
@@ -185,7 +178,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
             importIcon.setVisible(false);
             saveForOfflineIcon.setVisible(false);
 
-            if(MegaApiJava.userHandleToBase64(messages.get(positionG).getUserHandle()).equals(megaChatApi.getMyUserHandle()) && messages.get(positionG).isDeletable()) {
+            if (messages.get(positionG).getUserHandle() == megaChatApi.getMyUserHandle()
+					&& messages.get(positionG).isDeletable()) {
                 removeIcon.setVisible(true);
             }
             else{
@@ -255,7 +249,8 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				logDebug("Save for offline option");
 //				showSnackbar("Coming soon...");
 				if (messages.get(positionG) != null){
-					chatC.saveForOffline(messages.get(positionG).getMegaNodeList(), megaChatApi.getChatRoom(chatId));
+					chatC.saveForOffline(messages.get(positionG).getMegaNodeList(),
+							megaChatApi.getChatRoom(chatId), true, this);
 				}
 				break;
 			}
@@ -316,33 +311,14 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 
 		dbH = DatabaseHandler.getDbHandler(this);
 
-		MegaApplication app = (MegaApplication)getApplication();
-
 		if(isOnline(this)){
-			megaApi = app.getMegaApi();
-
-			if((megaApi==null||megaApi.getRootNode()==null) && !chatC.isInAnonymousMode()){
-				logDebug("Refresh session - sdk");
-				Intent intent = new Intent(this, LoginActivityLollipop.class);
-				intent.putExtra(VISIBLE_FRAGMENT,  LOGIN_FRAGMENT);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
+			if ((megaApi == null || megaApi.getRootNode() == null) && !chatC.isInAnonymousMode()) {
+				refreshSession();
 				return;
 			}
 		}
 
-		if (megaChatApi == null) {
-			megaChatApi = ((MegaApplication) getApplication()).getMegaChatApi();
-		}
-
-		if (megaChatApi == null || megaChatApi.getInitState() == MegaChatApi.INIT_ERROR) {
-			logDebug("Refresh session - karere");
-			Intent intent = new Intent(this, LoginActivityLollipop.class);
-			intent.putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT);
-			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			finish();
+		if (shouldRefreshSessionDueToKarere()) {
 			return;
 		}
 
@@ -479,7 +455,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			dragToExit.runEnterAnimation(intent, viewPager, animationStart -> {
 				if (animationStart) {
 					updateViewForAnimation();
-				} else {
+				} else if (!isFinishing()) {
 					showActionBar();
 
 					fragmentContainer.setBackgroundColor(BLACK);
@@ -571,6 +547,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				logWarning("e.getErrorCode() != MegaError.API_OK");
 
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					if (api.isForeignNode(request.getParentHandle())) {
+						showForeignStorageOverQuotaWarningDialog(this);
+						return;
+					}
+
 					logWarning("OVERQUOTA ERROR: "+e.getErrorCode());
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(ACTION_OVERQUOTA_STORAGE);
@@ -723,13 +704,11 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 			return;
 		}
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			boolean hasStoragePermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-			if (!hasStoragePermission) {
-				ActivityCompat.requestPermissions(this,
-		                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-						REQUEST_WRITE_STORAGE);
-			}
+		boolean hasStoragePermission = hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		if (!hasStoragePermission) {
+			requestPermission(this,
+					REQUEST_WRITE_STORAGE,
+					Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		}
 		
 		double availableFreeSpace = Double.MAX_VALUE;
@@ -760,7 +739,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
 				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					logDebug("ISFILE");
-					String localPath = getLocalFile(this, tempNode.getName(), tempNode.getSize());
+					String localPath = getLocalFile(tempNode);
 					if(localPath != null){	
 						try { 
 							copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
@@ -805,9 +784,7 @@ public class ChatFullScreenImageViewer extends PinActivityLollipop implements On
 				MegaNode node = megaApi.getNodeByHandle(hash);
 				if(node != null){
 					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-					if (node.getType() == MegaNode.TYPE_FOLDER) {
-//						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
-					} else {
+					if (node.getType() != MegaNode.TYPE_FOLDER) {
 						dlFiles.put(node, parentPath);
 					}
 					
