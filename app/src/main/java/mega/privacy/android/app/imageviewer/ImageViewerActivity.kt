@@ -17,7 +17,6 @@ import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
-import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.usecase.data.MegaNodeItem
@@ -29,6 +28,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILD
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.LinksUtil
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
 import mega.privacy.android.app.utils.ViewUtils.setStatusBarTransparent
@@ -40,11 +40,11 @@ import nz.mega.sdk.MegaNode
 import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
-class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower, ActionNodeCallback {
+class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower {
 
     companion object {
         private const val OFFSCREEN_PAGE_LIMIT = 3
-        private const val STATE_DEFAULT_PAGE_SET = "STATE_DEFAULT_PAGE_SET"
+        private const val STATE_PAGE_CALLBACK_SET = "STATE_PAGE_CALLBACK_SET"
 
         @JvmStatic
         fun getIntentForSingleNode(
@@ -109,7 +109,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     private val childrenOfflineHandles: LongArray? by extra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
     private val childOrder: Int? by extra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN)
 
-    private var defaultPageSet = false
+    private var pageCallbackSet = false
     private val viewModel by viewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy { ImageViewerAdapter(this) }
     private val pageChangeCallback by lazy {
@@ -136,7 +136,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         binding = ActivityImageViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        defaultPageSet = savedInstanceState?.getBoolean(STATE_DEFAULT_PAGE_SET) ?: defaultPageSet
+        pageCallbackSet = savedInstanceState?.getBoolean(STATE_PAGE_CALLBACK_SET) ?: pageCallbackSet
         setupView()
         setupObservers()
     }
@@ -147,7 +147,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean(STATE_DEFAULT_PAGE_SET, defaultPageSet)
+        outState.putBoolean(STATE_PAGE_CALLBACK_SET, pageCallbackSet)
         super.onSaveInstanceState(outState)
     }
 
@@ -165,7 +165,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
         binding.viewPager.apply {
             adapter = pagerAdapter
             offscreenPageLimit = OFFSCREEN_PAGE_LIMIT
-            registerOnPageChangeCallback(pageChangeCallback)
         }
     }
 
@@ -185,16 +184,27 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
                 error("Invalid params")
         }
 
-        viewModel.getImagesHandle().observe(this, pagerAdapter::submitList)
+        viewModel.getImagesHandle().observe(this) { items ->
+            pagerAdapter.submitList(items)
+
+            if (items.isNullOrEmpty()) {
+                logError("Null image items")
+                finish()
+            }
+        }
         viewModel.getCurrentImage().observe(this, ::showCurrentImageInfo)
         viewModel.onSwitchToolbar().observe(this) { switchToolbarVisibility() }
-        viewModel.getInitialPosition().observe(this) { position ->
-            if (!defaultPageSet) {
-                defaultPageSet = true
-                binding.viewPager.waitForLayout {
+        viewModel.getCurrentPosition().observe(this) { position ->
+            binding.viewPager.waitForLayout {
+                if (position != binding.viewPager.currentItem) {
                     binding.viewPager.setCurrentItem(position, false)
-                    true
+
+                    if (!pageCallbackSet) {
+                        pageCallbackSet = true
+                        binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
+                    }
                 }
+                true
             }
         }
     }
@@ -237,7 +247,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val currentNodeHandle = viewModel.getCurrentHandle().value!!
+        val currentNodeHandle = viewModel.getCurrentNodeHandle() ?: return true
 
         return when (item.itemId) {
             android.R.id.home -> {
@@ -285,7 +295,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
     }
 
     fun showRenameDialog(node: MegaNode) {
-        showRenameNodeDialog(this, node, this, this)
+        showRenameNodeDialog(this, node, this, null)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -297,10 +307,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower,
             else ->
                 super.onActivityResult(requestCode, resultCode, intent)
         }
-    }
-
-    override fun actionConfirmed() {
-        viewModel.reloadCurrentImage()
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

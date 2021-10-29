@@ -147,10 +147,6 @@ class ImageViewerPageFragment : Fragment() {
                 binding.progress.hide()
                 binding.btnVideo.isVisible = item.isVideo
             }
-        } else {
-            logError("ImageItem is null")
-            Toast.makeText(requireContext(), R.string.error_fail_to_open_file_general, Toast.LENGTH_LONG).show()
-            activity?.finish()
         }
     }
 

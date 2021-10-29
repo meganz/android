@@ -8,7 +8,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.map
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -22,6 +22,7 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.notifyObserver
 
 class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageUseCase: GetImageUseCase,
@@ -31,23 +32,24 @@ class ImageViewerViewModel @ViewModelInject constructor(
     private val cancelTransferUseCase: CancelTransferUseCase
 ) : BaseRxViewModel() {
 
-    private val currentHandle = MutableLiveData<Long>()
-    private val initialPosition = MutableLiveData<Int>()
-    private val images: MutableLiveData<List<ImageItem>> = MutableLiveData()
-    private val switchToolbar: MutableLiveData<Unit> = MutableLiveData()
-
-    fun getCurrentHandle(): LiveData<Long> = currentHandle
+    private val images = MutableLiveData<List<ImageItem>?>()
+    private val currentPosition = MutableLiveData<Int>()
+    private val switchToolbar = MutableLiveData<Unit>()
 
     fun getCurrentImage(): LiveData<MegaNodeItem?> =
-        Transformations.switchMap(currentHandle) { currentHandle -> getNode(currentHandle) }
+        Transformations.switchMap(currentPosition) { currentPosition ->
+            images.value?.get(currentPosition)?.let { getNode(it.handle) }
+        }
 
-    fun getImagesHandle(): LiveData<List<Long>> =
-        images.map { items -> items.map(ImageItem::handle) }
+    fun getImagesHandle(): LiveData<List<Long>?> =
+        images.map { items -> items?.map(ImageItem::handle) }
 
     fun getImage(nodeHandle: Long): LiveData<ImageItem?> =
-        images.map { items -> items.firstOrNull { it.handle == nodeHandle } }
+        images.map { items -> items?.firstOrNull { it.handle == nodeHandle } }
 
-    fun getInitialPosition(): LiveData<Int> = initialPosition
+    fun getCurrentPosition(): LiveData<Int> = currentPosition
+
+    fun getCurrentNodeHandle(): Long? = currentPosition.value?.let { images.value?.get(it)?.handle }
 
     fun onSwitchToolbar(): LiveData<Unit> = switchToolbar
 
@@ -192,17 +194,9 @@ class ImageViewerViewModel @ViewModelInject constructor(
         }
     }
 
-    fun reloadCurrentImage() {
-        currentHandle.value?.let { handle ->
-            loadSingleImage(handle, fullSize = false, highPriority = false)
-        }
-    }
-
     fun updateCurrentPosition(position: Int) {
-        images.value?.get(position)?.handle?.let { handle ->
-            if (handle != currentHandle.value) {
-                currentHandle.value = handle
-            }
+        if (position != currentPosition.value) {
+            currentPosition.postValue(position)
         }
     }
 
@@ -210,23 +204,49 @@ class ImageViewerViewModel @ViewModelInject constructor(
         switchToolbar.value = Unit
     }
 
-    private fun Single<List<ImageItem>>.subscribeAndUpdateImages(currentNodeHandle: Long? = null) {
+    private fun Flowable<List<ImageItem>>.subscribeAndUpdateImages(currentNodeHandle: Long? = null) {
         subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { imageItems ->
-                    images.value = imageItems.toList()
+                onNext = { imageItems ->
+                    when {
+                        imageItems.isEmpty() -> {
+                            updateCurrentPosition(0)
+                            images.value = null
+                        }
+                        images.value.isNullOrEmpty() -> {
+                            images.value = imageItems.toList()
 
-                    currentNodeHandle?.let { nodeHandle ->
-                        val currentIndex = imageItems.indexOfFirst { nodeHandle == it.handle }
-                        if (currentIndex != INVALID_POSITION) {
-                            currentHandle.value = nodeHandle
-                            initialPosition.value = currentIndex
+                            if (currentNodeHandle == null) {
+                                updateCurrentPosition(0)
+                            } else {
+                                val position = imageItems.indexOfFirst { currentNodeHandle == it.handle }
+                                if (position != INVALID_POSITION) {
+                                    updateCurrentPosition(position)
+                                } else {
+                                    updateCurrentPosition(0)
+                                }
+                            }
+                        }
+                        else -> {
+                            val currentItemPosition = currentPosition.value ?: 0
+                            val currentImagesSize = images.value?.size ?: 0
+
+                            if (currentImagesSize == imageItems.size) {
+                                images.value = imageItems.toList()
+                            } else {
+                                if (currentItemPosition >= imageItems.size) {
+                                    updateCurrentPosition(imageItems.size - 1)
+                                }
+                                images.value = imageItems.toList()
+                                currentPosition.notifyObserver()
+                            }
                         }
                     }
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
+                    images.value = null
                 }
             )
             .addTo(composite)

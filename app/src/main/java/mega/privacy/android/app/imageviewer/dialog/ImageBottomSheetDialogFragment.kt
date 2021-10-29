@@ -268,7 +268,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             viewModel.moveNodeToRubbishBin(item.node.handle)
                         }
                         dismiss()
-                        activity?.finish()
                     }
                     .setNegativeButton(R.string.general_cancel, null)
                     .show()
