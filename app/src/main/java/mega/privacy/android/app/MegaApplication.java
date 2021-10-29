@@ -1360,15 +1360,15 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	/**
 	 * Method for showing an incoming group or one-to-one call notification.
 	 *
-	 * @param chatId The chat ID of the chat with call.
+	 * @param incomingCall The incoming call
 	 */
-	public void showOneCallNotification(long chatId) {
-		logDebug("Show incoming call notification and start to sound. Chat ID is "+chatId);
+	public void showOneCallNotification(MegaChatCall incomingCall) {
+		logDebug("Show incoming call notification and start to sound. Chat ID is "+incomingCall.getChatid());
 		createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
-		getChatManagement().addNotificationShown(chatId);
+		getChatManagement().addNotificationShown(incomingCall.getChatid());
 		stopService(new Intent(this, IncomingCallService.class));
 		ChatAdvancedNotificationBuilder notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this, megaApi, megaChatApi);
-		notificationBuilder.showOneCallNotification(megaChatApi.getChatCall(chatId));
+		notificationBuilder.showOneCallNotification(incomingCall);
 	}
 
 	public void onChatListItemUpdate(MegaChatApiJava api, MegaChatListItem item) {
@@ -1510,7 +1510,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	}
 
 	public void checkOneCall(long incomingCallChatId) {
-		logDebug("One call : Chat Id = " + incomingCallChatId + ", openCall Chat Id = " + openCallChatId);
+		logDebug("One call : Chat ID is " + incomingCallChatId + ", openCall Chat ID is " + openCallChatId);
 		if (openCallChatId == incomingCallChatId) {
 			logDebug("The call is already opened");
 			return;
@@ -1535,12 +1535,11 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 
 		if (!CallUtil.isOneToOneCall(chatRoom) && callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && (!getChatManagement().isOpeningMeetingLink(incomingCallChatId))) {
-			logDebug("Group call or meeting the notification should be displayed");
-			showOneCallNotification(incomingCallChatId);
+			logDebug("Group call or meeting, the notification should be displayed");
+			showOneCallNotification(callToLaunch);
 			return;
 		}
 
-		logDebug("One-to-one call, it is necessary to check whether the notification or the screen should be displayed");
 		checkOneToOneIncomingCall(callToLaunch);
 	}
 
@@ -1559,10 +1558,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 				wakeLock.acquire(10 * 1000);
 			}
 
-			logDebug("The notification should be displayed");
-			showOneCallNotification(callToLaunch.getCallId());
+			logDebug("The notification should be displayed. Chat ID of incoming call " + callToLaunch.getChatid());
+			showOneCallNotification(callToLaunch);
 		} else {
-			logDebug("The call screen should be displayed");
+			logDebug("The call screen should be displayed. Chat ID of incoming call " + callToLaunch.getChatid());
 			MegaApplication.getInstance().createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
 			launchCallActivity(callToLaunch);
 		}
@@ -1581,7 +1580,10 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			if (callStatus == CALL_STATUS_USER_NO_PRESENT && chatRoom != null) {
 				if (!CallUtil.isOneToOneCall(chatRoom) && !getChatManagement().isOpeningMeetingLink(incomingCallChatId)) {
 					logDebug("Show incoming group call notification");
-					showOneCallNotification(incomingCallChatId);
+					MegaChatCall incomingCall = megaChatApi.getChatCall(incomingCallChatId);
+					if (incomingCall != null) {
+						showOneCallNotification(incomingCall);
+					}
 					return;
 				}
 

@@ -1282,6 +1282,7 @@ public class CallUtil {
      * @param callStatus         Call Status
      */
     public static void incomingCall(MegaHandleList listAllCalls, long incomingCallChatId, int callStatus) {
+        logDebug("Chat ID of incoming call is " + incomingCallChatId);
         if (!MegaApplication.getInstance().getMegaApi().isChatNotifiable(incomingCallChatId) ||
                 MegaApplication.getChatManagement().isNotificationShown(incomingCallChatId)){
             logDebug("The chat is not notifiable or the notification is already being displayed");

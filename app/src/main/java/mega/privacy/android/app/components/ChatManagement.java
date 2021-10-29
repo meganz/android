@@ -365,7 +365,7 @@ public class ChatManagement {
         }
 
         logDebug("Show incoming call notification");
-        app.showOneCallNotification(chatId);
+        app.showOneCallNotification(call);
     }
 
     public void registerScreenReceiver(){
