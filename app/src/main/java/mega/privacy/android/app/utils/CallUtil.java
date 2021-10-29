@@ -1295,7 +1295,7 @@ public class CallUtil {
         }
 
         if (!chatRoom.isMeeting() || !MegaApplication.getChatManagement().isOpeningMeetingLink(incomingCallChatId)) {
-            MegaApplication.getInstance().createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
+            logError("It is necessary to check the number of current calls");
             controlNumberOfCalls(listAllCalls, callStatus, incomingCallChatId);
         }
     }

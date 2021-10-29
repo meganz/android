@@ -1053,6 +1053,8 @@ public final class ChatAdvancedNotificationBuilder {
             if (notificationManager == null) {
                 notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
+
+            logWarning("Notify incoming call");
             notifyCall(notificationId, notificationBuilder.build());
         }
     }

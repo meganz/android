@@ -1363,7 +1363,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 	 * @param chatId The chat ID of the chat with call.
 	 */
 	public void showOneCallNotification(long chatId) {
-		logDebug("Show group or one-to-one call notification: chatId = "+chatId);
+		logDebug("Show incoming call notification and start to sound. Chat ID is "+chatId);
 		createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
 		getChatManagement().addNotificationShown(chatId);
 		stopService(new Intent(this, IncomingCallService.class));
@@ -1517,10 +1517,14 @@ public class MegaApplication extends MultiDexApplication implements Application.
 		}
 
 		MegaChatCall callToLaunch = megaChatApi.getChatCall(incomingCallChatId);
-		int callStatus = callToLaunch.getStatus();
+		if(callToLaunch == null){
+			logWarning("Call is null");
+			return;
+		}
 
+		int callStatus = callToLaunch.getStatus();
 		if (callStatus > MegaChatCall.CALL_STATUS_IN_PROGRESS){
-			logWarning("Launch not in correct status");
+			logWarning("Launch not in correct status: "+callStatus);
 			return;
 		}
 
@@ -1530,12 +1534,13 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			return;
 		}
 
-		if (callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && !CallUtil.isOneToOneCall(chatRoom) && (!getChatManagement().isOpeningMeetingLink(incomingCallChatId))) {
-			logDebug("The notification should be displayed");
+		if (!CallUtil.isOneToOneCall(chatRoom) && callToLaunch.getStatus() == CALL_STATUS_USER_NO_PRESENT && callToLaunch.isRinging() && (!getChatManagement().isOpeningMeetingLink(incomingCallChatId))) {
+			logDebug("Group call or meeting the notification should be displayed");
 			showOneCallNotification(incomingCallChatId);
 			return;
 		}
 
+		logDebug("One-to-one call, it is necessary to check whether the notification or the screen should be displayed");
 		checkOneToOneIncomingCall(callToLaunch);
 	}
 
@@ -1558,6 +1563,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
 			showOneCallNotification(callToLaunch.getCallId());
 		} else {
 			logDebug("The call screen should be displayed");
+			MegaApplication.getInstance().createOrUpdateAudioManager(false, AUDIO_MANAGER_CALL_RINGING);
 			launchCallActivity(callToLaunch);
 		}
 	}
