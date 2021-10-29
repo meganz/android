@@ -63,6 +63,7 @@ import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.PermissionUtils.*;
+import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
@@ -1358,11 +1359,9 @@ public class CallUtil {
      * @return Notification title
      */
     public static String getIncomingCallNotificationTitle(MegaChatRoom chatRoom) {
-        if (isOneToOneCall(chatRoom)) {
-            return StringResourcesUtils.getString(R.string.title_notification_incoming_individual_audio_call);
-        }
-
-        return StringResourcesUtils.getString(R.string.title_notification_incoming_group_call);
+        return getString(isOneToOneCall(chatRoom)
+                ? R.string.title_notification_incoming_individual_audio_call
+                : R.string.title_notification_incoming_group_call);
     }
 
     /**
