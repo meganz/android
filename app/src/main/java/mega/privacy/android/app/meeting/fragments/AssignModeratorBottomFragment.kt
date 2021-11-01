@@ -8,7 +8,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.databinding.ActivityAssignModeratorBinding
@@ -20,7 +19,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 /**
  * AssignModerator page allow moderator assign other users moderator when they are leaving the meeting
  */
-@ExperimentalCoroutinesApi
 class AssignModeratorBottomFragment(
     private val leaveMeeting: () -> Unit
 ) : BottomSheetDialogFragment() {
@@ -77,7 +75,6 @@ class AssignModeratorBottomFragment(
         }
     }
 
-    @ExperimentalCoroutinesApi
     private fun initRecyclerview() {
         participantsAdapter = AssignParticipantsAdapter(inMeetingViewModel, selectCallback)
         selectedParticipantsAdapter =
@@ -193,7 +190,6 @@ class AssignModeratorBottomFragment(
     /**
      * Make selected participants to moderator
      */
-    @ExperimentalCoroutinesApi
     private fun makeModerators() {
         // Get the list and assign the user in the list to moderator
         selectedParticipants.forEach {
