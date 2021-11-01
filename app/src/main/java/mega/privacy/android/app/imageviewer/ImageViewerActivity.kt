@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.core.view.isVisible
+import androidx.core.view.isInvisible
 import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -168,6 +168,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun setupObservers() {
         when {
             parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE ->
@@ -185,26 +186,42 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
 
         viewModel.getImagesHandle().observe(this) { items ->
-            pagerAdapter.submitList(items)
-
             if (items.isNullOrEmpty()) {
                 logError("Null image items")
                 finish()
+            } else {
+                val sizeDifference = pagerAdapter.itemCount != items.size
+                pagerAdapter.submitList(items) {
+                    if (sizeDifference) {
+                        pagerAdapter.notifyDataSetChanged()
+                    }
+                }
             }
         }
         viewModel.getCurrentImage().observe(this, ::showCurrentImageInfo)
         viewModel.onSwitchToolbar().observe(this) { switchToolbarVisibility() }
-        viewModel.getCurrentPosition().observe(this) { position ->
-            binding.viewPager.waitForLayout {
-                if (position != binding.viewPager.currentItem) {
-                    binding.viewPager.setCurrentItem(position, false)
+        viewModel.getCurrentPosition().observe(this) { positionPair ->
+            binding.txtPageCount.apply {
+                text = getString(
+                    R.string.wizard_steps_indicator,
+                    positionPair.first + 1,
+                    positionPair.second
+                )
+                isInvisible = positionPair.second <= 1
+            }
+
+            binding.viewPager.apply {
+                waitForLayout {
+                    if (currentItem != positionPair.first) {
+                        setCurrentItem(positionPair.first, false)
+                    }
 
                     if (!pageCallbackSet) {
                         pageCallbackSet = true
-                        binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
+                        registerOnPageChangeCallback(pageChangeCallback)
                     }
+                    true
                 }
-                true
             }
         }
     }
@@ -212,16 +229,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private fun showCurrentImageInfo(item: MegaNodeItem?) {
         item?.let {
             binding.txtTitle.text = item.node.name
-
-            val itemCount = binding.viewPager.adapter?.itemCount ?: 0
-            if (itemCount > 1) {
-                val currentItem = binding.viewPager.currentItem + 1
-                binding.txtPageCount.text = getString(R.string.wizard_steps_indicator, currentItem, itemCount)
-                binding.txtPageCount.isVisible = true
-            } else {
-                binding.txtPageCount.isVisible = false
-            }
-
             binding.toolbar.menu?.apply {
                 if (isOnline() && !item.isFromRubbishBin) {
                     findItem(R.id.action_download)?.isVisible = true

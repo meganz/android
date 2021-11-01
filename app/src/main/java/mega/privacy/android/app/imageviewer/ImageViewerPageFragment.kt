@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -19,7 +18,6 @@ import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -156,8 +154,6 @@ class ImageViewerPageFragment : Fragment() {
             .setControllerListener(object : BaseControllerListener<ImageInfo>() {
                 override fun onFailure(id: String, throwable: Throwable) {
                     logError(throwable.stackTraceToString())
-                    Toast.makeText(requireContext(), throwable.message, Toast.LENGTH_LONG).show()
-                    activity?.finish()
                 }
             })
             .setLowResImageRequest(ImageRequest.fromUri(lowResImageUri))

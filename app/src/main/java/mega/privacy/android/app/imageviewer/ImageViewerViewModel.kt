@@ -22,7 +22,7 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
-import mega.privacy.android.app.utils.notifyObserver
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 class ImageViewerViewModel @ViewModelInject constructor(
     private val getImageUseCase: GetImageUseCase,
@@ -38,7 +38,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
 
     fun getCurrentImage(): LiveData<MegaNodeItem?> =
         Transformations.switchMap(currentPosition) { currentPosition ->
-            images.value?.get(currentPosition)?.let { getNode(it.handle) }
+            images.value?.getOrNull(currentPosition)?.let { getNode(it.handle) }
         }
 
     fun getImagesHandle(): LiveData<List<Long>?> =
@@ -47,7 +47,11 @@ class ImageViewerViewModel @ViewModelInject constructor(
     fun getImage(nodeHandle: Long): LiveData<ImageItem?> =
         images.map { items -> items?.firstOrNull { it.handle == nodeHandle } }
 
-    fun getCurrentPosition(): LiveData<Int> = currentPosition
+    fun getCurrentPosition(): LiveData<Pair<Int, Int>> =
+        currentPosition.map { position ->
+            Pair(position, images.value?.size ?: 0)
+        }
+
 
     fun getCurrentNodeHandle(): Long? = currentPosition.value?.let { images.value?.get(it)?.handle }
 
@@ -194,8 +198,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
         }
     }
 
-    fun updateCurrentPosition(position: Int) {
-        if (position != currentPosition.value) {
+    fun updateCurrentPosition(position: Int, forceUpdate: Boolean = false) {
+        if (forceUpdate || position != currentPosition.value) {
             currentPosition.postValue(position)
         }
     }
@@ -211,36 +215,38 @@ class ImageViewerViewModel @ViewModelInject constructor(
                 onNext = { imageItems ->
                     when {
                         imageItems.isEmpty() -> {
-                            updateCurrentPosition(0)
                             images.value = null
+                            updateCurrentPosition(0)
                         }
                         images.value.isNullOrEmpty() -> {
                             images.value = imageItems.toList()
 
-                            if (currentNodeHandle == null) {
-                                updateCurrentPosition(0)
+                            val position = imageItems.indexOfFirst { it.handle == currentNodeHandle }
+                            if (position != INVALID_POSITION) {
+                                updateCurrentPosition(position, true)
                             } else {
-                                val position = imageItems.indexOfFirst { currentNodeHandle == it.handle }
-                                if (position != INVALID_POSITION) {
-                                    updateCurrentPosition(position)
-                                } else {
-                                    updateCurrentPosition(0)
-                                }
+                                updateCurrentPosition(0, true)
                             }
                         }
                         else -> {
+                            val actualNodeHandle = getCurrentNodeHandle() ?: INVALID_HANDLE
                             val currentItemPosition = currentPosition.value ?: 0
-                            val currentImagesSize = images.value?.size ?: 0
-
-                            if (currentImagesSize == imageItems.size) {
-                                images.value = imageItems.toList()
-                            } else {
-                                if (currentItemPosition >= imageItems.size) {
-                                    updateCurrentPosition(imageItems.size - 1)
+                            val newPosition =
+                                if (imageItems.contains(actualNodeHandle)) {
+                                    imageItems.indexOfFirst { it.handle == actualNodeHandle }
+                                } else {
+                                    when {
+                                        currentItemPosition >= imageItems.size ->
+                                            imageItems.size - 1
+                                        currentItemPosition == 0 ->
+                                            currentItemPosition + 1
+                                        else ->
+                                            currentItemPosition
+                                    }
                                 }
-                                images.value = imageItems.toList()
-                                currentPosition.notifyObserver()
-                            }
+
+                            images.value = imageItems.toList()
+                            updateCurrentPosition(newPosition, true)
                         }
                     }
                 },
