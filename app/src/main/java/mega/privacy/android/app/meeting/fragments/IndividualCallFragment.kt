@@ -15,7 +15,6 @@ import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.constants.EventConstants
@@ -37,7 +36,6 @@ import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaChatSession.SESSION_STATUS_IN_PROGRESS
 
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class IndividualCallFragment : MeetingBaseFragment() {
 

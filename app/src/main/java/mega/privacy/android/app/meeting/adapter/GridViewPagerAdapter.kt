@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.adapter
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
@@ -90,6 +91,7 @@ class GridViewPagerAdapter(
      *
      * @param newData Updated list of participants on each page
      */
+    @SuppressLint("NotifyDataSetChanged")
     fun setNewData(newData: List<List<Participant>>) {
         if (data.isNotEmpty()) {
             data = newData
@@ -117,6 +119,7 @@ class GridViewPagerAdapter(
      * @param currentList the current list of participants
      * @param position the position that has changed
      */
+    @SuppressLint("NotifyDataSetChanged")
     fun participantAdded(
         previousList: List<List<Participant>>,
         currentList: List<List<Participant>>,
@@ -234,6 +237,7 @@ class GridViewPagerAdapter(
      * @param numPage num of the page with the change
      * @param lastPage the last page
      */
+    @SuppressLint("NotifyDataSetChanged")
     private fun checkPagesToUpdate(position: Int, numPage: Int, lastPage: Int) {
         logDebug("Checking the rest of the pages to be updated ... ")
         for (i in numPage until lastPage + 1) {
@@ -260,6 +264,7 @@ class GridViewPagerAdapter(
      * @param pageWithChange num of the Page
      * @param position position of participant removed
      */
+    @SuppressLint("NotifyDataSetChanged")
     private fun updatePageWithChange(pageWithChange: Int, position: Int) {
         val participantsForPage = data[pageWithChange]
         adapterList[pageWithChange]?.let {
@@ -636,6 +641,7 @@ class GridViewPagerAdapter(
      * @param widthPixels the new width
      * @param heightPixels the new height
      */
+    @SuppressLint("NotifyDataSetChanged")
     fun updateOrientation(widthPixels: Int, heightPixels: Int) {
         maxWidth = widthPixels
         maxHeight = heightPixels

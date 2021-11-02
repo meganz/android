@@ -69,6 +69,7 @@ import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.COP
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.INCOMING_FRAGMENT;
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.MOVE;
 import static mega.privacy.android.app.search.usecase.SearchNodesUseCase.TYPE_INCOMING_EXPLORER;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 import static mega.privacy.android.app.utils.LogUtil.logDebug;
 import static mega.privacy.android.app.utils.LogUtil.logWarning;
 import static mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText;
@@ -181,6 +182,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_explorer_multiaction, menu);
 			((FileExplorerActivityLollipop) context).hideTabs(true, INCOMING_FRAGMENT);
+			checkScroll();
 			return true;
 		}
 
@@ -194,6 +196,7 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 			}
 			clearSelections();
 			adapter.setMultipleSelect(false);
+			checkScroll();
 		}
 
 		@Override
@@ -260,7 +263,9 @@ public class IncomingSharesExplorerFragmentLollipop extends RotatableFragment
 		if (recyclerView == null) return;
 
 		((FileExplorerActivityLollipop) context).changeActionBarElevation(
-				recyclerView.canScrollVertically(-1), FileExplorerActivityLollipop.INCOMING_FRAGMENT);
+				recyclerView.canScrollVertically(SCROLLING_UP_DIRECTION)
+						|| (adapter != null && adapter.isMultipleSelect()),
+				FileExplorerActivityLollipop.INCOMING_FRAGMENT);
 	}
 
 	@Override

@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA Xem PDF</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">trong tổng</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Có</string>
     <!-- Answer for confirmation dialog. -->
@@ -1863,7 +1861,7 @@
     <!-- title of the section for unlocked rewards -->
     <string name="unlocked_rewards_title">Phần thưởng đã nhận</string>
     <!-- title of the section for unlocked storage quota -->
-    <string name="unlocked_storage_title">Storage quota</string>
+    <string name="unlocked_storage_title">Mức lưu trữ</string>
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Invitation bonuses</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
@@ -2227,10 +2225,12 @@
     <string name="settings_video_upload_quality">Chất Lượng Video</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Camera Uploads cần quyền truy cập vào hình ảnh và các nội dung đa phương tiện khác trên thiết bị. Xin đi vào phần cài đặt và cấp quyền truy cập cho MEGA.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Chất lượng nguyên gốc</item>
-        <item>Chất lượng trung bình</item>
+        <item>Thấp</item>
+        <item>Thường</item>
+        <item>Cao</item>
+        <item>Nguyên gốc</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Cuộc gọi nhỡ</string>
@@ -2529,9 +2529,9 @@
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
     <string name="archived_chats_show_option">Số cuộc chát được bảo lưu (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Archive chat</string>
+    <string name="archive_chat_option">Bảo lưu cuộc chát</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Unarchive chat</string>
+    <string name="unarchive_chat_option">Bỏ bảo lưu cuộc chát</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Chuyển Vào Bảo Lưu</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
@@ -3573,7 +3573,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Tin nhắn này đã đạt giới hạn bày tỏ tối đa %d cảm xúc.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] đã thay đổi thời gian tự động xóa tin nhắn đã có lâu là[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] đã thay đổi thời gian tự động xóa tin nhắn đã có lâu là [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Xóa lịch sử nội dung chát</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
