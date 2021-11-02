@@ -99,6 +99,10 @@ public class SettingsConstants {
     public static final String KEY_AUTO_PLAY_SWITCH = "auto_play_switch";
     public static final String KEY_MOBILE_DATA_HIGH_RESOLUTION = "setting_mobile_data_high_resolution";
 
+    /* User interface settings */
+    public static final String KEY_START_SCREEN = "settings_start_screen";
+    public static final String KEY_HIDE_RECENT_ACTIVITY = "settings_hide_recent_activity";
+
     /* PassCode Lock settings */
     public static final String KEY_PASSCODE_ENABLE = "settings_passcode_enable";
     public static final String KEY_RESET_PASSCODE = "settings_change_passcode";

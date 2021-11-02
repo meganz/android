@@ -5,14 +5,12 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.view.View.OnClickListener
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -20,6 +18,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -37,16 +36,21 @@ import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.interfaces.Scrollable
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
+import mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.shouldShowStartScreenDialog
 import mega.privacy.android.app.lollipop.AddContactActivityLollipop
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
+import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
+import mega.privacy.android.app.utils.callManager
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -54,6 +58,22 @@ import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 @AndroidEntryPoint
 class HomepageFragment : Fragment() {
+
+    companion object {
+        private const val FAB_ANIM_DURATION = 200L
+        private const val FAB_MASK_OUT_DELAY = 200L
+        private const val ALPHA_TRANSPARENT = 0f
+        private const val ALPHA_OPAQUE = 1f
+        private const val FAB_DEFAULT_ANGEL = 0f
+        private const val FAB_ROTATE_ANGEL = 135f
+        private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
+        private const val KEY_CONTACT_TYPE = "contactType"
+        private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
+        const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
+        private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
+        private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
+        private const val START_SCREEN_DIALOG_SHOWN = "START_SCREEN_DIALOG_SHOWN"
+    }
 
     private val viewModel: HomePageViewModel by viewModels()
 
@@ -87,6 +107,8 @@ class HomepageFragment : Fragment() {
     private val tabsChildren = ArrayList<View>()
 
     private var windowContent: ViewGroup? = null
+
+    private var startScreenDialog: AlertDialog? = null
 
     private val homepageVisibilityChangeObserver = androidx.lifecycle.Observer<Boolean> {
         if (it) {
@@ -169,6 +191,10 @@ class HomepageFragment : Fragment() {
         requireContext().registerReceiver(
             networkReceiver, IntentFilter(BROADCAST_ACTION_INTENT_CONNECTIVITY_CHANGE)
         )
+
+        if (savedInstanceState?.getBoolean(START_SCREEN_DIALOG_SHOWN, false) == true) {
+            showChooseStartScreenDialog()
+        }
     }
 
     override fun onResume() {
@@ -181,6 +207,12 @@ class HomepageFragment : Fragment() {
         // Retrieve the banners from the server again, for the banners are possibly varied
         // while the app is on the background
         viewModel.getBanners()
+
+        callManager { manager ->
+            if (manager.isInMainHomePage && shouldShowStartScreenDialog(requireContext())) {
+                showChooseStartScreenDialog()
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -191,6 +223,8 @@ class HomepageFragment : Fragment() {
 
         LiveEventBus.get(EVENT_HOMEPAGE_VISIBILITY, Boolean::class.java)
             .removeObserver(homepageVisibilityChangeObserver)
+
+        startScreenDialog?.dismiss()
     }
 
     /**
@@ -315,6 +349,7 @@ class HomepageFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
+        outState.putBoolean(START_SCREEN_DIALOG_SHOWN, isAlertDialogShown(startScreenDialog))
         outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
         if (this::bottomSheetBehavior.isInitialized) {
             outState.putBoolean(
@@ -754,18 +789,22 @@ class HomepageFragment : Fragment() {
         fabMaskMain.show()
     }
 
-    companion object {
-        private const val FAB_ANIM_DURATION = 200L
-        private const val FAB_MASK_OUT_DELAY = 200L
-        private const val ALPHA_TRANSPARENT = 0f
-        private const val ALPHA_OPAQUE = 1f
-        private const val FAB_DEFAULT_ANGEL = 0f
-        private const val FAB_ROTATE_ANGEL = 135f
-        private const val SLIDE_OFFSET_CHANGE_BACKGROUND = 0.8f
-        private const val KEY_CONTACT_TYPE = "contactType"
-        private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
-        const val BOTTOM_SHEET_ELEVATION = 2f    // 2dp, for the overlay opacity is 7%
-        private const val BOTTOM_SHEET_CORNER_SIZE = 8f  // 8dp
-        private const val KEY_IS_BOTTOM_SHEET_EXPANDED = "isBottomSheetExpanded"
+    /**
+     * Shows the dialog which informs the start screen can be changed.
+     */
+    private fun showChooseStartScreenDialog() {
+        startScreenDialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(R.layout.dialog_choose_start_screen)
+            .setPositiveButton(StringResourcesUtils.getString(R.string.change_setting_action)) { _, _ ->
+                callManager { manager -> manager.moveToSettingsSectionStartScreen() }
+                notAlertAnymoreAboutStartScreen(requireContext())
+            }
+            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
+                notAlertAnymoreAboutStartScreen(requireContext())
+            }
+            .show().apply {
+                setCancelable(false)
+                setCanceledOnTouchOutside(false)
+            }
     }
 }

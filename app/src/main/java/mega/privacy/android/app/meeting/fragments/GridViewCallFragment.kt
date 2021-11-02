@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
@@ -7,13 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.viewpager2.widget.ViewPager2
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.databinding.GridViewCallFragmentBinding
 import mega.privacy.android.app.meeting.adapter.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import nz.mega.sdk.MegaChatSession
 
-@ExperimentalCoroutinesApi
 class GridViewCallFragment : MeetingBaseFragment() {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
@@ -28,6 +27,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
     private lateinit var adapterPager: GridViewPagerAdapter
 
+    @SuppressLint("NotifyDataSetChanged")
     private val participantsObserver = Observer<MutableList<Participant>> {
         participants = it
         val newData = sliceBy6(it)
@@ -51,6 +51,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
         return viewDataBinding.root
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Suppress("DEPRECATION")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

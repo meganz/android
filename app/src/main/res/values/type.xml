@@ -65,6 +65,10 @@
         <item name="android:textColor">@color/grey_038_white_038</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Grey60White60">
+        <item name="android:textColor">@color/grey_060_white_060</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Red.18">
         <item name="android:textSize">18sp</item>
     </style>
@@ -184,6 +188,10 @@
     <!-- Medium, normal, 20sp, white - black -->
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6">
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6.Grey87White">
+        <item name="android:textColor">@color/grey_087_white</item>
     </style>
 
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant7">
