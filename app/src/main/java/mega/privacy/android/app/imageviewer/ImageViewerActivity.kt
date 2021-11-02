@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HAN
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
 import mega.privacy.android.app.utils.ViewUtils.setStatusBarTransparent
@@ -227,7 +228,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
 
     private fun showCurrentImageInfo(item: MegaNodeItem?) {
-        item?.let {
+        if (item != null) {
             binding.txtTitle.text = item.node.name
             binding.toolbar.menu?.apply {
                 if (isOnline() && !item.isFromRubbishBin) {
@@ -242,6 +243,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     findItem(R.id.action_chat)?.isVisible = false
                 }
             }
+        } else {
+            logWarning("Null image item")
         }
     }
 

@@ -22,6 +22,7 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 
 class ImageViewerViewModel @ViewModelInject constructor(
@@ -52,8 +53,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
             Pair(position, images.value?.size ?: 0)
         }
 
-
-    fun getCurrentNodeHandle(): Long? = currentPosition.value?.let { images.value?.get(it)?.handle }
+    fun getCurrentNodeHandle(): Long? =
+        currentPosition.value?.let { images.value?.getOrNull(it)?.handle }
 
     fun onSwitchToolbar(): LiveData<Unit> = switchToolbar
 
@@ -98,10 +99,17 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = { imageItem ->
-                    images.value?.toMutableList()?.let { items ->
-                        val index = items.indexOfFirst { it.handle == nodeHandle }
-                        items[index] = imageItem
-                        images.value = items.toList()
+                    val currentImages = images.value?.toMutableList()
+                    if (!currentImages.isNullOrEmpty()) {
+                        val index = currentImages.indexOfFirst { it.handle == nodeHandle }
+                        if (index != INVALID_POSITION) {
+                            currentImages[index] = imageItem
+                            images.value = currentImages.toList()
+                        } else {
+                            logWarning("Image ${imageItem.handle} was not found")
+                        }
+                    } else {
+                        logWarning("Images are null")
                     }
                 },
                 onError = { error ->
@@ -121,8 +129,8 @@ class ImageViewerViewModel @ViewModelInject constructor(
                     result.value = item
                 },
                 onError = { error ->
-                    result.value = null
                     logError(error.stackTraceToString())
+                    result.value = null
                 }
             )
             .addTo(composite)
@@ -229,21 +237,19 @@ class ImageViewerViewModel @ViewModelInject constructor(
                             }
                         }
                         else -> {
-                            val actualNodeHandle = getCurrentNodeHandle() ?: INVALID_HANDLE
+                            val actualNodeHandle = getCurrentNodeHandle()
                             val currentItemPosition = currentPosition.value ?: 0
-                            val newPosition =
-                                if (imageItems.contains(actualNodeHandle)) {
-                                    imageItems.indexOfFirst { it.handle == actualNodeHandle }
-                                } else {
-                                    when {
-                                        currentItemPosition >= imageItems.size ->
-                                            imageItems.size - 1
-                                        currentItemPosition == 0 ->
-                                            currentItemPosition + 1
-                                        else ->
-                                            currentItemPosition
-                                    }
-                                }
+                            val foundIndex = imageItems.indexOfFirst { it.handle == actualNodeHandle }
+                            val newPosition = when {
+                                foundIndex != INVALID_POSITION ->
+                                    foundIndex
+                                currentItemPosition >= imageItems.size ->
+                                    imageItems.size - 1
+                                currentItemPosition == 0 ->
+                                    currentItemPosition + 1
+                                else ->
+                                    currentItemPosition
+                            }
 
                             images.value = imageItems.toList()
                             updateCurrentPosition(newPosition, true)

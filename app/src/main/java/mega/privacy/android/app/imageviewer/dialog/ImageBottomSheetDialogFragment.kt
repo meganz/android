@@ -75,7 +75,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.getNode(imageNodeHandle).observe(viewLifecycleOwner, ::showNodeData)
         viewModel.getImage(imageNodeHandle).observe(viewLifecycleOwner) { imageItem ->
-            binding.imgThumbnail.setImageURI(imageItem?.thumbnailUri)
+            binding.imgThumbnail.setImageURI(imageItem?.getLowestResolutionAvailableUri())
         }
         super.onViewCreated(view, savedInstanceState)
     }
@@ -158,19 +158,19 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Offline
             optionOfflineLayout.isVisible = !item.isFromRubbishBin
             switchOffline.isChecked = item.isAvailableOffline
-            switchOffline.setOnCheckedChangeListener { _, isChecked ->
+            switchOffline.setOnCheckedChangeListener { _, _ ->
                 viewModel.setNodeAvailableOffline(
                     requireActivity(),
                     item.node.handle,
-                    !isChecked
+                    !item.isAvailableOffline
                 )
                 dismiss()
             }
-            optionOffline.setOnClickListener {
+            optionOfflineLayout.setOnClickListener {
                 viewModel.setNodeAvailableOffline(
                     requireActivity(),
                     item.node.handle,
-                    !switchOffline.isChecked
+                    !item.isAvailableOffline
                 )
                 dismiss()
             }
@@ -178,13 +178,9 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             // Links
             if (item.node.isExported) {
                 optionManageLink.setText(R.string.edit_link_option)
-                optionRemoveLink.isVisible = true
             } else {
                 optionManageLink.text = resources.getQuantityString(R.plurals.get_links, 1)
-                optionRemoveLink.isVisible = false
             }
-            optionRemoveLink.isVisible = item.hasFullAccess && !item.isFromRubbishBin
-            optionManageLink.isVisible = item.hasFullAccess && !item.isFromRubbishBin
             optionManageLink.setOnClickListener {
                 LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, item.node.handle)
                 dismiss()
@@ -199,6 +195,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     .setNegativeButton(R.string.general_cancel, null)
                     .show()
             }
+            optionManageLink.isVisible = item.hasFullAccess && !item.isFromRubbishBin
+            optionRemoveLink.isVisible = item.node.isExported
 
             // Send to contact
             optionSendToContact.isVisible = !item.isFromRubbishBin

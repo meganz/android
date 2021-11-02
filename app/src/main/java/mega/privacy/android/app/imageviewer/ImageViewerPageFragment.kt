@@ -12,12 +12,14 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.facebook.common.util.UriUtil
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.controller.BaseControllerListener
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.databinding.PageImageViewerBinding
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -32,6 +34,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILD
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_POSITION
 import mega.privacy.android.app.utils.LogUtil.logError
+import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.NetworkUtil.isMeteredConnection
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
 import nz.mega.documentscanner.utils.IntentUtils.extraNotNull
@@ -142,10 +145,15 @@ class ImageViewerPageFragment : Fragment() {
                         })
                     }
                 }
-                binding.progress.hide()
                 binding.btnVideo.isVisible = item.isVideo
             }
+        } else {
+            logWarning("Null image item")
+            binding.image.controller = Fresco.newDraweeControllerBuilder()
+                .setUri(UriUtil.getUriForResourceId(R.drawable.ic_error))
+                .build()
         }
+        binding.progress.hide()
     }
 
     private fun showImageUris(mainImageUri: Uri, lowResImageUri: Uri? = null) {
@@ -173,7 +181,7 @@ class ImageViewerPageFragment : Fragment() {
     }
 
     private fun launchVideoScreen(item: ImageItem) {
-        val fileUri = item.getAvailableUri()
+        val fileUri = item.getHighestResolutionAvailableUri()
         val intent = Intent(context, VideoPlayerActivity::class.java).apply {
             setDataAndType(fileUri, MimeTypeList.typeForName(item.name).type)
             putExtra(INTENT_EXTRA_KEY_HANDLE, item.handle)

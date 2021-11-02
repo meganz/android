@@ -14,8 +14,11 @@ data class ImageItem constructor(
     var isFullyLoaded: Boolean = false
 ) {
 
-    fun getAvailableUri(): Uri? =
+    fun getHighestResolutionAvailableUri(): Uri? =
         fullSizeUri ?: previewUri ?: thumbnailUri
+
+    fun getLowestResolutionAvailableUri(): Uri? =
+        thumbnailUri ?: previewUri ?: fullSizeUri
 
     class DiffCallback : DiffUtil.ItemCallback<ImageItem>() {
         override fun areItemsTheSame(oldItem: ImageItem, newItem: ImageItem) =
