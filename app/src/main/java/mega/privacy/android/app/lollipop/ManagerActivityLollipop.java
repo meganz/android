@@ -131,9 +131,10 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
-import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
-import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.fragments.homepage.photos.ImagesFragment;
+import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
+import mega.privacy.android.app.gallery.fragment.newImages.Images1Fragment;
+import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TransfersManagementActivity;
@@ -1524,14 +1525,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 }
             }
 
-            if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES) {
-                ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
-                imagesFragment.refreshSelf();
-
-                if (needReload) {
-                    imagesFragment.loadPhotos();
-                }
-            }
+//            if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES) {
+//                ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
+//                imagesFragment.refreshSelf();
+//
+//                if (needReload) {
+//                    imagesFragment.loadPhotos();
+//                }
+//            }
         });
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -5575,7 +5576,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             return;
         }
 
-        ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
+		Images1Fragment imagesFragment = getFragmentByType(Images1Fragment.class);
         boolean shouldShow = imagesFragment.shouldShowZoomMenuItem();
 
         zoomOutMenuItem.setVisible(shouldShow);
