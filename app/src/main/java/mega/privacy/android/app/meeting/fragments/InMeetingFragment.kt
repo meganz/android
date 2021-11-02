@@ -824,7 +824,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
 
     private var permissionCallbacks = object : PermissionUtils.PermissionCallbacks {
         override fun onPermissionsCallback(requestType: Int, perms: ArrayList<String>) {
-            logDebug("NonPermissionsCallback requestType = $requestType")
+            logDebug("PermissionsCallback requestType = $requestType")
             perms.forEach {
                 when (it) {
                     Manifest.permission.CAMERA -> {

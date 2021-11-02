@@ -113,7 +113,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
 
     protected var permissionCallbacks = object : PermissionUtils.PermissionCallbacks {
         override fun onPermissionsCallback(requestType: Int, perms: ArrayList<String>) {
-            logDebug("NonPermissionsCallback requestType = $requestType")
+            logDebug("PermissionsCallback requestType = $requestType")
             perms.forEach {
                 when (it) {
                     Manifest.permission.CAMERA -> {
@@ -378,7 +378,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
     private fun onPermNeverAskAgain(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.RECORD_AUDIO)
             || permissions.contains(Manifest.permission.CAMERA)) {
-            logDebug("user denies the RECORD_AUDIO permission")
+            logDebug("user denies the permission")
             showSnackBar()
         }
     }
