@@ -299,7 +299,7 @@ class RingingMeetingFragment : BaseFragment(),
     private fun onPermNeverAskAgain(permissions: ArrayList<String>) {
         if (permissions.contains(Manifest.permission.RECORD_AUDIO)
             || permissions.contains(Manifest.permission.CAMERA)) {
-            logDebug("user denies the RECORD_AUDIO permission")
+            logDebug("user denies the permission")
             showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
         }
     }
