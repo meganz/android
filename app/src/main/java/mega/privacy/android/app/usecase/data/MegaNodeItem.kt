@@ -4,9 +4,11 @@ import nz.mega.sdk.MegaNode
 
 data class MegaNodeItem constructor(
     val node: MegaNode,
+    val infoText: String,
     val hasFullAccess: Boolean,
     val isFromRubbishBin: Boolean,
     val isFromInbox: Boolean,
     val isFromRoot: Boolean,
-    val isAvailableOffline: Boolean
+    val isAvailableOffline: Boolean,
+    val hasVersions: Boolean
 )

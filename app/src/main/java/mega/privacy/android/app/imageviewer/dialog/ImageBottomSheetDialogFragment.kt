@@ -27,6 +27,7 @@ import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.ExtraUtils.extraNotNull
+import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
@@ -82,7 +83,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     @SuppressLint("SetTextI18n")
     private fun showNodeData(item: MegaNodeItem?) {
-        if (item?.node == null || item.node.isTakenDown) {
+        if (item?.node == null) {
+            logError("Image node is null")
             (activity as? ImageViewerActivity?)?.showSnackbar(getString(R.string.error_fail_to_open_file_general))
             dismiss()
             return
@@ -90,10 +92,16 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         binding.apply {
             txtName.text = item.node.name
+            txtInfo.text = item.infoText
 
-            val nodeSizeText = Util.getSizeString(item.node.size)
-            val nodeDateText = TimeUtils.formatLongDateTime(item.node.creationTime)
-            txtInfo.text = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
+            if (item.hasVersions) {
+                txtInfo.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    R.drawable.ic_baseline_history,
+                    0,
+                    0,
+                    0
+                )
+            }
 
             // File Info
             optionInfo.setOnClickListener {
@@ -103,7 +111,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
 
                 startActivity(intent)
-                dismiss()
             }
 
             // Favorite
@@ -114,7 +121,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
             optionFavorite.setOnClickListener {
                 viewModel.markNodeAsFavorite(item.node.handle, !item.node.isFavourite)
-                dismiss()
             }
 
             // Label
@@ -131,14 +137,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionLabelCurrent.isVisible = item.node.label != MegaNode.NODE_LBL_UNKNOWN
             optionLabelLayout.isVisible = !item.isFromRubbishBin && item.hasFullAccess
             optionLabelLayout.setOnClickListener {
-                NodeLabelBottomSheetDialogFragment.newInstance(item.node.handle).show(childFragmentManager, TAG)
+                NodeLabelBottomSheetDialogFragment.newInstance(item.node.handle)
+                    .show(childFragmentManager, TAG)
             }
 
             // Open with
             optionOpenWith.isVisible = !item.isFromRubbishBin
             optionOpenWith.setOnClickListener {
                 ModalBottomSheetUtil.openWith(requireContext(), item.node)
-                dismiss()
             }
 
             // Download
@@ -183,14 +189,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
             optionManageLink.setOnClickListener {
                 LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, item.node.handle)
-                dismiss()
             }
             optionRemoveLink.setOnClickListener {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(resources.getQuantityString(R.plurals.remove_links_warning_text, 1))
                     .setPositiveButton(R.string.general_remove) { _, _ ->
-                        viewModel.removeLink(item.node.handle)
-                        dismiss()
+                        (activity as? ImageViewerActivity?)?.removeLink(item.node.handle) ?: run {
+                            viewModel.removeLink(item.node.handle)
+                        }
                     }
                     .setNegativeButton(R.string.general_cancel, null)
                     .show()
@@ -199,7 +205,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRemoveLink.isVisible = item.node.isExported
 
             // Send to contact
-            optionSendToContact.isVisible = !item.isFromRubbishBin
+            optionSendToContact.isVisible = item.hasFullAccess && !item.isFromRubbishBin
             optionSendToContact.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.attachNode(item.node.handle)
                 dismiss()
@@ -218,7 +224,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRename.isVisible = item.hasFullAccess && !item.isFromRubbishBin
             optionRename.setOnClickListener {
                 (activity as? ImageViewerActivity?)?.showRenameDialog(item.node)
-                dismiss()
             }
 
             // Move
@@ -245,6 +250,13 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 dismiss()
             }
 
+            // Restore
+            optionRestore.isVisible = item.isFromRubbishBin && item.node.restoreHandle != INVALID_HANDLE
+            optionRestore.setOnClickListener {
+                viewModel.moveNode(item.node.handle, item.node.restoreHandle)
+                dismiss()
+            }
+
             // Rubbish bin
             if (item.isFromRubbishBin) {
                 optionRubbishBin.setText(R.string.general_remove)
@@ -252,10 +264,16 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionRubbishBin.setText(R.string.context_move_to_trash)
             }
             optionRubbishBin.setOnClickListener {
-                val buttonText =
-                    if (item.isFromRubbishBin) R.string.general_remove else R.string.general_move
-                val messageText =
-                    if (item.isFromRubbishBin) R.string.confirmation_delete_from_mega else R.string.confirmation_move_to_rubbish
+                val buttonText: Int
+                val messageText: Int
+
+                if (item.isFromRubbishBin) {
+                    buttonText = R.string.general_remove
+                    messageText = R.string.confirmation_delete_from_mega
+                } else {
+                    buttonText = R.string.general_move
+                    messageText = R.string.confirmation_move_to_rubbish
+                }
 
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(messageText)
@@ -272,7 +290,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
 
             // Separators
-            separatorInfo.isVisible = optionFavorite.isVisible
             separatorLabel.isVisible = optionLabelLayout.isVisible
             separatorOpen.isVisible = optionOpenWith.isVisible
             separatorOffline.isVisible = optionOfflineLayout.isVisible

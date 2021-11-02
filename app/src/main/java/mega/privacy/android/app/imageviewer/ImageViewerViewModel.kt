@@ -151,13 +151,26 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .subscribeAndComplete()
     }
 
-    fun removeLink(nodeHandle: Long) {
+    fun removeLink(nodeHandle: Long): LiveData<Boolean> {
+        val result = MutableLiveData<Boolean>()
         exportNodeUseCase.disableExport(nodeHandle)
-            .subscribeAndComplete()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    result.value = true
+                },
+                onError = { error ->
+                    logError(error.stackTraceToString())
+                    result.value = false
+                }
+            )
+            .addTo(composite)
+        return result
     }
 
-    fun shareNode(nodeHandle: Long): LiveData<String> {
-        val result = MutableLiveData<String>()
+    fun shareNode(nodeHandle: Long): LiveData<String?> {
+        val result = MutableLiveData<String?>()
         exportNodeUseCase.export(nodeHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -167,6 +180,7 @@ class ImageViewerViewModel @ViewModelInject constructor(
                 },
                 onError = { error ->
                     logError(error.stackTraceToString())
+                    result.value = null
                 }
             )
             .addTo(composite)

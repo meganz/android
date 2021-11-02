@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.core.view.isInvisible
 import androidx.viewpager2.widget.ViewPager2
@@ -19,6 +20,7 @@ import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
 import mega.privacy.android.app.interfaces.PermissionRequester
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
@@ -32,6 +34,7 @@ import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.LogUtil.logWarning
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.NetworkUtil.isOnline
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.ViewUtils.setStatusBarTransparent
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import nz.mega.documentscanner.utils.IntentUtils.extra
@@ -113,6 +116,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private var pageCallbackSet = false
     private val viewModel by viewModels<ImageViewerViewModel>()
     private val pagerAdapter by lazy { ImageViewerAdapter(this) }
+    private val nodeAttacher by lazy { WeakReference(MegaAttacher(this)) }
+    private var bottomSheet: ImageBottomSheetDialogFragment? = null
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -120,7 +125,6 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
         }
     }
-    private val nodeAttacher by lazy { WeakReference(MegaAttacher(this)) }
     private val nodeSaver by lazy {
         WeakReference(
             NodeSaver(
@@ -154,6 +158,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     override fun onDestroy() {
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
+        nodeAttacher.clear()
+        nodeSaver.clear()
         super.onDestroy()
     }
 
@@ -229,6 +235,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private fun showCurrentImageInfo(item: MegaNodeItem?) {
         if (item != null) {
+            bottomSheet?.dismiss()
+
             binding.txtTitle.text = item.node.name
             binding.toolbar.menu?.apply {
                 if (isOnline() && !item.isFromRubbishBin) {
@@ -281,8 +289,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_more -> {
-                ImageBottomSheetDialogFragment.newInstance(currentNodeHandle)
-                    .show(supportFragmentManager)
+                bottomSheet = ImageBottomSheetDialogFragment.newInstance(currentNodeHandle).apply {
+                    show(supportFragmentManager)
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -302,6 +311,16 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     fun attachNode(nodeHandle: Long) {
         nodeAttacher.get()?.attachNode(nodeHandle)
+    }
+
+    fun removeLink(nodeHandle: Long) {
+        viewModel.removeLink(nodeHandle).observe(this) { isSuccess ->
+            if (isSuccess) {
+                showSnackbar(getQuantityString(R.plurals.context_link_removal_success, 1))
+            } else {
+                showSnackbar(getQuantityString(R.plurals.context_link_removal_error, 1))
+            }
+        }
     }
 
     fun showRenameDialog(node: MegaNode) {

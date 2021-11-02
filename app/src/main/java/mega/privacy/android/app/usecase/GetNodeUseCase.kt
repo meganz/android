@@ -15,6 +15,9 @@ import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -36,16 +39,22 @@ class GetNodeUseCase @Inject constructor(
     fun getNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
         Single.fromCallable {
             val node = megaApi.getNodeByHandle(nodeHandle)
+            requireNotNull(node)
+
+            val nodeSizeText = Util.getSizeString(node.size)
+            val nodeDateText = TimeUtils.formatLongDateTime(node.creationTime)
+            val infoText = TextUtil.getFileInfo(nodeSizeText, nodeDateText)
 
             val nodeAccess = megaApi.getAccess(node)
             val hasFullAccess = nodeAccess == MegaShare.ACCESS_OWNER || nodeAccess == MegaShare.ACCESS_FULL
+
             val isAvailableOffline = isNodeAvailableOffline(nodeHandle).blockingGet()
+            val hasVersions = megaApi.hasVersions(node)
+
             var isFromRubbishBin = false
             var isFromInbox = false
             var isFromRoot = false
-
-            val parentNode = megaApi.getRootParentNode(node)
-            when (parentNode.handle) {
+            when (megaApi.getRootParentNode(node).handle) {
                 megaApi.rootNode.handle -> isFromRoot = true
                 megaApi.inboxNode.handle -> isFromInbox = true
                 megaApi.rubbishNode.handle -> isFromRubbishBin = true
@@ -53,11 +62,13 @@ class GetNodeUseCase @Inject constructor(
 
             MegaNodeItem(
                 node,
+                infoText,
                 hasFullAccess,
                 isFromRubbishBin,
                 isFromInbox,
                 isFromRoot,
-                isAvailableOffline
+                isAvailableOffline,
+                hasVersions
             )
         }
 

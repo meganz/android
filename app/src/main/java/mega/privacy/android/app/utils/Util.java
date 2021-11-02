@@ -157,7 +157,7 @@ public class Util {
 	private static long lastClickTime;
 
 	// 150ms, a smaller value may cause the keyboard to fail to open
-	public final static int SHOW_IM_DELAY = 150;
+	public final static long SHOW_IM_DELAY = 150;
 
     /**
      * Language tag for simplified Chinese.

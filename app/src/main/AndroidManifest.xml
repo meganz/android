@@ -162,7 +162,7 @@
             android:label=""
             android:launchMode="singleTop"
             android:theme="@style/Theme.Mega.FullScreen.Draggable"
-            android:windowSoftInputMode="stateAlwaysHidden" />
+            android:windowSoftInputMode="stateHidden|adjustResize" />
 
         <activity
             android:name="mega.privacy.android.app.lollipop.ContactFileListActivityLollipop"
