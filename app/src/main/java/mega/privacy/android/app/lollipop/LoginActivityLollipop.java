@@ -43,6 +43,7 @@ import nz.mega.sdk.MegaTransfer;
 
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
 import static mega.privacy.android.app.constants.IntentConstants.EXTRA_FIRST_LOGIN;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.setStartScreenTimeStamp;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -371,6 +372,7 @@ public class LoginActivityLollipop extends BaseActivity implements MegaRequestLi
     public void startCameraUploadService(boolean firstTimeCam, int time) {
         logDebug("firstTimeCam: " + firstNameTemp + "time: " + time);
         if (firstTimeCam) {
+            setStartScreenTimeStamp(this);
             Intent intent = new Intent(this, ManagerActivityLollipop.class);
             intent.putExtra(EXTRA_FIRST_LOGIN, true);
             startActivity(intent);

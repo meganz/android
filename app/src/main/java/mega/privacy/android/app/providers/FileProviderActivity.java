@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StatFs;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputLayout;
@@ -121,6 +122,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 	private MaterialToolbar tB;
 	private ActionBar aB;
+	private AppBarLayout aBL;
 
 	private ScrollView scrollView;
 	private LinearLayout loginLogin;
@@ -160,7 +162,6 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 	private Button attachButton;
 
 	private TabLayout tabLayoutProvider;
-	private LinearLayout providerSectionLayout;
 	private ProviderPageAdapter mTabsAdapterProvider;
 	private CustomViewPager viewPagerProvider;
 
@@ -307,6 +308,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 				logDebug("megaApi.getRootNode() NOT null");
 
+				aBL = findViewById(R.id.app_bar_layout_provider);
+
 				//Set toolbar
 				tB = findViewById(R.id.toolbar_provider);
 				setSupportActionBar(tB);
@@ -328,12 +331,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 				activateButton(false);
 
 				//TABS section
-				providerSectionLayout = findViewById(R.id.tabhost_provider);
 				tabLayoutProvider = findViewById(R.id.sliding_tabs_provider);
 				viewPagerProvider = findViewById(R.id.provider_tabs_pager);
-
-				//Create tabs
-				providerSectionLayout.setVisibility(View.VISIBLE);
 
 				if (mTabsAdapterProvider == null) {
 
@@ -1540,12 +1539,8 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 		activateButton(false);
 
 		//TABS section
-		providerSectionLayout = findViewById(R.id.tabhost_provider);
 		tabLayoutProvider = findViewById(R.id.sliding_tabs_provider);
 		viewPagerProvider = findViewById(R.id.provider_tabs_pager);
-
-		//Create tabs
-		providerSectionLayout.setVisibility(View.VISIBLE);
 
 		if (mTabsAdapterProvider == null) {
 			mTabsAdapterProvider = new ProviderPageAdapter(getSupportFragmentManager(), this);
@@ -1869,5 +1864,21 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
 		viewPagerProvider.disableSwipe(hide);
 		tabLayoutProvider.setVisibility(hide ? View.GONE : View.VISIBLE);
+	}
+
+	/**
+	 * Changes the elevation.
+	 *
+	 * @param withElevation True if should show elevation, false otherwise.
+	 * @param fragmentIndex Fragment index wich wants to modify the elevation.
+	 */
+	public void changeActionBarElevation(boolean withElevation, int fragmentIndex) {
+		if (viewPagerProvider == null || viewPagerProvider.getCurrentItem() != fragmentIndex) {
+			return;
+		}
+
+		ColorUtils.changeStatusBarColorForElevation(this, withElevation);
+		float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
+		aBL.setElevation(withElevation ? elevation : 0);
 	}
 }

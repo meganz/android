@@ -101,7 +101,6 @@ import nz.mega.sdk.*
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import java.lang.Integer.min
 
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarShower,
     StartChatCallListener.StartChatCallCallback, AnswerChatCallListener.OnCallAnsweredCallback,
@@ -335,7 +334,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
                 showMeetingInfoFragment()
             }
         }
-        bottomFloatingPanelViewHolder.updateMeetingType(!inMeetingViewModel.isOneToOneCall())
+        bottomFloatingPanelViewHolder.updateMeetingType()
     }
 
     private val callCompositionObserver = Observer<MegaChatCall> {
@@ -631,7 +630,6 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
         MegaApplication.getInstance().startProximitySensor()
         initToolbar()
         initFloatingWindowContainerDragListener(view)
-        initFloatingPanel()
 
         var chatId: Long? =
             arguments?.getLong(MeetingActivity.MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
@@ -653,6 +651,8 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
                 }
             }
         }
+
+        initFloatingPanel()
 
         val meetingName: String = args.meetingName
         meetingName.let {
@@ -2094,8 +2094,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
             BottomFloatingPanelViewHolder(
                 inMeetingViewModel,
                 binding,
-                this,
-                !inMeetingViewModel.isOneToOneCall()
+                this
             )
 
         updatePanelParticipantList()

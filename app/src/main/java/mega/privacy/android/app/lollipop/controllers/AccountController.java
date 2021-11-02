@@ -55,6 +55,7 @@ import static mega.privacy.android.app.utils.ChatUtil.*;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.JobUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.*;
@@ -390,6 +391,10 @@ public class AccountController {
 
         //clear offline warning preference
         PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(SHOW_OFFLINE_WARNING, true).apply();
+
+        //clear user interface preferences
+        context.getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+                .edit().clear().apply();
 
         removeEmojisSharedPreferences();
 
