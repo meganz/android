@@ -268,6 +268,8 @@ public class CameraUploadsFragment extends BaseFragment implements CUGridViewAda
                             StringResourcesUtils.getString(R.string.video_quality_info),
                             MEGACHAT_INVALID_HANDLE);
                 }
+
+                mFirstLoginBinding.qualityText.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             });
             return;
         }
