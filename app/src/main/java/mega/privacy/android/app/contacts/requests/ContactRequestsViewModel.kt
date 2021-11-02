@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -68,43 +69,23 @@ class ContactRequestsViewModel @ViewModelInject constructor(
         getFilteredContactRequests().map { it.find { item -> item.handle == requestHandle } }
 
     fun acceptRequest(requestHandle: Long) {
-        replyContactRequestUseCase.acceptReceivedRequest(requestHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { logError(it.stackTraceToString()) })
-            .addTo(composite)
+        replyContactRequestUseCase.acceptReceivedRequest(requestHandle).subscribeAndUpdate()
     }
 
     fun ignoreRequest(requestHandle: Long) {
-        replyContactRequestUseCase.ignoreReceivedRequest(requestHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { logError(it.stackTraceToString()) })
-            .addTo(composite)
+        replyContactRequestUseCase.ignoreReceivedRequest(requestHandle).subscribeAndUpdate()
     }
 
     fun declineRequest(requestHandle: Long) {
-        replyContactRequestUseCase.denyReceivedRequest(requestHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { logError(it.stackTraceToString()) })
-            .addTo(composite)
+        replyContactRequestUseCase.denyReceivedRequest(requestHandle).subscribeAndUpdate()
     }
 
     fun reinviteRequest(requestHandle: Long) {
-        replyContactRequestUseCase.remindSentRequest(requestHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { logError(it.stackTraceToString()) })
-            .addTo(composite)
+        replyContactRequestUseCase.remindSentRequest(requestHandle).subscribeAndUpdate()
     }
 
     fun removeRequest(requestHandle: Long) {
-        replyContactRequestUseCase.deleteSentRequest(requestHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { logError(it.stackTraceToString()) })
-            .addTo(composite)
+        replyContactRequestUseCase.deleteSentRequest(requestHandle).subscribeAndUpdate()
     }
 
     fun setQuery(query: String?) {
@@ -112,6 +93,12 @@ class ContactRequestsViewModel @ViewModelInject constructor(
         contactRequests.notifyObserver()
     }
 
+    /**
+     * Retrieve ViewPager's default position based on contact requests size and current outGoing value
+     *
+     * @param isOutgoing    Wether the current view is for outgoing requests or not
+     * @return              LiveData with ViewPager's desired position
+     */
     fun getDefaultPagerPosition(isOutgoing: Boolean): LiveData<Int> {
         val result = MutableLiveData<Int>()
         getContactRequestsUseCase.getRequestsSize()
@@ -136,5 +123,14 @@ class ContactRequestsViewModel @ViewModelInject constructor(
                 onError = { logError(it.stackTraceToString()) })
             .addTo(composite)
         return result
+    }
+
+    private fun Completable.subscribeAndUpdate() {
+        subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onError = { logError(it.stackTraceToString()) }
+            )
+            .addTo(composite)
     }
 }
