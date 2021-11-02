@@ -94,10 +94,10 @@ class ContactRequestsViewModel @ViewModelInject constructor(
     }
 
     /**
-     * Retrieve ViewPager's default position based on contact requests size and current outGoing value
+     * Retrieve ViewPager's default position based on contact requests size and current outgoing value.
      *
-     * @param isOutgoing    Wether the current view is for outgoing requests or not
-     * @return              LiveData with ViewPager's desired position
+     * @param isOutgoing    Whether the current view is for outgoing requests or not.
+     * @return              LiveData with ViewPager's desired position.
      */
     fun getDefaultPagerPosition(isOutgoing: Boolean): LiveData<Int> {
         val result = MutableLiveData<Int>()
