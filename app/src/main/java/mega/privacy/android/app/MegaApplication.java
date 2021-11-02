@@ -36,7 +36,6 @@ import androidx.lifecycle.Observer;
 import androidx.multidex.MultiDexApplication;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import mega.privacy.android.app.di.MegaApi;
@@ -76,6 +75,7 @@ import mega.privacy.android.app.meeting.CallService;
 import mega.privacy.android.app.meeting.listeners.MeetingListener;
 import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.receivers.NetworkStateReceiver;
+import mega.privacy.android.app.service.crashreporter.CrashReporterImpl;
 import mega.privacy.android.app.utils.CUBackupInitializeChecker;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ThemeHelper;
@@ -723,9 +723,7 @@ public class MegaApplication extends MultiDexApplication implements Application.
             handleUncaughtException(thread, e);
 
             // Send the crash info manually.
-            FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
-            crashlytics.recordException(e);
-            crashlytics.sendUnsentReports();
+            new CrashReporterImpl().report(e);
         });
 
 		registerActivityLifecycleCallbacks(this);
