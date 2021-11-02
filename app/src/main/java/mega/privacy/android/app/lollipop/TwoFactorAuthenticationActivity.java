@@ -176,10 +176,13 @@ public class TwoFactorAuthenticationActivity extends PasscodeActivity implements
         tB.setVisibility(View.VISIBLE);
         setSupportActionBar(tB);
         aB = getSupportActionBar();
-        aB.setHomeButtonEnabled(true);
-        aB.setDisplayHomeAsUpEnabled(true);
-        tB.setTitle(StringResourcesUtils.getString(R.string.settings_2fa).toUpperCase(Locale.getDefault()));
-        setTitle(getString(R.string.settings_2fa));
+
+        if (aB != null) {
+            aB.setHomeButtonEnabled(true);
+            aB.setDisplayHomeAsUpEnabled(true);
+            aB.setTitle(StringResourcesUtils.getString(R.string.settings_2fa)
+                    .toUpperCase(Locale.getDefault()));
+        }
 
         if (savedInstanceState != null){
             logDebug("savedInstanceState No null");

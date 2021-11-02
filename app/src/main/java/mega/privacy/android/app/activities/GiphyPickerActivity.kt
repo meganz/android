@@ -91,10 +91,12 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         setContentView(binding.root)
 
         setSupportActionBar(binding.giphyToolbar)
-        val actionBar = supportActionBar
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.giphyToolbar.title = StringResourcesUtils.getString(R.string.search_giphy_title)
-            .toUpperCase(Locale.getDefault())
+
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = StringResourcesUtils.getString(R.string.search_giphy_title)
+                .toUpperCase(Locale.getDefault())
+        }
 
         binding.giphyToolbar.setOnClickListener { searchMenuItem?.expandActionView() }
 
