@@ -22,6 +22,7 @@ import mega.privacy.android.app.fragments.BaseFragment;
 import mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 
+import static android.text.TextUtils.isEmpty;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static mega.privacy.android.app.lollipop.adapters.ImportFilesAdapter.MAX_VISIBLE_ITEMS_AT_BEGINNING;
@@ -118,11 +119,9 @@ public class ImportFilesFragment extends BaseFragment {
         int wrongNames = 0;
 
         for (String name : nameFiles.values()) {
-            if (name.trim().isEmpty()) {
+            if (name == null || name.trim().isEmpty()) {
                 emptyNames++;
-            }
-
-            if (NODE_NAME_REGEX.matcher(name).find()) {
+            } else if (NODE_NAME_REGEX.matcher(name).find()) {
                 wrongNames++;
             }
         }
@@ -172,6 +171,9 @@ public class ImportFilesFragment extends BaseFragment {
 
             for (int i = 0; i < filePreparedInfos.size(); i++) {
                 String name = filePreparedInfos.get(i).getTitle();
+                if (isEmpty(name)) {
+                    name = filePreparedInfos.get(i).getOriginalFileName();
+                }
                 nameFiles.put(name, name);
             }
 

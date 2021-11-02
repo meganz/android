@@ -1,5 +1,6 @@
 package mega.privacy.android.app.meeting.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Pair
 import android.view.*
@@ -10,7 +11,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.constants.EventConstants.EVENT_REMOTE_AUDIO_LEVEL_CHANGE
 import mega.privacy.android.app.databinding.SpeakerViewCallFragmentBinding
@@ -24,7 +24,6 @@ import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatSession
 
-@ExperimentalCoroutinesApi
 class SpeakerViewCallFragment : MeetingBaseFragment(),
     MegaSurfaceRenderer.MegaSurfaceRendererListener {
 
@@ -494,6 +493,7 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
      * @param isAdded True, if the participant has joined. False, if the participant has left
      * @param position The position of the change
      */
+    @SuppressLint("NotifyDataSetChanged")
     fun peerAddedOrRemoved(
         isAdded: Boolean,
         position: Int,
