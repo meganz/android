@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.LogUtil
+import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
@@ -112,5 +113,9 @@ class JoinMeetingAsGuestFragment : AbstractMeetingOnBoardingFragment() {
             ConstraintSet.TOP,
         )
         constraintSet.applyTo(binding.createMeeting)
+    }
+
+    override fun onPermissionsResponse(requestType: Int) {
+        logDebug("onPermissionsResponse requestType = $requestType")
     }
 }

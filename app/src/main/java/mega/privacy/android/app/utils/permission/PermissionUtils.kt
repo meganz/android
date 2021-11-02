@@ -31,6 +31,11 @@ import java.lang.Exception
  */
 @TargetApi(Build.VERSION_CODES.M)
 object PermissionUtils {
+    const val TYPE_REQUIRE_PERMISSION = 0
+    const val TYPE_GRANTED = 1
+    const val TYPE_DENIED = 2
+    const val TYPE_NEVER_ASK_AGAIN = 3
+
     /**
      * Checks all given permissions have been granted.
      *
@@ -264,5 +269,55 @@ object PermissionUtils {
             }
             activity?.startActivityForResult(intent, requestCode)
         }
+    }
+
+    /**
+     * Callback function for granting permissions for sub class
+     *
+     * @param permissions permission list
+     */
+    @JvmStatic
+    fun onRequiresPermission(
+        permissions: ArrayList<String>,
+        permissionCallbacks: PermissionCallbacks
+    ) {
+        permissionCallbacks.onPermissionsCallback(TYPE_REQUIRE_PERMISSION, permissions)
+    }
+
+    /**
+     * Process when the user denies the permissions
+     *
+     * @param permissions permission list
+     */
+    @JvmStatic
+    fun onPermissionDenied(permissions: ArrayList<String>, permissionCallbacks: PermissionCallbacks) {
+        permissionCallbacks.onPermissionsCallback(TYPE_DENIED, permissions)
+    }
+
+    /**
+     * Callback function that allow for continuation or cancellation of a permission request..
+     *
+     * @param request allow for continuation or cancellation of a permission request.
+     */
+    @JvmStatic
+    fun onShowRationale(request: PermissionRequest) {
+        request.proceed()
+    }
+
+    /**
+     * Callback function that will be called when the user denies the permissions and tickets "Never Ask Again" after calls requestPermissions()
+     *
+     * @param permissions permission list
+     */
+    @JvmStatic
+    fun onNeverAskAgain(permissions: ArrayList<String>, permissionCallbacks: PermissionCallbacks) {
+        permissionCallbacks.onPermissionsCallback(TYPE_NEVER_ASK_AGAIN, permissions)
+    }
+
+    /**
+     * Callback interface to receive the results of permissions request
+     */
+    interface PermissionCallbacks {
+        fun onPermissionsCallback(requestType: Int, perms: ArrayList<String>)
     }
 }

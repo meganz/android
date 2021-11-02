@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_JOIN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_REJOIN
@@ -18,6 +19,7 @@ import nz.mega.sdk.MegaChatRoom
 @AndroidEntryPoint
 class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
+    @ExperimentalCoroutinesApi
     override fun onMeetingButtonClick() {
         if (chatId == MEGACHAT_INVALID_HANDLE) {
             logError("Chat Id is invalid when join meeting")
@@ -61,10 +63,14 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
         }
     }
 
+    override fun onPermissionsResponse(requestType: Int) {
+        logDebug("onPermissionsResponse requestType = $requestType")
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRTCAudioManager()
-
+        TODO("Not yet implemented")
         binding.btnStartJoinMeeting.text = StringResourcesUtils.getString(R.string.join_meeting)
         binding.typeMeetingEditText.visibility = View.GONE
     }
