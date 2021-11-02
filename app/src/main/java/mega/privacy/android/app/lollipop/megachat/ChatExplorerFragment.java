@@ -59,6 +59,7 @@ import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
 
 import static mega.privacy.android.app.lollipop.FileExplorerActivityLollipop.CHAT_FRAGMENT;
+import static mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION;
 import static mega.privacy.android.app.utils.ContactUtil.*;
 import static mega.privacy.android.app.utils.LogUtil.*;
 import static mega.privacy.android.app.utils.Util.*;
@@ -279,7 +280,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
     public void checkScroll() {
         if (listView == null) return;
 
-        boolean canScroll = listView.canScrollVertically(-1);
+        boolean canScroll = listView.canScrollVertically(SCROLLING_UP_DIRECTION) || !addedItems.isEmpty();
         boolean addLayoutVisible = (addLayout != null && addLayout.getVisibility() == View.VISIBLE);
         float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
 
@@ -443,6 +444,11 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         if (item != null && !addedItems.contains(item)) {
             addedItems.add(item);
+
+            if (addedItems.size() == 1) {
+                checkScroll();
+            }
+
             adapterAdded.setItems(addedItems);
             setFirstLayoutVisibility(View.GONE);
 
@@ -461,6 +467,10 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         }
         else if (addedItems.contains(item)) {
             deleteItem(item);
+
+            if (addedItems.isEmpty()) {
+                checkScroll();
+            }
         }
     }
 

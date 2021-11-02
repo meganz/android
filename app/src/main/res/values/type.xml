@@ -190,6 +190,10 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="TextAppearance.Mega.Subtitle1.Medium.Variant6.Grey87White">
+        <item name="android:textColor">@color/grey_087_white</item>
+    </style>
+
     <style name="TextAppearance.Mega.Subtitle1.Medium.Variant7">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/grey_087_white</item>

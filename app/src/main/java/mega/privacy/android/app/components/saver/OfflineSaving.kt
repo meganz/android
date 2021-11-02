@@ -2,7 +2,7 @@ package mega.privacy.android.app.components.saver
 
 import android.content.Context
 import android.content.Intent
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList

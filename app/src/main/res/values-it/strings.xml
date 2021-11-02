@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Visualizzatore PDF</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">di</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Si</string>
     <!-- Answer for confirmation dialog. -->
@@ -2274,10 +2272,12 @@
     <string name="settings_video_upload_quality">Qualità dei video</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">I Caricamenti da fotocamera hanno bisogno dell’accesso alle tue foto e agli altri media sul tuo dispositivo. Per favore, vai nella pagina delle Impostazioni e garantisci questo permesso.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Qualità originale</item>
-        <item>Qualità media</item>
+        <item>Bassa</item>
+        <item>Media</item>
+        <item>Alta</item>
+        <item>Originale</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Chiamata persa</string>
@@ -3453,7 +3453,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Il tuo account è stato temporaneamente bloccato per la tua sicurezza.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Per favore, verifica la tua email[/A] e segui le istruzioni per sbloccare il tuo account.</string>
+    <string name="verify_email_and_follow_steps">Per favore, segui i passi nella [A]email di verifica[/A] per sbloccare il tuo account.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">Perché sto vedendo questo?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3651,7 +3651,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Questo messaggio ha raggiunto il limite massimo di %d reazioni.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] ha cambiato il tempo di eliminazione dei messaggi a[/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] ha cambiato il tempo di eliminazione dei messaggi a [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Pulisci la chat</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3720,7 +3720,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Seleziona trasferimenti</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Il cambiamento di priorità del trasferimento ”%1$s” è fallito.</string>
+    <string name="change_of_transfer_priority_failed">Impossibile cambiare la priorità del trasferimento ”%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Invia la chiave di decriptazione separatamente</string>
     <!-- Explanation option to send separated the link and decryption key -->

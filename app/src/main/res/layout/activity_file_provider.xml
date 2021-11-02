@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/provider_container"
     android:layout_width="match_parent"
@@ -6,10 +7,39 @@
     android:fitsSystemWindows="true"
     tools:context=".providers.FileProviderActivity">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar_provider"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout_provider"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize" />
+        android:layout_height="wrap_content"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar_provider"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/sliding_tabs_provider"
+            style="@style/Widget.Mega.TabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <mega.privacy.android.app.components.CustomViewPager
+        android:id="@+id/provider_tabs_pager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/separator"
+        android:layout_below="@+id/app_bar_layout_provider" />
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@id/options_provider_layout"
+        android:background="@color/grey_012_white_012" />
 
     <LinearLayout
         android:id="@+id/options_provider_layout"
@@ -31,35 +61,6 @@
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/general_attach" />
 
-    </LinearLayout>
-
-    <View
-        android:id="@+id/separator"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_above="@id/options_provider_layout"
-        android:background="@color/grey_012_white_012" />
-
-    <LinearLayout
-        android:id="@+id/tabhost_provider"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/separator"
-        android:layout_below="@id/toolbar_provider"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/sliding_tabs_provider"
-            style="@style/Widget.Mega.TabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <mega.privacy.android.app.components.CustomViewPager
-            android:id="@+id/provider_tabs_pager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
     </LinearLayout>
 
 </RelativeLayout>
