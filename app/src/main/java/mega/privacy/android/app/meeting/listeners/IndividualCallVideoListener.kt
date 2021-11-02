@@ -7,13 +7,11 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
 import mega.privacy.android.app.utils.Constants.INVALID_DIMENSION
-import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatVideoListenerInterface
 import java.nio.ByteBuffer
-import kotlin.math.min
 
 /**
  * A listener for metadata corresponding to video being rendered.

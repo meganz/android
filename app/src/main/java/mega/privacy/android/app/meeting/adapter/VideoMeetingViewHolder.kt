@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_participant_video.view.*
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemParticipantVideoBinding
 import mega.privacy.android.app.meeting.MegaSurfaceRenderer
@@ -85,11 +84,11 @@ class VideoMeetingViewHolder(
             }
 
 
-            (binding.root.mute_icon.layoutParams as ConstraintLayout.LayoutParams).apply {
+            (binding.muteIcon.layoutParams as ConstraintLayout.LayoutParams).apply {
                 bottomMargin = 0
             }
 
-            (binding.root.moderator_icon.layoutParams as ConstraintLayout.LayoutParams).apply {
+            (binding.moderatorIcon.layoutParams as ConstraintLayout.LayoutParams).apply {
                 bottomMargin = 0
             }
 
@@ -549,7 +548,7 @@ class VideoMeetingViewHolder(
                     w = screenWidth / TWO_COLUMNS
                     h = screenHeight
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_0 -> {
                             w -= borderWidth
                         }
@@ -559,7 +558,7 @@ class VideoMeetingViewHolder(
                     w = (screenWidth / THREE_COLUMNS)
                     h = (screenHeight * 0.6).toInt()
                     marginBottom = screenHeight - h
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_0, POSITION_1 -> {
                             w -= borderWidth
                         }
@@ -568,7 +567,7 @@ class VideoMeetingViewHolder(
                 SLOT_NUM_4 -> {
                     w = (screenWidth / FOUR_COLUMNS)
                     h = (screenHeight - borderWidth) / TWO_FILES
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_0 -> {
                             w -= borderWidth
                             marginBottom = borderWidth
@@ -585,7 +584,7 @@ class VideoMeetingViewHolder(
                     w = screenWidth / FOUR_COLUMNS
                     h = (screenHeight - borderWidth) / TWO_FILES
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_0, POSITION_1 -> {
                             w -= borderWidth
                             marginBottom = borderWidth
@@ -605,7 +604,7 @@ class VideoMeetingViewHolder(
                 SLOT_NUM_6 -> {
                     w = screenWidth / FOUR_COLUMNS
                     h = (screenHeight - borderWidth) / TWO_FILES
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_0, POSITION_1 -> {
                             w -= borderWidth
                             marginBottom = borderWidth
@@ -622,7 +621,7 @@ class VideoMeetingViewHolder(
         } else {
             w = screenWidth / FOUR_COLUMNS
             h = (screenHeight - borderWidth) / TWO_FILES
-            when (adapterPosition) {
+            when (bindingAdapterPosition) {
                 POSITION_0, POSITION_1 -> {
                     w -= borderWidth
                     marginBottom = borderWidth
@@ -676,7 +675,7 @@ class VideoMeetingViewHolder(
                     w = screenWidth
                     h = screenHeight / TWO_FILES
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_1 -> marginTop = borderWidth
                     }
                 }
@@ -686,7 +685,7 @@ class VideoMeetingViewHolder(
                     marginLeft = (screenWidth - w) / 2
                     marginRight = marginLeft
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_1, POSITION_2 -> marginTop = borderWidth
                     }
                 }
@@ -694,15 +693,15 @@ class VideoMeetingViewHolder(
                     w = screenWidth / TWO_COLUMNS
                     h = w
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
                     }
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_2, POSITION_3 -> marginTop = borderWidth
                     }
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_1, POSITION_3 -> marginLeft = borderWidth
                     }
                 }
@@ -710,7 +709,7 @@ class VideoMeetingViewHolder(
                     w = screenWidth / TWO_COLUMNS
                     h = w
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
 
                         POSITION_2, POSITION_3 -> marginTop = borderWidth
@@ -722,7 +721,7 @@ class VideoMeetingViewHolder(
                         }
                     }
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_1, POSITION_3 -> marginLeft = borderWidth
                     }
                 }
@@ -730,13 +729,13 @@ class VideoMeetingViewHolder(
                     w = screenWidth / TWO_COLUMNS
                     h = w
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
 
                         POSITION_2, POSITION_3, POSITION_4, POSITION_5 -> marginTop = borderWidth
                     }
 
-                    when (adapterPosition) {
+                    when (bindingAdapterPosition) {
                         POSITION_1, POSITION_3, POSITION_5 -> marginLeft = borderWidth
                     }
                 }
@@ -745,7 +744,7 @@ class VideoMeetingViewHolder(
             w = screenWidth / TWO_COLUMNS
             h = w
 
-            when (adapterPosition) {
+            when (bindingAdapterPosition) {
                 POSITION_0, POSITION_1 -> marginTop = nonZeroMarginTop
 
                 POSITION_2, POSITION_3, POSITION_4, POSITION_5 -> {
@@ -753,7 +752,7 @@ class VideoMeetingViewHolder(
                 }
             }
 
-            when (adapterPosition) {
+            when (bindingAdapterPosition) {
                 POSITION_1, POSITION_3, POSITION_5 -> marginLeft = borderWidth
             }
         }

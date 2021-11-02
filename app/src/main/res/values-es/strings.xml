@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">Visor de PDF MEGA</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">de</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">Sí</string>
     <!-- Answer for confirmation dialog. -->
@@ -1124,7 +1122,7 @@
     <!-- Message to promote PRO accounts -->
     <string name="get_pro_account">Aumenta la capacidad de tu nube. [A]Obtén más espacio y más cuota de transferencia con una cuenta Pro.</string>
     <!-- success message when the MasterKey file has been downloaded -->
-    <string name="toast_master_key">Se ha realizado una copia de seguridad de la Clave de recuperación en: %1s.[A] Encontrarás el archivo con la Clave de recuperación en la sección Sin conexión.[A]Aviso: Si cierras la sesión, la Clave de recuperación se eliminará, por lo tanto tienes que guardarla en un lugar seguro fuera de tu cuenta MEGA.</string>
+    <string name="toast_master_key">Se ha realizado una copia de seguridad de la Clave de recuperación en: %1s.[A] Encontrarás el archivo con la Clave de recuperación en la sección Sin conexión.[/A] Aviso: Si cierras la sesión, la Clave se eliminará, por lo tanto tienes que guardarla en un lugar seguro fuera de tu cuenta de MEGA.</string>
     <!-- Error shown when the user tries to change his mail to one that is already used -->
     <string name="mail_already_used">Este correo electrónico ya está asociado a una cuenta de MEGA. Por favor usa otra dirección de correo electrónico.</string>
     <!-- Error shown when the user tries to change his mail while the user has already requested a confirmation link for that email address -->
@@ -2274,10 +2272,12 @@
     <string name="settings_video_upload_quality">Calidad de vídeo</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Subidas de la cámara necesita acceder a tus fotos y otros archivos multimedia del dispositivo. Ve a los ajustes y permite el acceso.</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>Calidad original</item>
-        <item>Calidad media</item>
+        <item>Baja</item>
+        <item>Media</item>
+        <item>Alta</item>
+        <item>Original</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Llamada perdida</string>
@@ -3453,7 +3453,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">Tu cuenta ha sido bloqueada temporalmente por seguridad.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]Verifica tu dirección de correo electrónico[/A] y sigue los pasos en el correo de MEGA que te envíamos para desbloquear tu cuenta.</string>
+    <string name="verify_email_and_follow_steps">Sigue los pasos que te enviamos en el [A]correo electrónico de verificación[/A] para desbloquear tu cuenta.</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">¿Por qué estoy viendo esto?</string>
     <!-- Label of a button which action is resend an email -->
@@ -3651,7 +3651,7 @@
     <!-- Shows the error when the limit of reactions per message is reached and a user tries to add one more. Keep the placeholder because is to show limit number in runtime. -->
     <string name="limit_reaction_per_message">Este mensaje ha alcanzado el límite máximo de %d reacciones.</string>
     <!-- System message displayed to all chat participants when one of them enables retention history -->
-    <string name="retention_history_changed_by">[A]%1$s[/A][B] ha cambiado el tiempo de limpieza de mensajes a [/B][A] %2$s[/A][B].[/B]</string>
+    <string name="retention_history_changed_by">[A]%1$s[/A][B] ha cambiado el tiempo de limpieza de mensajes a [/B][A]%2$s[/A][B].[/B]</string>
     <!-- Title of the section to clear the chat content in the Manage chat history screen -->
     <string name="title_properties_clear_chat_history">Limpiar historial del chat</string>
     <!-- System message that is shown to all chat participants upon disabling the Retention history -->
@@ -3720,7 +3720,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">Seleccionar transferencias</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">Ha habido un error en el cambio de prioridad de la transferencia ”%1$s”.</string>
+    <string name="change_of_transfer_priority_failed">No se ha podido cambiar la prioridad de la transferencia “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">Envíar la clave de cifrado por separado</string>
     <!-- Explanation option to send separated the link and decryption key -->

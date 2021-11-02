@@ -3,8 +3,10 @@ package mega.privacy.android.app.lollipop.managerSections;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 
@@ -37,6 +40,7 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.WebViewActivity;
+import mega.privacy.android.app.activities.settingsActivities.StartScreenPreferencesActivity;
 import mega.privacy.android.app.exportRK.ExportRecoveryKeyActivity;
 import mega.privacy.android.app.activities.settingsActivities.AdvancedPreferencesActivity;
 import mega.privacy.android.app.activities.settingsActivities.CameraUploadsPreferencesActivity;
@@ -56,12 +60,18 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder;
 import mega.privacy.android.app.utils.ThemeHelper;
 
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_START_SCREEN;
 import static mega.privacy.android.app.constants.SettingsConstants.*;
+import static mega.privacy.android.app.fragments.settingsFragments.startSceen.util.StartScreenUtil.HOME_BNV;
 import static mega.privacy.android.app.service.PlatformConstantsKt.RATE_APP_URL;
 import static mega.privacy.android.app.utils.Constants.*;
 import static mega.privacy.android.app.utils.DBUtil.callToAccountDetails;
 import static mega.privacy.android.app.utils.FileUtil.buildDefaultDownloadDir;
 import static mega.privacy.android.app.utils.LogUtil.*;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.HIDE_RECENT_ACTIVITY;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.PREFERRED_START_SCREEN;
+import static mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES;
 import static mega.privacy.android.app.utils.Util.*;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -93,6 +103,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
     private PreferenceCategory storageCategory;
     private Preference nestedDownloadLocation;
     private Preference fileManagementPrefence;
+    private Preference startScreen;
+    private SwitchPreferenceCompat hideRecentActivity;
     private Preference helpHelpCentre;
     private Preference helpSendFeedback;
     private PreferenceCategory aboutCategory;
@@ -138,6 +150,11 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         nestedDownloadLocation.setOnPreferenceClickListener(this);
         fileManagementPrefence = findPreference(KEY_STORAGE_FILE_MANAGEMENT);
         fileManagementPrefence.setOnPreferenceClickListener(this);
+
+        startScreen = findPreference(KEY_START_SCREEN);
+        startScreen.setOnPreferenceClickListener(this);
+        hideRecentActivity = findPreference(KEY_HIDE_RECENT_ACTIVITY);
+        hideRecentActivity.setOnPreferenceClickListener(this);
 
         securityCategory = findPreference(CATEGORY_SECURITY);
         recoveryKey = findPreference(KEY_RECOVERY_KEY);
@@ -190,6 +207,7 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
         updatePasscodeLock();
         refreshCameraUploadsSettings();
+        checkUIPreferences();
         update2FAVisibility();
         setAutoaccept = false;
         autoAccept = true;
@@ -225,10 +243,45 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         cameraUploadsPreference.setSummary(getString(isCameraUploadOn ? R.string.mute_chat_notification_option_on : R.string.mute_chatroom_notification_option_off));
     }
 
+    /**
+     * Checks and sets the User interface setting values.
+     */
+    private void checkUIPreferences() {
+        SharedPreferences sharedPreferences = requireContext()
+                .getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE);
+
+        updateStartScreenSetting(sharedPreferences.getInt(PREFERRED_START_SCREEN, HOME_BNV));
+        hideRecentActivity.setChecked(sharedPreferences.getBoolean(HIDE_RECENT_ACTIVITY, false));
+    }
+
+    /**
+     * Updates the start screen setting.
+     *
+     * @param newStartScreen Value to set as new start screen.
+     */
+    private void updateStartScreenSetting(int newStartScreen) {
+        String startScreenSummary =
+                getResources().getStringArray(R.array.settings_start_screen)[newStartScreen];
+
+        startScreen.setSummary(startScreenSummary);
+    }
+
+    /**
+     * Updates the hide recent activity setting.
+     *
+     * @param hide True if should enable the setting, false otherwise.
+     */
+    private void updateHideRecentActivitySetting(boolean hide) {
+        if (hide != hideRecentActivity.isChecked()) {
+            hideRecentActivity.setChecked(hide);
+        }
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         logDebug("onViewCreated");
+        setupObservers();
 
         // Init QR code setting
         megaApi.getContactLinksOption((ManagerActivityLollipop) context);
@@ -237,6 +290,8 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
             goToCategoryStorage();
         } else if (((ManagerActivityLollipop) context).openSettingsQR) {
             goToCategoryQR();
+        } else if (((ManagerActivityLollipop) context).openSettingsStartScreen) {
+            goToSectionStartScreen();
         }
 
         getListView().addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -256,6 +311,14 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
         if (bEvaluateAppDialogShow) {
             showEvaluatedAppDialog();
         }
+    }
+
+    private void setupObservers() {
+        LiveEventBus.get(EVENT_UPDATE_START_SCREEN, Integer.class)
+                .observe(getViewLifecycleOwner(), this::updateStartScreenSetting);
+
+        LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean.class)
+                .observe(getViewLifecycleOwner(), this::updateHideRecentActivitySetting);
     }
 
     @Override
@@ -454,6 +517,16 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
                     playerService.getViewModel().toggleBackgroundPlay();
                 }
                 break;
+            case KEY_START_SCREEN:
+                startActivity(new Intent(context, StartScreenPreferencesActivity.class));
+                break;
+            case KEY_HIDE_RECENT_ACTIVITY:
+                requireContext().getSharedPreferences(USER_INTERFACE_PREFERENCES, Context.MODE_PRIVATE)
+                        .edit().putBoolean(HIDE_RECENT_ACTIVITY, hideRecentActivity.isChecked()).apply();
+
+                LiveEventBus.get(EVENT_UPDATE_HIDE_RECENT_ACTIVITY, Boolean.class)
+                        .post(hideRecentActivity.isChecked());
+                break;
         }
 
         if (preference.getKey().compareTo(KEY_ABOUT_APP_VERSION) != 0) {
@@ -515,6 +588,12 @@ public class SettingsFragmentLollipop extends SettingsBaseFragment {
 
     public void goToCategoryQR() {
         scrollToPreference(qrCodeAutoAcceptSwitch);
+    }
+
+    public void goToSectionStartScreen() {
+        scrollToPreference(startScreen);
+        startActivity(new Intent(context, StartScreenPreferencesActivity.class));
+        ((ManagerActivityLollipop) context).openSettingsStartScreen = false;
     }
 
     private void refreshAccountInfo() {

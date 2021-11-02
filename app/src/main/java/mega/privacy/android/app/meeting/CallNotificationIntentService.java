@@ -13,7 +13,6 @@ import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatCall;
-import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaChatRoom;
 
 import static mega.privacy.android.app.utils.CallUtil.*;
