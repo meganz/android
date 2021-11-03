@@ -33,6 +33,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.arch.BaseRxViewModel;
 import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.BaseListener;
 import mega.privacy.android.app.repo.MegaNodeRepo;
@@ -515,56 +516,11 @@ class CuViewModel extends BaseRxViewModel {
      * Also requests needed previews to show in cards if not exist yet.
      */
     public void getCards() {
-        List<CUCard> days = new ArrayList<>();
-        List<CUCard> months = new ArrayList<>();
-        List<CUCard> years = new ArrayList<>();
-        List<MegaNode> nodesWithoutPreview = new ArrayList<>();
-        LocalDate lastDayDate = null;
-        LocalDate lastMonthDate = null;
-        LocalDate lastYearDate = null;
+        DateCardsProvider cardsProvider = new DateCardsProvider();
         List<MegaNode> cardNodes = mRepo.getFilteredCuChildren(ORDER_MODIFICATION_DESC);
+        cardsProvider.extractCardsFromNodeList(mAppContext, cardNodes);
 
-        for (MegaNode node : cardNodes) {
-            boolean shouldGetPreview = false;
-            File preview = new File(getPreviewFolder(mAppContext), node.getBase64Handle() + JPG_EXTENSION);
-            LocalDate modifyDate = fromEpoch(node.getModificationTime());
-            String day = ofPattern("dd").format(modifyDate);
-            String month = ofPattern("MMMM").format(modifyDate);
-            String year = ofPattern("yyyy").format(modifyDate);
-            boolean sameYear = Year.from(LocalDate.now()).equals(Year.from(modifyDate));
-
-            if (lastDayDate == null || lastDayDate.getDayOfYear() != modifyDate.getDayOfYear()) {
-                shouldGetPreview = true;
-                lastDayDate = modifyDate;
-                String date = ofPattern(sameYear ? "dd MMMM" : "dd MMMM yyyy").format(lastDayDate);
-                days.add(new CUCard(node, preview.exists() ? preview : null, day, month,
-                        sameYear ? null : year, date, modifyDate, 0));
-            } else if (!days.isEmpty()){
-                days.get(days.size() - 1).incrementNumItems();
-            }
-
-            if (lastMonthDate == null
-                    || !YearMonth.from(lastMonthDate).equals(YearMonth.from(modifyDate))) {
-                shouldGetPreview = true;
-                lastMonthDate = modifyDate;
-                String date = sameYear ? month : ofPattern("MMMM yyyy").format(modifyDate);
-                months.add(new CUCard(node, preview.exists() ? preview : null,null, month,
-                        sameYear ? null : year, date, modifyDate, 0));
-            }
-
-            if (lastYearDate == null || !Year.from(lastYearDate).equals(Year.from(modifyDate))) {
-                shouldGetPreview = true;
-                lastYearDate = modifyDate;
-                years.add(new CUCard(node, preview.exists() ? preview : null,null, null,
-                        year, year, modifyDate, 0));
-            }
-
-            if (shouldGetPreview && !preview.exists()) {
-                nodesWithoutPreview.add(node);
-            }
-        }
-
-        add(Observable.fromIterable(nodesWithoutPreview)
+        add(Observable.fromIterable(cardsProvider.getNodesWithoutPreview().keySet())
                 .zipWith(Observable.interval(GET_THUMBNAIL_THROTTLE_MS, MILLISECONDS),
                         (node, interval) -> node)
                 .observeOn(Schedulers.computation())
@@ -575,9 +531,9 @@ class CuViewModel extends BaseRxViewModel {
                     }
                 }, logErr("CuViewModel getPreview")));
 
-        dayCards.postValue(days);
-        monthCards.postValue(months);
-        yearCards.postValue(years);
+        dayCards.postValue(cardsProvider.getDays());
+        monthCards.postValue(cardsProvider.getMonths());
+        yearCards.postValue(cardsProvider.getYears());
     }
 
     /**

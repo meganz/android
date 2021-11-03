@@ -92,83 +92,16 @@ class ImagesViewModel @ViewModelInject constructor(
     }
 
     val dateCards: LiveData<List<List<CUCard>>> = items.map {
-        val days = ArrayList<CUCard>()
-        val months = ArrayList<CUCard>()
-        val years = ArrayList<CUCard>()
-
-        val nodesWithoutPreview = mutableMapOf<MegaNode, String>()
-        var lastDayDate: LocalDate? = null
-        var lastMonthDate: LocalDate? = null
-        var lastYearDate: LocalDate? = null
-
-        it.forEach foreach@{ photoItem ->
-            if (photoItem.node == null) return@foreach
-
-            val node = photoItem.node!!
-
-            var shouldGetPreview = false
-            val preview = File(
-                PreviewUtils.getPreviewFolder(repository.context),
-                node.base64Handle + FileUtil.JPG_EXTENSION
-            )
-
-            val modifyDate = fromEpoch(node.modificationTime)
-            val day = ofPattern("dd").format(modifyDate)
-            val month = ofPattern("MMMM").format(modifyDate)
-            val year = ofPattern("uuuu").format(modifyDate)
-            val sameYear = Year.from(LocalDate.now()) == Year.from(modifyDate)
-
-            if (lastDayDate == null || lastDayDate!!.dayOfYear != modifyDate.dayOfYear) {
-                shouldGetPreview = true
-                lastDayDate = modifyDate
-                val date =
-                    ofPattern(if (sameYear) "dd MMMM" else "dd MMMM uuuu").format(lastDayDate)
-                days.add(
-                    CUCard(
-                        node, if (preview.exists()) preview else null, day, month,
-                        if (sameYear) null else year, date, modifyDate, 0
-                    )
-                )
-            } else if (days.isNotEmpty()) {
-                days[days.size - 1].incrementNumItems()
-            }
-
-            if (lastMonthDate == null || YearMonth.from(lastMonthDate) != YearMonth.from(modifyDate)
-            ) {
-                shouldGetPreview = true
-                lastMonthDate = modifyDate
-                val date = if (sameYear) month else ofPattern("MMMM yyyy").format(modifyDate)
-                months.add(
-                    CUCard(
-                        node, if (preview.exists()) preview else null, null, month,
-                        if (sameYear) null else year, date, modifyDate, 0
-                    )
-                )
-            }
-
-            if (lastYearDate == null || Year.from(lastYearDate) != Year.from(modifyDate)) {
-                shouldGetPreview = true
-                lastYearDate = modifyDate
-                years.add(
-                    CUCard(
-                        node, if (preview.exists()) preview else null, null, null,
-                        year, year, modifyDate, 0
-                    )
-                )
-            }
-
-            if (shouldGetPreview && !preview.exists()) {
-                nodesWithoutPreview[node] = preview.absolutePath
-            }
-        }
+       val cardsProvider = DateCardsProvider()
+        cardsProvider.extractCardsFromNodeList(repository.context, it.mapNotNull { photoNodeItem ->  photoNodeItem.node })
 
         viewModelScope.launch {
-            repository.getPreviews(nodesWithoutPreview) {
+            repository.getPreviews(cardsProvider.getNodesWithoutPreview()) {
                 _refreshCards.value = true
             }
         }
 
-        listOf(days, months, years)
+        listOf(cardsProvider.getDays(), cardsProvider.getMonths(), cardsProvider.getYears())
     }
 
     /**
