@@ -50,7 +50,6 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModelFactory;
 import mega.privacy.android.app.fragments.managerFragments.LinksFragment;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.interfaces.SnackbarShower;
@@ -131,8 +130,7 @@ public abstract class MegaNodeBaseFragment extends RotatableFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        sortByHeaderViewModel = new ViewModelProvider(this, new SortByHeaderViewModelFactory(context))
-                .get(SortByHeaderViewModel.class);
+        sortByHeaderViewModel = new ViewModelProvider(this).get(SortByHeaderViewModel.class);
 
         sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),
                 new EventObserver<>(this::showSortByPanel));

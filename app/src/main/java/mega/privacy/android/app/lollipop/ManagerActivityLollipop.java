@@ -874,15 +874,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		}
 	};
 
-    private BroadcastReceiver receiverUpdateView = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent != null) {
-                updateView(intent.getBooleanExtra("isList", true));
-            }
-        }
-    };
-
 	private BroadcastReceiver receiverCUAttrChanged = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1461,7 +1452,10 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 				new IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE));
 
 		registerReceiver(receiverUpdateOrder, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_ORDER));
-		registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
+
+		LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class)
+				.observe(this, isList -> updateView(isList));
+
 		registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED));
 
 		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
@@ -3490,7 +3484,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		unregisterReceiver(updateMyAccountReceiver);
 		unregisterReceiver(networkReceiver);
 		unregisterReceiver(receiverUpdateOrder);
-		unregisterReceiver(receiverUpdateView);
 		unregisterReceiver(chatArchivedReceiver);
 		LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
 				.removeObserver(refreshAddPhoneNumberButtonObserver);

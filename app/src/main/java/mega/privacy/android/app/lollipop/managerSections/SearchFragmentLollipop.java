@@ -66,7 +66,6 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel;
-import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModelFactory;
 import mega.privacy.android.app.search.callback.SearchActionsCallback;
 import mega.privacy.android.app.search.usecase.SearchNodesUseCase;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
@@ -508,7 +507,7 @@ public class SearchFragmentLollipop extends RotatableFragment implements SearchA
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		logDebug("onCreateView");
 
-		SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this, new SortByHeaderViewModelFactory(context))
+		SortByHeaderViewModel sortByHeaderViewModel = new ViewModelProvider(this)
 				.get(SortByHeaderViewModel.class);
 
 		sortByHeaderViewModel.getShowDialogEvent().observe(getViewLifecycleOwner(),

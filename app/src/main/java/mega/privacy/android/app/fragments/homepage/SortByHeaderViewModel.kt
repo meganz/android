@@ -1,23 +1,17 @@
 package mega.privacy.android.app.fragments.homepage
 
-import android.content.Context
-import android.content.Intent
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.jeremyliao.liveeventbus.LiveEventBus
-import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.utils.Constants.EVENT_LIST_GRID_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
 import nz.mega.sdk.MegaApiJava.*
 
-class SortByHeaderViewModel @ViewModelInject constructor(
-    @ApplicationContext private val context: Context
-) : ViewModel() {
+class SortByHeaderViewModel : ViewModel() {
 
     // Pair<Int, Int>: First is order Cloud, second order Others (Incoming root)
     var order = Pair(ORDER_DEFAULT_ASC, ORDER_DEFAULT_ASC)
@@ -60,9 +54,7 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     }
 
     fun switchListGrid() {
-        val intent = Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_VIEW)
-        intent.putExtra(Constants.INTENT_EXTRA_KEY_IS_LIST, !isList)
-        context.sendBroadcast(intent)
+        LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java).post(!isList)
     }
 
     override fun onCleared() {

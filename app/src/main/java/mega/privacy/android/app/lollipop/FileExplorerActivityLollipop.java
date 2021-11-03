@@ -12,6 +12,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -104,6 +105,7 @@ import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 
 import static android.webkit.URLUtil.*;
+import static mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.ChatUtil.createAttachmentPendingMessage;
@@ -281,15 +283,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 	private String currentAction;
 
 	private BottomSheetDialogFragment bottomSheetDialogFragment;
-
-	private final BroadcastReceiver receiverUpdateView = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent != null) {
-				refreshViewNodes(intent.getBooleanExtra("isList", true));
-			}
-		}
-	};
 
 	@Override
 	public void onRequestStart(MegaChatApiJava api, MegaChatRequest request) {
@@ -618,7 +611,8 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
-		registerReceiver(receiverUpdateView, new IntentFilter(BROADCAST_ACTION_INTENT_UPDATE_VIEW));
+		LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class)
+				.observe(this, isList -> refreshViewNodes(isList));
 	}
 	
 	private void afterLoginAndFetch(){
@@ -2262,8 +2256,6 @@ public class FileExplorerActivityLollipop extends TransfersManagementActivity
 				logWarning("IOException deleting childThumbDir.", e);
 			}
 		}
-
-		unregisterReceiver(receiverUpdateView);
 		
 		super.onDestroy();
 	}
