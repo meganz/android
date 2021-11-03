@@ -1606,9 +1606,6 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 
 		LiveEventBus.get(EVENT_LIST_GRID_CHANGE, Boolean.class).post(isList);
 
-		LiveEventBus.get(EVENT_ORDER_CHANGE, Pair.class)
-				.post(new Pair(sortOrderManagement.getOrderCloud(), sortOrderManagement.getOrderOthers()));
-
 		handler = new Handler();
 
 		logDebug("Set view");

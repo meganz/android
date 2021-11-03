@@ -27,6 +27,7 @@ import mega.privacy.android.app.databinding.FragmentAudioBinding
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.fragments.homepage.*
 import mega.privacy.android.app.fragments.homepage.BaseNodeItemAdapter.Companion.TYPE_HEADER
+import mega.privacy.android.app.globalmanagement.SortOrderManagement
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.MODE1
@@ -65,6 +66,9 @@ class AudioFragment : Fragment(), HomepageSearchable {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var sortOrderManagement: SortOrderManagement
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -152,7 +156,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.loadAudio(true, it.first)
+            viewModel.loadAudio(true)
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(
@@ -210,7 +214,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
         }
 
         intent.putExtra(INTENT_EXTRA_KEY_POSITION, index)
-        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, viewModel.order)
+        intent.putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrderManagement.getOrderCloud())
         intent.putExtra(INTENT_EXTRA_KEY_FILE_NAME, node.name)
         intent.putExtra(INTENT_EXTRA_KEY_HANDLE, file.handle)
 

@@ -177,7 +177,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.loadDocuments(true, it.first)
+            viewModel.loadDocuments(true)
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(
