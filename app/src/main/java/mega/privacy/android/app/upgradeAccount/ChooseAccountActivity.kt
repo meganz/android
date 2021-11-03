@@ -22,6 +22,7 @@ import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import java.util.*
 
 open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
@@ -81,6 +82,8 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         supportActionBar?.apply {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
+            title = StringResourcesUtils.getString(R.string.choose_account_fragment)
+                .toUpperCase(Locale.getDefault())
         }
 
         ListenScrollChangesHelper().addViewToListen(
