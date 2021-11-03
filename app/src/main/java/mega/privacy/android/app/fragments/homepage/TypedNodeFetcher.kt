@@ -198,23 +198,6 @@ class TypedNodesFetcher(
         }
     }
 
-    private fun formatDateTitle(date: Pair<String, String>) : Spanned {
-        var dateText =
-            if (TextUtil.isTextEmpty(date.second)) "[B]" + date.first + "[/B]" else StringResourcesUtils.getString(
-                R.string.cu_month_year_date,
-                date.first,
-                date.second
-            )
-        try {
-            dateText = dateText.replace("[B]", "<font face=\"sans-serif-medium\">")
-                .replace("[/B]", "</font>")
-        } catch (e: Exception) {
-            LogUtil.logWarning("Exception formatting text.", e)
-        }
-
-        return dateText.toSpannedHtmlText()
-    }
-
     private fun addPhotoDateTitle(dateString: String, date: Pair<String, String>) {
         // RandomUUID() can ensure non-repetitive values in practical purpose
         fileNodesMap[UUID.randomUUID()] = PhotoNodeItem(
@@ -223,7 +206,7 @@ class TypedNodesFetcher(
             null,
             -1,
             dateString,
-            formatDateTitle(date),
+            StringUtils.formatDateTitle(date),
             null,
             false
         )
