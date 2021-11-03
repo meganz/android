@@ -11974,7 +11974,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
      *
      * @return True if the current screen is the photos, false otherwise.
      */
-    public boolean isInPhotosPage() {
+    public boolean isInImagesPage() {
         return drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES;
     }
 
