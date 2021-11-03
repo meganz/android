@@ -13,12 +13,23 @@ import mega.privacy.android.app.utils.Constants.EVENT_LIST_GRID_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
 import nz.mega.sdk.MegaApiJava.*
 
+/**
+ * ViewModel in charge of manage actions from sub-headers in which view mode (list or grid)
+ * and sort by options can be changed.
+ */
 class SortByHeaderViewModel @ViewModelInject constructor(
     sortOrderManagement: SortOrderManagement
 ) : ViewModel() {
 
-    // Pair<Int, Int>: First is order Cloud, second order Others (Incoming root)
-    var order = Pair(sortOrderManagement.getOrderCloud(), sortOrderManagement.getOrderOthers())
+    /* Triple<Int, Int, Int>:
+        - First: Cloud order
+        - Second: Others order (Incoming root)
+        - Third: Offline order */
+    var order = Triple(
+        sortOrderManagement.getOrderCloud(),
+        sortOrderManagement.getOrderOthers(),
+        sortOrderManagement.getOrderOffline()
+    )
         private set
     var isList = true
         private set
@@ -26,13 +37,13 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     private val _showDialogEvent = MutableLiveData<Event<Unit>>()
     val showDialogEvent: LiveData<Event<Unit>> = _showDialogEvent
 
-    private val _orderChangeEvent = MutableLiveData<Event<Pair<Int, Int>>>()
-    val orderChangeEvent: LiveData<Event<Pair<Int, Int>>> = _orderChangeEvent
+    private val _orderChangeEvent = MutableLiveData<Event<Triple<Int, Int, Int>>>()
+    val orderChangeEvent: LiveData<Event<Triple<Int, Int, Int>>> = _orderChangeEvent
 
     private val _listGridChangeEvent = MutableLiveData<Event<Boolean>>()
     val listGridChangeEvent: LiveData<Event<Boolean>> = _listGridChangeEvent
 
-    private val orderChangeObserver = Observer<Pair<Int, Int>> {
+    private val orderChangeObserver = Observer<Triple<Int, Int, Int>> {
         order = it
         _orderChangeEvent.value = Event(it)
     }

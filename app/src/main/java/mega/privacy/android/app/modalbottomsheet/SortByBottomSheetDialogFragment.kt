@@ -81,6 +81,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             ORDER_CLOUD -> sortOrderManagement.getOrderCloud()
             ORDER_CAMERA -> sortOrderManagement.getOrderCamera()
             ORDER_OTHERS -> sortOrderManagement.getOrderOthers()
+            ORDER_OFFLINE -> sortOrderManagement.getOrderOffline()
             else -> ORDER_DEFAULT_ASC
         }
 
@@ -104,6 +105,11 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.sortBySizeSeparator.isVisible = false
                 binding.sortByNewestDate.isVisible = false
                 binding.sortByOldestDate.isVisible = false
+            }
+            ORDER_OFFLINE -> {
+                binding.sortByDateSeparator.isVisible = false
+                binding.sortByFavoritesType.isVisible = false
+                binding.sortByLabelType.isVisible = false
             }
         }
 
@@ -183,8 +189,14 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         when (orderType) {
             ORDER_CLOUD -> {
                 sortOrderManagement.setOrderCloud(order)
-                LiveEventBus.get(EVENT_ORDER_CHANGE, Pair::class.java)
-                    .post(Pair(order, sortOrderManagement.getOrderOthers()))
+                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                    .post(
+                        Triple(
+                            order,
+                            sortOrderManagement.getOrderOthers(),
+                            sortOrderManagement.getOrderOffline()
+                        )
+                    )
 
                 if (requireActivity() is ManagerActivityLollipop) {
                     (requireActivity() as ManagerActivityLollipop).refreshCloudOrder(order)
@@ -201,13 +213,34 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
             ORDER_OTHERS -> {
                 sortOrderManagement.setOrderOthers(order)
-                LiveEventBus.get(EVENT_ORDER_CHANGE, Pair::class.java)
-                    .post(Pair(sortOrderManagement.getOrderCloud(), order))
+                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                    .post(
+                        Triple(
+                            sortOrderManagement.getOrderCloud(),
+                            order,
+                            sortOrderManagement.getOrderOffline()
+                        )
+                    )
 
                 if (requireActivity() is ManagerActivityLollipop) {
                     (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()
                 } else if (requireActivity() is FileExplorerActivityLollipop) {
                     updateFileExplorerOrder(order)
+                }
+            }
+            ORDER_OFFLINE -> {
+                sortOrderManagement.setOrderOffline(order)
+                LiveEventBus.get(EVENT_ORDER_CHANGE, Triple::class.java)
+                    .post(
+                        Triple(
+                            sortOrderManagement.getOrderCloud(),
+                            sortOrderManagement.getOrderOthers(),
+                            order
+                        )
+                    )
+
+                if (requireActivity() is ManagerActivityLollipop) {
+                    (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()
                 }
             }
         }
