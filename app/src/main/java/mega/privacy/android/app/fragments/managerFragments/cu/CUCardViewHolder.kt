@@ -10,6 +10,7 @@ import mega.privacy.android.app.databinding.ItemCuCardBinding
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment.*
 import mega.privacy.android.app.utils.LogUtil
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.StringUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 
 /**
@@ -40,31 +41,23 @@ class CUCardViewHolder(
         itemView.setOnClickListener { listener.onCardClicked(position, card) }
 
         var date = when (viewType) {
-            YEARS_VIEW -> "[B]" + card.year + "[/B]"
-            MONTHS_VIEW -> if (card.year == null) "[B]" + card.month + "[/B]" else getString(
+            YEARS_VIEW -> Pair(card.year, "")
+            MONTHS_VIEW -> if (card.year == null) Pair(card.month, "") else Pair("", getString(
                 R.string.cu_month_year_date,
                 card.month,
                 card.year
-            )
-            DAYS_VIEW -> if (card.year == null) "[B]" + card.date + "[/B]" else getString(
+            ))
+            DAYS_VIEW -> if (card.year == null)  Pair(card.date, "") else
+            Pair("", getString(
                 R.string.cu_day_month_year_date,
                 card.day,
                 card.month,
                 card.year
-            )
-            else -> null
+            ))
+            else -> Pair("", "")
         }
 
-        if (date != null) {
-            try {
-                date = date.replace("[B]", "<b><font face=\"sans-serif\">")
-                    .replace("[/B]", "</font></b>")
-            } catch (e: Exception) {
-                LogUtil.logWarning("Exception formatting text.", e)
-            }
-
-            binding.dateText.text = date?.toSpannedHtmlText()
-        }
+        binding.dateText.text = StringUtils.formatDateTitle(date)
 
         val numItems = card.numItems
 
