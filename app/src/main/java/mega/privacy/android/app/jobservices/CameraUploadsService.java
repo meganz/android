@@ -70,7 +70,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import static mega.privacy.android.app.constants.BroadcastConstants.*;
-import static mega.privacy.android.app.constants.SettingsConstants.VIDEO_QUALITY_MEDIUM;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.addCompletedTransfer;
 import static mega.privacy.android.app.globalmanagement.TransfersManagement.launchTransferUpdateIntent;
 import static mega.privacy.android.app.utils.Constants.*;
