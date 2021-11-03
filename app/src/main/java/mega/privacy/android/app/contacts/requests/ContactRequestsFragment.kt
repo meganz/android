@@ -47,7 +47,22 @@ class ContactRequestsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupView(savedInstanceState)
+        setupView()
+
+        if (savedInstanceState?.containsKey(STATE_PAGER_POSITION) == true) {
+            setViewPagerPosition(savedInstanceState.getInt(STATE_PAGER_POSITION))
+        } else {
+            val position = if (isOutgoing) {
+                Tabs.OUTGOING.ordinal
+            } else {
+                Tabs.INCOMING.ordinal
+            }
+            setViewPagerPosition(position)
+
+            viewModel.getDefaultPagerPosition(isOutgoing).observe(viewLifecycleOwner) { pagePosition ->
+                setViewPagerPosition(pagePosition)
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -62,25 +77,17 @@ class ContactRequestsFragment : Fragment() {
         }
     }
 
-    private fun setupView(savedInstanceState: Bundle?) {
-        binding.pager.adapter = ContactRequestPageAdapter(this)
-        TabLayoutMediator(binding.tabs, binding.pager) { tab, position ->
-            tab.text = if (position == Tabs.INCOMING.ordinal) {
-                getString(R.string.tab_received_requests)
-            } else {
-                getString(R.string.tab_sent_requests)
-            }
-        }.attach()
+    private fun setupView() {
+        binding.pager.apply {
+            adapter = ContactRequestPageAdapter(this@ContactRequestsFragment)
 
-        binding.pager.post {
-            val defaultPosition = if (isOutgoing) {
-                Tabs.OUTGOING.ordinal
-            } else {
-                Tabs.INCOMING.ordinal
-            }
-
-            binding.pager.currentItem = savedInstanceState?.getInt(STATE_PAGER_POSITION, defaultPosition)
-                ?: defaultPosition
+            TabLayoutMediator(binding.tabs, this) { tab, position ->
+                tab.text = if (position == Tabs.INCOMING.ordinal) {
+                    getString(R.string.tab_received_requests)
+                } else {
+                    getString(R.string.tab_sent_requests)
+                }
+            }.attach()
         }
     }
 
@@ -94,5 +101,14 @@ class ContactRequestsFragment : Fragment() {
         if (Util.isDarkMode(requireContext())) {
             (activity as ContactsActivity?)?.showElevation(show)
         }
+    }
+
+    /**
+     * Update ViewPager current position
+     *
+     * @param pagerPosition     Position to be shown
+     */
+    private fun setViewPagerPosition(pagerPosition: Int) {
+        binding.pager.post { binding.pager.currentItem = pagerPosition }
     }
 }
