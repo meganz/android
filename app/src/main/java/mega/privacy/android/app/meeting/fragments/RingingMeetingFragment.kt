@@ -23,6 +23,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ANSWERED_IN_
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.databinding.MeetingRingingFragmentBinding
 import mega.privacy.android.app.fragments.BaseFragment
+import mega.privacy.android.app.meeting.MeetingPermissionCallbacks
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_OFF
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_RINGING_VIDEO_ON
@@ -71,35 +72,7 @@ class RingingMeetingFragment : BaseFragment(),
         Manifest.permission.RECORD_AUDIO
     )
 
-    private var permissionCallbacks = object : PermissionUtils.PermissionCallbacks {
-        override fun onPermissionsCallback(requestType: Int, perms: ArrayList<String>) {
-            logDebug("PermissionsCallback requestType = $requestType")
-            perms.forEach {
-                when (it) {
-                    Manifest.permission.CAMERA -> {
-                        when (requestType) {
-                            PermissionUtils.TYPE_DENIED, PermissionUtils.TYPE_NEVER_ASK_AGAIN -> {
-                                sharedModel.setCameraPermission(false)
-                            }
-                            else -> {
-                                sharedModel.setCameraPermission(true)
-                            }
-                        }
-                    }
-                    Manifest.permission.RECORD_AUDIO -> {
-                        when (requestType) {
-                            PermissionUtils.TYPE_DENIED, PermissionUtils.TYPE_NEVER_ASK_AGAIN -> {
-                                sharedModel.setRecordAudioPermission(false)
-                            }
-                            else -> {
-                                sharedModel.setRecordAudioPermission(true)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    lateinit var meetingPermissionCallbacks: MeetingPermissionCallbacks
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -113,6 +86,7 @@ class RingingMeetingFragment : BaseFragment(),
         arguments?.let {
             chatId = it.getLong(MEETING_CHAT_ID)
         }
+        meetingPermissionCallbacks = MeetingPermissionCallbacks(sharedModel)
     }
 
     override fun onCreateView(
@@ -240,7 +214,7 @@ class RingingMeetingFragment : BaseFragment(),
                         ArrayList()
                     )
                 )
-                    .setOnRequiresPermission { l -> onRequiresPermission(l, permissionCallbacks) }
+                    .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
                     .setOnShowRationale { l -> onShowRationale(l) }
                     .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
                     .build()
@@ -255,7 +229,7 @@ class RingingMeetingFragment : BaseFragment(),
                         ArrayList()
                     )
                 )
-                    .setOnRequiresPermission { l -> onRequiresPermission(l, permissionCallbacks) }
+                    .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
                     .setOnShowRationale { l -> onShowRationale(l) }
                     .setOnNeverAskAgain { l -> onPermNeverAskAgain(l) }
                     .build()
@@ -267,10 +241,10 @@ class RingingMeetingFragment : BaseFragment(),
     override fun onAttach(context: Context) {
         super.onAttach(context)
         permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
-            .setOnPermissionDenied { l -> onPermissionDenied(l, permissionCallbacks) }
-            .setOnRequiresPermission { l -> onRequiresPermission(l, permissionCallbacks) }
+            .setOnPermissionDenied { l -> onPermissionDenied(l, meetingPermissionCallbacks) }
+            .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
             .setOnShowRationale { l -> onShowRationale(l) }
-            .setOnNeverAskAgain { l -> onNeverAskAgain(l, permissionCallbacks) }
+            .setOnNeverAskAgain { l -> onNeverAskAgain(l, meetingPermissionCallbacks) }
             .setPermissionEducation { showPermissionsEducation() }
             .build()
     }
@@ -282,9 +256,9 @@ class RingingMeetingFragment : BaseFragment(),
         permissionsBuilder(permissions.toCollection(ArrayList()))
             .setPermissionRequestType(PermissionType.CheckPermission)
             .setOnRequiresPermission { l ->
-                onRequiresPermission(l, permissionCallbacks)
+                onRequiresPermission(l, meetingPermissionCallbacks)
             }.setOnPermissionDenied { l ->
-                onPermissionDenied(l, permissionCallbacks)
+                onPermissionDenied(l, meetingPermissionCallbacks)
             }.build().launch(false)
     }
 

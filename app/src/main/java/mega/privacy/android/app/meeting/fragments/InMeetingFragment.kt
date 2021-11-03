@@ -68,6 +68,7 @@ import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY
+import mega.privacy.android.app.meeting.MeetingPermissionCallbacks
 import mega.privacy.android.app.meeting.OnDragTouchListener
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_CREATE
@@ -611,6 +612,8 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
         }
     }
 
+    lateinit var meetingPermissionCallbacks: MeetingPermissionCallbacks
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -811,6 +814,8 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
 
         meetingActivity = activity as MeetingActivity
 
+        meetingPermissionCallbacks = MeetingPermissionCallbacks(sharedModel)
+
         // Set parent activity can receive the orientation changes
         meetingActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
 
@@ -822,44 +827,14 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
         sendEnterCallEvent()
     }
 
-    private var permissionCallbacks = object : PermissionUtils.PermissionCallbacks {
-        override fun onPermissionsCallback(requestType: Int, perms: ArrayList<String>) {
-            logDebug("PermissionsCallback requestType = $requestType")
-            perms.forEach {
-                when (it) {
-                    Manifest.permission.CAMERA -> {
-                        when (requestType) {
-                            PermissionUtils.TYPE_DENIED, PermissionUtils.TYPE_NEVER_ASK_AGAIN -> {
-                                sharedModel.setCameraPermission(false)
-                            }
-                            else -> {
-                                sharedModel.setCameraPermission(true)
-                            }
-                        }
-                    }
-                    Manifest.permission.RECORD_AUDIO -> {
-                        when (requestType) {
-                            PermissionUtils.TYPE_DENIED, PermissionUtils.TYPE_NEVER_ASK_AGAIN -> {
-                                sharedModel.setRecordAudioPermission(false)
-                            }
-                            else -> {
-                                sharedModel.setRecordAudioPermission(true)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // Do not share the instance with other permission check process, because the callback functions are different.
         permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
-            .setOnPermissionDenied { l -> onPermissionDenied(l, permissionCallbacks) }
-            .setOnRequiresPermission { l -> onRequiresPermission(l, permissionCallbacks) }
+            .setOnPermissionDenied { l -> onPermissionDenied(l, meetingPermissionCallbacks) }
+            .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
             .setOnShowRationale { l -> onShowRationale(l) }
-            .setOnNeverAskAgain { l -> onNeverAskAgain(l, permissionCallbacks) }
+            .setOnNeverAskAgain { l -> onNeverAskAgain(l, meetingPermissionCallbacks) }
             .setPermissionEducation { showPermissionsEducation() }
             .build()
     }
@@ -1099,7 +1074,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
                 )
                     .setOnRequiresPermission { l ->
                         run {
-                            onRequiresPermission(l, permissionCallbacks)
+                            onRequiresPermission(l, meetingPermissionCallbacks)
                             // Continue expected action after granted
                             sharedModel.clickCamera(true)
                             bottomFloatingPanelViewHolder.updateCamPermissionWaring(true)
@@ -1119,7 +1094,7 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
                 )
                     .setOnRequiresPermission { l ->
                         run {
-                            onRequiresPermission(l, permissionCallbacks)
+                            onRequiresPermission(l, meetingPermissionCallbacks)
                             // Continue expected action after granted
                             sharedModel.clickMic(true)
                             bottomFloatingPanelViewHolder.updateMicPermissionWaring(true)
@@ -2860,9 +2835,9 @@ class InMeetingFragment : BaseFragment(), BottomFloatingPanelListener, SnackbarS
         permissionsBuilder(permissions.toCollection(ArrayList()))
             .setPermissionRequestType(PermissionType.CheckPermission)
             .setOnRequiresPermission { l ->
-                onRequiresPermission(l, permissionCallbacks)
+                onRequiresPermission(l, meetingPermissionCallbacks)
             }.setOnPermissionDenied { l ->
-                onPermissionDenied(l, permissionCallbacks)
+                onPermissionDenied(l, meetingPermissionCallbacks)
             }.build().launch(false)
 
         // The same chatId and the timer is paused, so resume it

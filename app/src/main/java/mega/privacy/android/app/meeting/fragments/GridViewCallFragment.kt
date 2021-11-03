@@ -18,6 +18,7 @@ import nz.mega.sdk.MegaChatSession
 class GridViewCallFragment : BaseFragment() {
 
     private lateinit var viewDataBinding: GridViewCallFragmentBinding
+    lateinit var meetingActivity: MeetingActivity
 
     private var maxWidth = 0
     private var maxHeight = 0

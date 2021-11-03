@@ -20,6 +20,7 @@ import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.databinding.MeetingOnBoardingFragmentBinding
 import mega.privacy.android.app.fragments.BaseFragment
 import mega.privacy.android.app.lollipop.megachat.AppRTCAudioManager
+import mega.privacy.android.app.meeting.MeetingPermissionCallbacks
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
@@ -28,8 +29,6 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.LogUtil.logDebug
 import mega.privacy.android.app.utils.LogUtil.logError
 import mega.privacy.android.app.utils.permission.*
-import mega.privacy.android.app.utils.permission.PermissionUtils.TYPE_DENIED
-import mega.privacy.android.app.utils.permission.PermissionUtils.TYPE_NEVER_ASK_AGAIN
 import mega.privacy.android.app.utils.permission.PermissionUtils.onNeverAskAgain
 import mega.privacy.android.app.utils.permission.PermissionUtils.onPermissionDenied
 import mega.privacy.android.app.utils.permission.PermissionUtils.onRequiresPermission
@@ -111,36 +110,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
         }
     }
 
-    protected var permissionCallbacks = object : PermissionUtils.PermissionCallbacks {
-        override fun onPermissionsCallback(requestType: Int, perms: ArrayList<String>) {
-            logDebug("PermissionsCallback requestType = $requestType")
-            perms.forEach {
-                when (it) {
-                    Manifest.permission.CAMERA -> {
-                        when (requestType) {
-                            TYPE_DENIED, TYPE_NEVER_ASK_AGAIN -> {
-                                sharedModel.setCameraPermission(false)
-                            }
-                            else -> {
-                                sharedModel.setCameraPermission(true)
-                            }
-                        }
-                    }
-                    Manifest.permission.RECORD_AUDIO -> {
-                        when (requestType) {
-                            TYPE_DENIED, TYPE_NEVER_ASK_AGAIN -> {
-                                sharedModel.setRecordAudioPermission(false)
-                            }
-                            else -> {
-                                sharedModel.setRecordAudioPermission(true)
-                            }
-                        }
-                    }
-                }
-            }
-            onPermissionsResponse(requestType)
-        }
-    }
+    lateinit var meetingPermissionCallbacks: MeetingPermissionCallbacks
 
     /**
      * Override to implement other permission action after callback
@@ -150,16 +120,22 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         meetingActivity = activity as MeetingActivity
+        meetingPermissionCallbacks = object: MeetingPermissionCallbacks(sharedModel) {
+            override fun onPermissionsCallback(requestType: Int, perms: ArrayList<String>) {
+                super.onPermissionsCallback(requestType, perms)
+                onPermissionsResponse(requestType)
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         // Do not share the instance with other permission check process, because the callback functions are different.
         permissionsRequester = permissionsBuilder(permissions.toCollection(ArrayList()))
-            .setOnPermissionDenied { l -> onPermissionDenied(l, permissionCallbacks) }
-            .setOnRequiresPermission { l -> onRequiresPermission(l, permissionCallbacks) }
+            .setOnPermissionDenied { l -> onPermissionDenied(l, meetingPermissionCallbacks) }
+            .setOnRequiresPermission { l -> onRequiresPermission(l, meetingPermissionCallbacks) }
             .setOnShowRationale { l -> onShowRationale(l) }
-            .setOnNeverAskAgain { l -> onNeverAskAgain(l, permissionCallbacks) }
+            .setOnNeverAskAgain { l -> onNeverAskAgain(l, meetingPermissionCallbacks) }
             .setPermissionEducation { showPermissionsEducation() }
             .build()
     }
@@ -216,9 +192,9 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
         permissionsBuilder(permissions.toCollection(ArrayList()))
             .setPermissionRequestType(PermissionType.CheckPermission)
             .setOnRequiresPermission { l ->
-                onRequiresPermission(l, permissionCallbacks)
+                onRequiresPermission(l, meetingPermissionCallbacks)
             }.setOnPermissionDenied { l ->
-                onPermissionDenied(l, permissionCallbacks)
+                onPermissionDenied(l, meetingPermissionCallbacks)
             }.build().launch(false)
     }
 
@@ -258,18 +234,18 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
                     java.util.ArrayList()
                 )
             )
-                .setOnPermissionDenied { l -> onPermissionDenied(l, permissionCallbacks) }
+                .setOnPermissionDenied { l -> onPermissionDenied(l, meetingPermissionCallbacks) }
                 .setOnRequiresPermission { l ->
                     run {
                         toast?.cancel()
-                        onRequiresPermission(l, permissionCallbacks)
+                        onRequiresPermission(l, meetingPermissionCallbacks)
                         onMeetingButtonClick()
                     }
                 }
                 .setOnShowRationale { l -> onShowRationale(l) }
                 .setOnNeverAskAgain { l ->
                     run {
-                        onNeverAskAgain(l, permissionCallbacks)
+                        onNeverAskAgain(l, meetingPermissionCallbacks)
                         showSnackBar()
                     }
                 }
@@ -337,7 +313,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
                         )
                             .setOnRequiresPermission { l ->
                                 run {
-                                    onRequiresPermission(l, permissionCallbacks)
+                                    onRequiresPermission(l, meetingPermissionCallbacks)
                                     // Continue expected action after granted
                                     sharedModel.clickCamera(true)
                                 }
@@ -355,7 +331,7 @@ abstract class AbstractMeetingOnBoardingFragment : BaseFragment() {
                         )
                             .setOnRequiresPermission { l ->
                                 run {
-                                    onRequiresPermission(l, permissionCallbacks)
+                                    onRequiresPermission(l, meetingPermissionCallbacks)
                                     // Continue expected action after granted
                                     sharedModel.clickMic(true)
                                 }
