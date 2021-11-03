@@ -22,14 +22,22 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
+        android:layout_height="?attr/actionBarSize"
+        android:backgroundTint="@color/white_alpha_070_grey_alpha_070"
         android:elevation="0dp"
         android:fitsSystemWindows="true"
-        android:minHeight="?attr/actionBarSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/bg_bottom"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:background="@color/white_alpha_070_grey_alpha_070"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/txt_title"
@@ -42,8 +50,10 @@
         android:textAppearance="@style/TextAppearance.Mega.Body1.Variant2"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@id/txt_page_count"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/bg_bottom"
+        app:layout_constraintStart_toStartOf="@id/bg_bottom"
+        app:layout_constraintTop_toTopOf="@id/bg_bottom"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_goneMarginBottom="16dp"
         tools:text="IMG_20171123_17221.jpg" />
 
@@ -55,13 +65,11 @@
         android:layout_marginEnd="16dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:paddingBottom="16dp"
         android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87"
-        android:visibility="gone"
         app:layout_constrainedWidth="true"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:text="7 of 100"
-        tools:visibility="visible" />
+        app:layout_constraintBottom_toBottomOf="@id/bg_bottom"
+        app:layout_constraintEnd_toEndOf="@id/bg_bottom"
+        app:layout_constraintStart_toStartOf="@id/bg_bottom"
+        app:layout_constraintTop_toBottomOf="@id/txt_title"
+        tools:text="7 of 100" />
 </androidx.constraintlayout.motion.widget.MotionLayout>

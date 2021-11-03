@@ -36,6 +36,7 @@ object ViewUtils {
      * @param delayMillis   Time in millis to be delayed
      */
     @JvmStatic
+    @JvmOverloads
     fun View.showSoftKeyboardDelayed(delayMillis: Long = SHOW_IM_DELAY) {
         postDelayed({ showSoftKeyboard() }, delayMillis)
     }

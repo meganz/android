@@ -1381,6 +1381,10 @@ public class Util {
 		return String.format("#%06X", 0xFFFFFF & color);
 	}
 
+	/**
+	 * @deprecated Use {@link mega.privacy.android.app.utils.ViewUtils#showSoftKeyboardDelayed(View)} instead
+	 */
+	@Deprecated
     public static void showKeyboardDelayed(final View view) {
 		if (view == null) return;
 

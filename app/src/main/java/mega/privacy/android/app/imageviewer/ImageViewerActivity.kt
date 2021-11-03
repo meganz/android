@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
@@ -214,7 +215,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                     positionPair.first + 1,
                     positionPair.second
                 )
-                isInvisible = positionPair.second <= 1
+                isVisible = positionPair.second > 1
             }
 
             binding.viewPager.apply {
