@@ -33,6 +33,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.arch.BaseRxViewModel;
 import mega.privacy.android.app.di.MegaApi;
+import mega.privacy.android.app.fragments.homepage.photos.CardClickHandler;
 import mega.privacy.android.app.fragments.homepage.photos.DateCardsProvider;
 import mega.privacy.android.app.globalmanagement.SortOrderManagement;
 import mega.privacy.android.app.listeners.BaseListener;
@@ -537,35 +538,6 @@ class CuViewModel extends BaseRxViewModel {
     }
 
     /**
-     * Checks a clicked card, if it is in the provided list and if is in right position.
-     *
-     * @param position Clicked position in the list.
-     * @param handle   Identifier of the card node.
-     * @param cards    List of cards to check.
-     * @return The checked card if found, null otherwise.
-     */
-    private CUCard getClickedCard(int position, long handle, List<CUCard> cards) {
-        if (cards == null) {
-            return null;
-        }
-
-        CUCard card = cards.get(position);
-
-        if (handle != card.getNode().getHandle()) {
-            card = null;
-
-            for (CUCard c : cards) {
-                if (c.getNode().getHandle() == handle) {
-                    card = c;
-                    break;
-                }
-            }
-        }
-
-        return card;
-    }
-
-    /**
      * Checks and gets the clicked day card.
      *
      * @param position Clicked position in the list.
@@ -573,7 +545,7 @@ class CuViewModel extends BaseRxViewModel {
      * @return The checked day card.
      */
     public CUCard dayClicked(int position, CUCard card) {
-        return getClickedCard(position, card.getNode().getHandle(), getDayCards());
+        return CardClickHandler.INSTANCE.getClickedCard(position, card.getNode().getHandle(), getDayCards());
     }
 
     /**
@@ -585,44 +557,7 @@ class CuViewModel extends BaseRxViewModel {
      * the closest day to the current.
      */
     public int monthClicked(int position, CUCard card) {
-        CUCard monthCard = getClickedCard(position, card.getNode().getHandle(), getMonthCards());
-        if (monthCard == null) {
-            return 0;
-        }
-
-        List<CUCard> dayCards = getDayCards();
-        LocalDate cardLocalDate = monthCard.getLocalDate();
-        int cardMonth = cardLocalDate.getMonthValue();
-        int cardYear = cardLocalDate.getYear();
-        int currentDay = LocalDate.now().getDayOfMonth();
-        int dayPosition = 0;
-
-        for (int i = 0; i < dayCards.size(); i++) {
-            LocalDate nextLocalDate = dayCards.get(i).getLocalDate();
-            int nextDay = nextLocalDate.getDayOfMonth();
-            int nextMonth = nextLocalDate.getMonthValue();
-            int nextYear = nextLocalDate.getYear();
-
-            if (nextYear == cardYear && nextMonth == cardMonth) {
-                if (nextDay <= currentDay) {
-                    //Month of year clicked, current day. If not exists, the closest day behind the current.
-                    if (i == 0 || nextDay == currentDay
-                            || dayCards.get(i - 1).getLocalDate().getMonthValue() != cardMonth) {
-                        return i;
-                    }
-
-                    int previousDay = dayCards.get(i - 1).getLocalDate().getDayOfMonth();
-
-                    //The closest day to the current
-                    return previousDay - currentDay <= currentDay - nextDay ? i - 1 : i;
-                } else {
-                    //Save the closest day above the current in case there is no day of month behind the current.
-                    dayPosition = i;
-                }
-            }
-        }
-
-        return dayPosition;
+        return CardClickHandler.INSTANCE.monthClicked(position, card , getDayCards(), getMonthCards());
     }
 
     /**
@@ -634,35 +569,7 @@ class CuViewModel extends BaseRxViewModel {
      * the closest month to the current.
      */
     public int yearClicked(int position, CUCard card) {
-        CUCard yearCard = getClickedCard(position, card.getNode().getHandle(), getYearCards());
-        if (yearCard == null) {
-            return 0;
-        }
-
-        List<CUCard> monthCards = getMonthCards();
-        int cardYear = yearCard.getLocalDate().getYear();
-        int currentMonth = LocalDate.now().getMonthValue();
-
-        for (int i = 0; i < monthCards.size(); i++) {
-            LocalDate nextLocalDate = monthCards.get(i).getLocalDate();
-            int nextMonth = nextLocalDate.getMonthValue();
-
-            if (nextLocalDate.getYear() == cardYear && nextMonth <= currentMonth) {
-                //Year clicked, current month. If not exists, the closest month behind the current.
-                if (i == 0 || nextMonth == currentMonth
-                        || monthCards.get(i -1).getLocalDate().getYear() != cardYear) {
-                    return i;
-                }
-
-                long previousMonth = monthCards.get(i - 1).getLocalDate().getMonthValue();
-
-                //The closest month to the current
-                return previousMonth - currentMonth <= currentMonth - nextMonth ? i - 1 : i;
-            }
-        }
-
-        //No month equal or behind the current found, then return the latest month.
-        return monthCards.size() - 1;
+        return CardClickHandler.INSTANCE.yearClicked(position, card , getMonthCards(), getYearCards());
     }
 
     public void setZoom(int zoom) {
