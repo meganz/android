@@ -422,7 +422,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.setOrder(it.first)
+            viewModel.setOrder(it.third)
             adapter?.notifyItemChanged(0)
         })
 
