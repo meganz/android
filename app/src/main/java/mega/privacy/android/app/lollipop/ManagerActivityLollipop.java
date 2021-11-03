@@ -131,7 +131,6 @@ import mega.privacy.android.app.Product;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.GestureScaleListener;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
-import mega.privacy.android.app.fragments.homepage.photos.ImagesFragment;
 import mega.privacy.android.app.fragments.managerFragments.cu.PhotosFragment;
 import mega.privacy.android.app.gallery.fragment.newImages.Images1Fragment;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
@@ -3698,6 +3697,17 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
         aB.setTitle(title);
     }
 
+	/**
+	 * compatible with independent all the toolbar
+	 */
+	public void setToolbarVisibility(){
+    	if(mHomepageScreen == HomepageScreen.IMAGES){
+			toolbar.setVisibility(View.GONE);
+		}else{
+			toolbar.setVisibility(View.VISIBLE);
+		}
+	}
+
 	public void setToolbarTitle(){
 		logDebug("setToolbarTitle");
 		if(drawerItem==null){
@@ -5129,6 +5139,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
 		logDebug("onCreateOptionsMenuLollipop");
 		// Force update the toolbar title to make the the tile length to be updated
 		setToolbarTitle();
+		setToolbarVisibility();
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_manager, menu);
@@ -5600,15 +5611,15 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
     }
 
     public void updatePhotosFragmentOptionsMenu() {
-        if (zoomOutMenuItem == null || zoomInMenuItem == null) {
-            return;
-        }
-
-		Images1Fragment imagesFragment = getFragmentByType(Images1Fragment.class);
-        boolean shouldShow = imagesFragment.shouldShowZoomMenuItem();
-
-        zoomOutMenuItem.setVisible(shouldShow);
-        zoomInMenuItem.setVisible(shouldShow);
+//        if (zoomOutMenuItem == null || zoomInMenuItem == null) {
+//            return;
+//        }
+//
+//		Images1Fragment imagesFragment = getFragmentByType(Images1Fragment.class);
+//        boolean shouldShow = imagesFragment.shouldShowZoomMenuItem();
+//
+//        zoomOutMenuItem.setVisible(shouldShow);
+//        zoomInMenuItem.setVisible(shouldShow);
     }
 
 	private void setGridListIcon() {

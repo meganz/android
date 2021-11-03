@@ -52,7 +52,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
                 android:orientation="vertical"
-                app:visibleGone="@{viewModel.items.size() > (viewModel.searchMode ? Constants.MIN_ITEMS_SCROLLBAR : Constants.MIN_ITEMS_SCROLLBAR_GRID)}" />
+                app:visibleGone="@{viewModel.items.size() >  Constants.MIN_ITEMS_SCROLLBAR_GRID}" />
 
             <include
                 android:id="@+id/photos_view_type"
