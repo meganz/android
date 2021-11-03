@@ -368,7 +368,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_FIRST_LOGIN_CHAT + " BOOLEAN, "               															//28
                 + KEY_SMALL_GRID_CAMERA + " BOOLEAN,"               															//29
                 + KEY_AUTO_PLAY + " BOOLEAN,"                       															//30
-                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT DEFAULT '" + encrypt(String.valueOf(VIDEO_QUALITY_MEDIUM))+ "',"			//31
+                + KEY_UPLOAD_VIDEO_QUALITY + " TEXT DEFAULT '" + encrypt(String.valueOf(VIDEO_QUALITY_ORIGINAL))+ "',"			//31
                 + KEY_CONVERSION_ON_CHARGING + " BOOLEAN,"          															//32
                 + KEY_CHARGING_ON_SIZE + " TEXT,"                   															//33
                 + KEY_SHOULD_CLEAR_CAMSYNC_RECORDS + " TEXT,"       															//34
