@@ -13,7 +13,7 @@ class OfflineSortedByViewHolder(
     override fun bind(position: Int, node: OfflineNode) {
         binding.apply {
             this.orderNameStringId =
-                SortByHeaderViewModel.orderNameMap[sortByViewModel.order]!!
+                SortByHeaderViewModel.orderNameMap[sortByViewModel.order.first]!!
             this.sortByHeaderViewModel = sortByViewModel
         }
     }

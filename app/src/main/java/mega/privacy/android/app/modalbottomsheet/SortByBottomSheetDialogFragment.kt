@@ -183,7 +183,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         when (orderType) {
             ORDER_CLOUD -> {
                 sortOrderManagement.setOrderCloud(order)
-                LiveEventBus.get(EVENT_ORDER_CHANGE, Int::class.java).post(order)
+                LiveEventBus.get(EVENT_ORDER_CHANGE, Pair::class.java)
+                    .post(Pair(order, sortOrderManagement.getOrderOthers()))
 
                 if (requireActivity() is ManagerActivityLollipop) {
                     (requireActivity() as ManagerActivityLollipop).refreshCloudOrder(order)
@@ -200,7 +201,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
             ORDER_OTHERS -> {
                 sortOrderManagement.setOrderOthers(order)
-                LiveEventBus.get(EVENT_ORDER_CHANGE, Int::class.java).post(order)
+                LiveEventBus.get(EVENT_ORDER_CHANGE, Pair::class.java)
+                    .post(Pair(sortOrderManagement.getOrderCloud(), order))
 
                 if (requireActivity() is ManagerActivityLollipop) {
                     (requireActivity() as ManagerActivityLollipop).refreshOthersOrder()

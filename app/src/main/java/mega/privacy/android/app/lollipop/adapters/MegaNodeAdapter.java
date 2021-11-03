@@ -179,7 +179,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         private void bind(SortByHeaderViewModel sortByHeaderViewModel) {
             binding.setSortByHeaderViewModel(sortByHeaderViewModel);
             binding.setOrderNameStringId(sortByHeaderViewModel.getOrderMap()
-                    .get(sortByHeaderViewModel.getOrder()));
+                    .get(type == INCOMING_SHARES_ADAPTER
+                            && ((ManagerActivityLollipop) context).getDeepBrowserTreeIncoming() == 0
+                            ? sortByHeaderViewModel.getOrder().getSecond()
+                            : sortByHeaderViewModel.getOrder().getFirst()));
 
             binding.listModeSwitch.setVisibility(type == LINKS_ADAPTER
                     ? View.GONE

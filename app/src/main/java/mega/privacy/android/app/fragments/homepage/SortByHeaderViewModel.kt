@@ -19,7 +19,8 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    var order = ORDER_DEFAULT_ASC
+    // Pair<Int, Int>: First is order Cloud, second order Others (Incoming root)
+    var order = Pair(ORDER_DEFAULT_ASC, ORDER_DEFAULT_ASC)
         private set
     var isList = true
         private set
@@ -27,13 +28,13 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     private val _showDialogEvent = MutableLiveData<Event<Unit>>()
     val showDialogEvent: LiveData<Event<Unit>> = _showDialogEvent
 
-    private val _orderChangeEvent = MutableLiveData<Event<Int>>()
-    val orderChangeEvent: LiveData<Event<Int>> = _orderChangeEvent
+    private val _orderChangeEvent = MutableLiveData<Event<Pair<Int, Int>>>()
+    val orderChangeEvent: LiveData<Event<Pair<Int, Int>>> = _orderChangeEvent
 
     private val _listGridChangeEvent = MutableLiveData<Event<Boolean>>()
     val listGridChangeEvent: LiveData<Event<Boolean>> = _listGridChangeEvent
 
-    private val orderChangeObserver = Observer<Int> {
+    private val orderChangeObserver = Observer<Pair<Int, Int>> {
         order = it
         _orderChangeEvent.value = Event(it)
     }
@@ -45,8 +46,9 @@ class SortByHeaderViewModel @ViewModelInject constructor(
 
     init {
         // Use "sticky" to observe the value set in ManagerActivity onCreate()
-        LiveEventBus.get(EVENT_ORDER_CHANGE, Int::class.java)
-            .observeStickyForever(orderChangeObserver)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_ORDER_CHANGE)
+            .observeStickyForever(orderChangeObserver as Observer<Any>)
         LiveEventBus.get(
             EVENT_LIST_GRID_CHANGE,
             Boolean::class.java
@@ -64,8 +66,9 @@ class SortByHeaderViewModel @ViewModelInject constructor(
     }
 
     override fun onCleared() {
-        LiveEventBus.get(EVENT_ORDER_CHANGE, Int::class.java)
-            .removeObserver(orderChangeObserver)
+        @Suppress("UNCHECKED_CAST")
+        LiveEventBus.get(EVENT_ORDER_CHANGE)
+            .removeObserver(orderChangeObserver as Observer<Any>)
         LiveEventBus.get(
             EVENT_LIST_GRID_CHANGE,
             Boolean::class.java

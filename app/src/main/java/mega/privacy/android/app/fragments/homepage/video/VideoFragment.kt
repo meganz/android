@@ -343,7 +343,7 @@ class VideoFragment : Fragment(), HomepageSearchable {
         })
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.loadVideo(true, it)
+            viewModel.loadVideo(true, it.first)
         })
 
         sortByHeaderViewModel.listGridChangeEvent.observe(

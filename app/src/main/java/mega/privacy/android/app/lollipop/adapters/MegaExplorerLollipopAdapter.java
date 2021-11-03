@@ -147,7 +147,10 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
         private void bind(SortByHeaderViewModel sortByHeaderViewModel) {
             binding.setSortByHeaderViewModel(sortByHeaderViewModel);
             binding.setOrderNameStringId(sortByHeaderViewModel.getOrderMap()
-                    .get(sortByHeaderViewModel.getOrder()));
+                    .get(fragment instanceof IncomingSharesExplorerFragmentLollipop
+                            && parentHandle == -1
+                            ? sortByHeaderViewModel.getOrder().getSecond()
+                            : sortByHeaderViewModel.getOrder().getFirst()));
         }
     }
 	
