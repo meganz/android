@@ -67,40 +67,6 @@ public class IncomingCallNotification {
         notificationManager.createNotificationChannel(channel);
     }
 
-    @TargetApi(Build.VERSION_CODES.Q)
-    public static void toIncomingCall(Context context, MegaChatCall callToLaunch, MegaChatApiAndroid megaChatApi) {
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        createChannel(notificationManager);
-        @NoMeaning int i = 0;
-        PendingIntent pendingIntent = CallUtil.getPendingIntentMeetingRinging(context, callToLaunch.getChatid(), i);
-        NotificationCompat.Builder mBuilderCompat = new NotificationCompat.Builder(context, INCOMING_CALL_CHANNEL_ID);
-        mBuilderCompat
-                .setSmallIcon(R.drawable.ic_stat_notify)
-                .setContentText(context.getString(R.string.notification_subtitle_incoming))
-                .setAutoCancel(true)
-                .addAction(R.drawable.ic_phone_white, context.getString(R.string.notification_incoming_action), pendingIntent)
-                .setFullScreenIntent(pendingIntent, true)
-                .setOngoing(true)
-                .setContentIntent(pendingIntent)
-                .setColor(ContextCompat.getColor(context, R.color.red_600_red_300))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_CALL);
-
-        MegaChatRoom chat = megaChatApi.getChatRoom(callToLaunch.getChatid());
-        if (chat != null) {
-            mBuilderCompat.setContentTitle(getTitleChat(chat));
-        }
-
-        notificationManager.notify(INCOMING_CALL_NOTI_ID, mBuilderCompat.build());
-    }
-
-    public static void cancelIncomingCallNotification(Context context) {
-        NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        if (manager != null) {
-            manager.cancel(INCOMING_CALL_NOTI_ID);
-        }
-    }
-
     public static boolean shouldNotify(Context context) {
         return isAndroid10() && !Settings.canDrawOverlays(context);
     }
