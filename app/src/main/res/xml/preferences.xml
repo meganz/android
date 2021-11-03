@@ -66,6 +66,33 @@
 	</androidx.preference.PreferenceCategory>
 
 	<androidx.preference.PreferenceCategory
+		android:key="settings_ui"
+		android:title="@string/user_interface_setting"
+		app:allowDividerAbove="false"
+		app:allowDividerBelow="false">
+
+		<Preference
+			android:defaultValue="default"
+			android:key="settings_start_screen"
+			android:title="@string/start_screen_setting"
+			android:summary="@string/home_section"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false"
+			app:useSimpleSummaryProvider="true" />
+
+		<androidx.preference.SwitchPreferenceCompat
+			android:defaultValue="false"
+			android:key="settings_hide_recent_activity"
+			android:summary="@string/hide_recent_setting_context"
+			android:title="@string/hide_recent_setting"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false" />
+
+	</androidx.preference.PreferenceCategory>
+
+	<androidx.preference.PreferenceCategory
 		android:key="settings_media"
 		android:title="@string/settings_media"
 		app:allowDividerAbove="false"

@@ -8,8 +8,6 @@
     <string name="prolite_account">Pro Lite</string>
     <!-- Name of the MEGA PDF Viewer. Keep uppercase. -->
     <string name="pdf_app_name">MEGA PDF 查看器</string>
-    <!-- Showing progress of elements. Example: 2 of 10. -->
-    <string name="general_x_of_x">的</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_yes">是</string>
     <!-- Answer for confirmation dialog. -->
@@ -625,7 +623,7 @@
     <!-- upload to. Then choose an Image file -->
     <string name="upload_to_image">图片</string>
     <!-- upload to. Then choose an Audio file -->
-    <string name="upload_to_audio">语音</string>
+    <string name="upload_to_audio">音乐</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="upload_to_video">视频</string>
     <!-- upload to. Then choose to browse the file system to choose a file -->
@@ -2226,10 +2224,12 @@
     <string name="settings_video_upload_quality">视频画质</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">相机上传需要访问您设备上的照片和其他媒体内容。请转至设置页面开启权限。</string>
-    <!-- the options for the option on setting to set up the quality of multimedia files uploaded to the chat, the options of medium quality multimedia file to  upload. -->
+    <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
     <string-array name="settings_chat_upload_quality_entries">
-        <item>原始画质</item>
-        <item>中等画质</item>
+        <item>低</item>
+        <item>中</item>
+        <item>高</item>
+        <item>原版的</item>
     </string-array>
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">未接来电</string>
@@ -3376,7 +3376,7 @@
     <!-- Text informing user that their account has been suspended -->
     <string name="account_temporarily_suspended">为了确保安全，您的帐户已被暂时锁定。</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
-    <string name="verify_email_and_follow_steps">[A]请验证您的电子邮箱[/A]并按照MEGA邮件中的步骤解锁您的帐户。</string>
+    <string name="verify_email_and_follow_steps">请按照[A]验证电子邮件[/A]中的步骤解锁您的帐户。</string>
     <!-- Question which takes the user to a help screen -->
     <string name="why_am_i_seeing_this">为什么我的帐户被停用？</string>
     <!-- Label of a button which action is resend an email -->
@@ -3542,7 +3542,7 @@
     <!-- Text that indicates that there’s no document to show -->
     <string name="homepage_empty_hint_documents">无文档</string>
     <!-- Text that indicates that there’s no audio to show -->
-    <string name="homepage_empty_hint_audio">无语音文件</string>
+    <string name="homepage_empty_hint_audio">无音频文件</string>
     <!-- Text that indicates that there’s no video to show -->
     <string name="homepage_empty_hint_video">无视频</string>
     <!-- Title of the screen to attach GIFs -->
@@ -3634,7 +3634,7 @@
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
     <string name="title_select_transfers">选择传输</string>
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
-    <string name="change_of_transfer_priority_failed">传输”%1$s”的优先级更改失败。</string>
+    <string name="change_of_transfer_priority_failed">无法更改传输“%1$s”的先后顺序</string>
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">单独发送解密密钥</string>
     <!-- Explanation option to send separated the link and decryption key -->

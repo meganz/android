@@ -8,7 +8,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingParticipantBinding
 import mega.privacy.android.app.lollipop.controllers.ChatController
@@ -23,7 +22,6 @@ import nz.mega.sdk.*
 /**
  * The fragment shows options for different roles when click the three dots
  */
-@ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private val bottomViewModel: MeetingParticipantBottomSheetDialogViewModel by viewModels()
@@ -182,7 +180,6 @@ class MeetingParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragmen
      *
      * @param participant the target participant
      */
-    @ExperimentalCoroutinesApi
     private fun initAvatar(participant: Participant) {
         binding.avatar.setImageBitmap(inMeetingViewModel.getAvatarBitmapByPeerId(participant.peerId))
     }

@@ -74,6 +74,6 @@
     <string name="payment_egeneric_api_error_unknown">알 수 없는 오류</string>
     <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
     <string name="api_error_http">HTTP 오류</string>
-    <!-- Label to show that an error related with a circular upload procedures occurs recursivity during a SDK operation -->
+    <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
     <string name="api_ecircular_ec_upload">재귀적 디렉토리 구조로 인하여 전송을 실패하였습니다</string>
 </resources>
