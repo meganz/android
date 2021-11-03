@@ -1530,14 +1530,14 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
                 }
             }
 
-//            if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES) {
-//                ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
-//                imagesFragment.refreshSelf();
-//
-//                if (needReload) {
-//                    imagesFragment.loadPhotos();
-//                }
-//            }
+            if (drawerItem == DrawerItem.HOMEPAGE && mHomepageScreen == HomepageScreen.IMAGES) {
+                ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
+                imagesFragment.refreshSelf();
+
+                if (needReload) {
+                    imagesFragment.loadPhotos();
+                }
+            }
         });
 
         dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -5604,7 +5604,7 @@ public class ManagerActivityLollipop extends TransfersManagementActivity
             return;
         }
 
-		Images1Fragment imagesFragment = getFragmentByType(Images1Fragment.class);
+        ImagesFragment imagesFragment = getFragmentByType(ImagesFragment.class);
         boolean shouldShow = imagesFragment.shouldShowZoomMenuItem();
 
         zoomOutMenuItem.setVisible(shouldShow);
