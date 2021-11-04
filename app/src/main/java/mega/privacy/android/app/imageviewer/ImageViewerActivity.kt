@@ -56,6 +56,15 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
 
         @JvmStatic
+        fun getIntentForSingleNode(
+            context: Context,
+            nodeFileLink: String
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(EXTRA_LINK, nodeFileLink)
+            }
+
+        @JvmStatic
         fun getIntentForSingleOfflineNode(
             context: Context,
             nodeHandle: Long
@@ -105,6 +114,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     private val nodeHandle: Long? by extra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
     private val nodeOfflineHandle: Long? by extra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE)
     private val parentNodeHandle: Long? by extra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE)
+    private val nodeFileLink: String? by extra(EXTRA_LINK)
     private val childrenHandles: LongArray? by extra(NODE_HANDLES)
     private val childrenOfflineHandles: LongArray? by extra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
     private val childOrder: Int? by extra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN)
@@ -207,6 +217,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 viewModel.retrieveSingleOfflineImage(nodeOfflineHandle!!)
             nodeHandle != null && nodeHandle != INVALID_HANDLE ->
                 viewModel.retrieveSingleImage(nodeHandle!!)
+            !nodeFileLink.isNullOrBlank() ->
+                viewModel.retrieveSingleImage(nodeFileLink!!)
             else ->
                 error("Invalid params")
         }

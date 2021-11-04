@@ -10,18 +10,22 @@ import mega.privacy.android.app.DatabaseHandler
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.di.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.ErrorUtils.toThrowable
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
 import mega.privacy.android.app.utils.MegaNodeUtil.isVideo
 import mega.privacy.android.app.utils.OfflineUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNode.CHANGE_TYPE_NEW
 import nz.mega.sdk.MegaNode.CHANGE_TYPE_PARENT
 import nz.mega.sdk.MegaNode.CHANGE_TYPE_REMOVED
+import nz.mega.sdk.MegaRequest
 import javax.inject.Inject
 
 class GetImageHandlesUseCase @Inject constructor(
@@ -34,6 +38,7 @@ class GetImageHandlesUseCase @Inject constructor(
     fun get(
         nodeHandles: LongArray? = null,
         parentNodeHandle: Long? = null,
+        nodeFileLink: String? = null,
         sortOrder: Int? = ORDER_PHOTO_ASC,
         isOffline: Boolean = false
     ): Flowable<List<ImageItem>> =
@@ -55,12 +60,39 @@ class GetImageHandlesUseCase @Inject constructor(
                 nodeHandles != null && nodeHandles.isNotEmpty() -> {
                     items.addNodeHandles(nodeHandles)
                 }
+                !nodeFileLink.isNullOrBlank() -> {
+                    megaApi.getPublicNode(nodeFileLink, OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { request, error ->
+                            if (emitter.isCancelled) return@OptionalMegaRequestListenerInterface
+
+                            if (error.errorCode == MegaError.API_OK) {
+                                if (!request.flag) {
+                                    val publicNode = request.publicNode
+                                    if (publicNode?.isValidForImageViewer() == true) {
+                                        items.add(publicNode.toImageItem())
+                                    }
+                                    emitter.onNext(items)
+                                } else {
+                                    emitter.onError(IllegalStateException("Invalid key for public node"))
+                                }
+                            } else {
+                                emitter.onError(error.toThrowable())
+                            }
+                        }
+                    ))
+                }
                 else -> {
                     emitter.onError(IllegalArgumentException("Invalid parameters"))
                     return@create
                 }
             }
-            emitter.onNext(items)
+            if (nodeFileLink.isNullOrBlank()) {
+                emitter.onNext(items)
+                if (items.isEmpty()) {
+                    emitter.onError(IllegalStateException("Invalid image handles"))
+                    return@create
+                }
+            }
 
             val globalSubscription = getGlobalChangesUseCase.get().subscribeBy(
                 onNext = { change ->

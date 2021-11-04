@@ -63,6 +63,11 @@ class ImageViewerViewModel @ViewModelInject constructor(
             .subscribeAndUpdateImages()
     }
 
+    fun retrieveSingleImage(nodeFileLink: String) {
+        getImageHandlesUseCase.get(nodeFileLink = nodeFileLink)
+            .subscribeAndUpdateImages()
+    }
+
     fun retrieveSingleOfflineImage(nodeHandle: Long) {
         getImageHandlesUseCase.get(nodeHandles = longArrayOf(nodeHandle), isOffline = true)
             .subscribeAndUpdateImages()

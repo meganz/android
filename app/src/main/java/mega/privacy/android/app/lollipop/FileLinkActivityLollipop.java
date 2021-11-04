@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -713,7 +714,7 @@ public class FileLinkActivityLollipop extends TransfersManagementActivity implem
 		logDebug("showFile");
 		String serializeString = document.serialize();
 		if(MimeTypeList.typeForName(document.getName()).isImage()){
-			Intent intent = ImageViewerActivity.getIntentForSingleNode(this, document.getHandle());
+			Intent intent = ImageViewerActivity.getIntentForSingleNode(this, url);
 			startActivity(intent);
 		}else if (MimeTypeList.typeForName(document.getName()).isVideoReproducible() || MimeTypeList.typeForName(document.getName()).isAudio() ){
 			logDebug("Is video");
