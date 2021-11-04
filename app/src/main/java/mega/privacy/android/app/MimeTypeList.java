@@ -236,9 +236,8 @@ public class MimeTypeList {
 	}
 
 	public boolean isAudioNotSupported() {
-		return extension.equals("wma") || extension.equals("aif")
-				|| extension.equals("aiff") || extension.equals("iff") || extension.equals("oga")|| extension.equals("opus")
-				|| extension.equals("3ga");
+		return extension.equals("wma") || extension.equals("aif") || extension.equals("aiff")
+				|| extension.equals("iff") || extension.equals("oga") || extension.equals("3ga");
 	}
 
 	/*

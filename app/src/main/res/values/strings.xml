@@ -4200,4 +4200,8 @@
     <string name="show_activity_action">Show activity</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]Recents[/B] activity hidden</string>
+    <!-- Alert informing the user can choose the video quality for Camera Uploads Videos -->
+    <string name="video_quality_info">You can save space by decreasing the video quality in Camera Uploads settings.</string>
+    <!-- Label indicating video original quality -->
+    <string name="original_quality">Original quality</string>
 </resources>
